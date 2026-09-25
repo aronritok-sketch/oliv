@@ -1,0 +1,319 @@
+{
+    "pages": {
+        "home": {
+            "title": "Home",
+            "excerpt": "",
+            "content": "<h2>Dynamic yet gentle — just enough of everything<\/h2>\n<p>I'm Olivia, a hatha flow teacher trained in Budapest and now teaching in Fort Myers. My classes won't ask you to stand on your hands. They'll ask you to breathe, to notice, and to move with a little more ease than you walked in with.<\/p>\n<p>Every class weaves together breathwork, strength, stretching, balance, a real flow state and an unhurried relaxation at the end. Complete beginners are welcome, and people who have practiced for years still find a challenge.<\/p>\n<p>Most of my students aren't chasing the perfect pose. They come between work, kids, grandkids, golf and gardening — and leave saying things like “I needed that,” “I've finally landed” or “I'm going to sleep so well tonight.” That's the whole point.<\/p>"
+        },
+        "about": {
+            "title": "About Olivia",
+            "excerpt": "Hatha flow teacher, trained in Budapest, teaching in Fort Myers — and a firm believer that nobody on the next mat is watching you.",
+            "seo_title": "About Olivia Kovács | Hatha Yoga Teacher in Fort Myers, FL",
+            "seo_desc": "Meet Olivia Kovács: certified hatha yoga teacher (2023, Samadhi Yoga Studio, Budapest) teaching hatha flow, slow flow and private yoga in Fort Myers, FL.",
+            "content": "<h2>Yoga found me as exercise. It stayed because it taught me to be here, now.<\/h2>\n<p>I came to yoga the way most people do: looking for a good way to move. What I found was a tool for getting to know myself — one that slowly brought up a kind of confidence and self-kindness I hadn't known I was missing. That is what I want to pass on in every class.<\/p>\n<p>If you look at yoga only as a workout, the extra spice is that it's never just about strength. Even the toughest class holds observation, silence and permission. And strength without permission always runs out.<\/p>\n\n<h2>Training and teaching<\/h2>\n<p>I earned my hatha yoga teacher certification, recognized by Yoga Alliance International, in 2023 at Samadhi Yoga Studio in Budapest, Hungary, in Ádám Diószegi's teacher training.<\/p>\n<p>In Budapest I taught weekly group classes in three districts — at the Buda Perinatal Center, the Prána Yoga Center and Korall Sportsziget — alongside online classes, outdoor yoga, live-music flows with handpan and tongue drum, sound yoga with guided meditation, and hatha flow and meditation sessions at the MANAS Festival. I also teach office yoga and team-building classes for companies, and mobility sessions for athletes.<\/p>\n<p>Now I'm bringing the same practice to Fort Myers and Southwest Florida — to group classes, to lanais and clubhouses, and to the beach at sunrise.<\/p>\n\n<h2>How I teach<\/h2>\n<p>Dynamic, yet gentle. I build every class so a beginner can follow and someone who has practiced for years still enjoys it. I love the flow state — for me it's the most beautiful part of yoga — and sometimes I hold strengthening poses a little longer so everyone's attention can arrive.<\/p>\n<p>You may meet a challenge in my classes, but nothing is compulsory. Nobody will look at you because you're not flexible, or because you're not yet where the person on the next mat is — or the teacher, or whoever you saw in a beautiful photo.<\/p>\n<blockquote><p>Awareness: I notice, I see, I observe, I allow — then I respond. Control: I want to steer it, grip it, regulate it, push it down. That is the most important difference yoga has taught me so far.<\/p><\/blockquote>\n<p>I'm proud that so many of my students come back week after week — people who resonate with this way of practicing and who are open to yoga as a whole, not just as a set of poses.<\/p>\n\n<h2>What yoga changed for me<\/h2>\n<p>From my own experience, and from what students have shared with me, regular practice can help loosen patterns like these:<\/p>\n<ul>\n<li>a constant need to meet everyone's expectations, including your own<\/li>\n<li>overthinking, and a mind that won't switch off at night<\/li>\n<li>anxiety that plays the worst-case scenario on repeat<\/li>\n<li>“stress addiction” — feeling useless unless you're busy<\/li>\n<li>feeling empty or restless in your own company<\/li>\n<li>losing touch with the world, burnout, the hamster wheel<\/li>\n<li>fear of feeling your own emotions, or of trying something new<\/li>\n<li>low self-confidence<\/li>\n<\/ul>\n<p>Yoga isn't therapy and I'm not a doctor. But I've watched it give people room to breathe around all of these — myself included.<\/p>\n<p>[oy_booking_link label=\"Practice with me\"]<\/p>"
+        },
+        "classes": {
+            "title": "Yoga Classes",
+            "excerpt": "Hatha flow, slow flow, private yoga, sound and live-music classes and yoga for teams — in Fort Myers and online.",
+            "seo_title": "Yoga Classes in Fort Myers, FL | Hatha Flow, Slow Flow & Private",
+            "seo_desc": "Find the right yoga class in Fort Myers: dynamic hatha flow, gentle slow flow, private one-on-one yoga, sound yoga events, office yoga and yoga for athletes.",
+            "content": "<p>Every class I teach includes breathwork, strengthening, stretching, balance, a flow state and a proper relaxation at the end. What changes is the pace — and where the emphasis sits.<\/p>\n[oy_classes]\n<h2>Which class should I choose?<\/h2>\n<p><strong>New to yoga, or coming back after a break?<\/strong> Start with <a href=\"{{class:slow-flow}}\">Slow Flow<\/a>, or book a <a href=\"{{page:private-yoga}}\">private session<\/a> to learn the foundations one-on-one.<\/p>\n<p><strong>Already active — running, lifting, tennis, pickleball, paddleboarding?<\/strong> <a href=\"{{class:hatha-flow}}\">Hatha Flow<\/a> will challenge you and give you back mobility.<\/p>\n<p><strong>Want a class designed only for you?<\/strong> That's <a href=\"{{page:private-yoga}}\">private yoga<\/a> — at your home, on your lanai or on the beach.<\/p>\n<p><strong>Looking for something for your team?<\/strong> See <a href=\"{{page:corporate-yoga}}\">corporate and athlete yoga<\/a>.<\/p>\n<p>[oy_booking_link]<\/p>"
+        },
+        "private-yoga": {
+            "title": "Private Yoga in Fort Myers",
+            "excerpt": "One-on-one yoga at your home, lanai, condo clubhouse, on the beach or online — planned around your body and your goals.",
+            "seo_title": "Private Yoga in Fort Myers, FL | In-Home & Beach Sessions",
+            "seo_desc": "Private one-on-one yoga in Fort Myers at your home, lanai, clubhouse or on the beach. Tailored hatha yoga for beginners, stiff backs and busy schedules.",
+            "content": "<h2>A class that fits exactly one person<\/h2>\n<p>In a group class I teach to the room. In a private session I teach to you: your shoulders after years at a desk, the knee you're careful with, the golf swing you'd like back, the sleep you'd like to find. We work at your pace, and every session builds on the last.<\/p>\n\n<h2>Who private yoga is for<\/h2>\n<ul>\n<li>Complete beginners who want to learn the foundations safely before joining a group<\/li>\n<li>Anyone who prefers to practice without an audience<\/li>\n<li>People working around stiffness, old injuries or limited mobility — with their doctor's OK<\/li>\n<li>Couples, friends and families who want to practice together<\/li>\n<li>Busy people who'd rather yoga came to them<\/li>\n<li>Visitors and seasonal residents who want a sunrise session during their stay<\/li>\n<\/ul>\n\n<h2>Where we can practice<\/h2>\n<p><strong>At home or on your lanai.<\/strong> All we need is a quiet spot the size of a yoga mat — or two, if you'd like to practice with a partner. I can bring mats and props.<\/p>\n<p><strong>On the beach.<\/strong> Sunrise and sunset sessions on the sand around Fort Myers Beach, Sanibel, Bonita Beach or your local stretch of the Gulf. In the summer months, early mornings are cooler and calmer.<\/p>\n<p><strong>In your condo or HOA clubhouse.<\/strong> A private group class for your community, one-off or weekly.<\/p>\n<p><strong>Online.<\/strong> Live, one-on-one video sessions — useful when you travel, or between in-person classes.<\/p>\n\n<h2>How it works<\/h2>\n<ol>\n<li><strong>Send a message<\/strong> with your area and the days that suit you.<\/li>\n<li><strong>We talk for 15 minutes<\/strong> about how you move, any injuries or conditions, and what you'd like to feel after a class.<\/li>\n<li><strong>Your first session.<\/strong> I bring a plan and adjust it as we go. You'll leave with one or two simple practices to do on your own.<\/li>\n<li><strong>Keep going<\/strong> with single sessions or a 5-session pack — weekly, or whenever it suits you.<\/li>\n<\/ol>\n\n<h2>Sessions and prices<\/h2>\n<p>Private sessions are 60, 75 or 90 minutes. You'll find current rates on the <a href=\"{{page:schedule-pricing}}\">schedule and pricing page<\/a>.<\/p>\n<p>[oy_private_link]<\/p>\n<p>Private yoga also makes a lovely present — ask about a <a href=\"{{page:schedule-pricing}}#gift-cards\">gift card<\/a>.<\/p>"
+        },
+        "schedule-pricing": {
+            "title": "Schedule & Pricing",
+            "excerpt": "Weekly group yoga classes in Fort Myers, private session rates, class passes and gift cards.",
+            "seo_title": "Yoga Schedule & Prices in Fort Myers, FL | Olivia Kovács",
+            "seo_desc": "Weekly hatha flow and slow flow class times in Fort Myers, drop-in and class pass prices, private yoga rates and yoga gift cards.",
+            "content": "<h2>Weekly group classes<\/h2>\n[oy_schedule]\n<p>Please book ahead so I can plan the room. Beginners are welcome in every class.<\/p>\n\n<h2>Prices<\/h2>\n[oy_pricing]\n\n<h2 id=\"gift-cards\">Gift cards<\/h2>\n<p>Give a single class or a 5-class pass. After buying, send me the recipient's name, the email address they'd like to use for booking, and which class they'd enjoy. I'll make out the gift card in their name — you can forward it or print it, or if we meet in person, I'm happy to print it for you.<\/p>\n<p>[oy_gift_link]<\/p>\n\n<h2>Good to know<\/h2>\n<p><strong>What to bring:<\/strong> comfortable clothes, water, and your own mat if you have a favorite. If you need to borrow one, mention it when you book. We practice barefoot.<\/p>\n<p><strong>New to yoga?<\/strong> Read <a href=\"{{page:faq}}\">the most common questions<\/a> or <a href=\"{{page:contact}}\">send me a message<\/a> before your first class.<\/p>"
+        },
+        "corporate-yoga": {
+            "title": "Corporate & Athlete Yoga",
+            "excerpt": "Office yoga, team-building sessions, lunchtime classes and yoga for athletes and sports teams across Southwest Florida.",
+            "seo_title": "Corporate Yoga & Office Yoga in Fort Myers | Team Building",
+            "seo_desc": "On-site office yoga, team-building yoga and lunchtime classes for companies in Fort Myers and Southwest Florida — plus mobility yoga for athletes and sports teams.",
+            "content": "<h2>Office yoga and team building<\/h2>\n<p>If you'd like to improve your team's focus, stress management and mental resilience — or you're simply a group of people who love yoga — let's plan something memorable together. A one-off team-building session, a weekly class alongside lunch, or short desk-friendly resets built into the working day.<\/p>\n<h3>Formats<\/h3>\n<ul>\n<li><strong>Team-building session:<\/strong> 60–90 minutes, any fitness level, on-site or outdoors.<\/li>\n<li><strong>Weekly lunchtime class:<\/strong> 45–60 minutes, in a meeting room or on the lawn.<\/li>\n<li><strong>Chair and desk yoga:<\/strong> 20–30 minute resets for neck, shoulders and back. No mats, no changing clothes.<\/li>\n<li><strong>Retreats and offsites:<\/strong> sunrise flows or evening wind-downs for your event.<\/li>\n<\/ul>\n<h3>What teams usually notice<\/h3>\n<p>Less stiffness from long hours at a screen, easier breathing under pressure, and a shared calm that carries into meetings. And it's simply a good hour spent together.<\/p>\n\n<h2>Yoga for athletes and sports teams<\/h2>\n<p>If you'd like to improve your team's or your athletes' mobility, concentration, stress management, breathing and endurance, let's add yoga to training — with a strength, mobility or recovery focus — so everyone can bring 100% to the match, the race or the competition.<\/p>\n<ul>\n<li>Mobility sessions for hips, shoulders and spine<\/li>\n<li>Breathing practice for focus and faster recovery<\/li>\n<li>Recovery classes after heavy training blocks<\/li>\n<li>Pre-season and in-season programs<\/li>\n<\/ul>\n\n<h2>Get a proposal<\/h2>\n<p>Tell me your team size, your location and what you'd like to achieve, and I'll send you a proposal with pricing.<\/p>\n<p>[oy_button url=\"{{contact:corporate}}\" label=\"Request a proposal\"]<\/p>"
+        },
+        "events": {
+            "title": "Yoga Events",
+            "excerpt": "Sound yoga, live-music flows with handpan and tongue drum, beach flows and seasonal specials in and around Fort Myers.",
+            "seo_title": "Yoga Events in Fort Myers | Sound Yoga, Live Music & Beach Yoga",
+            "seo_desc": "Upcoming yoga events in Fort Myers: sound yoga with guided meditation, live handpan music yoga, sunrise beach flows and seasonal specials.",
+            "content": "<p>A few times a season, the class becomes an occasion. These are some of my favorite formats:<\/p>\n<ul>\n<li><strong>Live-music slow flow:<\/strong> handpan and tongue drum played live while we move.<\/li>\n<li><strong>Sound yoga and guided meditation:<\/strong> singing bowls and sound lead the movement, followed by a long guided rest.<\/li>\n<li><strong>Sunrise and sunset beach flows:<\/strong> light, playful practice on the sand.<\/li>\n<li><strong>Seasonal specials:<\/strong> a New Year reset, a summer opener, a full-moon slow flow.<\/li>\n<\/ul>\n<h2>Upcoming events<\/h2>\n[oy_events]"
+        },
+        "faq": {
+            "title": "Yoga FAQ",
+            "excerpt": "Answers to the most common questions about classes, private yoga, beginners, payment and what to bring.",
+            "seo_title": "Yoga FAQ | Beginner Questions Answered | Fort Myers Yoga",
+            "seo_desc": "Am I flexible enough for yoga? Which class for beginners? What to bring? Answers to common questions about yoga classes and private yoga in Fort Myers.",
+            "content": "[oy_faq]\n<p>Can't find your question? <a href=\"{{page:contact}}\">Send me a message<\/a> — I'm happy to help you choose.<\/p>"
+        },
+        "contact": {
+            "title": "Contact & Booking",
+            "excerpt": "Book a class, ask about private yoga or corporate sessions, or just send a question.",
+            "seo_title": "Contact & Book Yoga in Fort Myers | Olivia Kovács Yoga",
+            "seo_desc": "Book a yoga class or a private session in Fort Myers, FL, or ask about corporate yoga. Send Olivia a message and get a personal reply.",
+            "content": "<p>Whether you'd like to book your first class, plan a private session on your lanai, or bring yoga to your team — write a few lines and I'll get back to you as soon as I can.<\/p>\n[oy_contact_form]\n<h2>Where I teach<\/h2>\n<p>Group classes in Fort Myers, and private sessions at homes, clubhouses, offices and beaches across Southwest Florida, including:<\/p>\n[oy_areas]"
+        },
+        "journal": {
+            "title": "Journal",
+            "excerpt": "Notes on practice, private yoga and life on the mat in Fort Myers.",
+            "seo_title": "Yoga Journal | Tips & Articles from Fort Myers",
+            "seo_desc": "Yoga articles from Fort Myers: private yoga, hatha flow vs slow flow, sunrise beach yoga and simple practices for everyday life.",
+            "content": ""
+        }
+    },
+    "classes": {
+        "hatha-flow": {
+            "title": "Hatha Flow",
+            "excerpt": "The stronger, more dynamic side of my teaching: breath-led sequences, held strength poses, balance work and a flow you can lose yourself in.",
+            "duration": "60 min",
+            "level": "All levels with some movement background",
+            "intensity": "3",
+            "seo_title": "Hatha Flow Yoga Class in Fort Myers | Dynamic Yoga",
+            "content": "<h2>What happens in a Hatha Flow class<\/h2>\n<p>We begin by arriving — a few minutes of breath to leave the day at the door. Then we build heat: sun salutations, standing sequences, strength work for the deep muscles of the core, back and legs, and balance poses that ask for focus. Some poses flow with the breath; some we hold a little longer so everyone's attention can land.<\/p>\n<p>The last part of class slows down: stretching, a few moments of stillness and a long relaxation.<\/p>\n<h2>Who it's for<\/h2>\n<p>Hatha Flow is the stronger, more dynamic class. It suits you if movement is already part of your life in some way — walking, the gym, tennis, pickleball, golf, paddleboarding — and you're comfortable getting down to the floor and back up. You don't need to be flexible.<\/p>\n<h2>What you'll take home<\/h2>\n<ul>\n<li>Strength in the deep core and back muscles that support good posture<\/li>\n<li>More freedom in your hips, shoulders and spine<\/li>\n<li>Steadier balance and focus<\/li>\n<li>A breath you can use when the day gets loud<\/li>\n<\/ul>"
+        },
+        "slow-flow": {
+            "title": "Slow Flow",
+            "excerpt": "Slower and more observant. We still flow, but with time to feel each shape — ideal after a long day and for beginners.",
+            "duration": "75–90 min",
+            "level": "Beginners welcome",
+            "intensity": "1",
+            "seo_title": "Slow Flow Yoga in Fort Myers | Gentle Yoga for Beginners",
+            "content": "<h2>A slower class with more room to notice<\/h2>\n<p>Slow Flow still moves — the flow experience matters to me in every class — but the pace leaves space to feel each shape, to notice where you're holding on, and to let go a little. There's more time on the floor, more stretching and a longer relaxation.<\/p>\n<h2>Who it's for<\/h2>\n<p>Complete beginners, anyone returning after a break, people who sit a lot, and anyone who ends the day both wired and tired. Experienced practitioners love it too, as a counterweight to stronger training.<\/p>\n<h2>What to expect<\/h2>\n<ul>\n<li>Gentle breathwork to arrive<\/li>\n<li>Mobility for the spine, hips and shoulders<\/li>\n<li>Slow, mindful standing and balance work<\/li>\n<li>Longer-held floor stretches<\/li>\n<li>A guided relaxation to close<\/li>\n<\/ul>"
+        },
+        "private-yoga": {
+            "title": "Private Yoga",
+            "excerpt": "One-on-one or small-group yoga at your home, lanai, clubhouse, on the beach or online — planned for your body and your goals.",
+            "duration": "60, 75 or 90 min",
+            "level": "Tailored to you",
+            "intensity": "2",
+            "private": "1",
+            "link": "{{page:private-yoga}}",
+            "noindex": "1",
+            "content": "<p>A private session is yoga built around one body: yours. We start with a short conversation about how you move and what you'd like to feel, then I plan the class for exactly that. Read <a href=\"{{page:private-yoga}}\">how private yoga works<\/a>.<\/p>"
+        },
+        "sound-yoga": {
+            "title": "Sound & Live-Music Yoga",
+            "excerpt": "Special slow flows where handpan, tongue drum or singing bowls lead the movement, followed by a guided meditation.",
+            "duration": "90–120 min",
+            "level": "All levels",
+            "intensity": "1",
+            "seo_title": "Sound Yoga & Live Music Yoga in Fort Myers",
+            "content": "<p>Some evenings the playlist stays off. Instead, handpan and tongue drum are played live, or singing bowls set the rhythm — and the movement follows the sound. These slow flows have lightness and playfulness at their heart, and end with a guided meditation and a long rest.<\/p>\n<h2>Good to know<\/h2>\n<ul>\n<li>Suitable for complete beginners<\/li>\n<li>Places are limited, so booking ahead is essential<\/li>\n<li>Bring a blanket or a warm layer for the final rest<\/li>\n<\/ul>\n<p>Sound and live-music classes are announced as <a href=\"{{page:events}}\">events<\/a>.<\/p>"
+        },
+        "office-yoga": {
+            "title": "Office & Team Yoga",
+            "excerpt": "Team-building sessions, lunchtime classes and desk-friendly resets for workplaces across Southwest Florida.",
+            "duration": "20–90 min",
+            "level": "Any fitness level",
+            "intensity": "1",
+            "link": "{{page:corporate-yoga}}",
+            "noindex": "1",
+            "content": "<p>Yoga that fits into the working day. See the formats and request a proposal on the <a href=\"{{page:corporate-yoga}}\">corporate yoga page<\/a>.<\/p>"
+        },
+        "yoga-for-athletes": {
+            "title": "Yoga for Athletes",
+            "excerpt": "Mobility, breathing and focus work for sports teams and athletes — with a strength, mobility or recovery focus.",
+            "duration": "60 min",
+            "level": "Athletes and active people",
+            "intensity": "3",
+            "seo_title": "Yoga for Athletes in Fort Myers | Mobility & Recovery",
+            "content": "<p>Strength without mobility gets injured; focus without breath gets rushed. These sessions add what most training plans leave out: mobility through the hips, shoulders and spine, breathing that steadies you under pressure, and recovery that actually lets the body rebuild.<\/p>\n<h2>Session types<\/h2>\n<ul>\n<li><strong>Strength-focused:<\/strong> long holds and controlled transitions that build stability.<\/li>\n<li><strong>Mobility-focused:<\/strong> joint-by-joint range of motion work.<\/li>\n<li><strong>Recovery-focused:<\/strong> slow, supported stretching and down-regulating breathwork.<\/li>\n<\/ul>\n<p>For teams, clubs and individual athletes. <a href=\"{{contact:athletes}}\">Ask for a plan<\/a> for your season.<\/p>"
+        },
+        "online-yoga": {
+            "title": "Online Yoga",
+            "excerpt": "Join selected group classes live from home — same booking, same attention to detail.",
+            "duration": "60 min",
+            "level": "All levels",
+            "intensity": "2",
+            "seo_title": "Live Online Yoga Classes with Olivia Kovács",
+            "content": "<p>Can't make it in person — travelling, sheltering from a summer storm, or just not leaving the house tonight? Selected group classes can be joined live online using the same booking.<\/p>\n<h2>What you need<\/h2>\n<ul>\n<li>A phone, tablet or laptop with a camera<\/li>\n<li>A space the size of a yoga mat<\/li>\n<li>A mat, a cushion and a blanket for the relaxation<\/li>\n<\/ul>"
+        }
+    },
+    "sessions": [
+        {
+            "day": 1,
+            "start": "17:45",
+            "end": "19:15",
+            "class": "slow-flow",
+            "location": "Fort Myers — location shared on booking",
+            "note": ""
+        },
+        {
+            "day": 2,
+            "start": "19:00",
+            "end": "20:00",
+            "class": "hatha-flow",
+            "location": "Fort Myers — location shared on booking",
+            "note": "Also online"
+        },
+        {
+            "day": 3,
+            "start": "18:30",
+            "end": "19:30",
+            "class": "hatha-flow",
+            "location": "Fort Myers — location shared on booking",
+            "note": ""
+        },
+        {
+            "day": 6,
+            "start": "07:30",
+            "end": "08:30",
+            "class": "slow-flow",
+            "location": "Fort Myers Beach",
+            "note": "Sunrise on the sand, weather permitting"
+        }
+    ],
+    "prices": [
+        {
+            "title": "Drop-in class",
+            "price": "$25",
+            "unit": "per class",
+            "features": "Any group class\nIn person or online",
+            "featured": "",
+            "cta": "Book a class",
+            "url": ""
+        },
+        {
+            "title": "5-class pass",
+            "price": "$110",
+            "unit": "per pass",
+            "features": "Save $15\nUse for any group class\nAlso available as a gift card",
+            "featured": "1",
+            "cta": "Get the pass",
+            "url": ""
+        },
+        {
+            "title": "Private session",
+            "price": "$95",
+            "unit": "60 minutes",
+            "features": "At your home, lanai, beach or online\n75 minutes: $120\n90 minutes: $140\nCouples and small groups: ask for a quote",
+            "featured": "",
+            "cta": "Book a private session",
+            "url": "{{private}}"
+        },
+        {
+            "title": "5 private sessions",
+            "price": "$425",
+            "unit": "per pack",
+            "features": "5 × 60 minutes\nSave $50\nA plan that builds session by session",
+            "featured": "",
+            "cta": "Start a private pack",
+            "url": "{{private}}"
+        },
+        {
+            "title": "Teams & companies",
+            "price": "Custom",
+            "unit": "quote",
+            "features": "On-site, outdoors or online\nOne-off or weekly\nSports teams and clubs too",
+            "featured": "",
+            "cta": "Request a proposal",
+            "url": "{{contact:corporate}}"
+        }
+    ],
+    "faqs": [
+        {
+            "q": "Am I flexible enough for yoga?",
+            "home": "1",
+            "a": "You don't need to be flexible to start yoga — flexibility is something the practice builds. My classes are for people who, between work, family, grandkids, gardening and everything else, are perfectly happy with “that felt good,” “I've landed,” “I'm going to sleep so well” or “my back doesn't hurt anymore.”\n\nWe won't be practicing handstands. Classes are varied and there's always a little challenge in them, but nothing is compulsory."
+        },
+        {
+            "q": "I'm a complete beginner. Which class should I take?",
+            "home": "1",
+            "a": "Beginners are warmly welcome, especially if movement is already part of your life in some way. Slow Flow is the gentlest place to start; Hatha Flow is stronger and more dynamic. If you'd like to learn the foundations first, one or two private sessions are a great way in."
+        },
+        {
+            "q": "How hard are the group classes?",
+            "home": "1",
+            "a": "Everyone finds something different hard. For some it's the strength work, for others the stretching or the balance — and for some, switching off their thoughts for an hour.\n\nHatha Flow is the stronger, more dynamic class. Slow Flow puts more emphasis on observation, at a slower pace. Both include a flow experience, which for me is the most beautiful part of yoga. Sometimes I hold strengthening poses a little longer so everyone's attention can arrive."
+        },
+        {
+            "q": "What is hatha yoga?",
+            "home": "",
+            "a": "“Ha” means sun and “tha” means moon. Hatha yoga balances the active and the passive energies in us: effort and ease, strength and surrender. Think of all the opposite poles that balance each other — hot and cold, light and shadow, receiving and letting go. One doesn't exist without the other.\n\nWhen that balance tips, we feel it first as discomfort or restlessness. Hatha yoga uses physical practice to find and keep the balance. The poses (asanas) are a doorway to meditation — a more dynamic doorway — and only one of the eight limbs of yoga."
+        },
+        {
+            "q": "What should I bring?",
+            "home": "1",
+            "a": "Comfortable clothes you can move in, a bottle of water, and your own mat if you have a favorite. If you need to borrow one, mention it when you book. We practice barefoot. For beach sessions, bring a large towel or a mat, and sun protection."
+        },
+        {
+            "q": "Where do private yoga sessions take place?",
+            "home": "",
+            "a": "Wherever suits you: your home or lanai, your condo or HOA clubhouse, your office, the beach — or online. I teach private sessions across Fort Myers and nearby areas including Cape Coral, Fort Myers Beach, Sanibel, Estero and Bonita Springs."
+        },
+        {
+            "q": "Do you offer beach yoga in Fort Myers?",
+            "home": "",
+            "a": "Yes. Sunrise and sunset sessions on the sand are available as private sessions for individuals, couples and groups, and from time to time as group events. In summer, early mornings are the most comfortable; if a storm rolls in, we reschedule."
+        },
+        {
+            "q": "How can I pay?",
+            "home": "",
+            "a": "You can pay by card when you book online, or in cash at class. Private sessions and passes can also be paid in advance."
+        },
+        {
+            "q": "Can I give yoga as a gift?",
+            "home": "",
+            "a": "Yes — there are gift cards for a single class or a 5-class pass. After buying, send me the recipient's name, their email address for booking, and the class they'd enjoy. I'll make out the gift card in their name so you can forward or print it."
+        },
+        {
+            "q": "Do you teach yoga for companies and sports teams?",
+            "home": "",
+            "a": "Yes: team-building sessions, weekly lunchtime classes, chair and desk yoga, and strength, mobility or recovery-focused yoga for athletes and sports teams. Send your team size and location for a proposal."
+        },
+        {
+            "q": "I have an injury or a health condition, or I'm pregnant. Can I join?",
+            "home": "",
+            "a": "Please check with your doctor first, and tell me before class. In a group class I'll offer options; for specific needs, a private session is often the best way to start. Yoga complements medical care — it doesn't replace it."
+        },
+        {
+            "q": "What can a regular yoga practice help with?",
+            "home": "",
+            "a": "Many people come to the mat for back and lower-back tension from sitting, a stiff “phone neck” and slumped posture, restless sleep, constant tiredness, a foggy mind, weak back and core muscles, or stress. Regular hatha practice builds deep strength, supports better posture and teaches you to use your breath more consciously — and many students find they sleep and focus better. If you have a medical condition, talk to your doctor about what's right for you."
+        }
+    ],
+    "posts": {
+        "private-yoga-fort-myers-what-to-expect": {
+            "title": "Private Yoga in Fort Myers: What a One-on-One Session Is Really Like",
+            "excerpt": "What happens in a private yoga session, who it helps most, and how to get the most out of practicing one-on-one at home, on your lanai or on the beach.",
+            "category": "Private yoga",
+            "days_ago": 3,
+            "content": "<p>Most people picture private yoga as something for celebrities or advanced practitioners. In reality, the people who book one-on-one sessions with me in Fort Myers are usually the opposite: beginners who don't want to feel lost in a room full of experienced yogis, busy people who can't make a fixed class time, and anyone who wants their practice to answer to their own body rather than to the average of a group.<\/p>\n\n<h2>Before the first session: a short conversation<\/h2>\n<p>Every private series starts with a 15-minute call. I ask how you move day to day, whether there's anything to be careful with — a shoulder, a knee, a lower back that complains after a long drive — and what you'd like to feel after a class. Calmer? Stronger? Less stiff on the golf course? That conversation shapes everything that follows.<\/p>\n\n<h2>The session itself<\/h2>\n<p>We start by arriving: a few minutes of breathing, so the part of you still answering emails can catch up with the part standing on the mat. Then we move. Unlike a group class, I can slow down exactly where you need it, repeat what you want to learn, and skip what doesn't serve you. If a pose doesn't work for your body, we find the version that does.<\/p>\n<p>Most sessions end with a relaxation long enough to actually relax, and with one or two short practices you can do on your own between sessions.<\/p>\n\n<h2>Where it happens<\/h2>\n<p>This is where Southwest Florida makes private yoga special. Sessions can take place in your living room, on a screened lanai, in your condo clubhouse, or on the sand at sunrise. All we need is a quiet space about the size of a yoga mat. I can bring mats and props, so there's nothing to buy before you start.<\/p>\n\n<h2>Who benefits most<\/h2>\n<ul>\n<li><strong>Beginners<\/strong> who want to learn the foundations safely before joining a group class.<\/li>\n<li><strong>People with stiffness or old injuries<\/strong> who need a pace and a plan of their own (with their doctor's OK).<\/li>\n<li><strong>Couples and friends<\/strong> who want a shared hour that isn't another dinner out.<\/li>\n<li><strong>Seasonal residents and visitors<\/strong> who want a few sunrise sessions during their stay.<\/li>\n<\/ul>\n\n<h2>How often?<\/h2>\n<p>Once a week is a wonderful rhythm: enough to feel real change within a month, especially if you add ten minutes of practice on a couple of other days. Some students book a pack of five, others come whenever their schedule allows. There's no wrong way.<\/p>\n\n<p>If you're curious, <a href=\"{{page:private-yoga}}\">read how private yoga works<\/a> or simply <a href=\"{{contact:private}}\">send me a message<\/a> with your area and the days that suit you.<\/p>"
+        },
+        "hatha-flow-vs-slow-flow": {
+            "title": "Hatha Flow vs. Slow Flow: Which Yoga Class Is Right for You?",
+            "excerpt": "Both classes include breath, strength, stretching, balance and relaxation. Here is how they differ — and how to choose between them.",
+            "category": "Practice",
+            "days_ago": 10,
+            "content": "<p>“Which class should I come to?” is the question I hear most often from new students in Fort Myers. There are countless styles of yoga, and the names don't always help. So here's a plain-language guide to the two group classes I teach.<\/p>\n\n<h2>What they have in common<\/h2>\n<p>Both are hatha yoga. Both include breathing exercises, strengthening, stretching, balance, a flow experience and a proper relaxation at the end. In both, you'll find options to make things easier or more challenging — and in both, nothing is compulsory.<\/p>\n\n<h2>Hatha Flow: the dynamic one<\/h2>\n<p>Hatha Flow represents the stronger, more dynamic side of the practice. We link movement and breath into flowing sequences, build heat, and sometimes hold strengthening poses a little longer so attention has time to settle. You'll work the deep core and back muscles that support your posture, and leave feeling both energized and quiet.<\/p>\n<p><strong>Choose Hatha Flow if<\/strong> movement is already part of your life — gym, running, tennis, pickleball, paddleboarding, long walks — and you'd like a class that challenges you while giving back mobility.<\/p>\n\n<h2>Slow Flow: the observant one<\/h2>\n<p>Slow Flow keeps the flow but slows everything down. The emphasis moves from effort to observation: noticing how a shape feels, where you're gripping, what happens when you let go a little. There's more floor work, more stretching and a longer rest.<\/p>\n<p><strong>Choose Slow Flow if<\/strong> you're new to yoga, returning after a break, sitting a lot, or finishing your days tired and wired at the same time. It's also a perfect counterweight to hard training.<\/p>\n\n<h2>Still not sure?<\/h2>\n<p>Ask yourself one question: do you need more energy, or more calm? If energy, try Hatha Flow. If calm, try Slow Flow. And if you'd rather learn the basics with full attention first, one or two <a href=\"{{page:private-yoga}}\">private sessions<\/a> make joining a group much easier.<\/p>\n<p>You'll find both on the <a href=\"{{page:schedule-pricing}}\">weekly schedule<\/a>. Come as you are — nobody on the next mat is watching.<\/p>"
+        },
+        "sunrise-beach-yoga-fort-myers": {
+            "title": "Sunrise Beach Yoga Around Fort Myers: How to Make It Feel Amazing",
+            "excerpt": "Practical tips for practicing yoga on the sand in Southwest Florida — timing, heat, tides, what to bring and how to make the most of it.",
+            "category": "Beach yoga",
+            "days_ago": 18,
+            "content": "<p>There are few better places to practice yoga than a Southwest Florida beach before the day heats up. The sand is cool, the Gulf is often glassy, and the pelicans are already at work. Here's how to make a beach session feel as good as it looks.<\/p>\n\n<h2>Go early (or late)<\/h2>\n<p>From late spring to early fall, the first hour after sunrise is the sweet spot: cooler air, softer light, fewer people. Because our Gulf beaches face west, the sun rises behind you — which means gentle light on your back rather than glare in your eyes. Sunset sessions are beautiful too, with the sun going down over the water, but the sand holds the day's heat longer.<\/p>\n\n<h2>Choose your spot<\/h2>\n<p>Fort Myers Beach, Sanibel, Lovers Key and Bonita Beach all have long stretches of sand. Look for firm, flat sand just above the high-tide line: dry enough to stay put, firm enough for balance poses. Check the tide times before you go so the water doesn't join the class. If you're planning an organized group session in a park or preserve, check the local rules first.<\/p>\n\n<h2>What to bring<\/h2>\n<ul>\n<li>A large towel or an old mat (sand gets everywhere — don't bring your favorite)<\/li>\n<li>Water, even at 7am<\/li>\n<li>Reef-safe sunscreen and a hat for the way back<\/li>\n<li>A light layer for the final relaxation on breezy mornings<\/li>\n<\/ul>\n\n<h2>Adjust your practice to the sand<\/h2>\n<p>Sand is unstable, which makes balance poses both harder and more rewarding. Widen your stance a little, move more slowly, and let your feet work — they'll thank you. Keep flows gentle and save the strongest standing work for the studio. Lying down at the end and listening to the waves is the best relaxation you'll ever have.<\/p>\n\n<h2>Want company?<\/h2>\n<p>I teach sunrise and sunset sessions on the beach as <a href=\"{{page:private-yoga}}\">private yoga<\/a> for individuals, couples, families and groups — and from time to time as open <a href=\"{{page:events}}\">events<\/a>. It's a lovely way to start a vacation, celebrate a birthday or simply reset a busy week.<\/p>"
+        }
+    },
+    "events": {
+        "live-music-slow-flow-sample": {
+            "title": "Live-Music Slow Flow with Handpan (sample — edit before publishing)",
+            "excerpt": "A slow flow class where handpan and tongue drum are played live, followed by guided meditation.",
+            "content": "<p>On this special evening, the practice is accompanied live by the soft melodies of handpan and tongue drum. A slow flow with lightness and playfulness at its heart, followed by a guided meditation and a long rest. Suitable for all levels, including complete beginners.<\/p><p>Bring a mat and a warm layer for the relaxation.<\/p>",
+            "date": "2026-10-24",
+            "start": "18:00",
+            "end": "19:30",
+            "venue": "Fort Myers",
+            "address": "Fort Myers, FL",
+            "price": "$35"
+        }
+    }
+}
