@@ -957,15 +957,18 @@ def build_preview():
         imgmap[k] = 'data:image/jpeg;base64,' + base64.b64encode(buf.getvalue()).decode()
     header_html = header('')
     footer_html = footer()
+    full_head = head(home, '<style>' + CSS + '</style>')
+    body = (SVG_DEFS + header_html +
+            '<main id="main">' + ''.join(chunks) + '</main>' + footer_html +
+            '<script type="application/json" id="oy-img">' + json.dumps(imgmap) + '</script>' +
+            '<script type="application/json" id="oy-meta">' + json.dumps(meta, ensure_ascii=False).replace('</', '<\\/') + '</script>' +
+            '<script>' + JS + '</script><script>' + ROUTER + '</script>')
+    # Standalone, downloadable file: a complete document that opens straight from disk.
+    open(os.path.join(OUT, 'olivia-kovacs-yoga.html'), 'w').write(full_head + '<body>' + body + '</body></html>')
     # The artifact host supplies <!doctype>, <html>, <head> and <body>; the preview carries only its own tags.
-    top = head(home, '<style>' + CSS + '</style>')
-    top = top.replace('<!doctype html><html lang="en-US"><head><meta charset="utf-8">', '').replace('</head>', '')
+    top = full_head.replace('<!doctype html><html lang="en-US"><head><meta charset="utf-8">', '').replace('</head>', '')
     top = re.sub(r'<meta name="viewport"[^>]*>', '', top)
-    doc = (top + SVG_DEFS + header_html +
-           '<main id="main">' + ''.join(chunks) + '</main>' + footer_html +
-           '<script type="application/json" id="oy-img">' + json.dumps(imgmap) + '</script>' +
-           '<script type="application/json" id="oy-meta">' + json.dumps(meta, ensure_ascii=False).replace('</', '<\\/') + '</script>' +
-           '<script>' + JS + '</script><script>' + ROUTER + '</script>')
+    doc = top + body
     open(os.path.join(OUT, 'preview.html'), 'w').write(doc)
     return len(PAGES), len(doc)
 
