@@ -89,6 +89,9 @@ class OYS_Customers {
 		if ( ! empty( $_POST['website'] ) ) {
 			$errors[] = __( 'Something went wrong. Please try again.', 'olivia-studio' ); // Honeypot.
 		}
+		if ( ! OYS_Security::signup_allowed() ) {
+			$errors = array( __( 'Too many new accounts from this connection. Please try again later or contact us.', 'olivia-studio' ) );
+		}
 		if ( $errors ) {
 			foreach ( $errors as $err ) {
 				oys_flash( $err, 'error' );
@@ -109,6 +112,7 @@ class OYS_Customers {
 			oys_flash( $user_id->get_error_message(), 'error' );
 			oys_redirect( add_query_arg( 'oys_view', 'register', $back ) );
 		}
+		OYS_Security::record_signup();
 		update_user_meta( $user_id, 'oys_phone', $phone );
 		update_user_meta( $user_id, 'oys_marketing', empty( $_POST['marketing'] ) ? '' : '1' );
 		self::record_waiver( $user_id );
@@ -128,7 +132,7 @@ class OYS_Customers {
 			'remember'      => true,
 		), is_ssl() );
 		if ( is_wp_error( $user ) ) {
-			oys_flash( __( 'That email and password don\'t match. Try again or reset your password.', 'olivia-studio' ), 'error' );
+			oys_flash( 'oys_locked' === $user->get_error_code() ? $user->get_error_message() : __( 'That email and password don\'t match. Try again or reset your password.', 'olivia-studio' ), 'error' );
 			oys_redirect( add_query_arg( 'oys_view', 'login', $back ) );
 		}
 		oys_redirect( $back );

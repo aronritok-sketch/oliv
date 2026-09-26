@@ -5,7 +5,9 @@
  *
  * Webhook endpoint: /wp-json/oys/v1/stripe-webhook
  * Events: checkout.session.completed, checkout.session.async_payment_succeeded,
- *         checkout.session.async_payment_failed, checkout.session.expired, charge.refunded
+ *         checkout.session.async_payment_failed, checkout.session.expired, charge.refunded,
+ *         customer.subscription.updated, customer.subscription.deleted, invoice.paid,
+ *         invoice.payment_failed
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -95,7 +97,11 @@ class OYS_Stripe {
 	 * Create a Checkout Session for an order and return the hosted page URL.
 	 * @return string|WP_Error
 	 */
-	public static function start_checkout( $order_id, $product_name, $description = '' ) {
+	/**
+	 * @param array $lines optional line items for the receipt: [ [ 'name', 'description', 'unit_amount', 'quantity' ], … ]
+	 *                     (e.g. the customer's own spot plus "Guest ticket × 2"). Defaults to one line for the whole order.
+	 */
+	public static function start_checkout( $order_id, $product_name, $description = '', array $lines = array() ) {
 		$order = OYS_Orders::get( $order_id );
 		$user  = get_userdata( $order->user_id );
 		$hold  = max( 30, (int) OYS_Settings::get( 'hold_minutes' ) ); // Stripe's minimum is 30 minutes.
@@ -107,19 +113,7 @@ class OYS_Stripe {
 			'success_url'         => add_query_arg( 'oys_return', 'success', $return ) . '&session_id={CHECKOUT_SESSION_ID}',
 			'cancel_url'          => add_query_arg( 'oys_return', 'cancel', $return ),
 			'expires_at'          => time() + $hold * MINUTE_IN_SECONDS,
-			'line_items'          => array(
-				array(
-					'quantity'   => 1,
-					'price_data' => array(
-						'currency'     => $order->currency,
-						'unit_amount'  => (int) $order->amount_cents,
-						'product_data' => array_filter( array(
-							'name'        => $product_name,
-							'description' => $description ?: null,
-						) ),
-					),
-				),
-			),
+			'line_items'          => self::line_items( $order, $lines ?: array( array( $product_name, $description, (int) $order->amount_cents, 1 ) ) ),
 			'metadata'            => array( 'order_id' => $order_id, 'type' => $order->type, 'site' => home_url() ),
 			'payment_intent_data' => array(
 				'description' => $product_name,
@@ -140,9 +134,66 @@ class OYS_Stripe {
 		return $res['url'];
 	}
 
+	private static function line_items( $order, array $lines ) {
+		$items = array();
+		foreach ( $lines as $l ) {
+			$items[] = array(
+				'quantity'   => max( 1, (int) $l[3] ),
+				'price_data' => array(
+					'currency'     => $order->currency,
+					'unit_amount'  => (int) $l[2],
+					'product_data' => array_filter( array( 'name' => $l[0], 'description' => $l[1] ?: null ) ),
+				),
+			);
+		}
+		return $items;
+	}
+
+	/**
+	 * Checkout in subscription mode for a membership plan. The first invoice is paid on the
+	 * Stripe page; later renewals arrive as invoice.paid webhooks.
+	 * @return string|WP_Error
+	 */
+	public static function start_subscription_checkout( $order_id, array $product ) {
+		$order  = OYS_Orders::get( $order_id );
+		$return = oys_page_url( 'book', array( 'oys_order' => $order_id, 'oys_key' => self::order_key( $order_id ) ) );
+		$params = array(
+			'mode'                => 'subscription',
+			'client_reference_id' => (string) $order_id,
+			'success_url'         => add_query_arg( 'oys_return', 'success', $return ) . '&session_id={CHECKOUT_SESSION_ID}',
+			'cancel_url'          => add_query_arg( 'oys_return', 'cancel', $return ),
+			'expires_at'          => time() + max( 30, (int) OYS_Settings::get( 'hold_minutes' ) ) * MINUTE_IN_SECONDS,
+			'line_items'          => array(
+				array(
+					'quantity'   => 1,
+					'price_data' => array(
+						'currency'     => $order->currency,
+						'unit_amount'  => (int) $product['price_cents'],
+						'recurring'    => array( 'interval' => 'year' === $product['interval'] ? 'year' : 'month', 'interval_count' => max( 1, (int) $product['interval_count'] ) ),
+						'product_data' => array_filter( array( 'name' => $product['name'], 'description' => $product['description'] ?: null ) ),
+					),
+				),
+			),
+			'metadata'            => array( 'order_id' => $order_id, 'type' => 'membership', 'site' => home_url() ),
+			'subscription_data'   => array( 'metadata' => array( 'order_id' => $order_id, 'product_id' => $product['id'], 'wp_user_id' => $order->user_id ) ),
+		);
+		$customer = self::customer_for( $order->user_id );
+		if ( $customer ) {
+			$params['customer'] = $customer;
+		} else {
+			$params['customer_email'] = get_userdata( $order->user_id )->user_email;
+		}
+		$res = self::request( 'POST', '/v1/checkout/sessions', $params, 'oys-order-' . $order_id );
+		if ( is_wp_error( $res ) ) {
+			return $res;
+		}
+		OYS_Orders::update( $order_id, array( 'stripe_session_id' => $res['id'] ) );
+		return $res['url'];
+	}
+
 	/** Fulfil from the Checkout Session (webhook or return page). */
 	public static function sync_session( $session_id ) {
-		$cs = self::request( 'GET', '/v1/checkout/sessions/' . rawurlencode( $session_id ), array( 'expand' => array( 'payment_intent.latest_charge' ) ) );
+		$cs = self::request( 'GET', '/v1/checkout/sessions/' . rawurlencode( $session_id ), array( 'expand' => array( 'payment_intent.latest_charge', 'invoice' ) ) );
 		if ( is_wp_error( $cs ) ) {
 			return $cs;
 		}
@@ -166,6 +217,19 @@ class OYS_Stripe {
 			if ( is_array( $pi ) ) {
 				$receipt = $pi['latest_charge']['receipt_url'] ?? '';
 				$pi      = $pi['id'] ?? '';
+			}
+			if ( 'subscription' === ( $cs['mode'] ?? '' ) ) {
+				$sub  = is_array( $cs['subscription'] ?? null ) ? ( $cs['subscription']['id'] ?? '' ) : (string) ( $cs['subscription'] ?? '' );
+				$cust = is_array( $cs['customer'] ?? null ) ? ( $cs['customer']['id'] ?? '' ) : (string) ( $cs['customer'] ?? '' );
+				$inv  = is_array( $cs['invoice'] ?? null ) ? $cs['invoice'] : null;
+				$meta = $order->meta;
+				$meta['subscription_id'] = $sub;
+				$meta['customer_id']     = $cust;
+				OYS_Orders::update( $order->id, array( 'meta' => $meta ) );
+				if ( $inv ) {
+					$receipt = $inv['hosted_invoice_url'] ?? '';
+					$pi      = is_string( $inv['payment_intent'] ?? null ) ? $inv['payment_intent'] : $pi;
+				}
 			}
 			if ( ! empty( $cs['amount_total'] ) && (int) $cs['amount_total'] !== (int) $order->amount_cents ) {
 				oys_log( 'Amount mismatch', array( 'order' => $order->id, 'stripe' => $cs['amount_total'] ) );
@@ -272,6 +336,16 @@ class OYS_Stripe {
 					if ( $order ) {
 						OYS_Orders::mark_unpaid( $order->id, 'expired' );
 					}
+					break;
+				case 'customer.subscription.updated':
+				case 'customer.subscription.deleted':
+					OYS_Memberships::sync( $object );
+					break;
+				case 'invoice.paid':
+					OYS_Memberships::record_invoice( $object );
+					break;
+				case 'invoice.payment_failed':
+					OYS_Memberships::payment_failed( $object );
 					break;
 				case 'charge.refunded':
 					$order = ! empty( $object['payment_intent'] ) ? OYS_Orders::by_payment_intent( $object['payment_intent'] ) : null;

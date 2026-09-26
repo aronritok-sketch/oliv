@@ -26,3 +26,8 @@
 .oys-new-row td { background: #f6f7f7; }
 .oys-product.is-inactive { opacity: .7; }
 .oys-plain { list-style: disc; padding-left: 20px; }
+.oys-guest-tag { display: inline-block; background: #ECE1FA; color: #3B2F4A; font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: .04em; }
+.oys-wrap tr.oys-guest-row td:first-child { padding-left: 28px; }
+.oys-status--active { background: #d7f0dd; }
+.oys-status--past_due { background: #FFE0EE; }
+.oys-status--cancelled { background: #eee; }

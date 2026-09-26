@@ -107,11 +107,44 @@ class OYS_Emails {
 
 	/* ---------- Customer emails ---------- */
 
-	public static function booking_confirmed( $booking_id ) {
-		$b = OYS_Bookings::get( $booking_id );
-		$s = OYS_Schedule::get( $b->session_id );
-		$body  = '<p>' . sprintf( esc_html__( 'Hi %s, you\'re booked. See you on the mat!', 'olivia-studio' ), esc_html( self::first_name( $b->user_id ) ) ) . '</p>';
+	/** "You + Bea, Cora" list for emails. */
+	private static function guest_list_html( array $rows, $title ) {
+		if ( ! $rows ) {
+			return '';
+		}
+		$labels = OYS_Bookings::paid_with_labels();
+		$html   = '<p style="margin:18px 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#53635A">' . esc_html( $title ) . '</p><ul style="margin:0 0 12px;padding-left:18px">';
+		foreach ( $rows as $g ) {
+			$html .= '<li><b>' . esc_html( $g->guest_name ) . '</b> <span style="color:#53635A">· ' . esc_html( $labels[ $g->paid_with ] ?? $g->paid_with ) . '</span></li>';
+		}
+		return $html . '</ul>';
+	}
+
+	/**
+	 * Confirmation to the customer. $ids = rows confirmed just now (their own and/or guests);
+	 * when only guests were added, the email says so. Guests with an email get their own invite.
+	 */
+	public static function booking_confirmed( $booking_id, array $ids = array() ) {
+		$host = OYS_Bookings::get( $booking_id );
+		if ( ! $host ) {
+			return;
+		}
+		$s      = OYS_Schedule::get( $host->session_id );
+		$ids    = $ids ?: array( (int) $host->id );
+		$rows   = array_map( array( 'OYS_Bookings', 'get' ), $ids );
+		$new_g  = array_values( array_filter( $rows, fn( $r ) => $r && $r->guest_of ) );
+		$only_g = ! in_array( (int) $host->id, array_map( 'intval', $ids ), true );
+		$all_g  = OYS_Bookings::guests_of( $host->id, array( 'confirmed' ) );
+
+		if ( $only_g ) {
+			$heading = _n( 'Guest added', 'Guests added', count( $new_g ), 'olivia-studio' );
+			$body    = '<p>' . sprintf( esc_html__( 'Hi %s, your guests are booked in with you.', 'olivia-studio' ), esc_html( self::first_name( $host->user_id ) ) ) . '</p>';
+		} else {
+			$heading = __( 'You\'re booked', 'olivia-studio' );
+			$body    = '<p>' . sprintf( esc_html__( 'Hi %s, you\'re booked. See you on the mat!', 'olivia-studio' ), esc_html( self::first_name( $host->user_id ) ) ) . '</p>';
+		}
 		$body .= self::session_block( $s );
+		$body .= self::guest_list_html( $all_g, sprintf( _n( 'Your guest (%d)', 'Your guests (%d)', count( $all_g ), 'olivia-studio' ), count( $all_g ) ) );
 		if ( $s->online_url ) {
 			$body .= '<p><b>' . esc_html__( 'Online class link:', 'olivia-studio' ) . '</b> <a href="' . esc_url( $s->online_url ) . '">' . esc_html( $s->online_url ) . '</a></p>';
 		}
@@ -119,37 +152,76 @@ class OYS_Emails {
 			$body .= '<p>' . esc_html__( 'Please arrive 10 minutes early. Bring a mat if you have one, water, and a warm layer for the relaxation.', 'olivia-studio' ) . '</p>';
 		}
 		$body .= '<p style="font-size:14px;color:#53635A">' . esc_html( OYS_Settings::get( 'cancel_policy' ) ) . '</p>';
-		self::send( self::user_email( $b->user_id ), sprintf( __( 'Booked: %s', 'olivia-studio' ), oys_session_title( $s ) . ', ' . oys_date( $s->starts_at, 'M j, g:i a' ) ), __( 'You\'re booked', 'olivia-studio' ), $body, array( self::ics_file( $s, $booking_id ) ), array( __( 'Manage booking', 'olivia-studio' ), oys_account_url() ) );
+		$subject = $only_g
+			? sprintf( __( 'Guests added: %s', 'olivia-studio' ), oys_session_title( $s ) . ', ' . oys_date( $s->starts_at, 'M j, g:i a' ) )
+			: sprintf( __( 'Booked: %s', 'olivia-studio' ), oys_session_title( $s ) . ', ' . oys_date( $s->starts_at, 'M j, g:i a' ) );
+		self::send( self::user_email( $host->user_id ), $subject, $heading, $body, array( self::ics_file( $s, $host->id ) ), array( __( 'Manage booking', 'olivia-studio' ), oys_account_url() ) );
+		foreach ( $new_g as $g ) {
+			if ( $g->guest_email ) {
+				self::guest_invite( $g, $s );
+			}
+		}
 	}
 
-	public static function booking_cancelled( $booking_id, $outcome, $by_studio = false, $reason = '' ) {
+	/** A guest who gave an email gets the details and a calendar invite (no account needed). */
+	public static function guest_invite( $g, $s ) {
+		$host  = self::first_name( $g->user_id );
+		$body  = '<p>' . sprintf( esc_html__( 'Hi %1$s, %2$s booked you a spot. See you on the mat!', 'olivia-studio' ), esc_html( $g->guest_name ), esc_html( $host ) ) . '</p>';
+		$body .= self::session_block( $s );
+		if ( $s->online_url ) {
+			$body .= '<p><b>' . esc_html__( 'Online class link:', 'olivia-studio' ) . '</b> <a href="' . esc_url( $s->online_url ) . '">' . esc_html( $s->online_url ) . '</a></p>';
+		}
+		$body .= '<p>' . esc_html__( 'Please arrive 10 minutes early. New to yoga? Tell Olivia before class about any injuries or health conditions.', 'olivia-studio' ) . '</p>';
+		$body .= '<p style="font-size:14px;color:#53635A">' . esc_html( OYS_Settings::get( 'waiver_text' ) ) . '</p>';
+		self::send( $g->guest_email, sprintf( __( '%1$s booked you into %2$s', 'olivia-studio' ), $host, oys_session_title( $s ) ), __( 'You\'re coming to yoga', 'olivia-studio' ), $body, array( self::ics_file( $s, $g->id ) ), array( __( 'About the classes', 'olivia-studio' ), home_url( '/' ) ) );
+	}
+
+	/**
+	 * $ids = every row cancelled together (the customer's own and their guests').
+	 */
+	public static function booking_cancelled( $booking_id, $outcome, $by_studio = false, $reason = '', array $ids = array() ) {
 		$b = OYS_Bookings::get( $booking_id );
 		$s = OYS_Schedule::get( $b->session_id );
+		$rows   = array_filter( array_map( array( 'OYS_Bookings', 'get' ), $ids ?: array( $booking_id ) ) );
+		$guests = array_values( array_filter( $rows, fn( $r ) => $r->guest_of ) );
 		if ( $by_studio ) {
 			$body = '<p>' . esc_html__( 'I\'m sorry, this session has been cancelled.', 'olivia-studio' ) . ( $reason ? ' ' . esc_html( $reason ) : '' ) . '</p>';
+		} elseif ( $b->guest_of ) {
+			$body = '<p>' . sprintf( esc_html__( 'Your guest %s has been removed from this class.', 'olivia-studio' ), '<b>' . esc_html( $b->guest_name ) . '</b>' ) . '</p>';
 		} else {
 			$body = '<p>' . esc_html__( 'Your booking has been cancelled.', 'olivia-studio' ) . '</p>';
 		}
 		$body .= self::session_block( $s );
+		if ( $guests && ! $b->guest_of ) {
+			$body .= self::guest_list_html( $guests, __( 'Guests cancelled with you', 'olivia-studio' ) );
+		}
 		$messages = array(
-			'returned' => __( 'The class is back on your pass.', 'olivia-studio' ),
-			'credit'   => sprintf( __( 'You have a class credit to use within %d days.', 'olivia-studio' ), (int) OYS_Settings::get( 'dropin_credit_days' ) ),
-			'late'     => __( 'Because this was inside the cancellation window, the class counts as used.', 'olivia-studio' ),
-			'none'     => '',
+			'returned'   => count( $rows ) > 1 ? __( 'The classes are back on your pass.', 'olivia-studio' ) : __( 'The class is back on your pass.', 'olivia-studio' ),
+			'credit'     => sprintf( __( 'You have a class credit to use within %d days.', 'olivia-studio' ), (int) OYS_Settings::get( 'dropin_credit_days' ) ),
+			'membership' => __( 'This class won\'t count towards your membership.', 'olivia-studio' ),
+			'late'       => __( 'Because this was inside the cancellation window, the class counts as used.', 'olivia-studio' ),
+			'none'       => '',
 		);
 		if ( ! empty( $messages[ $outcome ] ) ) {
 			$body .= '<p><b>' . esc_html( $messages[ $outcome ] ) . '</b></p>';
 		}
 		self::send( self::user_email( $b->user_id ), sprintf( __( 'Cancelled: %s', 'olivia-studio' ), oys_session_title( $s ) . ', ' . oys_date( $s->starts_at, 'M j' ) ), $by_studio ? __( 'Class cancelled', 'olivia-studio' ) : __( 'Booking cancelled', 'olivia-studio' ), $body, array(), array( __( 'Book another class', 'olivia-studio' ), oys_page_url( 'book' ) ) );
+		foreach ( $rows as $r ) {
+			if ( $r->guest_of && $r->guest_email ) {
+				self::send( $r->guest_email, sprintf( __( 'Cancelled: %s', 'olivia-studio' ), oys_session_title( $s ) . ', ' . oys_date( $s->starts_at, 'M j' ) ), __( 'Class cancelled', 'olivia-studio' ),
+					'<p>' . sprintf( esc_html__( 'Hi %s, your spot in this class has been cancelled.', 'olivia-studio' ), esc_html( $r->guest_name ) ) . '</p>' . self::session_block( $s ) );
+			}
+		}
 		if ( ! $by_studio ) {
-			self::admin_notice( sprintf( __( 'Cancellation: %s', 'olivia-studio' ), oys_session_title( $s ) ), sprintf( '%s cancelled %s (%s).', self::first_name( $b->user_id ), oys_session_title( $s ) . ' ' . oys_date( $s->starts_at ), $outcome ) );
+			self::admin_notice( sprintf( __( 'Cancellation: %s', 'olivia-studio' ), oys_session_title( $s ) ), sprintf( '%s cancelled %s (%d %s, %s).', self::first_name( $b->user_id ), oys_session_title( $s ) . ' ' . oys_date( $s->starts_at ), count( $rows ), _n( 'person', 'people', count( $rows ), 'olivia-studio' ), $outcome ) );
 		}
 	}
 
 	public static function waitlist_promoted( $booking_id ) {
 		$b = OYS_Bookings::get( $booking_id );
 		$s = OYS_Schedule::get( $b->session_id );
-		$body  = '<p>' . esc_html__( 'Good news: a spot opened up and you\'re in. One class was taken from your pass.', 'olivia-studio' ) . '</p>';
+		$how   = 'membership' === $b->paid_with ? __( 'It\'s covered by your membership.', 'olivia-studio' ) : __( 'One class was taken from your pass.', 'olivia-studio' );
+		$body  = '<p>' . esc_html__( 'Good news: a spot opened up and you\'re in.', 'olivia-studio' ) . ' ' . esc_html( $how ) . '</p>';
 		$body .= self::session_block( $s );
 		$body .= '<p>' . esc_html__( 'Can\'t make it after all? Cancel from your account so the next person can come.', 'olivia-studio' ) . '</p>';
 		self::send( self::user_email( $b->user_id ), sprintf( __( 'You\'re in: %s', 'olivia-studio' ), oys_session_title( $s ) ), __( 'You\'re off the waitlist', 'olivia-studio' ), $body, array( self::ics_file( $s, $booking_id ) ), array( __( 'Manage booking', 'olivia-studio' ), oys_account_url() ) );
@@ -166,6 +238,7 @@ class OYS_Emails {
 		$s = OYS_Schedule::get( $b->session_id );
 		$body  = '<p>' . sprintf( esc_html__( 'Hi %s, a quick reminder about your class.', 'olivia-studio' ), esc_html( self::first_name( $b->user_id ) ) ) . '</p>';
 		$body .= self::session_block( $s );
+		$body .= self::guest_list_html( OYS_Bookings::guests_of( $b->id, array( 'confirmed' ) ), __( 'Coming with you', 'olivia-studio' ) );
 		if ( $s->online_url ) {
 			$body .= '<p><b>' . esc_html__( 'Join online:', 'olivia-studio' ) . '</b> <a href="' . esc_url( $s->online_url ) . '">' . esc_html( $s->online_url ) . '</a></p>';
 		}
@@ -225,6 +298,47 @@ class OYS_Emails {
 			$body .= '<p>' . nl2br( esc_html( $request->admin_message ) ) . '</p>';
 		}
 		self::send( self::user_email( $request->user_id ), __( 'Your private session: please confirm', 'olivia-studio' ), __( 'Your private session', 'olivia-studio' ), $body, array(), array( __( 'Confirm and pay', 'olivia-studio' ), oys_book_url( $session->id ) ) );
+	}
+
+	/* ---------- Memberships ---------- */
+
+	private static function membership_block( $m ) {
+		$p     = OYS_Products::get( $m->product_id );
+		$price = $p ? oys_money( $p['price_cents'] ) . ' ' . OYS_Products::period_label( $p ) : '';
+		$what  = (int) $m->classes_per_period ? sprintf( _n( '%d group class per period', '%d group classes per period', (int) $m->classes_per_period, 'olivia-studio' ), (int) $m->classes_per_period ) : __( 'Unlimited group classes', 'olivia-studio' );
+		return '<p><b>' . esc_html( $m->name ) . '</b><br>' . esc_html( $what ) . ( $price ? ' · ' . esc_html( $price ) : '' ) . '</p>';
+	}
+
+	public static function membership_started( $membership_id ) {
+		$m    = OYS_Memberships::get( $membership_id );
+		$body = '<p>' . sprintf( esc_html__( 'Welcome to the membership, %s! You can book group classes straight away: choose "Use my membership" when you book.', 'olivia-studio' ), esc_html( self::first_name( $m->user_id ) ) ) . '</p>'
+			. self::membership_block( $m )
+			. ( $m->current_period_end ? '<p>' . sprintf( esc_html__( 'Next renewal: %s. You can cancel any time in your account; you keep access until the end of the paid period.', 'olivia-studio' ), esc_html( oys_date( $m->current_period_end, get_option( 'date_format' ) ) ) ) . '</p>' : '' );
+		self::send( self::user_email( $m->user_id ), __( 'Your membership is active', 'olivia-studio' ), __( 'Welcome, member', 'olivia-studio' ), $body, array(), array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ) );
+		self::admin_notice( __( 'New membership', 'olivia-studio' ), sprintf( '%s joined: %s', self::first_name( $m->user_id ), $m->name ) );
+	}
+
+	public static function membership_cancel_scheduled( $membership_id ) {
+		$m    = OYS_Memberships::get( $membership_id );
+		$body = '<p>' . sprintf( esc_html__( 'Your membership won\'t renew. You can keep booking classes until %s.', 'olivia-studio' ), '<b>' . esc_html( oys_date( $m->current_period_end, get_option( 'date_format' ) ) ) . '</b>' ) . '</p>'
+			. self::membership_block( $m ) . '<p>' . esc_html__( 'Changed your mind? Resume it in your account before that date.', 'olivia-studio' ) . '</p>';
+		self::send( self::user_email( $m->user_id ), __( 'Your membership will end', 'olivia-studio' ), __( 'Membership cancelled', 'olivia-studio' ), $body, array(), array( __( 'Resume membership', 'olivia-studio' ), oys_account_url( 'membership' ) ) );
+		self::admin_notice( __( 'Membership cancelled', 'olivia-studio' ), sprintf( '%s cancelled %s (ends %s).', self::first_name( $m->user_id ), $m->name, oys_date( $m->current_period_end ) ) );
+	}
+
+	public static function membership_ended( $membership_id ) {
+		$m    = OYS_Memberships::get( $membership_id );
+		$body = '<p>' . esc_html__( 'Your membership has ended. Thank you for practicing with me! You can join again or buy a class pass any time.', 'olivia-studio' ) . '</p>' . self::membership_block( $m );
+		self::send( self::user_email( $m->user_id ), __( 'Your membership has ended', 'olivia-studio' ), __( 'Membership ended', 'olivia-studio' ), $body, array(), array( __( 'See prices', 'olivia-studio' ), home_url( '/schedule-pricing/' ) ) );
+	}
+
+	public static function membership_payment_failed( $membership_id, $invoice_url = '' ) {
+		$m    = OYS_Memberships::get( $membership_id );
+		$body = '<p>' . esc_html__( 'We couldn\'t take this month\'s membership payment. Your card may have expired or been declined. Stripe will try again over the next few days; please update your card so your membership continues.', 'olivia-studio' ) . '</p>'
+			. self::membership_block( $m )
+			. ( $invoice_url ? '<p><a href="' . esc_url( $invoice_url ) . '">' . esc_html__( 'Pay the invoice now', 'olivia-studio' ) . '</a></p>' : '' );
+		self::send( self::user_email( $m->user_id ), __( 'Action needed: membership payment failed', 'olivia-studio' ), __( 'Payment failed', 'olivia-studio' ), $body, array(), array( __( 'Update my card', 'olivia-studio' ), oys_account_url( 'membership' ) ) );
+		self::admin_notice( __( 'Membership payment failed', 'olivia-studio' ), sprintf( '%s — %s', self::first_name( $m->user_id ), $m->name ) );
 	}
 
 	/* ---------- Studio emails ---------- */

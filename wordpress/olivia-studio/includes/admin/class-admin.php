@@ -18,7 +18,7 @@ class OYS_Admin {
 			}
 		} );
 		$actions = array( 'save_session', 'cancel_session', 'roster', 'save_template', 'delete_template', 'generate', 'private_offer', 'private_decline',
-			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking' );
+			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership' );
 		foreach ( $actions as $a ) {
 			add_action( 'admin_post_oys_admin_' . $a, array( __CLASS__, 'guard' ) );
 		}
@@ -34,6 +34,7 @@ class OYS_Admin {
 			'oys-templates' => array( __( 'Weekly timetable', 'olivia-studio' ), 'page_templates' ),
 			'oys-private'   => array( __( 'Private requests', 'olivia-studio' ) . ( $new ? ' <span class="awaiting-mod">' . $new . '</span>' : '' ), 'page_private' ),
 			'oys-customers' => array( __( 'Customers', 'olivia-studio' ), 'page_customers' ),
+			'oys-members'   => array( __( 'Memberships', 'olivia-studio' ), 'page_members' ),
 			'oys-orders'    => array( __( 'Payments', 'olivia-studio' ), 'page_orders' ),
 			'oys-gifts'     => array( __( 'Gift cards', 'olivia-studio' ), 'page_gifts' ),
 			'oys-products'  => array( __( 'Prices & passes', 'olivia-studio' ), 'page_products' ),
@@ -114,6 +115,7 @@ class OYS_Admin {
 		$kpis = array(
 			array( __( 'Revenue, last 30 days', 'olivia-studio' ), oys_money( $rev30 ) ),
 			array( __( 'Booked, next 7 days', 'olivia-studio' ), $book7 . ' / ' . $cap7 ),
+			array( __( 'Active members · MRR', 'olivia-studio' ), count( array_filter( OYS_Memberships::query(), fn( $m ) => in_array( $m->status, OYS_Memberships::BOOKABLE, true ) ) ) . ' · ' . oys_money( OYS_Memberships::mrr() ) ),
 			array( __( 'New private requests', 'olivia-studio' ), count( $new ) ),
 			array( __( 'Customers', 'olivia-studio' ), $cust ),
 		);
@@ -148,7 +150,8 @@ class OYS_Admin {
 			echo '<ol>';
 			foreach ( $bookings as $b ) {
 				$health = get_user_meta( $b->user_id, 'oys_health_notes', true );
-				echo '<li>' . self::user_label( $b->user_id ) . ( 'attended' === $b->status ? ' ✓' : '' ) . ( $health ? ' <span class="oys-flag" title="' . esc_attr( $health ) . '">' . esc_html__( 'health note', 'olivia-studio' ) . '</span>' : '' ) . '</li>'; // phpcs:ignore
+				$health = $b->guest_of ? '' : $health;
+				echo '<li>' . ( $b->guest_of ? '<span class="oys-guest-tag">' . esc_html__( 'Guest', 'olivia-studio' ) . '</span> ' . esc_html( OYS_Bookings::person_label( $b ) ) : self::user_label( $b->user_id ) ) . ( 'attended' === $b->status ? ' ✓' : '' ) . ( $health ? ' <span class="oys-flag" title="' . esc_attr( $health ) . '">' . esc_html__( 'health note', 'olivia-studio' ) . '</span>' : '' ) . '</li>'; // phpcs:ignore
 			}
 			echo '</ol>';
 		}
@@ -280,7 +283,11 @@ class OYS_Admin {
 				continue;
 			}
 			$active = in_array( $b->status, array( 'confirmed', 'attended', 'no_show' ), true );
-			echo '<tr><td>' . self::user_label( $b->user_id ) . '</td><td>' . esc_html( get_user_meta( $b->user_id, 'oys_phone', true ) ) . '</td><td>' . esc_html( $b->paid_with ) . '</td><td class="oys-health">' . esc_html( get_user_meta( $b->user_id, 'oys_health_notes', true ) ) . '</td><td>' . esc_html( $st[ $b->status ] ?? $b->status ) . '</td><td>'; // phpcs:ignore
+			$labels = OYS_Bookings::paid_with_labels();
+			$name   = $b->guest_of
+				? '<span class="oys-guest-tag">' . esc_html__( 'Guest', 'olivia-studio' ) . '</span> <b>' . esc_html( $b->guest_name ) . '</b><br><small>' . sprintf( esc_html__( 'with %s', 'olivia-studio' ), self::user_label( $b->user_id ) ) . ( $b->guest_email ? ' · ' . esc_html( $b->guest_email ) : '' ) . '</small>'
+				: self::user_label( $b->user_id );
+			echo '<tr' . ( $b->guest_of ? ' class="oys-guest-row"' : '' ) . '><td>' . $name . '</td><td>' . esc_html( $b->guest_of ? '' : get_user_meta( $b->user_id, 'oys_phone', true ) ) . '</td><td>' . esc_html( $labels[ $b->paid_with ] ?? $b->paid_with ) . '</td><td class="oys-health">' . esc_html( $b->guest_of ? '' : get_user_meta( $b->user_id, 'oys_health_notes', true ) ) . '</td><td>' . esc_html( $st[ $b->status ] ?? $b->status ) . '</td><td>'; // phpcs:ignore
 			if ( $active ) {
 				echo self::form( 'roster', 'class="oys-inline"' ) . '<input type="hidden" name="session" value="' . (int) $id . '"><input type="hidden" name="booking" value="' . (int) $b->id . '">' // phpcs:ignore
 					. '<button name="do" value="attended" class="button button-small' . ( 'attended' === $b->status ? ' button-primary' : '' ) . '">' . esc_html__( 'Here', 'olivia-studio' ) . '</button> '
@@ -500,6 +507,11 @@ class OYS_Admin {
 			. '<input type="number" name="credits" min="1" value="1" class="small-text"> ' . esc_html__( 'valid for', 'olivia-studio' ) . ' <input type="number" name="days" min="1" value="90" class="small-text"> ' . esc_html__( 'days', 'olivia-studio' )
 			. ' <input name="name" placeholder="' . esc_attr__( 'Label, e.g. Paid in cash', 'olivia-studio' ) . '"> <button class="button button-primary">' . esc_html__( 'Add', 'olivia-studio' ) . '</button></form></div></div>';
 
+		$ms = OYS_Memberships::for_user( $user_id );
+		if ( $ms ) {
+			echo '<h2>' . esc_html__( 'Memberships', 'olivia-studio' ) . '</h2>';
+			self::members_table( $ms, false );
+		}
 		$st = OYS_Bookings::statuses();
 		echo '<h2>' . esc_html__( 'Bookings', 'olivia-studio' ) . '</h2><table class="widefat striped oys-table"><thead><tr><th>' . esc_html__( 'Date', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Session', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Paid with', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Status', 'olivia-studio' ) . '</th></tr></thead><tbody>';
 		foreach ( OYS_Bookings::for_user( $user_id, 'all' ) as $b ) {
@@ -531,6 +543,57 @@ class OYS_Admin {
 		$exp = sanitize_text_field( wp_unslash( $_POST['expires'] ?? '' ) );
 		OYS_Passes::adjust( (int) $_POST['pass'], (int) $_POST['credits_left'], $exp ? oys_local_to_utc( $exp . ' 23:59:59' ) : '' );
 		self::back( 'oys-customers', array( 'user' => (int) $_POST['user'] ), __( 'Pass updated.', 'olivia-studio' ) );
+	}
+
+	/* ======================================================================
+	   Memberships
+	   ====================================================================== */
+
+	public static function page_members() {
+		self::header( __( 'Memberships', 'olivia-studio' ) );
+		$all    = OYS_Memberships::query();
+		$active = array_filter( $all, fn( $m ) => in_array( $m->status, OYS_Memberships::BOOKABLE, true ) );
+		echo '<div class="oys-kpis"><div class="oys-kpi"><span>' . esc_html__( 'Active members', 'olivia-studio' ) . '</span><b>' . count( $active ) . '</b></div>'
+			. '<div class="oys-kpi"><span>' . esc_html__( 'Monthly recurring revenue', 'olivia-studio' ) . '</span><b>' . esc_html( oys_money( OYS_Memberships::mrr() ) ) . '</b></div>'
+			. '<div class="oys-kpi"><span>' . esc_html__( 'Payment problems', 'olivia-studio' ) . '</span><b>' . count( array_filter( $all, fn( $m ) => 'past_due' === $m->status ) ) . '</b></div>'
+			. '<div class="oys-kpi"><span>' . esc_html__( 'Ending (cancel scheduled)', 'olivia-studio' ) . '</span><b>' . count( array_filter( $active, fn( $m ) => $m->cancel_at_period_end ) ) . '</b></div></div>';
+		echo '<p class="description">' . esc_html__( 'Plans and prices: Studio → Prices & passes. Billing details, invoices and disputes are in your Stripe dashboard; changes made there appear here automatically.', 'olivia-studio' ) . '</p>';
+		self::members_table( $all, true );
+		echo '</div>';
+	}
+
+	private static function members_table( $rows, $with_user ) {
+		$st = OYS_Memberships::statuses();
+		echo '<table class="widefat striped oys-table"><thead><tr>' . ( $with_user ? '<th>' . esc_html__( 'Member', 'olivia-studio' ) . '</th>' : '' ) . '<th>' . esc_html__( 'Plan', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Status', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Used this period', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Period', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Since', 'olivia-studio' ) . '</th><th></th></tr></thead><tbody>';
+		foreach ( $rows as $m ) {
+			$bookable = in_array( $m->status, OYS_Memberships::BOOKABLE, true );
+			$status   = ( $st[ $m->status ] ?? $m->status ) . ( $bookable && $m->cancel_at_period_end ? ' · ' . __( 'ends at period end', 'olivia-studio' ) : '' );
+			echo '<tr>' . ( $with_user ? '<td>' . self::user_label( $m->user_id ) . '</td>' : '' ) . '<td>' . esc_html( $m->name ) . '</td><td><span class="oys-status oys-status--' . esc_attr( $m->status ) . '">' . esc_html( $status ) . '</span></td>' // phpcs:ignore
+				. '<td>' . (int) OYS_Memberships::used_in_period( $m ) . ( (int) $m->classes_per_period ? ' / ' . (int) $m->classes_per_period : '' ) . '</td>'
+				. '<td>' . esc_html( $m->current_period_start ? oys_date( $m->current_period_start, 'M j' ) . ' – ' . oys_date( $m->current_period_end, 'M j, Y' ) : '—' ) . '</td><td>' . esc_html( oys_date( $m->created_at, 'M j, Y' ) ) . '</td><td>';
+			if ( $bookable ) {
+				$f = fn( $do, $label, $cls = '', $confirm = '' ) => self::form( 'membership', 'class="oys-inline"' . ( $confirm ? ' onsubmit="return confirm(\'' . esc_js( $confirm ) . '\')"' : '' ) ) . '<input type="hidden" name="id" value="' . (int) $m->id . '"><input type="hidden" name="do" value="' . $do . '"><input type="hidden" name="back" value="' . ( $with_user ? 'list' : (int) $m->user_id ) . '"><button class="button button-small ' . $cls . '">' . esc_html( $label ) . '</button></form> ';
+				echo $m->cancel_at_period_end ? $f( 'resume', __( 'Resume', 'olivia-studio' ) ) : $f( 'cancel', __( 'Cancel at period end', 'olivia-studio' ), '', __( 'The member keeps access until the end of the paid period and is emailed. Continue?', 'olivia-studio' ) ); // phpcs:ignore
+				echo $f( 'end', __( 'End now', 'olivia-studio' ), 'button-link-delete', __( 'End the membership immediately? No refund is made automatically; future classes booked with it are cancelled.', 'olivia-studio' ) ); // phpcs:ignore
+			}
+			echo '</td></tr>';
+		}
+		if ( ! $rows ) {
+			echo '<tr><td colspan="7">' . esc_html__( 'No memberships yet.', 'olivia-studio' ) . '</td></tr>';
+		}
+		echo '</tbody></table>';
+	}
+
+	private static function do_membership() {
+		$m    = OYS_Memberships::get( (int) $_POST['id'] );
+		$back = sanitize_key( $_POST['back'] ?? 'list' );
+		$res  = null;
+		if ( $m ) {
+			$do  = sanitize_key( $_POST['do'] ?? '' );
+			$res = 'end' === $do ? OYS_Memberships::cancel_now( $m ) : OYS_Memberships::set_cancel_at_period_end( $m, 'cancel' === $do );
+		}
+		$msg = is_wp_error( $res ) ? $res->get_error_message() . ' ' . ( $res->get_error_data()['stripe'] ?? '' ) : __( 'Membership updated.', 'olivia-studio' );
+		'list' === $back ? self::back( 'oys-members', array(), $msg ) : self::back( 'oys-customers', array( 'user' => (int) $back ), $msg );
 	}
 
 	/* ======================================================================
@@ -621,6 +684,7 @@ class OYS_Admin {
 			echo '<tr><th>' . esc_html__( 'Price', 'olivia-studio' ) . '</th><td><input name="price" class="small-text" value="' . esc_attr( $p['price_cents'] / 100 ) . '"> ' . esc_html( strtoupper( OYS_Settings::get( 'currency' ) ) ) . '</td></tr>';
 			echo '<tr><th>' . esc_html__( 'Classes / sessions', 'olivia-studio' ) . '</th><td><input type="number" name="credits" min="1" class="small-text" value="' . (int) $p['credits'] . '"> ' . esc_html__( 'valid for', 'olivia-studio' ) . ' <input type="number" name="validity_days" min="0" class="small-text" value="' . (int) $p['validity_days'] . '"> ' . esc_html__( 'days (0 = no expiry)', 'olivia-studio' ) . '</td></tr>';
 			echo '<tr><th>' . esc_html__( 'Session length (private)', 'olivia-studio' ) . '</th><td><input type="number" name="duration_min" min="0" class="small-text" value="' . (int) $p['duration_min'] . '"> min</td></tr>';
+			echo '<tr><th>' . esc_html__( 'Membership billing', 'olivia-studio' ) . '</th><td>' . esc_html__( 'every', 'olivia-studio' ) . ' <input type="number" name="interval_count" min="1" class="small-text" value="' . (int) $p['interval_count'] . '"> <select name="interval"><option value="month"' . selected( $p['interval'], 'month', false ) . '>' . esc_html__( 'month(s)', 'olivia-studio' ) . '</option><option value="year"' . selected( $p['interval'], 'year', false ) . '>' . esc_html__( 'year(s)', 'olivia-studio' ) . '</option></select> · ' . esc_html__( 'classes per period', 'olivia-studio' ) . ' <input type="number" name="classes_per_period" min="0" class="small-text" value="' . (int) $p['classes_per_period'] . '"> <span class="description">' . esc_html__( '0 = unlimited. Only used for memberships; a price change applies to new members (existing members keep their price in Stripe).', 'olivia-studio' ) . '</span></td></tr>';
 			echo '<tr><th>' . esc_html__( 'Short description', 'olivia-studio' ) . '</th><td><input class="large-text" name="description" value="' . esc_attr( $p['description'] ) . '"></td></tr>';
 			echo '<tr><th>' . esc_html__( 'Bullet points (one per line)', 'olivia-studio' ) . '</th><td><textarea name="features" rows="3" class="large-text">' . esc_textarea( $p['features'] ) . '</textarea></td></tr>';
 			echo '<tr><th>' . esc_html__( 'Options', 'olivia-studio' ) . '</th><td><label><input type="checkbox" name="active" value="1"' . checked( 1, (int) $p['active'], false ) . '> ' . esc_html__( 'On sale', 'olivia-studio' ) . '</label> &nbsp; <label><input type="checkbox" name="giftable" value="1"' . checked( 1, (int) $p['giftable'], false ) . '> ' . esc_html__( 'Can be bought as a gift', 'olivia-studio' ) . '</label> &nbsp; <label><input type="checkbox" name="featured" value="1"' . checked( 1, (int) $p['featured'], false ) . '> ' . esc_html__( 'Highlight as most popular', 'olivia-studio' ) . '</label> &nbsp; ' . esc_html__( 'Order', 'olivia-studio' ) . ' <input type="number" name="sort" class="small-text" value="' . (int) $p['sort'] . '"></td></tr>';
@@ -655,6 +719,9 @@ class OYS_Admin {
 			'active'        => empty( $_POST['active'] ) ? 0 : 1,
 			'duration_min'  => max( 0, (int) ( $_POST['duration_min'] ?? 0 ) ),
 			'sort'          => (int) ( $_POST['sort'] ?? 50 ),
+			'interval'           => 'year' === ( $_POST['interval'] ?? '' ) ? 'year' : 'month',
+			'interval_count'     => max( 1, (int) ( $_POST['interval_count'] ?? 1 ) ),
+			'classes_per_period' => max( 0, (int) ( $_POST['classes_per_period'] ?? 0 ) ),
 		) );
 		self::back( 'oys-products', array(), __( 'Saved.', 'olivia-studio' ) );
 	}
@@ -679,7 +746,7 @@ class OYS_Admin {
 		echo '<tr><th>' . esc_html__( 'Test webhook signing secret', 'olivia-studio' ) . '</th><td>' . $f( 'stripe_test_webhook', 'password', 'regular-text', 'autocomplete="off" placeholder="whsec_…"' ) . '</td></tr>'; // phpcs:ignore
 		echo '<tr><th>' . esc_html__( 'Live secret key', 'olivia-studio' ) . '</th><td>' . $f( 'stripe_live_secret', 'password', 'regular-text', 'autocomplete="off" placeholder="sk_live_… or rk_live_…"' ) . '</td></tr>'; // phpcs:ignore
 		echo '<tr><th>' . esc_html__( 'Live webhook signing secret', 'olivia-studio' ) . '</th><td>' . $f( 'stripe_live_webhook', 'password', 'regular-text', 'autocomplete="off" placeholder="whsec_…"' ) . '</td></tr>'; // phpcs:ignore
-		echo '<tr><th>' . esc_html__( 'Webhook URL', 'olivia-studio' ) . '</th><td><code>' . esc_html( $hook ) . '</code><p class="description">' . esc_html__( 'In Stripe → Developers → Webhooks, add this URL with the events: checkout.session.completed, checkout.session.async_payment_succeeded, checkout.session.async_payment_failed, checkout.session.expired, charge.refunded.', 'olivia-studio' ) . '</p></td></tr>';
+		echo '<tr><th>' . esc_html__( 'Webhook URL', 'olivia-studio' ) . '</th><td><code>' . esc_html( $hook ) . '</code><p class="description">' . esc_html__( 'In Stripe → Developers → Webhooks, add this URL with the events: checkout.session.completed, checkout.session.async_payment_succeeded, checkout.session.async_payment_failed, checkout.session.expired, charge.refunded, customer.subscription.updated, customer.subscription.deleted, invoice.paid, invoice.payment_failed. For memberships also turn on the Customer portal (Settings → Billing → Customer portal).', 'olivia-studio' ) . '</p></td></tr>';
 		echo '<tr><th>' . esc_html__( 'Currency', 'olivia-studio' ) . '</th><td>' . $f( 'currency', 'text', 'small-text', 'maxlength="3"' ) . '</td></tr>'; // phpcs:ignore
 		echo '</table><h2>' . esc_html__( 'Booking rules', 'olivia-studio' ) . '</h2><table class="form-table">';
 		$nums = array(
@@ -692,6 +759,7 @@ class OYS_Admin {
 			'weeks_ahead'           => __( 'Create weekly classes this many weeks ahead', 'olivia-studio' ),
 			'reminder_hours'        => __( 'Reminder email (hours before; 0 = off)', 'olivia-studio' ),
 			'hold_minutes'          => __( 'Hold a spot during card payment (minutes, 30 or more)', 'olivia-studio' ),
+			'max_guests'            => __( 'Guests a customer can bring per booking (0 = off)', 'olivia-studio' ),
 		);
 		foreach ( $nums as $k => $l ) {
 			echo '<tr><th>' . esc_html( $l ) . '</th><td>' . $f( $k, 'number', 'small-text', 'min="0"' ) . '</td></tr>'; // phpcs:ignore

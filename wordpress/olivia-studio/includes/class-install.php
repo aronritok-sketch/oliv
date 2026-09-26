@@ -21,6 +21,7 @@ class OYS_Install {
 	public static function maybe_upgrade() {
 		if ( get_option( 'oys_db_version' ) !== OYS_DB_VERSION ) {
 			self::activate();
+			OYS_Products::add_missing_kinds();
 		}
 	}
 
@@ -82,6 +83,10 @@ class OYS_Install {
 			paid_with varchar(20) NOT NULL DEFAULT '',
 			pass_id bigint(20) unsigned NOT NULL DEFAULT 0,
 			order_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			membership_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			guest_of bigint(20) unsigned NOT NULL DEFAULT 0,
+			guest_name varchar(190) NOT NULL DEFAULT '',
+			guest_email varchar(190) NOT NULL DEFAULT '',
 			hold_expires datetime NULL,
 			reminder_sent tinyint(1) unsigned NOT NULL DEFAULT 0,
 			note text NULL,
@@ -90,7 +95,9 @@ class OYS_Install {
 			checked_in_at datetime NULL,
 			PRIMARY KEY  (id),
 			KEY session_status (session_id,status),
-			KEY user_status (user_id,status)
+			KEY user_status (user_id,status),
+			KEY guest_of (guest_of),
+			KEY order_id (order_id)
 		) $c;" );
 
 		dbDelta( 'CREATE TABLE ' . self::table( 'waitlist' ) . " (
@@ -133,12 +140,14 @@ class OYS_Install {
 			status varchar(20) NOT NULL DEFAULT 'pending',
 			stripe_session_id varchar(255) NULL,
 			stripe_payment_intent varchar(255) NOT NULL DEFAULT '',
+			stripe_invoice_id varchar(255) NULL,
 			receipt_url varchar(500) NOT NULL DEFAULT '',
 			meta longtext NULL,
 			created_at datetime NOT NULL,
 			paid_at datetime NULL,
 			PRIMARY KEY  (id),
 			UNIQUE KEY stripe_session_id (stripe_session_id),
+			UNIQUE KEY stripe_invoice_id (stripe_invoice_id),
 			KEY user_id (user_id),
 			KEY status (status)
 		) $c;" );
@@ -179,6 +188,28 @@ class OYS_Install {
 			PRIMARY KEY  (id),
 			KEY user_id (user_id),
 			KEY status (status)
+		) $c;" );
+
+		// Recurring memberships (Stripe subscriptions). Periods mirror the subscription.
+		dbDelta( 'CREATE TABLE ' . self::table( 'memberships' ) . " (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			user_id bigint(20) unsigned NOT NULL,
+			product_id varchar(60) NOT NULL DEFAULT '',
+			name varchar(190) NOT NULL DEFAULT '',
+			classes_per_period smallint(5) unsigned NOT NULL DEFAULT 0,
+			status varchar(20) NOT NULL DEFAULT 'incomplete',
+			cancel_at_period_end tinyint(1) unsigned NOT NULL DEFAULT 0,
+			current_period_start datetime NULL,
+			current_period_end datetime NULL,
+			stripe_subscription_id varchar(255) NULL,
+			stripe_customer_id varchar(255) NOT NULL DEFAULT '',
+			order_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			created_at datetime NOT NULL,
+			updated_at datetime NULL,
+			ended_at datetime NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY stripe_subscription_id (stripe_subscription_id),
+			KEY user_status (user_id,status)
 		) $c;" );
 
 		// Processed Stripe webhook events: makes webhook handling idempotent.

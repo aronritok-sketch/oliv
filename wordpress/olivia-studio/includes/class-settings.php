@@ -27,6 +27,7 @@ class OYS_Settings {
 			'booking_close_minutes'   => 30,
 			'weeks_ahead'             => 6,
 			'reminder_hours'          => 24,
+			'max_guests'              => 4,
 			'email_from_name'         => 'Olivia Kovács Yoga',
 			'email_from'              => get_option( 'admin_email' ),
 			'notify_email'            => get_option( 'admin_email' ),

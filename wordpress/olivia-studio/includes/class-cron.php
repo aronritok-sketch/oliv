@@ -55,7 +55,7 @@ class OYS_Cron {
 		// Bookings made after the reminder window opened don't need a reminder; they just got a confirmation.
 		$ids = $wpdb->get_col( $wpdb->prepare(
 			"SELECT b.id FROM $b b JOIN $s s ON s.id = b.session_id
-			 WHERE b.status = 'confirmed' AND b.reminder_sent = 0 AND s.status = 'scheduled'
+			 WHERE b.status = 'confirmed' AND b.guest_of = 0 AND b.reminder_sent = 0 AND s.status = 'scheduled'
 			 AND s.starts_at > %s AND s.starts_at <= %s AND b.created_at < DATE_SUB(s.starts_at, INTERVAL %d HOUR)",
 			oys_now(), oys_utc_plus( $hours * HOUR_IN_SECONDS ), $hours
 		) );

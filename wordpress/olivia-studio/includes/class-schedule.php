@@ -191,6 +191,21 @@ class OYS_Schedule {
 		return 1 === (int) $wpdb->query( $wpdb->prepare( "UPDATE $t SET booked = booked + 1 WHERE id = %d AND status = 'scheduled' AND booked < capacity", $session_id ) );
 	}
 
+	/** Atomically take $n seats at once (a customer and their guests): all or nothing. */
+	public static function take_seats( $session_id, $n ) {
+		global $wpdb;
+		$n = max( 1, (int) $n );
+		$t = OYS_Install::table( 'sessions' );
+		return 1 === (int) $wpdb->query( $wpdb->prepare( "UPDATE $t SET booked = booked + %d WHERE id = %d AND status = 'scheduled' AND booked + %d <= capacity", $n, $session_id, $n ) );
+	}
+
+	public static function release_seats( $session_id, $n ) {
+		global $wpdb;
+		$t = OYS_Install::table( 'sessions' );
+		$wpdb->query( $wpdb->prepare( "UPDATE $t SET booked = GREATEST(0, CAST(booked AS SIGNED) - %d) WHERE id = %d", (int) $n, $session_id ) );
+		do_action( 'oys_seat_released', (int) $session_id );
+	}
+
 	public static function release_seat( $session_id ) {
 		global $wpdb;
 		$t = OYS_Install::table( 'sessions' );
@@ -219,6 +234,10 @@ class OYS_Schedule {
 		self::save( array( 'status' => 'cancelled' ), $session_id );
 		$n = 0;
 		foreach ( OYS_Bookings::for_session( $session_id, array( 'confirmed', 'pending' ) ) as $booking ) {
+			$fresh = OYS_Bookings::get( $booking->id );
+			if ( ! in_array( $fresh->status, array( 'confirmed', 'pending' ), true ) ) {
+				continue; // Already cancelled together with its host booking.
+			}
 			OYS_Bookings::cancel( $booking->id, array( 'by_studio' => true, 'reason' => $reason ) );
 			$n++;
 		}

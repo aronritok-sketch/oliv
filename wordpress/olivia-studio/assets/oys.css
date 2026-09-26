@@ -128,3 +128,32 @@
 .oys-gift input:checked + .oys-gift__card { box-shadow: 6px 6px 0 var(--oys-ink); transform: translate(-3px, -3px); }
 .oys-gift input:focus-visible + .oys-gift__card { outline: 3px solid var(--oys-orchid); outline-offset: 3px; }
 .oys-gifts--preview .oys-gift { cursor: default; }
+
+/* Guests */
+.oys-guests { border: 1.5px dashed var(--oys-ink); border-radius: 6px; padding: .9rem 1rem 1rem; margin: 1rem 0; display: grid; gap: .7rem; }
+.oys-guests legend { font-weight: 800; text-transform: uppercase; letter-spacing: .06em; font-size: .8rem; padding: 0 .4rem; color: var(--oys-ink); }
+.oys-guests .oys-small { margin: 0; }
+.oys-guests [data-guest-add] { justify-self: start; }
+.oys-guest { display: grid; grid-template-columns: 1fr 1fr auto; gap: .6rem; align-items: end; padding-top: .7rem; border-top: 1px solid var(--oys-line); position: relative; }
+.oys-guest__n { position: absolute; top: .55rem; right: 2.6rem; font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--oys-muted); }
+.oys-guest__remove { width: 40px; height: 44px; border: 2px solid var(--oys-ink); border-radius: 6px; background: transparent; font-size: 1.3rem; line-height: 1; cursor: pointer; color: var(--oys-ink); }
+.oys-guest__remove:hover { background: var(--oys-pink); }
+@media (max-width: 560px) { .oys-guest { grid-template-columns: 1fr auto; } .oys-guest .field:nth-of-type(2) { grid-column: 1; } .oys-guest__remove { grid-row: 1; grid-column: 2; } }
+.oys-party { margin: .2rem 0 .4rem; font-size: .92rem; color: var(--oys-muted); }
+.oys-party b { color: var(--oys-ink); font-size: 1.1rem; }
+.oys-option__label small { display: block; font-weight: 500; font-size: .8rem; color: var(--oys-muted); margin-top: .15rem; }
+.oys-guestlist { list-style: none; margin: .6rem 0 0; padding: 0; display: grid; gap: .3rem; }
+.oys-guestlist li { display: flex; gap: .75rem; align-items: center; justify-content: space-between; max-width: 460px; padding: .35rem .6rem; border-radius: 6px; background: var(--oys-lilac); color: var(--oys-ink); font-weight: 600; font-size: .92rem; }
+.oys-guestlist li:nth-child(even) { background: var(--oys-pink); }
+.oys-guestlist .oys-icon { width: 16px; height: 16px; display: inline-block; vertical-align: -3px; margin-right: .35rem; }
+.oys-guestlist small { font-weight: 500; color: rgba(18,35,26,.7); }
+.oys-linkbtn { background: none; border: 0; padding: 0; font: inherit; font-size: .78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; text-decoration: underline; cursor: pointer; color: var(--oys-ink); }
+
+/* Membership */
+.oys-membership { background: var(--oys-sun); box-shadow: 8px 8px 0 var(--oys-ink); }
+.oys-membership h3 { margin: 0 0 1rem; font-family: var(--f-display, sans-serif); font-weight: 400; text-transform: uppercase; font-size: 2rem; }
+.oys-dl { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: .8rem; margin: 0 0 1rem; }
+.oys-dl dt { font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: rgba(18,35,26,.75); }
+.oys-dl dd { margin: .2rem 0 0; font-weight: 700; color: var(--oys-ink); }
+.oys-bigprice small { font-family: var(--f-text, sans-serif); font-size: .9rem; letter-spacing: 0; }
+.oys-item__main .badge { vertical-align: 2px; }

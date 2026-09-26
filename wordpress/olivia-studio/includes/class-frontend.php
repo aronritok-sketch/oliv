@@ -144,10 +144,11 @@ class OYS_Frontend {
 	   Pricing
 	   ====================================================================== */
 
+
 	public static function sc_pricing( $atts ) {
 		$dropin = (int) apply_filters( 'oys_dropin_display_price', 2500 );
 		$cards  = array();
-		$cards[] = array( 'tone' => 'paper', 'title' => __( 'Drop-in class', 'olivia-studio' ), 'price' => oys_money( $dropin ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array( __( 'Any group class', 'olivia-studio' ), __( 'In person or online', 'olivia-studio' ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
+		$cards[] = array( 'tone' => 'paper', 'title' => __( 'Drop-in class', 'olivia-studio' ), 'price' => oys_money( $dropin ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array( __( 'Any group class', 'olivia-studio' ), __( 'In person or online', 'olivia-studio' ), __( 'Bring friends: add guests when you book', 'olivia-studio' ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
 		$tones = array( 'lilac', 'sun', 'pink' );
 		$i     = 0;
 		foreach ( OYS_Products::all( true ) as $p ) {
@@ -156,15 +157,16 @@ class OYS_Frontend {
 			}
 			$features = array_filter( array_map( 'trim', explode( "\n", $p['features'] ) ) );
 			if ( 'private_single' === $p['kind'] ) {
-				$cta = array( __( 'Request a private session', 'olivia-studio' ), oys_account_url( 'private' ) );
+				$cta  = array( __( 'Request a private session', 'olivia-studio' ), oys_account_url( 'private' ) );
 				$unit = sprintf( __( '%d minutes', 'olivia-studio' ), (int) $p['duration_min'] );
-				$more = array();
 				foreach ( OYS_Products::all( true ) as $q ) {
 					if ( 'private_single' === $q['kind'] && 60 !== (int) $q['duration_min'] ) {
-						$more[] = sprintf( '%d minutes: %s', (int) $q['duration_min'], oys_money( $q['price_cents'] ) );
+						$features[] = sprintf( '%d minutes: %s', (int) $q['duration_min'], oys_money( $q['price_cents'] ) );
 					}
 				}
-				$features = array_merge( $features, $more );
+			} elseif ( 'membership' === $p['kind'] ) {
+				$cta  = array( __( 'Join', 'olivia-studio' ), oys_page_url( 'book', array( 'product' => $p['id'] ) ) );
+				$unit = OYS_Products::period_label( $p );
 			} else {
 				$cta  = array( 'intro' === $p['kind'] ? __( 'Claim the intro offer', 'olivia-studio' ) : __( 'Buy now', 'olivia-studio' ), oys_page_url( 'book', array( 'product' => $p['id'] ) ) );
 				$unit = 'private_pack' === $p['kind'] ? __( 'per pack', 'olivia-studio' ) : sprintf( _n( '%d class', '%d classes', (int) $p['credits'], 'olivia-studio' ), (int) $p['credits'] );
@@ -265,6 +267,35 @@ class OYS_Frontend {
 			. '<label class="oys-check"><input type="checkbox" name="waiver" value="1" required> <span>' . esc_html__( 'I have read and accept the participation agreement.', 'olivia-studio' ) . '</span></label>';
 	}
 
+
+	/** Guest name/email rows. Visible rows = $open; the rest appear with "Add a guest". */
+	private static function guest_fields( $max, $open = 0 ) {
+		if ( $max < 1 ) {
+			return '';
+		}
+		$rows = '';
+		for ( $i = 0; $i < $max; $i++ ) {
+			$rows .= '<div class="oys-guest" data-guest' . ( $i >= $open ? ' hidden' : '' ) . '><span class="oys-guest__n">' . sprintf( esc_html__( 'Guest %d', 'olivia-studio' ), $i + 1 ) . '</span>'
+				. '<label class="field"><span>' . esc_html__( 'Name', 'olivia-studio' ) . '</span><input type="text" name="guest_name[]" id="oys-guest-name-' . $i . '" autocomplete="off"></label>'
+				. '<label class="field"><span>' . esc_html__( 'Email (optional, for their invite)', 'olivia-studio' ) . '</span><input type="email" name="guest_email[]" id="oys-guest-email-' . $i . '" autocomplete="off"></label>'
+				. '<button type="button" class="oys-guest__remove" data-guest-remove aria-label="' . esc_attr__( 'Remove guest', 'olivia-studio' ) . '">×</button></div>';
+		}
+		return '<fieldset class="oys-guests" data-guests data-max="' . (int) $max . '"><legend>' . esc_html__( 'Bringing friends?', 'olivia-studio' ) . '</legend>'
+			. '<p class="oys-small">' . sprintf( esc_html__( 'Add up to %d guests. Each guest takes one spot and is paid from your pass or by card, together with your booking.', 'olivia-studio' ), (int) $max ) . '</p>'
+			. $rows . '<button type="button" class="btn btn--ghost btn--sm" data-guest-add>' . esc_html__( '+ Add a guest', 'olivia-studio' ) . '</button></fieldset>';
+	}
+
+	/** Small script: show/hide guest rows and update the party size and card total on each option. */
+	private static function party_script() {
+		return '<script>(function(){document.querySelectorAll("[data-party]").forEach(function(f){var box=f.querySelector("[data-guests]");var rows=box?[].slice.call(box.querySelectorAll("[data-guest]")):[];var add=box&&box.querySelector("[data-guest-add]");var host=parseInt(f.getAttribute("data-host"),10);'
+			. 'function count(){return rows.filter(function(r){return !r.hidden&&r.querySelector("input[type=text]").value.trim()!=="";}).length;}'
+			. 'function upd(){var n=count(),people=host+n;f.querySelectorAll("[data-each]").forEach(function(el){var each=parseInt(el.getAttribute("data-each"),10),fixed=parseInt(el.getAttribute("data-fixed")||"0",10),mult=el.getAttribute("data-guests-only")?n:people;el.textContent="$"+((fixed+each*mult)/100).toFixed((fixed+each*mult)%100?2:0);});'
+			. 'f.querySelectorAll("[data-needs]").forEach(function(el){var need=el.getAttribute("data-guests-only")?n:people,have=parseInt(el.getAttribute("data-needs"),10),opt=el.closest(".oys-option"),inp=opt.querySelector("input");var ok=have>=need;opt.classList.toggle("is-disabled",!ok);inp.disabled=!ok;if(!ok&&inp.checked){var o=f.querySelector(".oys-option:not(.is-disabled) input");if(o)o.checked=true;}});'
+			. 'var ps=f.querySelector("[data-party-size]");if(ps)ps.textContent=people;if(add)add.hidden=rows.every(function(r){return !r.hidden;});}'
+			. 'if(add)add.addEventListener("click",function(){var r=rows.find(function(r){return r.hidden;});if(r){r.hidden=false;r.querySelector("input").focus();}upd();});'
+			. 'rows.forEach(function(r){r.querySelector("[data-guest-remove]").addEventListener("click",function(){r.hidden=true;r.querySelectorAll("input").forEach(function(i){i.value="";});upd();});r.querySelectorAll("input").forEach(function(i){i.addEventListener("input",upd);});});upd();});})();</script>';
+	}
+
 	private static function render_session_checkout( $session_id ) {
 		$s       = OYS_Schedule::get( $session_id );
 		$user_id = get_current_user_id();
@@ -279,99 +310,152 @@ class OYS_Frontend {
 		$out = '<div class="oys-checkout">' . self::session_card( $s ) . '<div class="oys-checkout__main">';
 
 		if ( ! $user_id ) {
-			return $out . self::auth_block( $here, __( 'You need an account to book, so you can manage or cancel your spot and keep track of your passes. It takes a minute.', 'olivia-studio' ) ) . '</div></div>';
+			return $out . self::auth_block( $here, __( 'You need an account to book, so you can manage or cancel your spot, bring guests and keep track of your passes. It takes a minute.', 'olivia-studio' ) ) . '</div></div>';
 		}
-		$mine = OYS_Bookings::active_for( $user_id, $s->id );
+		$closed    = OYS_Schedule::closed_reason( $s );
+		$left      = OYS_Schedule::spots_left( $s );
+		$mine      = OYS_Bookings::active_for( $user_id, $s->id );
+		$kind      = OYS_Bookings::credit_kind( $s );
+		$credits   = $s->credits_allowed ? OYS_Passes::balance( $user_id, $kind ) : 0;
+		$max_g     = 'private' === $s->kind ? 0 : (int) OYS_Settings::get( 'max_guests' );
+		$ready     = OYS_Settings::payments_ready();
+		$price     = (int) $s->price_cents;
+
+		// Already booked: confirmation, guests, and "bring more guests".
 		if ( $mine && 'pending' !== $mine->status ) {
-			return $out . '<div class="oys-card oys-done"><h2>' . esc_html__( 'You\'re booked', 'olivia-studio' ) . '</h2><p>' . esc_html__( 'See you on the mat. You\'ll find this booking in your account.', 'olivia-studio' ) . '</p><p class="btn-row"><a class="btn btn--primary" href="' . esc_url( oys_account_url() ) . '">' . esc_html__( 'My bookings', 'olivia-studio' ) . '</a>' . self::ics_link( $mine->id ) . '</p></div></div></div>';
+			$guests = OYS_Bookings::guests_of( $mine->id, array( 'confirmed' ) );
+			$out   .= '<div class="oys-card oys-done"><h2>' . esc_html__( 'You\'re booked', 'olivia-studio' ) . '</h2><p>' . esc_html__( 'See you on the mat. You\'ll find this booking in your account.', 'olivia-studio' ) . '</p>';
+			if ( $guests ) {
+				$out .= '<p><b>' . esc_html( sprintf( _n( 'Your guest: %s', 'Your guests: %s', count( $guests ), 'olivia-studio' ), implode( ', ', wp_list_pluck( $guests, 'guest_name' ) ) ) ) . '</b></p>';
+			}
+			$out .= '<p class="btn-row"><a class="btn btn--primary" href="' . esc_url( oys_account_url() ) . '">' . esc_html__( 'My bookings', 'olivia-studio' ) . '</a>' . self::ics_link( $mine->id ) . '</p></div>';
+			$room = min( $left, $max_g - count( $guests ) );
+			if ( ! $closed && $room > 0 ) {
+				$opts = array();
+				if ( $credits > 0 ) {
+					$opts[] = '<label class="oys-option"><input type="radio" name="method" value="credit" checked><span class="oys-option__label">' . esc_html__( 'From my pass', 'olivia-studio' ) . ' <small>' . sprintf( esc_html__( '(%d left)', 'olivia-studio' ), $credits ) . '</small></span><span class="oys-option__price" data-needs="' . (int) $credits . '" data-guests-only="1">' . esc_html__( '1 class each', 'olivia-studio' ) . '</span></label>';
+				}
+				if ( $price > 0 && $ready ) {
+					$opts[] = '<label class="oys-option"><input type="radio" name="method" value="card"' . ( $credits > 0 ? '' : ' checked' ) . '><span class="oys-option__label">' . esc_html__( 'Pay by card', 'olivia-studio' ) . '</span><span class="oys-option__price" data-each="' . $price . '" data-guests-only="1">' . esc_html( oys_money( $price ) ) . '</span></label>';
+				}
+				if ( ! $price ) {
+					$opts[] = '<label class="oys-option"><input type="radio" name="method" value="free" checked><span class="oys-option__label">' . esc_html__( 'Reserve spots', 'olivia-studio' ) . '</span><span class="oys-option__price">' . esc_html__( 'Free', 'olivia-studio' ) . '</span></label>';
+				}
+				if ( $opts ) {
+					$out .= self::form_open( 'oys_checkout', 'class="oys-card oys-pay" data-party data-host="0"' ) . '<h2>' . esc_html__( 'Bring guests', 'olivia-studio' ) . '</h2>'
+						. '<input type="hidden" name="session" value="' . (int) $s->id . '"><input type="hidden" name="add_guests" value="' . (int) $mine->id . '">'
+						. self::guest_fields( $room, 1 )
+						. '<fieldset class="oys-options"><legend class="sr-only">' . esc_html__( 'Payment option', 'olivia-studio' ) . '</legend>' . implode( '', $opts ) . '</fieldset>'
+						. '<button class="btn btn--primary oys-submit" type="submit">' . esc_html__( 'Add guests', 'olivia-studio' ) . '</button></form>' . self::party_script();
+				}
+			}
+			return $out . '</div></div>';
 		}
-		$closed = OYS_Schedule::closed_reason( $s );
 		if ( $closed ) {
 			return $out . '<p class="oys-notice oys-notice--error">' . esc_html( $closed ) . '</p></div></div>';
 		}
 
-		if ( OYS_Schedule::spots_left( $s ) < 1 ) {
+		if ( $left < 1 ) {
 			$pos = OYS_Bookings::waitlist_position( $user_id, $s->id );
 			$out .= '<div class="oys-card"><h2>' . esc_html__( 'This class is full', 'olivia-studio' ) . '</h2>';
 			if ( $pos ) {
-				$out .= '<p>' . sprintf( esc_html__( 'You\'re number %d on the waitlist. If a spot opens and you have a pass, you\'re booked in automatically and we email you. Otherwise we email you so you can book first.', 'olivia-studio' ), $pos ) . '</p>'
+				$out .= '<p>' . sprintf( esc_html__( 'You\'re number %d on the waitlist. If a spot opens and you have a pass or membership, you\'re booked in automatically and we email you. Otherwise we email you so you can book first.', 'olivia-studio' ), $pos ) . '</p>'
 					. self::form_open( 'oys_waitlist' ) . '<input type="hidden" name="session" value="' . (int) $s->id . '"><input type="hidden" name="do" value="leave"><button class="btn btn--ghost">' . esc_html__( 'Leave the waitlist', 'olivia-studio' ) . '</button></form>';
 			} else {
-				$out .= '<p>' . esc_html__( 'Join the waitlist. If a spot opens and you have a pass, you\'re booked in automatically. Otherwise we email you straight away.', 'olivia-studio' ) . '</p>'
+				$out .= '<p>' . esc_html__( 'Join the waitlist. If a spot opens and you have a pass or membership, you\'re booked in automatically. Otherwise we email you straight away.', 'olivia-studio' ) . '</p>'
 					. self::form_open( 'oys_waitlist' ) . '<input type="hidden" name="session" value="' . (int) $s->id . '"><input type="hidden" name="do" value="join"><button class="btn btn--primary">' . esc_html__( 'Join the waitlist', 'olivia-studio' ) . '</button></form>';
 			}
 			return $out . '</div></div></div>';
 		}
 
-		// Payment options.
-		$kind    = OYS_Bookings::credit_kind( $s );
-		$credits = $s->credits_allowed ? OYS_Passes::balance( $user_id, $kind ) : 0;
+		// Payment options (prices update with the number of guests).
+		$member  = OYS_Memberships::current_for( $user_id );
+		$covered = $member && true === OYS_Memberships::covers( $member, $s );
 		$options = array();
+		if ( $covered ) {
+			$note = (int) $member->classes_per_period ? sprintf( __( '%d left this period', 'olivia-studio' ), OYS_Memberships::remaining( $member ) ) : __( 'unlimited', 'olivia-studio' );
+			$options[] = array( 'membership', sprintf( __( 'Use my membership (%s)', 'olivia-studio' ), $note ), '<span class="oys-option__price">' . esc_html__( 'Included', 'olivia-studio' ) . '</span>', __( 'Guests are paid from your pass if you have enough classes, otherwise by card.', 'olivia-studio' ) );
+		}
 		if ( $credits > 0 ) {
-			$options[] = array( 'credit', sprintf( _n( 'Use my pass (%d class left)', 'Use my pass (%d classes left)', $credits, 'olivia-studio' ), $credits ), __( 'Nothing to pay', 'olivia-studio' ) );
+			$options[] = array( 'credit', sprintf( _n( 'Use my pass (%d class left)', 'Use my pass (%d classes left)', $credits, 'olivia-studio' ), $credits ), '<span class="oys-option__price" data-needs="' . (int) $credits . '">' . esc_html__( '1 class each', 'olivia-studio' ) . '</span>', '' );
 		}
-		if ( $s->price_cents > 0 ) {
-			$options[] = array( 'card', 'private' === $s->kind ? __( 'Pay for this session', 'olivia-studio' ) : __( 'Pay for this class (drop-in)', 'olivia-studio' ), oys_money( $s->price_cents ) );
+		if ( $price > 0 ) {
+			$options[] = array( 'card', 'private' === $s->kind ? __( 'Pay for this session', 'olivia-studio' ) : __( 'Pay by card (drop-in)', 'olivia-studio' ), '<span class="oys-option__price" data-each="' . $price . '">' . esc_html( oys_money( $price ) ) . '</span>', '' );
 		} elseif ( ! $credits || ! $s->credits_allowed ) {
-			$options[] = array( 'free', __( 'Reserve my spot', 'olivia-studio' ), __( 'Free', 'olivia-studio' ) );
+			$options[] = array( 'free', __( 'Reserve my spot', 'olivia-studio' ), '<span class="oys-option__price">' . esc_html__( 'Free', 'olivia-studio' ) . '</span>', '' );
 		}
-		if ( 'private' !== $s->kind && $s->credits_allowed && OYS_Settings::payments_ready() ) {
+		if ( 'private' !== $s->kind && $s->credits_allowed && $ready ) {
 			foreach ( OYS_Products::purchasable() as $p ) {
-				if ( 'class' !== OYS_Products::credit_kind( $p ) ) {
+				if ( 'class' !== OYS_Products::credit_kind( $p ) || ( 'intro' === $p['kind'] && ! OYS_Orders::is_new_customer( $user_id ) ) ) {
 					continue;
 				}
-				if ( 'intro' === $p['kind'] && ! OYS_Orders::is_new_customer( $user_id ) ) {
-					continue;
-				}
-				$options[] = array( 'pack:' . $p['id'], sprintf( __( 'Buy %s and use one for this class', 'olivia-studio' ), $p['name'] ), oys_money( $p['price_cents'] ) );
+				$options[] = array( 'pack:' . $p['id'], sprintf( __( 'Buy %s and use it for this booking', 'olivia-studio' ), $p['name'] ), '<span class="oys-option__price" data-needs="' . (int) $p['credits'] . '">' . esc_html( oys_money( $p['price_cents'] ) ) . '</span>', '' );
 			}
 		}
 
-		$out .= self::form_open( 'oys_checkout', 'class="oys-card oys-pay"' ) . '<h2>' . esc_html__( 'How would you like to book?', 'olivia-studio' ) . '</h2>'
-			. '<input type="hidden" name="session" value="' . (int) $s->id . '"><fieldset class="oys-options"><legend class="sr-only">' . esc_html__( 'Payment option', 'olivia-studio' ) . '</legend>';
+		$out .= self::form_open( 'oys_checkout', 'class="oys-card oys-pay" data-party data-host="1"' ) . '<h2>' . esc_html__( 'How would you like to book?', 'olivia-studio' ) . '</h2>'
+			. '<input type="hidden" name="session" value="' . (int) $s->id . '">'
+			. self::guest_fields( min( $max_g, $left - 1 ) )
+			. '<p class="oys-party">' . esc_html__( 'People in this booking:', 'olivia-studio' ) . ' <b data-party-size>1</b></p>'
+			. '<fieldset class="oys-options"><legend class="sr-only">' . esc_html__( 'Payment option', 'olivia-studio' ) . '</legend>';
 		foreach ( $options as $i => $o ) {
 			$needs_card = 'card' === $o[0] || str_starts_with( $o[0], 'pack:' );
-			$disabled   = $needs_card && ! OYS_Settings::payments_ready();
-			$out       .= '<label class="oys-option' . ( $disabled ? ' is-disabled' : '' ) . '"><input type="radio" name="method" value="' . esc_attr( $o[0] ) . '"' . checked( 0, $i, false ) . disabled( $disabled, true, false ) . '><span class="oys-option__label">' . esc_html( $o[1] ) . '</span><span class="oys-option__price">' . esc_html( $o[2] ) . '</span></label>';
+			$disabled   = $needs_card && ! $ready;
+			$out       .= '<label class="oys-option' . ( $disabled ? ' is-disabled' : '' ) . '"><input type="radio" name="method" value="' . esc_attr( $o[0] ) . '"' . checked( 0, $i, false ) . disabled( $disabled, true, false ) . '><span class="oys-option__label">' . esc_html( $o[1] ) . ( $o[3] ? '<small>' . esc_html( $o[3] ) . '</small>' : '' ) . '</span>' . $o[2] . '</label>';
 		}
 		$out .= '</fieldset>';
-		if ( ! OYS_Settings::payments_ready() && ! $credits ) {
+		if ( ! $ready && ! $credits && ! $covered ) {
 			$out .= '<p class="oys-notice">' . esc_html__( 'Online payment is being set up. To book now, send a message and I\'ll hold your spot.', 'olivia-studio' ) . '</p>';
 		}
 		$out .= self::waiver_field()
 			. '<p class="oys-policy">' . esc_html( OYS_Settings::get( 'cancel_policy' ) ) . '</p>'
 			. '<button class="btn btn--primary oys-submit" type="submit">' . esc_html__( 'Continue', 'olivia-studio' ) . '</button>'
-			. '<p class="oys-secure">' . esc_html__( 'Card payments are processed securely by Stripe. Apple Pay and Google Pay are accepted.', 'olivia-studio' ) . '</p></form>';
+			. '<p class="oys-secure">' . esc_html__( 'Card payments are processed securely by Stripe. Apple Pay and Google Pay are accepted.', 'olivia-studio' ) . '</p></form>' . self::party_script();
 		return $out . '</div></div>';
 	}
 
+
 	private static function render_product_checkout( $product_id ) {
 		$p = OYS_Products::get( $product_id );
-		if ( ! $p || empty( $p['active'] ) || ! in_array( $p['kind'], array( 'pack', 'intro', 'private_pack' ), true ) ) {
+		if ( ! $p || empty( $p['active'] ) || ! in_array( $p['kind'], array( 'pack', 'intro', 'private_pack', 'membership' ), true ) ) {
 			return '<p class="oys-notice oys-notice--error">' . esc_html__( 'This pass is not available.', 'olivia-studio' ) . '</p>';
 		}
-		$here = oys_page_url( 'book', array( 'product' => $p['id'] ) );
-		$feat = array_filter( array_map( 'trim', explode( "\n", $p['features'] ) ) );
-		$card = '<div class="oys-card oys-summary"><p class="kicker">' . esc_html__( 'Pass', 'olivia-studio' ) . '</p><h2>' . esc_html( $p['name'] ) . '</h2><p class="oys-bigprice">' . esc_html( oys_money( $p['price_cents'] ) ) . '</p>'
+		$is_member = 'membership' === $p['kind'];
+		$here      = oys_page_url( 'book', array( 'product' => $p['id'] ) );
+		$feat      = array_filter( array_map( 'trim', explode( "\n", $p['features'] ) ) );
+		$card      = '<div class="oys-card oys-summary"><p class="kicker">' . esc_html( $is_member ? __( 'Membership', 'olivia-studio' ) : __( 'Pass', 'olivia-studio' ) ) . '</p><h2>' . esc_html( $p['name'] ) . '</h2>'
+			. '<p class="oys-bigprice">' . esc_html( oys_money( $p['price_cents'] ) ) . ( $is_member ? '<small> ' . esc_html( OYS_Products::period_label( $p ) ) . '</small>' : '' ) . '</p>'
 			. ( $p['description'] ? '<p>' . esc_html( $p['description'] ) . '</p>' : '' )
 			. '<ul class="oys-facts">' . implode( '', array_map( fn( $f ) => '<li>' . oys_icon( 'check' ) . '<span>' . esc_html( $f ) . '</span></li>', $feat ) ) . '</ul></div>';
 		$out = '<div class="oys-checkout">' . $card . '<div class="oys-checkout__main">';
 		if ( ! is_user_logged_in() ) {
-			return $out . self::auth_block( $here, __( 'Your pass lives in your account, where you can see how many classes are left and book with one click.', 'olivia-studio' ) ) . '</div></div>';
+			return $out . self::auth_block( $here, $is_member ? __( 'Your membership lives in your account, where you book classes, see renewals and manage billing.', 'olivia-studio' ) : __( 'Your pass lives in your account, where you can see how many classes are left and book with one click.', 'olivia-studio' ) ) . '</div></div>';
 		}
 		if ( 'intro' === $p['kind'] && ! OYS_Orders::is_new_customer( get_current_user_id() ) ) {
 			return $out . '<p class="oys-notice oys-notice--error">' . esc_html__( 'The intro offer is for first-time students. Have a look at the class passes instead.', 'olivia-studio' ) . '</p></div></div>';
 		}
+		if ( $is_member && OYS_Memberships::current_for( get_current_user_id() ) ) {
+			return $out . '<p class="oys-notice">' . esc_html__( 'You already have an active membership.', 'olivia-studio' ) . ' <a class="text-link" href="' . esc_url( oys_account_url( 'membership' ) ) . '">' . esc_html__( 'Manage it in your account', 'olivia-studio' ) . '</a></p></div></div>';
+		}
 		if ( ! OYS_Settings::payments_ready() ) {
 			return $out . '<p class="oys-notice">' . esc_html__( 'Online payment is being set up. Please send a message to buy a pass.', 'olivia-studio' ) . '</p></div></div>';
 		}
+		if ( $is_member ) {
+			$out .= self::form_open( 'oys_join', 'class="oys-card oys-pay"' ) . '<h2>' . esc_html__( 'Join', 'olivia-studio' ) . '</h2><input type="hidden" name="product" value="' . esc_attr( $p['id'] ) . '">'
+				. '<p>' . sprintf( esc_html__( 'You pay %1$s today, then %1$s %2$s until you cancel. Cancel any time in your account; you keep access until the end of the paid period.', 'olivia-studio' ), esc_html( oys_money( $p['price_cents'] ) ), esc_html( OYS_Products::period_label( $p ) ) ) . '</p>'
+				. self::waiver_field()
+				. '<button class="btn btn--primary oys-submit" type="submit">' . sprintf( esc_html__( 'Join for %s', 'olivia-studio' ), esc_html( oys_money( $p['price_cents'] ) ) ) . '</button>'
+				. '<p class="oys-secure">' . esc_html__( 'Recurring payments are processed securely by Stripe. Update your card or cancel from your account.', 'olivia-studio' ) . '</p></form>';
+			return $out . '</div></div>';
+		}
 		$out .= self::form_open( 'oys_buy', 'class="oys-card oys-pay"' ) . '<h2>' . esc_html__( 'Buy this pass', 'olivia-studio' ) . '</h2><input type="hidden" name="product" value="' . esc_attr( $p['id'] ) . '">'
-			. '<p>' . esc_html__( 'After paying, book any class from the timetable in one click.', 'olivia-studio' ) . '</p>'
+			. '<p>' . esc_html__( 'After paying, book any class from the timetable in one click. You can use your pass for guests you bring, too.', 'olivia-studio' ) . '</p>'
 			. self::waiver_field()
 			. '<button class="btn btn--primary oys-submit" type="submit">' . sprintf( esc_html__( 'Pay %s', 'olivia-studio' ), esc_html( oys_money( $p['price_cents'] ) ) ) . '</button>'
 			. '<p class="oys-secure">' . esc_html__( 'Card payments are processed securely by Stripe. Apple Pay and Google Pay are accepted.', 'olivia-studio' ) . '</p></form>';
 		return $out . '</div></div>';
 	}
+
 
 	private static function render_return() {
 		$order_id = (int) $_GET['oys_order'];
@@ -390,13 +474,20 @@ class OYS_Frontend {
 			return '<div class="oys-card oys-done"><h2>' . esc_html__( 'Payment processing', 'olivia-studio' ) . '</h2><p>' . esc_html__( 'Your payment is being confirmed. You\'ll get an email as soon as it goes through, and it will show in your account.', 'olivia-studio' ) . '</p><p class="btn-row"><a class="btn btn--primary" href="' . esc_url( oys_account_url() ) . '">' . esc_html__( 'My account', 'olivia-studio' ) . '</a></p></div>';
 		}
 		$html = '<div class="oys-card oys-done oys-done--paid">';
-		if ( $order->booking_id ) {
-			$b = OYS_Bookings::get( $order->booking_id );
-			$s = OYS_Schedule::get( $b->session_id );
-			$html .= '<h2>' . esc_html__( 'You\'re booked!', 'olivia-studio' ) . '</h2><p>' . sprintf( esc_html__( '%1$s on %2$s. A confirmation with a calendar invite is on its way to your inbox.', 'olivia-studio' ), '<b>' . esc_html( oys_session_title( $s ) ) . '</b>', esc_html( oys_date( $s->starts_at, 'l, F j \a\t g:i a' ) ) ) . '</p>';
-			$html .= '<p class="btn-row"><a class="btn btn--primary" href="' . esc_url( oys_account_url() ) . '">' . esc_html__( 'My bookings', 'olivia-studio' ) . '</a>' . self::ics_link( $b->id ) . '</p>';
+		$rows = OYS_Bookings::for_order( $order->id, array( 'confirmed' ) );
+		if ( $rows ) {
+			$s      = OYS_Schedule::get( $rows[0]->session_id );
+			$host   = $rows[0]->guest_of ? (int) $rows[0]->guest_of : (int) $rows[0]->id;
+			$guests = array_filter( $rows, fn( $r ) => $r->guest_of );
+			$html  .= '<h2>' . esc_html( count( $guests ) === count( $rows ) ? _n( 'Guest added!', 'Guests added!', count( $guests ), 'olivia-studio' ) : __( 'You\'re booked!', 'olivia-studio' ) ) . '</h2><p>' . sprintf( esc_html__( '%1$s on %2$s. A confirmation with a calendar invite is on its way to your inbox.', 'olivia-studio' ), '<b>' . esc_html( oys_session_title( $s ) ) . '</b>', esc_html( oys_date( $s->starts_at, 'l, F j \a\t g:i a' ) ) ) . '</p>';
+			if ( $guests ) {
+				$html .= '<p>' . esc_html( sprintf( _n( 'Guest: %s', 'Guests: %s', count( $guests ), 'olivia-studio' ), implode( ', ', wp_list_pluck( $guests, 'guest_name' ) ) ) ) . '</p>';
+			}
+			$html .= '<p class="btn-row"><a class="btn btn--primary" href="' . esc_url( oys_account_url() ) . '">' . esc_html__( 'My bookings', 'olivia-studio' ) . '</a>' . self::ics_link( $host ) . '</p>';
 		} elseif ( 'gift' === $order->type ) {
 			$html .= '<h2>' . esc_html__( 'Gift sent!', 'olivia-studio' ) . '</h2><p>' . sprintf( esc_html__( 'We emailed the gift card to %s and sent you a receipt.', 'olivia-studio' ), esc_html( $order->meta['recipient_email'] ?? '' ) ) . '</p>';
+		} elseif ( 'membership' === $order->type ) {
+			$html .= '<h2>' . esc_html__( 'Welcome, member!', 'olivia-studio' ) . '</h2><p>' . esc_html__( 'Your membership is active. Choose "Use my membership" when you book a class.', 'olivia-studio' ) . '</p><p class="btn-row"><a class="btn btn--primary" href="' . esc_url( oys_page_url( 'book' ) ) . '">' . esc_html__( 'Book a class', 'olivia-studio' ) . '</a><a class="btn btn--ghost" href="' . esc_url( oys_account_url( 'membership' ) ) . '">' . esc_html__( 'My membership', 'olivia-studio' ) . '</a></p>';
 		} else {
 			$html .= '<h2>' . esc_html__( 'Your pass is ready', 'olivia-studio' ) . '</h2><p>' . esc_html__( 'Book any class from the timetable in one click.', 'olivia-studio' ) . '</p><p class="btn-row"><a class="btn btn--primary" href="' . esc_url( oys_page_url( 'book' ) ) . '">' . esc_html__( 'Book a class', 'olivia-studio' ) . '</a></p>';
 		}
@@ -429,6 +520,7 @@ class OYS_Frontend {
 		OYS_Customers::record_waiver( $user_id );
 	}
 
+
 	public static function handle_checkout() {
 		check_admin_referer( 'oys_checkout' );
 		$user_id = get_current_user_id();
@@ -438,25 +530,69 @@ class OYS_Frontend {
 			oys_flash( __( 'This class could not be found.', 'olivia-studio' ), 'error' );
 			oys_redirect( oys_page_url( 'book' ) );
 		}
-		self::accept_waiver_or_back( $back );
 		$method = sanitize_text_field( wp_unslash( $_POST['method'] ?? '' ) );
+		$guests = 'private' === $s->kind ? array() : OYS_Bookings::clean_guests( $_POST['guest_name'] ?? array(), $_POST['guest_email'] ?? array() );
+		$n      = count( $guests );
+		$kind   = OYS_Bookings::credit_kind( $s );
+		$fail   = function ( $res ) use ( $back ) {
+			oys_flash( $res->get_error_message(), 'error' );
+			oys_redirect( $back );
+		};
 
-		if ( 'credit' === $method ) {
-			$res = OYS_Bookings::book_with_credit( $user_id, $s );
+		// Adding guests to an existing booking.
+		$host_id = (int) ( $_POST['add_guests'] ?? 0 );
+		if ( $host_id ) {
+			$host = OYS_Bookings::get( $host_id );
+			if ( ! $host || (int) $host->user_id !== $user_id || (int) $host->session_id !== (int) $s->id ) {
+				oys_redirect( $back );
+			}
+			if ( ! $n ) {
+				$fail( new WP_Error( 'oys_guests', __( 'Add at least one guest name.', 'olivia-studio' ) ) );
+			}
+			if ( 'card' === $method && $s->price_cents > 0 ) {
+				self::start_paid_booking( $user_id, $s, array(
+					'type'         => 'dropin',
+					'description'  => sprintf( _n( 'Guest ticket: %1$s, %2$s', 'Guest tickets (%3$d): %1$s, %2$s', $n, 'olivia-studio' ), oys_session_title( $s ), oys_date( $s->starts_at, 'M j, g:i a' ), $n ),
+					'amount_cents' => (int) $s->price_cents * $n,
+					'meta'         => array( 'guests' => wp_list_pluck( $guests, 'name' ) ),
+				), array( array( sprintf( __( 'Guest ticket: %s', 'olivia-studio' ), oys_session_title( $s ) ), implode( ', ', wp_list_pluck( $guests, 'name' ) ) . ' · ' . oys_date( $s->starts_at, 'l, F j · g:i a' ), (int) $s->price_cents, $n ) ), $back, $guests, false, $host_id );
+			}
+			$res = OYS_Bookings::book_party( $user_id, $s, array( 'method' => $method, 'guest_method' => 'free' === $method && ! $s->price_cents ? 'free' : 'credit', 'guests' => $guests, 'host_booking' => $host_id ) );
 			if ( is_wp_error( $res ) ) {
-				oys_flash( $res->get_error_message(), 'error' );
+				$fail( $res );
+			}
+			oys_flash( sprintf( _n( '%d guest added.', '%d guests added.', $n, 'olivia-studio' ), $n ) );
+			oys_redirect( $back );
+		}
+
+		self::accept_waiver_or_back( $back );
+
+		if ( 'credit' === $method || ( 'free' === $method && ! $s->price_cents ) ) {
+			$res = OYS_Bookings::book_party( $user_id, $s, array( 'method' => $method, 'guests' => $guests ) );
+			if ( is_wp_error( $res ) ) {
+				$fail( $res );
 			}
 			oys_redirect( $back );
 		}
 
-		if ( 'free' === $method ) {
-			if ( $s->price_cents > 0 ) {
-				oys_redirect( $back );
-			}
-			$check = OYS_Bookings::can_book( $user_id, $s );
-			$res   = is_wp_error( $check ) ? $check : OYS_Bookings::book_manual( $user_id, $s, 'free' );
+		if ( 'membership' === $method ) {
+			// The member is covered; guests use pass credits if there are enough, otherwise they are paid by card.
+			$guest_credit = $n && OYS_Passes::balance( $user_id, $kind ) >= $n;
+			$res          = OYS_Bookings::book_party( $user_id, $s, array( 'method' => 'membership', 'guests' => $guest_credit ? $guests : array(), 'guest_method' => 'credit' ) );
 			if ( is_wp_error( $res ) ) {
-				oys_flash( $res->get_error_message(), 'error' );
+				$fail( $res );
+			}
+			if ( $n && ! $guest_credit ) {
+				if ( $s->price_cents < 1 ) {
+					OYS_Bookings::book_party( $user_id, $s, array( 'method' => 'free', 'guests' => $guests, 'host_booking' => $res ) );
+					oys_redirect( $back );
+				}
+				self::start_paid_booking( $user_id, $s, array(
+					'type'         => 'dropin',
+					'description'  => sprintf( _n( 'Guest ticket: %1$s, %2$s', 'Guest tickets (%3$d): %1$s, %2$s', $n, 'olivia-studio' ), oys_session_title( $s ), oys_date( $s->starts_at, 'M j, g:i a' ), $n ),
+					'amount_cents' => (int) $s->price_cents * $n,
+					'meta'         => array( 'guests' => wp_list_pluck( $guests, 'name' ) ),
+				), array( array( sprintf( __( 'Guest ticket: %s', 'olivia-studio' ), oys_session_title( $s ) ), implode( ', ', wp_list_pluck( $guests, 'name' ) ) . ' · ' . oys_date( $s->starts_at, 'l, F j · g:i a' ), (int) $s->price_cents, $n ) ), $back, $guests, false, $res );
 			}
 			oys_redirect( $back );
 		}
@@ -467,17 +603,22 @@ class OYS_Frontend {
 			}
 			$type  = 'private' === $s->kind ? 'private' : 'dropin';
 			$title = oys_session_title( $s );
-			$meta  = array();
+			$when  = oys_date( $s->starts_at, 'l, F j · g:i a' );
+			$meta  = $n ? array( 'guests' => wp_list_pluck( $guests, 'name' ) ) : array();
 			if ( 'private' === $s->kind ) {
-				$r    = OYS_Privates::for_session( $s->id );
-				$meta = array( 'request_id' => $r ? (int) $r->id : 0 );
+				$r                  = OYS_Privates::for_session( $s->id );
+				$meta['request_id'] = $r ? (int) $r->id : 0;
+			}
+			$lines = array( array( $title, $when, (int) $s->price_cents, 1 ) );
+			if ( $n ) {
+				$lines[] = array( sprintf( __( 'Guest ticket: %s', 'olivia-studio' ), $title ), implode( ', ', wp_list_pluck( $guests, 'name' ) ) . ' · ' . $when, (int) $s->price_cents, $n );
 			}
 			self::start_paid_booking( $user_id, $s, array(
 				'type'         => $type,
-				'description'  => $title . ', ' . oys_date( $s->starts_at, 'M j, g:i a' ),
-				'amount_cents' => (int) $s->price_cents,
+				'description'  => $title . ', ' . oys_date( $s->starts_at, 'M j, g:i a' ) . ( $n ? ' ' . sprintf( _n( '(+%d guest)', '(+%d guests)', $n, 'olivia-studio' ), $n ) : '' ),
+				'amount_cents' => (int) $s->price_cents * ( 1 + $n ),
 				'meta'         => $meta,
-			), $title, oys_date( $s->starts_at, 'l, F j · g:i a' ), $back );
+			), $lines, $back, $guests );
 		}
 
 		if ( str_starts_with( $method, 'pack:' ) ) {
@@ -486,30 +627,35 @@ class OYS_Frontend {
 				oys_redirect( $back );
 			}
 			if ( 'intro' === $p['kind'] && ! OYS_Orders::is_new_customer( $user_id ) ) {
-				oys_flash( __( 'The intro offer is for first-time students.', 'olivia-studio' ), 'error' );
-				oys_redirect( $back );
+				$fail( new WP_Error( 'oys_intro', __( 'The intro offer is for first-time students.', 'olivia-studio' ) ) );
 			}
+			if ( (int) $p['credits'] < 1 + $n ) {
+				$fail( new WP_Error( 'oys_pack', sprintf( __( '%1$s has %2$d classes, which isn\'t enough for %3$d people. Choose a bigger pass or pay by card.', 'olivia-studio' ), $p['name'], (int) $p['credits'], 1 + $n ) ) );
+			}
+			$desc = sprintf( __( 'Includes your spot in %s', 'olivia-studio' ), oys_session_title( $s ) . ', ' . oys_date( $s->starts_at, 'M j, g:i a' ) ) . ( $n ? ' ' . sprintf( _n( 'and %d guest', 'and %d guests', $n, 'olivia-studio' ), $n ) : '' );
 			self::start_paid_booking( $user_id, $s, array(
 				'type'         => 'pack',
 				'product_id'   => $p['id'],
-				'description'  => $p['name'] . ' + ' . oys_session_title( $s ) . ', ' . oys_date( $s->starts_at, 'M j' ),
+				'description'  => $p['name'] . ' + ' . oys_session_title( $s ) . ', ' . oys_date( $s->starts_at, 'M j' ) . ( $n ? ' ' . sprintf( _n( '(+%d guest)', '(+%d guests)', $n, 'olivia-studio' ), $n ) : '' ),
 				'amount_cents' => (int) $p['price_cents'],
-			), $p['name'], sprintf( __( 'Includes your spot in %s', 'olivia-studio' ), oys_session_title( $s ) . ', ' . oys_date( $s->starts_at, 'M j, g:i a' ) ), $back );
+				'meta'         => $n ? array( 'guests' => wp_list_pluck( $guests, 'name' ) ) : array(),
+			), array( array( $p['name'], $desc, (int) $p['price_cents'], 1 ) ), $back, $guests );
 		}
 		oys_redirect( $back );
 	}
 
-	/** Hold a seat, create the order, send the customer to Stripe. */
-	private static function start_paid_booking( $user_id, $s, array $order, $line_name, $line_desc, $back ) {
-		$order_id   = OYS_Orders::create( array_merge( array( 'user_id' => $user_id, 'session_id' => $s->id ), $order ) );
-		$booking_id = OYS_Bookings::hold( $user_id, $s, $order_id );
-		if ( is_wp_error( $booking_id ) ) {
+
+	/** Hold the seats (customer and/or guests), create the order, send the customer to Stripe. */
+	private static function start_paid_booking( $user_id, $s, array $order, array $lines, $back, array $guests = array(), $include_host = true, $host_booking = 0 ) {
+		$order_id = OYS_Orders::create( array_merge( array( 'user_id' => $user_id, 'session_id' => $s->id ), $order ) );
+		$first    = OYS_Bookings::hold( $user_id, $s, $order_id, $guests, $include_host, $host_booking );
+		if ( is_wp_error( $first ) ) {
 			OYS_Orders::update( $order_id, array( 'status' => 'failed' ) );
-			oys_flash( $booking_id->get_error_message(), 'error' );
+			oys_flash( $first->get_error_message(), 'error' );
 			oys_redirect( $back );
 		}
-		OYS_Orders::update( $order_id, array( 'booking_id' => $booking_id ) );
-		$url = OYS_Stripe::start_checkout( $order_id, $line_name, $line_desc );
+		OYS_Orders::update( $order_id, array( 'booking_id' => $include_host ? $first : (int) $host_booking ) );
+		$url = OYS_Stripe::start_checkout( $order_id, $lines[0][0], $lines[0][1], $lines );
 		if ( is_wp_error( $url ) ) {
 			OYS_Orders::mark_unpaid( $order_id, 'failed' );
 			oys_flash( $url->get_error_message(), 'error' );
@@ -562,7 +708,8 @@ class OYS_Frontend {
 			$msg = array(
 				'returned' => __( 'Cancelled. The class is back on your pass.', 'olivia-studio' ),
 				'credit'   => __( 'Cancelled. You have a class credit to use for another class.', 'olivia-studio' ),
-				'late'     => __( 'Cancelled. Because it was inside the cancellation window, the class counts as used.', 'olivia-studio' ),
+				'late'       => __( 'Cancelled. Because it was inside the cancellation window, the class counts as used.', 'olivia-studio' ),
+				'membership' => __( 'Cancelled. It won\'t count towards your membership.', 'olivia-studio' ),
 				'none'     => __( 'Cancelled.', 'olivia-studio' ),
 			);
 			oys_flash( $msg[ $res ] ?? $msg['none'] );
@@ -635,29 +782,39 @@ class OYS_Frontend {
 			. '<script>(function(){document.querySelectorAll("[data-oys-tabs]").forEach(function(t){t.querySelectorAll("[data-tab]").forEach(function(b){b.addEventListener("click",function(){t.querySelectorAll("[data-tab]").forEach(function(x){x.setAttribute("aria-selected",x===b?"true":"false")});t.querySelectorAll("[data-panel]").forEach(function(p){p.hidden=p.getAttribute("data-panel")!==b.getAttribute("data-tab")});});});});})();</script>';
 	}
 
+
 	public static function sc_account() {
 		$flash = oys_render_flash();
 		if ( ! is_user_logged_in() ) {
-			return $flash . '<div class="oys-card oys-auth oys-auth--page"><p class="lead">' . esc_html__( 'Book and cancel classes, see your passes and receipts, and request private sessions.', 'olivia-studio' ) . '</p>' . self::auth_forms( oys_account_url() ) . '</div>';
+			return $flash . '<div class="oys-card oys-auth oys-auth--page"><p class="lead">' . esc_html__( 'Book and cancel classes, bring guests, see your passes, membership and receipts, and request private sessions.', 'olivia-studio' ) . '</p>' . self::auth_forms( oys_account_url() ) . '</div>';
 		}
 		$user_id = get_current_user_id();
 		$user    = wp_get_current_user();
 		$tabs    = array(
-			'bookings' => __( 'Bookings', 'olivia-studio' ),
-			'passes'   => __( 'Passes', 'olivia-studio' ),
-			'private'  => __( 'Private sessions', 'olivia-studio' ),
-			'history'  => __( 'History', 'olivia-studio' ),
-			'payments' => __( 'Payments', 'olivia-studio' ),
-			'profile'  => __( 'Profile', 'olivia-studio' ),
+			'bookings'   => __( 'Bookings', 'olivia-studio' ),
+			'passes'     => __( 'Passes', 'olivia-studio' ),
+			'membership' => __( 'Membership', 'olivia-studio' ),
+			'private'    => __( 'Private sessions', 'olivia-studio' ),
+			'history'    => __( 'History', 'olivia-studio' ),
+			'payments'   => __( 'Payments', 'olivia-studio' ),
+			'profile'    => __( 'Profile', 'olivia-studio' ),
 		);
+		if ( ! OYS_Products::memberships() && ! OYS_Memberships::for_user( $user_id ) ) {
+			unset( $tabs['membership'] );
+		}
 		$tab = sanitize_key( $_GET['tab'] ?? 'bookings' );
 		$tab = isset( $tabs[ $tab ] ) ? $tab : 'bookings';
 
 		$credits = OYS_Passes::balance( $user_id, 'class' );
 		$private = OYS_Passes::balance( $user_id, 'private' );
+		$member  = OYS_Memberships::current_for( $user_id );
 		$next    = OYS_Bookings::for_user( $user_id, 'upcoming', array( 'confirmed' ) );
-		$out     = $flash . '<div class="oys-account"><header class="oys-account__head"><div><h2>' . sprintf( esc_html__( 'Hi, %s', 'olivia-studio' ), esc_html( $user->first_name ?: $user->display_name ) ) . '</h2></div>'
-			. '<dl class="oys-stats"><div class="oys-stat oys-stat--lilac"><dt>' . esc_html__( 'Classes on passes', 'olivia-studio' ) . '</dt><dd>' . (int) $credits . '</dd></div>'
+		$out     = $flash . '<div class="oys-account"><header class="oys-account__head"><div><h2>' . sprintf( esc_html__( 'Hi, %s', 'olivia-studio' ), esc_html( $user->first_name ?: $user->display_name ) ) . '</h2></div><dl class="oys-stats">';
+		if ( $member ) {
+			$left = (int) $member->classes_per_period ? OYS_Memberships::remaining( $member ) . ' / ' . (int) $member->classes_per_period : '∞';
+			$out .= '<div class="oys-stat oys-stat--sun"><dt>' . esc_html__( 'Membership', 'olivia-studio' ) . '</dt><dd>' . esc_html( $left ) . '</dd></div>';
+		}
+		$out .= '<div class="oys-stat oys-stat--lilac"><dt>' . esc_html__( 'Classes on passes', 'olivia-studio' ) . '</dt><dd>' . (int) $credits . '</dd></div>'
 			. ( $private ? '<div class="oys-stat oys-stat--sun"><dt>' . esc_html__( 'Private sessions', 'olivia-studio' ) . '</dt><dd>' . (int) $private . '</dd></div>' : '' )
 			. '<div class="oys-stat oys-stat--pink"><dt>' . esc_html__( 'Upcoming', 'olivia-studio' ) . '</dt><dd>' . count( $next ) . '</dd></div></dl></header>';
 		$out .= '<nav class="oys-account__nav" aria-label="' . esc_attr__( 'Account', 'olivia-studio' ) . '">';
@@ -669,23 +826,42 @@ class OYS_Frontend {
 		return $out . '</div></div>';
 	}
 
+
 	private static function tab_bookings( $user_id ) {
 		$items = OYS_Bookings::for_user( $user_id, 'upcoming', array( 'confirmed' ) );
+		$paid  = OYS_Bookings::paid_with_labels();
 		$out   = '<h3>' . esc_html__( 'Upcoming bookings', 'olivia-studio' ) . '</h3>';
 		if ( ! $items ) {
 			$out .= '<p class="oys-empty">' . esc_html__( 'No upcoming classes yet.', 'olivia-studio' ) . ' <a class="text-link" href="' . esc_url( oys_page_url( 'book' ) ) . '">' . esc_html__( 'See the timetable', 'olivia-studio' ) . '</a></p>';
 		} else {
 			$out .= '<ul class="oys-list">';
 			foreach ( $items as $b ) {
-				$s        = OYS_Schedule::get( $b->session_id );
-				$in_time  = OYS_Bookings::in_cancel_window( $b, $s );
-				$cancel   = self::form_open( 'oys_cancel', 'class="oys-inline" onsubmit="return confirm(this.dataset.msg)" data-msg="' . esc_attr( $in_time ? __( 'Cancel this booking?', 'olivia-studio' ) : __( 'It\'s inside the cancellation window, so this class will count as used. Cancel anyway?', 'olivia-studio' ) ) . '"' )
+				$s       = OYS_Schedule::get( $b->session_id );
+				$in_time = OYS_Bookings::in_cancel_window( $b, $s );
+				$msg     = $in_time ? __( 'Cancel this booking?', 'olivia-studio' ) : __( 'It\'s inside the cancellation window, so this class will count as used. Cancel anyway?', 'olivia-studio' );
+				if ( $b->guests ) {
+					$msg = $in_time ? __( 'Cancel your booking and your guests\' spots?', 'olivia-studio' ) : __( 'It\'s inside the cancellation window, so your and your guests\' classes count as used. Cancel anyway?', 'olivia-studio' );
+				}
+				$cancel = self::form_open( 'oys_cancel', 'class="oys-inline" onsubmit="return confirm(this.dataset.msg)" data-msg="' . esc_attr( $msg ) . '"' )
 					. '<input type="hidden" name="booking" value="' . (int) $b->id . '"><button class="btn btn--ghost btn--sm" type="submit">' . esc_html__( 'Cancel', 'olivia-studio' ) . '</button></form>';
+				$guests = '';
+				if ( $b->guests ) {
+					$guests = '<ul class="oys-guestlist">';
+					foreach ( $b->guests as $g ) {
+						$guests .= '<li><span>' . oys_icon( 'user' ) . esc_html( $g->guest_name ) . ' <small>' . esc_html( $paid[ $g->paid_with ] ?? $g->paid_with ) . '</small></span>'
+							. self::form_open( 'oys_cancel', 'class="oys-inline" onsubmit="return confirm(this.dataset.msg)" data-msg="' . esc_attr( sprintf( __( 'Remove %s from this class?', 'olivia-studio' ), $g->guest_name ) ) . '"' )
+							. '<input type="hidden" name="booking" value="' . (int) $g->id . '"><button class="oys-linkbtn" type="submit">' . esc_html__( 'Remove', 'olivia-studio' ) . '</button></form></li>';
+					}
+					$guests .= '</ul>';
+				}
+				$add = 'private' !== $b->kind && ! OYS_Schedule::closed_reason( $s ) && count( $b->guests ) < (int) OYS_Settings::get( 'max_guests' ) && OYS_Schedule::spots_left( $s ) > 0
+					? '<a class="btn btn--ghost btn--sm" href="' . esc_url( oys_book_url( $b->session_id ) ) . '">' . esc_html__( '+ Guests', 'olivia-studio' ) . '</a>' : '';
 				$out .= '<li class="oys-item"><div class="oys-item__when"><b>' . esc_html( wp_date( 'j', oys_ts( $b->starts_at ) ) ) . '</b><span>' . esc_html( wp_date( 'M', oys_ts( $b->starts_at ) ) ) . '</span></div>'
-					. '<div class="oys-item__main"><h4>' . esc_html( oys_session_title( $s ) ) . '</h4><p>' . esc_html( oys_date( $b->starts_at, 'l, g:i a' ) . ' – ' . oys_time( $b->ends_at ) . ( $b->location ? ' · ' . $b->location : '' ) ) . '</p>'
+					. '<div class="oys-item__main"><h4>' . esc_html( oys_session_title( $s ) ) . ' <span class="badge">' . esc_html( $paid[ $b->paid_with ] ?? $b->paid_with ) . '</span></h4><p>' . esc_html( oys_date( $b->starts_at, 'l, g:i a' ) . ' – ' . oys_time( $b->ends_at ) . ( $b->location ? ' · ' . $b->location : '' ) ) . '</p>'
 					. ( $b->online_url ? '<p><a class="text-link" href="' . esc_url( $b->online_url ) . '" target="_blank" rel="noopener">' . esc_html__( 'Join online', 'olivia-studio' ) . '</a></p>' : '' )
+					. $guests
 					. ( ! $in_time ? '<p class="oys-small">' . esc_html__( 'Inside the cancellation window', 'olivia-studio' ) . '</p>' : '' ) . '</div>'
-					. '<div class="oys-item__actions">' . self::ics_link( $b->id ) . $cancel . '</div></li>';
+					. '<div class="oys-item__actions">' . $add . self::ics_link( $b->id ) . $cancel . '</div></li>';
 			}
 			$out .= '</ul>';
 		}
@@ -699,6 +875,53 @@ class OYS_Frontend {
 			$out .= '</ul>';
 		}
 		$out .= '<p class="oys-policy">' . esc_html( OYS_Settings::get( 'cancel_policy' ) ) . '</p>';
+		return $out;
+	}
+
+	private static function tab_membership( $user_id ) {
+		$all = OYS_Memberships::for_user( $user_id );
+		$st  = OYS_Memberships::statuses();
+		$out = '';
+		$cur = OYS_Memberships::current_for( $user_id );
+		if ( $cur ) {
+			$p     = OYS_Products::get( $cur->product_id );
+			$used  = OYS_Memberships::used_in_period( $cur );
+			$limit = (int) $cur->classes_per_period;
+			$out  .= '<div class="oys-card oys-membership"><p class="kicker">' . esc_html__( 'Your membership', 'olivia-studio' ) . '</p><h3>' . esc_html( $cur->name ) . ' <span class="badge">' . esc_html( $st[ $cur->status ] ?? $cur->status ) . '</span></h3>';
+			if ( 'past_due' === $cur->status ) {
+				$out .= '<p class="oys-notice oys-notice--error">' . esc_html__( 'Your last payment didn\'t go through. Please update your card to keep your membership.', 'olivia-studio' ) . '</p>';
+			}
+			$out .= '<dl class="oys-dl"><div><dt>' . esc_html__( 'Classes this period', 'olivia-studio' ) . '</dt><dd>' . ( $limit ? sprintf( esc_html__( '%1$d of %2$d used', 'olivia-studio' ), $used, $limit ) : sprintf( esc_html__( '%d · unlimited', 'olivia-studio' ), $used ) ) . '</dd></div>'
+				. '<div><dt>' . esc_html__( 'Current period', 'olivia-studio' ) . '</dt><dd>' . esc_html( oys_date( $cur->current_period_start, 'M j' ) . ' – ' . oys_date( $cur->current_period_end, 'M j, Y' ) ) . '</dd></div>'
+				. '<div><dt>' . esc_html( $cur->cancel_at_period_end ? __( 'Ends on', 'olivia-studio' ) : __( 'Renews on', 'olivia-studio' ) ) . '</dt><dd>' . esc_html( oys_date( $cur->current_period_end, get_option( 'date_format' ) ) ) . ( $p && ! $cur->cancel_at_period_end ? ' · ' . esc_html( oys_money( $p['price_cents'] ) ) : '' ) . '</dd></div></dl>';
+			if ( $limit ) {
+				$out .= '<span class="oys-meter"><span style="width:' . (int) min( 100, round( 100 * $used / max( 1, $limit ) ) ) . '%"></span></span>';
+			}
+			$btn  = fn( $do, $label, $cls = 'btn--ghost', $confirm = '' ) => self::form_open( 'oys_membership', 'class="oys-inline"' . ( $confirm ? ' onsubmit="return confirm(this.dataset.msg)" data-msg="' . esc_attr( $confirm ) . '"' : '' ) ) . '<input type="hidden" name="membership" value="' . (int) $cur->id . '"><input type="hidden" name="do" value="' . esc_attr( $do ) . '"><button class="btn ' . $cls . ' btn--sm" type="submit">' . esc_html( $label ) . '</button></form>';
+			$out .= '<p class="btn-row">' . $btn( 'portal', __( 'Update card & invoices', 'olivia-studio' ), 'btn--primary' )
+				. ( $cur->cancel_at_period_end ? $btn( 'resume', __( 'Keep my membership', 'olivia-studio' ) ) : $btn( 'cancel', __( 'Cancel membership', 'olivia-studio' ), 'btn--ghost', sprintf( __( 'Your membership will end on %s and won\'t renew. Continue?', 'olivia-studio' ), oys_date( $cur->current_period_end, get_option( 'date_format' ) ) ) ) ) . '</p>'
+				. '<p class="oys-small">' . esc_html__( 'Your membership covers you. Guests you bring are paid from your pass or by card.', 'olivia-studio' ) . '</p></div>';
+		} else {
+			$plans = OYS_Products::memberships();
+			$out  .= '<h3>' . esc_html__( 'Become a member', 'olivia-studio' ) . '</h3>';
+			if ( $plans ) {
+				$out .= '<ul class="oys-buy">';
+				foreach ( $plans as $p ) {
+					$out .= '<li><span><b>' . esc_html( $p['name'] ) . '</b> ' . esc_html( $p['description'] ) . '</span><a class="btn btn--dark btn--sm" href="' . esc_url( oys_page_url( 'book', array( 'product' => $p['id'] ) ) ) . '">' . esc_html( oys_money( $p['price_cents'] ) . ' ' . OYS_Products::period_label( $p ) ) . '</a></li>';
+				}
+				$out .= '</ul>';
+			} else {
+				$out .= '<p class="oys-empty">' . esc_html__( 'Memberships are not available right now.', 'olivia-studio' ) . '</p>';
+			}
+		}
+		$past = array_filter( $all, fn( $m ) => ! $cur || (int) $m->id !== (int) $cur->id );
+		if ( $past ) {
+			$out .= '<h3>' . esc_html__( 'Earlier memberships', 'olivia-studio' ) . '</h3><table class="oys-table"><thead><tr><th>' . esc_html__( 'Plan', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Started', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Ended', 'olivia-studio' ) . '</th></tr></thead><tbody>';
+			foreach ( $past as $m ) {
+				$out .= '<tr><td>' . esc_html( $m->name ) . '</td><td>' . esc_html( oys_date( $m->created_at, 'M j, Y' ) ) . '</td><td>' . esc_html( $m->ended_at ? oys_date( $m->ended_at, 'M j, Y' ) : ( $st[ $m->status ] ?? $m->status ) ) . '</td></tr>';
+			}
+			$out .= '</tbody></table>';
+		}
 		return $out;
 	}
 

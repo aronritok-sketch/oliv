@@ -5,6 +5,7 @@
  * update fulfils. Stripe webhooks and the customer's return page can both trigger it.
  *
  * type: dropin (one class) | pack (pass, optionally booking a class with it) | gift | private
+ *       | membership (first payment via Checkout; renewals are recorded from invoice.paid)
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -102,9 +103,7 @@ class OYS_Orders {
 		switch ( $order->type ) {
 			case 'dropin':
 			case 'private':
-				if ( $order->booking_id ) {
-					OYS_Bookings::confirm_paid( $order->booking_id, $order->id );
-				}
+				OYS_Bookings::confirm_order( $order->id );
 				if ( 'private' === $order->type && ! empty( $order->meta['request_id'] ) ) {
 					OYS_Privates::mark_paid( (int) $order->meta['request_id'], $order->id );
 				}
@@ -118,29 +117,21 @@ class OYS_Orders {
 				$pass_id = OYS_Passes::grant_product( $order->user_id, $product, $order->id );
 				OYS_Emails::pass_purchased( $order->id, $pass_id );
 				if ( $order->booking_id ) {
-					self::book_held_with_new_pass( $order->booking_id, $pass_id, $order->id );
+					// "Buy a pass and book this class": every held seat (the customer and any guests) uses one credit of the new pass.
+					OYS_Bookings::confirm_order( $order->id, $pass_id );
 				}
 				break;
 
 			case 'gift':
 				OYS_Gifts::issue_for_order( $order );
 				break;
+
+			case 'membership':
+				OYS_Memberships::activate_from_order( $order );
+				break;
 		}
 		OYS_Emails::admin_new_order( $order->id );
 		do_action( 'oys_order_paid', $order->id );
-	}
-
-	/** "Buy a pass and book this class": the held seat is paid for with the first credit of the new pass. */
-	private static function book_held_with_new_pass( $booking_id, $pass_id, $order_id ) {
-		global $wpdb;
-		$booking = OYS_Bookings::get( $booking_id );
-		if ( ! $booking ) {
-			return;
-		}
-		$t = OYS_Install::table( 'passes' );
-		$wpdb->query( $wpdb->prepare( "UPDATE $t SET credits_left = credits_left - 1 WHERE id = %d AND credits_left > 0", $pass_id ) );
-		$wpdb->update( OYS_Install::table( 'bookings' ), array( 'paid_with' => 'credit', 'pass_id' => $pass_id ), array( 'id' => $booking_id ) );
-		OYS_Bookings::confirm_paid( $booking_id, $order_id );
 	}
 
 	/** Checkout expired or payment failed. */
@@ -149,10 +140,7 @@ class OYS_Orders {
 		$t  = OYS_Install::table( 'orders' );
 		$ok = $wpdb->query( $wpdb->prepare( "UPDATE $t SET status = %s WHERE id = %d AND status = 'pending'", $status, $order_id ) );
 		if ( 1 === (int) $ok ) {
-			$order = self::get( $order_id );
-			if ( $order->booking_id ) {
-				OYS_Bookings::release_hold( $order->booking_id );
-			}
+			OYS_Bookings::release_order( $order_id );
 		}
 	}
 
@@ -173,13 +161,8 @@ class OYS_Orders {
 		if ( ! $full ) {
 			return;
 		}
-		if ( $order->booking_id ) {
-			$b = OYS_Bookings::get( $order->booking_id );
-			if ( $b && 'confirmed' === $b->status ) {
-				global $wpdb;
-				$wpdb->update( OYS_Install::table( 'bookings' ), array( 'status' => 'cancelled', 'cancelled_at' => oys_now(), 'note' => 'Refunded' ), array( 'id' => $b->id ) );
-				OYS_Schedule::release_seat( $b->session_id );
-			}
+		foreach ( OYS_Bookings::for_order( $order_id, array( 'confirmed' ) ) as $b ) {
+			OYS_Bookings::void( $b->id, 'Refunded' );
 		}
 		if ( 'pack' === $order->type ) {
 			global $wpdb;
@@ -217,7 +200,8 @@ class OYS_Orders {
 			'dropin'  => __( 'Drop-in', 'olivia-studio' ),
 			'pack'    => __( 'Pass', 'olivia-studio' ),
 			'gift'    => __( 'Gift card', 'olivia-studio' ),
-			'private' => __( 'Private session', 'olivia-studio' ),
+			'private'    => __( 'Private session', 'olivia-studio' ),
+			'membership' => __( 'Membership', 'olivia-studio' ),
 		);
 	}
 }
