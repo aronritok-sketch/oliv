@@ -79,14 +79,59 @@ class OYS_Bookings {
 		return $rows;
 	}
 
-	/** The customer's own active booking for a session (guests excluded). */
+	/**
+	 * The customer's own booking for a session (guests excluded). A card payment that was
+	 * started but not finished is not a booking: see unfinished_for().
+	 */
 	public static function active_for( $user_id, $session_id ) {
 		global $wpdb;
 		$t = OYS_Install::table( 'bookings' );
 		return $wpdb->get_row( $wpdb->prepare(
-			"SELECT * FROM $t WHERE user_id = %d AND session_id = %d AND guest_of = 0 AND ( status IN ('confirmed','attended','no_show') OR ( status = 'pending' AND hold_expires > %s ) ) ORDER BY id DESC LIMIT 1",
+			"SELECT * FROM $t WHERE user_id = %d AND session_id = %d AND guest_of = 0 AND status IN ('confirmed','attended','no_show') ORDER BY id DESC LIMIT 1",
+			$user_id, $session_id
+		) );
+	}
+
+	/** Seats held for card checkouts this customer started for the session but hasn't paid (own spot and guests). */
+	public static function unfinished_for( $user_id, $session_id ) {
+		global $wpdb;
+		$t = OYS_Install::table( 'bookings' );
+		return $wpdb->get_results( $wpdb->prepare(
+			"SELECT * FROM $t WHERE user_id = %d AND session_id = %d AND status = 'pending' AND hold_expires > %s ORDER BY id DESC",
 			$user_id, $session_id, oys_now()
 		) );
+	}
+
+	/**
+	 * Drop the customer's unfinished card checkouts for a session before they book again:
+	 * the Stripe page is closed so it can't be paid later, and the held seats are freed.
+	 * If Stripe says a payment did go through after all, that order is fulfilled instead.
+	 * @return string 'paid' when an earlier payment turned out complete, '' otherwise
+	 */
+	public static function abandon_unfinished( $user_id, $session_id ) {
+		$result = '';
+		foreach ( array_unique( array_map( 'intval', wp_list_pluck( self::unfinished_for( $user_id, $session_id ), 'order_id' ) ) ) as $order_id ) {
+			$order = $order_id ? OYS_Orders::get( $order_id ) : null;
+			if ( ! $order || 'pending' !== $order->status ) {
+				continue;
+			}
+			if ( $order->stripe_session_id ) {
+				$res = OYS_Stripe::request( 'POST', '/v1/checkout/sessions/' . rawurlencode( $order->stripe_session_id ) . '/expire' );
+				if ( is_wp_error( $res ) ) {
+					// Not open any more (paid, or already expired) or Stripe unreachable: ask Stripe what happened.
+					$synced = OYS_Stripe::sync_session( $order->stripe_session_id );
+					if ( is_wp_error( $synced ) ) {
+						continue; // Keep the hold rather than risk charging twice.
+					}
+					if ( in_array( $synced->status, array( 'paid', 'partially_refunded' ), true ) ) {
+						$result = 'paid';
+						continue;
+					}
+				}
+			}
+			OYS_Orders::mark_unpaid( $order_id, 'expired' );
+		}
+		return $result;
 	}
 
 	public static function credit_kind( $session ) {
@@ -414,6 +459,9 @@ class OYS_Bookings {
 		if ( self::active_for( $user_id, $session->id ) ) {
 			return new WP_Error( 'oys_dupe', __( 'You\'re already booked into this class.', 'olivia-studio' ) );
 		}
+		if ( self::unfinished_for( $user_id, $session->id ) ) {
+			return new WP_Error( 'oys_unfinished', __( 'You have an unfinished card payment for this class. Continue it, or start again from the class page.', 'olivia-studio' ) );
+		}
 		return true;
 	}
 
@@ -440,7 +488,7 @@ class OYS_Bookings {
 			return new WP_Error( 'oys_missing', __( 'Booking not found.', 'olivia-studio' ) );
 		}
 		if ( 'pending' === $booking->status ) {
-			self::release_hold( $booking_id );
+			self::abandon_unfinished( $booking->user_id, $booking->session_id );
 			return 'none';
 		}
 		if ( 'confirmed' !== $booking->status ) {

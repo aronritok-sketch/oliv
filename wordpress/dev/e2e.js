@@ -391,6 +391,48 @@ async function payOnMockStripe(page, button = '#pay') {
     check(await overflow(a, BASE + path) <= 0, `no sideways scroll, logged in: ${path}`);
   }
 
+  // 26. Started paying, then left Stripe with the browser's back button (not Stripe's cancel link).
+  //     The class must not count as booked; booking again closes the old Stripe page and starts a new one.
+  const u1 = fresh();
+  await a.goto(`${BASE}/book/?session=${u1}`);
+  await a.check('input[value="card"]');
+  await a.click('.oys-submit');
+  await a.waitForURL(/127\.0\.0\.1:8090\/pay\//);
+  const firstPay = a.url();
+  await a.goBack();
+  await a.goto(`${BASE}/book/?session=${u1}`);
+  check(!(await a.isVisible("text=You're booked")), 'unfinished payment is not shown as booked');
+  check(await a.isVisible("text=Your payment wasn't finished"), 'unfinished payment notice shown');
+  check(await a.isVisible('a:has-text("Continue to payment")'), 'can continue the unfinished payment');
+  await a.goto(`${BASE}/schedule-pricing/`);
+  check(!(await a.locator(`a[href*="session=${u1}"]`).first().locator('xpath=ancestor::li[1]').locator("text=You're booked").count()), 'timetable does not say booked');
+  await a.goto(`${BASE}/book/?session=${u1}`);
+  await a.check('input[value="card"]');
+  await a.click('.oys-submit');
+  await a.waitForURL(/127\.0\.0\.1:8090\/pay\//);
+  check(a.url() !== firstPay, 'a new Stripe page was started');
+  const oldStripe = await (await fetch(firstPay.replace('/pay/', '/v1/checkout/sessions/'), { headers: { Authorization: 'Bearer sk_test_mock' } })).json();
+  check(oldStripe.status === 'expired', 'the old Stripe page was closed so it cannot be paid');
+  await Promise.all([a.waitForNavigation({ url: /oys_return=success/ }), a.click('#pay')]);
+  const uRows = JSON.parse(q(`SELECT status FROM wp_oys_bookings WHERE session_id=${u1} ORDER BY id`));
+  check(uRows.map(r => r.status).join(',') === 'expired,confirmed', 'one booking confirmed, the abandoned hold expired');
+  check(parseInt(JSON.parse(q(`SELECT booked FROM wp_oys_sessions WHERE id=${u1}`))[0].booked, 10) === 1, 'only one seat taken');
+  // Paid in the first tab after all, then clicked Book again from a stale page: no second charge.
+  const u2 = fresh();
+  await a.goto(`${BASE}/book/?session=${u2}`);
+  await a.check('input[value="card"]');
+  await a.click('.oys-submit');
+  await a.waitForURL(/127\.0\.0\.1:8090\/pay\//);
+  // Pay "in another tab" that never makes it back to the site (and no webhook yet).
+  await fetch(a.url(), { method: 'POST', body: new URLSearchParams({ skip_webhook: '1' }), redirect: 'manual' });
+  check(JSON.parse(q(`SELECT status FROM wp_oys_orders WHERE session_id=${u2}`))[0].status === 'pending', 'paid on Stripe, site not told yet');
+  await a.goBack();
+  await a.goto(`${BASE}/book/?session=${u2}`);
+  await a.check('input[value="card"]');
+  await Promise.all([a.waitForNavigation(), a.click('.oys-submit')]);
+  check(await a.isVisible('text=went through'), 'an earlier payment that went through is recognised');
+  check(JSON.parse(q(`SELECT COUNT(*) AS n FROM wp_oys_orders WHERE session_id=${u2} AND status='paid'`))[0].n == 1, 'charged once');
+
   // Screens for review.
   await a.goto(`${BASE}/schedule-pricing/`);
   await a.screenshot({ path: `${SHOTS}/10-schedule-pricing.png`, fullPage: true });

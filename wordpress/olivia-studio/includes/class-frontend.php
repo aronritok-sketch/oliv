@@ -315,6 +315,8 @@ class OYS_Frontend {
 		$closed    = OYS_Schedule::closed_reason( $s );
 		$left      = OYS_Schedule::spots_left( $s );
 		$mine      = OYS_Bookings::active_for( $user_id, $s->id );
+		$held      = $mine ? array() : OYS_Bookings::unfinished_for( $user_id, $s->id );
+		$left     += count( $held ); // Seats held for this customer's own unfinished payment are theirs to use again.
 		$kind      = OYS_Bookings::credit_kind( $s );
 		$credits   = $s->credits_allowed ? OYS_Passes::balance( $user_id, $kind ) : 0;
 		$max_g     = 'private' === $s->kind ? 0 : (int) OYS_Settings::get( 'max_guests' );
@@ -353,6 +355,16 @@ class OYS_Frontend {
 		}
 		if ( $closed ) {
 			return $out . '<p class="oys-notice oys-notice--error">' . esc_html( $closed ) . '</p></div></div>';
+		}
+
+		// A card payment was started but not finished: offer to continue it, or book again below.
+		if ( $held ) {
+			$order = OYS_Orders::get( (int) $held[0]->order_id );
+			$url   = $order && 'pending' === $order->status ? (string) ( $order->meta['checkout_url'] ?? '' ) : '';
+			$out  .= '<div class="oys-card oys-unfinished"><h2>' . esc_html__( 'Your payment wasn\'t finished', 'olivia-studio' ) . '</h2>'
+				. '<p>' . esc_html__( 'You started paying for this class but didn\'t complete it, so you\'re not booked yet and nothing was charged.', 'olivia-studio' ) . '</p>'
+				. ( $url ? '<p class="btn-row"><a class="btn btn--primary" href="' . esc_url( $url ) . '">' . esc_html__( 'Continue to payment', 'olivia-studio' ) . '</a></p>' : '' )
+				. '<p class="oys-small">' . esc_html__( 'Or choose again below: the unfinished payment is cancelled automatically.', 'olivia-studio' ) . '</p></div>';
 		}
 
 		if ( $left < 1 ) {
@@ -529,6 +541,11 @@ class OYS_Frontend {
 		if ( ! $s || ! OYS_Privates::may_book( $user_id, $s ) ) {
 			oys_flash( __( 'This class could not be found.', 'olivia-studio' ), 'error' );
 			oys_redirect( oys_page_url( 'book' ) );
+		}
+		// Booking again replaces a card payment for this class that was started but not finished.
+		if ( 'paid' === OYS_Bookings::abandon_unfinished( $user_id, $s->id ) ) {
+			oys_flash( __( 'Your earlier payment for this class went through, so you\'re already booked.', 'olivia-studio' ) );
+			oys_redirect( $back );
 		}
 		$method = sanitize_text_field( wp_unslash( $_POST['method'] ?? '' ) );
 		$guests = 'private' === $s->kind ? array() : OYS_Bookings::clean_guests( $_POST['guest_name'] ?? array(), $_POST['guest_email'] ?? array() );

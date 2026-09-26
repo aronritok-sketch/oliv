@@ -71,6 +71,9 @@ if ( preg_match( '#^/v1/checkout/sessions/([^/]+)(/expire)?$#', $path, $m ) ) {
 		return out( array( 'error' => array( 'message' => 'No such checkout.session' ) ), 404 );
 	}
 	if ( 'POST' === $method && ! empty( $m[2] ) ) {
+		if ( 'open' !== $s['status'] ) {
+			return out( array( 'error' => array( 'message' => 'Only Checkout Sessions with a status of open can be expired.' ) ), 400 );
+		}
 		$db['sessions'][ $m[1] ]['status'] = 'expired';
 		save();
 		return out( $db['sessions'][ $m[1] ] );

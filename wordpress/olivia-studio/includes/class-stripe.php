@@ -130,7 +130,9 @@ class OYS_Stripe {
 		if ( is_wp_error( $res ) ) {
 			return $res;
 		}
-		OYS_Orders::update( $order_id, array( 'stripe_session_id' => $res['id'] ) );
+		$meta                 = $order->meta;
+		$meta['checkout_url'] = $res['url'];
+		OYS_Orders::update( $order_id, array( 'stripe_session_id' => $res['id'], 'meta' => $meta ) );
 		return $res['url'];
 	}
 
