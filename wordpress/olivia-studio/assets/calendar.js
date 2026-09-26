@@ -156,12 +156,14 @@
     const cls = ['oys-ev', 'oys-ev--' + tone(s)];
     if (s.status === 'cancelled') cls.push('is-cancelled');
     if (s.format === 'online') cls.push('is-online');
+    if (s.format === 'hybrid') cls.push('is-hybrid');
     if (s.past) cls.push('is-past');
     if (full) cls.push('is-full');
     if (height < 44) cls.push('is-short');
     const end = toTime(toMin(s.start) + s.duration);
     const badges = (s.series ? '<i class="oys-ev__rep" title="' + esc(s.series.label) + '">↻</i>' : '')
       + (s.format === 'online' ? '<i class="oys-ev__tag">Online</i>' : '')
+      + (s.format === 'hybrid' ? '<i class="oys-ev__tag">+ Live ' + s.online_booked + '</i>' : '')
       + (s.kind === 'event' ? '<i class="oys-ev__tag">Event</i>' : '')
       + (s.kind === 'private' ? '<i class="oys-ev__tag">Private</i>' : '');
     return '<div class="' + cls.join(' ') + '" data-id="' + s.id + '" tabindex="0" role="button" aria-label="' + esc(s.label + ', ' + longDate(s.date) + ' ' + clock(s.start)) + '"'
@@ -239,18 +241,23 @@
     if (!isNew) {
       html += '<p class="oys-drawer__when">' + esc(longDate(v.date)) + ' · ' + clock(v.start) + ' – ' + clock(toTime(toMin(v.start) + v.duration)) + (v.status === 'cancelled' ? ' · <b class="oys-chip is-bad">Cancelled</b>' : '') + '</p>';
       if (v.series) html += '<p class="oys-drawer__series">↻ ' + esc(v.series.label) + (v.series.active ? '' : ' (stopped)') + '</p>';
-      html += '<div class="oys-drawer__people"><div class="oys-meter"><span style="width:' + Math.min(100, v.booked / v.capacity * 100) + '%"></span></div><p><b>' + v.booked + ' / ' + v.capacity + '</b> booked' + (v.held ? ' · ' + v.held + ' paying now' : '') + (v.waitlist ? ' · ' + v.waitlist + ' on the waitlist' : '') + '</p>'
+      html += '<div class="oys-drawer__people"><div class="oys-meter"><span style="width:' + Math.min(100, v.booked / v.capacity * 100) + '%"></span></div><p><b>' + v.booked + ' / ' + v.capacity + '</b> ' + (v.format === 'hybrid' ? 'in the studio · <b>' + v.online_booked + (v.online_capacity ? ' / ' + v.online_capacity : '') + '</b> online' : 'booked') + (v.held ? ' · ' + v.held + ' paying now' : '') + (v.waitlist ? ' · ' + v.waitlist + ' on the waitlist' : '') + '</p>'
         + (v.people.length ? '<ul>' + v.people.map(p => '<li>' + esc(p) + '</li>').join('') + '</ul>' : '')
-        + '<p class="oys-drawer__links"><a class="button" href="' + esc(C.rosterUrl + v.id) + '">Roster &amp; attendance</a> <a class="button-link" href="' + esc(C.bookUrl + v.id) + '" target="_blank" rel="noopener">Booking page ↗</a></p></div>';
+        + '<p class="oys-drawer__links"><a class="button" href="' + esc(C.rosterUrl + v.id) + '">Roster &amp; attendance</a> <a class="button-link" href="' + esc(C.bookUrl + v.id) + '" target="_blank" rel="noopener">Booking page ↗</a></p>'
+        + (v.zoom && v.status === 'scheduled' ? '<p class="oys-drawer__zoom"><a class="button button-primary" href="' + esc(v.zoom.start) + '" target="_blank" rel="noopener">Start the Zoom class</a> <span>Meeting ' + esc(v.zoom.id) + '</span></p>' : '')
+        + '</div>';
     }
     html += '<form class="oys-drawer__form"' + (locked ? ' inert' : '') + '>';
     html += '<div class="oys-seg" role="radiogroup" aria-label="Type">' + Object.keys(kinds).map(k => '<label><input type="radio" name="kind" value="' + k + '"' + (v.kind === k ? ' checked' : '') + (isNew ? '' : ' disabled') + '><span>' + kinds[k] + '</span></label>').join('') + '</div>';
     html += field('Class', '<select name="class_slug"><option value="">— none —</option>' + classKeys.map(k => '<option value="' + esc(k) + '"' + (v.class_slug === k ? ' selected' : '') + '>' + esc(C.classes[k]) + '</option>').join('') + '</select>', 'f-class');
     html += field('Title', '<input type="text" name="title" value="' + esc(v.title) + '" placeholder="e.g. Full Moon Flow with live music">', 'f-title');
     html += '<div class="oys-row">' + field('Date', '<input type="date" name="date" required value="' + esc(v.date) + '">') + field('Starts', '<input type="time" name="start" step="300" required value="' + esc(v.start) + '">') + field('Minutes', '<input type="number" name="duration" min="15" max="600" step="5" value="' + v.duration + '">') + '</div>';
-    html += '<div class="oys-seg" role="radiogroup" aria-label="Where"><label><input type="radio" name="format" value="studio"' + (v.format !== 'online' ? ' checked' : '') + '><span>In person</span></label><label><input type="radio" name="format" value="online"' + (v.format === 'online' ? ' checked' : '') + '><span>Online</span></label></div>';
+    const formats = { studio: 'In person', online: 'Online', hybrid: 'Both' };
+    html += '<div class="oys-seg" role="radiogroup" aria-label="Where">' + Object.keys(formats).map(k => '<label><input type="radio" name="format" value="' + k + '"' + ((v.format || 'studio') === k ? ' checked' : '') + '><span>' + formats[k] + '</span></label>').join('') + '</div>';
+    html += '<p class="description f-hybrid-note">In the studio and streamed live: people choose how they join.</p>';
     html += field('Location', '<input type="text" name="location" value="' + esc(v.location) + '" placeholder="Studio or address">', 'f-loc');
-    html += field('Online link (Zoom, Meet…)', '<input type="url" name="online_url" value="' + esc(v.online_url) + '" placeholder="https://">', 'f-url');
+    html += field(C.zoom ? 'Online link (leave empty: a Zoom meeting is created automatically)' : 'Online link (Zoom, Meet…)', '<input type="url" name="online_url" value="' + esc(v.online_url) + '" placeholder="https://">', 'f-url');
+    html += '<div class="oys-row f-online">' + field('Online spots (0 = no limit)', '<input type="number" name="online_capacity" min="0" value="' + (v.online_capacity || 0) + '">') + field('Online ticket (' + esc(C.currency) + ')', '<input type="number" name="online_price" min="0" step="0.01" value="' + ((v.format === 'hybrid' ? v.online_price : C.prices.online) / 100) + '">') + '</div>';
     html += '<div class="oys-row">' + field('Spots', '<input type="number" name="capacity" min="1" value="' + v.capacity + '">') + field('Drop-in price (' + esc(C.currency) + ')', '<input type="number" name="price" min="0" step="0.01" value="' + (v.price / 100) + '">') + '</div>';
     html += '<label class="oys-check"><input type="checkbox" name="credits_allowed"' + (v.credits_allowed ? ' checked' : '') + '> Passes and memberships can be used</label>';
     html += field('Short note (shown on the timetable)', '<input type="text" name="note" value="' + esc(v.note) + '" placeholder="e.g. Bring a towel">');
@@ -268,9 +275,13 @@
     const sync = () => {
       const kind = form.kind.value;
       const online = form.format.value === 'online';
+      const hybrid = form.format.value === 'hybrid';
       d.querySelector('.f-title').hidden = kind === 'group';
       d.querySelector('.f-desc').hidden = kind === 'group';
       d.querySelector('.f-loc').hidden = online;
+      d.querySelector('.f-url').hidden = !online && !hybrid;
+      d.querySelector('.f-online').hidden = !hybrid;
+      d.querySelector('.f-hybrid-note').hidden = !hybrid;
       const rep = d.querySelector('.f-repeat');
       if (rep) {
         rep.hidden = kind !== 'group';
@@ -281,6 +292,7 @@
       if (e.target.name === 'format' && isNew) {
         // New online classes default to the online price, in-person ones to the drop-in price.
         form.price.value = (form.format.value === 'online' ? C.prices.online : C.prices.group) / 100;
+        form.online_price.value = C.prices.online / 100;
       }
       if (e.target.name === 'kind' && isNew) {
         if (form.kind.value === 'private') { form.capacity.value = 1; form.credits_allowed.checked = false; }
@@ -315,6 +327,8 @@
       format: form.format.value,
       location: form.location.value.trim(),
       online_url: form.online_url.value.trim(),
+      online_capacity: parseInt(form.online_capacity.value, 10) || 0,
+      online_price: Math.round(parseFloat(form.online_price.value || '0') * 100),
       capacity: parseInt(form.capacity.value, 10) || 1,
       price: Math.round(parseFloat(form.price.value || '0') * 100),
       credits_allowed: form.credits_allowed.checked,

@@ -76,8 +76,11 @@ class OYS_Emails {
 	public static function ics( $session, $booking_id ) {
 		$esc   = fn( $s ) => str_replace( array( '\\', ';', ',', "\n" ), array( '\\\\', '\;', '\,', '\n' ), (string) $s );
 		$desc  = oys_session_title( $session ) . ' with ' . OYS_Settings::get( 'email_from_name' );
-		if ( $session->online_url ) {
-			$desc .= "\nJoin online: " . $session->online_url;
+		$b     = OYS_Bookings::get( $booking_id );
+		$join  = $b ? OYS_Bookings::join_link( $b, $session ) : '';
+		$live  = $b && 'online' === oys_mode_for( $session, $b->mode );
+		if ( $join ) {
+			$desc .= "\nJoin online: " . $join;
 		}
 		$desc .= "\nManage your booking: " . oys_account_url();
 		$lines = array(
@@ -88,7 +91,7 @@ class OYS_Emails {
 			'DTSTART:' . gmdate( 'Ymd\THis\Z', oys_ts( $session->starts_at ) ),
 			'DTEND:' . gmdate( 'Ymd\THis\Z', oys_ts( $session->ends_at ) ),
 			'SUMMARY:' . $esc( oys_session_title( $session ) . ' — ' . OYS_Settings::get( 'email_from_name' ) ),
-			'LOCATION:' . $esc( $session->location ?: ( $session->online_url ? 'Online' : '' ) ),
+			'LOCATION:' . $esc( $live ? ( $join ?: 'Online' ) : $session->location ),
 			'DESCRIPTION:' . $esc( $desc ),
 			'BEGIN:VALARM', 'TRIGGER:-PT2H', 'ACTION:DISPLAY', 'DESCRIPTION:Yoga in 2 hours', 'END:VALARM',
 			'END:VEVENT', 'END:VCALENDAR',
@@ -105,6 +108,23 @@ class OYS_Emails {
 		$file = $dir . '/yoga-' . (int) $booking_id . '-' . wp_generate_password( 8, false ) . '.ics';
 		file_put_contents( $file, self::ics( $session, $booking_id ) );
 		return $file;
+	}
+
+	/** The join link (or a note that it's coming) for someone taking part online; '' in the studio. */
+	private static function join_html( $booking, $session ) {
+		if ( ! $booking || 'online' !== oys_mode_for( $session, $booking->mode ) ) {
+			return '';
+		}
+		$url = OYS_Bookings::join_link( $booking, $session );
+		if ( ! $url ) {
+			return '<p><b>' . esc_html__( 'You\'re joining online.', 'olivia-studio' ) . '</b> ' . esc_html__( 'The link to join comes in your reminder email and is in your account before the class.', 'olivia-studio' ) . '</p>';
+		}
+		$html = '<p style="margin:22px 0 6px"><a href="' . esc_url( $url ) . '" style="display:inline-block;background:#C6A3EE;color:#12231A;text-decoration:none;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:13px;padding:13px 20px;border-radius:999px;border:2px solid #12231A">' . esc_html__( 'Join the live class', 'olivia-studio' ) . '</a></p>'
+			. '<p style="font-size:13px;color:#53635A;word-break:break-all">' . esc_html( $url ) . '</p>';
+		if ( $session->zoom_password && ! str_contains( $url, 'pwd=' ) ) {
+			$html .= '<p style="font-size:13px;color:#53635A">' . esc_html__( 'Passcode:', 'olivia-studio' ) . ' <b>' . esc_html( $session->zoom_password ) . '</b></p>';
+		}
+		return $html . '<p style="font-size:13px;color:#53635A">' . esc_html__( 'Join a few minutes early, set up where the camera sees your mat (or leave it off), and keep your microphone muted.', 'olivia-studio' ) . '</p>';
 	}
 
 	/* ---------- Customer emails ---------- */
@@ -147,10 +167,8 @@ class OYS_Emails {
 		}
 		$body .= self::session_block( $s );
 		$body .= self::guest_list_html( $all_g, sprintf( _n( 'Your guest (%d)', 'Your guests (%d)', count( $all_g ), 'olivia-studio' ), count( $all_g ) ) );
-		if ( $s->online_url ) {
-			$body .= '<p><b>' . esc_html__( 'Online class link:', 'olivia-studio' ) . '</b> <a href="' . esc_url( $s->online_url ) . '">' . esc_html( $s->online_url ) . '</a></p>';
-		}
-		if ( 'private' !== $s->kind ) {
+		$body .= self::join_html( $host, $s );
+		if ( 'private' !== $s->kind && 'online' !== oys_mode_for( $s, $host->mode ) ) {
 			$body .= '<p>' . esc_html__( 'Please arrive 10 minutes early. Bring a mat if you have one, water, and a warm layer for the relaxation.', 'olivia-studio' ) . '</p>';
 		}
 		$body .= '<p style="font-size:14px;color:#53635A">' . esc_html( OYS_Settings::get( 'cancel_policy' ) ) . '</p>';
@@ -170,10 +188,8 @@ class OYS_Emails {
 		$host  = self::first_name( $g->user_id );
 		$body  = '<p>' . sprintf( esc_html__( 'Hi %1$s, %2$s booked you a spot. See you on the mat!', 'olivia-studio' ), esc_html( $g->guest_name ), esc_html( $host ) ) . '</p>';
 		$body .= self::session_block( $s );
-		if ( $s->online_url ) {
-			$body .= '<p><b>' . esc_html__( 'Online class link:', 'olivia-studio' ) . '</b> <a href="' . esc_url( $s->online_url ) . '">' . esc_html( $s->online_url ) . '</a></p>';
-		}
-		$body .= '<p>' . esc_html__( 'Please arrive 10 minutes early. New to yoga? Tell Olivia before class about any injuries or health conditions.', 'olivia-studio' ) . '</p>';
+		$body .= self::join_html( $g, $s );
+		$body .= '<p>' . esc_html( 'online' === oys_mode_for( $s, $g->mode ) ? '' : __( 'Please arrive 10 minutes early.', 'olivia-studio' ) . ' ' ) . esc_html__( 'New to yoga? Tell Olivia before class about any injuries or health conditions.', 'olivia-studio' ) . '</p>';
 		$body .= '<p style="font-size:14px;color:#53635A">' . esc_html( OYS_Settings::get( 'waiver_text' ) ) . '</p>';
 		self::send( $g->guest_email, sprintf( __( '%1$s booked you into %2$s', 'olivia-studio' ), $host, oys_session_title( $s ) ), __( 'You\'re coming to yoga', 'olivia-studio' ), $body, array( self::ics_file( $s, $g->id ) ), array( __( 'About the classes', 'olivia-studio' ), home_url( '/' ) ) );
 	}
@@ -243,9 +259,7 @@ class OYS_Emails {
 		$body  = '<p>' . sprintf( esc_html__( 'Hi %s, there\'s a change to your class. Your spot is kept, nothing to do if the new details work for you.', 'olivia-studio' ), esc_html( $name ) ) . '</p>';
 		$body .= '<p style="color:#53635A">' . esc_html__( 'Before:', 'olivia-studio' ) . ' <s>' . esc_html( oys_date( $before->starts_at, 'l, F j · g:i a' ) . ( oys_is_online( $before ) ? ' · ' . __( 'Online', 'olivia-studio' ) : ( $before->location ? ' · ' . $before->location : '' ) ) ) . '</s></p>';
 		$body .= '<p><b>' . esc_html__( 'Now:', 'olivia-studio' ) . '</b></p>' . self::session_block( $session );
-		if ( $session->online_url ) {
-			$body .= '<p><b>' . esc_html__( 'Join online:', 'olivia-studio' ) . '</b> <a href="' . esc_url( $session->online_url ) . '">' . esc_html( $session->online_url ) . '</a></p>';
-		}
+		$body .= self::join_html( $booking, $session );
 		if ( ! $guest ) {
 			$body .= '<p>' . esc_html__( 'Can\'t make the new time? Cancel in your account and your class goes back on your pass (or you get a class credit).', 'olivia-studio' ) . '</p>';
 		}
@@ -258,9 +272,7 @@ class OYS_Emails {
 		$body  = '<p>' . sprintf( esc_html__( 'Hi %s, a quick reminder about your class.', 'olivia-studio' ), esc_html( self::first_name( $b->user_id ) ) ) . '</p>';
 		$body .= self::session_block( $s );
 		$body .= self::guest_list_html( OYS_Bookings::guests_of( $b->id, array( 'confirmed' ) ), __( 'Coming with you', 'olivia-studio' ) );
-		if ( $s->online_url ) {
-			$body .= '<p><b>' . esc_html__( 'Join online:', 'olivia-studio' ) . '</b> <a href="' . esc_url( $s->online_url ) . '">' . esc_html( $s->online_url ) . '</a></p>';
-		}
+		$body .= self::join_html( $b, $s );
 		$body .= '<p>' . esc_html__( 'Can\'t come? Please cancel in your account so someone on the waitlist can take your spot.', 'olivia-studio' ) . '</p>';
 		self::send( self::user_email( $b->user_id ), sprintf( __( 'Tomorrow: %s', 'olivia-studio' ), oys_session_title( $s ) . ', ' . oys_time( $s->starts_at ) ), __( 'See you soon', 'olivia-studio' ), $body, array(), array( __( 'My bookings', 'olivia-studio' ), oys_account_url() ) );
 	}

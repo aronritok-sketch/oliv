@@ -60,8 +60,51 @@ add_filter( 'pre_wp_mail', '__return_true' );
 // In-process Stripe: remembers what was asked, answers like the API.
 $GLOBALS['stripe_calls'] = array();
 $GLOBALS['stripe_subs']  = array();
+// In-process Zoom: token, meetings, registrants. $GLOBALS['zoom_fail'] = true makes meeting creation fail.
+$GLOBALS['zoom_calls']    = array();
+$GLOBALS['zoom_meetings'] = array();
 add_filter( 'pre_http_request', function ( $pre, $args, $url ) {
-	if ( ! str_starts_with( $url, OYS_Stripe::api_base() ) ) {
+	$is_zoom = str_starts_with( $url, OYS_Zoom::api_base() ) || str_contains( $url, 'oauth/token' );
+	if ( ! $is_zoom ) {
+		return $pre;
+	}
+	$path = str_contains( $url, 'oauth/token' ) ? '/oauth' : substr( parse_url( $url, PHP_URL_PATH ), strlen( parse_url( OYS_Zoom::api_base(), PHP_URL_PATH ) ) );
+	$body = json_decode( $args['body'] ?? 'null', true ) ?: array();
+	$GLOBALS['zoom_calls'][] = array( $args['method'] ?? 'POST', $path, $body );
+	$code = 200;
+	$json = array();
+	if ( '/oauth' === $path ) {
+		$json = array( 'access_token' => 'tok', 'expires_in' => 3600 );
+	} elseif ( preg_match( '#^/users/[^/]+/meetings$#', $path ) ) {
+		if ( ! empty( $GLOBALS['zoom_fail'] ) ) {
+			$code = 500;
+			$json = array( 'message' => 'Zoom is down' );
+		} else {
+			$id   = 90000 + count( $GLOBALS['zoom_meetings'] ) + 1;
+			$json = array( 'id' => $id, 'join_url' => "https://zoom.test/j/$id?pwd=x", 'password' => 'yoga12' );
+			$GLOBALS['zoom_meetings'][ $id ] = $body;
+			$code = 201;
+		}
+	} elseif ( preg_match( '#^/meetings/(\d+)/registrants$#', $path, $m ) ) {
+		$json = array( 'registrant_id' => 'reg_' . md5( $body['email'] ), 'join_url' => "https://zoom.test/j/{$m[1]}?tk=" . md5( $body['email'] ) );
+		$code = 201;
+	} elseif ( preg_match( '#^/meetings/(\d+)$#', $path, $m ) ) {
+		if ( 'GET' === $args['method'] ) {
+			$json = array( 'id' => $m[1], 'start_url' => "https://zoom.test/s/{$m[1]}?zak=fresh" );
+		} else {
+			$code = 204;
+		}
+	} else {
+		$code = 204;
+	}
+	return array( 'headers' => array(), 'body' => $json ? wp_json_encode( $json ) : '', 'response' => array( 'code' => $code, 'message' => 'OK' ), 'cookies' => array(), 'filename' => null );
+}, 9, 3 );
+function zoom_calls( $method, $pattern ) {
+	return count( array_filter( $GLOBALS['zoom_calls'], fn( $c ) => $c[0] === $method && preg_match( $pattern, $c[1] ) ) );
+}
+
+add_filter( 'pre_http_request', function ( $pre, $args, $url ) {
+	if ( false !== $pre || ! str_starts_with( $url, OYS_Stripe::api_base() ) ) {
 		return $pre;
 	}
 	$path = parse_url( $url, PHP_URL_PATH );
@@ -114,6 +157,9 @@ function make_session( $args = array() ) {
 		'ends_at'         => gmdate( 'Y-m-d H:i:s', $start + 3600 ),
 		'capacity'        => $args['capacity'] ?? 10,
 		'format'          => $args['format'] ?? 'studio',
+		'online_capacity'    => $args['online_capacity'] ?? 0,
+		'online_price_cents' => $args['online_price'] ?? 0,
+		'online_url'         => $args['online_url'] ?? '',
 		'price_cents'     => $args['price'] ?? 2500,
 		'credits_allowed' => $args['credits_allowed'] ?? 1,
 		'status'          => 'scheduled',
@@ -493,6 +539,150 @@ test( 'calendar: validation and capacity below bookings', function () {
 	$d = OYS_Calendar::out( OYS_Schedule::get( $s->id ) );
 	OYS_Calendar::rest_save( cal_req( array_merge( $d, array( 'capacity' => 1 ) ), $s->id ), $s->id );
 	eq( 2, (int) OYS_Schedule::get( $s->id )->capacity, 'capacity never below the people booked' );
+} );
+
+test( 'hybrid: studio and online seats are counted separately', function () {
+	$s = make_session( array( 'format' => 'hybrid', 'capacity' => 1, 'online_capacity' => 2, 'online_price' => 600 ) );
+	ok( ! is_wp_error( OYS_Bookings::book_manual( make_user(), $s, 'comp', false ) ), 'studio seat booked' );
+	$b    = make_user();
+	$full = OYS_Bookings::book_manual( $b, $s, 'comp', false );
+	ok( is_wp_error( $full ) && str_contains( $full->get_error_message(), 'live online' ), 'full studio points to the online option' );
+	$on = OYS_Bookings::book_manual( $b, $s, 'comp', false, false, 'online' );
+	ok( ! is_wp_error( $on ), 'online seat booked while the studio is full' );
+	$row = OYS_Schedule::get( $s->id );
+	eq( 1, (int) $row->booked, 'studio count' );
+	eq( 1, (int) $row->online_booked, 'online count' );
+	eq( 'online', OYS_Bookings::get( $on )->mode, 'booking remembers it is online' );
+	$party = OYS_Bookings::book_party( make_user(), $s, array( 'method' => 'comp', 'mode' => 'online', 'guests' => guests( 'Bea' ), 'notify' => false ) );
+	ok( is_wp_error( $party ), 'two more online people do not fit in the last online seat' );
+	eq( 1, (int) OYS_Schedule::get( $s->id )->online_booked, 'nothing half-booked' );
+	OYS_Bookings::cancel( $on, array( 'notify' => false ) );
+	eq( 0, (int) OYS_Schedule::get( $s->id )->online_booked, 'cancel frees the online seat' );
+	eq( 1, (int) OYS_Schedule::get( $s->id )->booked, 'studio untouched' );
+	OYS_Schedule::recount( $s->id );
+	eq( 1, (int) OYS_Schedule::get( $s->id )->booked, 'recount keeps the studio count' );
+	eq( 600, OYS_Schedule::price_for( $s, 'online' ), 'online ticket price' );
+	eq( 2500, OYS_Schedule::price_for( $s, 'studio' ), 'studio drop-in price' );
+	$open = make_session( array( 'format' => 'hybrid', 'capacity' => 1 ) );
+	eq( PHP_INT_MAX, OYS_Schedule::spots_left( $open, 'online' ), 'online seats unlimited when 0' );
+} );
+
+test( 'hybrid: online takes online credits and does not use a membership limit', function () {
+	OYS_Settings::update( array( 'online_per_credit' => 4 ) );
+	$u = make_user();
+	$s = make_session( array( 'format' => 'hybrid', 'online_price' => 600 ) );
+	OYS_Passes::grant( $u, array( 'credits' => 1 ) );
+	eq( 1, OYS_Passes::available_for( $u, $s, 'studio' ), 'studio: one class' );
+	eq( 4, OYS_Passes::available_for( $u, $s, 'online' ), 'online: four online classes' );
+	ok( ! is_wp_error( OYS_Bookings::book_with_credit( $u, $s, false, 'online' ) ), 'booked online with the pass' );
+	eq( 0, OYS_Passes::balance( $u, 'class' ), 'studio class converted' );
+	eq( 3, OYS_Passes::balance( $u, 'online' ), 'three online classes left' );
+	$m  = make_user();
+	make_membership( $m, 1 );
+	$h1 = make_session( array( 'format' => 'hybrid', 'in_hours' => 40 ) );
+	$h2 = make_session( array( 'format' => 'hybrid', 'in_hours' => 50 ) );
+	ok( ! is_wp_error( OYS_Bookings::book_with_membership( $m, $h1, false, 'online' ) ), 'member joins online' );
+	eq( 0, OYS_Memberships::used_in_period( OYS_Memberships::current_for( $m ) ), 'online does not count' );
+	ok( ! is_wp_error( OYS_Bookings::book_with_membership( $m, $h2, false, 'studio' ) ), 'member still has the studio class' );
+} );
+
+test( 'hybrid: card hold and late payment use the online seats', function () {
+	$u = make_user();
+	$s = make_session( array( 'format' => 'hybrid', 'capacity' => 1, 'online_capacity' => 1, 'online_price' => 600 ) );
+	$o = OYS_Orders::create( array( 'user_id' => $u, 'type' => 'dropin', 'session_id' => $s->id, 'amount_cents' => 600 ) );
+	$h = OYS_Bookings::hold( $u, $s, $o, array(), true, 0, 'online' );
+	ok( ! is_wp_error( $h ), 'online seat held' );
+	eq( 1, (int) OYS_Schedule::get( $s->id )->online_booked, 'held online seat counted' );
+	eq( 0, (int) OYS_Schedule::get( $s->id )->booked, 'studio seat still free' );
+	OYS_Bookings::release_hold( $h );
+	eq( 0, (int) OYS_Schedule::get( $s->id )->online_booked, 'released' );
+	OYS_Bookings::confirm_order( $o );
+	eq( 1, (int) OYS_Schedule::get( $s->id )->online_booked, 'late payment takes the online seat back' );
+	eq( 'confirmed', OYS_Bookings::get( $h )->status, 'confirmed' );
+} );
+
+test( 'zoom: meeting created once, only for online people, kept in step with the class', function () {
+	OYS_Settings::update( array( 'zoom_account_id' => 'acc', 'zoom_client_id' => 'id', 'zoom_client_secret' => 'secret', 'zoom_auto' => 1, 'zoom_personal' => 0 ) );
+	delete_transient( OYS_Zoom::TOKEN );
+	$GLOBALS['zoom_calls'] = array();
+	$s  = make_session( array( 'format' => 'hybrid', 'online_price' => 600 ) );
+	$st = OYS_Bookings::get( OYS_Bookings::book_manual( make_user(), $s, 'comp', false ) );
+	eq( '', OYS_Bookings::join_link( $st, $s ), 'studio people get no link' );
+	eq( 0, zoom_calls( 'POST', '#/meetings$#' ), 'no meeting for studio bookings' );
+	$on   = OYS_Bookings::get( OYS_Bookings::book_manual( make_user(), $s, 'comp', false, false, 'online' ) );
+	$link = OYS_Bookings::join_link( $on, OYS_Schedule::get( $s->id ) );
+	ok( str_starts_with( $link, 'https://zoom.test/j/' ), 'online person gets the Zoom link' );
+	OYS_Bookings::join_link( $on, OYS_Schedule::get( $s->id ) );
+	eq( 1, zoom_calls( 'POST', '#/meetings$#' ), 'meeting created once' );
+	$meeting = end( $GLOBALS['zoom_meetings'] );
+	eq( gmdate( 'Y-m-d\TH:i:s\Z', oys_ts( $s->starts_at ) ), $meeting['start_time'], 'meeting starts with the class' );
+	eq( 60, $meeting['duration'], 'meeting length' );
+	eq( 'yoga12', OYS_Schedule::get( $s->id )->zoom_password, 'passcode stored' );
+	$new = gmdate( 'Y-m-d H:i:s', oys_ts( $s->starts_at ) + HOUR_IN_SECONDS );
+	OYS_Schedule::save( array( 'starts_at' => $new, 'ends_at' => gmdate( 'Y-m-d H:i:s', oys_ts( $new ) + 3600 ) ), $s->id );
+	eq( 1, zoom_calls( 'PATCH', '#/meetings/\d+$#' ), 'moving the class updates the meeting' );
+	OYS_Schedule::save( array( 'note' => 'Bring a strap' ), $s->id );
+	eq( 1, zoom_calls( 'PATCH', '#/meetings/\d+$#' ), 'a note change does not touch Zoom' );
+	ok( str_contains( OYS_Zoom::start_url( $s->id ), 'zak=fresh' ), 'host start link fetched fresh' );
+	OYS_Schedule::cancel_session( $s->id );
+	eq( 1, zoom_calls( 'DELETE', '#/meetings/\d+$#' ), 'cancelling the class deletes the meeting' );
+	eq( '', OYS_Schedule::get( $s->id )->zoom_meeting_id, 'meeting fields cleared' );
+	$manual = make_session( array( 'format' => 'online', 'online_url' => 'https://meet.example/abc' ) );
+	$mb     = OYS_Bookings::get( OYS_Bookings::book_manual( make_user(), $manual, 'comp', false ) );
+	eq( 'https://meet.example/abc', OYS_Bookings::join_link( $mb, $manual ), 'a link typed in by hand wins' );
+	eq( 1, zoom_calls( 'POST', '#/meetings$#' ), 'no Zoom meeting for it' );
+} );
+
+test( 'zoom: personal links per person, cancelled with the booking', function () {
+	OYS_Settings::update( array( 'zoom_account_id' => 'acc', 'zoom_client_id' => 'id', 'zoom_client_secret' => 'secret', 'zoom_auto' => 1, 'zoom_personal' => 1 ) );
+	$GLOBALS['zoom_calls'] = array();
+	$s   = make_session( array( 'format' => 'online', 'price' => 600 ) );
+	$u   = make_user( 'Ana' );
+	$hid = OYS_Bookings::book_party( $u, $s, array( 'method' => 'comp', 'guests' => array( array( 'name' => 'Bea', 'email' => 'bea@example.test' ) ), 'notify' => false ) );
+	$h   = OYS_Bookings::get( $hid );
+	$g   = OYS_Bookings::guests_of( $hid )[0];
+	$l1  = OYS_Bookings::join_link( $h, $s );
+	$l2  = OYS_Bookings::join_link( $g, $s );
+	ok( str_contains( $l1, 'tk=' ) && str_contains( $l2, 'tk=' ) && $l1 !== $l2, 'each person has their own link' );
+	eq( 2, zoom_calls( 'POST', '#/registrants$#' ), 'both registered' );
+	OYS_Bookings::join_link( OYS_Bookings::get( $hid ), $s );
+	eq( 2, zoom_calls( 'POST', '#/registrants$#' ), 'link stored, not registered twice' );
+	OYS_Bookings::cancel( $g->id, array( 'notify' => false ) );
+	eq( 1, zoom_calls( 'PUT', '#/registrants/status$#' ), 'cancelled guest removed from Zoom' );
+	eq( '', OYS_Bookings::get( $g->id )->join_url, 'guest link cleared' );
+	OYS_Settings::update( array( 'zoom_personal' => 0 ) );
+} );
+
+test( 'zoom: a failed meeting does not block booking and is retried later', function () {
+	OYS_Settings::update( array( 'zoom_account_id' => 'acc', 'zoom_client_id' => 'id', 'zoom_client_secret' => 'secret', 'zoom_auto' => 1 ) );
+	$GLOBALS['zoom_calls'] = array();
+	$GLOBALS['zoom_fail']  = true;
+	$s  = make_session( array( 'format' => 'online', 'price' => 600, 'in_hours' => 10 ) );
+	$id = OYS_Bookings::book_manual( make_user(), $s, 'comp', false );
+	ok( ! is_wp_error( $id ), 'booking works while Zoom is down' );
+	eq( '', OYS_Bookings::join_link( OYS_Bookings::get( $id ), $s ), 'no link yet' );
+	OYS_Bookings::join_link( OYS_Bookings::get( $id ), $s );
+	eq( 1, zoom_calls( 'POST', '#/meetings$#' ), 'not retried on every page view' );
+	$GLOBALS['zoom_fail'] = false;
+	delete_transient( 'oys_zoom_fail_' . $s->id );
+	OYS_Zoom::prepare_upcoming();
+	ok( '' !== OYS_Schedule::get( $s->id )->zoom_meeting_id, 'the hourly job creates it' );
+} );
+
+test( 'zoom: only one meeting when two requests ask at once', function () {
+	global $wpdb;
+	OYS_Settings::update( array( 'zoom_account_id' => 'acc', 'zoom_client_id' => 'id', 'zoom_client_secret' => 'secret', 'zoom_auto' => 1 ) );
+	$GLOBALS['zoom_calls'] = array();
+	$s = make_session( array( 'format' => 'online', 'price' => 600 ) );
+	// Another request is creating it right now.
+	$wpdb->update( OYS_Install::table( 'sessions' ), array( 'zoom_meeting_id' => 'creating:' . time() ), array( 'id' => $s->id ) );
+	ok( false === OYS_Zoom::has_meeting( OYS_Schedule::get( $s->id ) ), 'the marker is not a meeting' );
+	// A marker left behind by a crash is taken over after a minute.
+	$wpdb->update( OYS_Install::table( 'sessions' ), array( 'zoom_meeting_id' => 'creating:' . ( time() - 120 ) ), array( 'id' => $s->id ) );
+	$res = OYS_Zoom::ensure_meeting( $s->id );
+	ok( ! is_wp_error( $res ) && OYS_Zoom::has_meeting( $res ), 'stale marker taken over, meeting created' );
+	OYS_Zoom::ensure_meeting( $s->id );
+	eq( 1, zoom_calls( 'POST', '#/meetings$#' ), 'created once' );
 } );
 
 test( 'helpers: money and periods', function () {

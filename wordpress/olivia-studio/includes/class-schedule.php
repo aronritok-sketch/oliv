@@ -33,7 +33,9 @@ class OYS_Schedule {
 			'duration_min' => max( 15, (int) ( $data['duration_min'] ?? 60 ) ),
 			'capacity'     => max( 1, (int) ( $data['capacity'] ?? 12 ) ),
 			'location'     => sanitize_text_field( $data['location'] ?? '' ),
-			'format'       => 'online' === ( $data['format'] ?? '' ) ? 'online' : 'studio',
+			'format'       => in_array( $data['format'] ?? '', array( 'online', 'hybrid' ), true ) ? $data['format'] : 'studio',
+			'online_capacity'    => max( 0, (int) ( $data['online_capacity'] ?? 0 ) ),
+			'online_price_cents' => max( 0, (int) ( $data['online_price_cents'] ?? 0 ) ),
 			'online_url'   => esc_url_raw( $data['online_url'] ?? '' ),
 			'price_cents'  => (int) ( $data['price_cents'] ?? 0 ),
 			'note'         => sanitize_text_field( $data['note'] ?? '' ),
@@ -90,6 +92,8 @@ class OYS_Schedule {
 					'capacity'    => $tpl->capacity,
 					'location'    => $tpl->location,
 					'format'      => $tpl->format,
+					'online_capacity'    => $tpl->online_capacity,
+					'online_price_cents' => $tpl->online_price_cents,
 					'online_url'  => $tpl->online_url,
 					'price_cents' => $tpl->price_cents,
 					'note'        => $tpl->note,
@@ -160,22 +164,21 @@ class OYS_Schedule {
 		global $wpdb;
 		$t   = OYS_Install::table( 'sessions' );
 		$row = array();
-		foreach ( array( 'kind', 'class_slug', 'title', 'description', 'starts_at', 'ends_at', 'capacity', 'location', 'format', 'online_url', 'price_cents', 'credits_allowed', 'note', 'status', 'template_id', 'tpl_slot' ) as $k ) {
+		foreach ( array( 'kind', 'class_slug', 'title', 'description', 'starts_at', 'ends_at', 'capacity', 'location', 'format', 'online_url', 'price_cents', 'online_capacity', 'online_price_cents', 'zoom_meeting_id', 'zoom_join_url', 'zoom_password', 'credits_allowed', 'note', 'status', 'template_id', 'tpl_slot' ) as $k ) {
 			if ( array_key_exists( $k, $data ) ) {
 				$row[ $k ] = $data[ $k ];
 			}
 		}
 		if ( $id ) {
+			$before = self::get( $id );
 			$wpdb->update( $t, $row, array( 'id' => $id ) );
+			/** Fires after a session changed (time, place, format, status…); Zoom keeps its meeting in step. */
+			do_action( 'oys_session_saved', (int) $id, $before );
 			return (int) $id;
 		}
 		$row['created_at'] = oys_now();
 		$wpdb->insert( $t, $row );
 		return (int) $wpdb->insert_id;
-	}
-
-	public static function spots_left( $session ) {
-		return max( 0, (int) $session->capacity - (int) $session->booked );
 	}
 
 	/** Why a session can't be booked right now, or '' if it can. */
@@ -190,42 +193,85 @@ class OYS_Schedule {
 		return '';
 	}
 
-	/** Atomically take one seat. Returns true when a seat was free. */
-	public static function take_seat( $session_id ) {
+	/**
+	 * Seats are counted per way of joining: studio seats in `booked` / `capacity`; the online
+	 * seats of a hybrid class in `online_booked` / `online_capacity` (0 = no limit). An online-only
+	 * class counts its (online) seats in `booked` / `capacity`.
+	 */
+	private static function counts_online( $session_id, $mode ) {
+		if ( 'online' !== $mode ) {
+			return false;
+		}
 		global $wpdb;
-		$t = OYS_Install::table( 'sessions' );
-		return 1 === (int) $wpdb->query( $wpdb->prepare( "UPDATE $t SET booked = booked + 1 WHERE id = %d AND status = 'scheduled' AND booked < capacity", $session_id ) );
+		return 'hybrid' === $wpdb->get_var( $wpdb->prepare( 'SELECT format FROM ' . OYS_Install::table( 'sessions' ) . ' WHERE id = %d', $session_id ) );
+	}
+
+	/** Atomically take one seat. Returns true when a seat was free. */
+	public static function take_seat( $session_id, $mode = 'studio' ) {
+		return self::take_seats( $session_id, 1, $mode );
 	}
 
 	/** Atomically take $n seats at once (a customer and their guests): all or nothing. */
-	public static function take_seats( $session_id, $n ) {
+	public static function take_seats( $session_id, $n, $mode = 'studio' ) {
 		global $wpdb;
 		$n = max( 1, (int) $n );
 		$t = OYS_Install::table( 'sessions' );
+		if ( self::counts_online( $session_id, $mode ) ) {
+			return 1 === (int) $wpdb->query( $wpdb->prepare( "UPDATE $t SET online_booked = online_booked + %d WHERE id = %d AND status = 'scheduled' AND ( online_capacity = 0 OR online_booked + %d <= online_capacity )", $n, $session_id, $n ) );
+		}
 		return 1 === (int) $wpdb->query( $wpdb->prepare( "UPDATE $t SET booked = booked + %d WHERE id = %d AND status = 'scheduled' AND booked + %d <= capacity", $n, $session_id, $n ) );
 	}
 
-	public static function release_seats( $session_id, $n ) {
+	/** Take seats even when full (staff, or a late payment that must be honoured). */
+	public static function force_seats( $session_id, $n, $mode = 'studio' ) {
 		global $wpdb;
-		$t = OYS_Install::table( 'sessions' );
-		$wpdb->query( $wpdb->prepare( "UPDATE $t SET booked = GREATEST(0, CAST(booked AS SIGNED) - %d) WHERE id = %d", (int) $n, $session_id ) );
-		do_action( 'oys_seat_released', (int) $session_id );
+		$col = self::counts_online( $session_id, $mode ) ? 'online_booked' : 'booked';
+		$wpdb->query( $wpdb->prepare( 'UPDATE ' . OYS_Install::table( 'sessions' ) . " SET $col = $col + %d WHERE id = %d", (int) $n, $session_id ) );
 	}
 
-	public static function release_seat( $session_id ) {
+	public static function release_seats( $session_id, $n, $mode = 'studio' ) {
 		global $wpdb;
-		$t = OYS_Install::table( 'sessions' );
-		$wpdb->query( $wpdb->prepare( "UPDATE $t SET booked = booked - 1 WHERE id = %d AND booked > 0", $session_id ) );
-		do_action( 'oys_seat_released', (int) $session_id );
+		$t   = OYS_Install::table( 'sessions' );
+		$col = self::counts_online( $session_id, $mode ) ? 'online_booked' : 'booked';
+		$wpdb->query( $wpdb->prepare( "UPDATE $t SET $col = GREATEST(0, CAST($col AS SIGNED) - %d) WHERE id = %d", (int) $n, $session_id ) );
+		do_action( 'oys_seat_released', (int) $session_id, $mode );
+	}
+
+	public static function release_seat( $session_id, $mode = 'studio' ) {
+		self::release_seats( $session_id, 1, $mode );
+	}
+
+	/** Free seats for this way of joining; PHP_INT_MAX when online seats are unlimited. */
+	public static function spots_left( $session, $mode = 'studio' ) {
+		if ( oys_is_hybrid( $session ) && 'online' === $mode ) {
+			return (int) $session->online_capacity ? max( 0, (int) $session->online_capacity - (int) $session->online_booked ) : PHP_INT_MAX;
+		}
+		return max( 0, (int) $session->capacity - (int) $session->booked );
 	}
 
 	/** Recount seats from bookings (repairs drift after manual database edits). */
 	public static function recount( $session_id ) {
 		global $wpdb;
-		$b     = OYS_Install::table( 'bookings' );
-		$count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $b WHERE session_id = %d AND ( status IN ('confirmed','attended','no_show') OR ( status = 'pending' AND hold_expires > %s ) )", $session_id, oys_now() ) );
-		$wpdb->update( OYS_Install::table( 'sessions' ), array( 'booked' => $count ), array( 'id' => $session_id ) );
+		$b      = OYS_Install::table( 'bookings' );
+		$s      = self::get( $session_id );
+		$active = "( status IN ('confirmed','attended','no_show') OR ( status = 'pending' AND hold_expires > %s ) )";
+		if ( oys_is_hybrid( $s ) ) {
+			$studio = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $b WHERE session_id = %d AND mode <> 'online' AND $active", $session_id, oys_now() ) );
+			$online = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $b WHERE session_id = %d AND mode = 'online' AND $active", $session_id, oys_now() ) );
+			$wpdb->update( OYS_Install::table( 'sessions' ), array( 'booked' => $studio, 'online_booked' => $online ), array( 'id' => $session_id ) );
+			return $studio;
+		}
+		$count = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $b WHERE session_id = %d AND $active", $session_id, oys_now() ) );
+		$wpdb->update( OYS_Install::table( 'sessions' ), array( 'booked' => $count, 'online_booked' => 0 ), array( 'id' => $session_id ) );
 		return $count;
+	}
+
+	/** Price of one ticket for this way of joining. */
+	public static function price_for( $session, $mode = 'studio' ) {
+		if ( oys_is_hybrid( $session ) && 'online' === $mode ) {
+			return (int) $session->online_price_cents;
+		}
+		return (int) $session->price_cents;
 	}
 
 	/**
@@ -263,6 +309,7 @@ class OYS_Schedule {
 		return array(
 			'studio' => __( 'In person', 'olivia-studio' ),
 			'online' => __( 'Online (live stream)', 'olivia-studio' ),
+			'hybrid' => __( 'In person + live online', 'olivia-studio' ),
 		);
 	}
 

@@ -12,6 +12,12 @@
  *   /_renew?sub=sub_…            next billing period paid (invoice.paid + subscription.updated)
  *   /_fail?sub=sub_…             renewal payment failed (invoice.payment_failed + past_due)
  *   /_end?sub=sub_…              Stripe gave up / ended the subscription (subscription.deleted)
+ *
+ * Also a Zoom stand-in under /zoom (Server-to-Server OAuth token, meetings, registrants):
+ * wp-config.php: define( 'OYS_ZOOM_API_BASE', 'http://127.0.0.1:8090/zoom/v2' );
+ *                define( 'OYS_ZOOM_OAUTH_URL', 'http://127.0.0.1:8090/zoom/oauth/token' );
+ * Plugin settings: Account ID "acc_mock", Client ID "zoom_client", Client Secret "zoom_secret".
+ *   /zoom/_meetings              every meeting and registrant (for tests)
  */
 
 const WEBHOOK_URL    = 'http://127.0.0.1:8080/wp-json/oys/v1/stripe-webhook';
@@ -21,7 +27,7 @@ $store_file = sys_get_temp_dir() . '/mock-stripe.json';
 $fp         = fopen( $store_file . '.lock', 'c' );
 flock( $fp, LOCK_EX );
 $db = is_file( $store_file ) ? json_decode( file_get_contents( $store_file ), true ) : array();
-$db += array( 'sessions' => array(), 'subs' => array(), 'invoices' => array(), 'n' => 0 );
+$db += array( 'sessions' => array(), 'subs' => array(), 'invoices' => array(), 'meetings' => array(), 'n' => 0 );
 
 function save() { global $db, $store_file; file_put_contents( $store_file, json_encode( $db ) ); }
 function unlock() { global $fp; flock( $fp, LOCK_UN ); }
@@ -33,6 +39,77 @@ $method = $_SERVER['REQUEST_METHOD'];
 $path   = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
 parse_str( file_get_contents( 'php://input' ), $body );
 parse_str( $_SERVER['QUERY_STRING'] ?? '', $query );
+
+/* ---------- Zoom ---------- */
+if ( str_starts_with( $path, '/zoom/' ) ) {
+	$json = json_decode( file_get_contents( 'php://input' ) ?: 'null', true ) ?: array();
+	if ( '/zoom/oauth/token' === $path ) {
+		$ok = 'Basic ' . base64_encode( 'zoom_client:zoom_secret' ) === ( $_SERVER['HTTP_AUTHORIZATION'] ?? '' ) && 'acc_mock' === ( $query['account_id'] ?? '' ) && 'account_credentials' === ( $query['grant_type'] ?? '' );
+		return $ok ? out( array( 'access_token' => 'zoom_token_mock', 'token_type' => 'bearer', 'expires_in' => 3599 ) ) : out( array( 'reason' => 'Invalid client_id or client_secret', 'error' => 'invalid_client' ), 400 );
+	}
+	if ( '/zoom/_meetings' === $path ) {
+		return out( $db['meetings'] );
+	}
+	if ( preg_match( '#^/zoom/(j|s)/(\d+)$#', $path, $m ) ) {
+		header( 'Content-Type: text/html; charset=utf-8' );
+		printf( '<!doctype html><title>Mock Zoom</title><body style="font-family:system-ui;max-width:420px;margin:60px auto"><p style="color:#2D8CFF;font-weight:700">MOCK ZOOM</p><h1 id="zoom-%s">%s meeting %s</h1>', 's' === $m[1] ? 'host' : 'join', 's' === $m[1] ? 'Starting' : 'Joining', htmlspecialchars( $m[2] ) );
+		return;
+	}
+	if ( 'Bearer zoom_token_mock' !== ( $_SERVER['HTTP_AUTHORIZATION'] ?? '' ) ) {
+		return out( array( 'code' => 124, 'message' => 'Invalid access token.' ), 401 );
+	}
+	$base = 'http://127.0.0.1:8090/zoom';
+	if ( preg_match( '#^/zoom/v2/users/([^/]+)$#', $path ) && 'GET' === $method ) {
+		return out( array( 'id' => 'u_mock', 'email' => 'olivia@example.com', 'type' => 2 ) );
+	}
+	if ( preg_match( '#^/zoom/v2/users/([^/]+)/meetings$#', $path ) && 'POST' === $method ) {
+		$db['n']++;
+		$id = 80000000000 + $db['n'];
+		$db['meetings'][ $id ] = array_merge( $json, array( 'id' => $id, 'join_url' => "$base/j/$id?pwd=mockpwd", 'password' => 'yoga12', 'registrants' => array(), 'status' => 'waiting' ) );
+		save();
+		return out( $db['meetings'][ $id ] + array( 'start_url' => "$base/s/$id?zak=first" ), 201 );
+	}
+	if ( preg_match( '#^/zoom/v2/meetings/(\d+)(/registrants(/status)?)?$#', $path, $m ) ) {
+		$id = $m[1];
+		if ( empty( $db['meetings'][ $id ] ) ) {
+			return out( array( 'code' => 3001, 'message' => 'Meeting does not exist: ' . $id . '.' ), 404 );
+		}
+		if ( empty( $m[2] ) ) {
+			if ( 'GET' === $method ) {
+				return out( $db['meetings'][ $id ] + array( 'start_url' => "$base/s/$id?zak=" . substr( md5( microtime() ), 0, 8 ) ) );
+			}
+			if ( 'PATCH' === $method ) {
+				$db['meetings'][ $id ] = array_merge( $db['meetings'][ $id ], $json );
+				save();
+				http_response_code( 204 );
+				return;
+			}
+			if ( 'DELETE' === $method ) {
+				unset( $db['meetings'][ $id ] );
+				save();
+				http_response_code( 204 );
+				return;
+			}
+		}
+		if ( '/registrants' === $m[2] && 'POST' === $method ) {
+			$rid = 'reg_' . substr( md5( $json['email'] . $id ), 0, 10 );
+			$db['meetings'][ $id ]['registrants'][ $rid ] = array( 'email' => $json['email'], 'first_name' => $json['first_name'] ?? '', 'status' => 'approved' );
+			save();
+			return out( array( 'id' => $id, 'registrant_id' => $rid, 'join_url' => "$base/j/$id?tk=$rid", 'topic' => $db['meetings'][ $id ]['topic'] ?? '' ), 201 );
+		}
+		if ( '/registrants/status' === $m[2] && 'PUT' === $method ) {
+			foreach ( $json['registrants'] ?? array() as $r ) {
+				if ( isset( $db['meetings'][ $id ]['registrants'][ $r['id'] ] ) ) {
+					$db['meetings'][ $id ]['registrants'][ $r['id'] ]['status'] = 'cancel' === $json['action'] ? 'cancelled' : $json['action'];
+				}
+			}
+			save();
+			http_response_code( 204 );
+			return;
+		}
+	}
+	return out( array( 'message' => 'Not found' ), 404 );
+}
 
 if ( str_starts_with( $path, '/v1/' ) && ( $_SERVER['HTTP_AUTHORIZATION'] ?? '' ) !== 'Bearer sk_test_mock' ) {
 	return out( array( 'error' => array( 'message' => 'Invalid API Key provided' ) ), 401 );

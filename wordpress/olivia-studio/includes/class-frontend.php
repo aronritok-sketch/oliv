@@ -110,7 +110,7 @@ class OYS_Frontend {
 				$out[] = '<li class="session session--' . esc_attr( $tone ) . ( $online ? ' session--online' : '' ) . '">'
 					. '<span class="session__time">' . esc_html( oys_time( $s->starts_at ) . ' – ' . oys_time( $s->ends_at ) ) . '</span>'
 					. '<span class="session__class">' . $title . '</span>'
-					. '<span class="session__place">' . ( $online ? '<span class="session__online">' . esc_html__( 'Online', 'olivia-studio' ) . '</span> ' . esc_html( $s->price_cents ? oys_money( $s->price_cents ) : '' ) : esc_html( $s->location ) ) . '</span>'
+					. '<span class="session__place">' . ( $online ? '<span class="session__online">' . esc_html__( 'Online', 'olivia-studio' ) . '</span> ' . esc_html( $s->price_cents ? oys_money( $s->price_cents ) : '' ) : esc_html( $s->location ) . ( oys_is_hybrid( $s ) ? ' <span class="session__online">' . esc_html__( '+ Live online', 'olivia-studio' ) . '</span>' : '' ) ) . '</span>'
 					. ( $s->note ? '<span class="session__note">' . esc_html( $s->note ) . '</span>' : '' )
 					. ( $spots ? '<span class="session__spots' . ( $left < 1 ? ' is-full' : '' ) . '">' . esc_html( $spots ) . '</span>' : '' )
 					. $action . '</li>';
@@ -248,11 +248,14 @@ class OYS_Frontend {
 		} elseif ( $s->location ) {
 			$rows[] = array( 'pin', $s->location );
 		}
+		if ( oys_is_hybrid( $s ) ) {
+			$rows[] = array( 'screen', __( 'Also streamed live: join from home if you prefer.', 'olivia-studio' ) );
+		}
 		if ( 'private' !== $s->kind ) {
 			$left   = OYS_Schedule::spots_left( $s );
-			$rows[] = array( 'users', $left < 1 ? __( 'Full', 'olivia-studio' ) : sprintf( _n( '%d spot left', '%d spots left', $left, 'olivia-studio' ), $left ) );
+			$rows[] = array( 'users', ( oys_is_hybrid( $s ) ? __( 'Studio:', 'olivia-studio' ) . ' ' : '' ) . ( $left < 1 ? __( 'Full', 'olivia-studio' ) : sprintf( _n( '%d spot left', '%d spots left', $left, 'olivia-studio' ), $left ) ) );
 		}
-		$html = '<div class="oys-card oys-summary"><p class="kicker">' . esc_html( ( OYS_Schedule::kinds()[ $s->kind ] ?? '' ) . ( oys_is_online( $s ) ? ' · ' . __( 'Online', 'olivia-studio' ) : '' ) ) . '</p><h2>' . esc_html( oys_session_title( $s ) ) . '</h2><ul class="oys-facts">';
+		$html = '<div class="oys-card oys-summary"><p class="kicker">' . esc_html( ( OYS_Schedule::kinds()[ $s->kind ] ?? '' ) . ( oys_is_online( $s ) ? ' · ' . __( 'Online', 'olivia-studio' ) : ( oys_is_hybrid( $s ) ? ' · ' . __( 'Studio + live online', 'olivia-studio' ) : '' ) ) ) . '</p><h2>' . esc_html( oys_session_title( $s ) ) . '</h2><ul class="oys-facts">';
 		foreach ( $rows as $r ) {
 			$html .= '<li>' . oys_icon( $r[0] ) . '<span>' . esc_html( $r[1] ) . '</span></li>';
 		}
@@ -324,23 +327,33 @@ class OYS_Frontend {
 			return $out . self::auth_block( $here, __( 'You need an account to book, so you can manage or cancel your spot, bring guests and keep track of your passes. It takes a minute.', 'olivia-studio' ) ) . '</div></div>';
 		}
 		$closed    = OYS_Schedule::closed_reason( $s );
-		$left      = OYS_Schedule::spots_left( $s );
 		$mine      = OYS_Bookings::active_for( $user_id, $s->id );
+		// Hybrid classes: in the studio or live online (?mode=online). A full studio offers online first.
+		$asked     = sanitize_key( $_GET['mode'] ?? '' );
+		$mode      = oys_mode_for( $s, $mine ? $mine->mode : ( $asked ?: 'studio' ) );
+		if ( ! $mine && ! $asked && oys_is_hybrid( $s ) && OYS_Schedule::spots_left( $s, 'studio' ) < 1 && OYS_Schedule::spots_left( $s, 'online' ) > 0 ) {
+			$mode = 'online';
+		}
+		$left      = OYS_Schedule::spots_left( $s, $mode );
 		$held      = $mine ? array() : OYS_Bookings::unfinished_for( $user_id, $s->id );
-		$left     += count( $held ); // Seats held for this customer's own unfinished payment are theirs to use again.
-		$kind      = OYS_Bookings::credit_kind( $s );
-		$credits   = $s->credits_allowed ? OYS_Passes::available_for( $user_id, $s ) : 0;
+		$left     += PHP_INT_MAX === $left ? 0 : count( $held ); // Seats held for this customer's own unfinished payment are theirs to use again.
+		$kind      = OYS_Bookings::credit_kind( $s, $mode );
+		$credits   = $s->credits_allowed ? OYS_Passes::available_for( $user_id, $s, $mode ) : 0;
 		// Online class and no online credits yet: studio pass classes are converted (1 → online_per_credit).
 		$converts  = 'online' === $kind && $credits > 0 && ! OYS_Passes::balance( $user_id, 'online' );
 		$conv_note = $converts ? sprintf( __( 'Online classes cost less: one class from your pass covers %d online classes, and the rest stay on your account.', 'olivia-studio' ), OYS_Passes::online_per_credit() ) : '';
 		$max_g     = 'private' === $s->kind ? 0 : (int) OYS_Settings::get( 'max_guests' );
 		$ready     = OYS_Settings::payments_ready();
-		$price     = (int) $s->price_cents;
+		$price     = OYS_Schedule::price_for( $s, $mode );
 
 		// Already booked: confirmation, guests, and "bring more guests".
 		if ( $mine && 'pending' !== $mine->status ) {
 			$guests = OYS_Bookings::guests_of( $mine->id, array( 'confirmed' ) );
-			$out   .= '<div class="oys-card oys-done"><h2>' . esc_html__( 'You\'re booked', 'olivia-studio' ) . '</h2><p>' . esc_html__( 'See you on the mat. You\'ll find this booking in your account.', 'olivia-studio' ) . '</p>';
+			$out   .= '<div class="oys-card oys-done"><h2>' . esc_html__( 'You\'re booked', 'olivia-studio' ) . '</h2><p>' . ( 'online' === $mode ? esc_html__( 'You\'re joining live online. The link is here and in your account; it\'s also in your reminder email.', 'olivia-studio' ) : esc_html__( 'See you on the mat. You\'ll find this booking in your account.', 'olivia-studio' ) ) . '</p>';
+			$join   = 'online' === $mode ? OYS_Bookings::join_link( $mine, $s ) : '';
+			if ( $join ) {
+				$out .= '<p><a class="btn btn--orchid oys-join" href="' . esc_url( $join ) . '" target="_blank" rel="noopener">' . esc_html__( 'Join the live class', 'olivia-studio' ) . '</a></p>';
+			}
 			if ( $guests ) {
 				$out .= '<p><b>' . esc_html( sprintf( _n( 'Your guest: %s', 'Your guests: %s', count( $guests ), 'olivia-studio' ), implode( ', ', wp_list_pluck( $guests, 'guest_name' ) ) ) ) . '</b></p>';
 			}
@@ -381,9 +394,27 @@ class OYS_Frontend {
 				. '<p class="oys-small">' . esc_html__( 'Or choose again below: the unfinished payment is cancelled automatically.', 'olivia-studio' ) . '</p></div>';
 		}
 
+		// Hybrid: choose between the studio and joining live online.
+		if ( oys_is_hybrid( $s ) ) {
+			$out .= '<div class="oys-modes" role="group" aria-label="' . esc_attr__( 'How would you like to join?', 'olivia-studio' ) . '">';
+			foreach ( array( 'studio' => __( 'In the studio', 'olivia-studio' ), 'online' => __( 'Live online', 'olivia-studio' ) ) as $m => $label ) {
+				$free  = OYS_Schedule::spots_left( $s, $m );
+				$state = $free < 1 ? __( 'Full', 'olivia-studio' ) : ( PHP_INT_MAX === $free ? __( 'Open', 'olivia-studio' ) : sprintf( _n( '%d spot left', '%d spots left', $free, 'olivia-studio' ), $free ) );
+				$cost  = OYS_Schedule::price_for( $s, $m );
+				$out  .= '<a class="oys-mode' . ( $m === $mode ? ' is-active' : '' ) . '" href="' . esc_url( add_query_arg( 'mode', $m, $here ) ) . '"' . ( $m === $mode ? ' aria-current="true"' : '' ) . ' data-mode="' . esc_attr( $m ) . '"><b>' . esc_html( $label ) . '</b><span>' . esc_html( ( $cost ? oys_money( $cost ) : __( 'Free', 'olivia-studio' ) ) . ' · ' . $state ) . '</span></a>';
+			}
+			$out .= '</div>';
+		}
+
+		if ( $left < 1 && oys_is_hybrid( $s ) && 'online' === $mode ) {
+			return $out . '<div class="oys-card"><h2>' . esc_html__( 'Online spots are taken', 'olivia-studio' ) . '</h2><p>' . esc_html__( 'All online spots for this class are booked.', 'olivia-studio' ) . '</p></div></div></div>';
+		}
 		if ( $left < 1 ) {
 			$pos = OYS_Bookings::waitlist_position( $user_id, $s->id );
-			$out .= '<div class="oys-card"><h2>' . esc_html__( 'This class is full', 'olivia-studio' ) . '</h2>';
+			$out .= '<div class="oys-card"><h2>' . esc_html( oys_is_hybrid( $s ) ? __( 'The studio is full', 'olivia-studio' ) : __( 'This class is full', 'olivia-studio' ) ) . '</h2>';
+			if ( oys_is_hybrid( $s ) && OYS_Schedule::spots_left( $s, 'online' ) > 0 ) {
+				$out .= '<p><a class="btn btn--orchid" href="' . esc_url( add_query_arg( 'mode', 'online', $here ) ) . '">' . esc_html__( 'Join live online instead', 'olivia-studio' ) . '</a></p>';
+			}
 			if ( $pos ) {
 				$out .= '<p>' . sprintf( esc_html__( 'You\'re number %d on the waitlist. If a spot opens and you have a pass or membership, you\'re booked in automatically and we email you. Otherwise we email you so you can book first.', 'olivia-studio' ), $pos ) . '</p>'
 					. self::form_open( 'oys_waitlist' ) . '<input type="hidden" name="session" value="' . (int) $s->id . '"><input type="hidden" name="do" value="leave"><button class="btn btn--ghost">' . esc_html__( 'Leave the waitlist', 'olivia-studio' ) . '</button></form>';
@@ -396,7 +427,7 @@ class OYS_Frontend {
 
 		// Payment options (prices update with the number of guests).
 		$member  = OYS_Memberships::current_for( $user_id );
-		$covered = $member && true === OYS_Memberships::covers( $member, $s );
+		$covered = $member && true === OYS_Memberships::covers( $member, $s, $mode );
 		$options = array();
 		if ( $covered ) {
 			$note = (int) $member->classes_per_period ? sprintf( __( '%d left this period', 'olivia-studio' ), OYS_Memberships::remaining( $member ) ) : __( 'unlimited', 'olivia-studio' );
@@ -409,7 +440,7 @@ class OYS_Frontend {
 			$options[] = array( 'credit', $label, '<span class="oys-option__price" data-needs="' . (int) $credits . '">' . esc_html( 'online' === $kind ? __( '1 online class each', 'olivia-studio' ) : __( '1 class each', 'olivia-studio' ) ) . '</span>', $conv_note );
 		}
 		if ( $price > 0 ) {
-			$options[] = array( 'card', 'private' === $s->kind ? __( 'Pay for this session', 'olivia-studio' ) : __( 'Pay by card (drop-in)', 'olivia-studio' ), '<span class="oys-option__price" data-each="' . $price . '">' . esc_html( oys_money( $price ) ) . '</span>', '' );
+			$options[] = array( 'card', 'private' === $s->kind ? __( 'Pay for this session', 'olivia-studio' ) : ( 'online' === $mode ? __( 'Pay by card (online ticket)', 'olivia-studio' ) : __( 'Pay by card (drop-in)', 'olivia-studio' ) ), '<span class="oys-option__price" data-each="' . $price . '">' . esc_html( oys_money( $price ) ) . '</span>', '' );
 		} elseif ( ! $credits || ! $s->credits_allowed ) {
 			$options[] = array( 'free', __( 'Reserve my spot', 'olivia-studio' ), '<span class="oys-option__price">' . esc_html__( 'Free', 'olivia-studio' ) . '</span>', '' );
 		}
@@ -423,7 +454,7 @@ class OYS_Frontend {
 		}
 
 		$out .= self::form_open( 'oys_checkout', 'class="oys-card oys-pay" data-party data-host="1"' ) . '<h2>' . esc_html__( 'How would you like to book?', 'olivia-studio' ) . '</h2>'
-			. '<input type="hidden" name="session" value="' . (int) $s->id . '">'
+			. '<input type="hidden" name="session" value="' . (int) $s->id . '"><input type="hidden" name="mode" value="' . esc_attr( $mode ) . '">'
 			. self::guest_fields( min( $max_g, $left - 1 ) )
 			. '<p class="oys-party">' . esc_html__( 'People in this booking:', 'olivia-studio' ) . ' <b data-party-size>1</b></p>'
 			. '<fieldset class="oys-options"><legend class="sr-only">' . esc_html__( 'Payment option', 'olivia-studio' ) . '</legend>';
@@ -567,31 +598,42 @@ class OYS_Frontend {
 		$method = sanitize_text_field( wp_unslash( $_POST['method'] ?? '' ) );
 		$guests = 'private' === $s->kind ? array() : OYS_Bookings::clean_guests( $_POST['guest_name'] ?? array(), $_POST['guest_email'] ?? array() );
 		$n      = count( $guests );
-		$kind   = OYS_Bookings::credit_kind( $s );
+		// Hybrid classes: in the studio or live online (guests join the way their host does).
+		$host_id = (int) ( $_POST['add_guests'] ?? 0 );
+		$host    = $host_id ? OYS_Bookings::get( $host_id ) : null;
+		$mode    = oys_mode_for( $s, $host ? $host->mode : sanitize_key( $_POST['mode'] ?? 'studio' ) );
+		if ( oys_is_hybrid( $s ) && 'online' === $mode ) {
+			$back = add_query_arg( 'mode', 'online', $back );
+		}
+		$kind   = OYS_Bookings::credit_kind( $s, $mode );
+		$price  = OYS_Schedule::price_for( $s, $mode );
+		$title  = oys_session_title( $s ) . ( oys_is_hybrid( $s ) && 'online' === $mode ? ' ' . __( '(live online)', 'olivia-studio' ) : '' );
 		$fail   = function ( $res ) use ( $back ) {
 			oys_flash( $res->get_error_message(), 'error' );
 			oys_redirect( $back );
 		};
+		// With a personal Zoom link for everyone, online guests need an email to receive theirs.
+		if ( 'online' === $mode && $n && OYS_Zoom::personal_links() && array_filter( $guests, fn( $g ) => ! $g['email'] ) ) {
+			$fail( new WP_Error( 'oys_guest_email', __( 'Add an email for each online guest, so they get their own link to join.', 'olivia-studio' ) ) );
+		}
 
 		// Adding guests to an existing booking.
-		$host_id = (int) ( $_POST['add_guests'] ?? 0 );
 		if ( $host_id ) {
-			$host = OYS_Bookings::get( $host_id );
 			if ( ! $host || (int) $host->user_id !== $user_id || (int) $host->session_id !== (int) $s->id ) {
 				oys_redirect( $back );
 			}
 			if ( ! $n ) {
 				$fail( new WP_Error( 'oys_guests', __( 'Add at least one guest name.', 'olivia-studio' ) ) );
 			}
-			if ( 'card' === $method && $s->price_cents > 0 ) {
+			if ( 'card' === $method && $price > 0 ) {
 				self::start_paid_booking( $user_id, $s, array(
 					'type'         => 'dropin',
-					'description'  => sprintf( _n( 'Guest ticket: %1$s, %2$s', 'Guest tickets (%3$d): %1$s, %2$s', $n, 'olivia-studio' ), oys_session_title( $s ), oys_date( $s->starts_at, 'M j, g:i a' ), $n ),
-					'amount_cents' => (int) $s->price_cents * $n,
+					'description'  => sprintf( _n( 'Guest ticket: %1$s, %2$s', 'Guest tickets (%3$d): %1$s, %2$s', $n, 'olivia-studio' ), $title, oys_date( $s->starts_at, 'M j, g:i a' ), $n ),
+					'amount_cents' => $price * $n,
 					'meta'         => array( 'guests' => wp_list_pluck( $guests, 'name' ) ),
-				), array( array( sprintf( __( 'Guest ticket: %s', 'olivia-studio' ), oys_session_title( $s ) ), implode( ', ', wp_list_pluck( $guests, 'name' ) ) . ' · ' . oys_date( $s->starts_at, 'l, F j · g:i a' ), (int) $s->price_cents, $n ) ), $back, $guests, false, $host_id );
+				), array( array( sprintf( __( 'Guest ticket: %s', 'olivia-studio' ), $title ), implode( ', ', wp_list_pluck( $guests, 'name' ) ) . ' · ' . oys_date( $s->starts_at, 'l, F j · g:i a' ), $price, $n ) ), $back, $guests, false, $host_id, $mode );
 			}
-			$res = OYS_Bookings::book_party( $user_id, $s, array( 'method' => $method, 'guest_method' => 'free' === $method && ! $s->price_cents ? 'free' : 'credit', 'guests' => $guests, 'host_booking' => $host_id ) );
+			$res = OYS_Bookings::book_party( $user_id, $s, array( 'method' => $method, 'guest_method' => 'free' === $method && ! $price ? 'free' : 'credit', 'guests' => $guests, 'host_booking' => $host_id, 'mode' => $mode ) );
 			if ( is_wp_error( $res ) ) {
 				$fail( $res );
 			}
@@ -601,8 +643,8 @@ class OYS_Frontend {
 
 		self::accept_waiver_or_back( $back );
 
-		if ( 'credit' === $method || ( 'free' === $method && ! $s->price_cents ) ) {
-			$res = OYS_Bookings::book_party( $user_id, $s, array( 'method' => $method, 'guests' => $guests ) );
+		if ( 'credit' === $method || ( 'free' === $method && ! $price ) ) {
+			$res = OYS_Bookings::book_party( $user_id, $s, array( 'method' => $method, 'guests' => $guests, 'mode' => $mode ) );
 			if ( is_wp_error( $res ) ) {
 				$fail( $res );
 			}
@@ -611,48 +653,47 @@ class OYS_Frontend {
 
 		if ( 'membership' === $method ) {
 			// The member is covered; guests use pass credits if there are enough, otherwise they are paid by card.
-			$guest_credit = $n && OYS_Passes::available_for( $user_id, $s ) >= $n;
-			$res          = OYS_Bookings::book_party( $user_id, $s, array( 'method' => 'membership', 'guests' => $guest_credit ? $guests : array(), 'guest_method' => 'credit' ) );
+			$guest_credit = $n && OYS_Passes::available_for( $user_id, $s, $mode ) >= $n;
+			$res          = OYS_Bookings::book_party( $user_id, $s, array( 'method' => 'membership', 'guests' => $guest_credit ? $guests : array(), 'guest_method' => 'credit', 'mode' => $mode ) );
 			if ( is_wp_error( $res ) ) {
 				$fail( $res );
 			}
 			if ( $n && ! $guest_credit ) {
-				if ( $s->price_cents < 1 ) {
-					OYS_Bookings::book_party( $user_id, $s, array( 'method' => 'free', 'guests' => $guests, 'host_booking' => $res ) );
+				if ( $price < 1 ) {
+					OYS_Bookings::book_party( $user_id, $s, array( 'method' => 'free', 'guests' => $guests, 'host_booking' => $res, 'mode' => $mode ) );
 					oys_redirect( $back );
 				}
 				self::start_paid_booking( $user_id, $s, array(
 					'type'         => 'dropin',
-					'description'  => sprintf( _n( 'Guest ticket: %1$s, %2$s', 'Guest tickets (%3$d): %1$s, %2$s', $n, 'olivia-studio' ), oys_session_title( $s ), oys_date( $s->starts_at, 'M j, g:i a' ), $n ),
-					'amount_cents' => (int) $s->price_cents * $n,
+					'description'  => sprintf( _n( 'Guest ticket: %1$s, %2$s', 'Guest tickets (%3$d): %1$s, %2$s', $n, 'olivia-studio' ), $title, oys_date( $s->starts_at, 'M j, g:i a' ), $n ),
+					'amount_cents' => $price * $n,
 					'meta'         => array( 'guests' => wp_list_pluck( $guests, 'name' ) ),
-				), array( array( sprintf( __( 'Guest ticket: %s', 'olivia-studio' ), oys_session_title( $s ) ), implode( ', ', wp_list_pluck( $guests, 'name' ) ) . ' · ' . oys_date( $s->starts_at, 'l, F j · g:i a' ), (int) $s->price_cents, $n ) ), $back, $guests, false, $res );
+				), array( array( sprintf( __( 'Guest ticket: %s', 'olivia-studio' ), $title ), implode( ', ', wp_list_pluck( $guests, 'name' ) ) . ' · ' . oys_date( $s->starts_at, 'l, F j · g:i a' ), $price, $n ) ), $back, $guests, false, $res, $mode );
 			}
 			oys_redirect( $back );
 		}
 
 		if ( 'card' === $method ) {
-			if ( $s->price_cents < 1 ) {
+			if ( $price < 1 ) {
 				oys_redirect( $back );
 			}
 			$type  = 'private' === $s->kind ? 'private' : 'dropin';
-			$title = oys_session_title( $s );
 			$when  = oys_date( $s->starts_at, 'l, F j · g:i a' );
 			$meta  = $n ? array( 'guests' => wp_list_pluck( $guests, 'name' ) ) : array();
 			if ( 'private' === $s->kind ) {
 				$r                  = OYS_Privates::for_session( $s->id );
 				$meta['request_id'] = $r ? (int) $r->id : 0;
 			}
-			$lines = array( array( $title, $when, (int) $s->price_cents, 1 ) );
+			$lines = array( array( $title, $when, $price, 1 ) );
 			if ( $n ) {
-				$lines[] = array( sprintf( __( 'Guest ticket: %s', 'olivia-studio' ), $title ), implode( ', ', wp_list_pluck( $guests, 'name' ) ) . ' · ' . $when, (int) $s->price_cents, $n );
+				$lines[] = array( sprintf( __( 'Guest ticket: %s', 'olivia-studio' ), $title ), implode( ', ', wp_list_pluck( $guests, 'name' ) ) . ' · ' . $when, $price, $n );
 			}
 			self::start_paid_booking( $user_id, $s, array(
 				'type'         => $type,
 				'description'  => $title . ', ' . oys_date( $s->starts_at, 'M j, g:i a' ) . ( $n ? ' ' . sprintf( _n( '(+%d guest)', '(+%d guests)', $n, 'olivia-studio' ), $n ) : '' ),
-				'amount_cents' => (int) $s->price_cents * ( 1 + $n ),
+				'amount_cents' => $price * ( 1 + $n ),
 				'meta'         => $meta,
-			), $lines, $back, $guests );
+			), $lines, $back, $guests, true, 0, $mode );
 		}
 
 		if ( str_starts_with( $method, 'pack:' ) ) {
@@ -666,23 +707,23 @@ class OYS_Frontend {
 			if ( (int) $p['credits'] < 1 + $n ) {
 				$fail( new WP_Error( 'oys_pack', sprintf( __( '%1$s has %2$d classes, which isn\'t enough for %3$d people. Choose a bigger pass or pay by card.', 'olivia-studio' ), $p['name'], (int) $p['credits'], 1 + $n ) ) );
 			}
-			$desc = sprintf( __( 'Includes your spot in %s', 'olivia-studio' ), oys_session_title( $s ) . ', ' . oys_date( $s->starts_at, 'M j, g:i a' ) ) . ( $n ? ' ' . sprintf( _n( 'and %d guest', 'and %d guests', $n, 'olivia-studio' ), $n ) : '' );
+			$desc = sprintf( __( 'Includes your spot in %s', 'olivia-studio' ), $title . ', ' . oys_date( $s->starts_at, 'M j, g:i a' ) ) . ( $n ? ' ' . sprintf( _n( 'and %d guest', 'and %d guests', $n, 'olivia-studio' ), $n ) : '' );
 			self::start_paid_booking( $user_id, $s, array(
 				'type'         => 'pack',
 				'product_id'   => $p['id'],
-				'description'  => $p['name'] . ' + ' . oys_session_title( $s ) . ', ' . oys_date( $s->starts_at, 'M j' ) . ( $n ? ' ' . sprintf( _n( '(+%d guest)', '(+%d guests)', $n, 'olivia-studio' ), $n ) : '' ),
+				'description'  => $p['name'] . ' + ' . $title . ', ' . oys_date( $s->starts_at, 'M j' ) . ( $n ? ' ' . sprintf( _n( '(+%d guest)', '(+%d guests)', $n, 'olivia-studio' ), $n ) : '' ),
 				'amount_cents' => (int) $p['price_cents'],
 				'meta'         => $n ? array( 'guests' => wp_list_pluck( $guests, 'name' ) ) : array(),
-			), array( array( $p['name'], $desc, (int) $p['price_cents'], 1 ) ), $back, $guests );
+			), array( array( $p['name'], $desc, (int) $p['price_cents'], 1 ) ), $back, $guests, true, 0, $mode );
 		}
 		oys_redirect( $back );
 	}
 
 
 	/** Hold the seats (customer and/or guests), create the order, send the customer to Stripe. */
-	private static function start_paid_booking( $user_id, $s, array $order, array $lines, $back, array $guests = array(), $include_host = true, $host_booking = 0 ) {
+	private static function start_paid_booking( $user_id, $s, array $order, array $lines, $back, array $guests = array(), $include_host = true, $host_booking = 0, $mode = 'studio' ) {
 		$order_id = OYS_Orders::create( array_merge( array( 'user_id' => $user_id, 'session_id' => $s->id ), $order ) );
-		$first    = OYS_Bookings::hold( $user_id, $s, $order_id, $guests, $include_host, $host_booking );
+		$first    = OYS_Bookings::hold( $user_id, $s, $order_id, $guests, $include_host, $host_booking, $mode );
 		if ( is_wp_error( $first ) ) {
 			OYS_Orders::update( $order_id, array( 'status' => 'failed' ) );
 			oys_flash( $first->get_error_message(), 'error' );
@@ -893,8 +934,8 @@ class OYS_Frontend {
 				$add = 'private' !== $b->kind && ! OYS_Schedule::closed_reason( $s ) && count( $b->guests ) < (int) OYS_Settings::get( 'max_guests' ) && OYS_Schedule::spots_left( $s ) > 0
 					? '<a class="btn btn--ghost btn--sm" href="' . esc_url( oys_book_url( $b->session_id ) ) . '">' . esc_html__( '+ Guests', 'olivia-studio' ) . '</a>' : '';
 				$out .= '<li class="oys-item"><div class="oys-item__when"><b>' . esc_html( wp_date( 'j', oys_ts( $b->starts_at ) ) ) . '</b><span>' . esc_html( wp_date( 'M', oys_ts( $b->starts_at ) ) ) . '</span></div>'
-					. '<div class="oys-item__main"><h4>' . esc_html( oys_session_title( $s ) ) . ' <span class="badge">' . esc_html( $paid[ $b->paid_with ] ?? $b->paid_with ) . '</span></h4><p>' . esc_html( oys_date( $b->starts_at, 'l, g:i a' ) . ' – ' . oys_time( $b->ends_at ) . ( $b->location ? ' · ' . $b->location : '' ) ) . '</p>'
-					. ( $b->online_url ? '<p><a class="text-link" href="' . esc_url( $b->online_url ) . '" target="_blank" rel="noopener">' . esc_html__( 'Join online', 'olivia-studio' ) . '</a></p>' : '' )
+					. '<div class="oys-item__main"><h4>' . esc_html( oys_session_title( $s ) ) . ' <span class="badge">' . esc_html( $paid[ $b->paid_with ] ?? $b->paid_with ) . '</span>' . ( oys_is_hybrid( $s ) && 'online' === $b->mode ? ' <span class="badge badge--online">' . esc_html__( 'Online', 'olivia-studio' ) . '</span>' : '' ) . '</h4><p>' . esc_html( oys_date( $b->starts_at, 'l, g:i a' ) . ' – ' . oys_time( $b->ends_at ) . ( $b->location ? ' · ' . $b->location : '' ) ) . '</p>'
+					. ( ( $join = OYS_Bookings::join_link( $b, $s ) ) ? '<p><a class="btn btn--orchid btn--sm oys-join" href="' . esc_url( $join ) . '" target="_blank" rel="noopener">' . esc_html__( 'Join live online', 'olivia-studio' ) . '</a></p>' : ( 'online' === $b->mode ? '<p class="oys-small">' . esc_html__( 'Joining online: the link arrives before the class.', 'olivia-studio' ) . '</p>' : '' ) )
 					. $guests
 					. ( ! $in_time ? '<p class="oys-small">' . esc_html__( 'Inside the cancellation window', 'olivia-studio' ) . '</p>' : '' ) . '</div>'
 					. '<div class="oys-item__actions">' . $add . self::ics_link( $b->id ) . $cancel . '</div></li>';

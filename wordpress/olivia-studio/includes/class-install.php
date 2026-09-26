@@ -25,6 +25,8 @@ class OYS_Install {
 			// v3: weekly dates remember the slot they were created for, so moving one date doesn't re-create it.
 			global $wpdb;
 			$wpdb->query( 'UPDATE ' . self::table( 'sessions' ) . ' SET tpl_slot = starts_at WHERE template_id > 0 AND tpl_slot IS NULL' );
+			// v4: every booking of an online class is an online booking.
+			$wpdb->query( 'UPDATE ' . self::table( 'bookings' ) . ' b JOIN ' . self::table( 'sessions' ) . " s ON s.id = b.session_id SET b.mode = 'online' WHERE s.format = 'online' AND b.mode <> 'online'" );
 		}
 	}
 
@@ -50,6 +52,8 @@ class OYS_Install {
 			format varchar(10) NOT NULL DEFAULT 'studio',
 			online_url varchar(255) NOT NULL DEFAULT '',
 			price_cents int(10) unsigned NOT NULL DEFAULT 0,
+			online_capacity smallint(5) unsigned NOT NULL DEFAULT 0,
+			online_price_cents int(10) unsigned NOT NULL DEFAULT 0,
 			note varchar(255) NOT NULL DEFAULT '',
 			active tinyint(1) unsigned NOT NULL DEFAULT 1,
 			valid_from date NULL,
@@ -71,6 +75,12 @@ class OYS_Install {
 			format varchar(10) NOT NULL DEFAULT 'studio',
 			online_url varchar(255) NOT NULL DEFAULT '',
 			price_cents int(10) unsigned NOT NULL DEFAULT 0,
+			online_capacity smallint(5) unsigned NOT NULL DEFAULT 0,
+			online_booked smallint(5) unsigned NOT NULL DEFAULT 0,
+			online_price_cents int(10) unsigned NOT NULL DEFAULT 0,
+			zoom_meeting_id varchar(32) NOT NULL DEFAULT '',
+			zoom_join_url varchar(500) NOT NULL DEFAULT '',
+			zoom_password varchar(64) NOT NULL DEFAULT '',
 			credits_allowed tinyint(1) unsigned NOT NULL DEFAULT 1,
 			note varchar(255) NOT NULL DEFAULT '',
 			status varchar(20) NOT NULL DEFAULT 'scheduled',
@@ -94,6 +104,9 @@ class OYS_Install {
 			guest_of bigint(20) unsigned NOT NULL DEFAULT 0,
 			guest_name varchar(190) NOT NULL DEFAULT '',
 			guest_email varchar(190) NOT NULL DEFAULT '',
+			mode varchar(10) NOT NULL DEFAULT 'studio',
+			join_url varchar(500) NOT NULL DEFAULT '',
+			zoom_registrant_id varchar(64) NOT NULL DEFAULT '',
 			hold_expires datetime NULL,
 			reminder_sent tinyint(1) unsigned NOT NULL DEFAULT 0,
 			note text NULL,

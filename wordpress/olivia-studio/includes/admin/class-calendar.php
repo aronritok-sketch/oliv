@@ -62,6 +62,7 @@ class OYS_Calendar {
 				'group'  => (int) apply_filters( 'oys_dropin_display_price', 2500 ),
 				'online' => (int) OYS_Settings::get( 'online_price_cents' ),
 			),
+			'zoom'      => OYS_Zoom::enabled(),
 			'rosterUrl' => admin_url( 'admin.php?page=oys-schedule&session=' ),
 			'listUrl'   => admin_url( 'admin.php?page=oys-schedule&view=list' ),
 			'bookUrl'   => oys_page_url( 'book', array( 'session' => '' ) ),
@@ -100,8 +101,11 @@ class OYS_Calendar {
 		$tz     = wp_timezone();
 		$start  = ( new DateTimeImmutable( $s->starts_at, new DateTimeZone( 'UTC' ) ) )->setTimezone( $tz );
 		$people = array();
+		$online = 0;
 		foreach ( OYS_Bookings::for_session( $s->id, array( 'confirmed', 'attended', 'no_show' ) ) as $b ) {
-			$people[] = $b->guest_of ? sprintf( __( '%s (guest)', 'olivia-studio' ), $b->guest_name ) : OYS_Bookings::person_label( $b );
+			$online += oys_is_hybrid( $s ) && 'online' === $b->mode ? 1 : 0;
+			$label    = $b->guest_of ? sprintf( __( '%s (guest)', 'olivia-studio' ), $b->guest_name ) : OYS_Bookings::person_label( $b );
+			$people[] = oys_is_hybrid( $s ) && 'online' === $b->mode ? $label . ' · ' . __( 'online', 'olivia-studio' ) : $label;
 		}
 		$tpl    = $s->template_id ? OYS_Schedule::template( $s->template_id ) : null;
 		$series = null;
@@ -123,14 +127,18 @@ class OYS_Calendar {
 			'start'           => $start->format( 'H:i' ),
 			'duration'        => (int) round( ( oys_ts( $s->ends_at ) - oys_ts( $s->starts_at ) ) / 60 ),
 			'capacity'        => (int) $s->capacity,
-			'booked'          => count( $people ),
-			'held'            => max( 0, (int) $s->booked - count( $people ) ),
+			'booked'          => count( $people ) - $online,
+			'held'            => max( 0, (int) $s->booked - ( count( $people ) - $online ) ),
 			'waitlist'        => count( OYS_Bookings::waitlist( $s->id ) ),
 			'people'          => $people,
 			'location'        => $s->location,
 			'format'          => $s->format ?: 'studio',
 			'online_url'      => $s->online_url,
 			'price'           => (int) $s->price_cents,
+			'online_capacity' => (int) $s->online_capacity,
+			'online_booked'   => $online,
+			'online_price'    => (int) $s->online_price_cents,
+			'zoom'            => OYS_Zoom::has_meeting( $s ) ? array( 'id' => $s->zoom_meeting_id, 'join' => $s->zoom_join_url, 'start' => wp_nonce_url( admin_url( 'admin-post.php?action=oys_admin_zoom_start&session=' . (int) $s->id ), 'oys_admin_zoom_start' ) ) : null,
 			'credits_allowed' => (bool) $s->credits_allowed,
 			'note'            => $s->note,
 			'status'          => $s->status,
@@ -162,7 +170,7 @@ class OYS_Calendar {
 		}
 		$dur    = min( 600, max( 15, (int) ( $p['duration'] ?? 60 ) ) );
 		$start  = oys_local_to_utc( $date . 'T' . $time );
-		$format = 'online' === ( $p['format'] ?? '' ) ? 'online' : 'studio';
+		$format = in_array( $p['format'] ?? '', array( 'online', 'hybrid' ), true ) ? $p['format'] : 'studio';
 		return array(
 			'kind'            => $kind,
 			'class_slug'      => $slug,
@@ -175,6 +183,8 @@ class OYS_Calendar {
 			'format'          => $format,
 			'online_url'      => esc_url_raw( $p['online_url'] ?? '' ),
 			'price_cents'     => max( 0, (int) ( $p['price'] ?? 0 ) ),
+			'online_capacity'    => 'hybrid' === $format ? max( 0, (int) ( $p['online_capacity'] ?? 0 ) ) : 0,
+			'online_price_cents' => 'hybrid' === $format ? max( 0, (int) ( $p['online_price'] ?? OYS_Settings::get( 'online_price_cents' ) ) ) : 0,
 			'credits_allowed' => array_key_exists( 'credits_allowed', $p ) ? ( empty( $p['credits_allowed'] ) ? 0 : 1 ) : 1,
 			'note'            => sanitize_text_field( $p['note'] ?? '' ),
 			// Helpers for the caller, not columns.
@@ -255,6 +265,8 @@ class OYS_Calendar {
 			'format'       => $d['format'],
 			'online_url'   => $d['online_url'],
 			'price_cents'  => $d['price_cents'],
+			'online_capacity'    => $d['online_capacity'],
+			'online_price_cents' => $d['online_price_cents'],
 			'note'         => $d['note'],
 			'active'       => 1,
 		);

@@ -134,12 +134,39 @@ class OYS_Bookings {
 		return $result;
 	}
 
-	/** Which pass credits pay for a session: private, online (online group classes) or class. */
-	public static function credit_kind( $session ) {
+	/** Which pass credits pay for a session: private, online (joining online) or class. */
+	public static function credit_kind( $session, $mode = 'studio' ) {
 		if ( 'private' === $session->kind ) {
 			return 'private';
 		}
-		return oys_is_online( $session ) ? 'online' : 'class';
+		return 'online' === oys_mode_for( $session, $mode ) ? 'online' : 'class';
+	}
+
+	/** Message when the seats for this way of joining are gone. */
+	private static function full_error( $session, $mode, $left ) {
+		if ( $left > 0 && PHP_INT_MAX !== $left ) {
+			return new WP_Error( 'oys_full', sprintf( _n( 'Only %d spot is left. Bring fewer guests or join the waitlist.', 'Only %d spots are left. Bring fewer guests or join the waitlist.', $left, 'olivia-studio' ), $left ) );
+		}
+		if ( oys_is_hybrid( $session ) && 'online' === $mode ) {
+			return new WP_Error( 'oys_full', __( 'The online spots for this class are taken.', 'olivia-studio' ) );
+		}
+		if ( oys_is_hybrid( $session ) ) {
+			return new WP_Error( 'oys_full', __( 'The studio is full. You can still join live online, or join the waitlist.', 'olivia-studio' ) );
+		}
+		return new WP_Error( 'oys_full', __( 'Sorry, this class is full. You can join the waitlist.', 'olivia-studio' ) );
+	}
+
+	/**
+	 * Link an online participant joins with: their own Zoom link, the class's Zoom meeting, or
+	 * the link set on the class. '' for people in the studio.
+	 */
+	public static function join_link( $booking, $session = null ) {
+		$session = $session ?: OYS_Schedule::get( $booking->session_id );
+		if ( ! $session || 'online' !== oys_mode_for( $session, $booking->mode ?? 'studio' ) ) {
+			return '';
+		}
+		$url = apply_filters( 'oys_join_link', '', $booking, $session );
+		return $url ?: (string) $session->online_url;
 	}
 
 	/** Display name for a roster line: the customer, or "Guest name (guest of Anna)". */
@@ -187,18 +214,21 @@ class OYS_Bookings {
 	 *   guests        [ ['name','email'], … ]
 	 *   guest_method  guests' payment: credit | free | admin | cash | comp (default: same as method, credit for membership)
 	 *   host_booking  existing booking id when only adding guests to it (the host row is not created)
+	 *   mode          'studio' | 'online' – how they join a hybrid class (online-only classes are always online)
 	 *   notify        send the confirmation (default true)
 	 *   force         staff: book even when full
 	 *
 	 * @return int|WP_Error the host booking id (or, when adding guests, the existing host id)
 	 */
 	public static function book_party( $user_id, $session, array $args = array() ) {
-		$args = wp_parse_args( $args, array( 'method' => 'credit', 'guests' => array(), 'guest_method' => '', 'host_booking' => 0, 'notify' => true, 'force' => false ) );
+		$args = wp_parse_args( $args, array( 'method' => 'credit', 'guests' => array(), 'guest_method' => '', 'host_booking' => 0, 'notify' => true, 'force' => false, 'mode' => 'studio' ) );
 		if ( is_numeric( $session ) ) {
 			$session = OYS_Schedule::get( $session );
 		}
 		$guests       = $args['guests'];
 		$host_booking = $args['host_booking'] ? self::get( $args['host_booking'] ) : null;
+		// Guests join the same way as the person who brings them.
+		$mode         = oys_mode_for( $session, $host_booking ? $host_booking->mode : $args['mode'] );
 		$with_host    = ! $host_booking;
 		$guest_method = $args['guest_method'] ?: ( 'membership' === $args['method'] ? 'credit' : $args['method'] );
 
@@ -221,9 +251,8 @@ class OYS_Bookings {
 		}
 
 		// Credits needed up front, so nothing is half-booked.
-		$kind  = self::credit_kind( $session );
 		$needs = ( $with_host && 'credit' === $args['method'] ? 1 : 0 ) + ( 'credit' === $guest_method ? count( $guests ) : 0 );
-		if ( $needs && ( ! $session->credits_allowed || OYS_Passes::available_for( $user_id, $session ) < $needs ) ) {
+		if ( $needs && ( ! $session->credits_allowed || OYS_Passes::available_for( $user_id, $session, $mode ) < $needs ) ) {
 			return new WP_Error( 'oys_no_credit', $session->credits_allowed
 				? sprintf( _n( 'You need %d class on your pass for this booking.', 'You need %d classes on your pass for this booking.', $needs, 'olivia-studio' ), $needs )
 				: __( 'Passes can\'t be used for this session.', 'olivia-studio' ) );
@@ -231,28 +260,25 @@ class OYS_Bookings {
 		$member = null;
 		if ( $with_host && 'membership' === $args['method'] ) {
 			$member = OYS_Memberships::current_for( $user_id );
-			$covers = OYS_Memberships::covers( $member, $session );
+			$covers = OYS_Memberships::covers( $member, $session, $mode );
 			if ( is_wp_error( $covers ) ) {
 				return $covers;
 			}
 		}
 
 		$people = ( $with_host ? 1 : 0 ) + count( $guests );
-		if ( ! OYS_Schedule::take_seats( $session->id, $people ) ) {
+		if ( ! OYS_Schedule::take_seats( $session->id, $people, $mode ) ) {
 			if ( ! $args['force'] ) {
-				$left = OYS_Schedule::spots_left( OYS_Schedule::get( $session->id ) );
-				return new WP_Error( 'oys_full', $left > 0
-					? sprintf( _n( 'Only %d spot is left. Bring fewer guests or join the waitlist.', 'Only %d spots are left. Bring fewer guests or join the waitlist.', $left, 'olivia-studio' ), $left )
-					: __( 'Sorry, this class is full. You can join the waitlist.', 'olivia-studio' ) );
+				return self::full_error( $session, $mode, OYS_Schedule::spots_left( OYS_Schedule::get( $session->id ), $mode ) );
 			}
-			self::force_seats( $session->id, $people );
+			OYS_Schedule::force_seats( $session->id, $people, $mode );
 		}
 
 		$created = array();
-		$pay     = function ( $method ) use ( $user_id, $kind, $session, $member ) {
-			$row = array( 'paid_with' => $method );
+		$pay     = function ( $method ) use ( $user_id, $session, $member, $mode ) {
+			$row = array( 'paid_with' => $method, 'mode' => $mode );
 			if ( 'credit' === $method ) {
-				$row['pass_id'] = OYS_Passes::consume_for( $user_id, $session );
+				$row['pass_id'] = OYS_Passes::consume_for( $user_id, $session, $mode );
 				if ( ! $row['pass_id'] ) {
 					return null;
 				}
@@ -261,7 +287,7 @@ class OYS_Bookings {
 			}
 			return $row;
 		};
-		$rollback = function () use ( &$created, $session, $people ) {
+		$rollback = function () use ( &$created, $session, $people, $mode ) {
 			foreach ( $created as $id ) {
 				$b = self::get( $id );
 				if ( 'credit' === $b->paid_with && $b->pass_id ) {
@@ -269,14 +295,14 @@ class OYS_Bookings {
 				}
 				self::set( $id, array( 'status' => 'cancelled', 'cancelled_at' => oys_now(), 'note' => 'Rolled back' ) );
 			}
-			OYS_Schedule::release_seats( $session->id, $people );
+			OYS_Schedule::release_seats( $session->id, $people, $mode );
 		};
 
 		$host_id = $host_booking ? (int) $host_booking->id : 0;
 		if ( $with_host ) {
 			$row = $pay( $args['method'] );
 			if ( null === $row ) {
-				OYS_Schedule::release_seats( $session->id, $people );
+				OYS_Schedule::release_seats( $session->id, $people, $mode );
 				return new WP_Error( 'oys_no_credit', __( 'You don\'t have a valid pass for this class.', 'olivia-studio' ) );
 			}
 			$host_id   = self::insert( array_merge( array( 'session_id' => $session->id, 'user_id' => $user_id, 'status' => 'confirmed' ), $row ) );
@@ -308,24 +334,24 @@ class OYS_Bookings {
 	}
 
 	/** Book one person with a pass credit (used by the waitlist and staff). */
-	public static function book_with_credit( $user_id, $session, $notify = true ) {
-		return self::book_party( $user_id, $session, array( 'method' => 'credit', 'notify' => $notify ) );
+	public static function book_with_credit( $user_id, $session, $notify = true, $mode = 'studio' ) {
+		return self::book_party( $user_id, $session, array( 'method' => 'credit', 'notify' => $notify, 'mode' => $mode ) );
 	}
 
 	/** Book one person with their membership. */
-	public static function book_with_membership( $user_id, $session, $notify = true ) {
-		return self::book_party( $user_id, $session, array( 'method' => 'membership', 'notify' => $notify ) );
+	public static function book_with_membership( $user_id, $session, $notify = true, $mode = 'studio' ) {
+		return self::book_party( $user_id, $session, array( 'method' => 'membership', 'notify' => $notify, 'mode' => $mode ) );
 	}
 
 	/** Staff adds someone to the roster (complimentary or paid at the door). */
-	public static function book_manual( $user_id, $session, $paid_with = 'admin', $notify = true, $force = false ) {
+	public static function book_manual( $user_id, $session, $paid_with = 'admin', $notify = true, $force = false, $mode = 'studio' ) {
 		if ( is_numeric( $session ) ) {
 			$session = OYS_Schedule::get( $session );
 		}
 		if ( ! $session ) {
 			return new WP_Error( 'oys_missing', __( 'Session not found.', 'olivia-studio' ) );
 		}
-		return self::book_party( $user_id, $session, array( 'method' => $paid_with, 'notify' => $notify, 'force' => $force ) );
+		return self::book_party( $user_id, $session, array( 'method' => $paid_with, 'notify' => $notify, 'force' => $force, 'mode' => $mode ) );
 	}
 
 	/* ---------- Card payments: hold, confirm, release ---------- */
@@ -335,7 +361,8 @@ class OYS_Bookings {
 	 * Guests are attached to the new host row, or to $host_booking when adding guests later.
 	 * @return int|WP_Error id of the first held row
 	 */
-	public static function hold( $user_id, $session, $order_id = 0, array $guests = array(), $include_host = true, $host_booking = 0 ) {
+	public static function hold( $user_id, $session, $order_id = 0, array $guests = array(), $include_host = true, $host_booking = 0, $mode = 'studio' ) {
+		$mode = oys_mode_for( $session, $mode );
 		if ( $include_host ) {
 			$check = self::can_book( $user_id, $session );
 			if ( is_wp_error( $check ) ) {
@@ -346,6 +373,7 @@ class OYS_Bookings {
 			if ( ! $host || (int) $host->user_id !== (int) $user_id || 'confirmed' !== $host->status ) {
 				return new WP_Error( 'oys_state', __( 'Book your own spot first, then add guests.', 'olivia-studio' ) );
 			}
+			$mode = oys_mode_for( $session, $host->mode );
 			$reason = OYS_Schedule::closed_reason( $session );
 			if ( $reason ) {
 				return new WP_Error( 'oys_closed', $reason );
@@ -355,15 +383,12 @@ class OYS_Bookings {
 		if ( $people < 1 ) {
 			return new WP_Error( 'oys_guests', __( 'Add at least one guest name.', 'olivia-studio' ) );
 		}
-		if ( ! OYS_Schedule::take_seats( $session->id, $people ) ) {
-			$left = OYS_Schedule::spots_left( OYS_Schedule::get( $session->id ) );
-			return new WP_Error( 'oys_full', $left > 0
-				? sprintf( _n( 'Only %d spot is left. Bring fewer guests or join the waitlist.', 'Only %d spots are left. Bring fewer guests or join the waitlist.', $left, 'olivia-studio' ), $left )
-				: __( 'Sorry, this class is full. You can join the waitlist.', 'olivia-studio' ) );
+		if ( ! OYS_Schedule::take_seats( $session->id, $people, $mode ) ) {
+			return self::full_error( $session, $mode, OYS_Schedule::spots_left( OYS_Schedule::get( $session->id ), $mode ) );
 		}
 		// A few minutes longer than the Stripe Checkout Session, which can't be paid after it expires.
 		$expires = oys_utc_plus( ( max( 30, (int) OYS_Settings::get( 'hold_minutes' ) ) + 5 ) * MINUTE_IN_SECONDS );
-		$base    = array( 'session_id' => $session->id, 'user_id' => $user_id, 'status' => 'pending', 'paid_with' => 'card', 'order_id' => $order_id, 'hold_expires' => $expires );
+		$base    = array( 'session_id' => $session->id, 'user_id' => $user_id, 'status' => 'pending', 'paid_with' => 'card', 'order_id' => $order_id, 'hold_expires' => $expires, 'mode' => $mode );
 		$host_id = $include_host ? self::insert( $base ) : (int) $host_booking;
 		$first   = $include_host ? $host_id : 0;
 		foreach ( $guests as $g ) {
@@ -385,9 +410,9 @@ class OYS_Bookings {
 		}
 		$ids = array();
 		foreach ( $rows as $b ) {
-			if ( 'expired' === $b->status && ! OYS_Schedule::take_seat( $b->session_id ) ) {
+			if ( 'expired' === $b->status && ! OYS_Schedule::take_seat( $b->session_id, $b->mode ) ) {
 				// The hold lapsed and the class filled up meanwhile. The customer has paid, so they keep the spot.
-				self::force_seats( $b->session_id, 1 );
+				OYS_Schedule::force_seats( $b->session_id, 1, $b->mode );
 				OYS_Emails::admin_notice(
 					__( 'Class is over capacity by one', 'olivia-studio' ),
 					sprintf( __( 'A payment for booking #%d arrived after its hold expired and the class had filled up in the meantime. The booking was confirmed anyway.', 'olivia-studio' ), $b->id )
@@ -419,11 +444,6 @@ class OYS_Bookings {
 		return self::confirm_order( $order_id );
 	}
 
-	private static function force_seats( $session_id, $n ) {
-		global $wpdb;
-		$wpdb->query( $wpdb->prepare( 'UPDATE ' . OYS_Install::table( 'sessions' ) . ' SET booked = booked + %d WHERE id = %d', $n, $session_id ) );
-	}
-
 	/** Payment failed or the checkout expired: free the seat. */
 	public static function release_hold( $booking_id ) {
 		global $wpdb;
@@ -431,7 +451,7 @@ class OYS_Bookings {
 		$ok = $wpdb->query( $wpdb->prepare( "UPDATE $t SET status = 'expired' WHERE id = %d AND status = 'pending'", $booking_id ) );
 		if ( 1 === (int) $ok ) {
 			$b = self::get( $booking_id );
-			OYS_Schedule::release_seat( $b->session_id );
+			OYS_Schedule::release_seat( $b->session_id, $b->mode );
 		}
 	}
 
@@ -535,8 +555,8 @@ class OYS_Bookings {
 				$outcome = 'returned';
 			} elseif ( 'card' === $b->paid_with ) {
 				OYS_Passes::grant( $b->user_id, array(
-					'name'          => 'private' === $session->kind ? __( 'Private session credit', 'olivia-studio' ) : ( oys_is_online( $session ) ? __( 'Online class credit', 'olivia-studio' ) : __( 'Class credit', 'olivia-studio' ) ),
-					'kind'          => self::credit_kind( $session ),
+					'name'          => 'private' === $session->kind ? __( 'Private session credit', 'olivia-studio' ) : ( 'online' === $b->mode ? __( 'Online class credit', 'olivia-studio' ) : __( 'Class credit', 'olivia-studio' ) ),
+					'kind'          => self::credit_kind( $session, $b->mode ),
 					'credits'       => 1,
 					'validity_days' => (int) OYS_Settings::get( 'dropin_credit_days' ),
 					'order_id'      => $b->order_id,
@@ -546,7 +566,7 @@ class OYS_Bookings {
 			}
 		}
 		self::set( $b->id, array( 'status' => $on_time ? 'cancelled' : 'late_cancelled', 'cancelled_at' => oys_now() ) );
-		OYS_Schedule::release_seat( $b->session_id );
+		OYS_Schedule::release_seat( $b->session_id, $b->mode );
 		return $outcome;
 	}
 
@@ -555,7 +575,7 @@ class OYS_Bookings {
 		$b = self::get( $booking_id );
 		if ( $b && in_array( $b->status, array( 'confirmed', 'pending' ), true ) ) {
 			self::set( $b->id, array( 'status' => 'cancelled', 'cancelled_at' => oys_now(), 'note' => $note ) );
-			OYS_Schedule::release_seat( $b->session_id );
+			OYS_Schedule::release_seat( $b->session_id, $b->mode );
 		}
 	}
 

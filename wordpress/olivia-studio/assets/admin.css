@@ -31,3 +31,5 @@
 .oys-status--active { background: #d7f0dd; }
 .oys-status--past_due { background: #FFE0EE; }
 .oys-status--cancelled { background: #eee; }
+.oys-online-tag { display: inline-block; background: #EFE4FC; color: #3B2F4A; font-size: 11px; font-weight: 600; padding: 1px 6px; border-radius: 3px; text-transform: uppercase; letter-spacing: .04em; }
+.oys-live { border-left: 6px solid #C6A3EE; }

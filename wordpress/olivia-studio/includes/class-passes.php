@@ -93,8 +93,8 @@ class OYS_Passes {
 	 * online credits plus what their studio credits convert to (one studio class = `online_per_credit`
 	 * online classes).
 	 */
-	public static function available_for( $user_id, $session ) {
-		$kind = OYS_Bookings::credit_kind( $session );
+	public static function available_for( $user_id, $session, $mode = 'studio' ) {
+		$kind = OYS_Bookings::credit_kind( $session, $mode );
 		$n    = 0;
 		foreach ( self::usable( $user_id, $kind, $session ) as $p ) {
 			$n += (int) $p->credits_left;
@@ -117,8 +117,8 @@ class OYS_Passes {
 	 * as its own pass) and one of those is used, so a studio pass goes further on online classes.
 	 * Returns the pass id used, or 0.
 	 */
-	public static function consume_for( $user_id, $session ) {
-		$kind = OYS_Bookings::credit_kind( $session );
+	public static function consume_for( $user_id, $session, $mode = 'studio' ) {
+		$kind = OYS_Bookings::credit_kind( $session, $mode );
 		$id   = self::consume( $user_id, $kind, $session );
 		if ( $id || 'online' !== $kind ) {
 			return $id;

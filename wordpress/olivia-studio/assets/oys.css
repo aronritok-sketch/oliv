@@ -159,3 +159,15 @@
 .oys-dl dd { margin: .2rem 0 0; font-weight: 700; color: var(--oys-ink); }
 .oys-bigprice small { font-family: var(--f-text, sans-serif); font-size: .9rem; letter-spacing: 0; }
 .oys-item__main .badge { vertical-align: 2px; }
+
+/* Hybrid classes: studio or live online */
+.oys-modes { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; margin: 0 0 1.2rem; }
+.oys-mode { display: grid; gap: .15rem; padding: .85rem 1rem; border: 2px solid var(--oys-ink); border-radius: 6px; background: var(--oys-paper); color: var(--oys-ink); text-decoration: none; }
+.oys-mode b { font-size: 1.02rem; }
+.oys-mode span { font-size: .84rem; color: var(--oys-muted); }
+.oys-mode:hover { background: var(--oys-card); }
+.oys-mode.is-active { background: var(--oys-forest); color: #fff; box-shadow: 4px 4px 0 var(--oys-ink); }
+.oys-mode.is-active span { color: rgba(255,255,255,.85); }
+.badge--online { background: var(--oys-lilac); color: var(--oys-ink); }
+.oys-join { margin-top: .35rem; }
+@media (max-width: 480px) { .oys-modes { grid-template-columns: 1fr; } }

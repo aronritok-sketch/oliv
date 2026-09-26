@@ -557,6 +557,48 @@ async function payOnMockStripe(page, button = '#pay') {
   await admPhone.waitForSelector('.oys-cal__daytabs');
   check(await admPhone.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth) <= 0, 'calendar fits a phone');
 
+  // 29. Hybrid class with automatic Zoom: studio full → join live online ($6), Zoom link in email,
+  //     account and booking page; the host starts the meeting from the roster; cancelling deletes it.
+  const zoomMeetings = async () => (await (await fetch('http://127.0.0.1:8090/zoom/_meetings')).json());
+  const hy = fresh();
+  php(`global $wpdb; $wpdb->query("UPDATE {$wpdb->prefix}oys_sessions SET format='hybrid', capacity=1, online_capacity=0, online_price_cents=600, online_url='' WHERE id=${hy}"); OYS_Bookings::book_manual(OYS_Customers::find_or_create('studio${stamp}@example.com','Stu Dio'), ${hy}, 'comp', false);`);
+  await zoe.goto(`${BASE}/book/?session=${hy}`);
+  check(await zoe.isVisible('.oys-mode.is-active:has-text("Live online")'), 'full studio: live online is offered');
+  check(await zoe.isVisible('.oys-mode:has-text("In the studio"):has-text("Full")'), 'studio shown as full');
+  check(await zoe.isVisible('.oys-option__price:has-text("$6")'), 'online ticket price $6');
+  await zoe.screenshot({ path: `${SHOTS}/17-hybrid-book.png`, fullPage: true });
+  await zoe.check('input[value="card"]');
+  await zoe.click('.oys-submit');
+  await payOnMockStripe(zoe);
+  await zoe.goto(`${BASE}/book/?session=${hy}`);
+  const joinHref = await zoe.getAttribute('.oys-join', 'href').catch(() => '');
+  check(joinHref && joinHref.startsWith('http://127.0.0.1:8090/zoom/j/'), 'booking page shows the Zoom join link');
+  const hyRow = JSON.parse(q(`SELECT b.mode, s.online_booked, s.booked, s.zoom_meeting_id FROM wp_oys_bookings b JOIN wp_oys_sessions s ON s.id=b.session_id WHERE b.session_id=${hy} AND b.user_id=${zoeId}`))[0];
+  check(hyRow && hyRow.mode === 'online' && +hyRow.online_booked === 1 && +hyRow.booked === 1, 'online seat taken, studio seat untouched');
+  check(hyRow && hyRow.zoom_meeting_id && (await zoomMeetings())[hyRow.zoom_meeting_id], 'Zoom meeting created automatically');
+  const hyMail = mails().map(f => fs.readFileSync(path.join(WP_DIR, 'wp-content/mail-log', f), 'utf8')).filter(h => h.includes('Join the live class') && h.includes(`/zoom/j/${hyRow.zoom_meeting_id}`));
+  check(hyMail.length > 0, 'confirmation email has the Zoom link');
+  await zoe.goto(`${BASE}/account/`);
+  check(await zoe.isVisible('a.oys-join:has-text("Join live online")'), 'account shows the join button');
+  // Host side
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-schedule&session=${hy}`);
+  check(await adm.isVisible('.oys-online-tag'), 'roster marks the online participant');
+  const [hostPage] = await Promise.all([adm.context().waitForEvent('page'), adm.click('a:has-text("Start the Zoom class (host)")')]);
+  await hostPage.waitForLoadState();
+  check(await hostPage.isVisible('#zoom-host'), 'host start link opens the Zoom meeting');
+  await hostPage.close();
+  await adm.screenshot({ path: `${SHOTS}/18-roster-live.png`, fullPage: true });
+  // Moving the class moves the meeting; cancelling deletes it.
+  php(`$s = OYS_Schedule::get(${hy}); OYS_Schedule::save(array('starts_at'=>gmdate('Y-m-d H:i:s', oys_ts($s->starts_at)+1800), 'ends_at'=>gmdate('Y-m-d H:i:s', oys_ts($s->ends_at)+1800)), ${hy});`);
+  const moved = (await zoomMeetings())[hyRow.zoom_meeting_id];
+  const hyStart = JSON.parse(q(`SELECT starts_at FROM wp_oys_sessions WHERE id=${hy}`))[0].starts_at.replace(' ', 'T') + 'Z';
+  check(moved && moved.start_time === hyStart, 'moving the class moves the Zoom meeting');
+  php(`OYS_Schedule::cancel_session(${hy}, 'Test');`);
+  check(!(await zoomMeetings())[hyRow.zoom_meeting_id], 'cancelling the class deletes the Zoom meeting');
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-settings`);
+  await Promise.all([adm.waitForNavigation(), adm.click('button:has-text("Test the connection")')]);
+  check(await adm.isVisible('text=Zoom is connected (olivia@example.com)'), 'Zoom connection test works');
+
   // Screens for review.
   await a.goto(`${BASE}/schedule-pricing/`);
   await a.screenshot({ path: `${SHOTS}/10-schedule-pricing.png`, fullPage: true });

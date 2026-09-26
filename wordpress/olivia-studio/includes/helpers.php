@@ -86,9 +86,27 @@ function oys_class_options() {
 	return $titles ?: array( 'hatha-flow' => 'Hatha Flow', 'slow-flow' => 'Slow Flow' );
 }
 
-/** Live-streamed class (joined through the online link) rather than in the studio. */
+/** Online-only class (joined through the online link), not in the studio. */
 function oys_is_online( $session ) {
 	return $session && 'online' === ( $session->format ?? 'studio' );
+}
+
+/** In the studio and streamed live at the same time: people choose how they join. */
+function oys_is_hybrid( $session ) {
+	return $session && 'hybrid' === ( $session->format ?? 'studio' );
+}
+
+/** Can people join this session online (online-only or hybrid)? */
+function oys_has_online( $session ) {
+	return oys_is_online( $session ) || oys_is_hybrid( $session );
+}
+
+/** How someone takes part: 'online' or 'studio'. Online-only classes are always online. */
+function oys_mode_for( $session, $mode = 'studio' ) {
+	if ( oys_is_online( $session ) ) {
+		return 'online';
+	}
+	return oys_is_hybrid( $session ) && 'online' === $mode ? 'online' : 'studio';
 }
 
 function oys_session_title( $session ) {

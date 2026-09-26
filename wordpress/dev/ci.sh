@@ -40,6 +40,7 @@ define( 'AUTH_SALT', 'ci5' ); define( 'SECURE_AUTH_SALT', 'ci6' ); define( 'LOGG
 define( 'WP_DEBUG', true ); define( 'WP_DEBUG_LOG', true ); define( 'WP_DEBUG_DISPLAY', false );
 define( 'WP_HOME', 'http://127.0.0.1:8080' ); define( 'WP_SITEURL', 'http://127.0.0.1:8080' );
 define( 'OYS_STRIPE_API_BASE', 'http://127.0.0.1:8090' );
+define( 'OYS_ZOOM_API_BASE', 'http://127.0.0.1:8090/zoom/v2' ); define( 'OYS_ZOOM_OAUTH_URL', 'http://127.0.0.1:8090/zoom/oauth/token' );
 define( 'DISABLE_WP_CRON', true );
 define( 'AUTOMATIC_UPDATER_DISABLED', true );
 if ( ! defined( 'ABSPATH' ) ) { define( 'ABSPATH', __DIR__ . '/' ); }

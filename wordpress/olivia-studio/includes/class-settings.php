@@ -1,7 +1,8 @@
 <?php
 /**
  * Plugin settings (one option array). Secrets can also come from wp-config.php constants,
- * which take precedence: OYS_STRIPE_SECRET_KEY, OYS_STRIPE_WEBHOOK_SECRET.
+ * which take precedence: OYS_STRIPE_SECRET_KEY, OYS_STRIPE_WEBHOOK_SECRET, OYS_ZOOM_ACCOUNT_ID,
+ * OYS_ZOOM_CLIENT_ID, OYS_ZOOM_CLIENT_SECRET.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -30,6 +31,13 @@ class OYS_Settings {
 			'max_guests'              => 4,
 			'online_price_cents'      => 600,
 			'online_per_credit'       => 4,
+			'zoom_account_id'         => '',
+			'zoom_client_id'          => '',
+			'zoom_client_secret'      => '',
+			'zoom_host'               => 'me',
+			'zoom_auto'               => 1,
+			'zoom_personal'           => 0,
+			'zoom_waiting_room'       => 0,
 			'email_from_name'         => 'Olivia Kovács Yoga',
 			'email_from'              => get_option( 'admin_email' ),
 			'notify_email'            => get_option( 'admin_email' ),
