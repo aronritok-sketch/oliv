@@ -1,0 +1,28 @@
+/* Olivia Studio — admin screens */
+.oys-wrap .oys-table td, .oys-wrap .oys-table th { vertical-align: middle; }
+.oys-wrap tr.is-cancelled td { opacity: .5; text-decoration: line-through; }
+.oys-kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin: 16px 0 8px; }
+.oys-kpi { background: #fff; border: 1px solid #c3c4c7; border-left: 6px solid #2B5036; padding: 12px 14px; }
+.oys-kpi:nth-child(2) { border-left-color: #C6A3EE; }
+.oys-kpi:nth-child(3) { border-left-color: #FF72B6; }
+.oys-kpi:nth-child(4) { border-left-color: #FF8C42; }
+.oys-kpi span { display: block; color: #50575e; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; }
+.oys-kpi b { font-size: 26px; line-height: 1.3; font-variant-numeric: tabular-nums; }
+.oys-box { background: #fff; border: 1px solid #c3c4c7; padding: 12px 16px; margin: 12px 0; }
+.oys-box h3 { margin: 4px 0 8px; display: flex; gap: 8px; align-items: center; }
+.oys-cols { display: grid; gap: 16px; }
+@media (min-width: 1100px) { .oys-cols { grid-template-columns: 1fr 1.4fr; } }
+.oys-fill { display: inline-block; width: 60px; height: 8px; background: #e0e0e0; border-radius: 4px; overflow: hidden; vertical-align: middle; }
+.oys-fill span { display: block; height: 100%; background: #2B5036; }
+.oys-flag { background: #FFE0EE; color: #8a1b55; font-size: 11px; padding: 1px 6px; border-radius: 3px; }
+.oys-health { max-width: 260px; color: #8a1b55; }
+.oys-inline { display: inline; }
+.oys-inline-form { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+.oys-status { display: inline-block; padding: 2px 8px; border-radius: 10px; background: #f0f0f1; font-size: 12px; }
+.oys-status--paid, .oys-status--booked { background: #d7f0dd; }
+.oys-status--new { background: #FFE0EE; }
+.oys-status--offered { background: #ECE1FA; }
+.oys-status--refunded, .oys-status--declined { background: #eee; }
+.oys-new-row td { background: #f6f7f7; }
+.oys-product.is-inactive { opacity: .7; }
+.oys-plain { list-style: disc; padding-left: 20px; }
