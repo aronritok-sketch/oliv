@@ -27,12 +27,22 @@
 - Tudja: órarend és helyfoglalás, Stripe fizetés (kártya/Apple Pay/Google Pay), bérletek és kreditek, várólista automatikus beléptetéssel,
   lemondási szabály, részvételi nyilatkozat, magánóra kérés → ajánlat → fizetés, ajándékkártya, ügyfélfiók, e-mailek naptármelléklettel,
   emlékeztető, admin (napi nézet, névsor/jelenlét, ügyfelek, fizetések és visszatérítés, árak, beállítások).
-- Tesztelve helyben (WordPress 6.8.3 + MariaDB + Stripe-szimulátor): `wordpress/dev/e2e.js`, 30/30 ellenőrzés sikeres.
+- Tesztelve helyben (WordPress 6.8.3 + MariaDB + Stripe-szimulátor).
+- Fejlesztői dokumentáció: `wordpress/DEVELOPER.md`.
 - Élesítéshez kell: tárhely, Stripe fiók + kulcsok + webhook, SMTP, cron, valós órarend/árak, ügyvéd a nyilatkozathoz.
+
+## 3. kör: tagság, vendégek, tesztek (2026-09-26)
+- **Havi tagság** Stripe előfizetéssel: korlátlan ($119/hó) és havi 4 óra ($85/hó) – MINTA árak. Fiókban keret, következő terhelés,
+  Stripe ügyfélportál, lemondás periódus végére / visszavonás; admin: Studio → Memberships, MRR.
+- **Vendégek:** foglaláskor vagy utólag több vendég (alap max. 4); bérletből fejenként 1 alkalom, kártyánál egy fizetés, számlán „Guest ticket × N”;
+  névsoron, leveleken, emlékeztetőn név szerint; vendég-meghívó e-mail; vendég külön lemondható, a foglaló lemondása viszi a vendégeket is.
+- **Biztonság:** belépési próbálkozások korlátozása, regisztráció-korlát.
+- **Tesztek:** 77 integrációs + 93 böngészős ellenőrzés, `wordpress/dev/ci.sh` nulláról; GitHub Actions minden pushnál.
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb.
-- Havi korlátlan tagság (Stripe előfizetés), ha kell.
+- Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
+- Valódi Stripe teszt-fiókkal végigpróbálni (a fejlesztői környezetből a Stripe nem érhető el, szimulátorral tesztelt).
 - Főoldal szövegeinek szerkeszthetővé tétele a Customizerben.
 - Ügyfél-visszajelzés a színarányokra (mennyi pink / lila / barack).
 - Hero: címsor mérete, a matrica és a névkártya elhelyezése.

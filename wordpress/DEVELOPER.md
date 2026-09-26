@@ -33,7 +33,7 @@ Két, egymástól elválasztott komponens:
 
 | Komponens | Mappa | Felelősség |
 |---|---|---|
-| **olivia-studio** (plugin) | `wordpress/olivia-studio/` | Minden üzleti logika: órarend, foglalás, fizetés (Stripe), bérletek, várólista, magánórák, ajándékkártya, ügyfélfiók, e-mailek, admin. |
+| **olivia-studio** (plugin) | `wordpress/olivia-studio/` | Minden üzleti logika: órarend, foglalás vendégekkel, fizetés (Stripe), bérletek, tagság (előfizetés), várólista, magánórák, ajándékkártya, ügyfélfiók, e-mailek, admin, belépés-védelem. |
 | **olivia-yoga** (téma) | `wordpress/olivia-yoga/` | Megjelenés és tartalom: sablonok, dizájn (CSS/JS), óratípusok és GYIK tartalomtípus, SEO, tartalombetöltő. |
 
 A téma **nem tartalmaz üzleti logikát**, a plugin **nem tartalmaz dizájnt** (csak a saját felületeihez alap CSS-t, ami a téma CSS-változóit használja). A kettő szűrőkön (filter) keresztül beszél egymással (lásd [12.](#12-hookok-bővítési-pontok)), így a plugin más témával is működik, a téma pedig plugin nélkül is betölt (a foglalási részek helyén üres hely vagy „coming soon” szöveg jelenik meg).
@@ -68,11 +68,13 @@ oliv/
 ├── preview.html             Egyfájlos előnézet (artifact) – gitignore
 ├── olivia-kovacs-yoga.html  Letölthető egyfájlos előnézet
 ├── JEGYZETEK.md             Projekt-jegyzet (állapot, döntések)
+├── .github/workflows/ci.yml GitHub Actions: lint, integrációs és E2E tesztek
 └── wordpress/
     ├── README.md            Telepítés, Stripe, élesítési lista (felhasználói)
     ├── DEVELOPER.md         ← ez a fájl
     ├── dist/                Feltölthető ZIP-ek (plugin, téma)
-    ├── dev/                 Csak fejlesztéshez: Stripe-szimulátor, levélfogó, router, E2E teszt
+    ├── dev/                 Csak fejlesztéshez: Stripe-szimulátor, levélfogó, router, telepítő, CI-szkript,
+    │                        integrációs tesztek (tests/run.php), böngészős E2E teszt (e2e.js)
     ├── olivia-studio/       Plugin
     │   ├── olivia-studio.php          Belépési pont, include-ok, bootstrap
     │   ├── assets/oys.css             Ügyféloldali felületek stílusa
@@ -91,6 +93,8 @@ oliv/
     │       ├── class-customers.php    Regisztráció, belépés, profil, nyilatkozat, wp-admin tiltás
     │       ├── class-privates.php     Magánóra-kérések és ajánlatok
     │       ├── class-gifts.php        Ajándékkártyák
+│       ├── class-memberships.php  Tagság (Stripe előfizetés): csatlakozás, szinkron, keret, lemondás, portál
+│       ├── class-security.php     Belépés- és regisztráció-korlátozás
     │       ├── class-cron.php         Háttérfeladatok
     │       ├── class-frontend.php     Shortcode-ok és nyilvános űrlapkezelők
     │       ├── class-privacy.php      WP adatexport / törlés
@@ -234,10 +238,13 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 
 | Oszlop | Jelentés |
 |---|---|
+| — | **Egy sor = egy ember.** A foglaló saját sora `guest_of = 0`; az általa hozott vendégek külön sorok (lásd 6.8) |
 | `status` | lásd 6.2 állapotgép |
-| `paid_with` | `credit` · `card` · `free` · `admin` · `cash` · `comp` |
+| `paid_with` | `credit` · `membership` · `card` · `free` · `admin` · `cash` · `comp` |
 | `pass_id` | melyik bérletből vont le kreditet (lemondáskor ide jár vissza) |
-| `order_id` | kártyás fizetés rendelése |
+| `membership_id` | ha tagsággal foglalt (a periódus-keret ebből számol) |
+| `guest_of`, `guest_name`, `guest_email` | vendégsor: a foglaló sorának id-je, a vendég neve és (opcionális) e-mailje; `user_id` = a foglaló (ő fizet, ő kezeli) |
+| `order_id` | kártyás fizetés rendelése (egy rendeléshez több sor tartozhat: foglaló + vendégek) |
 | `hold_expires` | fizetés alatti tartás lejárata (csak `pending`) |
 | `reminder_sent`, `checked_in_at`, `cancelled_at`, `note` | |
 
@@ -257,16 +264,27 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 
 | Oszlop | Jelentés |
 |---|---|
-| `type` | `dropin` · `pack` (bérlet, opcionálisan egy óra lefoglalásával) · `gift` · `private` |
+| `type` | `dropin` (óra, vendégekkel is) · `pack` (bérlet, opcionálisan óra lefoglalásával) · `gift` · `private` · `membership` (első díj Checkoutból, megújítások `invoice.paid`-ből) |
 | `status` | lásd 6.3 |
 | `amount_cents`, `currency` | a szerver számolja, a kliens nem befolyásolja |
 | `stripe_session_id` (UNIQUE), `stripe_payment_intent`, `receipt_url` | |
+| `stripe_invoice_id` (UNIQUE) | tagsági számla (megújítás idempotens rögzítése) |
 | `session_id`, `booking_id`, `product_id` | kapcsolt entitások |
-| `meta` (JSON) | pl. `recipient_name/email/message` (gift), `request_id` (private), `refunded_cents` |
+| `meta` (JSON) | pl. `recipient_name/email/message` (gift), `request_id` (private), `guests` (nevek), `subscription_id`, `customer_id`, `membership_id`, `refunded_cents` |
 
 **`gift_cards`** – `code` (UNIQUE, formátum `OY-XXXX-XXXX`, nem félreolvasható karakterekkel), `product_id`, `status` (`active` · `redeemed` · `void`), vásárló, címzett, beváltó.
 
 **`private_requests`** – `status` (`new` · `offered` · `booked` · `declined` · `cancelled`), igények (`duration_min`, `people`, `location_type`, `address`, `preferred`, `notes`), ajánlat (`session_id`, `price_cents`, `admin_message`), `order_id`.
+
+**`memberships`** – a Stripe-előfizetés tükre
+
+| Oszlop | Jelentés |
+|---|---|
+| `product_id`, `name`, `classes_per_period` | a csomag a csatlakozáskor (0 = korlátlan) |
+| `status` | `active` · `trialing` · `past_due` · `unpaid` · `paused` · `cancelled` (Stripe `canceled`) · `incomplete` |
+| `cancel_at_period_end` | 1 = nem újul meg, a periódus végéig érvényes |
+| `current_period_start`, `current_period_end` | UTC, a Stripe-ból szinkronizálva |
+| `stripe_subscription_id` (UNIQUE), `stripe_customer_id`, `order_id`, `ended_at` | |
 
 **`stripe_events`** – feldolgozott webhook esemény-azonosítók (idempotencia).
 
@@ -275,6 +293,7 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 | Hol | Kulcs | Mit |
 |---|---|---|
 | option | `oys_settings`, `oys_products`, `oys_db_version`, `oys_page_{book,account,gifts}` | konfiguráció |
+| transient | `oys_rl_{ip,user,signup}_*` | belépés/regisztráció számlálók (15 perc) |
 | user meta | `oys_phone`, `oys_area`, `oys_emergency_name`, `oys_emergency_phone`, `oys_health_notes`, `oys_marketing` | profil (`OYS_Customers::PROFILE_FIELDS`) |
 | user meta | `oys_waiver_version`, `oys_waiver_at`, `oys_waiver_ip` | nyilatkozat elfogadása |
 | user meta | `oys_stripe_customer_test`, `oys_stripe_customer_live` | Stripe customer ID módonként |
@@ -285,7 +304,7 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 
 ### 5.3 Termékek (`oys_products`)
 
-`id => [ name, kind, credits, validity_days, price_cents, description, features, featured, giftable, active, duration_min, sort ]`
+`id => [ name, kind, credits, validity_days, price_cents, description, features, featured, giftable, active, duration_min, sort, interval, interval_count, classes_per_period ]`
 
 | `kind` | Jelentés | Credit fajta |
 |---|---|---|
@@ -293,6 +312,7 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 | `intro` | bevezető ajánlat – csak `OYS_Orders::is_new_customer()` esetén vehető (alapból inaktív) | `class` |
 | `private_pack` | magánóra-csomag | `private` |
 | `private_single` | egy magánóra ára adott hosszra – árlista és ajándék (ajándékként 1 privát kredit) | `private` |
+| `membership` | tagság: `price_cents` / `interval_count` × `interval` (`month`/`year`), `classes_per_period` csoportos óra periódusonként (0 = korlátlan) | – (nem kredit) |
 
 A drop-in ár nem termék: az alkalom (`sessions.price_cents`) vagy a sablon adja.
 
@@ -309,6 +329,14 @@ UPDATE wp_oys_sessions SET booked = booked + 1
 
 Ha az érintett sorok száma 1, a hely a miénk (`OYS_Schedule::take_seat()`); különben telt ház. Felszabadítás: `release_seat()` (`booked - 1`, soha nem megy 0 alá), ami kiváltja az `oys_seat_released` actiont → várólista-feldolgozás. Ha a számláló elcsúszna (kézi DB-szerkesztés), az `OYS_Schedule::recount()` a foglalásokból újraszámolja; az admin névsor oldal megnyitáskor ezt meg is teszi.
 
+Társaságnál (foglaló + vendégek) egyszerre N hely kell, mindet vagy semmit:
+
+```sql
+UPDATE wp_oys_sessions SET booked = booked + %N WHERE id = %d AND status = 'scheduled' AND booked + %N <= capacity
+```
+
+(`take_seats()` / `release_seats()`).
+
 **Fontos:** foglalást **mindig** az `OYS_Bookings` metódusain keresztül hozz létre vagy törölj, különben a számláló elcsúszik.
 
 ### 6.2 Foglalás állapotai
@@ -316,8 +344,8 @@ Ha az érintett sorok száma 1, a hely a miénk (`OYS_Schedule::take_seat()`); k
 ```mermaid
 stateDiagram-v2
   [*] --> pending: hold() – kártyás fizetés indul
-  [*] --> confirmed: book_with_credit() / book_manual()
-  pending --> confirmed: confirm_paid() (rendelés fizetve)
+  [*] --> confirmed: book_party() – bérlet / tagság / ingyenes / stúdió
+  pending --> confirmed: confirm_order() (rendelés fizetve)
   pending --> expired: release_hold() – lejárt / megszakított / sikertelen fizetés
   confirmed --> cancelled: cancel() határidőn belül vagy stúdió által
   confirmed --> late_cancelled: cancel() határidő után
@@ -328,12 +356,12 @@ stateDiagram-v2
 ```
 
 - **Tartás** (`hold`): `hold_minutes` (min. 30) **+ 5 perc** – mindig tovább él, mint a Stripe Checkout Session, ami lejárat után már nem fizethető.
-- Ha a fizetés **a tartás lejárta után** érkezik (pl. késő aszinkron fizetés), a `confirm_paid()` újra helyet kér; ha nincs, akkor is megerősíti (a vendég fizetett), a számlálót túltolja, és e-mailben szól a stúdiónak.
+- Ha a fizetés **a tartás lejárta után** érkezik (pl. késő aszinkron fizetés), a `confirm_order()` soronként újra helyet kér; ha nincs, akkor is megerősíti (a vendég fizetett), a számlálót túltolja, és e-mailben szól a stúdiónak.
 - **Lemondás szabálya** (`cancel()`):
 
 | Ki / mikor | `paid_with = credit` | `paid_with = card` | egyéb |
 |---|---|---|---|
-| Ügyfél, határidőn belül (`cancel_hours`, magánóránál `private_cancel_hours`) | kredit vissza ugyanarra a bérletre (ha a bérlet ≤ 1 napon belül lejár vagy lejárt: új 1 kredites, 30 napos) → `returned` | új 1 kredites bérlet (`dropin_credit_days`) → `credit` | `none` |
+| Ügyfél, határidőn belül (`cancel_hours`, magánóránál `private_cancel_hours`) | kredit vissza ugyanarra a bérletre (ha a bérlet ≤ 1 napon belül lejár vagy lejárt: új 1 kredites, 30 napos) → `returned` | új 1 kredites bérlet (`dropin_credit_days`) → `credit` | tagság: az óra nem számít bele a keretbe → `membership`; egyéb: `none` |
 | Ügyfél, határidő után | nincs visszatérítés → `late` | → `late` | → `late` |
 | Stúdió (`by_studio`) | mindig mint „határidőn belül” | | |
 
@@ -369,14 +397,15 @@ Csak az a hívás teljesít (`fulfil()`), amelyik ezt az UPDATE-et megnyerte. K�
 
 | `type` | Teendő |
 |---|---|
-| `dropin` | `OYS_Bookings::confirm_paid( booking_id )` |
+| `dropin` | `OYS_Bookings::confirm_order( order_id )` – a rendelés összes tartott sora (foglaló + vendégek) megerősítve |
 | `private` | ugyanez + `OYS_Privates::mark_paid( request_id )` |
-| `pack` | bérlet jóváírása (`grant_product`) + levél; ha van `booking_id` („vedd meg és foglald le”): 1 kredit levonása az új bérletből, a foglalás `paid_with=credit` lesz (így lemondáskor a kredit a bérletre jár vissza) |
+| `pack` | bérlet jóváírása (`grant_product`) + levél; ha van tartott foglalás („vedd meg és foglald le”): `confirm_order( order_id, pass_id )` soronként 1 kreditet von le az új bérletből, a sorok `paid_with=credit` lesznek (így lemondáskor a kredit a bérletre jár vissza) |
 | `gift` | ajándékkód létrehozása, levél a címzettnek és a vásárlónak |
+| `membership` | `OYS_Memberships::activate_from_order()` – tagság létrehozása a Stripe-előfizetésből, periódus lekérése, üdvözlő levél |
 
 Utána: admin értesítő levél + `oys_order_paid` action.
 
-**Visszatérítés** (`mark_refunded`): részleges esetén csak státusz és `meta.refunded_cents`. Teljesnél ráadásul: jövőbeli megerősített foglalás törlése (hely felszabadul), a rendeléssel vett bérlet maradék kreditjeinek nullázása, aktív ajándékkód érvénytelenítése.
+**Visszatérítés** (`mark_refunded`): részleges esetén csak státusz és `meta.refunded_cents`. Teljesnél ráadásul: a rendelés összes megerősített foglalásának törlése (`OYS_Bookings::void`, a helyek felszabadulnak), a rendeléssel vett bérlet maradék kreditjeinek nullázása, aktív ajándékkód érvénytelenítése.
 
 ### 6.4 Tipikus foglalás kártyával (időrend)
 
@@ -386,14 +415,14 @@ sequenceDiagram
   participant WP as WordPress (plugin)
   participant S as Stripe
   U->>WP: POST admin-post.php?action=oys_checkout (method=card)
-  WP->>WP: Orders::create (pending) + Bookings::hold (seat +1)
+  WP->>WP: Orders::create (pending) + Bookings::hold (1 + vendégek hely, egyszerre)
   WP->>S: POST /v1/checkout/sessions (Idempotency-Key: oys-order-{id})
   S-->>WP: {id, url}
   WP-->>U: 302 → Stripe fizetőoldal
   U->>S: fizet
   S-->>WP: webhook checkout.session.completed (aláírt)
   WP->>S: GET /v1/checkout/sessions/{id}?expand[]=payment_intent.latest_charge
-  WP->>WP: mark_paid → confirm_paid → e-mail + .ics
+  WP->>WP: mark_paid → confirm_order → e-mail + .ics (vendégeknek meghívó)
   S-->>U: 302 → /book/?oys_order=…&oys_key=…&oys_return=success&session_id=…
   U->>WP: visszatérő oldal (sync_session – már fizetve, no-op) → „You're booked!”
 ```
@@ -405,7 +434,7 @@ Megszakítás („Back” a Stripe oldalon): a visszatérő oldal lejáratja a C
 `process_waitlist( session_id )` fut minden hely-felszabaduláskor (`oys_seat_released`), ha az óra kezdete előtt még több mint `waitlist_cutoff_hours` van:
 
 1. Sorban végigmegy a várólistán, amíg van szabad hely.
-2. Akinek van érvényes kreditje (és az alkalom engedi a bérletet) → **automatikusan lefoglalja** (`book_with_credit`), „You're in” levél.
+2. Akinek a tagsága fedezi az órát, vagy van érvényes kreditje → **automatikusan lefoglalja** (előbb tagsággal, utána bérletből), „You're in” levél.
 3. Akinek nincs → egyszeri „A spot opened” levél (`notified_at`), aki előbb foglal, azé.
 
 ### 6.6 Magánóra
@@ -428,13 +457,59 @@ sequenceDiagram
 
 Vásárlás (`oys_gift_buy`, bejelentkezés kell) → `gift` rendelés → fizetés után kód → címzett e-mail. Beváltás (`oys_gift_redeem`): feltételes UPDATE `active → redeemed` (kétszer nem váltható be), majd `grant_product(…, 'gift')`.
 
+### 6.8 Vendégek (társaság)
+
+A belépett ügyfél foglaláskor (vagy később) **több vendéget** is hozhat (`max_guests`, alap 4, a szabad helyek száma is korlátozza). Minden vendég **külön foglalási sor** (`guest_of` = a foglaló sora, `user_id` = a foglaló), saját hellyel és saját fizetéssel:
+
+| Fizetés | Foglaló | Vendégek |
+|---|---|---|
+| Bérlet (`credit`) | 1 kredit | fejenként 1 kredit ugyanabból a bérletből (előre ellenőrzött egyenleg; hiány esetén semmi nem történik) |
+| Kártya (`card`) | drop-in ár | fejenként drop-in ár – **egy** Checkout, a Stripe-számlán külön sor: „Guest ticket: Óra × N” (nevekkel) |
+| Tagság (`membership`) | tagság | bérletből, ha elég kredit van; különben kártyával (külön rendelés csak a vendégekre) |
+| Bérlet vétele + foglalás (`pack:ID`) | 1 kredit az új bérletből | fejenként 1 kredit az új bérletből (a bérletnek elég nagynak kell lennie) |
+| Ingyenes alkalom | ingyenes | ingyenes |
+
+- **Utólag hozzáadás:** a foglaló oldal „Bring guests” űrlapja (`add_guests` = a foglaló sora) → `book_party(..., host_booking)` vagy kártyánál `hold(..., include_host=false, host_booking)`.
+- **Eltávolítás:** a fiókban vendégenként „Remove” → `OYS_Bookings::cancel( guest_row )`; a lemondási szabály vendégenként érvényes (időben: kredit vissza, kártyásnál óra-kredit a foglalónak).
+- **A foglaló lemondása** a vendégeit is lemondja (`cancel()` a `guests_of()` sorokra is lefut), egy e-mail összesít.
+- **Megjelenés:** névsor („Guest · Név · with Anna”), napi áttekintő, visszaigazoló és emlékeztető levél (vendéglista), vendég-meghívó e-mail .ics-szel, ha van e-mail, Stripe-számla sor, rendelés leírása („+2 guests”).
+- **A tagság csak a tagot fedezi**, a vendégeket soha (`used_in_period` csak `membership_id`-s sorokat számol).
+- `active_for()` csak a saját sort nézi (`guest_of = 0`), így a vendégsorok nem akadályozzák a foglaló következő foglalását, és más ügyfél foglalásának sem számítanak.
+
+### 6.9 Tagság (Stripe előfizetés)
+
+```mermaid
+sequenceDiagram
+  participant C as Ügyfél
+  participant WP as Plugin
+  participant S as Stripe
+  C->>WP: /book/?product=four-a-month → Join (oys_join)
+  WP->>S: Checkout Session mode=subscription (price_data.recurring)
+  C->>S: fizet
+  S-->>WP: checkout.session.completed → order paid → activate_from_order (GET subscription → periódus)
+  S-->>WP: invoice.paid (subscription_create) → első számla hozzárendelése a rendeléshez
+  Note over S,WP: minden periódusban
+  S-->>WP: invoice.paid (subscription_cycle) → új "renewal" rendelés + periódus frissítés
+  S-->>WP: invoice.payment_failed → past_due + levél (kártyafrissítés)
+  S-->>WP: customer.subscription.updated/deleted → sync (lemondás ütemezve / véget ért)
+```
+
+- **Foglalás tagsággal** (`OYS_Memberships::covers()`): csoportos óra vagy esemény, ami engedi a bérletet; státusz `active`/`trialing`/`past_due` (a Stripe újrapróbálkozásai alatt a tag még foglalhat); korlátos csomagnál, vagy ha a lemondás ütemezve van, csak az aktuális periódusba eső óra; korlátos csomagnál maradt még alkalom (`used_in_period` = a periódusba eső `confirmed/attended/no_show/late_cancelled` tagsági sorok).
+- **Két fülön egyszerre** foglalt utolsó alkalom: a második foglalás a beszúrás után visszagörgetődik (`book_party` ellenőrzi a keretet).
+- **Lemondás az ügyféltől:** fiók → „Cancel membership” → `cancel_at_period_end=true` a Stripe-ban; a periódus végéig foglalhat; „Keep my membership” visszavonja. **Kártya, számlák:** Stripe Customer Portal (`/v1/billing_portal/sessions`), ezt a Stripe dashboardon be kell kapcsolni.
+- **Stúdió:** Studio → Memberships: lemondás periódus végére / visszavonás / azonnali megszüntetés (`DELETE /v1/subscriptions/{id}`, visszatérítés nélkül).
+- **Véget ért tagság:** a jövőbeli, tagsággal foglalt órák lemondódnak (e-mailt kap), a vendégeik is.
+- **Árváltozás:** a csomag árának módosítása csak az új tagokra érvényes (a Stripe-ban a meglévő előfizetés ára marad).
+- **MRR:** a foglalható, nem lemondott tagságok havi díjának összege (`OYS_Memberships::mrr()`), a Today és a Memberships oldalon.
+
 ---
 
 ## 7. Stripe integráció
 
-- **Stripe Checkout** (hosted), `mode=payment`, dinamikus fizetési módok (a Stripe dashboardon kapcsolhatók). SDK nincs: `OYS_Stripe::request()` = `wp_remote_request` + form-encoded body, `Stripe-Version: 2024-06-20`.
+- **Stripe Checkout** (hosted): `mode=payment` (órák, bérletek, ajándék, magánóra; több tételsorral) és `mode=subscription` (tagság, `price_data.recurring`), dinamikus fizetési módok (a Stripe dashboardon kapcsolhatók). SDK nincs: `OYS_Stripe::request()` = `wp_remote_request` + form-encoded body, `Stripe-Version: 2024-06-20`.
 - **API alap-URL** felülírható: `OYS_STRIPE_API_BASE` (csak teszthez!).
-- **Kulcsok**: Settings oldal vagy `wp-config.php` konstansok, amelyek elsőbbséget élveznek: `OYS_STRIPE_SECRET_KEY`, `OYS_STRIPE_WEBHOOK_SECRET`. Élesben a konstans ajánlott (nem kerül adatbázis-mentésbe). Korlátozott kulcs (restricted key) esetén szükséges jogok: Checkout Sessions (write), Customers (write), Refunds (write), PaymentIntents / Charges (read).
+- **Kulcsok**: Settings oldal vagy `wp-config.php` konstansok, amelyek elsőbbséget élveznek: `OYS_STRIPE_SECRET_KEY`, `OYS_STRIPE_WEBHOOK_SECRET`. Élesben a konstans ajánlott (nem kerül adatbázis-mentésbe). Korlátozott kulcs (restricted key) esetén szükséges jogok: Checkout Sessions (write), Customers (write), Refunds (write), Subscriptions (write), Customer portal (write), Invoices / PaymentIntents / Charges (read).
+- **API verzió:** `Stripe-Version: 2024-06-20` (itt a periódus-mezők az előfizetésen vannak; a kód az újabb, tételszintű mezőket is kezeli).
 - **Idempotencia a kimenő hívásokon**: `Idempotency-Key` = `oys-order-{id}`, `oys-customer-{user}-{mode}`, `oys-refund-{order}-{amount}`.
 - **Customer**: felhasználónként egy (`oys_stripe_customer_{test|live}` user meta), így a nyugták és a Stripe-os ügyféladatok egy helyen vannak.
 - **Checkout paraméterek**: `client_reference_id` = order id, `metadata.order_id`, `expires_at` = most + `hold_minutes` (Stripe minimuma 30 perc), `success_url` a `{CHECKOUT_SESSION_ID}` helyőrzővel és egy HMAC kulccsal (`OYS_Stripe::order_key()`), hogy a visszatérő oldal ne legyen kitalálható.
@@ -450,6 +525,9 @@ Vásárlás (`oys_gift_buy`, bejelentkezés kell) → `gift` rendelés → fizet
 | `checkout.session.async_payment_failed` | rendelés `failed`, hely felszabadul |
 | `checkout.session.expired` | rendelés `expired`, hely felszabadul |
 | `charge.refunded` | `mark_refunded( amount_refunded )` – a Stripe dashboardon indított visszatérítést is átveszi |
+| `customer.subscription.updated` / `.deleted` | `OYS_Memberships::sync()` – státusz, periódus, ütemezett lemondás; véget érésnél a jövőbeli tagsági foglalások lemondása |
+| `invoice.paid` | `OYS_Memberships::record_invoice()` – megújítás rögzítése rendelésként (`stripe_invoice_id` egyedi), periódus frissítés |
+| `invoice.payment_failed` | `OYS_Memberships::payment_failed()` – `past_due`, levél az ügyfélnek és a stúdiónak |
 
 ---
 
@@ -463,7 +541,7 @@ Vásárlás (`oys_gift_buy`, bejelentkezés kell) → `gift` rendelés → fizet
 | `[oys_events]` | – | Events oldal, főoldal |
 | `[oys_pricing]` | – | Schedule & pricing, főoldal |
 | `[oys_book]` | – (URL paraméterek: `session`, `product`, `oys_order`+`oys_key`+`oys_return`) | Book oldal |
-| `[oys_account]` | – (`tab` = `bookings` · `passes` · `private` · `history` · `payments` · `profile`) | My account oldal |
+| `[oys_account]` | – (`tab` = `bookings` · `passes` · `membership` · `private` · `history` · `payments` · `profile`) | My account oldal |
 | `[oys_gift_cards]` | – | Gift cards oldal |
 | `[oys_private_request]` | – | Private yoga oldal |
 
@@ -473,7 +551,9 @@ Vásárlás (`oys_gift_buy`, bejelentkezés kell) → `gift` rendelés → fizet
 |---|---|---|
 | `oys_register` | vendég | fiók létrehozása + nyilatkozat + belépés + üdvözlő levél |
 | `oys_login` | vendég | `wp_signon` |
-| `oys_checkout` | belépett | foglalás: `method` = `credit` · `card` · `free` · `pack:{product_id}` |
+| `oys_checkout` | belépett | foglalás: `method` = `credit` · `membership` · `card` · `free` · `pack:{product_id}`; `guest_name[]`, `guest_email[]`; `add_guests` = meglévő foglalás (vendég hozzáadása) |
+| `oys_join` | belépett | tagság: Checkout előfizetés módban |
+| `oys_membership` | belépett, saját tagság | `do` = `cancel` (periódus végén) · `resume` · `portal` (Stripe ügyfélportál) |
 | `oys_buy` | belépett | bérlet vásárlás foglalás nélkül |
 | `oys_cancel` | belépett, saját foglalás | lemondás |
 | `oys_waitlist` | belépett | `do` = `join` / `leave` |
@@ -502,11 +582,12 @@ admin-post.php?action=oys_admin_{művelet}  →  OYS_Admin::guard()  →  curren
 
 | Oldal (`page=`) | Tartalom |
 |---|---|
-| `oys` | Ma: KPI-k (30 napos bevétel, 7 napos telítettség, új kérések, ügyfelek), mai névsorok, 7 napos lista |
+| `oys` | Ma: KPI-k (30 napos bevétel, 7 napos telítettség, aktív tagok + MRR, új kérések, ügyfelek), mai névsorok (vendégekkel), 7 napos lista |
 | `oys-schedule` | Alkalmak listája (upcoming/past); `&edit=ID` szerkesztés/új (0), lemondás; `&session=ID` névsor, jelenlét, hozzáadás, várólista |
 | `oys-templates` | Heti sablonok soronkénti mentése (HTML `form=` attribútummal), „Create upcoming dates now” |
 | `oys-private` | Kérések; `&request=ID` ajánlat / elutasítás |
-| `oys-customers` | Keresés; `&user=ID` profil, bérletek (módosítás, kredit adás), foglalások, fizetések |
+| `oys-customers` | Keresés; `&user=ID` profil, tagság, bérletek (módosítás, kredit adás), foglalások, fizetések |
+| `oys-members` | Tagok, MRR, fizetési problémák, lemondás periódus végére / visszavonás / azonnali megszüntetés |
 | `oys-orders` | Szűrés státuszra, nyugta, részleges/teljes visszatérítés |
 | `oys-gifts`, `oys-products`, `oys-settings` | ajándékkártyák, árak/bérletek, beállítások |
 
@@ -531,12 +612,14 @@ admin-post.php?action=oys_admin_{művelet}  →  OYS_Admin::guard()  →  curren
 
 | Metódus | Mikor |
 |---|---|
-| `booking_confirmed` (+ .ics) | minden megerősített foglalás |
+| `booking_confirmed` (+ .ics) | minden megerősített foglalás; vendéglistával; ha csak vendég került be: „Guests added” |
+| `guest_invite` (+ .ics) | vendégnek, ha megadott e-mailt |
 | `booking_cancelled` | lemondás (ügyfél vagy stúdió), stúdiónak is szól ha az ügyfél mondta le |
 | `waitlist_promoted` (+ .ics), `waitlist_spot_open` | várólista |
 | `reminder` | `reminder_hours` órával előtte |
 | `pass_purchased`, `gift_card`, `gift_receipt` | vásárlások |
 | `welcome` | regisztráció |
+| `membership_started`, `membership_cancel_scheduled`, `membership_ended`, `membership_payment_failed` | tagság életciklusa |
 | `private_request_received`, `private_offer` | magánóra |
 | `admin_new_order`, `admin_notice` | stúdiónak (`notify_email`) |
 
@@ -550,9 +633,11 @@ Feladó: `email_from_name` / `email_from` beállítás. Élesben SMTP / tranzakc
 
 | Hook | Paraméterek | Mikor |
 |---|---|---|
-| `oys_booking_confirmed` | `$booking_id` | foglalás megerősítve (kredit, kártya, kézi, várólista) |
+| `oys_booking_confirmed` | `$booking_id` | foglalási sor megerősítve (kredit, tagság, kártya, kézi, várólista) – vendégsoronként is |
 | `oys_booking_cancelled` | `$booking_id`, `$outcome` (`returned`/`credit`/`late`/`none`) | lemondás |
-| `oys_order_paid` | `$order_id` | rendelés teljesítve (egyszer) |
+| `oys_order_paid` | `$order_id` | rendelés teljesítve (egyszer); tagsági megújításnál is |
+| `oys_membership_started` | `$membership_id` | új tag |
+| `oys_membership_ended` | `$membership_id` | tagság véget ért |
 | `oys_seat_released` | `$session_id` | hely felszabadult (belül: várólista) |
 | `oys_email_sent` | `$to`, `$subject`, `$html` | minden kimenő levél után (naplózáshoz, CRM-hez) |
 
@@ -642,31 +727,55 @@ A tartalom (`content.json`) és a CSS közös a témával: ha itt módosul a sz�
 - **Webhook**: aláírás + időbélyeg tolerancia + idempotencia; hamis kérés → 400.
 - **Visszatérő oldal**: HMAC kulcs az order ID mellett (`order_key()`), nem kitalálható.
 - **Adatvédelem**: egészségügyi megjegyzés csak a stúdiónak látszik; WP adatexport/törlés bekötve (a fizetési és foglalási adatok könyvelés miatt maradnak, a profil- és egészségügyi adatok törlődnek).
-- **Regisztráció**: honeypot mező. Brute-force / rate limit **nincs** a pluginban → élesben biztonsági bővítmény (pl. Wordfence, Limit Login Attempts) kell.
+- **Belépés-védelem** (`OYS_Security`): 6 hibás belépés után 15 percig tiltás IP-re és e-mailre (a WordPress jelszó-ellenőrzése *után* fut, `authenticate` 99-es prioritás, így a wp-login.php-t is védi); IP-nként max. 5 új fiók / 15 perc; honeypot mező. Nagyobb forgalomnál / proxy mögött (Cloudflare) a valódi IP-t a tárhelyen kell átadni `REMOTE_ADDR`-ként; teljes WAF-hoz Wordfence vagy Cloudflare ajánlott.
+- **Vendégadatok**: a vendég neve és opcionális e-mailje csak a névsorhoz és a meghívóhoz kell; az adatvédelmi szöveg említi.
 - **Titkok**: Stripe kulcsokat élesben `wp-config.php` konstansban tartsd.
 
 ---
 
 ## 16. Tesztelés
 
-### 16.1 Végpont-teszt (Playwright)
+Három szint, mind egy paranccsal futtatható, és a GitHub Actions is ezeket futtatja minden pushnál (`.github/workflows/ci.yml`).
 
-`wordpress/dev/e2e.js` – valódi böngészővel végigkattintja a folyamatokat a helyi WordPress + Stripe-szimulátor ellen, és közben az adatbázist ellenőrzi (`php` hívásokkal a `WP_DIR`-ben).
+### 16.1 Integrációs tesztek (`dev/tests/run.php`)
+
+Valódi WordPress + adatbázis ellen futnak, keretrendszer nélkül (saját `test()` / `ok()` / `eq()`). **Minden teszt egy tranzakcióban fut, amit a végén visszagörget**, így az oldalon nem marad nyoma; a módosított beállításokat a futás végén visszaállítja. A Stripe-hívásokat folyamaton belül válaszolja meg (`pre_http_request`), hálózat nem kell.
 
 ```bash
-npm i -g playwright   # ha nincs; a böngészőt a playwright telepíti
-WP_DIR=/ut/a/wordpress SHOTS=/tmp/oys-shots node wordpress/dev/e2e.js
+WP_DIR=/ut/a/wordpress php wordpress/dev/tests/run.php     # 16 teszt, 77 ellenőrzés
 ```
 
-30 ellenőrzés: vendég regisztráció a foglaló oldalon · hely tartása fizetés alatt · kártyás foglalás, nyugta, levél, .ics · bérlet vásárlás · foglalás kreditből · lemondás határidőn belül, kredit vissza · telt ház → várólista → lemondás → automatikus beléptetés + levél · magánóra kérés → ajánlat → fizetés, a cím nem látszik másnak · ajándékkártya vásárlás, beváltás, második beváltás tiltva · visszatérés a webhook előtt · késő webhook nem teljesít kétszer · megszakított fizetés felszabadítja a helyet · teljes visszatérítés törli a foglalást · hamis webhook 400. Futásonként új felhasználókat és üres alkalmakat használ, többször is futtatható. Képernyőképeket ment a `SHOTS` mappába.
+Lefedi: atomikus helyfoglalás · társaság kreditből és visszagörgetés hiányzó kreditnél · lemondás időben/későn, vendégekkel együtt · vendég eltávolítása és utólagos hozzáadása · kártyás tartás, egyszeri teljesítés, lejárat · részleges/teljes visszatérítés · webhook-aláírás (jó, módosított, rossz kulcs, régi) · duplikált webhook · tagsági keret, következő periódus, magánóra kizárása · ütemezett lemondás és véget érés · megújítás egyszeri rögzítése, sikertelen fizetés · várólista tagsággal · ajándékkód egyszer · belépés-zár · Stripe-tételsorok · pénz- és periódus-formázás.
 
-### 16.2 Stripe-szimulátor (`dev/mock-stripe.php`)
+### 16.2 Végpont-teszt (`dev/e2e.js`, Playwright)
 
-Implementálja: `POST /v1/customers`, `POST /v1/checkout/sessions`, `GET /v1/checkout/sessions/{id}` (`expand[]=payment_intent.latest_charge`), `POST …/{id}/expire`, `POST /v1/refunds`, egy hamis fizetőoldalt (`/pay/{id}`: „Pay”, „Pay (webhook delayed)”, „Back / cancel”) aláírt webhookkal, és egy teszt-segédet (`/_webhook?type=…&id=…`) esemény újraküldéséhez. Állapot: `sys_get_temp_dir()/mock-stripe.json`, webhook napló: `…/mock-stripe-webhooks.log`. **Élesre soha nem kerül.**
+Valódi böngészővel kattintja végig a folyamatokat a helyi WordPress + Stripe-szimulátor ellen, közben az adatbázist is ellenőrzi.
 
-### 16.3 Ami még nincs
+```bash
+WP_DIR=/ut/a/wordpress SHOTS=/tmp/oys-shots node wordpress/dev/e2e.js     # 93 ellenőrzés
+```
 
-PHPUnit egységtesztek (a `WP_UnitTestCase` keretrendszerrel érdemes a `OYS_Bookings::cancel`, `OYS_Passes::consume/refund_credit`, `OYS_Orders::mark_paid`, `OYS_Stripe::verify_signature` függvényekre), CI (GitHub Actions: `php -l`, PHPCS WordPress szabvány, E2E dockerben).
+Lefedi az eddigieket (regisztráció, kártyás foglalás, bérlet, kreditfoglalás, lemondás, várólista, magánóra, ajándékkártya, késő/duplikált webhook, megszakított fizetés, visszatérítés, hamis webhook), plusz:
+- **vendégek:** 2 vendég kártyával (Stripe-számla: saját sor + „Guest ticket × 2”, $75), meghívó e-mail, 2 vendég bérletből, vendég eltávolítása (kredit vissza), vendég utólag, a foglaló lemondása a vendégeket is viszi, hely-korlát a vendégmezőkön;
+- **tagság:** csatlakozás (előfizetés mód), foglalás tagsággal + vendég kártyával (csak a vendég fizet), 4 alkalmas keret betelése, fiók Tagság fül, ügyfélportál, megújítás (új periódus + megújítási fizetés), sikertelen terhelés (past_due + levél), lemondás periódus végére és visszavonás, véget érés (jövőbeli foglalások lemondva);
+- **belépés-zár** ismételt hibás jelszóra;
+- **nincs vízszintes görgetés** a fő oldalakon kijelentkezve, bejelentkezve és mobilon.
+
+Futásonként új felhasználókat és a teszthez frissen létrehozott órákat használ; képernyőképeket ment a `SHOTS` mappába.
+
+### 16.3 Minden egyben: `dev/ci.sh`
+
+```bash
+DB_NAME=oywp_ci DB_USER=root DB_PASSWORD= DB_HOST=127.0.0.1 WP_DIR=/tmp/wp-ci wordpress/dev/ci.sh
+```
+
+Nulláról: PHP lint → WordPress letöltése (git) → `wp-config.php` → telepítés, plugin, téma, tartalombetöltés (`dev/setup-site.php`) → integrációs tesztek → WordPress és Stripe-szimulátor indítása → E2E → a `debug.log` PHP figyelmeztetései is hibának számítanak. `SKIP_E2E=1` csak az első két szintet futtatja.
+
+**GitHub Actions** (`ci.yml`): lint PHP 8.1 és 8.3 alatt; majd MariaDB 10.11 szolgáltatással a teljes `ci.sh`; a képernyőképek és naplók letölthető artifactként.
+
+### 16.4 Stripe-szimulátor (`dev/mock-stripe.php`)
+
+Implementálja: `POST /v1/customers`, `POST /v1/checkout/sessions` (payment és subscription mód, több tételsor), `GET /v1/checkout/sessions/{id}` (`expand[]` = `payment_intent.latest_charge`, `invoice`), `POST …/{id}/expire`, `GET/POST/DELETE /v1/subscriptions/{id}`, `POST /v1/billing_portal/sessions`, `POST /v1/refunds`; hamis fizetőoldal (`/pay/{id}`: tételsorok, végösszeg, „Pay”, „Pay (webhook delayed)”, „Back / cancel”), hamis ügyfélportál, aláírt webhookok, és teszt-segédek: `/_webhook`, `/_renew`, `/_fail`, `/_end`. **Élesre soha nem kerül.**
 
 ---
 
@@ -690,10 +799,7 @@ PHPUnit egységtesztek (a `WP_UnitTestCase` keretrendszerrel érdemes a `OYS_Boo
 
 **Új bérlettípus (pl. 10 alkalmas)** – kód nem kell: Studio → Prices & passes → „Add a pass”, `kind = pack`.
 
-**Havi korlátlan tagság (Stripe előfizetés)** – javasolt terv:
-1. Új termék `kind = membership` + Stripe `mode=subscription` Checkout (`price_data.recurring.interval=month`).
-2. Új tábla vagy `passes` sor `kind=class`, `credits_total` nagy értékkel és `expires_at` = periódus vége; `invoice.paid` webhookon a lejárat meghosszabbítása, `customer.subscription.deleted`-en lezárás.
-3. Stripe Customer Portal link a fiók „Payments” fülére (lemondás, kártyacsere).
+**Új tagsági csomag** – Studio → Prices & passes → „Add a pass”, `kind = membership`, számlázási ciklus és alkalomkeret (0 = korlátlan). Próbaidőszakhoz: `subscription_data.trial_period_days` a `start_subscription_checkout()`-ban (a `trialing` státusz már foglalhat).
 
 **Admin felület magyarul** – a szövegek már `__()`/`esc_html__()`-ben vannak (`olivia-studio`, `olivia-yoga` text domain). Készíts `.pot`-ot (`wp i18n make-pot`), fordítsd le `hu_HU`-ra (Poedit / Loco Translate), a `.mo` fájlok a `languages/` mappába kerüljenek. A felhasználó profiljában állítható a nyelv, így Olivia admin-nyelve lehet magyar, a vendégoldal maradhat angol.
 
@@ -710,14 +816,13 @@ PHPUnit egységtesztek (a `WP_UnitTestCase` keretrendszerrel érdemes a `OYS_Boo
 ## 19. Ismert korlátok, technikai adósság
 
 - Admin és e-mail szövegek csak angolul (fordítás előkészítve, fájl még nincs).
-- Nincs előfizetéses tagság; az ajándékkártya termék-alapú (nem pénzösszeg).
+- Tagság: csomagváltás (upgrade/downgrade) a Stripe ügyfélportálon át nincs bekötve – most lemondás + új csatlakozás; szüneteltetés (pause) csak a Stripe-ban. Az ajándékkártya termék-alapú (nem pénzösszeg), tagság nem ajándékozható.
+- Vendég csak a foglalóval együtt jöhet (önálló vendégfiók nincs); a tagság a vendéget nem fedezi.
 - Privát kredit csak 60 perces alkalomra jó; 75/90 percnél kártyás fizetés.
 - A főoldal szekcióinak szövegei a `front-page.php`-ben vannak (a „Meet your teacher” kivételével); szerkeszthetővé tételük (Customizer / blokkok) a következő kör.
-- E-mail küldés szinkron a webhookban; lassú SMTP esetén a webhook válaszideje nő (a Stripe ~10 mp után újrapróbál; az idempotencia miatt ez nem okoz dupla teljesítést, de dupla adminlevelet sem, mert a teljesítés egyszeri). Nagy forgalomnál: levélküldés háttérfeladatba (Action Scheduler).
+- E-mail küldés szinkron a webhookban; lassú SMTP esetén nő a webhook válaszideje (az idempotencia miatt nem okoz dupla teljesítést). Nagy forgalomnál: levélküldés háttérfeladatba (Action Scheduler).
 - Részleges visszatérítés semmit nem von vissza automatikusan (szándékos: a stúdió dönt).
-- Nincs beépített rate limit a belépésre/regisztrációra.
-- `confirm()` párbeszédablak az admin és a fiók lemondás gombjain (JS nélkül is működik, csak megerősítés nélkül).
-- Egységtesztek és CI hiányoznak (16.3).
+- `confirm()` párbeszédablak a lemondás gombokon (JS nélkül is működik, csak megerősítés nélkül).
 - A téma képei a témában is és a médiatárban is megvannak (a betöltő másolja); a főoldal a téma képeit használja.
 
 ---
