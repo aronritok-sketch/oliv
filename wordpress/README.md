@@ -14,6 +14,8 @@ Két rész, mindkettő a WordPress adminban tölthető fel ZIP-ként (`dist/`):
 - Foglalás: bérletből 1 kattintással · tagsággal · egyedi óra kártyával (drop-in) · „vegyél bérletet és foglald le ezt az órát” egy lépésben · bevezető ajánlat új diákoknak (alapból kikapcsolva).
 - **Vendégek hozása:** foglaláskor (vagy utólag) több vendég is (alapból max. 4, beállítható). Bérletnél fejenként 1 alkalom vonódik le a saját bérletből; kártyánál egy fizetésben fizeti ki mindenkit, a Stripe-számlán külön sorban „Guest ticket × N”. A vendégek név szerint szerepelnek a névsoron, a visszaigazolásban, az emlékeztetőben; ha van e-mailjük, saját meghívót kapnak naptármelléklettel. Vendég külön is lemondható; ha a foglaló lemond, a vendégei is.
 - **Online órák:** saját, alacsonyabb ár (alap $6), online bérlet (minta: 10 óra $50). A stúdióbérletből 1 alkalom = 4 online óra (állítható): az első online foglaláskor 1 alkalom átváltódik 4 online órára, a maradék a fiókban marad. A tagság tartalmazza az online órákat, és nem számítanak a havi keretbe. Online magánóra olcsóbban (minta: 60 perc $65).
+- **Hibrid óra (stúdió + élő online):** egy stúdióórát élőben is lehet követni. A foglaló választ: a stúdióban ($25 / 1 alkalom) vagy élőben online ($6 / 1 online óra); a stúdió- és az online helyek külön számolódnak (online lehet korlátlan). Tele stúdiónál az online opciót ajánlja.
+- **Automatikus Zoom:** online és hibrid órákhoz a rendszer magától létrehozza a Zoom meetinget, a linket csak az online résztvevők kapják (levélben, a fiókban, kezdés előtt emlékeztetőben). Óra áthelyezésekor a meeting is mozog, lemondáskor törlődik; Olivia a névsorból vagy a naptárból egy gombbal indítja. Opcionálisan mindenki saját linket kap.
 - **Félbehagyott fizetés:** ha valaki elindítja a kártyás fizetést, de nem fejezi be, nem számít foglaltnak; az óra oldalán folytathatja a fizetést, vagy újra foglalhat (a régi Stripe fizetés automatikusan lezárul, dupla terhelés nincs).
 - **Havi tagság (Stripe előfizetés):** korlátlan vagy „havi X óra” csomag, automatikus megújítással. A tag egy kattintással foglal, a fiókjában látja a keretet és a következő terhelést, a Stripe ügyfélportálon kártyát cserél és számlát tölt le, lemondhat a periódus végére (és visszavonhatja). Sikertelen terhelésnél e-mail; ha véget ér a tagság, a jövőbeli foglalásai lemondódnak.
 - Fizetés Stripe Checkouttal (kártya, Apple Pay, Google Pay, Link) – a kártyaadat sosem jár a honlapon.
@@ -37,6 +39,7 @@ Két rész, mindkettő a WordPress adminban tölthető fel ZIP-ként (`dist/`):
 - Fizetések: visszatérítés részben vagy egészben (a Stripe-ban indított visszatérítést is átveszi).
 - Ajándékkártyák, Árak és bérletek, Beállítások (Stripe, szabályok, nyilatkozat, e-mail).
 - „Studio manager” szerepkör: más is kezelheti a stúdiót teljes admin jog nélkül.
+- **Emails & reminders:** minden automatikus levél be/ki kapcsolható, tárgya és szövege szerkeszthető (helyettesítőkkel), előnézet és tesztlevél; emlékeztetők: óra előtt (két időpont), online link N perccel előtte, bérlet lejárata előtt. A stúdiónak szóló értesítések külön kapcsolhatók.
 - Belépés-védelem: 6 hibás jelszó után 15 perc tiltás (IP és fiók), regisztráció-korlát IP-nként.
 
 ## Telepítés
@@ -63,6 +66,13 @@ Két rész, mindkettő a WordPress adminban tölthető fel ZIP-ként (`dist/`):
 5. *Settings → Payment methods:* Apple Pay / Google Pay / Link bekapcsolása; *Branding*: logó és színek (#2B5036); *Emails*: sikeres fizetés nyugta bekapcsolása.
 6. Teszt: Test módban `4242 4242 4242 4242` kártyával végigfoglalni egy órát vendéggel, bérletet, tagságot, ajándékkártyát; a tagság megújítását a Stripe *Test clocks* funkciójával lehet kipróbálni. Utána **Mode: Live**.
 
+## Zoom beállítása (online és hibrid órákhoz)
+
+1. [Zoom App Marketplace](https://marketplace.zoom.us/) → *Develop → Build App → Server-to-Server OAuth* (a Zoom-fiók tulajdonosa hozza létre; Pro csomag ajánlott: 40 percnél hosszabb meetingek, személyes linkek).
+2. Scopes: meetingek létrehozása, módosítása, törlése, regisztráltak kezelése, felhasználó olvasása (a DEVELOPER.md 6.13 pontja listázza). Az appot aktiválni kell.
+3. Account ID, Client ID, Client Secret → *Studio → Settings → Zoom* (vagy `wp-config.php`: `OYS_ZOOM_ACCOUNT_ID`, `OYS_ZOOM_CLIENT_ID`, `OYS_ZOOM_CLIENT_SECRET`), majd **Test the connection**.
+4. Egy teszt online órán végigpróbálni: foglalás online → a levélben Zoom-link → a névsorban „Start the Zoom class (host)”.
+
 ## Élesítés előtti lista
 
 - [ ] Valós órarend (*Studio → Calendar*), árak, bérlet-érvényesség, tagsági csomagok, online ár és átváltás (1 alkalom = hány online óra), vendég-limit (*Prices & passes, Settings*). A mostani adatok MINTA adatok (tagság: $119 korlátlan, $85 havi 4 óra).
@@ -70,7 +80,8 @@ Két rész, mindkettő a WordPress adminban tölthető fel ZIP-ként (`dist/`):
 - [ ] Részvételi nyilatkozat és lemondási szabály szövegét ügyvéd nézze át (*Studio → Settings*).
 - [ ] Adatvédelmi oldal (*Beállítások → Adatvédelem*) – a plugin javasolt szöveget ad hozzá.
 - [ ] Sales tax: Floridában a tiszta oktatás (jógaóra) általában nem adóköteles, de ezt könyvelő erősítse meg.
-- [ ] Stripe élesítés, webhook, SMTP, cron (fent).
+- [ ] Stripe élesítés, webhook, SMTP, cron (fent), Zoom app (fent).
+- [ ] *Studio → Emails & reminders*: feladó, emlékeztetők ideje, levelek szövege átnézve (tesztlevéllel).
 - [ ] Biztonság: erős admin jelszó + 2FA, napi mentés. A plugin korlátozza a belépési próbálkozásokat; teljes tűzfalhoz Wordfence vagy Cloudflare ajánlott.
 - [ ] SEO: a téma ad címet, leírást, Open Graph-ot és LocalBusiness/FAQ schemát; ha Yoast/Rank Math kerül fel, a téma ezt automatikusan átadja nekik. Google Business Profile összekötése.
 
@@ -80,10 +91,10 @@ Részletes fejlesztői dokumentáció (architektúra, adatmodell, folyamatok, ho
 
 `dev/` – helyi futtatáshoz és tesztekhez (élesre nem kell):
 
-- `mock-stripe.php` – Stripe-szimulátor (fizetés, előfizetés, ügyfélportál, aláírt webhookok, megújítás / sikertelen terhelés szimulálása).
+- `mock-stripe.php` – Stripe- és Zoom-szimulátor (fizetés, előfizetés, ügyfélportál, aláírt webhookok, megújítás / sikertelen terhelés szimulálása).
 - `mu-plugins/dev-mail-catcher.php` – küldés helyett fájlba írja a leveleket. `router.php` – PHP beépített szerverhez.
-- `tests/run.php` – integrációs tesztek (120 ellenőrzés, visszagörgetett tranzakciókban, az oldalon nem hagynak nyomot).
-- `e2e.js` – böngészős végpont-teszt (Playwright), 128 ellenőrzés: foglalás minden fizetési móddal, félbehagyott fizetés, online órák és átváltás, admin naptár (kattintás, húzás, heti ismétlés), vendégek (kártya, bérlet, utólag, eltávolítás, lemondás), tagság (csatlakozás, keret, megújítás, sikertelen terhelés, lemondás, véget érés), várólista, magánóra, ajándékkártya, webhook-hibák, visszatérítés, belépés-zár, mobil nézet.
+- `tests/run.php` – integrációs tesztek (192 ellenőrzés, visszagörgetett tranzakciókban, az oldalon nem hagynak nyomot).
+- `e2e.js` – böngészős végpont-teszt (Playwright), 150 ellenőrzés: foglalás minden fizetési móddal, félbehagyott fizetés, online órák és átváltás, admin naptár (kattintás, húzás, heti ismétlés), hibrid óra Zoom-linkkel, e-mail szövegek szerkesztése, vendégek (kártya, bérlet, utólag, eltávolítás, lemondás), tagság (csatlakozás, keret, megújítás, sikertelen terhelés, lemondás, véget érés), várólista, magánóra, ajándékkártya, webhook-hibák, visszatérítés, belépés-zár, mobil nézet.
 - `ci.sh` – minden egyben, nulláról (WordPress letöltése, telepítés, tesztek). A GitHub Actions minden pushnál ezt futtatja (`.github/workflows/ci.yml`).
 
 ```

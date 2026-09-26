@@ -95,6 +95,9 @@ oliv/
     │       ├── class-gifts.php        Ajándékkártyák
 │       ├── class-memberships.php  Tagság (Stripe előfizetés): csatlakozás, szinkron, keret, lemondás, portál
 │       ├── class-security.php     Belépés- és regisztráció-korlátozás
+│       ├── class-zoom.php         Zoom meetingek automatikusan (Server-to-Server OAuth)
+│       ├── class-email-templates.php  Az automatikus levelek szerkeszthető szövegei, ki/be kapcsolói
+│       ├── admin/class-calendar.php   Admin naptár (REST + oldal)
     │       ├── class-cron.php         Háttérfeladatok
     │       ├── class-frontend.php     Shortcode-ok és nyilvános űrlapkezelők
     │       ├── class-privacy.php      WP adatexport / törlés
@@ -219,7 +222,8 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 | `start_time` | `HH:MM`, **helyi idő** |
 | `duration_min`, `capacity`, `price_cents` | hossz, férőhely, drop-in ár |
 | `location`, `online_url`, `note` | hely, online link (csak foglalóknak látszik), rövid megjegyzés |
-| `format` | `studio` (személyes) · `online` (élő közvetítés) |
+| `format` | `studio` (személyes) · `online` (élő közvetítés) · `hybrid` (stúdió + élő online) |
+| `online_capacity`, `online_price_cents` | hibrid óra online helyei (0 = korlátlan) és online jegyára |
 | `active` | 0 = nem generál új alkalmat |
 | `valid_from` | az első dátum, amitől ismétlődik (a naptárból létrehozott heti óránál); NULL = azonnal |
 
@@ -232,7 +236,9 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 | `starts_at`, `ends_at` | UTC |
 | `capacity`, **`booked`** | `booked` = megerősített foglalások + **le nem járt** fizetési tartások. **Denormalizált számláló**, atomikusan módosul (lásd 6.1). |
 | `price_cents` | drop-in ár; 0 = ingyenes |
-| `format` | `studio` · `online` – online óránál online kredit fizet, és a tagsági keretbe nem számít (6.10) |
+| `format` | `studio` · `online` · `hybrid` – online részvételnél online kredit fizet, és a tagsági keretbe nem számít (6.10, 6.12) |
+| `online_capacity`, `online_booked`, `online_price_cents` | hibrid óra online helyei (0 = korlátlan), foglalt online helyek (denormalizált, atomikus mint a `booked`), online jegyár |
+| `zoom_meeting_id`, `zoom_join_url`, `zoom_password` | automatikus Zoom meeting (6.13); `creating:<idő>` = épp most jön létre |
 | `template_id`, `tpl_slot` | melyik heti órából jött, és az **eredeti** időpontja; ha egy dátumot áthelyeznek vagy lemondanak, a `tpl_slot` marad, így a generálás nem hozza létre újra |
 | `credits_allowed` | 1 = bérletből foglalható |
 | `status` | `scheduled` · `cancelled` |
@@ -247,6 +253,9 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 | `paid_with` | `credit` · `membership` · `card` · `free` · `admin` · `cash` · `comp` |
 | `pass_id` | melyik bérletből vont le kreditet (lemondáskor ide jár vissza) |
 | `membership_id` | ha tagsággal foglalt (a periódus-keret ebből számol) |
+| `mode` | `studio` · `online` – hogyan vesz részt (online-only órán mindig `online`; a vendég a foglalóét örökli) |
+| `join_url`, `zoom_registrant_id` | személyes Zoom-link (ha be van kapcsolva) |
+| `reminder_sent`, `reminder2_sent`, `join_reminder_sent` | elküldött emlékeztetők |
 | `guest_of`, `guest_name`, `guest_email` | vendégsor: a foglaló sorának id-je, a vendég neve és (opcionális) e-mailje; `user_id` = a foglaló (ő fizet, ő kezeli) |
 | `order_id` | kártyás fizetés rendelése (egy rendeléshez több sor tartozhat: foglaló + vendégek) |
 | `hold_expires` | fizetés alatti tartás lejárata (csak `pending`) |
@@ -532,6 +541,28 @@ Felület: heti rács (telefonon napi fülek), üres időre kattintás = új óra
 
 Sorozat-módosításnál minden további dátum ugyanannyi nappal tolódik, mint a szerkesztett, és az új kezdési időt kapja; a `tpl_slot` is átíródik, így a generálás nem duplikál. A lemondott dátumok is követik az új időpontot, hogy ne jöjjenek létre újra.
 
+### 6.12 Hibrid órák (stúdió + élő online)
+
+- `format = hybrid`: az óra a stúdióban van, és élőben közvetítik. A foglaló választ: **In the studio** (`mode = studio`, drop-in ár, stúdiókredit, `booked/capacity`) vagy **Live online** (`mode = online`, `online_price_cents`, online kredit / átváltás, `online_booked/online_capacity`, 0 = korlátlan).
+- `oys_mode_for( $session, $mode )` dönti el a tényleges módot (online-only órán mindig online). Minden helyfoglaló függvény kap `$mode`-ot: `take_seats()`, `release_seats()`, `force_seats()`, `spots_left()`, `price_for()`; a `book_party()` / `hold()` / `book_with_*()` / `book_manual()` `mode` argumentummal. A vendég a foglaló módját örökli.
+- Foglalóoldal: két fül (`?mode=online`); ha a stúdió tele van és online van hely, alapból az online nyílik. A várólista csak a stúdióhelyekre vonatkozik.
+- Kredit: `credit_kind( $session, $mode )`, `available_for( $user, $session, $mode )`, `consume_for(…, $mode)`; tagság: `covers( $m, $session, $mode )`, és `used_in_period()` a `mode = online` sorokat nem számolja.
+- Link: `OYS_Bookings::join_link( $booking )` – csak online résztvevőnek; a `oys_join_link` filteren át a Zoom adja, különben az órán megadott `online_url`. Stúdiós résztvevő soha nem kapja meg.
+
+### 6.13 Zoom (automatikus meetingek)
+
+`OYS_Zoom` (`includes/class-zoom.php`). Beállítás: Studio → Settings → Zoom (Account ID, Client ID, Client Secret; vagy `OYS_ZOOM_ACCOUNT_ID` / `OYS_ZOOM_CLIENT_ID` / `OYS_ZOOM_CLIENT_SECRET` a `wp-config.php`-ban), meeting gazdája (`me` vagy e-mail), automatikus meetingek, személyes linkek, várószoba, kapcsolatteszt.
+
+- **Zoom app:** Zoom App Marketplace → Develop → Build App → *Server-to-Server OAuth*; jogok (scope): meeting létrehozás / módosítás / törlés és regisztráltak kezelése (`meeting:write:admin` vagy a részletes `meeting:write:meeting:admin`, `meeting:update:meeting:admin`, `meeting:delete:meeting:admin`, `meeting:write:registrant:admin`, `meeting:update:registrant_status:admin`, és `user:read:user:admin` a teszthez). Az appot aktiválni kell.
+- **Token:** `POST https://zoom.us/oauth/token?grant_type=account_credentials&account_id=…` Basic auth-tal; transientben ~55 percig; 401-nél egyszer újrakéri.
+- **Mikor jön létre a meeting:** amikor egy online résztvevőnek először kell a link (visszaigazoló levél – `join_link()` lustán hívja `ensure_meeting()`-et), az óránkénti `prepare_upcoming()` a 26 órán belüli, online foglalással bíró órákra, vagy a névsor „Create the Zoom meeting now” gombja. Csak `online`/`hybrid`, `scheduled`, **kézzel beírt link nélküli** órára.
+- **Egyszerre két kérés** (Stripe webhook + visszatérő oldal) nem hoz létre két meetinget: `claim()` feltételes UPDATE-tel `creating:<időbélyeg>` jelölőt tesz a `zoom_meeting_id`-be; a másik kérés 5 másodpercig vár az id-re. 60 másodpercnél régebbi jelölőt (összeomlás) átvesz.
+- **Hiba:** 10 percig nem próbálja újra (transient), a stúdió e-mailt kap (`studio_alerts`), a foglalás ettől még létrejön; a link a levélben „hamarosan érkezik” szöveggel helyettesítődik, az emlékeztető már tartalmazza.
+- **Szinkron:** `oys_session_saved` action (`OYS_Schedule::save()` minden frissítés után): időpont / hossz / cím változás → `PATCH /meetings/{id}`; lemondás, nem-online formátum vagy kézi link → `DELETE` és a mezők ürítése.
+- **Személyes linkek** (`zoom_personal`): minden online résztvevő regisztrálva lesz (`POST /meetings/{id}/registrants`, `approval_type = 0`), a saját linkje a `bookings.join_url`-ba kerül; lemondáskor `PUT …/registrants/status` `cancel`. Online vendégnek ilyenkor kötelező az e-mail. Fizetős Zoom (Pro) kell hozzá.
+- **Óra indítása:** névsor / naptár „Start the Zoom class” → `admin-post.php?action=oys_admin_zoom_start` → friss `start_url` (`GET /meetings/{id}`) → átirányítás.
+- Fejlesztéshez: `OYS_ZOOM_API_BASE`, `OYS_ZOOM_OAUTH_URL` konstansok a szimulátorra (16.4).
+
 ---
 
 ## 7. Stripe integráció
@@ -620,7 +651,8 @@ admin-post.php?action=oys_admin_{művelet}  →  OYS_Admin::guard()  →  curren
 | `oys-customers` | Keresés; `&user=ID` profil, tagság, bérletek (módosítás, kredit adás), foglalások, fizetések |
 | `oys-members` | Tagok, MRR, fizetési problémák, lemondás periódus végére / visszavonás / azonnali megszüntetés |
 | `oys-orders` | Szűrés státuszra, nyugta, részleges/teljes visszatérítés |
-| `oys-gifts`, `oys-products`, `oys-settings` | ajándékkártyák, árak/bérletek, beállítások |
+| `oys-emails` | **Emails & reminders**: feladó, emlékeztetők, minden levél ki/be; `&edit=kulcs` szöveg, előnézet, teszt, visszaállítás |
+| `oys-gifts`, `oys-products`, `oys-settings` | ajándékkártyák, árak/bérletek, beállítások (Stripe, szabályok, online, **Zoom**, nyilatkozat) |
 
 ---
 
@@ -628,33 +660,35 @@ admin-post.php?action=oys_admin_{művelet}  →  OYS_Admin::guard()  →  curren
 
 | Hook | Ütem | Feladat |
 |---|---|---|
-| `oys_frequent` | 5 perc (`oys_5min`) | `OYS_Bookings::expire_holds()` – lejárt tartások felszabadítása · `OYS_Cron::send_reminders()` – emlékeztetők |
-| `oys_hourly` | óránként | `OYS_Schedule::generate()` – alkalmak létrehozása `weeks_ahead` hétre előre |
+| `oys_frequent` | 5 perc (`oys_5min`) | `OYS_Bookings::expire_holds()` – lejárt tartások · `OYS_Cron::send_reminders()` – óra-emlékeztetők (`reminder_hours`, `reminder2_hours`) · `send_join_reminders()` – online link `join_reminder_minutes` perccel előtte |
+| `oys_hourly` | óránként | `OYS_Schedule::generate()` – alkalmak `weeks_ahead` hétre előre · `send_pass_expiry()` – bérlet lejár `pass_expiry_days` napon belül · `OYS_Zoom::prepare_upcoming()` – Zoom meetingek a következő 26 órára |
 
 - A generálás **idempotens** (`template_id` + `starts_at` alapján kihagyja a meglévőt), bármikor futtatható.
-- Emlékeztető csak olyan foglalásra megy, amely az emlékeztető-ablak megnyílta **előtt** jött létre (aki 3 órával előtte foglal, a visszaigazolást kapja, emlékeztetőt nem), és csak egyszer (`reminder_sent`).
+- Emlékeztető csak olyan foglalásra megy, amely az adott emlékeztető ideje **előtt** jött létre (aki 3 órával előtte foglal, a visszaigazolást kapja, a 24 órás emlékeztetőt nem), és mindegyik csak egyszer (`reminder_sent`, `reminder2_sent`, `join_reminder_sent`, `passes.expiry_notice_sent`). 0 = kikapcsolva; a levél kikapcsolása a Studio → Emails oldalon szintén leállítja.
 - Élesben **valódi cron** ajánlott (`DISABLE_WP_CRON` + 5 percenkénti `wp-cron.php` hívás), különben forgalom nélkül nem futnak a feladatok.
 
 ---
 
 ## 11. E-mailek
 
-`OYS_Emails::send( $to, $subject, $heading, $body_html, $attachments, $cta )` – egységes HTML keret (táblázatos, inline stílus, e-mail kliens-barát), opcionális gomb. A `.ics` fájlok ideiglenesen a `uploads/oys-tmp/` mappába kerülnek és küldés után törlődnek.
+`OYS_Emails::send( $to, $subject, $heading, $body_html, $attachments, $cta )` – egységes HTML keret (táblázatos, inline stílus, e-mail kliens-barát). A `.ics` fájlok ideiglenesen a `uploads/oys-tmp/` mappába kerülnek és küldés után törlődnek.
 
-| Metódus | Mikor |
+**Szerkeszthető szövegek** (`OYS_Email_Templates`, Studio → **Emails & reminders**): minden levélnek kulcsa van, alapértelmezett tárgya, címsora, üzenete, záró sora és gombfelirata, helyettesítőkkel (`{first_name}`, `{studio}`, `{class}`, `{date}`, `{date_short}`, `{day}`, `{time}`, `{location}` + levélfüggők, pl. `{guest_name}`, `{host}`, `{reason}`, `{pass}`, `{classes_left}`, `{expires}`, `{ends}`, `{from}`, `{gift}`). A mentett eltérések az `oys_email_templates` opcióban vannak (kulcs → mezők + `enabled`); ami nincs mentve, az alapértelmezés. A levélküldő függvények a `compose()`-on át: üzenet → **automatikus részletek** (óra, vendégek, csatlakozási link, nyugta, ajándékkód – ezek nem szerkeszthetők) → záró sor → (pl. lemondási szabály). Kikapcsolt levél nem megy ki. Az admin oldalon előnézet (`OYS_Emails::preview()` mintaadatokkal), tesztlevél a saját címre (`send_test()`), visszaállítás.
+
+| Kulcs | Mikor |
 |---|---|
-| `booking_confirmed` (+ .ics) | minden megerősített foglalás; vendéglistával; ha csak vendég került be: „Guests added” |
-| `guest_invite` (+ .ics) | vendégnek, ha megadott e-mailt |
-| `booking_cancelled` | lemondás (ügyfél vagy stúdió), stúdiónak is szól ha az ügyfél mondta le |
+| `booking_confirmed` (+ .ics), `guests_added` | megerősített foglalás; ha csak vendég került be |
+| `guest_invite` (+ .ics), `guest_cancelled` | vendégnek, ha megadott e-mailt |
+| `booking_cancelled`, `class_cancelled` | lemondás az ügyféltől / a stúdiótól (az ok a `{reason}`) |
+| `session_changed` (+ .ics) | a naptárban áthelyezett óra, ha „email the people booked” |
 | `waitlist_promoted` (+ .ics), `waitlist_spot_open` | várólista |
-| `reminder` | `reminder_hours` órával előtte |
-| `pass_purchased`, `gift_card`, `gift_receipt` | vásárlások |
-| `welcome` | regisztráció |
-| `membership_started`, `membership_cancel_scheduled`, `membership_ended`, `membership_payment_failed` | tagság életciklusa |
-| `private_request_received`, `private_offer` | magánóra |
-| `admin_new_order`, `admin_notice` | stúdiónak (`notify_email`) |
+| `reminder`, `join_reminder`, `pass_expiring` | emlékeztetők (10. fejezet) |
+| `welcome`, `pass_purchased`, `gift_card`, `gift_receipt` | fiók, vásárlás, ajándék |
+| `private_request_received`, `private_offer`, `private_declined` | magánóra |
+| `membership_started`, `membership_cancel_scheduled`, `membership_ended`, `membership_payment_failed` | tagság |
+| `studio_payment`, `studio_private`, `studio_cancellation`, `studio_membership`, `studio_alerts` | a stúdiónak (`notify_email`), csak ki/be |
 
-Feladó: `email_from_name` / `email_from` beállítás. Élesben SMTP / tranzakciós szolgáltató kell (README).
+Új levél: vegyél fel egy kulcsot a `registry()`-ben (vagy az `oys_email_templates` filterrel), és küldd `compose( 'kulcs', $to, $vars, $blocks, … )`-szal. Feladó: `email_from_name` / `email_from`; élesben SMTP / tranzakciós szolgáltató kell (README).
 
 ---
 
@@ -669,7 +703,9 @@ Feladó: `email_from_name` / `email_from` beállítás. Élesben SMTP / tranzakc
 | `oys_order_paid` | `$order_id` | rendelés teljesítve (egyszer); tagsági megújításnál is |
 | `oys_membership_started` | `$membership_id` | új tag |
 | `oys_membership_ended` | `$membership_id` | tagság véget ért |
-| `oys_seat_released` | `$session_id` | hely felszabadult (belül: várólista) |
+| `oys_seat_released` | `$session_id`, `$mode` | hely felszabadult (belül: várólista) |
+| `oys_session_saved` | `$session_id`, `$before` | alkalom módosítva (`OYS_Schedule::save()`); a Zoom ezzel tartja szinkronban a meetinget |
+| `oys_zoom_meeting_created` | `$session_id`, `$meeting` | új Zoom meeting |
 | `oys_email_sent` | `$to`, `$subject`, `$html` | minden kimenő levél után (naplózáshoz, CRM-hez) |
 
 ### Filterek
@@ -681,6 +717,8 @@ Feladó: `email_from_name` / `email_from` beállítás. Élesben SMTP / tranzakc
 | `oys_corporate_contact_url` | `/contact/?topic=corporate#book` | árkártya „Request a proposal” |
 | `oys_featured_badge` | „Most popular” címke | a téma forgó matricára cseréli |
 | `oys_dropin_display_price` | `2500` | az árkártyán mutatott drop-in ár (a valódi ár alkalmanként az adatbázisból jön) |
+| `oys_join_link` | `''`, `$booking`, `$session` | online résztvevő linkje (a Zoom tölti; saját streaming szolgáltatás is ide köthető) |
+| `oys_email_templates` | a levelek listája | új levél vagy alapszöveg felvétele |
 
 Példa – új foglalás Slackre / CRM-be:
 
@@ -773,17 +811,17 @@ Három szint, mind egy paranccsal futtatható, és a GitHub Actions is ezeket fu
 Valódi WordPress + adatbázis ellen futnak, keretrendszer nélkül (saját `test()` / `ok()` / `eq()`). **Minden teszt egy tranzakcióban fut, amit a végén visszagörget**, így az oldalon nem marad nyoma; a módosított beállításokat a futás végén visszaállítja. A Stripe-hívásokat folyamaton belül válaszolja meg (`pre_http_request`), hálózat nem kell.
 
 ```bash
-WP_DIR=/ut/a/wordpress php wordpress/dev/tests/run.php     # 22 teszt, 120 ellenőrzés
+WP_DIR=/ut/a/wordpress php wordpress/dev/tests/run.php     # 32 teszt, 192 ellenőrzés
 ```
 
-Lefedi: atomikus helyfoglalás · társaság kreditből és visszagörgetés hiányzó kreditnél · lemondás időben/későn, vendégekkel együtt · vendég eltávolítása és utólagos hozzáadása · kártyás tartás, egyszeri teljesítés, lejárat · részleges/teljes visszatérítés · webhook-aláírás (jó, módosított, rossz kulcs, régi) · duplikált webhook · tagsági keret, következő periódus, magánóra kizárása · ütemezett lemondás és véget érés · megújítás egyszeri rögzítése, sikertelen fizetés · várólista tagsággal · ajándékkód egyszer · belépés-zár · Stripe-tételsorok · online órák (átváltás, online kredit elsőbbsége, társaság, tagsági keret, magánóra ára) · naptár (heti óra létrehozása, egy dátum áthelyezése generálás után sem duplikálódik, sorozat-módosítás e-maillel, leállítás, validálás, kapacitás) · pénz- és periódus-formázás.
+Lefedi: atomikus helyfoglalás · társaság kreditből és visszagörgetés hiányzó kreditnél · lemondás időben/későn, vendégekkel együtt · vendég eltávolítása és utólagos hozzáadása · kártyás tartás, egyszeri teljesítés, lejárat · részleges/teljes visszatérítés · webhook-aláírás (jó, módosított, rossz kulcs, régi) · duplikált webhook · tagsági keret, következő periódus, magánóra kizárása · ütemezett lemondás és véget érés · megújítás egyszeri rögzítése, sikertelen fizetés · várólista tagsággal · ajándékkód egyszer · belépés-zár · Stripe-tételsorok · online órák (átváltás, online kredit elsőbbsége, társaság, tagsági keret, magánóra ára) · naptár (heti óra létrehozása, egy dátum áthelyezése generálás után sem duplikálódik, sorozat-módosítás e-maillel, leállítás, validálás, kapacitás) · hibrid óra (külön stúdió- és online helyek, online kredit, tagság, kártyás tartás) · Zoom (egyszeri létrehozás, csak online résztvevőnek, áthelyezés → PATCH, lemondás → DELETE, kézi link elsőbbsége, személyes linkek, hiba és újrapróbálás, párhuzamos kérések) · e-mail szövegek (helyettesítők, ki/be, visszaállítás, előnézet) · emlékeztetők (kettő, online link, bérletlejárat) · pénz- és periódus-formázás.
 
 ### 16.2 Végpont-teszt (`dev/e2e.js`, Playwright)
 
 Valódi böngészővel kattintja végig a folyamatokat a helyi WordPress + Stripe-szimulátor ellen, közben az adatbázist is ellenőrzi.
 
 ```bash
-WP_DIR=/ut/a/wordpress SHOTS=/tmp/oys-shots node wordpress/dev/e2e.js     # 128 ellenőrzés
+WP_DIR=/ut/a/wordpress SHOTS=/tmp/oys-shots node wordpress/dev/e2e.js     # 150 ellenőrzés
 ```
 
 Lefedi az eddigieket (regisztráció, kártyás foglalás, bérlet, kreditfoglalás, lemondás, várólista, magánóra, ajándékkártya, késő/duplikált webhook, megszakított fizetés, visszatérítés, hamis webhook), plusz:
@@ -793,6 +831,8 @@ Lefedi az eddigieket (regisztráció, kártyás foglalás, bérlet, kreditfoglal
 - **félbehagyott fizetés:** Stripe oldal elhagyása Vissza gombbal → nem „booked”, „Continue to payment”, újrafoglalás lezárja a régi Stripe oldalt; másik fülön mégis kifizetett régi fizetés felismerése (nincs dupla terhelés);
 - **online órák:** $6 ár, 1 stúdióalkalom = 4 online óra, átváltott bérlet a fiókban, online bérlet vásárlás, árlista, online magánóra ár;
 - **admin naptár:** kattintás üres időre → online óra létrehozása, húzás másik napra, heti óra, sorozat-módosítás e-maillel, heti óra leállítása, telefonos nézet;
+- **hibrid + Zoom:** tele stúdió → online fül, $6-os jegy, kártyás fizetés, Zoom-link a levélben, a foglalóoldalon és a fiókban, névsor jelölése, host indítás, áthelyezés → meeting mozog, lemondás → meeting törlődik, kapcsolatteszt;
+- **e-mailek:** második emlékeztető beállítása, stúdiólevél kikapcsolása, tárgy szerkesztése, előnézet, tesztlevél, valódi foglalás az új tárggyal, visszaállítás;
 - **nincs vízszintes görgetés** a fő oldalakon kijelentkezve, bejelentkezve és mobilon.
 
 Futásonként új felhasználókat és a teszthez frissen létrehozott órákat használ; képernyőképeket ment a `SHOTS` mappába.
@@ -809,7 +849,7 @@ Nulláról: PHP lint → WordPress letöltése (git) → `wp-config.php` → tel
 
 ### 16.4 Stripe-szimulátor (`dev/mock-stripe.php`)
 
-Implementálja: `POST /v1/customers`, `POST /v1/checkout/sessions` (payment és subscription mód, több tételsor), `GET /v1/checkout/sessions/{id}` (`expand[]` = `payment_intent.latest_charge`, `invoice`), `POST …/{id}/expire`, `GET/POST/DELETE /v1/subscriptions/{id}`, `POST /v1/billing_portal/sessions`, `POST /v1/refunds`; hamis fizetőoldal (`/pay/{id}`: tételsorok, végösszeg, „Pay”, „Pay (webhook delayed)”, „Back / cancel”), hamis ügyfélportál, aláírt webhookok, és teszt-segédek: `/_webhook`, `/_renew`, `/_fail`, `/_end`. **Élesre soha nem kerül.**
+A Zoomot is szimulálja `/zoom/...` alatt (token, felhasználó, meeting létrehozás / lekérés / módosítás / törlés, regisztráltak, `/zoom/j/…` és `/zoom/s/…` oldalak, `/zoom/_meetings` a tesztekhez); a `ci.sh` `wp-config`-ja és a `setup-site.php` ide köti. Stripe-ból implementálja: `POST /v1/customers`, `POST /v1/checkout/sessions` (payment és subscription mód, több tételsor), `GET /v1/checkout/sessions/{id}` (`expand[]` = `payment_intent.latest_charge`, `invoice`), `POST …/{id}/expire`, `GET/POST/DELETE /v1/subscriptions/{id}`, `POST /v1/billing_portal/sessions`, `POST /v1/refunds`; hamis fizetőoldal (`/pay/{id}`: tételsorok, végösszeg, „Pay”, „Pay (webhook delayed)”, „Back / cancel”), hamis ügyfélportál, aláírt webhookok, és teszt-segédek: `/_webhook`, `/_renew`, `/_fail`, `/_end`. **Élesre soha nem kerül.**
 
 ---
 
@@ -853,6 +893,8 @@ Implementálja: `POST /v1/customers`, `POST /v1/checkout/sessions` (payment és 
 - Tagság: csomagváltás (upgrade/downgrade) a Stripe ügyfélportálon át nincs bekötve – most lemondás + új csatlakozás; szüneteltetés (pause) csak a Stripe-ban. Az ajándékkártya termék-alapú (nem pénzösszeg), tagság nem ajándékozható.
 - Vendég csak a foglalóval együtt jöhet (önálló vendégfiók nincs); a tagság a vendéget nem fedezi.
 - Privát kredit csak 60 perces alkalomra jó; 75/90 percnél kártyás fizetés. Online magánórára is jó (az ügyfél „drágábban” használja).
+- Zoom: élő fiókkal nem teszteltük (a fejlesztői környezetből a Zoom nem érhető el), csak szimulátorral; élesítés előtt egy valódi Server-to-Server apppal végig kell próbálni. Felvétel / visszanézés nincs.
+- E-mail szövegek egy nyelven (angolul) szerkeszthetők; a levél elrendezése (keret, színek) kódban van.
 - Naptár: csak heti ismétlés (kéthetente / havonta nincs), visszavonás (undo) nincs; a klasszikus táblás szerkesztők megmaradtak tartaléknak.
 - Online kredit átváltása egyirányú (online → stúdió nincs), és a töredék nem vész el, de csak online órára használható.
 - A főoldal szekcióinak szövegei a `front-page.php`-ben vannak (a „Meet your teacher” kivételével); szerkeszthetővé tételük (Customizer / blokkok) a következő kör.

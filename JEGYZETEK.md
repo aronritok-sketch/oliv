@@ -47,6 +47,14 @@
 - **Admin naptár:** Studio → Calendar – kattintós, húzható heti nézet, heti ismétlés, „csak ez a nap / ez és a következő hetek”, e-mail a foglalóknak.
 - Tesztek: 120 integrációs + 128 böngészős ellenőrzés.
 
+## 5. kör: hibrid órák, Zoom, e-mailek (2026-09-26)
+- **Hibrid óra:** stúdióóra élőben is követhető; foglaláskor választ (stúdió $25 / online $6), külön helyek; online jegy online kreditből vagy átváltással.
+- **Zoom automatikusan:** Server-to-Server OAuth app kell (Studio → Settings → Zoom). Meeting az első online foglaláskor jön létre; áthelyezésnél
+  mozog, lemondásnál törlődik; Olivia a névsorból / naptárból indítja; opcionálisan személyes link mindenkinek. Élő Zoommal még NEM teszteltük.
+- **Emails & reminders oldal:** minden levél ki/be, szöveg szerkeszthető, előnézet, tesztlevél; emlékeztetők: óra előtt (2 időpont), online link, bérletlejárat.
+- Tesztek: 192 integrációs + 150 böngészős ellenőrzés.
+- Következő nagy lépés: mobilapp az aktív felhasználóknak (API + élő óra az appban) – a hibrid/Zoom rész erre már felkészült.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb.
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
