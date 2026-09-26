@@ -29,7 +29,7 @@ class OYS_Frontend {
 		add_action( 'admin_post_oys_ics', array( __CLASS__, 'handle_ics' ) );
 		add_action( 'template_redirect', array( __CLASS__, 'return_from_stripe' ) );
 		add_filter( 'body_class', function ( $c ) {
-			$c[] = is_user_logged_in() ? 'oys-logged-in' : 'oys-guest';
+			$c[] = is_user_logged_in() ? 'oys-logged-in' : 'oys-logged-out';
 			return $c;
 		} );
 	}
@@ -275,10 +275,10 @@ class OYS_Frontend {
 		}
 		$rows = '';
 		for ( $i = 0; $i < $max; $i++ ) {
-			$rows .= '<div class="oys-guest" data-guest' . ( $i >= $open ? ' hidden' : '' ) . '><span class="oys-guest__n">' . sprintf( esc_html__( 'Guest %d', 'olivia-studio' ), $i + 1 ) . '</span>'
+			$rows .= '<div class="oys-guestrow" data-guest' . ( $i >= $open ? ' hidden' : '' ) . '><span class="oys-guestrow__n">' . sprintf( esc_html__( 'Guest %d', 'olivia-studio' ), $i + 1 ) . '</span>'
 				. '<label class="field"><span>' . esc_html__( 'Name', 'olivia-studio' ) . '</span><input type="text" name="guest_name[]" id="oys-guest-name-' . $i . '" autocomplete="off"></label>'
 				. '<label class="field"><span>' . esc_html__( 'Email (optional, for their invite)', 'olivia-studio' ) . '</span><input type="email" name="guest_email[]" id="oys-guest-email-' . $i . '" autocomplete="off"></label>'
-				. '<button type="button" class="oys-guest__remove" data-guest-remove aria-label="' . esc_attr__( 'Remove guest', 'olivia-studio' ) . '">×</button></div>';
+				. '<button type="button" class="oys-guestrow__remove" data-guest-remove aria-label="' . esc_attr__( 'Remove guest', 'olivia-studio' ) . '">×</button></div>';
 		}
 		return '<fieldset class="oys-guests" data-guests data-max="' . (int) $max . '"><legend>' . esc_html__( 'Bringing friends?', 'olivia-studio' ) . '</legend>'
 			. '<p class="oys-small">' . sprintf( esc_html__( 'Add up to %d guests. Each guest takes one spot and is paid from your pass or by card, together with your booking.', 'olivia-studio' ), (int) $max ) . '</p>'

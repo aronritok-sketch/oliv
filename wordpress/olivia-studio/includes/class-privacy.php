@@ -19,7 +19,7 @@ class OYS_Privacy {
 		} );
 		add_action( 'admin_init', function () {
 			if ( function_exists( 'wp_add_privacy_policy_content' ) ) {
-				wp_add_privacy_policy_content( 'Olivia Studio', wp_kses_post( '<p>' . __( 'When you create an account we store your name, email, phone, optional emergency contact and health notes, your bookings, passes and payments. Health notes are only visible to the teacher. Card payments are processed by Stripe; we never see or store card numbers.', 'olivia-studio' ) . '</p>' ) );
+				wp_add_privacy_policy_content( 'Olivia Studio', wp_kses_post( '<p>' . __( 'When you create an account we store your name, email, phone, optional emergency contact and health notes, your bookings, passes, membership and payments. If you bring guests, we store the name and (optional) email you give for them, only to put them on the class list and send them their booking details. Health notes are only visible to the teacher. Card payments are processed by Stripe; we never see or store card numbers.', 'olivia-studio' ) . '</p>' ) );
 			}
 		} );
 	}

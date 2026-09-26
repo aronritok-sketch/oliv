@@ -381,6 +381,16 @@ async function payOnMockStripe(page, button = '#pay') {
   check(await e.isVisible('text=Too many failed attempts'), 'login locked after repeated failures');
   php(`global $wpdb; $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient%oys_rl_%'");`);
 
+  // 25. No page scrolls sideways (logged out and logged in, desktop and phone).
+  const overflow = async (page, url) => { await page.goto(url); return page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth); };
+  const anon = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+  const phone = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+  for (const path of ['/', '/schedule-pricing/', '/book/', '/account/', '/gift-cards/', '/private-yoga/', `/book/?session=${g1}`]) {
+    check(await overflow(anon, BASE + path) <= 0, `no sideways scroll, logged out: ${path}`);
+    check(await overflow(phone, BASE + path) <= 0, `no sideways scroll, phone: ${path}`);
+    check(await overflow(a, BASE + path) <= 0, `no sideways scroll, logged in: ${path}`);
+  }
+
   // Screens for review.
   await a.goto(`${BASE}/schedule-pricing/`);
   await a.screenshot({ path: `${SHOTS}/10-schedule-pricing.png`, fullPage: true });

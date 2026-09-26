@@ -457,6 +457,7 @@ abbr[title] { text-decoration: none; }
 .price li::before { content: "✺"; position: absolute; left: 0; top: 0; font-size: .75em; }
 .price .btn { margin-top: auto; padding: .95em 1.1em; font-size: .76rem; }
 .sticker--price { width: 96px; right: -18px; top: -34px; }
+@media (max-width: 600px) { .sticker--price { right: 2px; width: 84px; } }
 .sticker--price text { font-size: 12.5px; }
 .sticker--price .sticker__core { font-size: 1.4rem; }
 

@@ -135,12 +135,12 @@
 .oys-guests .oys-small { margin: 0; }
 .oys-guests [data-guest-add] { justify-self: start; }
 .oys-guests [data-guest-add][hidden] { display: none; }
-.oys-guest { display: grid; grid-template-columns: 1fr 1fr auto; gap: .6rem; align-items: end; padding-top: .7rem; border-top: 1px solid var(--oys-line); }
-.oys-guest[hidden] { display: none; }
-.oys-guest__n { grid-column: 1 / -1; font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--oys-muted); margin-bottom: -.3rem; }
-.oys-guest__remove { width: 40px; height: 44px; border: 2px solid var(--oys-ink); border-radius: 6px; background: transparent; font-size: 1.3rem; line-height: 1; cursor: pointer; color: var(--oys-ink); }
-.oys-guest__remove:hover { background: var(--oys-pink); }
-@media (max-width: 560px) { .oys-guest { grid-template-columns: 1fr auto; } .oys-guest .field { grid-column: 1; } .oys-guest__remove { grid-row: 2; grid-column: 2; } }
+.oys-guestrow { display: grid; grid-template-columns: 1fr 1fr auto; gap: .6rem; align-items: end; padding-top: .7rem; border-top: 1px solid var(--oys-line); }
+.oys-guestrow[hidden] { display: none; }
+.oys-guestrow__n { grid-column: 1 / -1; font-size: .68rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--oys-muted); margin-bottom: -.3rem; }
+.oys-guestrow__remove { width: 40px; height: 44px; border: 2px solid var(--oys-ink); border-radius: 6px; background: transparent; font-size: 1.3rem; line-height: 1; cursor: pointer; color: var(--oys-ink); }
+.oys-guestrow__remove:hover { background: var(--oys-pink); }
+@media (max-width: 560px) { .oys-guestrow { grid-template-columns: 1fr auto; } .oys-guestrow .field { grid-column: 1; } .oys-guestrow__remove { grid-row: 2; grid-column: 2; } }
 .oys-party { margin: .2rem 0 .4rem; font-size: .92rem; color: var(--oys-muted); }
 .oys-party b { color: var(--oys-ink); font-size: 1.1rem; }
 .oys-option__label small { display: block; font-weight: 500; font-size: .8rem; color: var(--oys-muted); margin-top: .15rem; }
