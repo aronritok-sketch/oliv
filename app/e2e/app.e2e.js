@@ -197,6 +197,7 @@ const tid = (id) => `[data-testid="${id}"]`;
   await shot('09-passes');
   await page.goto(`${APP}/profile`);
   await page.waitForSelector(tid('logout'));
+  await page.waitForSelector(`text=${email}`, { timeout: 10000 }).catch(() => {});
   check(await page.isVisible(`text=${email}`), 'profile shows the email');
   check(await page.isVisible('text=Accepted. Thank you!'), 'agreement shown as accepted');
   await shot('10-profile');

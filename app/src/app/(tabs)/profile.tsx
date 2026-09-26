@@ -4,14 +4,16 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 
 import { Screen } from '@/components/screen';
-import { Button, Card, Notice, T } from '@/components/ui';
+import { Button, Card, Loading, Notice, T } from '@/components/ui';
 import { Colors, Radius, Spacing } from '@/constants/theme';
 import { ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
 import { plainText } from '@/lib/format';
+import { useLoad } from '@/lib/use-load';
 
 export default function Profile() {
-  const { me, api, setMe, logout } = useAuth();
+  const { me, api, setMe, logout, refreshMe } = useAuth();
+  const { error: loadError, refreshing, refresh } = useLoad(refreshMe);
   const [showWaiver, setShowWaiver] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -38,7 +40,9 @@ export default function Profile() {
   ];
 
   return (
-    <Screen eyebrow="Profile" title={me?.user.first_name || 'Profile'} testID="profile">
+    <Screen eyebrow="Profile" title={me?.user.first_name || 'Profile'} refreshing={refreshing} onRefresh={refresh} testID="profile">
+      {!me && !loadError ? <Loading /> : null}
+      {!me && loadError ? <Notice tone="error" text={loadError} /> : null}
       {me ? (
         <Card>
           <T variant="heading">{me.user.name}</T>
