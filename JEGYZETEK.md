@@ -39,6 +39,14 @@
 - **Biztonság:** belépési próbálkozások korlátozása, regisztráció-korlát.
 - **Tesztek:** 77 integrációs + 93 böngészős ellenőrzés, `wordpress/dev/ci.sh` nulláról; GitHub Actions minden pushnál.
 
+## 4. kör: hibajavítás, online órák, naptár (2026-09-26)
+- **Hiba javítva:** kártyás fizetés elkezdve, de nem befejezve (böngésző Vissza gomb) → az óra „foglaltnak” látszott. Most nem számít foglalásnak;
+  „Continue to payment” gomb, vagy újrafoglalás (a régi Stripe fizetés lezárul, dupla terhelés nincs).
+- **Online órák:** $6 drop-in (beállítás), online bérlet 10 óra $50 (MINTA), 1 stúdióalkalom = 4 online óra (beállítás: Studio → Settings → Online classes),
+  tagságban benne van és nem számít a havi keretbe; online magánóra olcsóbb (60/75/90 perc: $65/$80/$95 MINTA).
+- **Admin naptár:** Studio → Calendar – kattintós, húzható heti nézet, heti ismétlés, „csak ez a nap / ez és a következő hetek”, e-mail a foglalóknak.
+- Tesztek: 120 integrációs + 128 böngészős ellenőrzés.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb.
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

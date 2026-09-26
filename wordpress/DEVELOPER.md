@@ -219,7 +219,9 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 | `start_time` | `HH:MM`, **helyi idő** |
 | `duration_min`, `capacity`, `price_cents` | hossz, férőhely, drop-in ár |
 | `location`, `online_url`, `note` | hely, online link (csak foglalóknak látszik), rövid megjegyzés |
+| `format` | `studio` (személyes) · `online` (élő közvetítés) |
 | `active` | 0 = nem generál új alkalmat |
+| `valid_from` | az első dátum, amitől ismétlődik (a naptárból létrehozott heti óránál); NULL = azonnal |
 
 **`sessions`** – egy konkrét, foglalható alkalom
 
@@ -230,6 +232,8 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 | `starts_at`, `ends_at` | UTC |
 | `capacity`, **`booked`** | `booked` = megerősített foglalások + **le nem járt** fizetési tartások. **Denormalizált számláló**, atomikusan módosul (lásd 6.1). |
 | `price_cents` | drop-in ár; 0 = ingyenes |
+| `format` | `studio` · `online` – online óránál online kredit fizet, és a tagsági keretbe nem számít (6.10) |
+| `template_id`, `tpl_slot` | melyik heti órából jött, és az **eredeti** időpontja; ha egy dátumot áthelyeznek vagy lemondanak, a `tpl_slot` marad, így a generálás nem hozza létre újra |
 | `credits_allowed` | 1 = bérletből foglalható |
 | `status` | `scheduled` · `cancelled` |
 | `template_id` | honnan generálódott (0 = egyedi). A generálás a (`template_id`, `starts_at`) páros alapján hagyja ki a már létezőt (indexelt, de nem UNIQUE) |
@@ -312,6 +316,7 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 | `intro` | bevezető ajánlat – csak `OYS_Orders::is_new_customer()` esetén vehető (alapból inaktív) | `class` |
 | `private_pack` | magánóra-csomag | `private` |
 | `private_single` | egy magánóra ára adott hosszra – árlista és ajándék (ajándékként 1 privát kredit) | `private` |
+| `online_pack` | online bérlet: `credits` online óra | `online` |
 | `membership` | tagság: `price_cents` / `interval_count` × `interval` (`month`/`year`), `classes_per_period` csoportos óra periódusonként (0 = korlátlan) | – (nem kredit) |
 
 A drop-in ár nem termék: az alkalom (`sessions.price_cents`) vagy a sablon adja.
@@ -356,6 +361,7 @@ stateDiagram-v2
 ```
 
 - **Tartás** (`hold`): `hold_minutes` (min. 30) **+ 5 perc** – mindig tovább él, mint a Stripe Checkout Session, ami lejárat után már nem fizethető.
+- **A tartás nem foglalás.** `active_for()` csak `confirmed/attended/no_show` sort ad vissza; a be nem fejezett kártyás fizetést `unfinished_for()` adja. Ha az ügyfél a böngésző Vissza gombjával hagyja ott a Stripe oldalt (nem a Stripe „vissza” linkjével), az óra oldalán „Your payment wasn't finished” doboz jelenik meg „Continue to payment” gombbal (`orders.meta.checkout_url`). Ha inkább újra foglal, a `handle_checkout()` először `abandon_unfinished()`-t hív: lezárja a régi Stripe Checkoutot (`/expire`), és felszabadítja a helyeket. Ha a Stripe szerint a régi már ki lett fizetve (az expire hibát ad), akkor `sync_session()` teljesíti, és nem indul második fizetés.
 - Ha a fizetés **a tartás lejárta után** érkezik (pl. késő aszinkron fizetés), a `confirm_order()` soronként újra helyet kér; ha nincs, akkor is megerősíti (a vendég fizetett), a számlálót túltolja, és e-mailben szól a stúdiónak.
 - **Lemondás szabálya** (`cancel()`):
 
@@ -502,6 +508,30 @@ sequenceDiagram
 - **Árváltozás:** a csomag árának módosítása csak az új tagokra érvényes (a Stripe-ban a meglévő előfizetés ára marad).
 - **MRR:** a foglalható, nem lemondott tagságok havi díjának összege (`OYS_Memberships::mrr()`), a Today és a Memberships oldalon.
 
+### 6.10 Online órák
+
+- Az alkalom (és a heti óra) `format` mezője `studio` vagy `online`. Online órát a naptárban az „In person / Online” kapcsolóval lehet beállítani; új online óra az `online_price_cents` beállítás árát kapja (alap $6), de óránként átírható.
+- **Kredit:** `OYS_Bookings::credit_kind()` online csoportos órára `online`. Fizetési sorrend: online kredit (online bérlet, pl. `online-10`: 10 óra $50) → ha nincs, **átváltás**: `OYS_Passes::consume_for()` levon 1 stúdió kreditet, és létrehoz egy `online` bérletet `online_per_credit` (alap 4) kredittel, ugyanazzal a lejárattal (`source = convert`, név: „Online classes (from 5-class pass)”), és abból használ 1-et. Így 1 stúdióalkalom = 4 online óra. `available_for()` ezt már beszámolja (a foglalóoldal „Use my pass (4 online classes)”).
+- Online kredittel stúdióórát nem lehet fizetni.
+- **Lemondás** időben: a kredit az online bérletre jár vissza; kártyás online drop-in után „Online class credit” jár.
+- **Tagság:** az online órákat minden tagság tartalmazza, és a havi keretbe **nem** számítanak (`used_in_period` kihagyja, `covers()` nem nézi a keretet). Ütemezett lemondásnál a periódus vége rájuk is vonatkozik.
+- **Online magánóra:** a `private_single` termékeknek van `online_price_cents` ára (60/75/90 perc: $65/$80/$95 minta); az árlista és a kérés űrlap mutatja; online kérésre az ajánlat ezt az árat tölti ki, és az alkalom `format = online` lesz.
+
+### 6.11 Admin naptár
+
+`OYS_Calendar` (`includes/admin/class-calendar.php`) + `assets/calendar.js` / `calendar.css`, keretrendszer nélkül. Studio → **Calendar** (`page=oys-calendar`, `&week=Y-m-d`, `&open=ID`).
+
+| REST (cookie + `wp_rest` nonce, `oys_manage`) | Mit csinál |
+|---|---|
+| `GET oys/v1/admin/calendar?from=&days=7` | a hét alkalmai helyi időben (`date`, `start`, `duration`), foglalók nevei, várólista, heti óra címkéje |
+| `POST oys/v1/admin/sessions` | új alkalom; `repeat=weekly` esetén heti óra (`valid_from` = a dátum) + generálás |
+| `POST oys/v1/admin/sessions/{id}` | módosítás; `scope=one` csak ez a dátum, `scope=series` ez és a következő hetek (a heti óra is); `notify=true` → `OYS_Emails::session_changed()` a foglalóknak (és az e-mailes vendégeknek), .ics-szel |
+| `POST oys/v1/admin/sessions/{id}/cancel` | `scope=one` egy dátum; `scope=series` a heti óra leállítása (inaktív) + minden további dátum lemondása |
+
+Felület: heti rács (telefonon napi fülek), üres időre kattintás = új óra oldalpanelben (kattintott idő, online kapcsolónál online ár), órára kattintás = szerkesztés (foglalók, várólista, névsor link), **húzás** = áthelyezés (15 perces lépés, másik napra is), **alsó szél húzása** = hossz. Heti óránál párbeszéd: „Only this date” / „This and following weeks”, foglalók esetén „Email the N people booked” pipa. A kapacitás nem mehet a foglalók száma alá. Múltbeli és lemondott alkalom csak olvasható.
+
+Sorozat-módosításnál minden további dátum ugyanannyi nappal tolódik, mint a szerkesztett, és az új kezdési időt kapja; a `tpl_slot` is átíródik, így a generálás nem duplikál. A lemondott dátumok is követik az új időpontot, hogy ne jöjjenek létre újra.
+
 ---
 
 ## 7. Stripe integráció
@@ -583,8 +613,9 @@ admin-post.php?action=oys_admin_{művelet}  →  OYS_Admin::guard()  →  curren
 | Oldal (`page=`) | Tartalom |
 |---|---|
 | `oys` | Ma: KPI-k (30 napos bevétel, 7 napos telítettség, aktív tagok + MRR, új kérések, ügyfelek), mai névsorok (vendégekkel), 7 napos lista |
-| `oys-schedule` | Alkalmak listája (upcoming/past); `&edit=ID` szerkesztés/új (0), lemondás; `&session=ID` névsor, jelenlét, hozzáadás, várólista |
-| `oys-templates` | Heti sablonok soronkénti mentése (HTML `form=` attribútummal), „Create upcoming dates now” |
+| `oys-calendar` | **Naptár** (6.11): heti nézet, hozzáadás, szerkesztés, húzás, heti ismétlés, lemondás |
+| `oys-schedule` | „Rosters & list”: alkalmak listája (upcoming/past); `&edit=ID` klasszikus szerkesztő; `&session=ID` névsor, jelenlét, hozzáadás, várólista, „Edit in calendar” |
+| `oys-templates` | (menüben rejtett, a listáról elérhető) heti órák táblázatként |
 | `oys-private` | Kérések; `&request=ID` ajánlat / elutasítás |
 | `oys-customers` | Keresés; `&user=ID` profil, tagság, bérletek (módosítás, kredit adás), foglalások, fizetések |
 | `oys-members` | Tagok, MRR, fizetési problémák, lemondás periódus végére / visszavonás / azonnali megszüntetés |
@@ -742,23 +773,26 @@ Három szint, mind egy paranccsal futtatható, és a GitHub Actions is ezeket fu
 Valódi WordPress + adatbázis ellen futnak, keretrendszer nélkül (saját `test()` / `ok()` / `eq()`). **Minden teszt egy tranzakcióban fut, amit a végén visszagörget**, így az oldalon nem marad nyoma; a módosított beállításokat a futás végén visszaállítja. A Stripe-hívásokat folyamaton belül válaszolja meg (`pre_http_request`), hálózat nem kell.
 
 ```bash
-WP_DIR=/ut/a/wordpress php wordpress/dev/tests/run.php     # 16 teszt, 77 ellenőrzés
+WP_DIR=/ut/a/wordpress php wordpress/dev/tests/run.php     # 22 teszt, 120 ellenőrzés
 ```
 
-Lefedi: atomikus helyfoglalás · társaság kreditből és visszagörgetés hiányzó kreditnél · lemondás időben/későn, vendégekkel együtt · vendég eltávolítása és utólagos hozzáadása · kártyás tartás, egyszeri teljesítés, lejárat · részleges/teljes visszatérítés · webhook-aláírás (jó, módosított, rossz kulcs, régi) · duplikált webhook · tagsági keret, következő periódus, magánóra kizárása · ütemezett lemondás és véget érés · megújítás egyszeri rögzítése, sikertelen fizetés · várólista tagsággal · ajándékkód egyszer · belépés-zár · Stripe-tételsorok · pénz- és periódus-formázás.
+Lefedi: atomikus helyfoglalás · társaság kreditből és visszagörgetés hiányzó kreditnél · lemondás időben/későn, vendégekkel együtt · vendég eltávolítása és utólagos hozzáadása · kártyás tartás, egyszeri teljesítés, lejárat · részleges/teljes visszatérítés · webhook-aláírás (jó, módosított, rossz kulcs, régi) · duplikált webhook · tagsági keret, következő periódus, magánóra kizárása · ütemezett lemondás és véget érés · megújítás egyszeri rögzítése, sikertelen fizetés · várólista tagsággal · ajándékkód egyszer · belépés-zár · Stripe-tételsorok · online órák (átváltás, online kredit elsőbbsége, társaság, tagsági keret, magánóra ára) · naptár (heti óra létrehozása, egy dátum áthelyezése generálás után sem duplikálódik, sorozat-módosítás e-maillel, leállítás, validálás, kapacitás) · pénz- és periódus-formázás.
 
 ### 16.2 Végpont-teszt (`dev/e2e.js`, Playwright)
 
 Valódi böngészővel kattintja végig a folyamatokat a helyi WordPress + Stripe-szimulátor ellen, közben az adatbázist is ellenőrzi.
 
 ```bash
-WP_DIR=/ut/a/wordpress SHOTS=/tmp/oys-shots node wordpress/dev/e2e.js     # 93 ellenőrzés
+WP_DIR=/ut/a/wordpress SHOTS=/tmp/oys-shots node wordpress/dev/e2e.js     # 128 ellenőrzés
 ```
 
 Lefedi az eddigieket (regisztráció, kártyás foglalás, bérlet, kreditfoglalás, lemondás, várólista, magánóra, ajándékkártya, késő/duplikált webhook, megszakított fizetés, visszatérítés, hamis webhook), plusz:
 - **vendégek:** 2 vendég kártyával (Stripe-számla: saját sor + „Guest ticket × 2”, $75), meghívó e-mail, 2 vendég bérletből, vendég eltávolítása (kredit vissza), vendég utólag, a foglaló lemondása a vendégeket is viszi, hely-korlát a vendégmezőkön;
 - **tagság:** csatlakozás (előfizetés mód), foglalás tagsággal + vendég kártyával (csak a vendég fizet), 4 alkalmas keret betelése, fiók Tagság fül, ügyfélportál, megújítás (új periódus + megújítási fizetés), sikertelen terhelés (past_due + levél), lemondás periódus végére és visszavonás, véget érés (jövőbeli foglalások lemondva);
 - **belépés-zár** ismételt hibás jelszóra;
+- **félbehagyott fizetés:** Stripe oldal elhagyása Vissza gombbal → nem „booked”, „Continue to payment”, újrafoglalás lezárja a régi Stripe oldalt; másik fülön mégis kifizetett régi fizetés felismerése (nincs dupla terhelés);
+- **online órák:** $6 ár, 1 stúdióalkalom = 4 online óra, átváltott bérlet a fiókban, online bérlet vásárlás, árlista, online magánóra ár;
+- **admin naptár:** kattintás üres időre → online óra létrehozása, húzás másik napra, heti óra, sorozat-módosítás e-maillel, heti óra leállítása, telefonos nézet;
 - **nincs vízszintes görgetés** a fő oldalakon kijelentkezve, bejelentkezve és mobilon.
 
 Futásonként új felhasználókat és a teszthez frissen létrehozott órákat használ; képernyőképeket ment a `SHOTS` mappába.
@@ -818,7 +852,9 @@ Implementálja: `POST /v1/customers`, `POST /v1/checkout/sessions` (payment és 
 - Admin és e-mail szövegek csak angolul (fordítás előkészítve, fájl még nincs).
 - Tagság: csomagváltás (upgrade/downgrade) a Stripe ügyfélportálon át nincs bekötve – most lemondás + új csatlakozás; szüneteltetés (pause) csak a Stripe-ban. Az ajándékkártya termék-alapú (nem pénzösszeg), tagság nem ajándékozható.
 - Vendég csak a foglalóval együtt jöhet (önálló vendégfiók nincs); a tagság a vendéget nem fedezi.
-- Privát kredit csak 60 perces alkalomra jó; 75/90 percnél kártyás fizetés.
+- Privát kredit csak 60 perces alkalomra jó; 75/90 percnél kártyás fizetés. Online magánórára is jó (az ügyfél „drágábban” használja).
+- Naptár: csak heti ismétlés (kéthetente / havonta nincs), visszavonás (undo) nincs; a klasszikus táblás szerkesztők megmaradtak tartaléknak.
+- Online kredit átváltása egyirányú (online → stúdió nincs), és a töredék nem vész el, de csak online órára használható.
 - A főoldal szekcióinak szövegei a `front-page.php`-ben vannak (a „Meet your teacher” kivételével); szerkeszthetővé tételük (Customizer / blokkok) a következő kör.
 - E-mail küldés szinkron a webhookban; lassú SMTP esetén nő a webhook válaszideje (az idempotencia miatt nem okoz dupla teljesítést). Nagy forgalomnál: levélküldés háttérfeladatba (Action Scheduler).
 - Részleges visszatérítés semmit nem von vissza automatikusan (szándékos: a stúdió dönt).

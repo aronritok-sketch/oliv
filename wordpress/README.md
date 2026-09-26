@@ -13,6 +13,8 @@ Két rész, mindkettő a WordPress adminban tölthető fel ZIP-ként (`dist/`):
 - Órarend (heti ismétlődő órák + egyedi események), szabad helyek száma, „Book” gomb.
 - Foglalás: bérletből 1 kattintással · tagsággal · egyedi óra kártyával (drop-in) · „vegyél bérletet és foglald le ezt az órát” egy lépésben · bevezető ajánlat új diákoknak (alapból kikapcsolva).
 - **Vendégek hozása:** foglaláskor (vagy utólag) több vendég is (alapból max. 4, beállítható). Bérletnél fejenként 1 alkalom vonódik le a saját bérletből; kártyánál egy fizetésben fizeti ki mindenkit, a Stripe-számlán külön sorban „Guest ticket × N”. A vendégek név szerint szerepelnek a névsoron, a visszaigazolásban, az emlékeztetőben; ha van e-mailjük, saját meghívót kapnak naptármelléklettel. Vendég külön is lemondható; ha a foglaló lemond, a vendégei is.
+- **Online órák:** saját, alacsonyabb ár (alap $6), online bérlet (minta: 10 óra $50). A stúdióbérletből 1 alkalom = 4 online óra (állítható): az első online foglaláskor 1 alkalom átváltódik 4 online órára, a maradék a fiókban marad. A tagság tartalmazza az online órákat, és nem számítanak a havi keretbe. Online magánóra olcsóbban (minta: 60 perc $65).
+- **Félbehagyott fizetés:** ha valaki elindítja a kártyás fizetést, de nem fejezi be, nem számít foglaltnak; az óra oldalán folytathatja a fizetést, vagy újra foglalhat (a régi Stripe fizetés automatikusan lezárul, dupla terhelés nincs).
 - **Havi tagság (Stripe előfizetés):** korlátlan vagy „havi X óra” csomag, automatikus megújítással. A tag egy kattintással foglal, a fiókjában látja a keretet és a következő terhelést, a Stripe ügyfélportálon kártyát cserél és számlát tölt le, lemondhat a periódus végére (és visszavonhatja). Sikertelen terhelésnél e-mail; ha véget ér a tagság, a jövőbeli foglalásai lemondódnak.
 - Fizetés Stripe Checkouttal (kártya, Apple Pay, Google Pay, Link) – a kártyaadat sosem jár a honlapon.
 - Fizetés közben a hely 30 percig foglalva van; ha a vendég visszalép, azonnal felszabadul.
@@ -26,6 +28,7 @@ Két rész, mindkettő a WordPress adminban tölthető fel ZIP-ként (`dist/`):
 
 **Oliviának (wp-admin → Studio)**
 - Ma: bevétel (30 nap), telítettség (7 nap), aktív tagok és havi ismétlődő bevétel (MRR), új magánóra-kérések, mai jelenléti listák (vendégekkel).
+- **Naptár** (Studio → Calendar): heti nézet, telefonon napi. Üres időpontra kattintva új óra, órára kattintva szerkesztés, húzással áthelyezés, az alján húzva hosszabbítás. „Minden héten” ismétlés; heti óránál választható, hogy csak az adott napot vagy a következő heteket is módosítja; a bejelentkezettek e-mailt kaphatnak az új időpontról. Személyes / online kapcsoló.
 - Órarend és névsorok: jelenlét (itt volt / nem jött), valaki hozzáadása (bérletből, készpénz, ajándék), foglalás lemondása, egész óra lemondása (mindenki e-mailt kap, kreditet visszakap).
 - Heti órarend (sablonok) – ebből hetekre előre automatikusan készülnek az alkalmak.
 - Magánóra-kérések: ajánlat küldése / elutasítás.
@@ -62,7 +65,7 @@ Két rész, mindkettő a WordPress adminban tölthető fel ZIP-ként (`dist/`):
 
 ## Élesítés előtti lista
 
-- [ ] Valós órarend, árak, bérlet-érvényesség, tagsági csomagok és vendég-limit (*Studio → Weekly timetable, Prices & passes, Settings*). A mostani adatok MINTA adatok (tagság: $119 korlátlan, $85 havi 4 óra).
+- [ ] Valós órarend (*Studio → Calendar*), árak, bérlet-érvényesség, tagsági csomagok, online ár és átváltás (1 alkalom = hány online óra), vendég-limit (*Prices & passes, Settings*). A mostani adatok MINTA adatok (tagság: $119 korlátlan, $85 havi 4 óra).
 - [ ] A minta esemény („Live-Music Slow Flow…”) törlése vagy valódira cserélése.
 - [ ] Részvételi nyilatkozat és lemondási szabály szövegét ügyvéd nézze át (*Studio → Settings*).
 - [ ] Adatvédelmi oldal (*Beállítások → Adatvédelem*) – a plugin javasolt szöveget ad hozzá.
@@ -79,8 +82,8 @@ Részletes fejlesztői dokumentáció (architektúra, adatmodell, folyamatok, ho
 
 - `mock-stripe.php` – Stripe-szimulátor (fizetés, előfizetés, ügyfélportál, aláírt webhookok, megújítás / sikertelen terhelés szimulálása).
 - `mu-plugins/dev-mail-catcher.php` – küldés helyett fájlba írja a leveleket. `router.php` – PHP beépített szerverhez.
-- `tests/run.php` – integrációs tesztek (77 ellenőrzés, visszagörgetett tranzakciókban, az oldalon nem hagynak nyomot).
-- `e2e.js` – böngészős végpont-teszt (Playwright), 93 ellenőrzés: foglalás minden fizetési móddal, vendégek (kártya, bérlet, utólag, eltávolítás, lemondás), tagság (csatlakozás, keret, megújítás, sikertelen terhelés, lemondás, véget érés), várólista, magánóra, ajándékkártya, webhook-hibák, visszatérítés, belépés-zár, mobil nézet.
+- `tests/run.php` – integrációs tesztek (120 ellenőrzés, visszagörgetett tranzakciókban, az oldalon nem hagynak nyomot).
+- `e2e.js` – böngészős végpont-teszt (Playwright), 128 ellenőrzés: foglalás minden fizetési móddal, félbehagyott fizetés, online órák és átváltás, admin naptár (kattintás, húzás, heti ismétlés), vendégek (kártya, bérlet, utólag, eltávolítás, lemondás), tagság (csatlakozás, keret, megújítás, sikertelen terhelés, lemondás, véget érés), várólista, magánóra, ajándékkártya, webhook-hibák, visszatérítés, belépés-zár, mobil nézet.
 - `ci.sh` – minden egyben, nulláról (WordPress letöltése, telepítés, tesztek). A GitHub Actions minden pushnál ezt futtatja (`.github/workflows/ci.yml`).
 
 ```
