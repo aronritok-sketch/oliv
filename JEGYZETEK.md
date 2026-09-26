@@ -21,7 +21,19 @@
 - A preview-hoz Pillow kell: `pip install pillow`.
 - Az artifact frissítése: a `preview.html`-t kell újra publikálni a v2 linkre (`url` paraméterrel), hogy a link ne változzon.
 
+## WordPress verzió (2026-09-26)
+- `wordpress/olivia-yoga` – téma (az Urban flow dizájn), `wordpress/olivia-studio` – foglalás + fizetés plugin.
+- Telepíthető csomagok: `wordpress/dist/*.zip`; teljes leírás és élesítési lista: `wordpress/README.md`.
+- Tudja: órarend és helyfoglalás, Stripe fizetés (kártya/Apple Pay/Google Pay), bérletek és kreditek, várólista automatikus beléptetéssel,
+  lemondási szabály, részvételi nyilatkozat, magánóra kérés → ajánlat → fizetés, ajándékkártya, ügyfélfiók, e-mailek naptármelléklettel,
+  emlékeztető, admin (napi nézet, névsor/jelenlét, ügyfelek, fizetések és visszatérítés, árak, beállítások).
+- Tesztelve helyben (WordPress 6.8.3 + MariaDB + Stripe-szimulátor): `wordpress/dev/e2e.js`, 30/30 ellenőrzés sikeres.
+- Élesítéshez kell: tárhely, Stripe fiók + kulcsok + webhook, SMTP, cron, valós órarend/árak, ügyvéd a nyilatkozathoz.
+
 ## Következő kör – nyitott pontok / ötletek
+- Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb.
+- Havi korlátlan tagság (Stripe előfizetés), ha kell.
+- Főoldal szövegeinek szerkeszthetővé tétele a Customizerben.
 - Ügyfél-visszajelzés a színarányokra (mennyi pink / lila / barack).
 - Hero: címsor mérete, a matrica és a névkártya elhelyezése.
 - Mobil finomhangolás (hero, órarend, árkártyák).

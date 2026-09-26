@@ -91,8 +91,8 @@ class OYS_Frontend {
 				$mine  = $user_id ? OYS_Bookings::active_for( $user_id, $s->id ) : null;
 				$wait  = $user_id && ! $mine ? OYS_Bookings::waitlist_position( $user_id, $s->id ) : 0;
 				$class_url = apply_filters( 'oys_class_url', '', $s->class_slug );
-				$title = esc_html( oys_session_title( $s ) );
-				$title = $class_url && 'group' === $s->kind ? '<a href="' . esc_url( $class_url ) . '">' . $title . '</a>' : $title;
+				$plain     = esc_html( oys_session_title( $s ) );
+				$title     = $class_url && 'group' === $s->kind ? '<a href="' . esc_url( $class_url ) . '">' . $plain . '</a>' : $plain;
 
 				if ( $mine && 'pending' !== $mine->status ) {
 					$action = '<span class="session__status is-booked">' . oys_icon( 'check' ) . esc_html__( 'You\'re booked', 'olivia-studio' ) . '</span>';
@@ -103,7 +103,7 @@ class OYS_Frontend {
 				} elseif ( $left < 1 ) {
 					$action = '<a class="session__book" href="' . esc_url( oys_book_url( $s->id ) ) . '">' . esc_html__( 'Full · join waitlist', 'olivia-studio' ) . oys_icon( 'arrow' ) . '</a>';
 				} else {
-					$action = '<a class="session__book" href="' . esc_url( oys_book_url( $s->id ) ) . '">' . esc_html__( 'Book', 'olivia-studio' ) . '<span class="sr-only"> ' . $title . ', ' . esc_html( oys_date( $s->starts_at, 'l g:i a' ) ) . '</span>' . oys_icon( 'arrow' ) . '</a>';
+					$action = '<a class="session__book" href="' . esc_url( oys_book_url( $s->id ) ) . '">' . esc_html__( 'Book', 'olivia-studio' ) . '<span class="sr-only"> ' . $plain . ', ' . esc_html( oys_date( $s->starts_at, 'l g:i a' ) ) . '</span>' . oys_icon( 'arrow' ) . '</a>';
 				}
 				$spots = $left < 1 ? __( 'Full', 'olivia-studio' ) : ( $left <= 3 ? sprintf( _n( '%d spot left', '%d spots left', $left, 'olivia-studio' ), $left ) : '' );
 				$out[] = '<li class="session session--' . esc_attr( $tone ) . '">'
@@ -656,7 +656,7 @@ class OYS_Frontend {
 		$credits = OYS_Passes::balance( $user_id, 'class' );
 		$private = OYS_Passes::balance( $user_id, 'private' );
 		$next    = OYS_Bookings::for_user( $user_id, 'upcoming', array( 'confirmed' ) );
-		$out     = $flash . '<div class="oys-account"><header class="oys-account__head"><div><p class="kicker">' . esc_html__( 'My account', 'olivia-studio' ) . '</p><h2>' . sprintf( esc_html__( 'Hi, %s', 'olivia-studio' ), esc_html( $user->first_name ?: $user->display_name ) ) . '</h2></div>'
+		$out     = $flash . '<div class="oys-account"><header class="oys-account__head"><div><h2>' . sprintf( esc_html__( 'Hi, %s', 'olivia-studio' ), esc_html( $user->first_name ?: $user->display_name ) ) . '</h2></div>'
 			. '<dl class="oys-stats"><div class="oys-stat oys-stat--lilac"><dt>' . esc_html__( 'Classes on passes', 'olivia-studio' ) . '</dt><dd>' . (int) $credits . '</dd></div>'
 			. ( $private ? '<div class="oys-stat oys-stat--sun"><dt>' . esc_html__( 'Private sessions', 'olivia-studio' ) . '</dt><dd>' . (int) $private . '</dd></div>' : '' )
 			. '<div class="oys-stat oys-stat--pink"><dt>' . esc_html__( 'Upcoming', 'olivia-studio' ) . '</dt><dd>' . count( $next ) . '</dd></div></dl></header>';

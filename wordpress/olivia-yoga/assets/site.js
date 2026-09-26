@@ -30,19 +30,19 @@
 	document.addEventListener('keydown', function (e) {
 		if (e.key !== 'Escape') return;
 		if (body.classList.contains('nav-open')) { setNav(false); toggle && toggle.focus(); }
-		document.querySelectorAll('.has-sub.is-open').forEach(function (li) { li.classList.remove('is-open'); });
+		document.querySelectorAll('.has-sub.is-open, .menu-item-has-children.is-open').forEach(function (li) { li.classList.remove('is-open'); });
 	});
 	document.addEventListener('click', function (e) {
 		var a = e.target.closest('a');
 		if (a && body.classList.contains('nav-open')) setNav(false);
 		var t = e.target.closest('.sub-toggle');
 		if (t) {
-			var li = t.closest('.has-sub');
+			var li = t.closest('.has-sub, .menu-item-has-children');
 			var open = !li.classList.contains('is-open');
 			li.classList.toggle('is-open', open);
 			t.setAttribute('aria-expanded', open ? 'true' : 'false');
-		} else if (!e.target.closest('.has-sub')) {
-			document.querySelectorAll('.has-sub.is-open').forEach(function (li) { li.classList.remove('is-open'); });
+		} else if (!e.target.closest('.has-sub, .menu-item-has-children')) {
+			document.querySelectorAll('.has-sub.is-open, .menu-item-has-children.is-open').forEach(function (li) { li.classList.remove('is-open'); });
 		}
 	});
 

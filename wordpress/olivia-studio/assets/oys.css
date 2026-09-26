@@ -1,6 +1,6 @@
 /* Olivia Studio — booking UI. Uses the theme's tokens when present, with fallbacks. */
 
-.oys-checkout, .oys-account, .oys-card, .oys-schedule { --oys-ink: var(--ink, #12231A); --oys-card: var(--card, #FBFBF8); --oys-line: var(--line, rgba(18,35,26,.16)); --oys-muted: var(--muted, #53635A); --oys-forest: var(--forest, #2B5036); --oys-lilac: var(--lilac, #C6A3EE); --oys-pink: var(--pink, #FF72B6); --oys-sun: var(--sun, #FF8C42); --oys-orchid: var(--orchid, #D92B86); --oys-paper: var(--paper, #F3F2EC); }
+:root { --oys-ink: var(--ink, #12231A); --oys-card: var(--card, #FBFBF8); --oys-line: var(--line, rgba(18,35,26,.16)); --oys-muted: var(--muted, #53635A); --oys-forest: var(--forest, #2B5036); --oys-lilac: var(--lilac, #C6A3EE); --oys-pink: var(--pink, #FF72B6); --oys-sun: var(--sun, #FF8C42); --oys-orchid: var(--orchid, #D92B86); --oys-paper: var(--paper, #F3F2EC); }
 
 .oys-icon { width: 20px; height: 20px; flex: none; }
 .oys-hp { position: absolute; left: -9999px; }
@@ -115,6 +115,8 @@
 .oys-account__body { overflow-x: auto; }
 
 /* Gift cards */
+.oys-form fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+.oys-form fieldset > legend { padding: 0; }
 .oys-gifts { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); margin: .8rem 0 1.5rem; }
 .oys-gift { position: relative; display: block; cursor: pointer; }
 .oys-gift input { position: absolute; opacity: 0; }

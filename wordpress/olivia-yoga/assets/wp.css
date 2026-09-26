@@ -1,0 +1,71 @@
+/* WordPress-specific additions to the "Urban flow" design (site.css). */
+
+/* Editor content: readable measure, wide blocks break out */
+.entry > * { max-width: 68ch; margin-block: 0; }
+.entry > * + * { margin-top: 1em; }
+.entry > .block-wide, .entry > .oys-checkout, .entry > .oys-account, .entry > .oys-schedule, .entry > .oys-pricing,
+.entry > .oys-gifts, .entry > form, .entry > .oys-card, .entry > .oys-notice, .entry > .oys-intro, .layout--studio .entry > * { max-width: none; }
+.entry > .block-wide { margin-block: 2rem; }
+.entry > h2 { font-size: clamp(1.9rem, 1.4rem + 1.8vw, 2.8rem); margin-top: 1.6em; }
+.entry > h2:first-child { margin-top: 0; }
+.entry > h3 { margin-top: 1.5em; }
+.entry ul, .entry ol { padding-left: 0; list-style: none; }
+.entry ul:not([class]) li { position: relative; padding-left: 1.5rem; margin: .5rem 0; }
+.entry ul:not([class]) li::before { content: "✺"; position: absolute; left: 0; top: 0; color: var(--orchid); font-size: .85em; }
+.entry ol:not([class]) { counter-reset: o; }
+.entry ol:not([class]) li { counter-increment: o; position: relative; padding-left: 3rem; margin: .9rem 0; }
+.entry ol:not([class]) li::before { content: "0" counter(o); position: absolute; left: 0; top: -.2em; font-family: var(--f-display); color: var(--orchid); font-size: 1.6rem; line-height: 1; }
+.entry blockquote { margin: 2.2rem 0; padding: 1.6rem 1.8rem; background: var(--lilac); border: 2px solid var(--ink); border-radius: var(--radius); box-shadow: 6px 6px 0 var(--ink); font-family: var(--f-display); text-transform: uppercase; font-size: var(--step-2); line-height: 1.1; color: var(--ink); }
+.entry blockquote p { margin: 0; }
+.entry strong { color: var(--ink); }
+.entry img { height: auto; border-radius: var(--radius); }
+.entry .btn-row { margin-top: 1.5rem; }
+.layout--studio { padding-top: clamp(32px, 5vw, 56px); }
+
+/* Menus from Appearance → Menus */
+.nav .menu-item-has-children { position: relative; }
+.nav .sub-menu {
+	position: absolute; left: -1rem; top: calc(100% + 18px); min-width: 250px; list-style: none; margin: 0; padding: .5rem; z-index: 5;
+	background: var(--card); border: 2px solid var(--ink); box-shadow: 6px 6px 0 var(--lilac);
+	opacity: 0; visibility: hidden; transform: translateY(6px); transition: opacity .2s, transform .2s, visibility 0s .2s;
+}
+.nav .sub-menu a { display: block; padding: .55rem .75rem; }
+.nav .sub-menu a:hover { background: var(--lilac-soft); text-decoration: none; }
+.nav .menu-item-has-children:hover > .sub-menu, .nav .menu-item-has-children:focus-within > .sub-menu, .nav .menu-item-has-children.is-open > .sub-menu { opacity: 1; visibility: visible; transform: none; transition-delay: 0s; }
+.nav .current-menu-item > a, .nav .current-menu-ancestor > a, .nav .current_page_parent > a { text-decoration: underline; text-decoration-color: var(--orchid); text-decoration-thickness: 3px; text-underline-offset: .5em; }
+.drawer .sub-menu { list-style: none; margin: .2rem 0 .6rem; padding: 0; }
+.drawer .sub-menu a { font-family: var(--f-text) !important; text-transform: none !important; font-size: 1rem !important; color: var(--sage) !important; padding: .15rem 0 .15rem 1rem !important; }
+.drawer .sub-toggle { display: none; }
+
+.header-account { display: none; align-items: center; gap: .4rem; text-decoration: none; color: var(--ink); font-weight: 700; font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; font-variation-settings: "wdth" 110; }
+.header-account .icon { width: 20px; height: 20px; }
+.header-account:hover { color: var(--orchid); }
+@media (min-width: 760px) { .header-account { display: inline-flex; } }
+@media (max-width: 1179px) { .header-account { margin-left: auto; } .brand { margin-right: 0; } .site-header__inner { gap: 1rem; } }
+@media (min-width: 1180px) { .nav > ul { gap: 1.1rem; } }
+
+/* Logged-in admins: keep the sticky header under the admin bar */
+.admin-bar .site-header { top: calc(32px + env(safe-area-inset-top, 0px)); }
+@media (max-width: 782px) { .admin-bar .site-header { top: 0; } }
+
+/* Events list on a light page */
+.oy-events-dark { background: var(--moss); color: #D7E1D2; border-radius: var(--radius); padding: 1rem clamp(1rem, 3vw, 1.75rem) 1.25rem; border: 2px solid var(--ink); }
+.oy-events-dark .events { border-top: 0; }
+.oy-events-dark .oys-empty { color: var(--sage); margin: .5rem 0; }
+
+/* Pagination */
+.pagination .nav-links { display: flex; gap: .5rem; margin-top: 2rem; flex-wrap: wrap; }
+.pagination .page-numbers { padding: .55rem .9rem; border: 2px solid var(--ink); border-radius: 999px; text-decoration: none; color: var(--ink); font-weight: 700; }
+.pagination .page-numbers.current { background: var(--ink); color: var(--paper); }
+
+/* Contact form error notice */
+.form__notice.oys-notice--error { background: #FFE0EE; color: var(--ink); border: 2px solid var(--orchid); }
+
+/* Header fits at laptop widths */
+.nav a, .header-cta, .brand__name { white-space: nowrap; }
+@media (min-width: 1180px) and (max-width: 1399px) {
+	.brand__sub { display: none; }
+	.nav > ul { gap: .9rem; }
+	.nav a { font-size: .86rem; }
+	.header-account span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+}
