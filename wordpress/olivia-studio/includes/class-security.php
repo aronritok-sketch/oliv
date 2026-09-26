@@ -15,7 +15,8 @@ class OYS_Security {
 
 	public static function init() {
 		// wp-login.php and our own form both end in wp_signon → these hooks cover both.
-		add_filter( 'authenticate', array( __CLASS__, 'block_if_locked' ), 5, 2 );
+		// Priority 99: after WordPress has checked the password, so the lock can't be bypassed.
+		add_filter( 'authenticate', array( __CLASS__, 'block_if_locked' ), 99, 2 );
 		add_action( 'wp_login_failed', array( __CLASS__, 'record_failure' ) );
 		add_action( 'wp_login', array( __CLASS__, 'clear_on_success' ), 10, 1 );
 	}

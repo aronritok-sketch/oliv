@@ -45,6 +45,8 @@ async function payOnMockStripe(page, button = '#pay') {
 
 (async () => {
   const stamp = Date.now();
+  // Rate-limit counters from earlier runs (all test sign-ups come from 127.0.0.1).
+  php(`global $wpdb; $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient%oys_rl_%'");`);
   const browser = await chromium.launch(process.env.HTTPS_PROXY ? { args: ['--proxy-server=' + process.env.HTTPS_PROXY, '--proxy-bypass-list=127.0.0.1;localhost', '--ignore-certificate-errors'] } : {});
   const ctxA = await browser.newContext({ viewport: { width: 1280, height: 900 } });
   const a = await ctxA.newPage();
@@ -202,6 +204,182 @@ async function payOnMockStripe(page, button = '#pay') {
   // 11. Security: a forged webhook is rejected.
   const forged = execSync(`curl -s -o /dev/null -w "%{http_code}" -X POST -H "Stripe-Signature: t=${Math.floor(Date.now() / 1000)},v1=deadbeef" -d '{"id":"evt_x","type":"checkout.session.completed","data":{"object":{}}}' ${BASE}/wp-json/oys/v1/stripe-webhook`).toString();
   check(forged === '400', 'forged webhook rejected (400)');
+
+
+  // ---------- Guests ----------
+  const used = [s1, s2, s3, s4];
+  let freshN = 0;
+  const fresh = () => {
+    // A new group class 2+ days ahead, just for this test step.
+    freshN++;
+    const id = php(`$t = time() + (2 * DAY_IN_SECONDS) + (${freshN} * 3 * HOUR_IN_SECONDS); echo OYS_Schedule::save(array('kind'=>'group','class_slug'=>'hatha-flow','starts_at'=>gmdate('Y-m-d H:i:s',$t),'ends_at'=>gmdate('Y-m-d H:i:s',$t+3600),'capacity'=>12,'location'=>'Test studio','price_cents'=>2500,'credits_allowed'=>1,'status'=>'scheduled'));`);
+    used.push(id);
+    return id;
+  };
+  const rowsOf = (sid) => JSON.parse(q(`SELECT id, status, paid_with, guest_of, guest_name, guest_email, order_id FROM wp_oys_bookings WHERE session_id=${sid} ORDER BY id`));
+  async function addGuests(page, names, emails = []) {
+    for (let i = 0; i < names.length; i++) {
+      if (!(await page.isVisible(`#oys-guest-name-${i}`))) await page.click('[data-guest-add]');
+      await page.fill(`#oys-guest-name-${i}`, names[i]);
+      if (emails[i]) await page.fill(`#oys-guest-email-${i}`, emails[i]);
+    }
+  }
+
+  // 12. Card: Anna + 2 guests, one receipt with separate guest line.
+  const g1 = fresh();
+  await a.goto(`${BASE}/book/?session=${g1}`);
+  await addGuests(a, ['Bea Guest', 'Cora Guest'], [`bea.guest${stamp}@example.com`]);
+  const partySize = (await a.textContent('[data-party-size]')).trim();
+  check(partySize === '3', 'party size shows 3 people (got ' + partySize + ')');
+  await a.check('input[value="card"]');
+  await a.screenshot({ path: `${SHOTS}/13-guests-book.png`, fullPage: true });
+  await a.click('.oys-submit');
+  await a.waitForURL(/8090\/pay/);
+  const lines = await a.$$eval('tr.line', rs => rs.map(r => r.textContent.replace(/\s+/g, ' ')));
+  check(lines.length === 2 && /Guest ticket/.test(lines[1]) && /× 2/.test(lines[1]), 'Stripe receipt: own spot + "Guest ticket × 2" line');
+  check(/Total \$75/.test(await a.textContent('#total')), 'total is 3 × $25');
+  await a.screenshot({ path: `${SHOTS}/14-guests-stripe.png` });
+  await Promise.all([a.waitForNavigation({ url: /oys_return=success/ }), a.click('#pay')]);
+  check(await a.isVisible('text=Guests: Bea Guest, Cora Guest'), 'return page lists the guests');
+  let rows = rowsOf(g1);
+  check(rows.length === 3 && rows.every(r => r.status === 'confirmed' && r.paid_with === 'card'), 'three confirmed rows, all paid by card');
+  check(rows.filter(r => r.guest_of == rows[0].id).length === 2, 'guest rows linked to the host booking');
+  const o12 = JSON.parse(q(`SELECT amount_cents, description FROM wp_oys_orders WHERE id=${rows[0].order_id}`))[0];
+  check(o12.amount_cents == 7500 && /\+2 guests/.test(o12.description), 'order: $75, description mentions +2 guests');
+  check(mailSubjects().some(s => s && /booked you into/.test(s)), 'guest with email got an invite');
+  check(JSON.parse(q(`SELECT booked FROM wp_oys_sessions WHERE id=${g1}`))[0].booked == 3, 'three seats taken');
+
+  // 13. Pass: Anna brings 2 guests on her pass.
+  const g2 = fresh();
+  const before13 = bal();
+  await a.goto(`${BASE}/book/?session=${g2}`);
+  await addGuests(a, ['Dora Guest', 'Emil Guest']);
+  await a.check('input[value="credit"]');
+  await Promise.all([a.waitForNavigation(), a.click('.oys-submit')]);
+  rows = rowsOf(g2);
+  check(rows.length === 3 && rows.every(r => r.paid_with === 'credit'), 'party booked from the pass');
+  check(bal() === before13 - 3, 'three classes taken from the pass');
+
+  // 14. Remove one guest from the account: their class comes back.
+  await a.goto(`${BASE}/account/`);
+  await a.screenshot({ path: `${SHOTS}/15-account-guests.png`, fullPage: true });
+  a.once('dialog', d => d.accept());
+  await Promise.all([a.waitForNavigation(), a.locator('.oys-guestlist li', { hasText: 'Emil Guest' }).locator('button').click()]);
+  check(rowsOf(g2).find(r => r.guest_name === 'Emil Guest').status === 'cancelled', 'guest removed');
+  check(bal() === before13 - 2, 'removed guest\'s class returned');
+
+  // 15. Add a guest later to the same booking.
+  await a.goto(`${BASE}/book/?session=${g2}`);
+  check(await a.isVisible('text=Bring guests'), 'booked page offers "Bring guests"');
+  await a.fill('#oys-guest-name-0', 'Flora Guest');
+  await a.check('input[value="credit"]');
+  await Promise.all([a.waitForNavigation(), a.click('.oys-submit')]);
+  rows = rowsOf(g2);
+  check(rows.some(r => r.guest_name === 'Flora Guest' && r.status === 'confirmed' && r.guest_of == rows[0].id), 'guest added to existing booking');
+  check(bal() === before13 - 3, 'added guest paid from the pass');
+
+  // 16. Cancelling the host cancels the guests and returns all classes.
+  const hostId = rows[0].id;
+  php(`OYS_Bookings::cancel(${hostId});`);
+  rows = rowsOf(g2);
+  check(rows.filter(r => r.status === 'confirmed').length === 0, 'host cancel cancels guests too');
+  check(bal() === before13, 'all classes returned');
+  check(JSON.parse(q(`SELECT booked FROM wp_oys_sessions WHERE id=${g2}`))[0].booked == 0, 'all seats released');
+
+  // 17. Not enough spots for the whole party.
+  const g3 = fresh();
+  php(`global $wpdb; $wpdb->update($wpdb->prefix.'oys_sessions', array('capacity'=>2), array('id'=>${g3}));`);
+  await a.goto(`${BASE}/book/?session=${g3}`);
+  check(await a.locator('[data-guest]').count() === 1, 'guest rows limited by spots left');
+
+  // ---------- Memberships ----------
+  const ctxD = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const d = await ctxD.newPage();
+  const emailD = `dani${stamp}@example.com`;
+  await d.goto(`${BASE}/book/?product=four-a-month`);
+  await register(d, 'Dani', emailD);
+  await d.screenshot({ path: `${SHOTS}/16-join.png`, fullPage: true });
+  await d.click('.oys-submit');
+  await d.waitForURL(/8090\/pay/);
+  check(/SUBSCRIPTION/.test(await d.textContent('body')), 'Stripe checkout in subscription mode');
+  await Promise.all([d.waitForNavigation({ url: /oys_return=success/ }), d.click('#pay')]);
+  check(await d.isVisible('text=Welcome, member!'), 'membership welcome page');
+  const uidD = php(`echo get_user_by('email','${emailD}')->ID;`);
+  let mem = JSON.parse(q(`SELECT * FROM wp_oys_memberships WHERE user_id=${uidD}`))[0];
+  check(mem && mem.status === 'active' && mem.current_period_end && mem.classes_per_period == 4, 'membership active with period and 4-class limit');
+  check(mailSubjects().some(s => s === 'Your membership is active'), 'membership welcome email');
+
+  // 18. Book with the membership + a guest (no pass → guest paid by card).
+  const m1 = fresh();
+  await d.goto(`${BASE}/book/?session=${m1}`);
+  check(await d.isVisible('text=Use my membership'), 'membership option offered');
+  await addGuests(d, ['Gabi Guest']);
+  await d.check('input[value="membership"]');
+  await d.click('.oys-submit');
+  await d.waitForURL(/8090\/pay/);
+  check(/Guest ticket/.test(await d.textContent('body')) && /Total \$25/.test(await d.textContent('#total')), 'only the guest is charged');
+  await Promise.all([d.waitForNavigation({ url: /oys_return=success/ }), d.click('#pay')]);
+  rows = rowsOf(m1);
+  check(rows.length === 2 && rows[0].paid_with === 'membership' && rows[1].paid_with === 'card' && rows[1].guest_of == rows[0].id, 'member on membership, guest on card');
+
+  // 19. Class limit per period.
+  for (let i = 0; i < 3; i++) {
+    const sid = fresh();
+    await d.goto(`${BASE}/book/?session=${sid}`);
+    await d.check('input[value="membership"]');
+    await Promise.all([d.waitForNavigation(), d.click('.oys-submit')]);
+  }
+  mem = JSON.parse(q(`SELECT * FROM wp_oys_memberships WHERE user_id=${uidD}`))[0];
+  check(php(`echo OYS_Memberships::used_in_period(OYS_Memberships::get(${mem.id}));`) === '4', '4 classes used this period');
+  const m5 = fresh();
+  await d.goto(`${BASE}/book/?session=${m5}`);
+  check(!(await d.isVisible('input[value="membership"]')), 'membership no longer offered after 4 classes');
+  const direct = php(`$r = OYS_Bookings::book_with_membership(${uidD}, ${m5}); echo is_wp_error($r) ? $r->get_error_code() : 'booked';`);
+  check(direct === 'oys_membership', 'a 5th class is refused');
+
+  // 20. Account membership tab, portal.
+  await d.goto(`${BASE}/account/?tab=membership`);
+  await d.screenshot({ path: `${SHOTS}/17-membership-tab.png`, fullPage: true });
+  check(await d.isVisible('text=4 of 4 used'), 'membership tab shows usage');
+  await Promise.all([d.waitForNavigation(), d.click('button:has-text("Update card & invoices")')]);
+  check(/MOCK STRIPE CUSTOMER PORTAL/.test(await d.textContent('body')), 'billing portal opens');
+  await Promise.all([d.waitForNavigation(), d.click('#portal-return')]);
+
+  // 21. Renewal: new period, renewal recorded as a payment, usage resets.
+  const sub = mem.stripe_subscription_id;
+  execSync(`curl -s "http://127.0.0.1:8090/_renew?sub=${sub}"`);
+  const mem2 = JSON.parse(q(`SELECT * FROM wp_oys_memberships WHERE id=${mem.id}`))[0];
+  check(mem2.current_period_start > mem.current_period_start, 'period advanced after renewal');
+  check(JSON.parse(q(`SELECT COUNT(*) AS n FROM wp_oys_orders WHERE user_id=${uidD} AND type='membership' AND status='paid'`))[0].n == 2, 'renewal recorded as a second membership payment');
+
+  // 22. Failed payment → past due + email; then cancel at period end and resume from the account.
+  execSync(`curl -s "http://127.0.0.1:8090/_fail?sub=${sub}"`);
+  check(JSON.parse(q(`SELECT status FROM wp_oys_memberships WHERE id=${mem.id}`))[0].status === 'past_due', 'failed renewal → past due');
+  check(mailSubjects().some(s => s && /payment failed/.test(s)), 'payment failed email');
+  await d.goto(`${BASE}/account/?tab=membership`);
+  d.once('dialog', x => x.accept());
+  await Promise.all([d.waitForNavigation(), d.click('button:has-text("Cancel membership")')]);
+  check(JSON.parse(q(`SELECT cancel_at_period_end FROM wp_oys_memberships WHERE id=${mem.id}`))[0].cancel_at_period_end == 1, 'cancel at period end scheduled');
+  check(await d.isVisible('text=Keep my membership'), 'resume offered');
+  await Promise.all([d.waitForNavigation(), d.click('button:has-text("Keep my membership")')]);
+  check(JSON.parse(q(`SELECT cancel_at_period_end FROM wp_oys_memberships WHERE id=${mem.id}`))[0].cancel_at_period_end == 0, 'membership resumed');
+
+  // 23. Subscription ends: status ended, future membership bookings cancelled.
+  execSync(`curl -s "http://127.0.0.1:8090/_end?sub=${sub}"`);
+  check(JSON.parse(q(`SELECT status FROM wp_oys_memberships WHERE id=${mem.id}`))[0].status === 'cancelled', 'membership ended');
+  check(JSON.parse(q(`SELECT COUNT(*) AS n FROM wp_oys_bookings WHERE membership_id=${mem.id} AND status='confirmed'`))[0].n == 0, 'future membership bookings cancelled');
+
+  // 24. Rate limiting: repeated wrong passwords lock the login.
+  const ctxE = await browser.newContext();
+  const e = await ctxE.newPage();
+  for (let i = 0; i < 7; i++) {
+    await e.goto(`${BASE}/account/?oys_view=login`);
+    await e.fill('#oys-login-email', emailD);
+    await e.fill('#oys-login-password', 'wrong-' + i);
+    await Promise.all([e.waitForNavigation(), e.click('#oys-login button[type="submit"]')]);
+  }
+  check(await e.isVisible('text=Too many failed attempts'), 'login locked after repeated failures');
+  php(`global $wpdb; $wpdb->query("DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient%oys_rl_%'");`);
 
   // Screens for review.
   await a.goto(`${BASE}/schedule-pricing/`);
