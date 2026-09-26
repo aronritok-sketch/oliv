@@ -113,6 +113,7 @@ function make_session( $args = array() ) {
 		'starts_at'       => gmdate( 'Y-m-d H:i:s', $start ),
 		'ends_at'         => gmdate( 'Y-m-d H:i:s', $start + 3600 ),
 		'capacity'        => $args['capacity'] ?? 10,
+		'format'          => $args['format'] ?? 'studio',
 		'price_cents'     => $args['price'] ?? 2500,
 		'credits_allowed' => $args['credits_allowed'] ?? 1,
 		'status'          => 'scheduled',
@@ -365,6 +366,133 @@ test( 'stripe checkout: party receipt has a guest line with quantity', function 
 	eq( 2, (int) $items[1]['quantity'], 'guest line quantity 2' );
 	eq( 'Guest ticket: Hatha Flow', $items[1]['price_data']['product_data']['name'], 'guest line name' );
 	eq( 'payment', $call[2]['mode'], 'payment mode' );
+} );
+
+test( 'online: a studio class converts into online classes, online credits go first', function () {
+	OYS_Settings::update( array( 'online_per_credit' => 4 ) );
+	$u      = make_user();
+	$studio = make_session();
+	$on1    = make_session( array( 'format' => 'online', 'price' => 600 ) );
+	$on2    = make_session( array( 'format' => 'online', 'price' => 600, 'in_hours' => 96 ) );
+	$src    = OYS_Passes::grant( $u, array( 'credits' => 2, 'name' => '5-class pass', 'validity_days' => 60 ) );
+	eq( 'online', OYS_Bookings::credit_kind( $on1 ), 'online class uses online credits' );
+	eq( 8, OYS_Passes::available_for( $u, $on1 ), '2 studio classes = 8 online classes' );
+	eq( 2, OYS_Passes::available_for( $u, $studio ), 'studio class sees studio credits only' );
+	$b = OYS_Bookings::book_with_credit( $u, $on1, false );
+	ok( ! is_wp_error( $b ), 'online class booked with the studio pass' );
+	eq( 1, OYS_Passes::balance( $u, 'class' ), 'one studio class used' );
+	eq( 3, OYS_Passes::balance( $u, 'online' ), 'three online classes left over' );
+	$conv = OYS_Passes::get( OYS_Bookings::get( $b )->pass_id );
+	eq( 'convert', $conv->source, 'converted pass marked' );
+	eq( OYS_Passes::get( $src )->expires_at, $conv->expires_at, 'same expiry as the studio pass' );
+	OYS_Bookings::book_with_credit( $u, $on2, false );
+	eq( 1, OYS_Passes::balance( $u, 'class' ), 'second online class uses the online credits' );
+	eq( 2, OYS_Passes::balance( $u, 'online' ), 'online credits down to 2' );
+	OYS_Bookings::cancel( OYS_Bookings::active_for( $u, $on2->id )->id, array( 'notify' => false ) );
+	eq( 3, OYS_Passes::balance( $u, 'online' ), 'on-time cancel returns the online credit' );
+	eq( 1, OYS_Passes::available_for( $u, $studio ), 'online credits never pay for a studio class' );
+} );
+
+test( 'online: party on an online class converts as many studio classes as needed', function () {
+	OYS_Settings::update( array( 'online_per_credit' => 2 ) );
+	$u  = make_user();
+	$on = make_session( array( 'format' => 'online', 'price' => 600 ) );
+	OYS_Passes::grant( $u, array( 'credits' => 2 ) );
+	$r = OYS_Bookings::book_party( $u, $on, array( 'method' => 'credit', 'guests' => guests( 'Bea', 'Cora' ), 'notify' => false ) );
+	ok( ! is_wp_error( $r ), '3 people booked' );
+	eq( 0, OYS_Passes::balance( $u, 'class' ), 'two studio classes converted' );
+	eq( 1, OYS_Passes::balance( $u, 'online' ), 'one online class left' );
+	OYS_Settings::update( array( 'online_per_credit' => 4 ) );
+} );
+
+test( 'online: memberships include online classes without using the monthly limit', function () {
+	$u  = make_user();
+	$m  = make_membership( $u, 1 );
+	$st = make_session();
+	$on = make_session( array( 'format' => 'online', 'price' => 600, 'in_hours' => 30 ) );
+	ok( ! is_wp_error( OYS_Bookings::book_with_membership( $u, $st, false ) ), 'studio class uses the one class' );
+	eq( true, OYS_Memberships::covers( OYS_Memberships::current_for( $u ), $on ), 'online class still covered' );
+	ok( ! is_wp_error( OYS_Bookings::book_with_membership( $u, $on, false ) ), 'online class booked' );
+	eq( 1, OYS_Memberships::used_in_period( OYS_Memberships::current_for( $u ) ), 'online class not counted' );
+	ok( is_wp_error( OYS_Memberships::covers( OYS_Memberships::current_for( $u ), make_session( array( 'in_hours' => 50 ) ) ) ), 'another studio class is over the limit' );
+} );
+
+test( 'online: private session prices', function () {
+	ok( OYS_Products::private_price_for( 60, true ) > 0, 'online price exists' );
+	ok( OYS_Products::private_price_for( 60, true ) < OYS_Products::private_price_for( 60 ), 'online private is cheaper' );
+	eq( 'online', OYS_Products::credit_kind( array( 'kind' => 'online_pack' ) ), 'online pass gives online credits' );
+} );
+
+function cal_req( $params, $id = 0 ) {
+	$r = new WP_REST_Request( 'POST', '/oys/v1/admin/sessions' . ( $id ? '/' . $id : '' ) );
+	$r->set_header( 'content-type', 'application/json' );
+	$r->set_body( wp_json_encode( $params ) );
+	if ( $id ) {
+		$r->set_url_params( array( 'id' => $id ) );
+	}
+	return $r;
+}
+
+test( 'calendar: weekly class, move one date, change the series, stop it', function () {
+	global $wpdb;
+	$tz    = wp_timezone();
+	$first = ( new DateTimeImmutable( 'today', $tz ) )->modify( '+8 days' );
+	$res   = OYS_Calendar::rest_save( cal_req( array( 'kind' => 'group', 'class_slug' => 'hatha-flow', 'date' => $first->format( 'Y-m-d' ), 'start' => '10:00', 'duration' => 60, 'capacity' => 10, 'format' => 'online', 'price' => 600, 'repeat' => 'weekly' ) ) );
+	ok( ! is_wp_error( $res ), 'weekly class created' );
+	$s1  = $res->get_data()['session'];
+	$tpl = OYS_Schedule::template( OYS_Schedule::get( $s1['id'] )->template_id );
+	eq( $first->format( 'Y-m-d' ), $tpl->valid_from, 'repeats from the chosen date' );
+	eq( 'online', $tpl->format, 'weekly template is online' );
+	$dates = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . OYS_Install::table( 'sessions' ) . ' WHERE template_id = %d ORDER BY starts_at', $tpl->id ) );
+	ok( count( $dates ) >= 2, 'several weeks created' );
+	eq( $first->format( 'Y-m-d' ), $s1['date'], 'first date is the chosen one, nothing earlier' );
+	eq( '10:00', $s1['start'], 'local start time kept' );
+
+	// Move only the first date to the next day at 11:00; generating again must not re-create it.
+	$moved = OYS_Calendar::rest_save( cal_req( array_merge( $s1, array( 'date' => $first->modify( '+1 day' )->format( 'Y-m-d' ), 'start' => '11:00', 'scope' => 'one' ) ), $s1['id'] ), $s1['id'] );
+	ok( ! is_wp_error( $moved ), 'moved one date' );
+	OYS_Schedule::generate();
+	$on_old_day = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . OYS_Install::table( 'sessions' ) . ' WHERE template_id = %d AND starts_at = %s', $tpl->id, oys_local_to_utc( $first->format( 'Y-m-d' ) . 'T10:00' ) ) );
+	eq( 0, $on_old_day, 'the moved date is not created again' );
+
+	// Someone books the second date; the series moves to 9:30 and they are emailed.
+	$u  = make_user();
+	$s2 = OYS_Schedule::get( $dates[1]->id );
+	OYS_Bookings::book_manual( $u, $s2, 'comp', false );
+	$sent = array();
+	add_action( 'oys_email_sent', function ( $to, $subject ) use ( &$sent ) { $sent[] = $subject; }, 10, 2 );
+	$d2  = OYS_Calendar::out( $s2 );
+	$res = OYS_Calendar::rest_save( cal_req( array_merge( $d2, array( 'start' => '09:30', 'scope' => 'series', 'notify' => true ) ), $s2->id ), $s2->id );
+	ok( ! is_wp_error( $res ), 'series changed' );
+	eq( '09:30', OYS_Schedule::template( $tpl->id )->start_time, 'weekly time changed' );
+	$later = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . OYS_Install::table( 'sessions' ) . ' WHERE template_id = %d AND starts_at >= %s ORDER BY starts_at', $tpl->id, $dates[1]->starts_at ) );
+	ok( count( $later ) >= 1 && ! array_filter( $later, fn( $x ) => '09:30' !== wp_date( 'H:i', oys_ts( $x->starts_at ) ) ), 'every following date is at 9:30' );
+	eq( '11:00', OYS_Calendar::out( OYS_Schedule::get( $s1['id'] ) )['start'], 'the earlier moved date is untouched' );
+	ok( (bool) array_filter( $sent, fn( $x ) => str_starts_with( $x, 'Changed:' ) ), 'the person booked was emailed' );
+	$before = count( $later );
+	OYS_Schedule::generate();
+	eq( $before, (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . OYS_Install::table( 'sessions' ) . ' WHERE template_id = %d AND starts_at >= %s', $tpl->id, $dates[1]->starts_at ) ), 'no duplicates after generating again' );
+
+	// Stop the weekly class from the third date.
+	$c = new WP_REST_Request( 'POST', '/oys/v1/admin/sessions/' . $later[1]->id . '/cancel' );
+	$c->set_url_params( array( 'id' => $later[1]->id ) );
+	$c->set_body_params( array( 'scope' => 'series' ) );
+	OYS_Calendar::rest_cancel( $c );
+	eq( 0, (int) OYS_Schedule::template( $tpl->id )->active, 'weekly class stopped' );
+	eq( 'scheduled', OYS_Schedule::get( $later[0]->id )->status, 'earlier date kept' );
+	eq( 'cancelled', OYS_Schedule::get( $later[1]->id )->status, 'this date cancelled' );
+} );
+
+test( 'calendar: validation and capacity below bookings', function () {
+	$bad = OYS_Calendar::rest_save( cal_req( array( 'kind' => 'group', 'class_slug' => '', 'date' => wp_date( 'Y-m-d', time() + DAY_IN_SECONDS ), 'start' => '10:00' ) ) );
+	ok( is_wp_error( $bad ), 'a class needs a class type' );
+	$past = OYS_Calendar::rest_save( cal_req( array( 'kind' => 'event', 'title' => 'Old', 'date' => wp_date( 'Y-m-d', time() - 3 * DAY_IN_SECONDS ), 'start' => '10:00' ) ) );
+	ok( is_wp_error( $past ), 'no new sessions in the past' );
+	$s = make_session( array( 'capacity' => 3 ) );
+	OYS_Bookings::book_party( make_user(), $s, array( 'method' => 'free', 'guests' => guests( 'A' ), 'notify' => false ) );
+	$d = OYS_Calendar::out( OYS_Schedule::get( $s->id ) );
+	OYS_Calendar::rest_save( cal_req( array_merge( $d, array( 'capacity' => 1 ) ), $s->id ), $s->id );
+	eq( 2, (int) OYS_Schedule::get( $s->id )->capacity, 'capacity never below the people booked' );
 } );
 
 test( 'helpers: money and periods', function () {

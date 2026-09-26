@@ -88,6 +88,73 @@ class OYS_Passes {
 		return 0;
 	}
 
+	/**
+	 * Classes of this session the customer can pay with passes. For an online class that's their
+	 * online credits plus what their studio credits convert to (one studio class = `online_per_credit`
+	 * online classes).
+	 */
+	public static function available_for( $user_id, $session ) {
+		$kind = OYS_Bookings::credit_kind( $session );
+		$n    = 0;
+		foreach ( self::usable( $user_id, $kind, $session ) as $p ) {
+			$n += (int) $p->credits_left;
+		}
+		if ( 'online' === $kind ) {
+			foreach ( self::usable( $user_id, 'class', $session ) as $p ) {
+				$n += (int) $p->credits_left * self::online_per_credit();
+			}
+		}
+		return $n;
+	}
+
+	public static function online_per_credit() {
+		return max( 1, (int) OYS_Settings::get( 'online_per_credit' ) );
+	}
+
+	/**
+	 * Spend one class of a pass on this session. For an online class with no online credits left,
+	 * one studio credit is converted into `online_per_credit` online credits (same expiry, shown
+	 * as its own pass) and one of those is used, so a studio pass goes further on online classes.
+	 * Returns the pass id used, or 0.
+	 */
+	public static function consume_for( $user_id, $session ) {
+		$kind = OYS_Bookings::credit_kind( $session );
+		$id   = self::consume( $user_id, $kind, $session );
+		if ( $id || 'online' !== $kind ) {
+			return $id;
+		}
+		$from = self::consume( $user_id, 'class', $session );
+		if ( ! $from ) {
+			return 0;
+		}
+		$src  = self::get( $from );
+		$n    = self::online_per_credit();
+		$days = $src->expires_at ? max( 1, (int) ceil( ( oys_ts( $src->expires_at ) - time() ) / DAY_IN_SECONDS ) ) : 0;
+		$new  = self::grant( $user_id, array(
+			'product_id'    => $src->product_id,
+			'name'          => sprintf( __( 'Online classes (from %s)', 'olivia-studio' ), $src->name ),
+			'kind'          => 'online',
+			'credits'       => $n,
+			'validity_days' => $days,
+			'order_id'      => (int) $src->order_id,
+			'source'        => 'convert',
+		) );
+		global $wpdb;
+		if ( $src->expires_at ) {
+			$wpdb->update( OYS_Install::table( 'passes' ), array( 'expires_at' => $src->expires_at ), array( 'id' => $new ) );
+		}
+		$wpdb->query( $wpdb->prepare( 'UPDATE ' . OYS_Install::table( 'passes' ) . ' SET credits_left = credits_left - 1 WHERE id = %d AND credits_left > 0', $new ) );
+		return $new;
+	}
+
+	public static function kinds() {
+		return array(
+			'class'   => __( 'Group classes', 'olivia-studio' ),
+			'online'  => __( 'Online classes', 'olivia-studio' ),
+			'private' => __( 'Private sessions', 'olivia-studio' ),
+		);
+	}
+
 	/** Give a credit back. If the original pass has expired, the credit comes back as a fresh 30-day credit. */
 	public static function refund_credit( $pass_id, $user_id ) {
 		global $wpdb;

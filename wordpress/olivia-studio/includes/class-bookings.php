@@ -134,8 +134,12 @@ class OYS_Bookings {
 		return $result;
 	}
 
+	/** Which pass credits pay for a session: private, online (online group classes) or class. */
 	public static function credit_kind( $session ) {
-		return 'private' === $session->kind ? 'private' : 'class';
+		if ( 'private' === $session->kind ) {
+			return 'private';
+		}
+		return oys_is_online( $session ) ? 'online' : 'class';
 	}
 
 	/** Display name for a roster line: the customer, or "Guest name (guest of Anna)". */
@@ -219,7 +223,7 @@ class OYS_Bookings {
 		// Credits needed up front, so nothing is half-booked.
 		$kind  = self::credit_kind( $session );
 		$needs = ( $with_host && 'credit' === $args['method'] ? 1 : 0 ) + ( 'credit' === $guest_method ? count( $guests ) : 0 );
-		if ( $needs && ( ! $session->credits_allowed || OYS_Passes::balance( $user_id, $kind ) < $needs ) ) {
+		if ( $needs && ( ! $session->credits_allowed || OYS_Passes::available_for( $user_id, $session ) < $needs ) ) {
 			return new WP_Error( 'oys_no_credit', $session->credits_allowed
 				? sprintf( _n( 'You need %d class on your pass for this booking.', 'You need %d classes on your pass for this booking.', $needs, 'olivia-studio' ), $needs )
 				: __( 'Passes can\'t be used for this session.', 'olivia-studio' ) );
@@ -248,7 +252,7 @@ class OYS_Bookings {
 		$pay     = function ( $method ) use ( $user_id, $kind, $session, $member ) {
 			$row = array( 'paid_with' => $method );
 			if ( 'credit' === $method ) {
-				$row['pass_id'] = OYS_Passes::consume( $user_id, $kind, $session );
+				$row['pass_id'] = OYS_Passes::consume_for( $user_id, $session );
 				if ( ! $row['pass_id'] ) {
 					return null;
 				}
@@ -531,7 +535,7 @@ class OYS_Bookings {
 				$outcome = 'returned';
 			} elseif ( 'card' === $b->paid_with ) {
 				OYS_Passes::grant( $b->user_id, array(
-					'name'          => 'private' === $session->kind ? __( 'Private session credit', 'olivia-studio' ) : __( 'Class credit', 'olivia-studio' ),
+					'name'          => 'private' === $session->kind ? __( 'Private session credit', 'olivia-studio' ) : ( oys_is_online( $session ) ? __( 'Online class credit', 'olivia-studio' ) : __( 'Class credit', 'olivia-studio' ) ),
 					'kind'          => self::credit_kind( $session ),
 					'credits'       => 1,
 					'validity_days' => (int) OYS_Settings::get( 'dropin_credit_days' ),
@@ -626,7 +630,7 @@ class OYS_Bookings {
 					continue;
 				}
 			}
-			if ( $session->credits_allowed && OYS_Passes::balance( $entry->user_id, self::credit_kind( $session ) ) > 0 ) {
+			if ( $session->credits_allowed && OYS_Passes::available_for( (int) $entry->user_id, $session ) > 0 ) {
 				$id = self::book_with_credit( (int) $entry->user_id, $session, false );
 				if ( ! is_wp_error( $id ) ) {
 					OYS_Emails::waitlist_promoted( $id );

@@ -89,7 +89,7 @@ class OYS_Memberships {
 		$b = OYS_Install::table( 'bookings' );
 		$s = OYS_Install::table( 'sessions' );
 		return (int) $wpdb->get_var( $wpdb->prepare(
-			"SELECT COUNT(*) FROM $b b JOIN $s s ON s.id = b.session_id WHERE b.membership_id = %d AND b.status IN ('confirmed','attended','no_show','late_cancelled') AND s.starts_at >= %s AND s.starts_at < %s",
+			"SELECT COUNT(*) FROM $b b JOIN $s s ON s.id = b.session_id WHERE b.membership_id = %d AND b.status IN ('confirmed','attended','no_show','late_cancelled') AND s.format <> 'online' AND s.starts_at >= %s AND s.starts_at < %s",
 			$m->id, $m->current_period_start, $m->current_period_end
 		) );
 	}
@@ -116,12 +116,14 @@ class OYS_Memberships {
 			return new WP_Error( 'oys_membership', __( 'Memberships can\'t be used for this session.', 'olivia-studio' ) );
 		}
 		$in_period = $m->current_period_end && $session->starts_at < $m->current_period_end;
-		if ( ( $m->cancel_at_period_end || (int) $m->classes_per_period ) && ! $in_period ) {
+		// Online classes are included in every membership and don't use up the classes of a limited plan.
+		$limited = (int) $m->classes_per_period && ! oys_is_online( $session );
+		if ( ( $m->cancel_at_period_end || $limited ) && ! $in_period ) {
 			return new WP_Error( 'oys_membership', $m->cancel_at_period_end
 				? __( 'Your membership ends before this class.', 'olivia-studio' )
 				: sprintf( __( 'This class is in your next billing period. You can book it from %s.', 'olivia-studio' ), oys_date( $m->current_period_end, get_option( 'date_format' ) ) ) );
 		}
-		if ( self::remaining( $m ) < 1 ) {
+		if ( $limited && self::remaining( $m ) < 1 ) {
 			return new WP_Error( 'oys_membership', sprintf( __( 'You\'ve used all %d classes of this period. Your next period starts %s.', 'olivia-studio' ), (int) $m->classes_per_period, oys_date( $m->current_period_end, get_option( 'date_format' ) ) ) );
 		}
 		return true;

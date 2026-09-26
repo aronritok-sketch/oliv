@@ -22,6 +22,9 @@ class OYS_Install {
 		if ( get_option( 'oys_db_version' ) !== OYS_DB_VERSION ) {
 			self::activate();
 			OYS_Products::add_missing_kinds();
+			// v3: weekly dates remember the slot they were created for, so moving one date doesn't re-create it.
+			global $wpdb;
+			$wpdb->query( 'UPDATE ' . self::table( 'sessions' ) . ' SET tpl_slot = starts_at WHERE template_id > 0 AND tpl_slot IS NULL' );
 		}
 	}
 
@@ -44,10 +47,12 @@ class OYS_Install {
 			duration_min smallint(5) unsigned NOT NULL DEFAULT 60,
 			capacity smallint(5) unsigned NOT NULL DEFAULT 12,
 			location varchar(255) NOT NULL DEFAULT '',
+			format varchar(10) NOT NULL DEFAULT 'studio',
 			online_url varchar(255) NOT NULL DEFAULT '',
 			price_cents int(10) unsigned NOT NULL DEFAULT 0,
 			note varchar(255) NOT NULL DEFAULT '',
 			active tinyint(1) unsigned NOT NULL DEFAULT 1,
+			valid_from date NULL,
 			PRIMARY KEY  (id)
 		) $c;" );
 
@@ -63,12 +68,14 @@ class OYS_Install {
 			capacity smallint(5) unsigned NOT NULL DEFAULT 12,
 			booked smallint(5) unsigned NOT NULL DEFAULT 0,
 			location varchar(255) NOT NULL DEFAULT '',
+			format varchar(10) NOT NULL DEFAULT 'studio',
 			online_url varchar(255) NOT NULL DEFAULT '',
 			price_cents int(10) unsigned NOT NULL DEFAULT 0,
 			credits_allowed tinyint(1) unsigned NOT NULL DEFAULT 1,
 			note varchar(255) NOT NULL DEFAULT '',
 			status varchar(20) NOT NULL DEFAULT 'scheduled',
 			template_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			tpl_slot datetime NULL,
 			created_at datetime NOT NULL,
 			PRIMARY KEY  (id),
 			KEY starts_at (starts_at),
@@ -110,7 +117,7 @@ class OYS_Install {
 			UNIQUE KEY session_user (session_id,user_id)
 		) $c;" );
 
-		// Class passes and studio credit. kind = class | private.
+		// Class passes and studio credit. kind = class | online | private.
 		dbDelta( 'CREATE TABLE ' . self::table( 'passes' ) . " (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			user_id bigint(20) unsigned NOT NULL,

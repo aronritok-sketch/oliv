@@ -86,6 +86,11 @@ function oys_class_options() {
 	return $titles ?: array( 'hatha-flow' => 'Hatha Flow', 'slow-flow' => 'Slow Flow' );
 }
 
+/** Live-streamed class (joined through the online link) rather than in the studio. */
+function oys_is_online( $session ) {
+	return $session && 'online' === ( $session->format ?? 'studio' );
+}
+
 function oys_session_title( $session ) {
 	if ( ! $session ) {
 		return '';

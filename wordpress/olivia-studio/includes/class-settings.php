@@ -28,6 +28,8 @@ class OYS_Settings {
 			'weeks_ahead'             => 6,
 			'reminder_hours'          => 24,
 			'max_guests'              => 4,
+			'online_price_cents'      => 600,
+			'online_per_credit'       => 4,
 			'email_from_name'         => 'Olivia Kovács Yoga',
 			'email_from'              => get_option( 'admin_email' ),
 			'notify_email'            => get_option( 'admin_email' ),

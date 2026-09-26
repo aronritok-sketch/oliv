@@ -33,10 +33,12 @@ class OYS_Schedule {
 			'duration_min' => max( 15, (int) ( $data['duration_min'] ?? 60 ) ),
 			'capacity'     => max( 1, (int) ( $data['capacity'] ?? 12 ) ),
 			'location'     => sanitize_text_field( $data['location'] ?? '' ),
+			'format'       => 'online' === ( $data['format'] ?? '' ) ? 'online' : 'studio',
 			'online_url'   => esc_url_raw( $data['online_url'] ?? '' ),
 			'price_cents'  => (int) ( $data['price_cents'] ?? 0 ),
 			'note'         => sanitize_text_field( $data['note'] ?? '' ),
 			'active'       => empty( $data['active'] ) ? 0 : 1,
+			'valid_from'   => ! empty( $data['valid_from'] ) && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $data['valid_from'] ) ? $data['valid_from'] : null,
 		);
 		if ( $id ) {
 			$wpdb->update( $t, $data, array( 'id' => $id ) );
@@ -66,7 +68,7 @@ class OYS_Schedule {
 		foreach ( self::templates( true ) as $tpl ) {
 			for ( $d = 0; $d < $weeks * 7; $d++ ) {
 				$day = $today->modify( "+$d days" );
-				if ( (int) $day->format( 'N' ) !== (int) $tpl->weekday ) {
+				if ( (int) $day->format( 'N' ) !== (int) $tpl->weekday || ( $tpl->valid_from && $day->format( 'Y-m-d' ) < $tpl->valid_from ) ) {
 					continue;
 				}
 				$start_local = new DateTimeImmutable( $day->format( 'Y-m-d' ) . ' ' . $tpl->start_time, $tz );
@@ -74,7 +76,9 @@ class OYS_Schedule {
 				if ( $start->getTimestamp() < time() ) {
 					continue;
 				}
-				$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $s WHERE template_id = %d AND starts_at = %s", $tpl->id, $start->format( 'Y-m-d H:i:s' ) ) );
+				// A date that was moved or cancelled still holds its original slot, so it isn't created again.
+				$slot   = $start->format( 'Y-m-d H:i:s' );
+				$exists = $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $s WHERE template_id = %d AND ( tpl_slot = %s OR ( tpl_slot IS NULL AND starts_at = %s ) )", $tpl->id, $slot, $slot ) );
 				if ( $exists ) {
 					continue;
 				}
@@ -85,10 +89,12 @@ class OYS_Schedule {
 					'ends_at'     => $start->modify( '+' . (int) $tpl->duration_min . ' minutes' )->format( 'Y-m-d H:i:s' ),
 					'capacity'    => $tpl->capacity,
 					'location'    => $tpl->location,
+					'format'      => $tpl->format,
 					'online_url'  => $tpl->online_url,
 					'price_cents' => $tpl->price_cents,
 					'note'        => $tpl->note,
 					'template_id' => $tpl->id,
+					'tpl_slot'    => $slot,
 					'created_at'  => oys_now(),
 				) );
 				$made++;
@@ -154,7 +160,7 @@ class OYS_Schedule {
 		global $wpdb;
 		$t   = OYS_Install::table( 'sessions' );
 		$row = array();
-		foreach ( array( 'kind', 'class_slug', 'title', 'description', 'starts_at', 'ends_at', 'capacity', 'location', 'online_url', 'price_cents', 'credits_allowed', 'note', 'status', 'template_id' ) as $k ) {
+		foreach ( array( 'kind', 'class_slug', 'title', 'description', 'starts_at', 'ends_at', 'capacity', 'location', 'format', 'online_url', 'price_cents', 'credits_allowed', 'note', 'status', 'template_id', 'tpl_slot' ) as $k ) {
 			if ( array_key_exists( $k, $data ) ) {
 				$row[ $k ] = $data[ $k ];
 			}
@@ -250,6 +256,13 @@ class OYS_Schedule {
 			'group'   => __( 'Group class', 'olivia-studio' ),
 			'event'   => __( 'Event / workshop', 'olivia-studio' ),
 			'private' => __( 'Private session', 'olivia-studio' ),
+		);
+	}
+
+	public static function formats() {
+		return array(
+			'studio' => __( 'In person', 'olivia-studio' ),
+			'online' => __( 'Online (live stream)', 'olivia-studio' ),
 		);
 	}
 

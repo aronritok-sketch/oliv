@@ -13,7 +13,7 @@
 defined( 'ABSPATH' ) || exit;
 
 define( 'OYS_VERSION', '1.1.0' );
-define( 'OYS_DB_VERSION', '2' );
+define( 'OYS_DB_VERSION', '3' );
 define( 'OYS_FILE', __FILE__ );
 define( 'OYS_DIR', plugin_dir_path( __FILE__ ) );
 define( 'OYS_URL', plugin_dir_url( __FILE__ ) );
@@ -36,6 +36,7 @@ require_once OYS_DIR . 'includes/class-security.php';
 require_once OYS_DIR . 'includes/class-cron.php';
 require_once OYS_DIR . 'includes/class-frontend.php';
 require_once OYS_DIR . 'includes/class-privacy.php';
+require_once OYS_DIR . 'includes/admin/class-calendar.php';
 
 if ( is_admin() ) {
 	require_once OYS_DIR . 'includes/admin/class-admin.php';
@@ -56,6 +57,7 @@ add_action( 'plugins_loaded', function () {
 	OYS_Cron::init();
 	OYS_Frontend::init();
 	OYS_Privacy::init();
+	OYS_Calendar::init();
 	if ( is_admin() ) {
 		OYS_Admin::init();
 	}

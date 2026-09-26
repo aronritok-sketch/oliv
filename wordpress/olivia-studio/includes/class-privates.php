@@ -107,6 +107,7 @@ class OYS_Privates {
 			'ends_at'         => gmdate( 'Y-m-d H:i:s', oys_ts( $start ) + $duration_min * MINUTE_IN_SECONDS ),
 			'capacity'        => 1,
 			'location'        => $location,
+			'format'          => 'online' === $request->location_type || ( $online_url && ! $location ) ? 'online' : 'studio',
 			'online_url'      => $online_url,
 			'price_cents'     => $price_cents,
 			// A private credit covers a 60-minute session.

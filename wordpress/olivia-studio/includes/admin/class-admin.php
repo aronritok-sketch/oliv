@@ -16,6 +16,9 @@ class OYS_Admin {
 			if ( str_contains( $hook, 'oys' ) ) {
 				wp_enqueue_style( 'oys-admin', OYS_URL . 'assets/admin.css', array(), OYS_VERSION );
 			}
+			if ( str_ends_with( $hook, '_page_oys-calendar' ) ) {
+				OYS_Calendar::enqueue();
+			}
 		} );
 		$actions = array( 'save_session', 'cancel_session', 'roster', 'save_template', 'delete_template', 'generate', 'private_offer', 'private_decline',
 			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership' );
@@ -30,8 +33,8 @@ class OYS_Admin {
 		add_menu_page( __( 'Studio', 'olivia-studio' ), __( 'Studio', 'olivia-studio' ) . ( $new ? ' <span class="awaiting-mod">' . $new . '</span>' : '' ), self::CAP, 'oys', array( __CLASS__, 'page_today' ), 'dashicons-universal-access', 3 );
 		$pages = array(
 			'oys'           => array( __( 'Today', 'olivia-studio' ), 'page_today' ),
-			'oys-schedule'  => array( __( 'Schedule & rosters', 'olivia-studio' ), 'page_schedule' ),
-			'oys-templates' => array( __( 'Weekly timetable', 'olivia-studio' ), 'page_templates' ),
+			'oys-calendar'  => array( __( 'Calendar', 'olivia-studio' ), 'page_calendar' ),
+			'oys-schedule'  => array( __( 'Rosters & list', 'olivia-studio' ), 'page_schedule' ),
 			'oys-private'   => array( __( 'Private requests', 'olivia-studio' ) . ( $new ? ' <span class="awaiting-mod">' . $new . '</span>' : '' ), 'page_private' ),
 			'oys-customers' => array( __( 'Customers', 'olivia-studio' ), 'page_customers' ),
 			'oys-members'   => array( __( 'Memberships', 'olivia-studio' ), 'page_members' ),
@@ -43,6 +46,12 @@ class OYS_Admin {
 		foreach ( $pages as $slug => $p ) {
 			add_submenu_page( 'oys', $p[0], $p[0], self::CAP, $slug, array( __CLASS__, $p[1] ) );
 		}
+		// The weekly timetable as a table; the calendar does the same with less typing.
+		add_submenu_page( '', __( 'Weekly timetable', 'olivia-studio' ), '', self::CAP, 'oys-templates', array( __CLASS__, 'page_templates' ) );
+	}
+
+	public static function page_calendar() {
+		OYS_Calendar::page();
 	}
 
 	public static function setup_notice() {
@@ -187,7 +196,7 @@ class OYS_Admin {
 			self::page_session_edit( (int) $_GET['edit'] );
 			return;
 		}
-		self::header( __( 'Schedule & rosters', 'olivia-studio' ), ' <a class="page-title-action" href="' . esc_url( admin_url( 'admin.php?page=oys-schedule&edit=0' ) ) . '">' . esc_html__( 'Add session or event', 'olivia-studio' ) . '</a>' );
+		self::header( __( 'Rosters & list', 'olivia-studio' ), ' <a class="page-title-action" href="' . esc_url( admin_url( 'admin.php?page=oys-calendar' ) ) . '">' . esc_html__( 'Open the calendar', 'olivia-studio' ) . '</a> <a class="page-title-action" href="' . esc_url( admin_url( 'admin.php?page=oys-schedule&edit=0' ) ) . '">' . esc_html__( 'Add session or event', 'olivia-studio' ) . '</a> <a class="page-title-action" href="' . esc_url( admin_url( 'admin.php?page=oys-templates' ) ) . '">' . esc_html__( 'Weekly timetable (table)', 'olivia-studio' ) . '</a>' );
 		$view = sanitize_key( $_GET['view'] ?? 'upcoming' );
 		echo '<ul class="subsubsub"><li><a href="' . esc_url( admin_url( 'admin.php?page=oys-schedule' ) ) . '"' . ( 'past' !== $view ? ' class="current"' : '' ) . '>' . esc_html__( 'Upcoming', 'olivia-studio' ) . '</a> | </li><li><a href="' . esc_url( admin_url( 'admin.php?page=oys-schedule&view=past' ) ) . '"' . ( 'past' === $view ? ' class="current"' : '' ) . '>' . esc_html__( 'Past', 'olivia-studio' ) . '</a></li></ul><br class="clear">';
 		$sessions = 'past' === $view
@@ -200,7 +209,7 @@ class OYS_Admin {
 	private static function page_session_edit( $id ) {
 		$s = $id ? OYS_Schedule::get( $id ) : null;
 		self::header( $s ? __( 'Edit session', 'olivia-studio' ) : __( 'Add session or event', 'olivia-studio' ) );
-		$v = $s ?: (object) array( 'kind' => 'event', 'class_slug' => '', 'title' => '', 'description' => '', 'starts_at' => '', 'ends_at' => '', 'capacity' => 20, 'location' => '', 'online_url' => '', 'price_cents' => 3500, 'credits_allowed' => 0, 'note' => '', 'status' => 'scheduled' );
+		$v = $s ?: (object) array( 'kind' => 'event', 'class_slug' => '', 'title' => '', 'description' => '', 'starts_at' => '', 'ends_at' => '', 'capacity' => 20, 'location' => '', 'format' => 'studio', 'online_url' => '', 'price_cents' => 3500, 'credits_allowed' => 0, 'note' => '', 'status' => 'scheduled' );
 		$dur = $s ? (int) round( ( oys_ts( $s->ends_at ) - oys_ts( $s->starts_at ) ) / 60 ) : 90;
 		echo self::form( 'save_session', 'class="oys-form"' ) . '<input type="hidden" name="id" value="' . (int) $id . '"><table class="form-table">'; // phpcs:ignore
 		echo '<tr><th>' . esc_html__( 'Type', 'olivia-studio' ) . '</th><td><select name="kind">';
@@ -216,6 +225,7 @@ class OYS_Admin {
 		echo '<tr><th>' . esc_html__( 'Description', 'olivia-studio' ) . '</th><td><textarea name="description" rows="4" class="large-text">' . esc_textarea( $v->description ) . '</textarea></td></tr>';
 		echo '<tr><th>' . esc_html__( 'Starts', 'olivia-studio' ) . '</th><td><input type="datetime-local" name="starts" required value="' . esc_attr( oys_utc_to_local_input( $v->starts_at ) ) . '"> <label>' . esc_html__( 'Length (min)', 'olivia-studio' ) . ' <input type="number" name="duration" min="15" step="5" value="' . (int) $dur . '" class="small-text"></label></td></tr>';
 		echo '<tr><th>' . esc_html__( 'Capacity', 'olivia-studio' ) . '</th><td><input type="number" name="capacity" min="1" value="' . (int) $v->capacity . '" class="small-text"></td></tr>';
+		echo '<tr><th>' . esc_html__( 'Where', 'olivia-studio' ) . '</th><td><select name="format">' . implode( '', array_map( fn( $k, $l ) => '<option value="' . esc_attr( $k ) . '"' . selected( $v->format ?: 'studio', $k, false ) . '>' . esc_html( $l ) . '</option>', array_keys( OYS_Schedule::formats() ), OYS_Schedule::formats() ) ) . '</select></td></tr>';
 		echo '<tr><th>' . esc_html__( 'Location', 'olivia-studio' ) . '</th><td><input class="regular-text" name="location" value="' . esc_attr( $v->location ) . '"></td></tr>';
 		echo '<tr><th>' . esc_html__( 'Online link (Zoom etc.)', 'olivia-studio' ) . '</th><td><input class="regular-text" type="url" name="online_url" value="' . esc_attr( $v->online_url ) . '"><p class="description">' . esc_html__( 'Only shown to people who booked.', 'olivia-studio' ) . '</p></td></tr>';
 		echo '<tr><th>' . esc_html__( 'Price', 'olivia-studio' ) . '</th><td><input name="price" value="' . esc_attr( $v->price_cents / 100 ) . '" class="small-text"> ' . esc_html( strtoupper( OYS_Settings::get( 'currency' ) ) ) . ' <label><input type="checkbox" name="credits_allowed" value="1"' . checked( 1, (int) $v->credits_allowed, false ) . '> ' . esc_html__( 'Class passes can be used', 'olivia-studio' ) . '</label></td></tr>';
@@ -247,6 +257,7 @@ class OYS_Admin {
 			'ends_at'         => gmdate( 'Y-m-d H:i:s', oys_ts( $start ) + $dur * MINUTE_IN_SECONDS ),
 			'capacity'        => max( 1, (int) $_POST['capacity'] ),
 			'location'        => sanitize_text_field( wp_unslash( $_POST['location'] ) ),
+			'format'          => 'online' === ( $_POST['format'] ?? '' ) ? 'online' : 'studio',
 			'online_url'      => esc_url_raw( wp_unslash( $_POST['online_url'] ) ),
 			'price_cents'     => oys_cents_from_input( wp_unslash( $_POST['price'] ) ),
 			'credits_allowed' => empty( $_POST['credits_allowed'] ) ? 0 : 1,
@@ -273,7 +284,7 @@ class OYS_Admin {
 		}
 		OYS_Schedule::recount( $id );
 		$s = OYS_Schedule::get( $id );
-		self::header( oys_session_title( $s ) . ' · ' . oys_date( $s->starts_at, 'D M j, g:i a' ), ' <a class="page-title-action" href="' . esc_url( admin_url( 'admin.php?page=oys-schedule&edit=' . $id ) ) . '">' . esc_html__( 'Edit session', 'olivia-studio' ) . '</a>' );
+		self::header( oys_session_title( $s ) . ' · ' . oys_date( $s->starts_at, 'D M j, g:i a' ), ' <a class="page-title-action" href="' . esc_url( admin_url( 'admin.php?page=oys-calendar&week=' . wp_date( 'Y-m-d', oys_ts( $s->starts_at ) ) . '&open=' . $id ) ) . '">' . esc_html__( 'Edit in calendar', 'olivia-studio' ) . '</a>' );
 		echo '<p>' . esc_html( $s->location ) . ' · ' . sprintf( esc_html__( '%1$d of %2$d booked', 'olivia-studio' ), (int) $s->booked, (int) $s->capacity ) . ' · ' . esc_html( $s->status ) . '</p>';
 		$bookings = OYS_Bookings::for_session( $id );
 		$st       = OYS_Bookings::statuses();
@@ -423,7 +434,7 @@ class OYS_Admin {
 					. '<p>' . esc_html__( 'Status', 'olivia-studio' ) . ': <b>' . esc_html( $st[ $r->status ] ?? $r->status ) . '</b></p></div>';
 				if ( in_array( $r->status, array( 'new', 'offered' ), true ) ) {
 					$s     = $r->session_id ? OYS_Schedule::get( $r->session_id ) : null;
-					$price = $r->price_cents ?: OYS_Products::private_price_for( $r->duration_min ) * max( 1, 1 );
+					$price = $r->price_cents ?: OYS_Products::private_price_for( $r->duration_min, 'online' === $r->location_type );
 					echo '<h2>' . ( $s ? esc_html__( 'Change the offer', 'olivia-studio' ) : esc_html__( 'Send an offer', 'olivia-studio' ) ) . '</h2>' . self::form( 'private_offer' ) . '<input type="hidden" name="id" value="' . (int) $r->id . '"><table class="form-table">' // phpcs:ignore
 						. '<tr><th>' . esc_html__( 'Date and time', 'olivia-studio' ) . '</th><td><input type="datetime-local" name="starts" required value="' . esc_attr( $s ? oys_utc_to_local_input( $s->starts_at ) : '' ) . '"></td></tr>'
 						. '<tr><th>' . esc_html__( 'Length (min)', 'olivia-studio' ) . '</th><td><select name="duration">' . implode( '', array_map( fn( $d ) => '<option value="' . $d . '"' . selected( (int) $r->duration_min, $d, false ) . '>' . $d . '</option>', array( 60, 75, 90 ) ) ) . '</select></td></tr>'
@@ -683,7 +694,7 @@ class OYS_Admin {
 			echo '</select></td></tr>';
 			echo '<tr><th>' . esc_html__( 'Price', 'olivia-studio' ) . '</th><td><input name="price" class="small-text" value="' . esc_attr( $p['price_cents'] / 100 ) . '"> ' . esc_html( strtoupper( OYS_Settings::get( 'currency' ) ) ) . '</td></tr>';
 			echo '<tr><th>' . esc_html__( 'Classes / sessions', 'olivia-studio' ) . '</th><td><input type="number" name="credits" min="1" class="small-text" value="' . (int) $p['credits'] . '"> ' . esc_html__( 'valid for', 'olivia-studio' ) . ' <input type="number" name="validity_days" min="0" class="small-text" value="' . (int) $p['validity_days'] . '"> ' . esc_html__( 'days (0 = no expiry)', 'olivia-studio' ) . '</td></tr>';
-			echo '<tr><th>' . esc_html__( 'Session length (private)', 'olivia-studio' ) . '</th><td><input type="number" name="duration_min" min="0" class="small-text" value="' . (int) $p['duration_min'] . '"> min</td></tr>';
+			echo '<tr><th>' . esc_html__( 'Session length (private)', 'olivia-studio' ) . '</th><td><input type="number" name="duration_min" min="0" class="small-text" value="' . (int) $p['duration_min'] . '"> min · ' . esc_html__( 'online price', 'olivia-studio' ) . ' <input name="online_price" class="small-text" value="' . esc_attr( (int) $p['online_price_cents'] ? $p['online_price_cents'] / 100 : '' ) . '"> <span class="description">' . esc_html__( 'Single private sessions only: price when the session is online (empty = same as in person).', 'olivia-studio' ) . '</span></td></tr>';
 			echo '<tr><th>' . esc_html__( 'Membership billing', 'olivia-studio' ) . '</th><td>' . esc_html__( 'every', 'olivia-studio' ) . ' <input type="number" name="interval_count" min="1" class="small-text" value="' . (int) $p['interval_count'] . '"> <select name="interval"><option value="month"' . selected( $p['interval'], 'month', false ) . '>' . esc_html__( 'month(s)', 'olivia-studio' ) . '</option><option value="year"' . selected( $p['interval'], 'year', false ) . '>' . esc_html__( 'year(s)', 'olivia-studio' ) . '</option></select> · ' . esc_html__( 'classes per period', 'olivia-studio' ) . ' <input type="number" name="classes_per_period" min="0" class="small-text" value="' . (int) $p['classes_per_period'] . '"> <span class="description">' . esc_html__( '0 = unlimited. Only used for memberships; a price change applies to new members (existing members keep their price in Stripe).', 'olivia-studio' ) . '</span></td></tr>';
 			echo '<tr><th>' . esc_html__( 'Short description', 'olivia-studio' ) . '</th><td><input class="large-text" name="description" value="' . esc_attr( $p['description'] ) . '"></td></tr>';
 			echo '<tr><th>' . esc_html__( 'Bullet points (one per line)', 'olivia-studio' ) . '</th><td><textarea name="features" rows="3" class="large-text">' . esc_textarea( $p['features'] ) . '</textarea></td></tr>';
@@ -722,6 +733,7 @@ class OYS_Admin {
 			'interval'           => 'year' === ( $_POST['interval'] ?? '' ) ? 'year' : 'month',
 			'interval_count'     => max( 1, (int) ( $_POST['interval_count'] ?? 1 ) ),
 			'classes_per_period' => max( 0, (int) ( $_POST['classes_per_period'] ?? 0 ) ),
+			'online_price_cents' => '' === trim( (string) ( $_POST['online_price'] ?? '' ) ) ? 0 : oys_cents_from_input( wp_unslash( $_POST['online_price'] ) ),
 		) );
 		self::back( 'oys-products', array(), __( 'Saved.', 'olivia-studio' ) );
 	}
@@ -764,6 +776,10 @@ class OYS_Admin {
 		foreach ( $nums as $k => $l ) {
 			echo '<tr><th>' . esc_html( $l ) . '</th><td>' . $f( $k, 'number', 'small-text', 'min="0"' ) . '</td></tr>'; // phpcs:ignore
 		}
+		echo '</table><h2>' . esc_html__( 'Online classes', 'olivia-studio' ) . '</h2><table class="form-table">';
+		echo '<tr><th>' . esc_html__( 'Drop-in price for an online class', 'olivia-studio' ) . '</th><td><input name="online_price" class="small-text" value="' . esc_attr( $s['online_price_cents'] / 100 ) . '"> ' . esc_html( strtoupper( $s['currency'] ) ) . '<p class="description">' . esc_html__( 'Used for new online classes in the calendar; each class can still have its own price.', 'olivia-studio' ) . '</p></td></tr>';
+		echo '<tr><th>' . esc_html__( 'One class on a studio pass covers', 'olivia-studio' ) . '</th><td>' . $f( 'online_per_credit', 'number', 'small-text', 'min="1"' ) . ' ' . esc_html__( 'online classes', 'olivia-studio' ) . '<p class="description">' . esc_html__( 'When someone books an online class with a studio pass, one class from the pass turns into this many online classes (same expiry date); one is used and the rest stay in their account. Online passes are used first. Memberships include online classes, and they don\'t count towards a monthly class limit.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
+		echo '</table><table class="form-table">';
 		echo '<tr><th>' . esc_html__( 'Cancellation policy (shown at booking and in emails)', 'olivia-studio' ) . '</th><td><textarea name="s[cancel_policy]" rows="3" class="large-text">' . esc_textarea( $s['cancel_policy'] ) . '</textarea></td></tr>';
 		echo '</table><h2>' . esc_html__( 'Participation agreement (waiver)', 'olivia-studio' ) . '</h2><table class="form-table">';
 		echo '<tr><th>' . esc_html__( 'Text', 'olivia-studio' ) . '</th><td><textarea name="s[waiver_text]" rows="6" class="large-text">' . esc_textarea( $s['waiver_text'] ) . '</textarea><p class="description">' . esc_html__( 'Have this checked by a lawyer before going live.', 'olivia-studio' ) . '</p></td></tr>';
@@ -797,6 +813,10 @@ class OYS_Admin {
 		$clean['stripe_mode'] = 'live' === ( $clean['stripe_mode'] ?? '' ) ? 'live' : 'test';
 		$clean['currency']    = strtolower( substr( preg_replace( '/[^a-z]/i', '', $clean['currency'] ?? 'usd' ), 0, 3 ) ) ?: 'usd';
 		$clean['hold_minutes'] = max( 30, (int) ( $clean['hold_minutes'] ?? 30 ) );
+		$clean['online_per_credit'] = max( 1, (int) ( $clean['online_per_credit'] ?? 4 ) );
+		if ( isset( $_POST['online_price'] ) ) {
+			$clean['online_price_cents'] = oys_cents_from_input( wp_unslash( $_POST['online_price'] ) );
+		}
 		OYS_Settings::update( $clean );
 		self::back( 'oys-settings', array(), __( 'Settings saved.', 'olivia-studio' ) );
 	}

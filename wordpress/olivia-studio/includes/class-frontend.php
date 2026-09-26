@@ -106,10 +106,11 @@ class OYS_Frontend {
 					$action = '<a class="session__book" href="' . esc_url( oys_book_url( $s->id ) ) . '">' . esc_html__( 'Book', 'olivia-studio' ) . '<span class="sr-only"> ' . $plain . ', ' . esc_html( oys_date( $s->starts_at, 'l g:i a' ) ) . '</span>' . oys_icon( 'arrow' ) . '</a>';
 				}
 				$spots = $left < 1 ? __( 'Full', 'olivia-studio' ) : ( $left <= 3 ? sprintf( _n( '%d spot left', '%d spots left', $left, 'olivia-studio' ), $left ) : '' );
-				$out[] = '<li class="session session--' . esc_attr( $tone ) . '">'
+				$online = oys_is_online( $s );
+				$out[] = '<li class="session session--' . esc_attr( $tone ) . ( $online ? ' session--online' : '' ) . '">'
 					. '<span class="session__time">' . esc_html( oys_time( $s->starts_at ) . ' – ' . oys_time( $s->ends_at ) ) . '</span>'
 					. '<span class="session__class">' . $title . '</span>'
-					. '<span class="session__place">' . esc_html( $s->location ?: ( $s->online_url ? __( 'Online', 'olivia-studio' ) : '' ) ) . '</span>'
+					. '<span class="session__place">' . ( $online ? '<span class="session__online">' . esc_html__( 'Online', 'olivia-studio' ) . '</span> ' . esc_html( $s->price_cents ? oys_money( $s->price_cents ) : '' ) : esc_html( $s->location ) ) . '</span>'
 					. ( $s->note ? '<span class="session__note">' . esc_html( $s->note ) . '</span>' : '' )
 					. ( $spots ? '<span class="session__spots' . ( $left < 1 ? ' is-full' : '' ) . '">' . esc_html( $spots ) . '</span>' : '' )
 					. $action . '</li>';
@@ -148,7 +149,9 @@ class OYS_Frontend {
 	public static function sc_pricing( $atts ) {
 		$dropin = (int) apply_filters( 'oys_dropin_display_price', 2500 );
 		$cards  = array();
-		$cards[] = array( 'tone' => 'paper', 'title' => __( 'Drop-in class', 'olivia-studio' ), 'price' => oys_money( $dropin ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array( __( 'Any group class', 'olivia-studio' ), __( 'In person or online', 'olivia-studio' ), __( 'Bring friends: add guests when you book', 'olivia-studio' ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
+		$online_price = (int) OYS_Settings::get( 'online_price_cents' );
+		$ratio        = OYS_Passes::online_per_credit();
+		$cards[] = array( 'tone' => 'paper', 'title' => __( 'Drop-in class', 'olivia-studio' ), 'price' => oys_money( $dropin ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array_filter( array( __( 'Any group class in person', 'olivia-studio' ), $online_price ? sprintf( __( 'Online classes: %s', 'olivia-studio' ), oys_money( $online_price ) ) : '', __( 'Bring friends: add guests when you book', 'olivia-studio' ) ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
 		$tones = array( 'lilac', 'sun', 'pink' );
 		$i     = 0;
 		foreach ( OYS_Products::all( true ) as $p ) {
@@ -164,12 +167,18 @@ class OYS_Frontend {
 						$features[] = sprintf( '%d minutes: %s', (int) $q['duration_min'], oys_money( $q['price_cents'] ) );
 					}
 				}
+				if ( (int) $p['online_price_cents'] && (int) $p['online_price_cents'] !== (int) $p['price_cents'] ) {
+					$features[] = sprintf( __( 'Online: %s (60 minutes)', 'olivia-studio' ), oys_money( $p['online_price_cents'] ) );
+				}
 			} elseif ( 'membership' === $p['kind'] ) {
 				$cta  = array( __( 'Join', 'olivia-studio' ), oys_page_url( 'book', array( 'product' => $p['id'] ) ) );
 				$unit = OYS_Products::period_label( $p );
 			} else {
 				$cta  = array( 'intro' === $p['kind'] ? __( 'Claim the intro offer', 'olivia-studio' ) : __( 'Buy now', 'olivia-studio' ), oys_page_url( 'book', array( 'product' => $p['id'] ) ) );
-				$unit = 'private_pack' === $p['kind'] ? __( 'per pack', 'olivia-studio' ) : sprintf( _n( '%d class', '%d classes', (int) $p['credits'], 'olivia-studio' ), (int) $p['credits'] );
+				$unit = 'private_pack' === $p['kind'] ? __( 'per pack', 'olivia-studio' ) : sprintf( 'online_pack' === $p['kind'] ? _n( '%d online class', '%d online classes', (int) $p['credits'], 'olivia-studio' ) : _n( '%d class', '%d classes', (int) $p['credits'], 'olivia-studio' ), (int) $p['credits'] );
+				if ( in_array( $p['kind'], array( 'pack', 'intro' ), true ) && $ratio > 1 ) {
+					$features[] = sprintf( __( 'Online classes: 1 class = %d online', 'olivia-studio' ), $ratio );
+				}
 			}
 			$cards[] = array( 'tone' => $p['featured'] ? 'forest' : $tones[ $i++ % 3 ], 'title' => $p['name'], 'price' => oys_money( $p['price_cents'] ), 'unit' => $unit, 'features' => $features, 'cta' => $cta, 'featured' => (bool) $p['featured'] );
 		}
@@ -234,14 +243,16 @@ class OYS_Frontend {
 			array( 'calendar', oys_date( $s->starts_at, 'l, F j' ) ),
 			array( 'clock', oys_time( $s->starts_at ) . ' – ' . oys_time( $s->ends_at ) ),
 		);
-		if ( $s->location ) {
+		if ( oys_is_online( $s ) ) {
+			$rows[] = array( 'pin', __( 'Online, live. The link is in your confirmation email and your account.', 'olivia-studio' ) );
+		} elseif ( $s->location ) {
 			$rows[] = array( 'pin', $s->location );
 		}
 		if ( 'private' !== $s->kind ) {
 			$left   = OYS_Schedule::spots_left( $s );
 			$rows[] = array( 'users', $left < 1 ? __( 'Full', 'olivia-studio' ) : sprintf( _n( '%d spot left', '%d spots left', $left, 'olivia-studio' ), $left ) );
 		}
-		$html = '<div class="oys-card oys-summary"><p class="kicker">' . esc_html( OYS_Schedule::kinds()[ $s->kind ] ?? '' ) . '</p><h2>' . esc_html( oys_session_title( $s ) ) . '</h2><ul class="oys-facts">';
+		$html = '<div class="oys-card oys-summary"><p class="kicker">' . esc_html( ( OYS_Schedule::kinds()[ $s->kind ] ?? '' ) . ( oys_is_online( $s ) ? ' · ' . __( 'Online', 'olivia-studio' ) : '' ) ) . '</p><h2>' . esc_html( oys_session_title( $s ) ) . '</h2><ul class="oys-facts">';
 		foreach ( $rows as $r ) {
 			$html .= '<li>' . oys_icon( $r[0] ) . '<span>' . esc_html( $r[1] ) . '</span></li>';
 		}
@@ -318,7 +329,10 @@ class OYS_Frontend {
 		$held      = $mine ? array() : OYS_Bookings::unfinished_for( $user_id, $s->id );
 		$left     += count( $held ); // Seats held for this customer's own unfinished payment are theirs to use again.
 		$kind      = OYS_Bookings::credit_kind( $s );
-		$credits   = $s->credits_allowed ? OYS_Passes::balance( $user_id, $kind ) : 0;
+		$credits   = $s->credits_allowed ? OYS_Passes::available_for( $user_id, $s ) : 0;
+		// Online class and no online credits yet: studio pass classes are converted (1 → online_per_credit).
+		$converts  = 'online' === $kind && $credits > 0 && ! OYS_Passes::balance( $user_id, 'online' );
+		$conv_note = $converts ? sprintf( __( 'Online classes cost less: one class from your pass covers %d online classes, and the rest stay on your account.', 'olivia-studio' ), OYS_Passes::online_per_credit() ) : '';
 		$max_g     = 'private' === $s->kind ? 0 : (int) OYS_Settings::get( 'max_guests' );
 		$ready     = OYS_Settings::payments_ready();
 		$price     = (int) $s->price_cents;
@@ -389,7 +403,10 @@ class OYS_Frontend {
 			$options[] = array( 'membership', sprintf( __( 'Use my membership (%s)', 'olivia-studio' ), $note ), '<span class="oys-option__price">' . esc_html__( 'Included', 'olivia-studio' ) . '</span>', __( 'Guests are paid from your pass if you have enough classes, otherwise by card.', 'olivia-studio' ) );
 		}
 		if ( $credits > 0 ) {
-			$options[] = array( 'credit', sprintf( _n( 'Use my pass (%d class left)', 'Use my pass (%d classes left)', $credits, 'olivia-studio' ), $credits ), '<span class="oys-option__price" data-needs="' . (int) $credits . '">' . esc_html__( '1 class each', 'olivia-studio' ) . '</span>', '' );
+			$label     = 'online' === $kind
+				? sprintf( _n( 'Use my pass (%d online class)', 'Use my pass (%d online classes)', $credits, 'olivia-studio' ), $credits )
+				: sprintf( _n( 'Use my pass (%d class left)', 'Use my pass (%d classes left)', $credits, 'olivia-studio' ), $credits );
+			$options[] = array( 'credit', $label, '<span class="oys-option__price" data-needs="' . (int) $credits . '">' . esc_html( 'online' === $kind ? __( '1 online class each', 'olivia-studio' ) : __( '1 class each', 'olivia-studio' ) ) . '</span>', $conv_note );
 		}
 		if ( $price > 0 ) {
 			$options[] = array( 'card', 'private' === $s->kind ? __( 'Pay for this session', 'olivia-studio' ) : __( 'Pay by card (drop-in)', 'olivia-studio' ), '<span class="oys-option__price" data-each="' . $price . '">' . esc_html( oys_money( $price ) ) . '</span>', '' );
@@ -398,7 +415,7 @@ class OYS_Frontend {
 		}
 		if ( 'private' !== $s->kind && $s->credits_allowed && $ready ) {
 			foreach ( OYS_Products::purchasable() as $p ) {
-				if ( 'class' !== OYS_Products::credit_kind( $p ) || ( 'intro' === $p['kind'] && ! OYS_Orders::is_new_customer( $user_id ) ) ) {
+				if ( $kind !== OYS_Products::credit_kind( $p ) || ( 'intro' === $p['kind'] && ! OYS_Orders::is_new_customer( $user_id ) ) ) {
 					continue;
 				}
 				$options[] = array( 'pack:' . $p['id'], sprintf( __( 'Buy %s and use it for this booking', 'olivia-studio' ), $p['name'] ), '<span class="oys-option__price" data-needs="' . (int) $p['credits'] . '">' . esc_html( oys_money( $p['price_cents'] ) ) . '</span>', '' );
@@ -429,7 +446,7 @@ class OYS_Frontend {
 
 	private static function render_product_checkout( $product_id ) {
 		$p = OYS_Products::get( $product_id );
-		if ( ! $p || empty( $p['active'] ) || ! in_array( $p['kind'], array( 'pack', 'intro', 'private_pack', 'membership' ), true ) ) {
+		if ( ! $p || empty( $p['active'] ) || ! in_array( $p['kind'], array( 'pack', 'intro', 'online_pack', 'private_pack', 'membership' ), true ) ) {
 			return '<p class="oys-notice oys-notice--error">' . esc_html__( 'This pass is not available.', 'olivia-studio' ) . '</p>';
 		}
 		$is_member = 'membership' === $p['kind'];
@@ -594,7 +611,7 @@ class OYS_Frontend {
 
 		if ( 'membership' === $method ) {
 			// The member is covered; guests use pass credits if there are enough, otherwise they are paid by card.
-			$guest_credit = $n && OYS_Passes::balance( $user_id, $kind ) >= $n;
+			$guest_credit = $n && OYS_Passes::available_for( $user_id, $s ) >= $n;
 			$res          = OYS_Bookings::book_party( $user_id, $s, array( 'method' => 'membership', 'guests' => $guest_credit ? $guests : array(), 'guest_method' => 'credit' ) );
 			if ( is_wp_error( $res ) ) {
 				$fail( $res );
@@ -640,7 +657,7 @@ class OYS_Frontend {
 
 		if ( str_starts_with( $method, 'pack:' ) ) {
 			$p = OYS_Products::get( substr( $method, 5 ) );
-			if ( ! $p || empty( $p['active'] ) || 'class' !== OYS_Products::credit_kind( $p ) || ! in_array( $p['kind'], array( 'pack', 'intro' ), true ) ) {
+			if ( ! $p || empty( $p['active'] ) || $kind !== OYS_Products::credit_kind( $p ) || ! in_array( $p['kind'], array( 'pack', 'intro', 'online_pack' ), true ) ) {
 				oys_redirect( $back );
 			}
 			if ( 'intro' === $p['kind'] && ! OYS_Orders::is_new_customer( $user_id ) ) {
@@ -687,7 +704,7 @@ class OYS_Frontend {
 		$user_id = get_current_user_id();
 		$p       = OYS_Products::get( sanitize_key( $_POST['product'] ?? '' ) );
 		$back    = $p ? oys_page_url( 'book', array( 'product' => $p['id'] ) ) : oys_page_url( 'book' );
-		if ( ! $p || empty( $p['active'] ) || ! in_array( $p['kind'], array( 'pack', 'intro', 'private_pack' ), true ) ) {
+		if ( ! $p || empty( $p['active'] ) || ! in_array( $p['kind'], array( 'pack', 'intro', 'online_pack', 'private_pack' ), true ) ) {
 			oys_redirect( $back );
 		}
 		if ( 'intro' === $p['kind'] && ! OYS_Orders::is_new_customer( $user_id ) ) {
@@ -824,6 +841,7 @@ class OYS_Frontend {
 
 		$credits = OYS_Passes::balance( $user_id, 'class' );
 		$private = OYS_Passes::balance( $user_id, 'private' );
+		$online  = OYS_Passes::balance( $user_id, 'online' );
 		$member  = OYS_Memberships::current_for( $user_id );
 		$next    = OYS_Bookings::for_user( $user_id, 'upcoming', array( 'confirmed' ) );
 		$out     = $flash . '<div class="oys-account"><header class="oys-account__head"><div><h2>' . sprintf( esc_html__( 'Hi, %s', 'olivia-studio' ), esc_html( $user->first_name ?: $user->display_name ) ) . '</h2></div><dl class="oys-stats">';
@@ -832,6 +850,7 @@ class OYS_Frontend {
 			$out .= '<div class="oys-stat oys-stat--sun"><dt>' . esc_html__( 'Membership', 'olivia-studio' ) . '</dt><dd>' . esc_html( $left ) . '</dd></div>';
 		}
 		$out .= '<div class="oys-stat oys-stat--lilac"><dt>' . esc_html__( 'Classes on passes', 'olivia-studio' ) . '</dt><dd>' . (int) $credits . '</dd></div>'
+			. ( $online ? '<div class="oys-stat oys-stat--lilac"><dt>' . esc_html__( 'Online classes', 'olivia-studio' ) . '</dt><dd>' . (int) $online . '</dd></div>' : '' )
 			. ( $private ? '<div class="oys-stat oys-stat--sun"><dt>' . esc_html__( 'Private sessions', 'olivia-studio' ) . '</dt><dd>' . (int) $private . '</dd></div>' : '' )
 			. '<div class="oys-stat oys-stat--pink"><dt>' . esc_html__( 'Upcoming', 'olivia-studio' ) . '</dt><dd>' . count( $next ) . '</dd></div></dl></header>';
 		$out .= '<nav class="oys-account__nav" aria-label="' . esc_attr__( 'Account', 'olivia-studio' ) . '">';
@@ -967,7 +986,7 @@ class OYS_Frontend {
 				$expired = $p->expires_at && oys_ts( $p->expires_at ) < time();
 				$state   = $expired ? __( 'Expired', 'olivia-studio' ) : ( $p->credits_left < 1 ? __( 'Used up', 'olivia-studio' ) : '' );
 				$pct     = $p->credits_total ? round( 100 * $p->credits_left / $p->credits_total ) : 0;
-				$out    .= '<article class="oys-pass' . ( $state ? ' is-done' : '' ) . ' oys-pass--' . esc_attr( $p->kind ) . '"><p class="kicker">' . esc_html( 'private' === $p->kind ? __( 'Private sessions', 'olivia-studio' ) : __( 'Group classes', 'olivia-studio' ) ) . '</p>'
+				$out    .= '<article class="oys-pass' . ( $state ? ' is-done' : '' ) . ' oys-pass--' . esc_attr( $p->kind ) . '"><p class="kicker">' . esc_html( OYS_Passes::kinds()[ $p->kind ] ?? $p->kind ) . '</p>'
 					. '<h4>' . esc_html( $p->name ) . '</h4><p class="oys-pass__count"><b>' . (int) $p->credits_left . '</b> / ' . (int) $p->credits_total . '</p>'
 					. '<span class="oys-meter"><span style="width:' . (int) $pct . '%"></span></span>'
 					. '<p class="oys-small">' . ( $state ? esc_html( $state ) : ( $p->expires_at ? sprintf( esc_html__( 'Use by %s', 'olivia-studio' ), esc_html( oys_date( $p->expires_at, get_option( 'date_format' ) ) ) ) : esc_html__( 'No expiry', 'olivia-studio' ) ) ) . '</p></article>';
@@ -1032,8 +1051,9 @@ class OYS_Frontend {
 		}
 		$dur = '';
 		foreach ( array( 60, 75, 90 ) as $d ) {
-			$price = OYS_Products::private_price_for( $d );
-			$dur  .= '<option value="' . $d . '">' . sprintf( esc_html__( '%d minutes', 'olivia-studio' ), $d ) . ( $price ? ' · ' . esc_html( oys_money( $price ) ) : '' ) . '</option>';
+			$price  = OYS_Products::private_price_for( $d );
+			$oprice = OYS_Products::private_price_for( $d, true );
+			$dur   .= '<option value="' . $d . '">' . sprintf( esc_html__( '%d minutes', 'olivia-studio' ), $d ) . ( $price ? ' · ' . esc_html( oys_money( $price ) ) : '' ) . ( $oprice && $oprice !== $price ? ' · ' . esc_html( sprintf( __( 'online %s', 'olivia-studio' ), oys_money( $oprice ) ) ) : '' ) . '</option>';
 		}
 		return self::form_open( 'oys_private_request', 'class="oys-form oys-card"' )
 			. '<div class="form__row"><label class="field"><span>' . esc_html__( 'Length', 'olivia-studio' ) . '</span><select name="duration_min" id="oys-pr-duration">' . $dur . '</select></label>'

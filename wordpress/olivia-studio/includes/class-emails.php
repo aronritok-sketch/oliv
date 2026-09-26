@@ -49,7 +49,9 @@ class OYS_Emails {
 			__( 'Class', 'olivia-studio' ) => oys_session_title( $session ),
 			__( 'When', 'olivia-studio' )  => oys_date( $session->starts_at, 'l, F j · g:i a' ) . ' – ' . oys_time( $session->ends_at ),
 		);
-		if ( $session->location ) {
+		if ( oys_is_online( $session ) ) {
+			$rows[ __( 'Where', 'olivia-studio' ) ] = __( 'Online (live)', 'olivia-studio' );
+		} elseif ( $session->location ) {
 			$rows[ __( 'Where', 'olivia-studio' ) ] = $session->location;
 		}
 		$html = '<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-top:2px solid #12231A;margin:18px 0">';
@@ -231,6 +233,23 @@ class OYS_Emails {
 		$body  = '<p>' . esc_html__( 'A spot just opened in a class you\'re waiting for. It goes to whoever books first.', 'olivia-studio' ) . '</p>';
 		$body .= self::session_block( $session );
 		self::send( self::user_email( $user_id ), sprintf( __( 'A spot opened: %s', 'olivia-studio' ), oys_session_title( $session ) ), __( 'A spot is free', 'olivia-studio' ), $body, array(), array( __( 'Book now', 'olivia-studio' ), oys_book_url( $session->id ) ) );
+	}
+
+	/** The studio moved a class (new time, day or place): to the person who booked, or to a guest with an email. */
+	public static function session_changed( $booking, $session, $before ) {
+		$guest = (bool) $booking->guest_of;
+		$to    = $guest ? $booking->guest_email : self::user_email( $booking->user_id );
+		$name  = $guest ? $booking->guest_name : self::first_name( $booking->user_id );
+		$body  = '<p>' . sprintf( esc_html__( 'Hi %s, there\'s a change to your class. Your spot is kept, nothing to do if the new details work for you.', 'olivia-studio' ), esc_html( $name ) ) . '</p>';
+		$body .= '<p style="color:#53635A">' . esc_html__( 'Before:', 'olivia-studio' ) . ' <s>' . esc_html( oys_date( $before->starts_at, 'l, F j · g:i a' ) . ( oys_is_online( $before ) ? ' · ' . __( 'Online', 'olivia-studio' ) : ( $before->location ? ' · ' . $before->location : '' ) ) ) . '</s></p>';
+		$body .= '<p><b>' . esc_html__( 'Now:', 'olivia-studio' ) . '</b></p>' . self::session_block( $session );
+		if ( $session->online_url ) {
+			$body .= '<p><b>' . esc_html__( 'Join online:', 'olivia-studio' ) . '</b> <a href="' . esc_url( $session->online_url ) . '">' . esc_html( $session->online_url ) . '</a></p>';
+		}
+		if ( ! $guest ) {
+			$body .= '<p>' . esc_html__( 'Can\'t make the new time? Cancel in your account and your class goes back on your pass (or you get a class credit).', 'olivia-studio' ) . '</p>';
+		}
+		self::send( $to, sprintf( __( 'Changed: %s', 'olivia-studio' ), oys_session_title( $session ) . ', ' . oys_date( $session->starts_at, 'D M j · g:i a' ) ), __( 'Your class has changed', 'olivia-studio' ), $body, array( self::ics_file( $session, $booking->id ) ), $guest ? null : array( __( 'My bookings', 'olivia-studio' ), oys_account_url() ) );
 	}
 
 	public static function reminder( $booking_id ) {

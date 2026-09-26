@@ -433,6 +433,130 @@ async function payOnMockStripe(page, button = '#pay') {
   check(await a.isVisible('text=went through'), 'an earlier payment that went through is recognised');
   check(JSON.parse(q(`SELECT COUNT(*) AS n FROM wp_oys_orders WHERE session_id=${u2} AND status='paid'`))[0].n == 1, 'charged once');
 
+  // 27. Online classes: own price, a studio pass class converts into 4 online classes, online pass.
+  const on1 = fresh(), on2 = fresh();
+  php(`global $wpdb; $wpdb->query("UPDATE {$wpdb->prefix}oys_sessions SET format='online', price_cents=600, location='', online_url='https://zoom.example/j/1' WHERE id IN (${on1},${on2})");`);
+  const zoe = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
+  await zoe.goto(`${BASE}/book/?session=${on1}`);
+  await register(zoe, 'Zoe', `zoe${stamp}@example.com`);
+  const zoeId = php(`echo get_user_by('email','zoe${stamp}@example.com')->ID;`);
+  check(await zoe.isVisible('.oys-option__price:has-text("$6")'), 'online class costs $6 by card');
+  php(`OYS_Passes::grant(${zoeId}, array('credits'=>1,'name'=>'5-class pass','validity_days'=>60));`);
+  await zoe.goto(`${BASE}/book/?session=${on1}`);
+  check(await zoe.isVisible('text=Use my pass (4 online classes)'), 'one studio class shows as 4 online classes');
+  check(await zoe.isVisible('text=covers 4 online classes'), 'conversion is explained');
+  await zoe.screenshot({ path: `${SHOTS}/13-online-book.png`, fullPage: true });
+  await zoe.check('input[value="credit"]');
+  await Promise.all([zoe.waitForNavigation(), zoe.click('.oys-submit')]);
+  check(await zoe.isVisible("text=You're booked"), 'online class booked with the pass');
+  const zbal = k => parseInt(php(`echo OYS_Passes::balance(${zoeId},'${k}');`), 10);
+  check(zbal('class') === 0 && zbal('online') === 3, 'studio class converted: 3 online classes left');
+  await zoe.goto(`${BASE}/account/?tab=passes`);
+  check(await zoe.isVisible('text=Online classes (from 5-class pass)'), 'converted online classes show in the account');
+  await zoe.goto(`${BASE}/book/?session=${on2}`);
+  check(await zoe.isVisible('text=Use my pass (3 online classes)'), 'next online class uses the online classes');
+  await zoe.goto(`${BASE}/book/?product=online-10`);
+  check(await zoe.isVisible('text=Online 10-class pass'), 'online pass can be bought');
+  await zoe.click('.oys-submit');
+  await payOnMockStripe(zoe);
+  check(zbal('online') === 13, 'online pass adds 10 online classes');
+  await zoe.goto(`${BASE}/schedule-pricing/`);
+  check(await zoe.isVisible('text=Online classes: $6'), 'pricing shows the online price');
+  await zoe.goto(`${BASE}/account/?tab=private`);
+  check(await zoe.locator('#oys-pr-duration option', { hasText: 'online' }).count() > 0, 'private sessions show an online price');
+
+  // 28. Admin calendar: add a class by clicking, move it by dragging, weekly class, change the series, stop it.
+  const adm = await (await browser.newContext({ viewport: { width: 1440, height: 1000 } })).newPage();
+  adm.on('pageerror', e => console.log('Calendar JS error:', e.message));
+  await adm.goto(`${BASE}/wp-login.php`);
+  await adm.fill('#user_login', 'admin');
+  await adm.fill('#user_pass', 'admin12345');
+  await Promise.all([adm.waitForNavigation(), adm.click('#wp-submit')]);
+  const week = php(`echo (new DateTimeImmutable('monday this week', wp_timezone()))->modify('+35 days')->format('Y-m-d');`);
+  const wed = php(`echo (new DateTimeImmutable('${week}', wp_timezone()))->modify('+2 days')->format('Y-m-d');`);
+  const thu = php(`echo (new DateTimeImmutable('${week}', wp_timezone()))->modify('+3 days')->format('Y-m-d');`);
+  const fri = php(`echo (new DateTimeImmutable('${week}', wp_timezone()))->modify('+4 days')->format('Y-m-d');`);
+  // Leftovers of earlier runs would sit in the slots this test clicks.
+  php(`global $wpdb; $p = $wpdb->prefix; $wpdb->query("UPDATE {$p}oys_templates SET active = 0 WHERE location = 'Calendar test studio'"); $wpdb->query("UPDATE {$p}oys_sessions SET status = 'cancelled' WHERE location = 'Calendar test studio' OR online_url = 'https://zoom.example/j/2'");`);
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-calendar&week=${week}`);
+  await adm.waitForSelector('.oys-cal__grid');
+  const slotY = async (date, time) => {
+    const col = adm.locator(`.oys-cal__col[data-date="${date}"]`);
+    const box = await col.boundingBox();
+    const h0 = parseInt(await col.getAttribute('data-h0'), 10);
+    const [h, m] = time.split(':').map(Number);
+    return { x: box.x + box.width / 2, y: box.y + ((h * 60 + m) - h0 * 60) / 60 * 64 + 10 };
+  };
+  let pt = await slotY(wed, '06:00');
+  await adm.mouse.click(pt.x, pt.y);
+  await adm.waitForSelector('.oys-drawer');
+  check((await adm.inputValue('.oys-drawer [name=start]')) === '06:00', 'clicked time is filled in');
+  await adm.selectOption('.oys-drawer [name=class_slug]', { index: 1 });
+  await adm.click('.oys-drawer .oys-seg label:has-text("Online")');
+  check((await adm.inputValue('.oys-drawer [name=price]')) === '6', 'online price filled in');
+  await adm.fill('.oys-drawer [name=online_url]', 'https://zoom.example/j/2');
+  await adm.screenshot({ path: `${SHOTS}/14-calendar-new.png` });
+  await adm.click('.oys-drawer [data-save]');
+  await adm.waitForSelector('.oys-toast');
+  const created = JSON.parse(q(`SELECT id, format, price_cents FROM wp_oys_sessions WHERE online_url='https://zoom.example/j/2' ORDER BY id DESC LIMIT 1`))[0];
+  check(created && created.format === 'online' && +created.price_cents === 600, 'online class created from the calendar');
+  // Drag it to Thursday 07:00.
+  await adm.waitForSelector(`.oys-ev[data-id="${created.id}"]`);
+  const evBox = await adm.locator(`.oys-ev[data-id="${created.id}"]`).boundingBox();
+  pt = await slotY(thu, '07:00');
+  await adm.mouse.move(evBox.x + 20, evBox.y + 10);
+  await adm.mouse.down();
+  await adm.mouse.move(evBox.x + 40, evBox.y + 30, { steps: 4 });
+  await adm.mouse.move(pt.x, pt.y, { steps: 12 });
+  await adm.mouse.up();
+  await adm.waitForSelector('.oys-toast:has-text("Saved")', { timeout: 5000 }).catch(() => {});
+  const movedRow = JSON.parse(q(`SELECT starts_at FROM wp_oys_sessions WHERE id=${created.id}`))[0];
+  check(php(`echo wp_date('Y-m-d H:i', oys_ts('${movedRow.starts_at}'));`) === `${thu} 07:00`, 'dragging moves the class');
+  // A weekly class on Friday 08:00.
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-calendar&week=${week}`);
+  await adm.waitForSelector('.oys-cal__grid');
+  pt = await slotY(fri, '08:00');
+  await adm.mouse.click(pt.x, pt.y);
+  await adm.waitForSelector('.oys-drawer');
+  await adm.selectOption('.oys-drawer [name=class_slug]', { index: 1 });
+  await adm.fill('.oys-drawer [name=location]', 'Calendar test studio');
+  await adm.selectOption('.oys-drawer [name=repeat]', 'weekly');
+  await adm.click('.oys-drawer [data-save]');
+  await adm.waitForSelector('.oys-toast:has-text("Weekly class created")');
+  const tplRow = JSON.parse(q(`SELECT id, valid_from FROM wp_oys_templates WHERE location='Calendar test studio' ORDER BY id DESC LIMIT 1`))[0];
+  check(tplRow && tplRow.valid_from === fri, 'weekly class starts on the chosen Friday');
+  const series = JSON.parse(q(`SELECT id FROM wp_oys_sessions WHERE template_id=${tplRow.id} ORDER BY starts_at`));
+  check(series.length >= 1, 'weekly dates created');
+  // Book a customer on it, then change the time for this and following weeks and email them.
+  php(`OYS_Bookings::book_manual(${zoeId}, ${series[0].id}, 'comp', false);`);
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-calendar&week=${week}&open=${series[0].id}`);
+  await adm.waitForSelector('.oys-drawer');
+  check(await adm.isVisible('.oys-drawer__people >> text=Zoe'), 'drawer lists who is booked');
+  await adm.fill('.oys-drawer [name=start]', '08:30');
+  const mailsBefore = mailSubjects().filter(x => x && x.startsWith('Changed:')).length;
+  await adm.click('.oys-drawer [data-save]');
+  await adm.waitForSelector('.oys-modal');
+  await adm.screenshot({ path: `${SHOTS}/15-calendar-scope.png` });
+  check(await adm.isVisible('.oys-modal >> text=Email the 1 person booked'), 'asks to email the person booked');
+  await adm.click('.oys-modal button:has-text("This and following weeks")');
+  await adm.waitForSelector('.oys-toast:has-text("Weekly class updated")');
+  check(JSON.parse(q(`SELECT start_time FROM wp_oys_templates WHERE id=${tplRow.id}`))[0].start_time === '08:30', 'weekly time changed');
+  check(mailSubjects().filter(x => x && x.startsWith('Changed:')).length === mailsBefore + 1, 'booked customer emailed about the new time');
+  // Stop the weekly class.
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-calendar&week=${week}&open=${series[0].id}`);
+  await adm.waitForSelector('.oys-drawer');
+  await adm.click('.oys-drawer [data-cancel]');
+  await adm.fill('.oys-modal [name=reason]', 'Schedule change');
+  await adm.click('.oys-modal button:has-text("Stop the weekly class")');
+  await adm.waitForSelector('.oys-toast:has-text("Weekly class stopped")');
+  check(JSON.parse(q(`SELECT active FROM wp_oys_templates WHERE id=${tplRow.id}`))[0].active == 0, 'weekly class stopped');
+  check(JSON.parse(q(`SELECT COUNT(*) AS n FROM wp_oys_sessions WHERE template_id=${tplRow.id} AND status='scheduled'`))[0].n == 0, 'its dates are cancelled');
+  await adm.screenshot({ path: `${SHOTS}/16-calendar.png`, fullPage: true });
+  const admPhone = await (await browser.newContext({ viewport: { width: 390, height: 844 }, storageState: await adm.context().storageState() })).newPage();
+  await admPhone.goto(`${BASE}/wp-admin/admin.php?page=oys-calendar&week=${week}`);
+  await admPhone.waitForSelector('.oys-cal__daytabs');
+  check(await admPhone.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth) <= 0, 'calendar fits a phone');
+
   // Screens for review.
   await a.goto(`${BASE}/schedule-pricing/`);
   await a.screenshot({ path: `${SHOTS}/10-schedule-pricing.png`, fullPage: true });
