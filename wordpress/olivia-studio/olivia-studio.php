@@ -39,6 +39,7 @@ require_once OYS_DIR . 'includes/class-cron.php';
 require_once OYS_DIR . 'includes/class-frontend.php';
 require_once OYS_DIR . 'includes/class-privacy.php';
 require_once OYS_DIR . 'includes/admin/class-calendar.php';
+require_once OYS_DIR . 'includes/class-app-api.php';
 
 if ( is_admin() ) {
 	require_once OYS_DIR . 'includes/admin/class-admin.php';
@@ -61,6 +62,7 @@ add_action( 'plugins_loaded', function () {
 	OYS_Privacy::init();
 	OYS_Calendar::init();
 	OYS_Zoom::init();
+	OYS_App_API::init();
 	if ( is_admin() ) {
 		OYS_Admin::init();
 	}

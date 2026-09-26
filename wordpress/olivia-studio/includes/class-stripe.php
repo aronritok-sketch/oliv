@@ -106,7 +106,7 @@ class OYS_Stripe {
 		$user  = get_userdata( $order->user_id );
 		$hold  = max( 30, (int) OYS_Settings::get( 'hold_minutes' ) ); // Stripe's minimum is 30 minutes.
 
-		$return = oys_page_url( 'book', array( 'oys_order' => $order_id, 'oys_key' => self::order_key( $order_id ) ) );
+		$return = oys_page_url( 'book', array_filter( array( 'oys_order' => $order_id, 'oys_key' => self::order_key( $order_id ), 'app' => empty( $order->meta['app'] ) ? '' : 1 ) ) );
 		$params = array(
 			'mode'                => 'payment',
 			'client_reference_id' => (string) $order_id,

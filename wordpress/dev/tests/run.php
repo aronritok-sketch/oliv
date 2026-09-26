@@ -754,6 +754,123 @@ test( 'reminders: two class reminders, online join link, pass about to expire', 
 	eq( 0, count( array_filter( sent_mails( fn() => OYS_Cron::send_reminders() ), fn( $m ) => str_contains( $m['subject'], (string) $s2->id ) ) ), 'reminder switched off' );
 } );
 
+function api( $method, $path, $body = null, $token = '' ) {
+	$req = new WP_REST_Request( $method, '/oys/v1' . $path );
+	if ( $token ) {
+		$req->set_header( 'Authorization', 'Bearer ' . $token );
+	}
+	if ( null !== $body ) {
+		$req->set_header( 'Content-Type', 'application/json' );
+		$req->set_body( wp_json_encode( $body ) );
+	}
+	if ( str_contains( $path, '?' ) ) {
+		parse_str( substr( $path, strpos( $path, '?' ) + 1 ), $q );
+		$req->set_query_params( $q );
+		$req->set_route( '/oys/v1' . substr( $path, 0, strpos( $path, '?' ) ) );
+	}
+	wp_set_current_user( 0 );
+	$res = rest_do_request( $req );
+	return array( $res->get_status(), $res->get_data() );
+}
+
+test( 'app api: login, token, me, logout', function () {
+	$u    = make_user( 'Ivy' );
+	$user = get_userdata( $u );
+	[ $code ] = api( 'POST', '/app/login', array( 'email' => $user->user_email, 'password' => 'wrong' ) );
+	eq( 401, $code, 'wrong password refused' );
+	[ $code, $data ] = api( 'POST', '/app/login', array( 'email' => $user->user_email, 'password' => 'x-12345678', 'device' => 'iPhone' ) );
+	eq( 200, $code, 'logged in' );
+	ok( preg_match( '/^' . $u . '\.[A-Za-z0-9]{40}$/', $data['token'] ), 'token shape' );
+	eq( 'Ivy', $data['me']['user']['first_name'], 'profile in the login answer' );
+	$tok = $data['token'];
+	[ $code, $me ] = api( 'GET', '/app/me', null, $tok );
+	eq( 200, $code, 'me with the token' );
+	ok( ! str_contains( wp_json_encode( get_user_meta( $u, OYS_App_API::META, true ) ), explode( '.', $tok )[1] ), 'only a hash of the token is stored' );
+	[ $code ] = api( 'GET', '/app/me', null, $u . '.' . str_repeat( 'a', 40 ) );
+	eq( 401, $code, 'forged token refused' );
+	[ $code ] = api( 'GET', '/app/me' );
+	eq( 401, $code, 'no token refused' );
+	api( 'POST', '/app/logout', array(), $tok );
+	[ $code ] = api( 'GET', '/app/me', null, $tok );
+	eq( 401, $code, 'logged out token no longer works' );
+} );
+
+test( 'app api: schedule, book with a pass, card checkout, cancel, waiver', function () {
+	$u   = make_user( 'Joy' );
+	$tok = OYS_App_API::issue_token( $u, 'test' );
+	$s   = make_session( array( 'in_hours' => 30 ) );
+	OYS_Passes::grant( $u, array( 'credits' => 3 ) );
+	[ , $sched ] = api( 'GET', '/app/schedule?days=5', null, $tok );
+	ok( in_array( (int) $s->id, array_column( $sched['sessions'], 'id' ), true ), 'class in the schedule' );
+	[ , $detail ] = api( 'GET', '/app/sessions/' . $s->id, null, $tok );
+	eq( array( 'credit', 'card' ), array_column( $detail['options'], 'method' ), 'pass and card offered' );
+	[ $code, $res ] = api( 'POST', '/app/sessions/' . $s->id . '/book', array( 'method' => 'credit', 'guests' => array( array( 'name' => 'Kim', 'email' => '' ) ) ), $tok );
+	eq( 200, $code, 'booked' );
+	eq( 'booked', $res['status'], 'status booked' );
+	eq( array( 'Kim' ), $res['session']['my_booking']['guests'], 'guest on the booking' );
+	eq( 1, OYS_Passes::balance( $u, 'class' ), 'two classes used' );
+	[ $code ] = api( 'POST', '/app/sessions/' . $s->id . '/book', array( 'method' => 'credit' ), $tok );
+	eq( 409, $code, 'cannot book twice' );
+	[ , $list ] = api( 'GET', '/app/bookings', null, $tok );
+	eq( (int) $s->id, (int) $list['bookings'][0]['id'], 'in my bookings' );
+	$bid = $list['bookings'][0]['booking']['id'];
+	[ $code ] = api( 'POST', '/app/bookings/' . $bid . '/cancel', array(), OYS_App_API::issue_token( make_user(), 'x' ) );
+	eq( 404, $code, "someone else's booking can't be cancelled" );
+	[ $code, $c ] = api( 'POST', '/app/bookings/' . $bid . '/cancel', array(), $tok );
+	eq( 'returned', $c['outcome'], 'cancelled, classes back' );
+	eq( 3, OYS_Passes::balance( $u, 'class' ), 'pass restored' );
+	// Card: a Stripe Checkout URL, the seat is held, the return page knows it's the app.
+	$GLOBALS['stripe_calls'] = array();
+	$s2 = make_session( array( 'in_hours' => 40 ) );
+	[ $code, $co ] = api( 'POST', '/app/sessions/' . $s2->id . '/book', array( 'method' => 'card' ), $tok );
+	eq( 'checkout', $co['status'] ?? '', 'card returns a checkout' );
+	ok( str_starts_with( $co['url'], 'https://' ), 'checkout url' );
+	eq( 1, seats( $s2 ), 'seat held while paying' );
+	$call = array_values( array_filter( $GLOBALS['stripe_calls'], fn( $c ) => '/v1/checkout/sessions' === $c[1] ) )[0];
+	ok( str_contains( $call[2]['success_url'], 'app=1' ), 'return page knows it came from the app' );
+	// Waiver: a new version must be accepted in the app.
+	OYS_Settings::update( array( 'waiver_version' => 'v-test' ) );
+	[ $code, $w ] = api( 'POST', '/app/sessions/' . $s->id . '/book', array( 'method' => 'credit' ), $tok );
+	eq( 409, $code, 'waiver needed' );
+	eq( 'oys_waiver', $w['code'], 'waiver error code' );
+	[ $code ] = api( 'POST', '/app/sessions/' . $s->id . '/book', array( 'method' => 'credit', 'accept_waiver' => true ), $tok );
+	eq( 200, $code, 'booked after accepting' );
+	OYS_Settings::update( array( 'waiver_version' => '2026-09' ) );
+} );
+
+test( 'app api: hybrid online booking and the join link', function () {
+	OYS_Settings::update( array( 'zoom_auto' => 0 ) );
+	$u   = make_user( 'Liv' );
+	$tok = OYS_App_API::issue_token( $u, 'test' );
+	$far = make_session( array( 'format' => 'hybrid', 'online_price' => 600, 'online_url' => 'https://meet.example/h', 'in_hours' => 30 ) );
+	[ , $d ] = api( 'GET', '/app/sessions/' . $far->id . '?mode=online', null, $tok );
+	eq( 'online', $d['mode'], 'online mode' );
+	eq( 600, $d['price_cents'], 'online ticket price' );
+	[ $code ] = api( 'POST', '/app/sessions/' . $far->id . '/book', array( 'method' => 'free', 'mode' => 'online' ), $tok );
+	eq( 400, $code, 'paid class cannot be booked as free' );
+	OYS_Passes::grant( $u, array( 'credits' => 1 ) );
+	[ , $r ] = api( 'POST', '/app/sessions/' . $far->id . '/book', array( 'method' => 'credit', 'mode' => 'online' ), $tok );
+	eq( 'online', $r['session']['my_booking']['mode'], 'booked online' );
+	eq( '', $r['session']['my_booking']['join_url'], 'link not shown a day ahead' );
+	$soon = make_session( array( 'format' => 'online', 'price' => 0, 'online_url' => 'https://meet.example/soon', 'in_hours' => 0.9 ) );
+	global $wpdb;
+	$wpdb->update( OYS_Install::table( 'sessions' ), array( 'starts_at' => oys_utc_plus( 50 * MINUTE_IN_SECONDS ), 'ends_at' => oys_utc_plus( 110 * MINUTE_IN_SECONDS ) ), array( 'id' => $soon->id ) );
+	OYS_Bookings::book_manual( $u, $soon->id, 'comp', false, true );
+	[ , $list ] = api( 'GET', '/app/bookings', null, $tok );
+	$item = array_values( array_filter( $list['bookings'], fn( $b ) => (int) $b['id'] === (int) $soon->id ) )[0];
+	eq( 'https://meet.example/soon', $item['booking']['join_url'], 'join link within the hour' );
+} );
+
+test( 'app api: login lock applies to the app too', function () {
+	$u = get_userdata( make_user() );
+	for ( $i = 0; $i < OYS_Security::MAX_LOGIN_FAILS; $i++ ) {
+		api( 'POST', '/app/login', array( 'email' => $u->user_email, 'password' => 'nope' ) );
+	}
+	[ $code, $d ] = api( 'POST', '/app/login', array( 'email' => $u->user_email, 'password' => 'x-12345678' ) );
+	eq( 429, $code, 'locked after repeated failures' );
+	eq( 'oys_locked', $d['code'], 'locked code' );
+} );
+
 test( 'helpers: money and periods', function () {
 	eq( '$25', oys_money( 2500, 'usd' ), 'whole dollars' );
 	eq( '$25.50', oys_money( 2550, 'usd' ), 'cents' );

@@ -534,6 +534,10 @@ class OYS_Frontend {
 			return '<div class="oys-card oys-done"><h2>' . esc_html__( 'Payment processing', 'olivia-studio' ) . '</h2><p>' . esc_html__( 'Your payment is being confirmed. You\'ll get an email as soon as it goes through, and it will show in your account.', 'olivia-studio' ) . '</p><p class="btn-row"><a class="btn btn--primary" href="' . esc_url( oys_account_url() ) . '">' . esc_html__( 'My account', 'olivia-studio' ) . '</a></p></div>';
 		}
 		$html = '<div class="oys-card oys-done oys-done--paid">';
+		if ( ! empty( $order->meta['app'] ) ) {
+			// Paid from the mobile app: send them back to it.
+			$html .= '<p class="btn-row"><a class="btn btn--orchid oys-back-to-app" href="' . esc_url( apply_filters( 'oys_app_return_url', 'oliviayoga://bookings' ), array( 'oliviayoga', 'https', 'http' ) ) . '">' . esc_html__( 'Back to the app', 'olivia-studio' ) . '</a></p>';
+		}
 		$rows = OYS_Bookings::for_order( $order->id, array( 'confirmed' ) );
 		if ( $rows ) {
 			$s      = OYS_Schedule::get( $rows[0]->session_id );
