@@ -135,9 +135,7 @@ class OYS_Privates {
 		if ( $request->session_id ) {
 			OYS_Schedule::save( array( 'status' => 'cancelled' ), $request->session_id );
 		}
-		$u = get_userdata( $request->user_id );
-		OYS_Emails::send( $u->user_email, __( 'About your private session request', 'olivia-studio' ), __( 'About your request', 'olivia-studio' ),
-			'<p>' . esc_html__( 'Thank you for your request. Unfortunately I can\'t offer a session for it this time.', 'olivia-studio' ) . '</p>' . ( $message ? '<p>' . nl2br( esc_html( $message ) ) . '</p>' : '' ) );
+		OYS_Emails::private_declined( $request, $message );
 	}
 
 	public static function mark_paid( $request_id, $order_id ) {

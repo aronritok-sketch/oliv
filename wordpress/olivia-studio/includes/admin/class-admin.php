@@ -21,7 +21,7 @@ class OYS_Admin {
 			}
 		} );
 		$actions = array( 'save_session', 'cancel_session', 'roster', 'save_template', 'delete_template', 'generate', 'private_offer', 'private_decline',
-			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'zoom_start', 'zoom_create' );
+			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email' );
 		foreach ( $actions as $a ) {
 			add_action( 'admin_post_oys_admin_' . $a, array( __CLASS__, 'guard' ) );
 		}
@@ -41,6 +41,7 @@ class OYS_Admin {
 			'oys-orders'    => array( __( 'Payments', 'olivia-studio' ), 'page_orders' ),
 			'oys-gifts'     => array( __( 'Gift cards', 'olivia-studio' ), 'page_gifts' ),
 			'oys-products'  => array( __( 'Prices & passes', 'olivia-studio' ), 'page_products' ),
+			'oys-emails'    => array( __( 'Emails & reminders', 'olivia-studio' ), 'page_emails' ),
 			'oys-settings'  => array( __( 'Settings', 'olivia-studio' ), 'page_settings' ),
 		);
 		foreach ( $pages as $slug => $p ) {
@@ -797,7 +798,6 @@ class OYS_Admin {
 			'booking_close_minutes' => __( 'Online booking closes (minutes before start)', 'olivia-studio' ),
 			'waitlist_cutoff_hours' => __( 'Waitlist stops moving people in (hours before start)', 'olivia-studio' ),
 			'weeks_ahead'           => __( 'Create weekly classes this many weeks ahead', 'olivia-studio' ),
-			'reminder_hours'        => __( 'Reminder email (hours before; 0 = off)', 'olivia-studio' ),
 			'hold_minutes'          => __( 'Hold a spot during card payment (minutes, 30 or more)', 'olivia-studio' ),
 			'max_guests'            => __( 'Guests a customer can bring per booking (0 = off)', 'olivia-studio' ),
 		);
@@ -824,13 +824,121 @@ class OYS_Admin {
 		echo '</table><h2>' . esc_html__( 'Participation agreement (waiver)', 'olivia-studio' ) . '</h2><table class="form-table">';
 		echo '<tr><th>' . esc_html__( 'Text', 'olivia-studio' ) . '</th><td><textarea name="s[waiver_text]" rows="6" class="large-text">' . esc_textarea( $s['waiver_text'] ) . '</textarea><p class="description">' . esc_html__( 'Have this checked by a lawyer before going live.', 'olivia-studio' ) . '</p></td></tr>';
 		echo '<tr><th>' . esc_html__( 'Version', 'olivia-studio' ) . '</th><td>' . $f( 'waiver_version', 'text', 'small-text' ) . '<p class="description">' . esc_html__( 'Change the version after editing the text: everyone is asked to accept the new version at their next booking.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
-		echo '</table><h2>' . esc_html__( 'Emails', 'olivia-studio' ) . '</h2><table class="form-table">';
-		echo '<tr><th>' . esc_html__( 'Sender name', 'olivia-studio' ) . '</th><td>' . $f( 'email_from_name' ) . '</td></tr>'; // phpcs:ignore
-		echo '<tr><th>' . esc_html__( 'Sender email', 'olivia-studio' ) . '</th><td>' . $f( 'email_from', 'email' ) . '</td></tr>'; // phpcs:ignore
-		echo '<tr><th>' . esc_html__( 'Studio notifications go to', 'olivia-studio' ) . '</th><td>' . $f( 'notify_email', 'email' ) . '</td></tr>'; // phpcs:ignore
-		echo '</table>';
+		echo '</table><h2>' . esc_html__( 'Emails', 'olivia-studio' ) . '</h2><p>' . wp_kses_post( sprintf( __( 'Sender, reminders and the text of every automatic email are in <a href="%s">Studio → Emails &amp; reminders</a>.', 'olivia-studio' ), esc_url( admin_url( 'admin.php?page=oys-emails' ) ) ) ) . '</p>';
 		submit_button();
 		echo '</form>' . self::form( 'zoom_test', 'id="oys-zoom-test"' ) . '</form></div>'; // phpcs:ignore
+	}
+
+	/* ======================================================================
+	   Emails & reminders
+	   ====================================================================== */
+
+	public static function page_emails() {
+		$key = sanitize_key( $_GET['edit'] ?? '' );
+		if ( $key && OYS_Email_Templates::get( $key ) ) {
+			self::page_email_edit( $key );
+			return;
+		}
+		self::header( __( 'Emails & reminders', 'olivia-studio' ) );
+		$st  = OYS_Settings::all();
+		$num = fn( $k, $unit ) => '<input type="number" min="0" class="small-text" name="s[' . $k . ']" value="' . (int) $st[ $k ] . '"> ' . esc_html( $unit );
+		echo self::form( 'save_emails' ) . '<h2>' . esc_html__( 'Sender', 'olivia-studio' ) . '</h2><table class="form-table">'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'Sender name', 'olivia-studio' ) . '</th><td><input type="text" class="regular-text" name="s[email_from_name]" value="' . esc_attr( $st['email_from_name'] ) . '"></td></tr>';
+		echo '<tr><th>' . esc_html__( 'Sender email', 'olivia-studio' ) . '</th><td><input type="email" class="regular-text" name="s[email_from]" value="' . esc_attr( $st['email_from'] ) . '"><p class="description">' . esc_html__( 'Use an address on your own domain, and an SMTP plugin, so emails land in the inbox.', 'olivia-studio' ) . '</p></td></tr>';
+		echo '<tr><th>' . esc_html__( 'Studio notifications go to', 'olivia-studio' ) . '</th><td><input type="email" class="regular-text" name="s[notify_email]" value="' . esc_attr( $st['notify_email'] ) . '"></td></tr></table>';
+		echo '<h2>' . esc_html__( 'Reminders', 'olivia-studio' ) . '</h2><p class="description">' . esc_html__( '0 turns a reminder off. They go out automatically; people who book after a reminder\'s time just get their confirmation.', 'olivia-studio' ) . '</p><table class="form-table">';
+		echo '<tr><th>' . esc_html__( 'Class reminder', 'olivia-studio' ) . '</th><td>' . $num( 'reminder_hours', __( 'hours before the class', 'olivia-studio' ) ) . '</td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'Second reminder', 'olivia-studio' ) . '</th><td>' . $num( 'reminder2_hours', __( 'hours before the class (e.g. 2 on the day)', 'olivia-studio' ) ) . '</td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'Online: link to join', 'olivia-studio' ) . '</th><td>' . $num( 'join_reminder_minutes', __( 'minutes before an online or hybrid class', 'olivia-studio' ) ) . '</td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'Pass about to expire', 'olivia-studio' ) . '</th><td>' . $num( 'pass_expiry_days', __( 'days before unused classes expire', 'olivia-studio' ) ) . '</td></tr></table>'; // phpcs:ignore
+
+		$to = array( 'customer' => __( 'Customer', 'olivia-studio' ), 'guest' => __( 'Guest / recipient', 'olivia-studio' ), 'studio' => __( 'You', 'olivia-studio' ) );
+		foreach ( OYS_Email_Templates::groups() as $group => $label ) {
+			echo '<h2>' . esc_html( $label ) . '</h2><table class="widefat striped oys-table oys-emails"><thead><tr><th style="width:70px">' . esc_html__( 'On', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Email', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Sent when', 'olivia-studio' ) . '</th><th>' . esc_html__( 'To', 'olivia-studio' ) . '</th><th></th></tr></thead><tbody>';
+			foreach ( OYS_Email_Templates::registry() as $k => $d ) {
+				if ( $group !== $d['group'] ) {
+					continue;
+				}
+				$t = OYS_Email_Templates::get( $k );
+				echo '<tr' . ( $t['enabled'] ? '' : ' class="is-off"' ) . '><td><input type="hidden" name="on[' . esc_attr( $k ) . ']" value="0"><label class="oys-switch"><input type="checkbox" name="on[' . esc_attr( $k ) . ']" value="1"' . checked( $t['enabled'], true, false ) . ' aria-label="' . esc_attr( $d['label'] ) . '"><span></span></label></td>'
+					. '<td><b>' . esc_html( $d['label'] ) . '</b>' . ( $d['editable'] ? '<br><small>' . esc_html( OYS_Email_Templates::fill( $t['subject'], OYS_Emails::sample_vars() ) ) . '</small>' : '' ) . ( $t['customized'] ? ' <span class="oys-status oys-status--offered">' . esc_html__( 'edited', 'olivia-studio' ) . '</span>' : '' ) . '</td>'
+					. '<td>' . esc_html( $d['when'] ) . '</td><td>' . esc_html( $to[ $d['to'] ] ) . '</td>'
+					. '<td>' . ( $d['editable'] ? '<a class="button button-small" href="' . esc_url( admin_url( 'admin.php?page=oys-emails&edit=' . $k ) ) . '">' . esc_html__( 'Edit text', 'olivia-studio' ) . '</a>' : '' ) . '</td></tr>';
+			}
+			echo '</tbody></table>';
+		}
+		submit_button( __( 'Save emails and reminders', 'olivia-studio' ) );
+		echo '</form></div>';
+	}
+
+	private static function page_email_edit( $key ) {
+		$t = OYS_Email_Templates::get( $key );
+		self::header( sprintf( __( 'Email: %s', 'olivia-studio' ), $t['label'] ), ' <a class="page-title-action" href="' . esc_url( admin_url( 'admin.php?page=oys-emails' ) ) . '">' . esc_html__( '← All emails', 'olivia-studio' ) . '</a>' );
+		[ , $html ] = OYS_Emails::preview( $key );
+		echo '<p>' . esc_html( $t['when'] ) . '.</p><div class="oys-email-edit"><div>';
+		echo self::form( 'save_email_template' ) . '<input type="hidden" name="key" value="' . esc_attr( $key ) . '"><table class="form-table">'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'Send this email', 'olivia-studio' ) . '</th><td><input type="hidden" name="enabled" value="0"><label><input type="checkbox" name="enabled" value="1"' . checked( $t['enabled'], true, false ) . '> ' . esc_html__( 'On', 'olivia-studio' ) . '</label></td></tr>';
+		echo '<tr><th><label for="oys-e-subject">' . esc_html__( 'Subject', 'olivia-studio' ) . '</label></th><td><input type="text" id="oys-e-subject" class="large-text" name="subject" value="' . esc_attr( $t['subject'] ) . '"></td></tr>';
+		echo '<tr><th><label for="oys-e-heading">' . esc_html__( 'Heading', 'olivia-studio' ) . '</label></th><td><input type="text" id="oys-e-heading" class="large-text" name="heading" value="' . esc_attr( $t['heading'] ) . '"></td></tr>';
+		echo '<tr><th><label for="oys-e-message">' . esc_html__( 'Message', 'olivia-studio' ) . '</label></th><td><textarea id="oys-e-message" class="large-text" rows="5" name="message">' . esc_textarea( $t['message'] ) . '</textarea><p class="description">' . esc_html__( 'Shown before the automatic details (class, time, place, guests, join link, receipt…). An empty line starts a new paragraph.', 'olivia-studio' ) . '</p></td></tr>';
+		echo '<tr><th><label for="oys-e-closing">' . esc_html__( 'Closing note', 'olivia-studio' ) . '</label></th><td><textarea id="oys-e-closing" class="large-text" rows="3" name="closing">' . esc_textarea( $t['closing'] ) . '</textarea><p class="description">' . esc_html__( 'After the details. Can be empty.', 'olivia-studio' ) . '</p></td></tr>';
+		echo '<tr><th><label for="oys-e-button">' . esc_html__( 'Button', 'olivia-studio' ) . '</label></th><td><input type="text" id="oys-e-button" class="regular-text" name="button" value="' . esc_attr( $t['button'] ) . '"><p class="description">' . esc_html__( 'Empty = no button.', 'olivia-studio' ) . '</p></td></tr>';
+		echo '<tr><th>' . esc_html__( 'Placeholders', 'olivia-studio' ) . '</th><td><p class="oys-vars">' . implode( ' ', array_map( fn( $v ) => '<code>{' . esc_html( $v ) . '}</code>', $t['vars'] ) ) . '</p></td></tr></table>';
+		submit_button( __( 'Save', 'olivia-studio' ), 'primary', 'submit', false );
+		echo '</form><p class="oys-email-actions">' . self::form( 'test_email', 'class="oys-inline"' ) . '<input type="hidden" name="key" value="' . esc_attr( $key ) . '"><button class="button">' . esc_html( sprintf( __( 'Send a test to %s', 'olivia-studio' ), wp_get_current_user()->user_email ) ) . '</button></form> ' // phpcs:ignore
+			. ( $t['customized'] ? self::form( 'reset_email_template', 'class="oys-inline" onsubmit="return confirm(\'' . esc_js( __( 'Go back to the original text?', 'olivia-studio' ) ) . '\')"' ) . '<input type="hidden" name="key" value="' . esc_attr( $key ) . '"><button class="button button-link-delete">' . esc_html__( 'Reset to the original text', 'olivia-studio' ) . '</button></form>' : '' ) . '</p></div>'; // phpcs:ignore
+		echo '<div class="oys-email-preview"><p class="description">' . esc_html__( 'Preview with sample details (save to update):', 'olivia-studio' ) . '</p><iframe title="' . esc_attr__( 'Email preview', 'olivia-studio' ) . '" srcdoc="' . esc_attr( $html ) . '"></iframe></div></div></div>';
+	}
+
+	private static function do_save_emails() {
+		$in    = wp_unslash( $_POST['s'] ?? array() );
+		$clean = array(
+			'email_from_name' => sanitize_text_field( $in['email_from_name'] ?? '' ),
+			'email_from'      => sanitize_email( $in['email_from'] ?? '' ),
+			'notify_email'    => sanitize_email( $in['notify_email'] ?? '' ),
+		);
+		foreach ( array( 'reminder_hours', 'reminder2_hours', 'join_reminder_minutes', 'pass_expiry_days' ) as $k ) {
+			$clean[ $k ] = max( 0, (int) ( $in[ $k ] ?? 0 ) );
+		}
+		OYS_Settings::update( $clean );
+		foreach ( (array) ( $_POST['on'] ?? array() ) as $k => $v ) {
+			$k = sanitize_key( $k );
+			if ( OYS_Email_Templates::get( $k ) ) {
+				OYS_Email_Templates::save( $k, array( 'enabled' => (int) $v ? 1 : 0 ) );
+			}
+		}
+		self::back( 'oys-emails', array(), __( 'Saved.', 'olivia-studio' ) );
+	}
+
+	private static function do_save_email_template() {
+		$key = sanitize_key( $_POST['key'] ?? '' );
+		$t   = OYS_Email_Templates::get( $key );
+		if ( ! $t || ! $t['editable'] ) {
+			self::back( 'oys-emails' );
+		}
+		$in = wp_unslash( $_POST );
+		OYS_Email_Templates::save( $key, array(
+			'enabled' => empty( $in['enabled'] ) ? 0 : 1,
+			'subject' => sanitize_text_field( $in['subject'] ?? '' ),
+			'heading' => sanitize_text_field( $in['heading'] ?? '' ),
+			'message' => sanitize_textarea_field( $in['message'] ?? '' ),
+			'closing' => sanitize_textarea_field( $in['closing'] ?? '' ),
+			'button'  => sanitize_text_field( $in['button'] ?? '' ),
+		) );
+		self::back( 'oys-emails', array( 'edit' => $key ), __( 'Saved.', 'olivia-studio' ) );
+	}
+
+	private static function do_reset_email_template() {
+		$key = sanitize_key( $_POST['key'] ?? '' );
+		OYS_Email_Templates::reset( $key );
+		self::back( 'oys-emails', array( 'edit' => $key ), __( 'Back to the original text.', 'olivia-studio' ) );
+	}
+
+	private static function do_test_email() {
+		$key = sanitize_key( $_POST['key'] ?? '' );
+		$to  = wp_get_current_user()->user_email;
+		$ok  = OYS_Email_Templates::get( $key ) && OYS_Emails::send_test( $key, $to );
+		self::back( 'oys-emails', array( 'edit' => $key ), $ok ? sprintf( __( 'Test sent to %s.', 'olivia-studio' ), $to ) : __( 'The test could not be sent. Check the email set-up (SMTP plugin).', 'olivia-studio' ) );
 	}
 
 	private static function do_zoom_test() {

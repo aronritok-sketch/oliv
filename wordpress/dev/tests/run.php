@@ -134,8 +134,10 @@ add_filter( 'pre_http_request', function ( $pre, $args, $url ) {
 
 // Settings are changed for the tests and restored at the end (they live outside the transactions).
 $original_settings = get_option( OYS_Settings::OPTION );
-register_shutdown_function( function () use ( $original_settings ) {
+$original_templates = get_option( 'oys_email_templates' );
+register_shutdown_function( function () use ( $original_settings, $original_templates ) {
 	update_option( OYS_Settings::OPTION, $original_settings );
+	false === $original_templates ? delete_option( 'oys_email_templates' ) : update_option( 'oys_email_templates', $original_templates );
 } );
 OYS_Settings::update( array( 'stripe_test_secret' => 'sk_test_unit', 'stripe_test_webhook' => 'whsec_unit', 'stripe_mode' => 'test', 'max_guests' => 4, 'cancel_hours' => 12 ) );
 
@@ -149,7 +151,7 @@ function make_user( $name = 'Test' ) {
 }
 
 function make_session( $args = array() ) {
-	$start = time() + ( $args['in_hours'] ?? 72 ) * HOUR_IN_SECONDS;
+	$start = time() + (int) round( ( $args['in_hours'] ?? 72 ) * HOUR_IN_SECONDS );
 	return OYS_Schedule::get( OYS_Schedule::save( array(
 		'kind'            => $args['kind'] ?? 'group',
 		'class_slug'      => 'hatha-flow',
@@ -683,6 +685,73 @@ test( 'zoom: only one meeting when two requests ask at once', function () {
 	ok( ! is_wp_error( $res ) && OYS_Zoom::has_meeting( $res ), 'stale marker taken over, meeting created' );
 	OYS_Zoom::ensure_meeting( $s->id );
 	eq( 1, zoom_calls( 'POST', '#/meetings$#' ), 'created once' );
+} );
+
+function sent_mails( callable $fn ) {
+	$log = array();
+	$cb  = function ( $to, $subject, $html ) use ( &$log ) { $log[] = array( 'to' => $to, 'subject' => $subject, 'html' => $html ); };
+	add_action( 'oys_email_sent', $cb, 10, 3 );
+	$fn();
+	remove_action( 'oys_email_sent', $cb, 10 );
+	return $log;
+}
+
+test( 'emails: edited texts with placeholders, and switched-off emails are not sent', function () {
+	$u = make_user( 'Nora' );
+	$s = make_session();
+	OYS_Email_Templates::save( 'booking_confirmed', array( 'subject' => 'See you at {class}, {first_name}!', 'message' => "Hello {first_name}.\n\nSecond paragraph.", 'closing' => '', 'button' => '' ) );
+	$log = sent_mails( fn() => OYS_Bookings::book_manual( $u, $s, 'comp', true ) );
+	eq( 'See you at Hatha Flow, Nora!', $log[0]['subject'] ?? '', 'subject with placeholders' );
+	ok( str_contains( $log[0]['html'], '<p>Hello Nora.</p><p>Second paragraph.</p>' ), 'message paragraphs' );
+	ok( ! str_contains( $log[0]['html'], 'Manage booking' ), 'no button when its label is empty' );
+	ok( str_contains( $log[0]['html'], 'Hatha Flow' ) && str_contains( $log[0]['html'], 'When' ), 'automatic class details kept' );
+	OYS_Email_Templates::save( 'booking_confirmed', array( 'enabled' => 0 ) );
+	$log = sent_mails( fn() => OYS_Bookings::book_manual( make_user(), make_session( array( 'in_hours' => 90 ) ), 'comp', true ) );
+	eq( 0, count( $log ), 'switched off: not sent' );
+	OYS_Email_Templates::reset( 'booking_confirmed' );
+	eq( 'Booked: {class}, {date_short}', OYS_Email_Templates::get( 'booking_confirmed' )['subject'], 'reset brings back the original text' );
+	ok( ! OYS_Email_Templates::get( 'booking_confirmed' )['enabled'], 'reset keeps it switched off' );
+	OYS_Email_Templates::save( 'studio_cancellation', array( 'enabled' => 0 ) );
+	ok( false === OYS_Emails::admin_notice( 'x', 'y', 'studio_cancellation' ), 'studio notice switched off' );
+	[ $subject, $html ] = OYS_Emails::preview( 'reminder' );
+	ok( str_starts_with( $subject, 'Reminder: Slow Flow' ) && str_contains( $html, 'See you soon' ), 'preview with sample details' );
+	delete_option( OYS_Email_Templates::OPTION );
+} );
+
+test( 'reminders: two class reminders, online join link, pass about to expire', function () {
+	global $wpdb;
+	delete_option( OYS_Email_Templates::OPTION );
+	OYS_Settings::update( array( 'reminder_hours' => 24, 'reminder2_hours' => 2, 'join_reminder_minutes' => 30, 'pass_expiry_days' => 7 ) );
+	$b = OYS_Install::table( 'bookings' );
+	$u = make_user( 'Rita' );
+	$s = make_session( array( 'in_hours' => 20 ) );
+	$id = OYS_Bookings::book_manual( $u, $s, 'comp', false );
+	$wpdb->update( $b, array( 'created_at' => oys_utc_plus( -3 * DAY_IN_SECONDS ) ), array( 'id' => $id ) );
+	$log = sent_mails( fn() => OYS_Cron::send_reminders() );
+	eq( 1, count( array_filter( $log, fn( $m ) => str_starts_with( $m['subject'], 'Reminder: Hatha Flow' ) ) ), 'first reminder sent' );
+	eq( 0, count( sent_mails( fn() => OYS_Cron::send_reminders() ) ), 'not sent twice' );
+	$wpdb->update( OYS_Install::table( 'sessions' ), array( 'starts_at' => oys_utc_plus( HOUR_IN_SECONDS ), 'ends_at' => oys_utc_plus( 2 * HOUR_IN_SECONDS ) ), array( 'id' => $s->id ) );
+	eq( 1, count( sent_mails( fn() => OYS_Cron::send_reminders() ) ), 'second reminder on the day' );
+	// Online: join link shortly before, to the customer and a guest with an email.
+	OYS_Settings::update( array( 'zoom_auto' => 0 ) );
+	OYS_Settings::update( array( 'join_reminder_minutes' => 180 ) );
+	$on  = make_session( array( 'format' => 'online', 'price' => 600, 'online_url' => 'https://meet.example/live', 'in_hours' => 2 ) );
+	OYS_Bookings::book_party( make_user(), $on, array( 'method' => 'comp', 'guests' => array( array( 'name' => 'Gia', 'email' => 'gia@example.test' ), array( 'name' => 'NoMail', 'email' => '' ) ), 'notify' => false ) );
+	$log = sent_mails( fn() => OYS_Cron::send_join_reminders() );
+	eq( 2, count( $log ), 'join link to the customer and the guest with an email' );
+	ok( str_contains( $log[0]['html'], 'https://meet.example/live' ), 'email has the link' );
+	eq( 0, count( sent_mails( fn() => OYS_Cron::send_join_reminders() ) ), 'join link sent once' );
+	// Pass expiring.
+	$p = OYS_Passes::grant( $u, array( 'credits' => 3, 'validity_days' => 5, 'name' => '5-class pass' ) );
+	$wpdb->update( OYS_Install::table( 'passes' ), array( 'created_at' => oys_utc_plus( -60 * DAY_IN_SECONDS ) ), array( 'id' => $p ) );
+	$log = sent_mails( fn() => OYS_Cron::send_pass_expiry() );
+	eq( 1, count( array_filter( $log, fn( $m ) => str_contains( $m['subject'], '5-class pass expires' ) && str_contains( $m['html'], '3 classes' ) ) ), 'pass expiry reminder' );
+	eq( 0, count( sent_mails( fn() => OYS_Cron::send_pass_expiry() ) ), 'once per pass' );
+	OYS_Settings::update( array( 'reminder_hours' => 0 ) );
+	$s2 = make_session( array( 'in_hours' => 10 ) );
+	$id2 = OYS_Bookings::book_manual( make_user(), $s2, 'comp', false );
+	$wpdb->update( $b, array( 'created_at' => oys_utc_plus( -3 * DAY_IN_SECONDS ) ), array( 'id' => $id2 ) );
+	eq( 0, count( array_filter( sent_mails( fn() => OYS_Cron::send_reminders() ), fn( $m ) => str_contains( $m['subject'], (string) $s2->id ) ) ), 'reminder switched off' );
 } );
 
 test( 'helpers: money and periods', function () {

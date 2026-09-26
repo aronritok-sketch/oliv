@@ -599,6 +599,33 @@ async function payOnMockStripe(page, button = '#pay') {
   await Promise.all([adm.waitForNavigation(), adm.click('button:has-text("Test the connection")')]);
   check(await adm.isVisible('text=Zoom is connected (olivia@example.com)'), 'Zoom connection test works');
 
+  // 30. Studio → Emails & reminders: switch an email off, edit a text, send a test, reset.
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-emails`);
+  check(await adm.isVisible('h2:has-text("Reminders")'), 'emails page lists the reminders');
+  check(await adm.locator('table.oys-emails tbody tr').count() >= 25, 'every automatic email is listed');
+  await adm.fill('input[name="s[reminder2_hours]"]', '2');
+  await adm.uncheck('input[type=checkbox][name="on[studio_payment]"]');
+  await adm.screenshot({ path: `${SHOTS}/19-emails.png`, fullPage: true });
+  await Promise.all([adm.waitForNavigation(), adm.click('input[type=submit][value="Save emails and reminders"]')]);
+  check(php(`echo (int) OYS_Settings::get('reminder2_hours');`) === '2', 'second reminder saved');
+  check(php(`echo OYS_Email_Templates::enabled('studio_payment') ? 'on' : 'off';`) === 'off', 'studio payment email switched off');
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-emails&edit=booking_confirmed`);
+  await adm.fill('#oys-e-subject', 'Yay {first_name}: {class} on {date_short}');
+  await Promise.all([adm.waitForNavigation(), adm.click('#submit')]);
+  check(await adm.isVisible('text=Saved.'), 'email text saved');
+  const frame = adm.frameLocator('.oys-email-preview iframe');
+  check(await frame.locator('text=You\'re booked').count() > 0, 'preview shows the email');
+  await Promise.all([adm.waitForNavigation(), adm.click('button:has-text("Send a test to")')]);
+  check(mailSubjects().some(x => x && x.startsWith('[Test] Yay ')), 'test email sent with the new subject');
+  await adm.screenshot({ path: `${SHOTS}/20-email-edit.png`, fullPage: true });
+  const eu = fresh();
+  php(`OYS_Bookings::book_manual(${zoeId}, ${eu}, 'comp', true);`);
+  check(mailSubjects().some(x => x && x.startsWith('Yay Zoe: Hatha Flow on ')), 'real booking email uses the edited subject');
+  adm.once('dialog', d => d.accept());
+  await Promise.all([adm.waitForNavigation(), adm.click('button:has-text("Reset to the original text")')]);
+  check(php(`echo OYS_Email_Templates::get('booking_confirmed')['subject'];`) === 'Booked: {class}, {date_short}', 'reset to the original text');
+  php(`OYS_Email_Templates::save('studio_payment', array('enabled'=>1)); OYS_Settings::update(array('reminder2_hours'=>0));`);
+
   // Screens for review.
   await a.goto(`${BASE}/schedule-pricing/`);
   await a.screenshot({ path: `${SHOTS}/10-schedule-pricing.png`, fullPage: true });

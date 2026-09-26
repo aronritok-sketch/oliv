@@ -109,6 +109,8 @@ class OYS_Install {
 			zoom_registrant_id varchar(64) NOT NULL DEFAULT '',
 			hold_expires datetime NULL,
 			reminder_sent tinyint(1) unsigned NOT NULL DEFAULT 0,
+			reminder2_sent tinyint(1) unsigned NOT NULL DEFAULT 0,
+			join_reminder_sent tinyint(1) unsigned NOT NULL DEFAULT 0,
 			note text NULL,
 			created_at datetime NOT NULL,
 			cancelled_at datetime NULL,
@@ -142,6 +144,7 @@ class OYS_Install {
 			expires_at datetime NULL,
 			order_id bigint(20) unsigned NOT NULL DEFAULT 0,
 			source varchar(20) NOT NULL DEFAULT 'purchase',
+			expiry_notice_sent tinyint(1) unsigned NOT NULL DEFAULT 0,
 			created_at datetime NOT NULL,
 			PRIMARY KEY  (id),
 			KEY user_kind (user_id,kind)
