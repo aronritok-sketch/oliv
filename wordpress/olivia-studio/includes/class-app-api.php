@@ -251,7 +251,7 @@ class OYS_App_API {
 			'my_booking'      => $mine ? array(
 				'id'         => (int) $mine->id,
 				'mode'       => oys_mode_for( $s, $mine->mode ),
-				'paid_with'  => $mine->paid_with,
+				'paid_with'  => OYS_Bookings::paid_with_labels()[ $mine->paid_with ] ?? $mine->paid_with,
 				'guests'     => array_values( wp_list_pluck( $guests, 'guest_name' ) ),
 				'can_cancel' => 'confirmed' === $mine->status && $start > time(),
 				'in_window'  => OYS_Bookings::in_cancel_window( $mine, $s ),

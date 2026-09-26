@@ -67,6 +67,11 @@ for i in $(seq 1 30); do curl -s -o /dev/null http://127.0.0.1:8080/ && break; s
 set +e
 WP_DIR="$WP_DIR" SHOTS="$ARTIFACTS/screenshots" node "$WPD/dev/e2e.js"
 status=$?
+# The mobile app (web build, iPhone viewport) against the same site, when it was exported.
+if [ -n "${APP_DIST:-}" ] && [ -f "$APP_DIST/index.html" ]; then
+	echo "== Mobile app end-to-end tests"
+	WP_DIR="$WP_DIR" SHOTS="$ARTIFACTS/app-screenshots" APP_DIST="$APP_DIST" node "$WPD/../app/e2e/app.e2e.js" || status=1
+fi
 set -e
 pkill -f '^php -S 127.0.0.1:80[89]0' || true
 cp "$WP_DIR/wp-content/debug.log" "$ARTIFACTS/" 2>/dev/null || true

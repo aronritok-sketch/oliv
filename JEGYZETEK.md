@@ -55,6 +55,15 @@
 - Tesztek: 192 integrációs + 150 böngészős ellenőrzés.
 - Következő nagy lépés: mobilapp az aktív felhasználóknak (API + élő óra az appban) – a hibrid/Zoom rész erre már felkészült.
 
+## 6. kör: iOS app (2026-09-26)
+- **Mobil API** a pluginban (`oys/v1/app/*`): tokenes belépés, órarend, foglalás, várólista, lemondás, bérletek, profil.
+- **iOS app** az `app/` mappában (Expo / React Native): órarend, foglalás bérlettel / tagsággal / kártyával (Stripe a böngészőben),
+  hibrid óra online módban, „Join the live class” gomb 60 perccel óra előtt, saját órák, bérletek, profil. Márkaszínek, Anton + Archivo.
+- Kiadás: EAS Build → TestFlight (Mac nem kell). Kell hozzá: Apple Developer fiók (99 USD/év), Expo fiók, valódi domain az `app.json`-ban.
+- **App Store előtt még kell:** fióktörlés az appban; végleges ikon; képernyőképek; adatvédelmi szöveg.
+- Tesztek: 227 integrációs + 150 böngészős + 17 app unit + 36 app végpont-ellenőrzés (iPhone-méretű ablakban).
+- Következő ötletek: push értesítések (emlékeztető, várólistás hely), natív bérletvásárlás, Zoom az appon belül.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb.
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

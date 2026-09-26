@@ -68,7 +68,8 @@ oliv/
 ├── preview.html             Egyfájlos előnézet (artifact) – gitignore
 ├── olivia-kovacs-yoga.html  Letölthető egyfájlos előnézet
 ├── JEGYZETEK.md             Projekt-jegyzet (állapot, döntések)
-├── .github/workflows/ci.yml GitHub Actions: lint, integrációs és E2E tesztek
+├── .github/workflows/ci.yml GitHub Actions: lint, integrációs és E2E tesztek, app ellenőrzés
+├── app/                     iOS app (Expo / React Native) – lásd app/README.md és 6.14
 └── wordpress/
     ├── README.md            Telepítés, Stripe, élesítési lista (felhasználói)
     ├── DEVELOPER.md         ← ez a fájl
@@ -93,11 +94,12 @@ oliv/
     │       ├── class-customers.php    Regisztráció, belépés, profil, nyilatkozat, wp-admin tiltás
     │       ├── class-privates.php     Magánóra-kérések és ajánlatok
     │       ├── class-gifts.php        Ajándékkártyák
-│       ├── class-memberships.php  Tagság (Stripe előfizetés): csatlakozás, szinkron, keret, lemondás, portál
-│       ├── class-security.php     Belépés- és regisztráció-korlátozás
-│       ├── class-zoom.php         Zoom meetingek automatikusan (Server-to-Server OAuth)
-│       ├── class-email-templates.php  Az automatikus levelek szerkeszthető szövegei, ki/be kapcsolói
-│       ├── admin/class-calendar.php   Admin naptár (REST + oldal)
+    │       ├── class-memberships.php  Tagság (Stripe előfizetés): csatlakozás, szinkron, keret, lemondás, portál
+    │       ├── class-security.php     Belépés- és regisztráció-korlátozás
+    │       ├── class-zoom.php         Zoom meetingek automatikusan (Server-to-Server OAuth)
+    │       ├── class-email-templates.php  Az automatikus levelek szerkeszthető szövegei, ki/be kapcsolói
+    │       ├── class-app-api.php      Mobilapp REST API (oys/v1/app/*), tokenes belépés
+    │       ├── admin/class-calendar.php   Admin naptár (REST + oldal)
     │       ├── class-cron.php         Háttérfeladatok
     │       ├── class-frontend.php     Shortcode-ok és nyilvános űrlapkezelők
     │       ├── class-privacy.php      WP adatexport / törlés
@@ -563,6 +565,35 @@ Sorozat-módosításnál minden további dátum ugyanannyi nappal tolódik, mint
 - **Óra indítása:** névsor / naptár „Start the Zoom class” → `admin-post.php?action=oys_admin_zoom_start` → friss `start_url` (`GET /meetings/{id}`) → átirányítás.
 - Fejlesztéshez: `OYS_ZOOM_API_BASE`, `OYS_ZOOM_OAUTH_URL` konstansok a szimulátorra (16.4).
 
+### 6.14 Mobil API és iOS app
+
+**API** – `OYS_App_API` (`includes/class-app-api.php`), útvonalak a `oys/v1/app/` alatt:
+
+| Módszer | Útvonal | Mit csinál |
+|---|---|---|
+| POST | `/login` `{email, password, device}` | Belépés (a web rate-limitje érvényes) → `{token, me}` |
+| POST | `/logout` | Az aktuális token visszavonása |
+| GET | `/me` | Profil, egyenlegek (`class`/`online`/`private`), bérletek, tagság, nyilatkozat, stúdió-adatok, webes linkek |
+| POST | `/waiver` | Nyilatkozat elfogadása → `me` |
+| GET | `/schedule?days=` | Közelgő órák (max. 60 nap); magánóra csak a sajátja |
+| GET | `/sessions/{id}?mode=online` | Egy óra + a fizetési lehetőségek (`membership` / `credit` / `card` / `free`) az adott módra |
+| POST | `/sessions/{id}/book` `{mode, method, guests[], accept_waiver}` | Foglalás; kártyánál `{status:'checkout', url}` – a Stripe Checkout böngészőben nyílik |
+| POST | `/sessions/{id}/waitlist` `{do:'leave'?}` | Várólista be / ki |
+| GET | `/bookings?when=past` | Saját foglalások (közelgő vagy múltbeli) |
+| POST | `/bookings/{id}/cancel` | Lemondás, a webes szabályokkal; `{outcome, message}` |
+| POST | `/push-token` `{token, platform}` | Expo push token tárolása (`oys_push_tokens` user meta) – a küldés még nincs kész |
+
+- **Token:** `"<user_id>.<40 karakter>"`, a szerveren csak HMAC-hash-e van (`oys_app_tokens` user meta, eszközönként, max. 10). Fejléc: `Authorization: Bearer …`, vagy `X-OYS-Token: …` (ha a tárhely lenyeli az Authorization fejlécet). 401 → az app kilépteti a felhasználót.
+- **Hibák:** szabványos WP REST hiba (`code`, `message`, `data.status`); az app a `message`-et mutatja. A `409 oys_waiver` azt jelenti, hogy előbb a nyilatkozat kell.
+- **Join link:** a `join_url` online foglalásnál `''`, amíg az óra 60 percen belülre nem ér, utána a (Zoom) link; óra végén `null`.
+- **Kártyás fizetés az appból:** a rendelés `meta.app = 1` → a Stripe visszatérő URL-je `app=1`-et kap → a köszönőoldalon „Back to the app” gomb (`oliviayoga://bookings`, `oys_app_return_url` filter). Az app bezárja a böngészőt és frissít.
+
+**App** – `app/` (Expo SDK 57, Expo Router, TypeScript). Részletek, futtatás és TestFlight-kiadás: [`app/README.md`](../app/README.md).
+
+- Képernyők: belépés; Órarend (szűrő: összes / stúdió / online); óra részletei és foglalás (hibrid módválasztó, fizetési mód, vendégek, nyilatkozat, várólista, lemondás, „Join the live class”); Saját óráim (közelgő / múlt); Bérletek (egyenlegek, bérletek, tagság); Profil.
+- A token az iOS Keychainben (`expo-secure-store`), weben (csak előnézet) localStorage-ban.
+- Vásárlás (bérlet, tagság, ajándék) és profilszerkesztés: a weboldal nyílik az appon belüli böngészőben – az App Store szabályai szerint fizikai szolgáltatás (jógaóra) fizethető külső fizetéssel; a digitális tartalom (pl. felvételek) eladása viszont Apple in-app vásárlást igényelne.
+
 ---
 
 ## 7. Stripe integráció
@@ -845,11 +876,24 @@ DB_NAME=oywp_ci DB_USER=root DB_PASSWORD= DB_HOST=127.0.0.1 WP_DIR=/tmp/wp-ci wo
 
 Nulláról: PHP lint → WordPress letöltése (git) → `wp-config.php` → telepítés, plugin, téma, tartalombetöltés (`dev/setup-site.php`) → integrációs tesztek → WordPress és Stripe-szimulátor indítása → E2E → a `debug.log` PHP figyelmeztetései is hibának számítanak. `SKIP_E2E=1` csak az első két szintet futtatja.
 
-**GitHub Actions** (`ci.yml`): lint PHP 8.1 és 8.3 alatt; majd MariaDB 10.11 szolgáltatással a teljes `ci.sh`; a képernyőképek és naplók letölthető artifactként.
+**GitHub Actions** (`ci.yml`): lint PHP 8.1 és 8.3 alatt; az app típusellenőrzése, lintje, unit tesztjei és webes buildje; majd MariaDB 10.11 szolgáltatással a teljes `ci.sh` (a webes appal együtt); a képernyőképek és naplók letölthető artifactként.
 
 ### 16.4 Stripe-szimulátor (`dev/mock-stripe.php`)
 
 A Zoomot is szimulálja `/zoom/...` alatt (token, felhasználó, meeting létrehozás / lekérés / módosítás / törlés, regisztráltak, `/zoom/j/…` és `/zoom/s/…` oldalak, `/zoom/_meetings` a tesztekhez); a `ci.sh` `wp-config`-ja és a `setup-site.php` ide köti. Stripe-ból implementálja: `POST /v1/customers`, `POST /v1/checkout/sessions` (payment és subscription mód, több tételsor), `GET /v1/checkout/sessions/{id}` (`expand[]` = `payment_intent.latest_charge`, `invoice`), `POST …/{id}/expire`, `GET/POST/DELETE /v1/subscriptions/{id}`, `POST /v1/billing_portal/sessions`, `POST /v1/refunds`; hamis fizetőoldal (`/pay/{id}`: tételsorok, végösszeg, „Pay”, „Pay (webhook delayed)”, „Back / cancel”), hamis ügyfélportál, aláírt webhookok, és teszt-segédek: `/_webhook`, `/_renew`, `/_fail`, `/_end`. **Élesre soha nem kerül.**
+
+
+### 16.5 Az app tesztjei (`app/`)
+
+- `npm run typecheck`, `npm run lint`, `npm test` (Jest, `jest-expo`): formázók (pénz, napok, elérhetőség) és az API-kliens (URL, token-fejlécek, hibák, 401 → kiléptetés).
+- `app/e2e/app.e2e.js` (Playwright, iPhone-méretű ablak): az app webes buildje a helyi WordPress ellen – belépés (hibás / jó jelszó), órarend, foglalás bérlettel + nyilatkozat, hibrid óra online módban átváltott kredittel és „Join” gombbal, kártyás fizetés a Stripe-szimulátoron át, várólista, Saját óráim, lemondás és kredit-visszaadás, bérletek, profil, kilépés = token visszavonva (36 ellenőrzés, képernyőképek).
+
+```bash
+cd app && EXPO_PUBLIC_API_BASE=http://127.0.0.1:8080 npx expo export --platform web
+WP_DIR=/útvonal/wordpress node e2e/app.e2e.js
+```
+
+A `ci.sh` automatikusan futtatja, ha az `APP_DIST` a webes build mappájára mutat (a GitHub Actions így csinálja).
 
 ---
 

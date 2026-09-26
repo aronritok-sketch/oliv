@@ -1,0 +1,57 @@
+{
+  "expo": {
+    "name": "Olivia Yoga",
+    "slug": "olivia-yoga",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "oliviayoga",
+    "userInterfaceStyle": "light",
+    "backgroundColor": "#F3F2EC",
+    "ios": {
+      "bundleIdentifier": "com.oliviakovacsyoga.app",
+      "buildNumber": "1",
+      "supportsTablet": true,
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "infoPlist": {
+        "LSApplicationQueriesSchemes": ["zoomus", "zoomus-ios"]
+      }
+    },
+    "android": {
+      "package": "com.oliviakovacsyoga.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#2B5036",
+        "foregroundImage": "./assets/images/android-icon-foreground.png",
+        "backgroundImage": "./assets/images/android-icon-background.png",
+        "monochromeImage": "./assets/images/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-secure-store",
+      "expo-web-browser",
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#2B5036",
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200
+        }
+      ]
+    ],
+    "extra": {
+      "apiBase": "https://oliviakovacsyoga.com"
+    },
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    }
+  }
+}
