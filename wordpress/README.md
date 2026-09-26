@@ -67,6 +67,8 @@ Két rész, mindkettő a WordPress adminban tölthető fel ZIP-ként (`dist/`):
 
 ## Fejlesztés és tesztek
 
+Részletes fejlesztői dokumentáció (architektúra, adatmodell, folyamatok, hookok, tesztelés, kiadás): **[DEVELOPER.md](DEVELOPER.md)**.
+
 `dev/` – helyi futtatáshoz (élesre nem kell):
 
 - `mock-stripe.php` – Stripe-szimulátor (API + „fizetős oldal” + aláírt webhook).
