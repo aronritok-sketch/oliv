@@ -177,6 +177,7 @@ class OYS_Email_Templates {
 			$v['day']        = oys_date( $session->starts_at, 'D' );
 			$v['time']       = oys_time( $session->starts_at );
 			$v['location']   = oys_is_online( $session ) ? __( 'Online', 'olivia-studio' ) : (string) $session->location;
+			$v['teacher']    = OYS_Teachers::display_name( $session );
 		}
 		return $v;
 	}

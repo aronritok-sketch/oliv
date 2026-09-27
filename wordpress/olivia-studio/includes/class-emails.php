@@ -62,6 +62,9 @@ class OYS_Emails {
 			__( 'Class', 'olivia-studio' ) => oys_session_title( $session ),
 			__( 'When', 'olivia-studio' )  => oys_date( $session->starts_at, 'l, F j · g:i a' ) . ' – ' . oys_time( $session->ends_at ),
 		);
+		if ( OYS_Teachers::name_for( $session ) ) {
+			$rows[ __( 'Teacher', 'olivia-studio' ) ] = OYS_Teachers::name_for( $session );
+		}
 		if ( oys_is_online( $session ) ) {
 			$rows[ __( 'Where', 'olivia-studio' ) ] = __( 'Online (live)', 'olivia-studio' );
 		} elseif ( $session->location ) {
@@ -215,6 +218,8 @@ class OYS_Emails {
 				self::guest_invite( $g, $s );
 			}
 		}
+		self::teacher_notice( $s, sprintf( __( 'New booking: %s', 'olivia-studio' ), oys_session_title( $s ) . ', ' . oys_date( $s->starts_at, 'D M j, g:i a' ) ),
+			sprintf( _n( '%1$s booked (%2$d person). %3$d of %4$d spots are taken.', '%1$s booked (%2$d people). %3$d of %4$d spots are taken.', count( $rows ), 'olivia-studio' ), OYS_Bookings::person_label( $host ), count( $rows ), (int) $s->booked, (int) $s->capacity ) );
 	}
 
 	/** A guest who gave an email gets the details and a calendar invite (no account needed). */
@@ -248,6 +253,7 @@ class OYS_Emails {
 			'returned'   => count( $rows ) > 1 ? __( 'The classes are back on your pass.', 'olivia-studio' ) : __( 'The class is back on your pass.', 'olivia-studio' ),
 			'credit'     => sprintf( __( 'You have a class credit to use within %d days.', 'olivia-studio' ), (int) OYS_Settings::get( 'dropin_credit_days' ) ),
 			'membership' => __( 'This class won\'t count towards your membership.', 'olivia-studio' ),
+			'refunded'   => __( 'Your card payment is being refunded; it usually shows on your statement within 5–10 days.', 'olivia-studio' ),
 			'late'       => __( 'Because this was inside the cancellation window, the class counts as used.', 'olivia-studio' ),
 			'none'       => '',
 		);
@@ -261,6 +267,7 @@ class OYS_Emails {
 			}
 		}
 		if ( ! $by_studio ) {
+			self::teacher_notice( $s, sprintf( __( 'Cancellation: %s', 'olivia-studio' ), oys_session_title( $s ) . ', ' . oys_date( $s->starts_at, 'D M j, g:i a' ) ), sprintf( _n( '%1$s cancelled (%2$d person).', '%1$s cancelled (%2$d people).', count( $rows ), 'olivia-studio' ), self::first_name( $b->user_id ), count( $rows ) ) );
 			self::admin_notice( sprintf( __( 'Cancellation: %s', 'olivia-studio' ), oys_session_title( $s ) ), sprintf( '%s cancelled %s (%d %s, %s).', self::first_name( $b->user_id ), oys_session_title( $s ) . ' ' . oys_date( $s->starts_at ), count( $rows ), _n( 'person', 'people', count( $rows ), 'olivia-studio' ), $outcome ), 'studio_cancellation' );
 		}
 	}
@@ -457,8 +464,9 @@ class OYS_Emails {
 	}
 
 	/** A message the studio wrote to everyone in a class (roster → "Message everyone"). */
-	public static function class_message( $to, $session, $subject, $body_html ) {
-		return self::send( $to, $subject, $subject, $body_html . self::session_block( $session ), array(), array( __( 'My bookings', 'olivia-studio' ), oys_account_url() ) );
+	public static function class_message( $to, $session, $subject, $body_html, $reply_to = '' ) {
+		$headers = is_email( $reply_to ) ? array( 'Reply-To: ' . $reply_to ) : array();
+		return self::send_raw( $to, $subject, self::wrap( $subject, $body_html . self::session_block( $session ), array( __( 'My bookings', 'olivia-studio' ), oys_account_url() ) ), $headers );
 	}
 
 	public static function admin_notice( $subject, $text, $type = 'studio_alerts' ) {
@@ -468,6 +476,24 @@ class OYS_Emails {
 		return self::send( OYS_Settings::get( 'notify_email' ), '[Studio] ' . $subject, $subject, '<p>' . esc_html( $text ) . '</p>' );
 	}
 
+	/** A short note to the teacher of a class (if it has one and they want these emails). */
+	public static function teacher_notice( $session, $subject, $text ) {
+		$t = OYS_Teachers::for_session( $session );
+		if ( ! $t || ! (int) $t->notify || ! is_email( $t->email ) ) {
+			return false;
+		}
+		return self::send( $t->email, '[' . OYS_Settings::get( 'email_from_name' ) . '] ' . $subject, $subject, '<p>' . esc_html( $text ) . '</p>' . self::session_block( $session ), array(), array( __( 'Open your classes', 'olivia-studio' ), admin_url( 'admin.php?page=oys-teach&session=' . (int) $session->id ) ) );
+	}
+
+	/** Welcome for a new teacher login: set a password, then Teaching in the dashboard. */
+	public static function teacher_access( $t, $password_url ) {
+		$studio = OYS_Settings::get( 'email_from_name' );
+		$body   = '<p>' . sprintf( esc_html__( 'Hi %s,', 'olivia-studio' ), esc_html( strtok( $t->name, ' ' ) ) ) . '</p>'
+			. '<p>' . sprintf( esc_html__( 'You now have a teacher login at %s. There you can see who is booked into your classes, write to them, keep your profile and photos up to date, connect your Stripe account for card payments and see your monthly statement.', 'olivia-studio' ), esc_html( $studio ) ) . '</p>'
+			. '<p>' . esc_html__( 'Set your password with the button below, then log in. Your classes are under Teaching.', 'olivia-studio' ) . '</p>';
+		return self::send( $t->email, sprintf( __( 'Your teacher login at %s', 'olivia-studio' ), $studio ), __( 'Welcome to the team', 'olivia-studio' ), $body, array(), array( __( 'Set your password', 'olivia-studio' ), $password_url ) );
+	}
+
 	public static function admin_new_order( $order_id ) {
 		if ( ! OYS_Email_Templates::enabled( 'studio_payment' ) ) {
 			return;
@@ -475,7 +501,8 @@ class OYS_Emails {
 		$o = OYS_Orders::get( $order_id );
 		$u = get_userdata( $o->user_id );
 		self::send( OYS_Settings::get( 'notify_email' ), sprintf( '[Studio] %s — %s', oys_money( $o->amount_cents, $o->currency ), $o->description ), __( 'New payment', 'olivia-studio' ),
-			'<p><b>' . esc_html( $o->description ) . '</b><br>' . esc_html( $u ? $u->display_name . ' · ' . $u->user_email : '' ) . '<br>' . esc_html( oys_money( $o->amount_cents, $o->currency ) ) . '</p>',
+			'<p><b>' . esc_html( $o->description ) . '</b><br>' . esc_html( $u ? $u->display_name . ' · ' . $u->user_email : '' ) . '<br>' . esc_html( oys_money( $o->amount_cents, $o->currency ) ) . '</p>'
+			. ( ! empty( $o->meta['stripe_account'] ) ? '<p>' . esc_html( sprintf( __( 'Paid to the teacher\'s own Stripe account; your fee: %s.', 'olivia-studio' ), oys_money( (int) ( $o->meta['app_fee_cents'] ?? 0 ), $o->currency ) ) ) . '</p>' : '' ),
 			array(), array( __( 'Open orders', 'olivia-studio' ), admin_url( 'admin.php?page=oys-orders' ) ) );
 	}
 
@@ -487,7 +514,7 @@ class OYS_Emails {
 		return array(
 			'first_name' => $user && $user->first_name ? $user->first_name : 'Emma', 'studio' => OYS_Settings::get( 'email_from_name' ),
 			'class' => 'Slow Flow', 'date' => wp_date( 'l, F j', time() + 2 * DAY_IN_SECONDS ), 'date_short' => wp_date( 'M j', time() + 2 * DAY_IN_SECONDS ),
-			'day' => wp_date( 'D', time() + 2 * DAY_IN_SECONDS ), 'time' => '6:00 pm', 'location' => 'Fort Myers', 'host' => 'Emma', 'guest_name' => 'Sofia',
+			'day' => wp_date( 'D', time() + 2 * DAY_IN_SECONDS ), 'time' => '6:00 pm', 'location' => 'Fort Myers', 'teacher' => OYS_Settings::get( 'owner_name' ), 'host' => 'Emma', 'guest_name' => 'Sofia',
 			'reason' => 'Olivia is unwell.', 'how' => 'One class was taken from your pass.', 'pass' => '5-class pass', 'classes_left' => '2 classes',
 			'expires' => wp_date( get_option( 'date_format' ), time() + 7 * DAY_IN_SECONDS ), 'recipient' => 'Sofia', 'from' => 'Emma', 'gift' => '5-class pass',
 			'recipient_email' => 'sofia@example.com', 'ends' => wp_date( get_option( 'date_format' ), time() + 20 * DAY_IN_SECONDS ),

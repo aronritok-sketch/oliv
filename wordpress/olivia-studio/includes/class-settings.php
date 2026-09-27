@@ -1,7 +1,7 @@
 <?php
 /**
  * Plugin settings (one option array). Secrets can also come from wp-config.php constants,
- * which take precedence: OYS_STRIPE_SECRET_KEY, OYS_STRIPE_WEBHOOK_SECRET, OYS_ZOOM_ACCOUNT_ID,
+ * which take precedence: OYS_STRIPE_SECRET_KEY, OYS_STRIPE_WEBHOOK_SECRET, OYS_STRIPE_CONNECT_WEBHOOK_SECRET, OYS_ZOOM_ACCOUNT_ID,
  * OYS_ZOOM_CLIENT_ID, OYS_ZOOM_CLIENT_SECRET.
  */
 
@@ -18,6 +18,8 @@ class OYS_Settings {
 			'stripe_test_webhook'     => '',
 			'stripe_live_secret'      => '',
 			'stripe_live_webhook'     => '',
+			'stripe_test_connect_webhook' => '',
+			'stripe_live_connect_webhook' => '',
 			'currency'                => 'usd',
 			'hold_minutes'            => 30,
 			'cancel_hours'            => 12,
@@ -52,6 +54,9 @@ class OYS_Settings {
 			'newsletter_batch'        => 50,
 			'ai_api_key'              => '',
 			'ai_model'                => 'claude-opus-5',
+			'teacher_share_default'   => 50,
+			'settle_membership_cents' => 1500,
+			'owner_name'              => 'Olivia',
 			'online_price_cents'      => 600,
 			'online_per_credit'       => 4,
 			'zoom_account_id'         => '',
@@ -106,6 +111,14 @@ class OYS_Settings {
 			return OYS_STRIPE_WEBHOOK_SECRET;
 		}
 		return self::is_live() ? self::get( 'stripe_live_webhook' ) : self::get( 'stripe_test_webhook' );
+	}
+
+	/** Signing secret of the Connect webhook endpoint (events from the teachers' Stripe accounts). */
+	public static function connect_webhook_secret() {
+		if ( defined( 'OYS_STRIPE_CONNECT_WEBHOOK_SECRET' ) ) {
+			return OYS_STRIPE_CONNECT_WEBHOOK_SECRET;
+		}
+		return self::is_live() ? self::get( 'stripe_live_connect_webhook' ) : self::get( 'stripe_test_connect_webhook' );
 	}
 
 	public static function payments_ready() {

@@ -19,6 +19,12 @@
  * Plugin settings: Account ID "acc_mock", Client ID "zoom_client", Client Secret "zoom_secret".
  *   /zoom/_meetings              every meeting and registrant (for tests)
  *
+ * Stripe Connect for teachers: accounts, onboarding links (a fake onboarding page that finishes the
+ * account and sends account.updated), and calls made on a connected account (Stripe-Account
+ * header): Checkout Sessions with an application fee, refunds. Events from connected accounts carry
+ * "account" and are signed with the Connect secret "whsec_connect_mock".
+ *   /_state                      everything the mock holds (sessions, accounts, refunds), for tests
+ *
  * And a Claude (Anthropic Messages API) stand-in for the newsletter drafts:
  * wp-config.php: define( 'OYS_ANTHROPIC_API_URL', 'http://127.0.0.1:8090/anthropic/v1/messages' );
  * API key "sk-ant-mock". Answers with a structured newsletter that quotes the brief.
@@ -26,12 +32,13 @@
 
 const WEBHOOK_URL    = 'http://127.0.0.1:8080/wp-json/oys/v1/stripe-webhook';
 const WEBHOOK_SECRET = 'whsec_mock';
+const CONNECT_SECRET = 'whsec_connect_mock';
 
 $store_file = sys_get_temp_dir() . '/mock-stripe.json';
 $fp         = fopen( $store_file . '.lock', 'c' );
 flock( $fp, LOCK_EX );
 $db = is_file( $store_file ) ? json_decode( file_get_contents( $store_file ), true ) : array();
-$db += array( 'sessions' => array(), 'subs' => array(), 'invoices' => array(), 'meetings' => array(), 'n' => 0 );
+$db += array( 'sessions' => array(), 'subs' => array(), 'invoices' => array(), 'meetings' => array(), 'accounts' => array(), 'refunds' => array(), 'n' => 0 );
 
 function save() { global $db, $store_file; file_put_contents( $store_file, json_encode( $db ) ); }
 function unlock() { global $fp; flock( $fp, LOCK_UN ); }
@@ -43,6 +50,7 @@ $method = $_SERVER['REQUEST_METHOD'];
 $path   = parse_url( $_SERVER['REQUEST_URI'], PHP_URL_PATH );
 parse_str( file_get_contents( 'php://input' ), $body );
 parse_str( $_SERVER['QUERY_STRING'] ?? '', $query );
+$account = $_SERVER['HTTP_STRIPE_ACCOUNT'] ?? '';
 
 /* ---------- Zoom ---------- */
 if ( '/anthropic/v1/messages' === $path ) {
@@ -142,6 +150,45 @@ if ( str_starts_with( $path, '/v1/' ) && ( $_SERVER['HTTP_AUTHORIZATION'] ?? '' 
 	return out( array( 'error' => array( 'message' => 'Invalid API Key provided' ) ), 401 );
 }
 
+if ( '/_state' === $path ) {
+	return out( $db );
+}
+
+if ( 'POST' === $method && '/v1/accounts' === $path ) {
+	$id                   = rid( 'acct' );
+	$db['accounts'][ $id ] = array( 'id' => $id, 'object' => 'account', 'email' => $body['email'] ?? '', 'controller' => $body['controller'] ?? array(), 'charges_enabled' => false, 'details_submitted' => false, 'metadata' => $body['metadata'] ?? array() );
+	save();
+	return out( $db['accounts'][ $id ] );
+}
+
+if ( preg_match( '#^/v1/accounts/([^/]+)$#', $path, $m ) ) {
+	return isset( $db['accounts'][ $m[1] ] ) ? out( $db['accounts'][ $m[1] ] ) : out( array( 'error' => array( 'message' => 'No such account' ) ), 404 );
+}
+
+if ( 'POST' === $method && '/v1/account_links' === $path ) {
+	if ( empty( $db['accounts'][ $body['account'] ?? '' ] ) ) {
+		return out( array( 'error' => array( 'message' => 'No such account' ) ), 400 );
+	}
+	return out( array( 'object' => 'account_link', 'url' => 'http://127.0.0.1:8090/connect/' . $body['account'] . '?' . http_build_query( array( 'return' => $body['return_url'], 'refresh' => $body['refresh_url'] ) ) ) );
+}
+
+// Fake Connect onboarding page.
+if ( preg_match( '#^/connect/([^/]+)$#', $path, $m ) ) {
+	$id = $m[1];
+	if ( 'POST' === $method ) {
+		$db['accounts'][ $id ]['charges_enabled']   = true;
+		$db['accounts'][ $id ]['details_submitted'] = true;
+		save();
+		unlock();
+		send_webhook( 'account.updated', $db['accounts'][ $id ], $id );
+		header( 'Location: ' . $query['return'] );
+		return;
+	}
+	header( 'Content-Type: text/html; charset=utf-8' );
+	printf( '<!doctype html><title>Mock Stripe Connect</title><body style="font-family:system-ui;max-width:420px;margin:60px auto"><p style="color:#635bff;font-weight:700">MOCK STRIPE CONNECT</p><h1>Set up payments</h1><p>Account %s</p><form method="post"><button id="connect-finish" style="width:100%%;padding:14px;background:#635bff;color:#fff;border:0;border-radius:6px">Finish</button></form><p><a id="connect-later" href="%s">Later</a></p>', htmlspecialchars( $id ), htmlspecialchars( $query['refresh'] ?? '/' ) );
+	return;
+}
+
 if ( 'POST' === $method && '/v1/customers' === $path ) {
 	return out( array( 'id' => rid( 'cus' ), 'email' => $body['email'] ?? '' ) );
 }
@@ -164,14 +211,20 @@ if ( 'POST' === $method && '/v1/checkout/sessions' === $path ) {
 		'recurring' => $body['line_items'][0]['price_data']['recurring'] ?? null,
 		'sub_metadata' => $body['subscription_data']['metadata'] ?? array(),
 		'payment_intent' => null, 'subscription' => null, 'invoice' => null, 'url' => 'http://127.0.0.1:8090/pay/' . $id,
+		'account' => $account, 'application_fee_amount' => isset( $body['payment_intent_data']['application_fee_amount'] ) ? (int) $body['payment_intent_data']['application_fee_amount'] : null,
+		'customer_email' => $body['customer_email'] ?? null,
 	);
+	if ( $account && ( empty( $db['accounts'][ $account ]['charges_enabled'] ) || ! empty( $body['customer'] ) ) ) {
+		return out( array( 'error' => array( 'message' => empty( $body['customer'] ) ? 'The account cannot take charges yet.' : 'No such customer on the connected account.' ) ), 400 );
+	}
 	save();
 	return out( $db['sessions'][ $id ] );
 }
 
 if ( preg_match( '#^/v1/checkout/sessions/([^/]+)(/expire)?$#', $path, $m ) ) {
 	$s = $db['sessions'][ $m[1] ] ?? null;
-	if ( ! $s ) {
+	if ( ! $s || ( $s['account'] ?? '' ) !== $account ) {
+		// Like Stripe: a session on a connected account is only visible with its Stripe-Account header.
 		return out( array( 'error' => array( 'message' => 'No such checkout.session' ) ), 404 );
 	}
 	if ( 'POST' === $method && ! empty( $m[2] ) ) {
@@ -218,12 +271,20 @@ if ( 'POST' === $method && '/v1/billing_portal/sessions' === $path ) {
 
 if ( 'POST' === $method && '/v1/refunds' === $path ) {
 	$amount = isset( $body['amount'] ) ? (int) $body['amount'] : 0;
+	$found = false;
 	foreach ( array_merge( $db['sessions'], $db['invoices'] ) as $s ) {
-		if ( ( $s['payment_intent'] ?? '' ) === $body['payment_intent'] ) {
+		if ( ( $s['payment_intent'] ?? '' ) === $body['payment_intent'] && ( $s['account'] ?? '' ) === $account ) {
 			$amount = $amount ?: (int) ( $s['amount_total'] ?? $s['amount_paid'] );
+			$found  = true;
 		}
 	}
-	return out( array( 'id' => rid( 're' ), 'amount' => $amount, 'status' => 'succeeded' ) );
+	if ( ! $found ) {
+		return out( array( 'error' => array( 'message' => 'No such payment_intent' ) ), 404 );
+	}
+	$re                = array( 'id' => rid( 're' ), 'amount' => $amount, 'status' => 'succeeded', 'payment_intent' => $body['payment_intent'], 'account' => $account, 'refund_application_fee' => $body['refund_application_fee'] ?? null );
+	$db['refunds'][]   = $re;
+	save();
+	return out( $re );
 }
 
 // Fake Stripe customer portal.
@@ -266,7 +327,7 @@ if ( preg_match( '#^/pay/([^/]+)$#', $path, $m ) ) {
 		save();
 		unlock();
 		if ( empty( $_POST['skip_webhook'] ) ) {
-			send_webhook( 'checkout.session.completed', $db['sessions'][ $id ] );
+			send_webhook( 'checkout.session.completed', $db['sessions'][ $id ], $s['account'] ?? '' );
 			if ( $invoice ) {
 				send_webhook( 'invoice.paid', $invoice );
 			}
@@ -290,7 +351,7 @@ if ( preg_match( '#^/pay/([^/]+)$#', $path, $m ) ) {
 if ( '/_webhook' === $path ) {
 	$object = $db['sessions'][ $query['id'] ];
 	unlock();
-	send_webhook( $query['type'], $object );
+	send_webhook( $query['type'], $object, $object['account'] ?? '' );
 	return out( array( 'sent' => true ) );
 }
 
@@ -323,10 +384,14 @@ if ( in_array( $path, array( '/_renew', '/_fail', '/_end' ), true ) ) {
 	return out( $sub );
 }
 
-function send_webhook( $type, $object ) {
-	$payload = json_encode( array( 'id' => 'evt_' . substr( md5( $type . $object['id'] . microtime() ), 0, 14 ), 'type' => $type, 'data' => array( 'object' => $object ) ) );
+function send_webhook( $type, $object, $account = '' ) {
+	$event = array( 'id' => 'evt_' . substr( md5( $type . $object['id'] . microtime() ), 0, 14 ), 'type' => $type, 'data' => array( 'object' => $object ) );
+	if ( $account ) {
+		$event['account'] = $account; // Connect event: from a connected account, signed by the Connect endpoint.
+	}
+	$payload = json_encode( $event );
 	$t       = time();
-	$sig     = hash_hmac( 'sha256', $t . '.' . $payload, WEBHOOK_SECRET );
+	$sig     = hash_hmac( 'sha256', $t . '.' . $payload, $account ? CONNECT_SECRET : WEBHOOK_SECRET );
 	$ch      = curl_init( WEBHOOK_URL );
 	curl_setopt_array( $ch, array( CURLOPT_POST => true, CURLOPT_POSTFIELDS => $payload, CURLOPT_RETURNTRANSFER => true, CURLOPT_HTTPHEADER => array( 'Content-Type: application/json', "Stripe-Signature: t=$t,v1=$sig" ), CURLOPT_TIMEOUT => 30 ) );
 	$res = curl_exec( $ch );

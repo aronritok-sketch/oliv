@@ -265,6 +265,7 @@ class OYS_App_API {
 			) : null,
 			'pricing'         => oys_is_donation( $s ) ? 'donation' : 'fixed',
 			'minimum'         => OYS_Locations::notice( $s ),
+			'teacher'         => OYS_Teachers::public_data( OYS_Teachers::for_session( $s ) ),
 			'waitlist_position' => $mine ? 0 : OYS_Bookings::waitlist_position( $user_id, $s->id ),
 			'web_url'         => oys_book_url( $s->id ),
 		);

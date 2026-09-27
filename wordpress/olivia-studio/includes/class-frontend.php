@@ -109,7 +109,7 @@ class OYS_Frontend {
 				$online = oys_is_online( $s );
 				$out[] = '<li class="session session--' . esc_attr( $tone ) . ( $online ? ' session--online' : '' ) . '">'
 					. '<span class="session__time">' . esc_html( oys_time( $s->starts_at ) . ' – ' . oys_time( $s->ends_at ) ) . '</span>'
-					. '<span class="session__class">' . $title . '</span>'
+					. '<span class="session__class">' . $title . OYS_Teachers::card_line( $s ) . '</span>'
 					. '<span class="session__place">' . ( $online ? '<span class="session__online">' . esc_html__( 'Online', 'olivia-studio' ) . '</span> ' . esc_html( $s->price_cents || oys_is_donation( $s ) ? oys_price_label( $s ) : '' ) : esc_html( $s->location ) . ( oys_is_hybrid( $s ) ? ' <span class="session__online">' . esc_html__( '+ Live online', 'olivia-studio' ) . '</span>' : '' ) ) . ( oys_is_donation( $s ) && ! $online ? ' <span class="session__donation">' . esc_html__( 'By donation', 'olivia-studio' ) . '</span>' : '' ) . '</span>'
 					. ( $s->note ? '<span class="session__note">' . esc_html( $s->note ) . '</span>' : '' )
 					. ( $spots ? '<span class="session__spots' . ( $left < 1 ? ' is-full' : '' ) . '">' . esc_html( $spots ) . '</span>' : '' )
@@ -221,7 +221,7 @@ class OYS_Frontend {
 		if ( 'cancel' === $_GET['oys_return'] && 'pending' === $order->status ) {
 			// Close the Stripe page so it can't be paid later, and free the seat now.
 			if ( $order->stripe_session_id ) {
-				OYS_Stripe::request( 'POST', '/v1/checkout/sessions/' . rawurlencode( $order->stripe_session_id ) . '/expire' );
+				OYS_Stripe::expire_session( $order );
 			}
 			OYS_Orders::mark_unpaid( $order_id, 'expired' );
 		}
@@ -263,6 +263,13 @@ class OYS_Frontend {
 			$html .= '<li>' . oys_icon( $r[0] ) . '<span>' . esc_html( $r[1] ) . '</span></li>';
 		}
 		$html .= '</ul>';
+		$teacher = OYS_Teachers::for_session( $s );
+		if ( $teacher ) {
+			$img   = OYS_Teachers::photo( $teacher, 'thumbnail' );
+			$html .= '<div class="oys-teacher-mini">' . ( $img ? '<img src="' . esc_url( $img ) . '" alt="" width="56" height="56">' : '' ) . '<div><p class="oys-teacher-mini__name">' . esc_html( sprintf( __( 'with %s', 'olivia-studio' ), $teacher->name ) ) . '</p>'
+				. ( $teacher->headline ? '<p class="oys-teacher-mini__headline">' . esc_html( $teacher->headline ) . '</p>' : '' )
+				. ( $teacher->bio ? '<details class="oys-teacher-mini__bio"><summary>' . esc_html( sprintf( __( 'About %s', 'olivia-studio' ), strtok( $teacher->name, ' ' ) ) ) . '</summary>' . wpautop( esc_html( $teacher->bio ) ) . '</details>' : '' ) . '</div></div>';
+		}
 		if ( $s->description ) {
 			$html .= '<div class="oys-desc">' . wpautop( esc_html( $s->description ) ) . '</div>';
 		}

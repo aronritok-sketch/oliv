@@ -119,7 +119,7 @@ class OYS_Bookings {
 				continue;
 			}
 			if ( $order->stripe_session_id ) {
-				$res = OYS_Stripe::request( 'POST', '/v1/checkout/sessions/' . rawurlencode( $order->stripe_session_id ) . '/expire' );
+				$res = OYS_Stripe::expire_session( $order );
 				if ( is_wp_error( $res ) ) {
 					// Not open any more (paid, or already expired) or Stripe unreachable: ask Stripe what happened.
 					$synced = OYS_Stripe::sync_session( $order->stripe_session_id );
@@ -624,6 +624,8 @@ class OYS_Bookings {
 			} elseif ( 'credit' === $b->paid_with && $b->pass_id ) {
 				OYS_Passes::refund_credit( $b->pass_id, $b->user_id );
 				$outcome = 'returned';
+			} elseif ( 'card' === $b->paid_with && OYS_Connect::account_for_order( OYS_Orders::get( $b->order_id ) ) ) {
+				$outcome = 'refund'; // Paid to a teacher's own Stripe: refunded below, once the seat is freed.
 			} elseif ( 'card' === $b->paid_with ) {
 				OYS_Passes::grant( $b->user_id, array(
 					'name'          => 'private' === $session->kind ? __( 'Private session credit', 'olivia-studio' ) : ( 'online' === $b->mode ? __( 'Online class credit', 'olivia-studio' ) : __( 'Class credit', 'olivia-studio' ) ),
@@ -638,7 +640,38 @@ class OYS_Bookings {
 		}
 		self::set( $b->id, array( 'status' => $on_time ? 'cancelled' : 'late_cancelled', 'cancelled_at' => oys_now() ) );
 		OYS_Schedule::release_seat( $b->session_id, $b->mode );
+		if ( 'refund' === $outcome ) {
+			$outcome = self::refund_seat( $b, $session );
+		}
 		return $outcome;
+	}
+
+	/**
+	 * Refund one cancelled seat of a card payment made to a teacher's Stripe account (a studio
+	 * credit would leave the money with the teacher). Falls back to a class credit if Stripe says no.
+	 * @return string 'refunded' | 'credit'
+	 */
+	private static function refund_seat( $b, $session ) {
+		global $wpdb;
+		$order  = OYS_Orders::get( $b->order_id );
+		$left   = (int) $order->amount_cents - (int) ( $order->meta['refunded_cents'] ?? 0 );
+		$others = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . OYS_Install::table( 'bookings' ) . " WHERE order_id = %d AND id <> %d AND status IN ('confirmed','attended','no_show','pending')", $order->id, $b->id ) );
+		$amount = $others ? min( $left, OYS_Connect::seat_value( $order ) ) : $left;
+		$res    = $amount > 0 ? OYS_Stripe::refund( $order->id, $amount, 'b' . $b->id ) : new WP_Error( 'oys_refund', 'nothing left to refund' );
+		if ( ! is_wp_error( $res ) ) {
+			self::set( $b->id, array( 'note' => trim( $b->note . ' Refunded ' . oys_money( $amount ) ) ) );
+			return 'refunded';
+		}
+		oys_log( 'Teacher payment refund failed, class credit given', array( 'booking' => $b->id, 'order' => $order->id, 'error' => $res->get_error_message() ) );
+		OYS_Passes::grant( $b->user_id, array(
+			'name'          => __( 'Class credit', 'olivia-studio' ),
+			'kind'          => self::credit_kind( $session, $b->mode ),
+			'credits'       => 1,
+			'validity_days' => (int) OYS_Settings::get( 'dropin_credit_days' ),
+			'order_id'      => $b->order_id,
+			'source'        => 'cancel',
+		) );
+		return 'credit';
 	}
 
 	/** Staff/refund: cancel without giving anything back and without emails. */

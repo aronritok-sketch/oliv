@@ -5,6 +5,7 @@ import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 
 import { JoinButton } from '@/components/join-button';
 import { Screen } from '@/components/screen';
+import { TeacherCard } from '@/components/teacher-card';
 import { Button, Card, Loading, Notice, Pill, Row, T } from '@/components/ui';
 import { Colors, Fonts, Radius, Spacing } from '@/constants/theme';
 import { ApiError, type Guest, type Mode, type PayOption, type SessionDetail } from '@/lib/api';
@@ -63,6 +64,7 @@ export default function ClassDetail() {
         </T>
       </View>
 
+      {s.teacher ? <TeacherCard teacher={s.teacher} /> : null}
       {s.description ? <T>{plainText(s.description)}</T> : null}
       {s.note ? <Notice text={plainText(s.note)} /> : null}
       {s.minimum ? <Notice text={s.minimum} testID="minimum" /> : null}

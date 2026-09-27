@@ -24,7 +24,7 @@ class OYS_Customers {
 
 	public static function is_customer_only( $user = null ) {
 		$user = $user ?: wp_get_current_user();
-		return $user && $user->exists() && ! user_can( $user, 'edit_posts' ) && ! user_can( $user, 'oys_manage' );
+		return $user && $user->exists() && ! user_can( $user, 'edit_posts' ) && ! user_can( $user, 'oys_manage' ) && ! user_can( $user, 'oys_teach' );
 	}
 
 	public static function keep_out_of_admin() {
@@ -43,6 +43,9 @@ class OYS_Customers {
 	public static function login_redirect( $to, $requested, $user ) {
 		if ( $user instanceof WP_User && self::is_customer_only( $user ) ) {
 			return oys_account_url();
+		}
+		if ( $user instanceof WP_User && user_can( $user, 'oys_teach' ) && ! user_can( $user, 'oys_manage' ) && ( ! $requested || str_contains( $requested, 'wp-admin/' ) && ! str_contains( $requested, 'page=' ) ) ) {
+			return admin_url( 'admin.php?page=oys-teach' );
 		}
 		return $to;
 	}

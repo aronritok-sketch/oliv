@@ -164,6 +164,7 @@
     const badges = (s.series ? '<i class="oys-ev__rep" title="' + esc(s.series.label) + '">↻</i>' : '')
       + (s.format === 'online' ? '<i class="oys-ev__tag">Online</i>' : '')
       + (s.format === 'hybrid' ? '<i class="oys-ev__tag">+ Live ' + s.online_booked + '</i>' : '')
+      + (s.teacher ? '<i class="oys-ev__tag oys-ev__tag--teacher" title="Teacher">' + esc(s.teacher) + '</i>' : '')
       + (s.kind === 'event' ? '<i class="oys-ev__tag">Event</i>' : '')
       + (s.kind === 'private' ? '<i class="oys-ev__tag">Private</i>' : '')
       + (s.pricing === 'donation' ? '<i class="oys-ev__tag" title="By donation">♡</i>' : '')
@@ -232,7 +233,7 @@
   function openDrawer(s, preset) {
     closeDrawer();
     const isNew = !s;
-    const v = s || Object.assign({ kind: 'group', class_slug: classKeys[0] || '', title: '', description: '', date: C.today, start: '18:00', duration: 60, capacity: 12, location: '', format: 'studio', online_url: '', price: C.prices.group, credits_allowed: true, pricing: 'fixed', pay_later: true, note: '', status: 'scheduled', booked: 0, people: [] }, preset || {});
+    const v = s || Object.assign({ kind: 'group', class_slug: classKeys[0] || '', title: '', description: '', date: C.today, start: '18:00', duration: 60, capacity: 12, location: '', format: 'studio', online_url: '', price: C.prices.group, credits_allowed: true, pricing: 'fixed', pay_later: true, teacher_id: 0, note: '', status: 'scheduled', booked: 0, people: [] }, preset || {});
     const locked = !isNew && (v.status !== 'scheduled' || v.past);
     const d = document.createElement('aside');
     d.className = 'oys-drawer';
@@ -255,6 +256,10 @@
     html += '<div class="oys-seg" role="radiogroup" aria-label="Type">' + Object.keys(kinds).map(k => '<label><input type="radio" name="kind" value="' + k + '"' + (v.kind === k ? ' checked' : '') + (isNew ? '' : ' disabled') + '><span>' + kinds[k] + '</span></label>').join('') + '</div>';
     html += field('Class', '<select name="class_slug"><option value="">— none —</option>' + classKeys.map(k => '<option value="' + esc(k) + '"' + (v.class_slug === k ? ' selected' : '') + '>' + esc(C.classes[k]) + '</option>').join('') + '</select>', 'f-class');
     html += field('Title', '<input type="text" name="title" value="' + esc(v.title) + '" placeholder="e.g. Full Moon Flow with live music">', 'f-title');
+    const teachers = C.teachers || [];
+    if (teachers.length || v.teacher_id) {
+      html += field('Teacher', '<select name="teacher_id"><option value="0">' + esc(C.ownerName || 'Me') + '</option>' + teachers.map(t => '<option value="' + t.id + '"' + (+v.teacher_id === t.id ? ' selected' : '') + '>' + esc(t.name) + '</option>').join('') + (v.teacher_id && !teachers.some(t => t.id === +v.teacher_id) ? '<option value="' + v.teacher_id + '" selected>' + esc(v.teacher || 'Hidden teacher') + '</option>' : '') + '</select>', 'f-teacher');
+    }
     html += '<div class="oys-row">' + field('Date', '<input type="date" name="date" required value="' + esc(v.date) + '">') + field('Starts', '<input type="time" name="start" step="300" required value="' + esc(v.start) + '">') + field('Minutes', '<input type="number" name="duration" min="15" max="600" step="5" value="' + v.duration + '">') + '</div>';
     const formats = { studio: 'In person', online: 'Online', hybrid: 'Both' };
     html += '<div class="oys-seg" role="radiogroup" aria-label="Where">' + Object.keys(formats).map(k => '<label><input type="radio" name="format" value="' + k + '"' + ((v.format || 'studio') === k ? ' checked' : '') + '><span>' + formats[k] + '</span></label>').join('') + '</div>';
@@ -363,6 +368,7 @@
       pay_later: form.pay_later.checked,
       min_people: form.min_people.value === '' ? '' : parseInt(form.min_people.value, 10),
       decide_hours: form.decide_hours.value === '' ? '' : parseInt(form.decide_hours.value, 10),
+      teacher_id: form.teacher_id ? parseInt(form.teacher_id.value, 10) || 0 : undefined, // No picker (no teachers): the server keeps the class's teacher.
       note: form.note.value.trim(),
       repeat: form.repeat ? form.repeat.value : 'none',
     };

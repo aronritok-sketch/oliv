@@ -109,9 +109,16 @@ add_filter( 'pre_http_request', function ( $pre, $args, $url ) {
 	}
 	$path = parse_url( $url, PHP_URL_PATH );
 	parse_str( is_string( $args['body'] ?? null ) ? $args['body'] : '', $body );
-	$GLOBALS['stripe_calls'][] = array( $args['method'], $path, $body );
+	// [ method, path, body, connected account (Stripe-Account header) ]
+	$GLOBALS['stripe_calls'][] = array( $args['method'], $path, $body, $args['headers']['Stripe-Account'] ?? '' );
 	$json = array( 'id' => 'x_' . count( $GLOBALS['stripe_calls'] ) );
-	if ( '/v1/customers' === $path ) {
+	if ( '/v1/accounts' === $path ) {
+		$json = array( 'id' => 'acct_new' . count( $GLOBALS['stripe_calls'] ), 'charges_enabled' => false, 'details_submitted' => false );
+	} elseif ( preg_match( '#^/v1/accounts/(.+)$#', $path, $m ) ) {
+		$json = array( 'id' => $m[1], 'charges_enabled' => ! empty( $GLOBALS['acct_ready'] ), 'details_submitted' => ! empty( $GLOBALS['acct_ready'] ) );
+	} elseif ( '/v1/account_links' === $path ) {
+		$json = array( 'url' => 'https://connect.stripe.test/setup/' . $body['account'] );
+	} elseif ( '/v1/customers' === $path ) {
 		$json = array( 'id' => 'cus_test' );
 	} elseif ( '/v1/checkout/sessions' === $path ) {
 		$json = array( 'id' => 'cs_' . md5( wp_json_encode( $body ) . count( $GLOBALS['stripe_calls'] ) ), 'url' => 'https://checkout.stripe.test/pay' );
@@ -169,6 +176,7 @@ function make_session( $args = array() ) {
 		'location'        => $args['location'] ?? '',
 		'min_people'      => $args['min_people'] ?? null,
 		'decide_hours'    => $args['decide_hours'] ?? null,
+		'teacher_id'      => $args['teacher'] ?? 0,
 		'status'          => 'scheduled',
 	) ) );
 }
@@ -1287,6 +1295,237 @@ test( 'AI newsletter draft: request shape, structured answer, errors', function 
 	remove_filter( 'pre_http_request', $fake, 5 );
 	OYS_Settings::update( array( 'ai_api_key' => '' ) );
 	ok( is_wp_error( OYS_AI::draft_newsletter( 'x' ) ), 'no key: asks for one' );
+} );
+
+function last_stripe( $path ) {
+	foreach ( array_reverse( $GLOBALS['stripe_calls'] ) as $c ) {
+		if ( $c[1] === $path || ( str_starts_with( $path, '#' ) && preg_match( $path . '$#', $c[1] ) ) ) {
+			return $c;
+		}
+	}
+	return null;
+}
+
+function make_teacher( $args = array() ) {
+	global $wpdb;
+	$id = OYS_Teachers::save( array_merge( array( 'name' => 'Anna Teach', 'email' => 'anna.' . wp_generate_password( 5, false ) . '@example.test', 'share_percent' => 60, 'headline' => 'Yin and breath' ), $args ) );
+	if ( ! empty( $args['stripe'] ) ) {
+		$wpdb->update( OYS_Teachers::table(), array( 'stripe_account' => $args['stripe'], 'stripe_ready' => 1, 'stripe_live' => 0 ), array( 'id' => $id ) );
+		OYS_Teachers::flush();
+	}
+	return OYS_Teachers::get( $id );
+}
+
+test( 'teachers: profile, login, own classes, weekly classes, emails', function () {
+	global $wpdb;
+	$t = make_teacher( array( 'share_percent' => 55 ) );
+	eq( 'anna-teach', $t->slug, 'slug from the name' );
+	eq( 'anna-teach-2', make_teacher()->slug, 'slugs stay unique' );
+	ok( is_wp_error( OYS_Teachers::save( array( 'name' => '' ) ) ), 'name required' );
+	eq( 55, (int) $t->share_percent, 'own share' );
+	eq( 'Anna Teach', OYS_Teachers::name_for( make_session( array( 'teacher' => $t->id ) ) ), 'class shows its teacher' );
+	eq( '', OYS_Teachers::name_for( make_session() ), 'the studio\'s own class has no teacher' );
+	eq( OYS_Settings::get( 'owner_name' ), OYS_Teachers::display_name( make_session() ), 'owner name for own classes' );
+	eq( 0, OYS_Teachers::valid_id( 999999 ), 'unknown teacher id becomes 0' );
+
+	$sent = array();
+	$cb   = function ( $to, $subject ) use ( &$sent ) { $sent[] = array( $to, $subject ); };
+	add_action( 'oys_email_sent', $cb, 10, 2 );
+	$uid = OYS_Teachers::give_access( $t->id );
+	ok( is_int( $uid ), 'login created' );
+	$user = get_userdata( $uid );
+	ok( in_array( 'oys_teacher', $user->roles, true ), 'teacher role' );
+	ok( user_can( $user, 'oys_teach' ) && ! user_can( $user, 'oys_manage' ), 'can teach, cannot manage' );
+	ok( ! OYS_Customers::is_customer_only( $user ), 'teachers may use the dashboard' );
+	ok( (bool) array_filter( $sent, fn( $m ) => $m[0] === $t->email && str_contains( $m[1], 'teacher login' ) ), 'password email sent' );
+	wp_set_current_user( $uid );
+	eq( (int) $t->id, (int) OYS_Teachers::current()->id, 'current teacher from the login' );
+	wp_set_current_user( 0 );
+	$other = make_teacher( array( 'email' => $t->email ) );
+	ok( is_wp_error( OYS_Teachers::give_access( $other->id ) ), 'one login per teacher' );
+	OYS_Teachers::remove_access( $t->id );
+	ok( ! user_can( get_userdata( $uid ), 'oys_teach' ), 'login removed' );
+
+	$mine  = make_session( array( 'teacher' => $t->id ) );
+	$other = make_session( array( 'teacher' => make_teacher()->id ) );
+	ok( OYS_Teachers::owns( $t, $mine ) && ! OYS_Teachers::owns( $t, $other ) && ! OYS_Teachers::owns( $t, make_session() ), 'owns only their classes' );
+	$ids = wp_list_pluck( OYS_Schedule::query( array( 'teacher' => $t->id, 'from' => oys_now() ) ), 'id' );
+	ok( in_array( $mine->id, $ids ) && ! in_array( $other->id, $ids ), 'query by teacher' );
+
+	// Weekly class: the teacher goes with every date and stays when a form doesn't send it.
+	$tpl = OYS_Schedule::save_template( array( 'class_slug' => 'hatha-flow', 'weekday' => (int) wp_date( 'N', time() + 2 * DAY_IN_SECONDS ), 'start_time' => '07:15', 'active' => 1, 'teacher_id' => $t->id ) );
+	OYS_Schedule::generate( 2 );
+	$dates = $wpdb->get_col( $wpdb->prepare( 'SELECT teacher_id FROM ' . OYS_Install::table( 'sessions' ) . ' WHERE template_id = %d', $tpl ) );
+	ok( $dates && array_unique( $dates ) === array( (string) $t->id ), 'generated dates have the teacher' );
+	OYS_Schedule::save_template( array( 'class_slug' => 'hatha-flow', 'weekday' => 3, 'start_time' => '07:15', 'active' => 1 ), $tpl );
+	eq( (int) $t->id, (int) OYS_Schedule::template( $tpl )->teacher_id, 'kept when not sent' );
+	$res = OYS_Calendar::rest_save( cal_req( array( 'kind' => 'group', 'class_slug' => 'hatha-flow', 'date' => wp_date( 'Y-m-d', time() + 5 * DAY_IN_SECONDS ), 'start' => '09:00', 'duration' => 60, 'capacity' => 8, 'price' => 2000, 'teacher_id' => $t->id ) ) );
+	eq( (int) $t->id, $res->get_data()['session']['teacher_id'], 'calendar saves the teacher' );
+	eq( 'Anna Teach', $res->get_data()['session']['teacher'], 'calendar shows the name' );
+
+	// Emails: the teacher line, {teacher}, notices to the teacher, replies to the teacher.
+	eq( 'Anna Teach', OYS_Email_Templates::vars_for( 0, $mine )['teacher'], '{teacher} placeholder' );
+	$sent = array();
+	$u    = make_user( 'Mia' );
+	OYS_Bookings::book_manual( $u, $mine->id, 'comp', true, true );
+	ok( (bool) array_filter( $sent, fn( $m ) => $m[0] === $t->email && str_contains( $m[1], 'New booking' ) ), 'teacher told about a new booking' );
+	OYS_Teachers::save( array( 'notify' => 0 ), $t->id );
+	$sent = array();
+	OYS_Bookings::book_manual( make_user(), $mine->id, 'comp', true, true );
+	ok( ! array_filter( $sent, fn( $m ) => $m[0] === $t->email ), 'no notices when switched off' );
+	remove_action( 'oys_email_sent', $cb, 10 );
+	$headers = array();
+	$cap     = function ( $atts ) use ( &$headers ) { $headers[] = $atts['headers']; return $atts; };
+	add_filter( 'wp_mail', $cap );
+	eq( 2, OYS_Messages::send_to_session( $mine->id, 'Hi', 'Bring a blanket', array( 'reply_to' => $t->email ) ), 'teacher message sent to everyone' );
+	remove_filter( 'wp_mail', $cap );
+	ok( in_array( 'Reply-To: ' . $t->email, $headers[0], true ), 'replies go to the teacher' );
+
+	$data = OYS_App_API::session_data( $mine, $u );
+	eq( 'Anna Teach', $data['teacher']['name'], 'app gets the teacher' );
+	ok( null === OYS_App_API::session_data( make_session(), $u )['teacher'], 'no teacher for the studio\'s classes' );
+	ok( str_contains( OYS_Teachers::shortcode(), 'Anna Teach' ), 'teachers page lists them' );
+} );
+
+test( 'connect: card payments for a teacher\'s class go to their Stripe, studio fee, refunds', function () {
+	global $wpdb;
+	$t = make_teacher( array( 'stripe' => 'acct_anna', 'share_percent' => 60 ) );
+	$s = make_session( array( 'teacher' => $t->id, 'price' => 2500 ) );
+	$u = make_user();
+	$o = OYS_Orders::create( array( 'user_id' => $u, 'type' => 'dropin', 'session_id' => $s->id, 'amount_cents' => 2500 ) );
+	$b = OYS_Bookings::hold( $u, $s, $o );
+	OYS_Orders::update( $o, array( 'booking_id' => $b ) );
+	ok( is_string( OYS_Stripe::start_checkout( $o, 'Class', '' ) ), 'checkout started' );
+	$c = last_stripe( '/v1/checkout/sessions' );
+	eq( 'acct_anna', $c[3], 'created on the teacher\'s account' );
+	eq( 1000, (int) $c[2]['payment_intent_data']['application_fee_amount'], 'studio fee = 40%' );
+	ok( empty( $c[2]['customer'] ) && ! empty( $c[2]['customer_email'] ), 'no studio customer id on their account' );
+	$order = OYS_Orders::get( $o );
+	eq( 'acct_anna', $order->meta['stripe_account'], 'order remembers the account' );
+	eq( 1000, $order->meta['app_fee_cents'], 'order remembers the fee' );
+
+	OYS_Stripe::sync_session( $order->stripe_session_id );
+	eq( 'acct_anna', last_stripe( '#^/v1/checkout/sessions/[^/]+' )[3], 'reading the session uses the account' );
+	OYS_Stripe::expire_session( $order );
+	eq( 'acct_anna', last_stripe( '#^/v1/checkout/sessions/.+/expire' )[3], 'closing the session uses the account' );
+
+	// Passes, studio classes and teachers without Stripe are paid to the studio.
+	$pack = OYS_Orders::create( array( 'user_id' => $u, 'type' => 'pack', 'product_id' => 'pack-5', 'session_id' => $s->id, 'amount_cents' => 11000 ) );
+	OYS_Stripe::start_checkout( $pack, 'Pass', '' );
+	eq( '', last_stripe( '/v1/checkout/sessions' )[3], 'a pass is the studio\'s' );
+	$own = OYS_Orders::create( array( 'user_id' => $u, 'type' => 'dropin', 'session_id' => make_session()->id, 'amount_cents' => 2500 ) );
+	OYS_Stripe::start_checkout( $own, 'Class', '' );
+	eq( '', last_stripe( '/v1/checkout/sessions' )[3], 'the studio\'s own class' );
+	$nost = make_teacher();
+	ok( null === OYS_Connect::split_for_order( OYS_Orders::get( OYS_Orders::create( array( 'user_id' => $u, 'type' => 'dropin', 'session_id' => make_session( array( 'teacher' => $nost->id ) )->id, 'amount_cents' => 2500 ) ) ) ), 'teacher without Stripe: studio' );
+	OYS_Settings::update( array( 'stripe_mode' => 'live', 'stripe_live_secret' => 'sk_live_unit' ) );
+	ok( ! OYS_Connect::ready( OYS_Teachers::get( $t->id ) ), 'a test account is not used in live mode' );
+	OYS_Settings::update( array( 'stripe_mode' => 'test' ) );
+
+	// Paid, then cancelled in time: refunded on their account (a studio credit would leave the money with them).
+	OYS_Orders::mark_paid( $o, array( 'payment_intent' => 'pi_anna' ) );
+	$credits = OYS_Passes::balance( $u );
+	eq( 'refunded', OYS_Bookings::cancel( $b ), 'cancel refunds the card' );
+	$r = last_stripe( '/v1/refunds' );
+	eq( 'acct_anna', $r[3], 'refund on the teacher\'s account' );
+	eq( 'true', $r[2]['refund_application_fee'], 'studio fee returned' );
+	eq( 2500, (int) $r[2]['amount'], 'whole seat refunded' );
+	eq( $credits, OYS_Passes::balance( $u ), 'no class credit given' );
+	eq( 'refunded', OYS_Orders::get( $o )->status, 'order refunded' );
+
+	// Party: each cancelled guest gets their seat back, the last one the rest.
+	$o2 = OYS_Orders::create( array( 'user_id' => $u, 'type' => 'dropin', 'session_id' => $s->id, 'amount_cents' => 5000 ) );
+	$b2 = OYS_Bookings::hold( $u, $s, $o2, guests( 'Bea' ) );
+	OYS_Stripe::start_checkout( $o2, 'Class', '' );
+	OYS_Orders::mark_paid( $o2, array( 'payment_intent' => 'pi_anna2' ) );
+	$guest = OYS_Bookings::guests_of( $b2, array( 'confirmed' ) )[0];
+	OYS_Bookings::cancel( $guest->id );
+	eq( 2500, (int) last_stripe( '/v1/refunds' )[2]['amount'], 'guest seat refunded' );
+	eq( 'partially_refunded', OYS_Orders::get( $o2 )->status, 'host still booked' );
+	eq( 'confirmed', OYS_Bookings::get( $b2 )->status, 'host booking kept' );
+
+	// Connect webhook: signed with the Connect secret, updates the teacher.
+	OYS_Settings::update( array( 'stripe_test_connect_webhook' => 'whsec_connect_unit' ) );
+	$wpdb->update( OYS_Teachers::table(), array( 'stripe_ready' => 0 ), array( 'id' => $t->id ) );
+	OYS_Teachers::flush();
+	$payload = wp_json_encode( array( 'id' => 'evt_acct_' . wp_generate_password( 6, false ), 'type' => 'account.updated', 'account' => 'acct_anna', 'data' => array( 'object' => array( 'id' => 'acct_anna', 'charges_enabled' => true, 'details_submitted' => true ) ) ) );
+	$ts      = time();
+	$req     = new WP_REST_Request( 'POST', '/oys/v1/stripe-webhook' );
+	$req->set_body( $payload );
+	$req->set_header( 'stripe-signature', "t=$ts,v1=" . hash_hmac( 'sha256', "$ts.$payload", 'whsec_connect_unit' ) );
+	eq( 200, OYS_Stripe::webhook( $req )->get_status(), 'Connect event accepted' );
+	ok( OYS_Connect::ready( OYS_Teachers::get( $t->id ) ), 'account ready from the event' );
+	$req->set_header( 'stripe-signature', "t=$ts,v1=" . hash_hmac( 'sha256', "$ts.$payload", 'whsec_wrong' ) );
+	eq( 400, OYS_Stripe::webhook( $req )->get_status(), 'bad signature refused' );
+
+	// Onboarding: the account is created once, then a link each time.
+	$new = make_teacher();
+	$url = OYS_Connect::onboarding_url( $new->id, admin_url( 'admin.php?page=oys-teach-profile' ) );
+	ok( str_starts_with( $url, 'https://connect.stripe.test/setup/acct_new' ), 'onboarding link' );
+	$acct = OYS_Teachers::get( $new->id )->stripe_account;
+	$create = last_stripe( '/v1/accounts' );
+	eq( 'full', $create[2]['controller']['stripe_dashboard']['type'], 'teacher gets their own dashboard' );
+	eq( 'account', $create[2]['controller']['fees']['payer'], 'teacher pays their Stripe fees' );
+	$n = count( array_filter( $GLOBALS['stripe_calls'], fn( $c ) => '/v1/accounts' === $c[1] ) );
+	OYS_Connect::onboarding_url( $new->id, admin_url() );
+	eq( $n, count( array_filter( $GLOBALS['stripe_calls'], fn( $c ) => '/v1/accounts' === $c[1] ) ), 'account not created twice' );
+	eq( $acct, OYS_Teachers::get( $new->id )->stripe_account, 'same account' );
+	$GLOBALS['acct_ready'] = false;
+	ok( false === OYS_Connect::refresh( $new->id ), 'not finished yet' );
+	$GLOBALS['acct_ready'] = true;
+	ok( true === OYS_Connect::refresh( $new->id ), 'finished' );
+	OYS_Connect::disconnect( $new->id );
+	ok( ! OYS_Connect::ready( OYS_Teachers::get( $new->id ) ), 'disconnected' );
+} );
+
+test( 'statement: what each visit is worth and who owes whom', function () {
+	global $wpdb;
+	$t = make_teacher( array( 'share_percent' => 50, 'cash_by' => 'teacher' ) );
+	OYS_Settings::update( array( 'settle_membership_cents' => 1500 ) );
+	$s     = make_session( array( 'teacher' => $t->id, 'in_hours' => -48, 'price' => 2500 ) );
+	$month = wp_date( 'Y-m', oys_ts( $s->starts_at ) );
+	$u     = make_user();
+	$bk    = function ( $row ) use ( $s, $u, $wpdb ) {
+		$wpdb->insert( OYS_Install::table( 'bookings' ), array_merge( array( 'session_id' => $s->id, 'user_id' => $u, 'status' => 'attended', 'created_at' => oys_now() ), $row ) );
+		return $wpdb->insert_id;
+	};
+	$order = function ( $amount, $meta = array(), $type = 'dropin' ) use ( $u, $s ) {
+		$id = OYS_Orders::create( array( 'user_id' => $u, 'type' => $type, 'session_id' => $s->id, 'amount_cents' => $amount, 'meta' => $meta ) );
+		OYS_Orders::update( $id, array( 'status' => 'paid' ) );
+		return $id;
+	};
+	$bk( array( 'paid_with' => 'card', 'order_id' => $order( 2000, array( 'stripe_account' => 'acct_x', 'app_fee_cents' => 1000 ) ) ) ); // to the teacher's Stripe
+	$bk( array( 'paid_with' => 'card', 'order_id' => $order( 2500 ) ) );                                                            // to the studio
+	$pack = $order( 10000, array(), 'pack' );
+	$bk( array( 'paid_with' => 'credit', 'pass_id' => OYS_Passes::grant( $u, array( 'product_id' => 'pack-5', 'credits' => 5, 'order_id' => $pack ) ) ) ); // 100 / 5
+	$bk( array( 'paid_with' => 'credit', 'pass_id' => OYS_Passes::grant( $u, array( 'credits' => 1, 'source' => 'admin' ) ) ) );                 // free: class price
+	$bk( array( 'paid_with' => 'membership', 'status' => 'no_show' ) );
+	$bk( array( 'paid_with' => 'door', 'due_cents' => 1800, 'collected_with' => 'cash' ) );
+	$bk( array( 'paid_with' => 'door', 'due_cents' => 1500 ) );
+	$bk( array( 'paid_with' => 'comp' ) );
+	$bk( array( 'paid_with' => 'card', 'status' => 'cancelled', 'order_id' => $order( 2500 ) ) );
+	make_session( array( 'teacher' => $t->id, 'in_hours' => 48 ) ); // not taught yet
+	$st = OYS_Connect::statement( $t->id, $month );
+	eq( 1, $st['classes'], 'one finished class' );
+	eq( 8, count( $st['rows'] ), 'every paid or free visit, not cancellations' );
+	$how = wp_list_pluck( $st['rows'], 'how' );
+	eq( array( 'card_direct', 'card', 'credit', 'credit', 'membership', 'cash', 'due', 'free' ), $how, 'kinds of payment' );
+	eq( array( 2000, 2500, 2000, 2500, 1500, 1800, 0, 0 ), wp_list_pluck( $st['rows'], 'value' ), 'values' );
+	$tot = $st['totals'];
+	eq( 2000, $tot['direct'], 'paid straight to the teacher' );
+	eq( 1000, $tot['direct_fee'], 'studio fee already taken' );
+	eq( 1250 + 1000 + 1250 + 750, $tot['studio_owes'], 'studio owes the teacher their part' );
+	eq( 900, $tot['teacher_owes'], 'teacher owes the studio its part of the cash' );
+	eq( 4250 - 900, $tot['balance'], 'balance' );
+	eq( 1500, $tot['uncollected'], 'still to collect' );
+	OYS_Teachers::save( array( 'cash_by' => 'studio' ), $t->id );
+	$st2 = OYS_Connect::statement( $t->id, $month );
+	eq( 4250 + 900, $st2['totals']['studio_owes'], 'studio collects: owes the teacher their part of the cash' );
+	eq( 0, $st2['totals']['teacher_owes'], 'teacher owes nothing' );
+	$csv = OYS_Connect::csv( $st );
+	ok( str_contains( $csv, 'Balance' ) && str_contains( $csv, '33.50' ), 'CSV with the balance' );
+	eq( 0, OYS_Connect::statement( make_teacher()->id, $month )['classes'], 'other teachers see nothing' );
+	eq( 1000, OYS_Connect::credit_value( (object) array( 'order_id' => 0, 'source' => 'admin' ), (object) array( 'price_cents' => 1000, 'format' => 'studio' ) ), 'free credit: class price' );
 } );
 
 test( 'helpers: money and periods', function () {

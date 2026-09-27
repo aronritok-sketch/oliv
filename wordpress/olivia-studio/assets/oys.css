@@ -203,3 +203,22 @@
 .oys-coupon { margin: 0 0 1rem; }
 .oys-coupon summary { cursor: pointer; font-weight: 700; color: var(--oys-forest); }
 .oys-coupon .field { margin-top: .6rem; }
+
+/* Teachers */
+.oys-teacher-line { display: flex; align-items: center; gap: .4rem; margin-top: .2rem; font-size: .86rem; font-weight: 600; text-transform: none; letter-spacing: 0; }
+.oys-teacher-line img { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; }
+.oys-teacher-mini { display: flex; gap: .8rem; align-items: flex-start; margin: 1rem 0 0; padding-top: 1rem; border-top: 1px solid rgba(18, 35, 26, .15); }
+.oys-teacher-mini img { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; flex: none; }
+.oys-teacher-mini p { margin: 0; }
+.oys-teacher-mini__name { font-weight: 800; }
+.oys-teacher-mini__headline { font-size: .9rem; color: var(--muted, #53635A); }
+.oys-teacher-mini__bio summary { cursor: pointer; font-weight: 700; color: var(--oys-forest); margin-top: .3rem; }
+.oys-teachers { display: grid; gap: 2.5rem; }
+.oys-teacher { display: grid; gap: 1.25rem; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 760px) { .oys-teacher { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); align-items: start; } }
+.oys-teacher__photos { display: grid; gap: .5rem; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.oys-teacher__photos img { width: 100%; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 6px; }
+.oys-teacher__photos img:first-child { grid-column: 1 / -1; aspect-ratio: 4 / 3; }
+.oys-teacher__name { margin: 0 0 .2rem; }
+.oys-teacher__headline { font-weight: 700; color: var(--oys-forest); margin: 0 0 .8rem; }
+.oys-teacher__next { grid-column: 1 / -1; margin: -1rem 0 0; padding-left: 1.2rem; }

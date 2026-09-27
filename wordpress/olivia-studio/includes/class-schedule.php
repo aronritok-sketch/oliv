@@ -45,6 +45,7 @@ class OYS_Schedule {
 			// NULL = the location's minimum and decision time.
 			'min_people'   => array_key_exists( 'min_people', $data ) ? self::nullable_int( $data['min_people'] ) : ( $old->min_people ?? null ),
 			'decide_hours' => array_key_exists( 'decide_hours', $data ) ? self::nullable_int( $data['decide_hours'], 1 ) : ( $old->decide_hours ?? null ),
+			'teacher_id'   => array_key_exists( 'teacher_id', $data ) ? max( 0, (int) $data['teacher_id'] ) : (int) ( $old->teacher_id ?? 0 ),
 			'note'         => sanitize_text_field( $data['note'] ?? '' ),
 			'active'       => empty( $data['active'] ) ? 0 : 1,
 			'valid_from'   => ! empty( $data['valid_from'] ) && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $data['valid_from'] ) ? $data['valid_from'] : null,
@@ -112,6 +113,7 @@ class OYS_Schedule {
 					'pay_later'   => (int) $tpl->pay_later,
 					'min_people'  => $tpl->min_people,
 					'decide_hours' => $tpl->decide_hours,
+					'teacher_id'  => (int) $tpl->teacher_id,
 					'note'        => $tpl->note,
 					'template_id' => $tpl->id,
 					'tpl_slot'    => $slot,
@@ -131,7 +133,7 @@ class OYS_Schedule {
 	}
 
 	/**
-	 * @param array $args kind (string|array), from, to (UTC), status, class_slug, limit
+	 * @param array $args kind (string|array), from, to (UTC), status, class_slug, teacher (id; 0 = the studio's own), limit
 	 */
 	public static function query( array $args = array() ) {
 		global $wpdb;
@@ -159,6 +161,10 @@ class OYS_Schedule {
 			$where[] = 'class_slug = %s';
 			$vals[]  = $args['class_slug'];
 		}
+		if ( isset( $args['teacher'] ) && '' !== $args['teacher'] && null !== $args['teacher'] ) {
+			$where[] = 'teacher_id = %d';
+			$vals[]  = (int) $args['teacher'];
+		}
 		$order = ! empty( $args['desc'] ) ? 'DESC' : 'ASC';
 		$limit = ! empty( $args['limit'] ) ? ' LIMIT ' . (int) $args['limit'] : '';
 		$sql   = "SELECT * FROM $s WHERE " . implode( ' AND ', $where ) . " ORDER BY starts_at $order" . $limit;
@@ -180,7 +186,7 @@ class OYS_Schedule {
 		global $wpdb;
 		$t   = OYS_Install::table( 'sessions' );
 		$row = array();
-		foreach ( array( 'kind', 'class_slug', 'title', 'description', 'starts_at', 'ends_at', 'capacity', 'location', 'format', 'online_url', 'price_cents', 'online_capacity', 'online_price_cents', 'zoom_meeting_id', 'zoom_join_url', 'zoom_password', 'credits_allowed', 'pricing', 'pay_later', 'min_people', 'decide_hours', 'min_state', 'nudge_sent', 'note', 'status', 'template_id', 'tpl_slot' ) as $k ) {
+		foreach ( array( 'kind', 'class_slug', 'title', 'description', 'starts_at', 'ends_at', 'capacity', 'location', 'format', 'online_url', 'price_cents', 'online_capacity', 'online_price_cents', 'zoom_meeting_id', 'zoom_join_url', 'zoom_password', 'credits_allowed', 'pricing', 'pay_later', 'min_people', 'decide_hours', 'min_state', 'nudge_sent', 'teacher_id', 'note', 'status', 'template_id', 'tpl_slot' ) as $k ) {
 			if ( array_key_exists( $k, $data ) ) {
 				$row[ $k ] = $data[ $k ];
 			}

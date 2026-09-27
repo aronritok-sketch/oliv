@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Olivia Studio — Booking & Payments
  * Description:       Class schedule, online booking, class passes, memberships, private sessions, gift cards, waitlist, customer accounts and Stripe payments for Olivia Kovács Yoga.
- * Version:           1.1.0
+ * Version:           1.2.0
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            Olivia Kovács Yoga
@@ -12,8 +12,8 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OYS_VERSION', '1.1.0' );
-define( 'OYS_DB_VERSION', '8' );
+define( 'OYS_VERSION', '1.2.0' );
+define( 'OYS_DB_VERSION', '9' );
 define( 'OYS_FILE', __FILE__ );
 define( 'OYS_DIR', plugin_dir_path( __FILE__ ) );
 define( 'OYS_URL', plugin_dir_url( __FILE__ ) );
@@ -35,6 +35,8 @@ require_once OYS_DIR . 'includes/class-coupons.php';
 require_once OYS_DIR . 'includes/class-rewards.php';
 require_once OYS_DIR . 'includes/class-newsletter.php';
 require_once OYS_DIR . 'includes/class-ai.php';
+require_once OYS_DIR . 'includes/class-teachers.php';
+require_once OYS_DIR . 'includes/class-connect.php';
 require_once OYS_DIR . 'includes/class-customers.php';
 require_once OYS_DIR . 'includes/class-privates.php';
 require_once OYS_DIR . 'includes/class-gifts.php';
@@ -49,6 +51,7 @@ require_once OYS_DIR . 'includes/class-app-api.php';
 
 if ( is_admin() ) {
 	require_once OYS_DIR . 'includes/admin/class-admin.php';
+	require_once OYS_DIR . 'includes/admin/class-teachers-admin.php';
 }
 
 register_activation_hook( __FILE__, array( 'OYS_Install', 'activate' ) );
@@ -71,7 +74,9 @@ add_action( 'plugins_loaded', function () {
 	OYS_App_API::init();
 	OYS_Coupons::init();
 	OYS_Newsletter::init();
+	OYS_Teachers::init();
 	if ( is_admin() ) {
 		OYS_Admin::init();
+		OYS_Teachers_Admin::init();
 	}
 } );

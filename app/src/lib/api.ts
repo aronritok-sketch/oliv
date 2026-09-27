@@ -43,8 +43,19 @@ export type Session = {
   pricing?: 'fixed' | 'donation';
   /** "Goes ahead with 3 or more people…" when the class has a minimum, else ''. */
   minimum?: string;
+  /** Another teacher's class (null = the studio's own). */
+  teacher?: Teacher | null;
   waitlist_position: number;
   web_url: string;
+};
+
+export type Teacher = {
+  id: number;
+  name: string;
+  headline: string;
+  bio: string;
+  photo: string;
+  photos: string[];
 };
 
 export type PayOption = {

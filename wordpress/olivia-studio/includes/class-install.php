@@ -58,6 +58,7 @@ class OYS_Install {
 			pay_later tinyint(1) unsigned NOT NULL DEFAULT 1,
 			min_people smallint(5) unsigned NULL,
 			decide_hours smallint(5) unsigned NULL,
+			teacher_id bigint(20) unsigned NOT NULL DEFAULT 0,
 			note varchar(255) NOT NULL DEFAULT '',
 			active tinyint(1) unsigned NOT NULL DEFAULT 1,
 			valid_from date NULL,
@@ -92,6 +93,7 @@ class OYS_Install {
 			decide_hours smallint(5) unsigned NULL,
 			min_state tinyint(1) unsigned NOT NULL DEFAULT 0,
 			nudge_sent tinyint(1) unsigned NOT NULL DEFAULT 0,
+			teacher_id bigint(20) unsigned NOT NULL DEFAULT 0,
 			note varchar(255) NOT NULL DEFAULT '',
 			status varchar(20) NOT NULL DEFAULT 'scheduled',
 			template_id bigint(20) unsigned NOT NULL DEFAULT 0,
@@ -99,7 +101,8 @@ class OYS_Install {
 			created_at datetime NOT NULL,
 			PRIMARY KEY  (id),
 			KEY starts_at (starts_at),
-			KEY template_start (template_id,starts_at)
+			KEY template_start (template_id,starts_at),
+			KEY teacher_start (teacher_id,starts_at)
 		) $c;" );
 
 		dbDelta( 'CREATE TABLE ' . self::table( 'bookings' ) . " (
@@ -320,6 +323,30 @@ class OYS_Install {
 			UNIQUE KEY period_key (period_key)
 		) $c;" );
 
+		// Other teachers: public profile, their share of class income, their own Stripe account.
+		dbDelta( 'CREATE TABLE ' . self::table( 'teachers' ) . " (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			user_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			name varchar(190) NOT NULL DEFAULT '',
+			slug varchar(190) NOT NULL DEFAULT '',
+			email varchar(190) NOT NULL DEFAULT '',
+			headline varchar(255) NOT NULL DEFAULT '',
+			bio text NULL,
+			photos varchar(255) NOT NULL DEFAULT '',
+			share_percent tinyint(3) unsigned NOT NULL DEFAULT 50,
+			cash_by varchar(10) NOT NULL DEFAULT 'teacher',
+			notify tinyint(1) unsigned NOT NULL DEFAULT 1,
+			stripe_account varchar(64) NOT NULL DEFAULT '',
+			stripe_live tinyint(1) unsigned NOT NULL DEFAULT 0,
+			stripe_ready tinyint(1) unsigned NOT NULL DEFAULT 0,
+			active tinyint(1) unsigned NOT NULL DEFAULT 1,
+			sort int(10) NOT NULL DEFAULT 0,
+			created_at datetime NOT NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY slug (slug),
+			KEY user_id (user_id)
+		) $c;" );
+
 		// Messages the studio sent to the people booked into a class (Studio → roster).
 		dbDelta( 'CREATE TABLE ' . self::table( 'messages' ) . " (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
@@ -338,6 +365,8 @@ class OYS_Install {
 		add_role( 'oys_customer', __( 'Studio customer', 'olivia-studio' ), array( 'read' => true ) );
 		// A manager can run the studio (schedule, rosters, customers) without full site admin rights.
 		add_role( 'oys_manager', __( 'Studio manager', 'olivia-studio' ), array( 'read' => true, 'oys_manage' => true, 'upload_files' => true ) );
+		// A teacher sees their own classes and rosters, writes to their students, keeps their profile.
+		add_role( 'oys_teacher', __( 'Studio teacher', 'olivia-studio' ), array( 'read' => true, 'oys_teach' => true ) );
 		$admin = get_role( 'administrator' );
 		if ( $admin ) {
 			$admin->add_cap( 'oys_manage' );

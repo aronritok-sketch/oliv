@@ -154,6 +154,7 @@ class OYS_Locations {
 				sprintf( _n( '%1$d person is booked (minimum %2$d), so the class goes ahead.', '%1$d people are booked (minimum %2$d), so the class goes ahead.', $people, 'olivia-studio' ), $people, $min ),
 				'studio_minimum'
 			);
+			OYS_Emails::teacher_notice( $s, sprintf( __( 'Class is on: %s', 'olivia-studio' ), $when ), sprintf( _n( '%1$d person is booked (minimum %2$d), so the class goes ahead.', '%1$d people are booked (minimum %2$d), so the class goes ahead.', $people, 'olivia-studio' ), $people, $min ) );
 			do_action( 'oys_class_confirmed', (int) $s->id, $people );
 			return true;
 		}
@@ -164,6 +165,7 @@ class OYS_Locations {
 			sprintf( __( 'Only %1$d booked (minimum %2$d). Everyone was emailed with other dates and got their class back.', 'olivia-studio' ), $people, $min ),
 			'studio_minimum'
 		);
+		OYS_Emails::teacher_notice( OYS_Schedule::get( $s->id ), sprintf( __( 'Cancelled automatically: %s', 'olivia-studio' ), $when ), sprintf( __( 'Only %1$d booked (minimum %2$d), so the class was cancelled and everyone was emailed. No need to come in.', 'olivia-studio' ), $people, $min ) );
 		do_action( 'oys_class_cancelled_minimum', (int) $s->id, $people );
 		return false;
 	}

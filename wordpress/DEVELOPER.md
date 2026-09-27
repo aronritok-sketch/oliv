@@ -204,7 +204,7 @@ Tesztkártyák: `4242 4242 4242 4242` (sikeres), `4000 0000 0000 9995` (elutasí
 - **Időkezelés**: minden dátum **UTC-ben** tárolódik (`Y-m-d H:i:s`), megjelenítéskor a WP időzónájára vált (`oys_date()`, `oys_time()` → `wp_date`). Adminban beírt helyi időből `oys_local_to_utc()` készít UTC-t. A heti sablonok helyi időben értendők, így a nyári/téli időszámítás váltása nem tolja el az órákat.
 - **Pénz**: mindig egész **cent** (`*_cents`), pénznem kisbetűs ISO (`usd`). Kiírás: `oys_money()`, beolvasás: `oys_cents_from_input()`.
 - **Konfiguráció** két option tömbben: `oys_settings` (lásd `OYS_Settings::defaults()`) és `oys_products`. Oldal-hozzárendelés: `oys_page_book`, `oys_page_account`, `oys_page_gifts`.
-- **Jogosultság**: új capability **`oys_manage`** (adminisztrátor + „Studio manager” szerepkör). Ügyfelek: **`oys_customer`** szerepkör (csak `read`), nem látják a wp-admint (átirányítás a fiókra) és az admin sávot.
+- **Jogosultság**: új capability **`oys_manage`** (adminisztrátor + „Studio manager” szerepkör). Ügyfelek: **`oys_customer`** szerepkör (csak `read`), nem látják a wp-admint (átirányítás a fiókra) és az admin sávot. Oktatók: **`oys_teacher`** szerepkör (`read` + **`oys_teach`**): a wp-adminban csak a saját „Teaching” menüjüket látják (6.20).
 - **Flash üzenetek**: `oys_flash()` → transient (bejelentkezve felhasználónként, egyébként egy `oys_fk` sütihez kötve), kiírás: `oys_render_flash()`.
 
 ---
@@ -274,6 +274,8 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 **`newsletters`** / **`newsletter_queue`** – hírlevél (`subject`, `preheader`, `body` a saját egyszerű formátumban, gomb, `status` `draft` → `sending` → `sent`, `total`/`sent`) és a küldési sor (feliratkozónként egy sor, `status` `queued` · `sending` · `sent` · `skipped`; (`newsletter_id`, `user_id`) UNIQUE).
 
 **`raffles`** – hűség-sorsolás periódusonként: `period_key` (UNIQUE, pl. `2026-H2`), `label`, `starts_at`/`ends_at`, `tickets_total`, `entrants`, `winner_id`, `winner_tickets`, `pass_id` (a nyeremény), `newsletter_id` (bejelentés), `drawn_at`.
+
+**`teachers`** – további oktatók: `user_id` (a belépésük, 0 = nincs), `name`, `slug` (UNIQUE), `email` (belépés és értesítések, nem publikus), `headline`, `bio`, `photos` (médiatár-ID-k vesszővel, az első a fő kép), `share_percent` (az oktató része az óra bevételéből), `cash_by` (`teacher` · `studio`: ki szedi be a helyszíni fizetést), `notify`, `stripe_account` (`acct_…`), `stripe_live` (élő vagy teszt fiók), `stripe_ready` (fogadhat-e kártyás fizetést), `active`, `sort`. A `templates` és a `sessions` tábla `teacher_id` oszlopa mutat ide (0 = Olivia saját órája); a heti óra generált dátumai öröklik.
 
 **`messages`** – a névsorból küldött „Message everyone” üzenetek: `session_id`, `sender_id`, `subject` (kitöltve), `body`, `recipients` (hány embernek ment), `created_at`.
 
@@ -649,6 +651,18 @@ Sorozat-módosításnál minden további dátum ugyanannyi nappal tolódik, mint
 - **AI-vázlat** (`OYS_AI::draft_newsletter( $brief, $draft )`): `POST https://api.anthropic.com/v1/messages` `wp_remote_post`-tal (SDK nélkül, mint a Stripe/Zoom). Fejlécek: `x-api-key`, `anthropic-version: 2023-06-01`, `anthropic-beta: server-side-fallback-2026-07-01`. Törzs: `model` (`ai_model`, alap `claude-opus-5`), `max_tokens` 16000, `fallbacks: "default"`, `output_config: { effort: "medium", format: { type: "json_schema", schema } }` (subject, preheader, body, button_label). A rendszerprompt Olivia hangján, a következő 3 hét órarendjével kontextusként; csak a megadott dátumokat/árakat használhatja. `stop_reason = refusal` / `max_tokens` → érthető hiba. Kulcs: `ai_api_key` beállítás vagy `OYS_ANTHROPIC_API_KEY` konstans; tesztekhez `OYS_ANTHROPIC_API_URL` (a `dev/mock-stripe.php` `/anthropic/v1/messages` útvonala szimulálja).
 - Élesben SMTP / tranzakciós levelező plugin kell (pl. Brevo, Postmark, Amazon SES), különben a tömeges levelek spambe mehetnek.
 
+### 6.20 Oktatók és bevétel-megosztás (Stripe Connect)
+
+- **`OYS_Teachers`** (`class-teachers.php`): profil (név, címsor, bemutatkozás, fotók a médiatárba feltöltve), `for_session()`, `name_for()` / `display_name()` (saját óránál `owner_name`, alap „Olivia”), `give_access()` (új WP fiók vagy meglévőhöz hozzáadott `oys_teacher` szerepkör + jelszóbeállító levél), `remove_access()`, `owns( $teacher, $session )`, `[oys_teachers]` shortcode (fotók, bemutatkozás, következő órák). A foglalóoldal kártyáján és az órarend sorában „with Anna”, a levelek órablokkjában „Teacher” sor, `{teacher}` helyőrző, az app `session.teacher` mezője.
+- **Kiosztás**: a naptár fiókjában „Teacher” választó (csak ha van oktató), a klasszikus szerkesztőben is; heti órára a sorozattal együtt. `OYS_Schedule::query( [ 'teacher' => id ] )`.
+- **Oktató belépés** (`OYS_Teachers_Admin`, „Teaching” menü, `oys_teach`): *My classes* (következő 60 nap + elmúlt 45 nap), *roster* (`&session=ID`: név, első alkalom jelölés, egészségügyi megjegyzés, jelenlét, „Paid: cash / other”, „Message everyone” – a válasz az oktatóhoz megy, `Reply-To`), *My profile* (címsor, bemutatkozás, fotók, értesítések, Stripe csatlakozás), *My statement* (havi elszámolás + CSV). Minden művelet `admin-post.php?action=oys_teach_{…}` → `guard_teach()`: `oys_teach` + nonce + a saját tanár-rekord, és minden foglalásnál/óránál `owns()` ellenőrzés. Más órája: „This class isn't one of yours.”; a Studio oldalak 403. Belépés után és a Dashboard helyett a Teaching oldalra kerül.
+- **Értesítések** (`OYS_Emails::teacher_notice()`, ha `notify`): új foglalás, ügyfél általi lemondás, a minimum-döntés (megy / elmarad).
+- **Kártyás fizetés az oktató Stripe-jára** (`OYS_Connect`): ha az óra oktatójának kész (`ready()`) Connect fiókja van, a `dropin` / `private` típusú rendelés Checkoutja **direct charge**: `Stripe-Account: acct_…` fejléccel az oktató fiókján jön létre, `payment_intent_data[application_fee_amount]` = az ár `100 − share_percent` %-a (a stúdió része), `customer_email`-lel (a stúdió customer ID-ja ott nem érvényes). Így az eladó az oktató, a stúdió bevétele csak a díj. A rendelés `meta`-ja: `stripe_account`, `app_fee_cents`, `teacher_id`; a session olvasása, lejáratása (`expire_session()`) és a visszatérítés is ezzel a fejléccel megy, visszatérítésnél `refund_application_fee=true`. Bérlet, ajándékkártya, tagság mindig a stúdióé.
+- **Lemondás direct charge-os foglalásnál**: időben lemondva **visszatérítés a kártyára** (nem stúdió-kredit, mert a pénz az oktatónál van), társaságnál ülésenként, az utolsó a maradékot; ha a Stripe hibát ad, kredit (naplózva). Levélben: „Your card payment is being refunded…”.
+- **Onboarding**: `onboarding_url()` első híváskor `POST /v1/accounts` (`controller[stripe_dashboard][type]=full`, `controller[fees][payer]=account`, `controller[losses][payments]=stripe`, `controller[requirement_collection]=stripe` – saját dashboardos, „Standard” jellegű fiók), majd `POST /v1/account_links` (`account_onboarding`). Visszatéréskor `refresh()` (`GET /v1/accounts/{id}`: `charges_enabled` + `details_submitted`), és az `account.updated` webhook is frissít. Teszt- és élő fiók külön (`stripe_live`), módváltásnál újra kell csatlakozni. Olivia a platform: a Stripe dashboardon a **Connect**-et be kell kapcsolnia.
+- **Havi elszámolás** (`OYS_Connect::statement( $teacher_id, 'Y-m' )`): az oktató adott hónapban (stúdió-időben) lezajlott óráinak `confirmed` · `attended` · `no_show` · `late_cancelled` foglalásai. Érték: kártya → a rendelés egy ülésre eső része; bérlet → a bérletért fizetett ár / alkalmak (ajándékkártyánál az ajándék rendelése, átváltott online kreditnél ÷ `online_per_credit`, kártyás lemondásból lett kreditnél az eredeti ülés ára; ingyen adott kredit → az óra ára); tagság → `settle_membership_cents`; helyszíni fizetés → a beszedett összeg (be nem szedett: „uncollected”); `comp`/`free` → 0. Oktatói rész = érték × `share_percent`. Egyenleg: a stúdió tartozik az oktatónak (kártya a stúdiónak, bérlet, tagság, és a stúdió által beszedett készpénz oktatói része) − az oktató tartozik a stúdiónak (az általa beszedett készpénz stúdió-része); a direct charge-ok rendezettek (a díjat a Stripe már levonta). CSV (`csv()`) könyvelőnek.
+- **Adó**: direct charge-nál az oktató az eladó (neki megy az 1099-K), Olivia bevétele a díj; a bérletekből fizetett oktatói rész Olivia oldalán kifizetés (1099-NEC lehet). Élesítés előtt könyvelővel egyeztetendő.
+
 ---
 
 ## 7. Stripe integráció
@@ -675,6 +689,9 @@ Sorozat-módosításnál minden további dátum ugyanannyi nappal tolódik, mint
 | `customer.subscription.updated` / `.deleted` | `OYS_Memberships::sync()` – státusz, periódus, ütemezett lemondás; véget érésnél a jövőbeli tagsági foglalások lemondása |
 | `invoice.paid` | `OYS_Memberships::record_invoice()` – megújítás rögzítése rendelésként (`stripe_invoice_id` egyedi), periódus frissítés |
 | `invoice.payment_failed` | `OYS_Memberships::payment_failed()` – `past_due`, levél az ügyfélnek és a stúdiónak |
+| `account.updated` (Connect) | `OYS_Connect::apply_account()` – az oktató fiókja fogadhat-e fizetést |
+
+**Connect (oktatók):** a Stripe dashboardon egy második webhook végpont kell ugyanerre az URL-re „Events on Connected accounts” beállítással (`checkout.session.*`, `charge.refunded`, `account.updated`); a titka a Studio → Teachers oldalon (`stripe_{test|live}_connect_webhook`) vagy az `OYS_STRIPE_CONNECT_WEBHOOK_SECRET` konstansban. A végpont mindkét titokkal elfogadja az aláírást; a Connect események `account` mezőt hordoznak, a `sync_session()` ezzel a fejléccel olvas vissza. Kimenő hívásnál az `OYS_Stripe::request()` 5. paramétere a `Stripe-Account`. Idempotencia-kulcs direct charge-nál: `oys-order-{id}-{acct}`; visszatérítésnél ülésenként `oys-refund-{order}-{amount}-b{booking}`.
 
 ---
 
@@ -691,6 +708,7 @@ Sorozat-módosításnál minden további dátum ugyanannyi nappal tolódik, mint
 | `[oys_account]` | – (`tab` = `bookings` · `passes` · `membership` · `private` · `history` · `payments` · `profile`) | My account oldal |
 | `[oys_gift_cards]` | – | Gift cards oldal |
 | `[oys_private_request]` | – | Private yoga oldal |
+| `[oys_teachers]` | – | Teachers oldal (Studio → Teachers → „Create the Teachers page” hozza létre) |
 
 ### 8.2 Űrlapkezelők (`admin-post.php`, mind noncé-val)
 
@@ -739,6 +757,8 @@ admin-post.php?action=oys_admin_{művelet}  →  OYS_Admin::guard()  →  curren
 | `oys-orders` | Szűrés státuszra, nyugta, részleges/teljes visszatérítés |
 | `oys-emails` | **Emails & reminders**: feladó, emlékeztetők, minden levél ki/be; `&edit=kulcs` szöveg, előnézet, teszt, visszaállítás |
 | `oys-gifts`, `oys-products`, `oys-settings` | ajándékkártyák, árak/bérletek, beállítások (Stripe, szabályok, online, **Zoom**, nyilatkozat) |
+| `oys-teachers` | **Teachers** (`OYS_Teachers_Admin`, műveletek: `oys_teachers_{…}` → `guard_studio()`): lista, `&edit=ID` profil, fotók, belépés, Stripe; `&statement=ID&month=Y-m` elszámolás + CSV; havi összesítő; beállítások (saját név, alap részesedés, tagsági alkalom értéke, Connect webhook titok); Teachers oldal létrehozása |
+| `oys-teach`, `oys-teach-profile`, `oys-teach-statement` | **Teaching** (csak `oys_teach`): az oktató saját órái, névsor, üzenet, profil, Stripe, elszámolás (6.20) |
 
 ---
 
@@ -897,7 +917,7 @@ Három szint, mind egy paranccsal futtatható, és a GitHub Actions is ezeket fu
 Valódi WordPress + adatbázis ellen futnak, keretrendszer nélkül (saját `test()` / `ok()` / `eq()`). **Minden teszt egy tranzakcióban fut, amit a végén visszagörget**, így az oldalon nem marad nyoma; a módosított beállításokat a futás végén visszaállítja. A Stripe-hívásokat folyamaton belül válaszolja meg (`pre_http_request`), hálózat nem kell.
 
 ```bash
-WP_DIR=/ut/a/wordpress php wordpress/dev/tests/run.php     # 32 teszt, 192 ellenőrzés
+WP_DIR=/ut/a/wordpress php wordpress/dev/tests/run.php     # 54 teszt, 460 ellenőrzés
 ```
 
 Lefedi: atomikus helyfoglalás · társaság kreditből és visszagörgetés hiányzó kreditnél · lemondás időben/későn, vendégekkel együtt · vendég eltávolítása és utólagos hozzáadása · kártyás tartás, egyszeri teljesítés, lejárat · részleges/teljes visszatérítés · webhook-aláírás (jó, módosított, rossz kulcs, régi) · duplikált webhook · tagsági keret, következő periódus, magánóra kizárása · ütemezett lemondás és véget érés · megújítás egyszeri rögzítése, sikertelen fizetés · várólista tagsággal · ajándékkód egyszer · belépés-zár · Stripe-tételsorok · online órák (átváltás, online kredit elsőbbsége, társaság, tagsági keret, magánóra ára) · naptár (heti óra létrehozása, egy dátum áthelyezése generálás után sem duplikálódik, sorozat-módosítás e-maillel, leállítás, validálás, kapacitás) · hibrid óra (külön stúdió- és online helyek, online kredit, tagság, kártyás tartás) · Zoom (egyszeri létrehozás, csak online résztvevőnek, áthelyezés → PATCH, lemondás → DELETE, kézi link elsőbbsége, személyes linkek, hiba és újrapróbálás, párhuzamos kérések) · e-mail szövegek (helyettesítők, ki/be, visszaállítás, előnézet) · emlékeztetők (kettő, online link, bérletlejárat) · pénz- és periódus-formázás.
@@ -907,7 +927,7 @@ Lefedi: atomikus helyfoglalás · társaság kreditből és visszagörgetés hi�
 Valódi böngészővel kattintja végig a folyamatokat a helyi WordPress + Stripe-szimulátor ellen, közben az adatbázist is ellenőrzi.
 
 ```bash
-WP_DIR=/ut/a/wordpress SHOTS=/tmp/oys-shots node wordpress/dev/e2e.js     # 150 ellenőrzés
+WP_DIR=/ut/a/wordpress SHOTS=/tmp/oys-shots node wordpress/dev/e2e.js     # 236 ellenőrzés
 ```
 
 Lefedi az eddigieket (regisztráció, kártyás foglalás, bérlet, kreditfoglalás, lemondás, várólista, magánóra, ajándékkártya, késő/duplikált webhook, megszakított fizetés, visszatérítés, hamis webhook), plusz:
@@ -919,7 +939,8 @@ Lefedi az eddigieket (regisztráció, kártyás foglalás, bérlet, kreditfoglal
 - **admin naptár:** kattintás üres időre → online óra létrehozása, húzás másik napra, heti óra, sorozat-módosítás e-maillel, heti óra leállítása, telefonos nézet;
 - **hibrid + Zoom:** tele stúdió → online fül, $6-os jegy, kártyás fizetés, Zoom-link a levélben, a foglalóoldalon és a fiókban, névsor jelölése, host indítás, áthelyezés → meeting mozog, lemondás → meeting törlődik, kapcsolatteszt;
 - **e-mailek:** második emlékeztető beállítása, stúdiólevél kikapcsolása, tárgy szerkesztése, előnézet, tesztlevél, valódi foglalás az új tárggyal, visszaállítás;
-- **nincs vízszintes görgetés** a fő oldalakon kijelentkezve, bejelentkezve és mobilon.
+- **nincs vízszintes görgetés** a fő oldalakon kijelentkezve, bejelentkezve és mobilon;
+- **oktatók:** profil fotóval, belépés, óra kiosztása a naptárban, foglalóoldal az oktatóval, oktatói belépés → Stripe Connect onboarding, kártyás fizetés az oktató fiókjára $12.50 stúdió-díjjal (Connect webhook), Payments oldal, oktatói névsor (helyszíni fizetés, jelenlét, üzenet), idegen óra / Studio oldal tiltva, havi elszámolás + CSV, Teachers oldal, lemondás → visszatérítés az oktató fiókján.
 
 Futásonként új felhasználókat és a teszthez frissen létrehozott órákat használ; képernyőképeket ment a `SHOTS` mappába.
 
@@ -935,13 +956,13 @@ Nulláról: PHP lint → WordPress letöltése (git) → `wp-config.php` → tel
 
 ### 16.4 Stripe-szimulátor (`dev/mock-stripe.php`)
 
-A Zoomot is szimulálja `/zoom/...` alatt (token, felhasználó, meeting létrehozás / lekérés / módosítás / törlés, regisztráltak, `/zoom/j/…` és `/zoom/s/…` oldalak, `/zoom/_meetings` a tesztekhez); a `ci.sh` `wp-config`-ja és a `setup-site.php` ide köti. Stripe-ból implementálja: `POST /v1/customers`, `POST /v1/checkout/sessions` (payment és subscription mód, több tételsor), `GET /v1/checkout/sessions/{id}` (`expand[]` = `payment_intent.latest_charge`, `invoice`), `POST …/{id}/expire`, `GET/POST/DELETE /v1/subscriptions/{id}`, `POST /v1/billing_portal/sessions`, `POST /v1/refunds`; hamis fizetőoldal (`/pay/{id}`: tételsorok, végösszeg, „Pay”, „Pay (webhook delayed)”, „Back / cancel”), hamis ügyfélportál, aláírt webhookok, és teszt-segédek: `/_webhook`, `/_renew`, `/_fail`, `/_end`. **Élesre soha nem kerül.**
+A Zoomot is szimulálja `/zoom/...` alatt (token, felhasználó, meeting létrehozás / lekérés / módosítás / törlés, regisztráltak, `/zoom/j/…` és `/zoom/s/…` oldalak, `/zoom/_meetings` a tesztekhez); a `ci.sh` `wp-config`-ja és a `setup-site.php` ide köti. Stripe-ból implementálja: `POST /v1/customers`, `POST /v1/checkout/sessions` (payment és subscription mód, több tételsor), `GET /v1/checkout/sessions/{id}` (`expand[]` = `payment_intent.latest_charge`, `invoice`), `POST …/{id}/expire`, `GET/POST/DELETE /v1/subscriptions/{id}`, `POST /v1/billing_portal/sessions`, `POST /v1/refunds`; hamis fizetőoldal (`/pay/{id}`: tételsorok, végösszeg, „Pay”, „Pay (webhook delayed)”, „Back / cancel”), hamis ügyfélportál, aláírt webhookok, és teszt-segédek: `/_webhook`, `/_renew`, `/_fail`, `/_end`. Connect: `POST /v1/accounts`, `GET /v1/accounts/{id}`, `POST /v1/account_links`, hamis onboarding oldal (`/connect/{acct}` → „Finish” → `account.updated`), a `Stripe-Account` fejléc (a fiókhoz tartozó session csak vele látható, díj és visszatérítés rögzítve), Connect webhookok `whsec_connect_mock` aláírással, `/_state` a tesztekhez. **Élesre soha nem kerül.**
 
 
 ### 16.5 Az app tesztjei (`app/`)
 
 - `npm run typecheck`, `npm run lint`, `npm test` (Jest, `jest-expo`): formázók (pénz, napok, elérhetőség) és az API-kliens (URL, token-fejlécek, hibák, 401 → kiléptetés).
-- `app/e2e/app.e2e.js` (Playwright, iPhone-méretű ablak): az app webes buildje a helyi WordPress ellen – belépés (hibás / jó jelszó), órarend, foglalás bérlettel + nyilatkozat, hibrid óra online módban átváltott kredittel és „Join” gombbal, kártyás fizetés a Stripe-szimulátoron át, várólista, Saját óráim, lemondás és kredit-visszaadás, bérletek, profil, kilépés = token visszavonva (36 ellenőrzés, képernyőképek).
+- `app/e2e/app.e2e.js` (Playwright, iPhone-méretű ablak): az app webes buildje a helyi WordPress ellen – belépés (hibás / jó jelszó), órarend, foglalás bérlettel + nyilatkozat, hibrid óra online módban átváltott kredittel és „Join” gombbal, kártyás fizetés a Stripe-szimulátoron át, várólista, Saját óráim, lemondás és kredit-visszaadás, bérletek, profil, kilépés = token visszavonva, helyszíni fizetés, adomány, minimum-létszám, hírlevél, sorsolás, más oktató órája (49 ellenőrzés, képernyőképek).
 
 ```bash
 cd app && EXPO_PUBLIC_API_BASE=http://127.0.0.1:8080 npx expo export --platform web
@@ -1001,6 +1022,7 @@ A `ci.sh` automatikusan futtatja, ha az `APP_DIST` a webes build mappájára mut
 - Részleges visszatérítés semmit nem von vissza automatikusan (szándékos: a stúdió dönt).
 - `confirm()` párbeszédablak a lemondás gombokon (JS nélkül is működik, csak megerősítés nélkül).
 - A téma képei a témában is és a médiatárban is megvannak (a betöltő másolja); a főoldal a téma képeit használja.
+- Oktatók: egy órának egy oktatója van (közös óra / helyettesítés csak átírással); a magánórák mindig Oliviáé. A bérletes és tagsági részesedést Olivia utalja (az elszámolás megmondja, mennyit) – automatikus kifizetés (Connect transfer) nincs, hogy a pénzmozgás egyszerű maradjon. Tagsági alkalom értéke fix (`settle_membership_cents`). Direct charge-os óra időben lemondva visszatérítés (a Stripe díja elvész), nem kredit. Connect csak amerikai fiókokkal tesztelve (`country=US`).
 
 ---
 

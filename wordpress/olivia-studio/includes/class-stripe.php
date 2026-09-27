@@ -28,8 +28,11 @@ class OYS_Stripe {
 		return defined( 'OYS_STRIPE_API_BASE' ) ? rtrim( OYS_STRIPE_API_BASE, '/' ) : 'https://api.stripe.com';
 	}
 
-	/** @return array|WP_Error decoded response */
-	public static function request( $method, $path, array $params = array(), $idempotency_key = '' ) {
+	/**
+	 * @param string $account a teacher's connected account (acct_…): the call is made on their account
+	 * @return array|WP_Error decoded response
+	 */
+	public static function request( $method, $path, array $params = array(), $idempotency_key = '', $account = '' ) {
 		$secret = OYS_Settings::stripe_secret();
 		if ( ! $secret ) {
 			return new WP_Error( 'oys_stripe_keys', __( 'Online payments are not set up yet.', 'olivia-studio' ) );
@@ -43,6 +46,9 @@ class OYS_Stripe {
 				'Stripe-Version' => '2024-06-20',
 			),
 		);
+		if ( $account ) {
+			$args['headers']['Stripe-Account'] = $account;
+		}
 		if ( 'GET' === $method ) {
 			$url = $params ? $url . '?' . self::encode( $params ) : $url;
 		} else {
@@ -125,18 +131,31 @@ class OYS_Stripe {
 				'metadata'    => array( 'order_id' => $order_id ),
 			),
 		);
-		$customer = self::customer_for( $order->user_id );
-		if ( $customer ) {
-			$params['customer'] = $customer;
+		// A class of a teacher with their own Stripe: charged on their account, the studio's part as a fee.
+		$split = OYS_Connect::split_for_order( $order );
+		if ( $split ) {
+			$params['customer_email'] = $user->user_email; // Customers are per account; the studio's customer id isn't valid there.
+			$params['payment_intent_data']['application_fee_amount'] = $split['fee_cents'];
+			$params['metadata']['teacher_id'] = $split['teacher_id'];
 		} else {
-			$params['customer_email'] = $user->user_email;
+			$customer = self::customer_for( $order->user_id );
+			if ( $customer ) {
+				$params['customer'] = $customer;
+			} else {
+				$params['customer_email'] = $user->user_email;
+			}
 		}
-		$res = self::request( 'POST', '/v1/checkout/sessions', $params, 'oys-order-' . $order_id );
+		$res = self::request( 'POST', '/v1/checkout/sessions', $params, 'oys-order-' . $order_id . ( $split ? '-' . $split['account'] : '' ), $split ? $split['account'] : '' );
 		if ( is_wp_error( $res ) ) {
 			return $res;
 		}
 		$meta                 = $order->meta;
 		$meta['checkout_url'] = $res['url'];
+		if ( $split ) {
+			$meta['stripe_account'] = $split['account'];
+			$meta['app_fee_cents']  = $split['fee_cents'];
+			$meta['teacher_id']     = $split['teacher_id'];
+		}
 		OYS_Orders::update( $order_id, array( 'stripe_session_id' => $res['id'], 'meta' => $meta ) );
 		return $res['url'];
 	}
@@ -199,8 +218,11 @@ class OYS_Stripe {
 	}
 
 	/** Fulfil from the Checkout Session (webhook or return page). */
-	public static function sync_session( $session_id ) {
-		$cs = self::request( 'GET', '/v1/checkout/sessions/' . rawurlencode( $session_id ), array( 'expand' => array( 'payment_intent.latest_charge', 'invoice' ) ) );
+	public static function sync_session( $session_id, $account = null ) {
+		if ( null === $account ) {
+			$account = OYS_Connect::account_for_order( OYS_Orders::by_stripe_session( $session_id ) );
+		}
+		$cs = self::request( 'GET', '/v1/checkout/sessions/' . rawurlencode( $session_id ), array( 'expand' => array( 'payment_intent.latest_charge', 'invoice' ) ), '', $account );
 		if ( is_wp_error( $cs ) ) {
 			return $cs;
 		}
@@ -248,16 +270,29 @@ class OYS_Stripe {
 		return OYS_Orders::get( $order->id );
 	}
 
-	public static function refund( $order_id, $amount_cents = 0 ) {
+	/** Close an unpaid Stripe page so it can't be paid later. */
+	public static function expire_session( $order ) {
+		return self::request( 'POST', '/v1/checkout/sessions/' . rawurlencode( $order->stripe_session_id ) . '/expire', array(), '', OYS_Connect::account_for_order( $order ) );
+	}
+
+	/**
+	 * $key tells refunds of the same amount apart (e.g. one per cancelled guest).
+	 * Payments made on a teacher's account are refunded there, with the studio's fee returned in proportion.
+	 */
+	public static function refund( $order_id, $amount_cents = 0, $key = '' ) {
 		$order = OYS_Orders::get( $order_id );
 		if ( ! $order || ! $order->stripe_payment_intent ) {
 			return new WP_Error( 'oys_refund', __( 'This order has no card payment to refund.', 'olivia-studio' ) );
 		}
-		$params = array( 'payment_intent' => $order->stripe_payment_intent, 'metadata' => array( 'order_id' => $order_id ) );
+		$account = OYS_Connect::account_for_order( $order );
+		$params  = array( 'payment_intent' => $order->stripe_payment_intent, 'metadata' => array( 'order_id' => $order_id ) );
 		if ( $amount_cents ) {
 			$params['amount'] = (int) $amount_cents;
 		}
-		$res = self::request( 'POST', '/v1/refunds', $params, 'oys-refund-' . $order_id . '-' . (int) $amount_cents );
+		if ( $account ) {
+			$params['refund_application_fee'] = 'true';
+		}
+		$res = self::request( 'POST', '/v1/refunds', $params, 'oys-refund-' . $order_id . '-' . (int) $amount_cents . ( $key ? '-' . $key : '' ), $account );
 		if ( is_wp_error( $res ) ) {
 			return $res;
 		}
@@ -304,7 +339,9 @@ class OYS_Stripe {
 
 	public static function webhook( WP_REST_Request $request ) {
 		$payload = $request->get_body();
-		if ( ! self::verify_signature( $payload, $request->get_header( 'stripe_signature' ), OYS_Settings::webhook_secret() ) ) {
+		// Two endpoints can point here: the studio's own events, and Connect events from teachers' accounts.
+		$sig = $request->get_header( 'stripe_signature' );
+		if ( ! self::verify_signature( $payload, $sig, OYS_Settings::webhook_secret() ) && ! self::verify_signature( $payload, $sig, OYS_Settings::connect_webhook_secret() ) ) {
 			return new WP_REST_Response( array( 'error' => 'bad signature' ), 400 );
 		}
 		$event = json_decode( $payload, true );
@@ -326,7 +363,7 @@ class OYS_Stripe {
 				case 'checkout.session.async_payment_succeeded':
 					if ( 'paid' === ( $object['payment_status'] ?? '' ) ) {
 						// Re-read the session to get the receipt link; fall back to the event data.
-						$res = self::sync_session( $object['id'] );
+						$res = self::sync_session( $object['id'], $event['account'] ?? null );
 						if ( is_wp_error( $res ) ) {
 							self::apply_session( $object );
 						}
@@ -343,6 +380,9 @@ class OYS_Stripe {
 					if ( $order ) {
 						OYS_Orders::mark_unpaid( $order->id, 'expired' );
 					}
+					break;
+				case 'account.updated':
+					OYS_Connect::apply_account( $object );
 					break;
 				case 'customer.subscription.updated':
 				case 'customer.subscription.deleted':

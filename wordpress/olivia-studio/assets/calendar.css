@@ -135,3 +135,4 @@
 .oys-drawer__min { margin: 6px 0 0; padding: 6px 10px; background: #EEF3EA; border-left: 3px solid #2B5036; }
 .oys-drawer__min.is-short { background: #FFF4E5; border-left-color: #FF8C42; }
 .oys-ev__tag--warn { background: #FF8C42 !important; color: #12231A !important; }
+.oys-ev__tag--teacher { text-transform: none; background: #E6D6F7 !important; }

@@ -70,13 +70,14 @@ const tid = (id) => `[data-testid="${id}"]`;
     };
     $studio = $mk( 26 );
     $hybrid = $mk( 0.8, array( 'format' => 'hybrid', 'online_price_cents' => 600, 'online_capacity' => 0 ) );
-    $paid   = $mk( 50, array( 'credits_allowed' => 0, 'price_cents' => 1800 ) );
+    $teacher = OYS_Teachers::save( array( 'name' => 'Tara Lane', 'headline' => 'Slow flow and yin', 'bio' => 'Tara teaches gentle, unhurried classes.' ) );
+    $paid   = $mk( 50, array( 'credits_allowed' => 0, 'price_cents' => 1800, 'teacher_id' => $teacher ) );
     $full   = $mk( 28, array( 'capacity' => 1 ) );
     $door   = $mk( 30, array( 'credits_allowed' => 0 ) );
     $gift   = $mk( 32, array( 'credits_allowed' => 0, 'pricing' => 'donation', 'price_cents' => 1000 ) );
     OYS_Settings::update( array( 'pay_later' => 'all', 'donation_min_cents' => 500, 'donation_suggestions' => '5,10,15,20', 'fb_group_url' => 'https://www.facebook.com/groups/485915674202871' ) );
     OYS_Bookings::book_manual( OYS_Customers::find_or_create( 'full${stamp}@example.com', 'Full Up' ), $full, 'comp', false );
-    echo json_encode( compact( 'u', 'studio', 'hybrid', 'paid', 'full', 'door', 'gift' ) );
+    echo json_encode( compact( 'u', 'studio', 'hybrid', 'paid', 'full', 'door', 'gift', 'teacher' ) );
   `),
   );
 
@@ -169,6 +170,11 @@ const tid = (id) => `[data-testid="${id}"]`;
   await page.click(tid('book-submit'));
   await page.waitForSelector(tid('due'));
   check(await page.isVisible('text=To pay at the studio: $25'), 'booked, $25 to pay at the studio');
+  await page.goto(`${APP}/class/${setup.paid}`);
+  await page.waitForSelector(tid('teacher-name'));
+  check(await page.isVisible(`${tid('teacher-name')} >> text=with Tara Lane`), 'another teacher\'s class shows who teaches it');
+  await page.click(tid('teacher-more'));
+  check(await page.isVisible('text=Tara teaches gentle, unhurried classes.'), 'about the teacher');
   await page.goto(`${APP}/class/${setup.gift}`);
   await page.waitForSelector(tid('amount-1500'));
   await page.click(tid('amount-1500'));
@@ -248,6 +254,7 @@ const tid = (id) => `[data-testid="${id}"]`;
   check(tokens() === 0, 'logout revoked the token');
 
   // Clean up so the dev schedule stays tidy.
+  php(`global $wpdb; $wpdb->delete( $wpdb->prefix . 'oys_teachers', array( 'id' => ${setup.teacher} ) );`);
   php(`global $wpdb; foreach ( array( ${setup.studio}, ${setup.hybrid}, ${setup.paid}, ${setup.full}, ${setup.door}, ${setup.gift} ) as $id ) { $wpdb->update( $wpdb->prefix . 'oys_sessions', array( 'status' => 'cancelled' ), array( 'id' => $id ) ); }`);
   fs.rmSync(path.join(WP_DIR, '_app_e2e.php'), { force: true });
 

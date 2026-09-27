@@ -42,7 +42,7 @@ require_once get_template_directory() . '/inc/demo-import.php';
 wp_set_current_user( 1 );
 echo 'Imported: ' . implode( ', ', oy_import_all() ) . "\n";
 
-OYS_Settings::update( array( 'stripe_mode' => 'test', 'stripe_test_secret' => 'sk_test_mock', 'stripe_test_webhook' => 'whsec_mock' ) );
+OYS_Settings::update( array( 'stripe_mode' => 'test', 'stripe_test_secret' => 'sk_test_mock', 'stripe_test_webhook' => 'whsec_mock', 'stripe_test_connect_webhook' => 'whsec_connect_mock' ) );
 if ( defined( 'OYS_ZOOM_API_BASE' ) ) {
 	OYS_Settings::update( array( 'zoom_account_id' => 'acc_mock', 'zoom_client_id' => 'zoom_client', 'zoom_client_secret' => 'zoom_secret', 'zoom_auto' => 1 ) );
 	echo "Zoom mock connected.\n";

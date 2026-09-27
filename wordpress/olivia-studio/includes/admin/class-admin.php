@@ -118,7 +118,12 @@ class OYS_Admin {
 		$today = OYS_Schedule::query( array( 'from' => $start->format( 'Y-m-d H:i:s' ), 'to' => $start->modify( '+1 day' )->format( 'Y-m-d H:i:s' ), 'status' => 'scheduled' ) );
 		$week  = OYS_Schedule::query( array( 'from' => oys_now(), 'to' => oys_utc_plus( 7 * DAY_IN_SECONDS ), 'status' => 'scheduled' ) );
 		$o     = OYS_Install::table( 'orders' );
-		$rev30 = (int) $wpdb->get_var( $wpdb->prepare( "SELECT SUM(amount_cents) FROM $o WHERE status IN ('paid','partially_refunded') AND paid_at >= %s", oys_utc_plus( -30 * DAY_IN_SECONDS ) ) );
+		// Payments made to a teacher's own Stripe count with the studio's fee only.
+		$rev30 = 0;
+		foreach ( $wpdb->get_results( $wpdb->prepare( "SELECT amount_cents, meta FROM $o WHERE status IN ('paid','partially_refunded') AND paid_at >= %s", oys_utc_plus( -30 * DAY_IN_SECONDS ) ) ) as $row ) {
+			$meta   = json_decode( (string) $row->meta, true ) ?: array();
+			$rev30 += empty( $meta['stripe_account'] ) ? (int) $row->amount_cents : (int) ( $meta['app_fee_cents'] ?? 0 );
+		}
 		$book7 = array_sum( array_map( fn( $s ) => (int) $s->booked, $week ) );
 		$cap7  = array_sum( array_map( fn( $s ) => (int) $s->capacity, $week ) );
 		$new   = OYS_Privates::query( 'new' );
@@ -235,6 +240,14 @@ class OYS_Admin {
 		echo '<tr><th>' . esc_html__( 'Price', 'olivia-studio' ) . '</th><td><input name="price" value="' . esc_attr( $v->price_cents / 100 ) . '" class="small-text"> ' . esc_html( strtoupper( OYS_Settings::get( 'currency' ) ) ) . ' <label><input type="checkbox" name="credits_allowed" value="1"' . checked( 1, (int) $v->credits_allowed, false ) . '> ' . esc_html__( 'Class passes can be used', 'olivia-studio' ) . '</label>'
 			. '<br><label><input type="checkbox" name="donation" value="1"' . checked( 'donation', $v->pricing ?? 'fixed', false ) . '> ' . esc_html__( 'By donation (the price is the suggested amount)', 'olivia-studio' ) . '</label>'
 			. '<br><label><input type="checkbox" name="pay_later" value="1"' . checked( 1, (int) ( $v->pay_later ?? 1 ), false ) . '> ' . esc_html__( 'People can pay at the studio', 'olivia-studio' ) . '</label></td></tr>';
+		$teachers = OYS_Teachers::all();
+		if ( $teachers ) {
+			echo '<tr><th>' . esc_html__( 'Teacher', 'olivia-studio' ) . '</th><td><select name="teacher_id"><option value="0">' . esc_html( OYS_Settings::get( 'owner_name' ) ) . '</option>';
+			foreach ( $teachers as $t ) {
+				echo '<option value="' . (int) $t->id . '"' . selected( (int) ( $v->teacher_id ?? 0 ), (int) $t->id, false ) . '>' . esc_html( $t->name ) . '</option>';
+			}
+			echo '</select></td></tr>';
+		}
 		echo '<tr><th>' . esc_html__( 'Short note', 'olivia-studio' ) . '</th><td><input class="regular-text" name="note" value="' . esc_attr( $v->note ) . '" placeholder="Sunrise on the sand, weather permitting"></td></tr>';
 		echo '</table>';
 		submit_button( $s ? __( 'Save session', 'olivia-studio' ) : __( 'Create session', 'olivia-studio' ) );
@@ -270,6 +283,7 @@ class OYS_Admin {
 			'pricing'         => empty( $_POST['donation'] ) ? 'fixed' : 'donation',
 			'pay_later'       => empty( $_POST['pay_later'] ) ? 0 : 1,
 			'note'            => sanitize_text_field( wp_unslash( $_POST['note'] ) ),
+			'teacher_id'      => OYS_Teachers::valid_id( $_POST['teacher_id'] ?? 0 ),
 		);
 		if ( ! $id ) {
 			$data['status'] = 'scheduled';
@@ -293,7 +307,7 @@ class OYS_Admin {
 		OYS_Schedule::recount( $id );
 		$s = OYS_Schedule::get( $id );
 		self::header( oys_session_title( $s ) . ' · ' . oys_date( $s->starts_at, 'D M j, g:i a' ), ' <a class="page-title-action" href="' . esc_url( admin_url( 'admin.php?page=oys-calendar&week=' . wp_date( 'Y-m-d', oys_ts( $s->starts_at ) ) . '&open=' . $id ) ) . '">' . esc_html__( 'Edit in calendar', 'olivia-studio' ) . '</a>' );
-		echo '<p>' . esc_html( oys_is_online( $s ) ? __( 'Online', 'olivia-studio' ) : $s->location ) . ' · ' . sprintf( esc_html__( '%1$d of %2$d booked', 'olivia-studio' ), (int) $s->booked, (int) $s->capacity )
+		echo '<p>' . ( OYS_Teachers::name_for( $s ) ? esc_html( sprintf( __( 'Teacher: %s', 'olivia-studio' ), OYS_Teachers::name_for( $s ) ) ) . ' · ' : '' ) . esc_html( oys_is_online( $s ) ? __( 'Online', 'olivia-studio' ) : $s->location ) . ' · ' . sprintf( esc_html__( '%1$d of %2$d booked', 'olivia-studio' ), (int) $s->booked, (int) $s->capacity )
 			. ( oys_is_hybrid( $s ) ? ' · ' . sprintf( esc_html__( '%1$d online (%2$s)', 'olivia-studio' ), (int) $s->online_booked, (int) $s->online_capacity ? sprintf( esc_html__( 'of %d', 'olivia-studio' ), (int) $s->online_capacity ) : esc_html__( 'no limit', 'olivia-studio' ) ) : '' )
 			. ' · ' . esc_html( $s->status )
 			. ( oys_is_donation( $s ) ? ' · ' . esc_html__( 'by donation', 'olivia-studio' ) : '' )
@@ -373,7 +387,7 @@ class OYS_Admin {
 			echo self::form( 'message', 'class="oys-form oys-message"' ) . '<input type="hidden" name="session" value="' . (int) $s->id . '">' // phpcs:ignore
 				. '<p><label>' . esc_html__( 'Subject', 'olivia-studio' ) . '<br><input class="large-text" name="subject" required value="' . esc_attr( sprintf( __( 'About %1$s on %2$s', 'olivia-studio' ), '{class}', '{day} {date_short}' ) ) . '"></label></p>'
 				. '<p><label>' . esc_html__( 'Message', 'olivia-studio' ) . '<br><textarea class="large-text" name="body" rows="5" required placeholder="' . esc_attr__( 'Hi {first_name}, …', 'olivia-studio' ) . '"></textarea></label></p>'
-				. '<p class="description">' . esc_html__( 'Everyone gets their own email, with the class details and a link to their bookings. You can use {first_name}, {class}, {day}, {date_short}, {time} and {location}.', 'olivia-studio' ) . '</p>'
+				. '<p class="description">' . esc_html__( 'Everyone gets their own email, with the class details and a link to their bookings. You can use {first_name}, {class}, {day}, {date_short}, {time}, {location} and {teacher}.', 'olivia-studio' ) . '</p>'
 				. '<p><label><input type="checkbox" name="guests" value="1" checked> ' . esc_html__( 'Also guests who gave an email', 'olivia-studio' ) . '</label> &nbsp; <label><input type="checkbox" name="waitlist" value="1"> ' . esc_html__( 'Also the waitlist', 'olivia-studio' ) . '</label></p>'
 				. '<p><button class="button button-primary">' . esc_html__( 'Send the message', 'olivia-studio' ) . '</button></p></form>';
 		}
@@ -740,7 +754,9 @@ class OYS_Admin {
 		echo '<table class="widefat striped oys-table"><thead><tr><th>#</th><th>' . esc_html__( 'Date', 'olivia-studio' ) . '</th>' . ( $with_user ? '<th>' . esc_html__( 'Customer', 'olivia-studio' ) . '</th>' : '' ) . '<th>' . esc_html__( 'What', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Amount', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Status', 'olivia-studio' ) . '</th><th></th></tr></thead><tbody>';
 		foreach ( $orders as $o ) {
 			echo '<tr><td>' . (int) $o->id . '</td><td>' . esc_html( oys_date( $o->paid_at ?: $o->created_at, 'M j, Y g:i a' ) ) . '</td>' . ( $with_user ? '<td>' . self::user_label( $o->user_id ) . '</td>' : '' ) // phpcs:ignore
-				. '<td>' . esc_html( ( $types[ $o->type ] ?? $o->type ) . ': ' . $o->description ) . '</td><td>' . esc_html( oys_money( $o->amount_cents, $o->currency ) ) . ( ! empty( $o->meta['refunded_cents'] ) ? '<br><small>' . esc_html( sprintf( __( 'refunded %s', 'olivia-studio' ), oys_money( $o->meta['refunded_cents'], $o->currency ) ) ) . '</small>' : '' ) . '</td>'
+				. '<td>' . esc_html( ( $types[ $o->type ] ?? $o->type ) . ': ' . $o->description ) . '</td><td>' . esc_html( oys_money( $o->amount_cents, $o->currency ) )
+				. ( ! empty( $o->meta['stripe_account'] ) ? '<br><small class="oys-direct">' . esc_html( sprintf( __( 'to %1$s\'s Stripe · your fee %2$s', 'olivia-studio' ), ( OYS_Teachers::get( $o->meta['teacher_id'] ?? 0 )->name ?? __( 'the teacher', 'olivia-studio' ) ), oys_money( (int) ( $o->meta['app_fee_cents'] ?? 0 ), $o->currency ) ) ) . '</small>' : '' )
+				. ( ! empty( $o->meta['refunded_cents'] ) ? '<br><small>' . esc_html( sprintf( __( 'refunded %s', 'olivia-studio' ), oys_money( $o->meta['refunded_cents'], $o->currency ) ) ) . '</small>' : '' ) . '</td>'
 				. '<td><span class="oys-status oys-status--' . esc_attr( $o->status ) . '">' . esc_html( $st[ $o->status ] ?? $o->status ) . '</span></td><td>';
 			if ( $o->receipt_url ) {
 				echo '<a class="button button-small" target="_blank" rel="noopener" href="' . esc_url( $o->receipt_url ) . '">' . esc_html__( 'Receipt', 'olivia-studio' ) . '</a> ';

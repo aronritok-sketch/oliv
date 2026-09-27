@@ -797,6 +797,130 @@ async function payOnMockStripe(page, button = '#pay') {
   check(php(`echo get_user_meta(${raeId}, 'oys_marketing', true);`) === '', 'no longer subscribed');
   php(`OYS_Settings::update(array('ai_api_key'=>''));`);
 
+  // 38. Teachers: profile with a photo, a login, their class in the calendar, their roster and
+  //     messages, Stripe Connect; a customer pays by card straight to the teacher, the studio gets its fee.
+  php(`OYS_Settings::update(array('stripe_test_connect_webhook'=>'whsec_connect_mock','teacher_share_default'=>50));`);
+  const tEmail = `maya${stamp}@example.com`;
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-teachers`);
+  await Promise.all([adm.waitForNavigation(), adm.click('a.page-title-action:has-text("Add a teacher")')]);
+  await adm.fill('#t-name', 'Maya Green');
+  await adm.fill('#t-email', tEmail);
+  await adm.fill('#t-headline', 'Yin, restorative and breathwork');
+  await adm.fill('#t-bio', 'Maya has taught slow, quiet yoga for ten years.');
+  await Promise.all([adm.waitForNavigation(), adm.click('#submit')]);
+  check(await adm.isVisible('text=Teacher saved.'), 'teacher added');
+  const tId = adm.url().match(/edit=(\d+)/)[1];
+  const png = path.join(SHOTS, 'maya.png');
+  fs.writeFileSync(png, Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAgAAAAICAIAAABLbSncAAAAEUlEQVR4nGPQDjDDihiGlgQASAcsQciwrK8AAAAASUVORK5CYII=', 'base64'));
+  await adm.setInputFiles('input[name="photos[]"]', png);
+  await Promise.all([adm.waitForNavigation(), adm.click('button:has-text("Upload photos")')]);
+  check(await adm.isVisible('text=1 photo added.') && await adm.isVisible('.oys-photo img'), 'photo uploaded');
+  await Promise.all([adm.waitForNavigation(), adm.click('button:has-text("Give them a login")')]);
+  check(await adm.isVisible('text=they got an email to set their password'), 'teacher login created');
+  check(mailSubjects().some(x => x && x.startsWith('Your teacher login at')), 'login email sent');
+  await adm.screenshot({ path: `${SHOTS}/28-teacher-edit.png`, fullPage: true });
+  php(`$u = get_user_by('email','${tEmail}'); wp_set_password('teach-pass-123', $u->ID);`);
+
+  // Olivia puts Maya on a class in the calendar.
+  const tc = fresh();
+  const tcDay = php(`echo wp_date('Y-m-d', oys_ts(OYS_Schedule::get(${tc})->starts_at));`);
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-calendar&week=${tcDay}&open=${tc}`);
+  await adm.waitForSelector('.oys-drawer');
+  await adm.selectOption('.oys-drawer [name=teacher_id]', tId);
+  await adm.click('.oys-drawer [data-save]');
+  await adm.waitForSelector('.oys-modal button:has-text("Save change"), .oys-toast', { timeout: 10000 });
+  if (await adm.isVisible('.oys-modal button:has-text("Save change")')) await adm.click('.oys-modal button:has-text("Save change")');
+  await adm.waitForSelector('.oys-toast:has-text("Saved")');
+  check(php(`echo OYS_Schedule::get(${tc})->teacher_id;`) === tId, 'calendar: class assigned to the teacher');
+  check(!!(await adm.waitForSelector(`.oys-ev[data-id="${tc}"] .oys-ev__tag--teacher:has-text("Maya Green")`, { timeout: 10000 }).catch(() => null)), 'calendar shows the teacher on the class');
+
+  // The class page shows who teaches it.
+  const cust = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
+  await cust.goto(`${BASE}/book/?session=${tc}`);
+  check(await cust.isVisible('.oys-teacher-mini:has-text("with Maya Green")') && await cust.isVisible('.oys-teacher-mini img'), 'class page: teacher with photo');
+  await cust.click('.oys-teacher-mini__bio summary');
+  check(await cust.isVisible('text=Maya has taught slow, quiet yoga'), 'class page: about the teacher');
+
+  // Maya logs in: she lands on her classes and connects Stripe.
+  const tctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const tp = await tctx.newPage();
+  await tp.goto(`${BASE}/wp-login.php`);
+  await tp.fill('#user_login', tEmail);
+  await tp.fill('#user_pass', 'teach-pass-123');
+  await Promise.all([tp.waitForNavigation(), tp.click('#wp-submit')]);
+  check(tp.url().includes('page=oys-teach'), 'teacher lands on Teaching');
+  check(await tp.isVisible(`.oys-teach-classes a[href*="session=${tc}"]`), 'her class is listed');
+  await tp.goto(`${BASE}/wp-admin/admin.php?page=oys-teach-profile`);
+  await tp.fill('#t-bio', 'Maya has taught slow, quiet yoga for ten years. She loves long holds.');
+  await Promise.all([tp.waitForNavigation(), tp.click('#submit')]);
+  check(await tp.isVisible('text=Profile saved.'), 'teacher edits her profile');
+  await Promise.all([tp.waitForNavigation(), tp.click('button:has-text("Connect Stripe")')]);
+  check(tp.url().includes('127.0.0.1:8090/connect/acct_'), 'Stripe onboarding opens');
+  await Promise.all([tp.waitForNavigation(), tp.click('#connect-finish')]);
+  check(await tp.isVisible('text=Your Stripe account is connected'), 'Stripe connected');
+  await tp.screenshot({ path: `${SHOTS}/29-teacher-profile.png`, fullPage: true });
+  const acct = php(`echo OYS_Teachers::get(${tId})->stripe_account;`);
+  check(php(`echo OYS_Connect::ready(OYS_Teachers::get(${tId})) ? 'yes' : 'no';`) === 'yes', 'account ready');
+
+  // A customer pays by card: charged on Maya's account, Olivia's 50% as a fee.
+  await register(cust, 'Lena', `lena${stamp}@example.com`);
+  await cust.check('input[value="card"]');
+  await cust.click('.oys-submit');
+  await payOnMockStripe(cust);
+  check(await cust.isVisible("text=You're booked!"), 'paid and booked');
+  const cs = Object.values(JSON.parse(execSync('curl -s http://127.0.0.1:8090/_state').toString()).sessions).filter(x => x.account === acct).pop();
+  check(cs && cs.application_fee_amount === 1250 && cs.amount_total === 2500, 'charged on the teacher\'s account with a $12.50 fee');
+  const tOrder = JSON.parse(q(`SELECT o.id, o.status, o.meta FROM {$wpdb->prefix}oys_orders o JOIN {$wpdb->prefix}oys_bookings b ON b.order_id=o.id WHERE b.session_id=${tc} ORDER BY o.id DESC LIMIT 1`))[0];
+  check(tOrder.status === 'paid' && JSON.parse(tOrder.meta).stripe_account === acct, 'order paid, on the teacher\'s account');
+  check(fs.readFileSync('/tmp/mock-stripe-webhooks.log', 'utf8').trim().split('\n').filter(l => l.includes('checkout.session.completed')).pop().includes(' 200 '), 'Connect webhook accepted');
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-orders`);
+  check(await adm.isVisible("text=to Maya Green's Stripe · your fee $12.50"), 'Payments: paid to the teacher, the studio fee shown');
+
+  // Her roster: the customer, attendance, a message (replies go to her); other classes stay closed.
+  php(`OYS_Bookings::book_manual(${raeId}, ${tc}, 'door', false, true);`);
+  await tp.goto(`${BASE}/wp-admin/admin.php?page=oys-teach&session=${tc}`);
+  check(await tp.isVisible('.oys-teach-roster >> text=Lena') && await tp.isVisible('.oys-teach-roster >> text=Rae'), 'teacher sees who is booked');
+  check(await tp.isVisible('.oys-teach-roster .oys-pill:has-text("First class")'), 'first-timers flagged');
+  await Promise.all([tp.waitForNavigation(), tp.click('.oys-teach-roster tr:has-text("Rae") button:has-text("Paid: cash")')]);
+  check(await tp.isVisible('text=Marked as paid.'), 'teacher marks a studio payment');
+  await Promise.all([tp.waitForNavigation(), tp.click('.oys-teach-roster tr:has-text("Lena") button:has-text("Here")')]);
+  const tmark = mails().length;
+  await tp.fill('.oys-message textarea[name="body"]', 'Hi {first_name}, bring a blanket for the long holds.');
+  await Promise.all([tp.waitForNavigation(), tp.click('button:has-text("Send the message")')]);
+  check(await tp.isVisible('text=Message sent to 2 people'), 'teacher messages everyone booked');
+  check(mails().slice(tmark).some(f => fs.readFileSync(path.join(WP_DIR, 'wp-content/mail-log', f), 'utf8').includes('bring a blanket')), 'message emailed');
+  await tp.screenshot({ path: `${SHOTS}/30-teacher-roster.png`, fullPage: true });
+  await tp.goto(`${BASE}/wp-admin/admin.php?page=oys-teach&session=${fresh()}`);
+  check(await tp.isVisible("text=This class isn't one of yours."), 'other classes stay closed');
+  const denied = await tp.goto(`${BASE}/wp-admin/admin.php?page=oys-schedule`);
+  check(denied.status() === 403 || await tp.isVisible('text=Sorry, you are not allowed'), 'studio pages stay closed');
+
+  // Month statement: a finished class where Maya collected $20 at the door → she owes the studio $10.
+  php(`$t = time() - 2 * DAY_IN_SECONDS; $sid = OYS_Schedule::save(array('kind'=>'group','class_slug'=>'hatha-flow','starts_at'=>gmdate('Y-m-d H:i:s',$t),'ends_at'=>gmdate('Y-m-d H:i:s',$t+3600),'capacity'=>12,'price_cents'=>2000,'status'=>'scheduled','teacher_id'=>${tId})); global $wpdb; $wpdb->insert($wpdb->prefix.'oys_bookings', array('session_id'=>$sid,'user_id'=>${raeId},'status'=>'attended','paid_with'=>'door','due_cents'=>2000,'collected_with'=>'cash','created_at'=>oys_now()));`);
+  const stMonth = php(`echo wp_date('Y-m', time() - 2 * DAY_IN_SECONDS);`);
+  await tp.goto(`${BASE}/wp-admin/admin.php?page=oys-teach-statement&month=${stMonth}`);
+  check(await tp.isVisible('.oys-kpi:has-text("You pay the studio $10")'), 'teacher statement: she owes the studio $10');
+  const [csvDl] = await Promise.all([tp.waitForEvent('download'), tp.click('a:has-text("Download CSV")')]);
+  check(fs.readFileSync(await csvDl.path(), 'utf8').includes('-10.00'), 'statement CSV');
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-teachers&month=${stMonth}`);
+  check(await adm.isVisible('.oys-statement-summary tr:has-text("Maya Green") >> text=They pay you $10'), 'studio summary: Maya pays $10');
+  await adm.screenshot({ path: `${SHOTS}/31-teachers-list.png`, fullPage: true });
+
+  // Teachers page on the website.
+  if (await adm.isVisible('button:has-text("Create the Teachers page")')) await Promise.all([adm.waitForNavigation(), adm.click('button:has-text("Create the Teachers page")')]);
+  const tpage = php(`global $wpdb; echo get_permalink($wpdb->get_var("SELECT ID FROM {$wpdb->posts} WHERE post_type='page' AND post_status='publish' AND post_content LIKE '%[oys_teachers%' LIMIT 1"));`);
+  await cust.goto(tpage);
+  check(await cust.isVisible('.oys-teacher h2:has-text("Maya Green")') && await cust.isVisible('.oys-teacher__photos img'), 'Teachers page with name and photo');
+  check(await cust.isVisible(`.oys-teacher__next a[href*="session=${tc}"]`), 'her next classes are linked');
+  await cust.screenshot({ path: `${SHOTS}/32-teachers-page.png`, fullPage: true });
+
+  // Cancelled in time: the card is refunded on Maya's account, with the studio fee returned.
+  const lenaBooking = JSON.parse(q(`SELECT b.id FROM {$wpdb->prefix}oys_bookings b JOIN {$wpdb->users} u ON u.ID=b.user_id WHERE b.session_id=${tc} AND u.user_email='lena${stamp}@example.com'`))[0].id;
+  php(`global $wpdb; $wpdb->update($wpdb->prefix.'oys_bookings', array('status'=>'confirmed'), array('id'=>${lenaBooking}));`);
+  check(php(`echo OYS_Bookings::cancel(${lenaBooking});`) === 'refunded', 'cancelled in time: refunded');
+  const refund = JSON.parse(execSync('curl -s http://127.0.0.1:8090/_state').toString()).refunds.pop();
+  check(refund && refund.account === acct && refund.refund_application_fee === 'true' && refund.amount === 2500, 'refund on the teacher\'s account, studio fee returned');
+
   // Screens for review.
   await a.goto(`${BASE}/schedule-pricing/`);
   await a.screenshot({ path: `${SHOTS}/10-schedule-pricing.png`, fullPage: true });

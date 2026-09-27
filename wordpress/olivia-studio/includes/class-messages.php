@@ -1,7 +1,7 @@
 <?php
 /**
- * Messages from the studio to the people booked into a class: "Message everyone" on the roster
- * and in the calendar. Each message goes out as an email (with {first_name} filled in per person)
+ * Messages from the studio (or the class's teacher) to the people booked into a class:
+ * "Message everyone" on the roster, in the calendar and in Teaching. Each message goes out as an email (with {first_name} filled in per person)
  * and is kept in the `messages` table, so the roster shows what was sent and when.
  */
 
@@ -41,11 +41,12 @@ class OYS_Messages {
 
 	/**
 	 * Email everyone booked into a class.
-	 * $opts: guests (bool, default true), waitlist (bool, default false), sender_id (int)
+	 * $opts: guests (bool, default true), waitlist (bool, default false), sender_id (int),
+	 *        reply_to (email: answers go to the teacher who wrote)
 	 * @return int|WP_Error how many people were emailed
 	 */
 	public static function send_to_session( $session_id, $subject, $body, array $opts = array() ) {
-		$opts    = wp_parse_args( $opts, array( 'guests' => true, 'waitlist' => false, 'sender_id' => get_current_user_id() ) );
+		$opts    = wp_parse_args( $opts, array( 'guests' => true, 'waitlist' => false, 'sender_id' => get_current_user_id(), 'reply_to' => '' ) );
 		$session = OYS_Schedule::get( $session_id );
 		$subject = trim( sanitize_text_field( $subject ) );
 		$body    = trim( sanitize_textarea_field( $body ) );
@@ -62,7 +63,7 @@ class OYS_Messages {
 		$sent = 0;
 		foreach ( $people as $p ) {
 			$vars = array_merge( OYS_Email_Templates::vars_for( 0, $session ), array( 'first_name' => $p['name'] ) );
-			if ( OYS_Emails::class_message( $p['email'], $session, OYS_Email_Templates::fill( $subject, $vars ), OYS_Email_Templates::paragraphs( $body, $vars ) ) ) {
+			if ( OYS_Emails::class_message( $p['email'], $session, OYS_Email_Templates::fill( $subject, $vars ), OYS_Email_Templates::paragraphs( $body, $vars ), $opts['reply_to'] ) ) {
 				$sent++;
 			}
 		}

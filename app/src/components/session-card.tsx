@@ -30,6 +30,7 @@ export function SessionCard({ session: s, mode }: { session: Session; mode?: 'st
           </T>
           <T variant="small" style={{ color: Colors.muted }} numberOfLines={1}>
             {where}
+            {s.teacher ? ` · with ${s.teacher.name}` : ''}
           </T>
           <View style={styles.pills}>
             <Pill text={a.text} tone={a.tone} />
