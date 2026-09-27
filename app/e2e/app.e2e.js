@@ -72,8 +72,11 @@ const tid = (id) => `[data-testid="${id}"]`;
     $hybrid = $mk( 0.8, array( 'format' => 'hybrid', 'online_price_cents' => 600, 'online_capacity' => 0 ) );
     $paid   = $mk( 50, array( 'credits_allowed' => 0, 'price_cents' => 1800 ) );
     $full   = $mk( 28, array( 'capacity' => 1 ) );
+    $door   = $mk( 30, array( 'credits_allowed' => 0 ) );
+    $gift   = $mk( 32, array( 'credits_allowed' => 0, 'pricing' => 'donation', 'price_cents' => 1000 ) );
+    OYS_Settings::update( array( 'pay_later' => 'all', 'donation_min_cents' => 500, 'donation_suggestions' => '5,10,15,20', 'fb_group_url' => 'https://www.facebook.com/groups/485915674202871' ) );
     OYS_Bookings::book_manual( OYS_Customers::find_or_create( 'full${stamp}@example.com', 'Full Up' ), $full, 'comp', false );
-    echo json_encode( compact( 'u', 'studio', 'hybrid', 'paid', 'full' ) );
+    echo json_encode( compact( 'u', 'studio', 'hybrid', 'paid', 'full', 'door', 'gift' ) );
   `),
   );
 
@@ -157,6 +160,29 @@ const tid = (id) => `[data-testid="${id}"]`;
   await page.waitForSelector(tid('booked-title'));
   check(await page.isVisible('text=In the studio · Card'), 'card booking shows as paid by card');
 
+  // 4b. Pay at the studio, and a donation class given at the studio.
+  await page.goto(`${APP}/class/${setup.door}`);
+  await page.waitForSelector(tid('pay-door'));
+  await page.click(tid('pay-door'));
+  check(await page.isVisible('text=Book · pay $25 there'), 'pay at the studio: button says what to pay there');
+  await page.click(tid('book-submit'));
+  await page.waitForSelector(tid('due'));
+  check(await page.isVisible('text=To pay at the studio: $25'), 'booked, $25 to pay at the studio');
+  await page.goto(`${APP}/class/${setup.gift}`);
+  await page.waitForSelector(tid('amount-1500'));
+  await page.click(tid('amount-1500'));
+  await page.click(tid('pay-door'));
+  check(await page.isVisible(`${tid('pay-door')} >> text=$15`), 'donation: the amount follows the choice');
+  await page.fill(tid('amount-other'), '3');
+  check(await page.isVisible('text=The minimum is $5 per person.') && await page.isDisabled(tid('book-submit')), 'donation: below the minimum is blocked');
+  await page.fill(tid('amount-other'), '12');
+  await shot('06b-donation');
+  await page.click(tid('book-submit'));
+  await page.waitForSelector(tid('due'));
+  check(await page.isVisible('text=To pay at the studio: $12'), 'donation booked: $12 at the studio');
+  const dues = JSON.parse(php(`global $wpdb; echo json_encode( $wpdb->get_col( $wpdb->prepare( "SELECT due_cents FROM {$wpdb->prefix}oys_bookings WHERE user_id = %d AND paid_with = 'door' AND status = 'confirmed' ORDER BY id", ${setup.u} ) ) );`)).map(Number);
+  check(dues.join(',') === '2500,1200', 'stored: $25 and $12 due at the studio');
+
   // 5. Waitlist on a full class.
   await page.goto(`${APP}/class/${setup.full}`);
   await page.waitForSelector(tid('waitlist'));
@@ -175,7 +201,8 @@ const tid = (id) => `[data-testid="${id}"]`;
   const cards = await page.$$('[data-testid^="booking-"]');
   const ids = await Promise.all(cards.map((c) => c.getAttribute('data-testid')));
   const mine = JSON.parse(php(`global $wpdb; echo json_encode( array_map( 'intval', $wpdb->get_col( $wpdb->prepare( "SELECT id FROM {$wpdb->prefix}oys_bookings WHERE user_id = %d AND status = 'confirmed' AND guest_of = 0", ${setup.u} ) ) ) );`));
-  check(mine.length === 3 && mine.every((id) => ids.includes(`booking-${id}`)), 'my classes lists the three bookings');
+  check(mine.length === 5 && mine.every((id) => ids.includes(`booking-${id}`)), 'my classes lists all five bookings');
+  check(await page.isVisible('text=Pay $25 at the studio'), 'my classes: what to pay at the studio');
   check(await page.isVisible(tid('join-live')), 'join button on the online booking');
   await shot('08-my-classes');
 
@@ -200,6 +227,14 @@ const tid = (id) => `[data-testid="${id}"]`;
   await page.waitForSelector(`text=${email}`, { timeout: 10000 }).catch(() => {});
   check(await page.isVisible(`text=${email}`), 'profile shows the email');
   check(await page.isVisible('text=Accepted. Thank you!'), 'agreement shown as accepted');
+  check(await page.isVisible('text=Join our Facebook group'), 'profile links the Facebook group');
+  await page.click(tid('newsletter'));
+  let subscribed = false;
+  for (let i = 0; i < 20 && !subscribed; i++) {
+    await page.waitForTimeout(250);
+    subscribed = php(`echo get_user_meta( ${setup.u}, 'oys_marketing', true );`) === '1';
+  }
+  check(subscribed, 'newsletter switched on from the app');
   await shot('10-profile');
 
   // 9. The token survives a reload; logging out revokes it on the server.
@@ -211,7 +246,7 @@ const tid = (id) => `[data-testid="${id}"]`;
   check(tokens() === 0, 'logout revoked the token');
 
   // Clean up so the dev schedule stays tidy.
-  php(`global $wpdb; foreach ( array( ${setup.studio}, ${setup.hybrid}, ${setup.paid}, ${setup.full} ) as $id ) { $wpdb->update( $wpdb->prefix . 'oys_sessions', array( 'status' => 'cancelled' ), array( 'id' => $id ) ); }`);
+  php(`global $wpdb; foreach ( array( ${setup.studio}, ${setup.hybrid}, ${setup.paid}, ${setup.full}, ${setup.door}, ${setup.gift} ) as $id ) { $wpdb->update( $wpdb->prefix . 'oys_sessions', array( 'status' => 'cancelled' ), array( 'id' => $id ) ); }`);
   fs.rmSync(path.join(WP_DIR, '_app_e2e.php'), { force: true });
 
   await browser.close();

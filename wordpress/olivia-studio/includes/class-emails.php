@@ -41,6 +41,7 @@ class OYS_Emails {
 			. $body . $button
 			. '</td></tr><tr><td style="padding:16px 24px;border-top:2px solid #12231A;font-size:12px;color:#53635A">'
 			. esc_html( get_bloginfo( 'name' ) ) . ' · <a href="' . esc_url( home_url( '/' ) ) . '" style="color:#2B5036">' . esc_html( wp_parse_url( home_url(), PHP_URL_HOST ) ) . '</a> · <a href="' . esc_url( oys_account_url() ) . '" style="color:#2B5036">' . esc_html__( 'My account', 'olivia-studio' ) . '</a>'
+			. ( oys_fb_group_url() ? ' · <a href="' . esc_url( oys_fb_group_url() ) . '" style="color:#2B5036">' . esc_html__( 'Facebook group', 'olivia-studio' ) . '</a>' : '' )
 			. '</td></tr></table></td></tr></table></body></html>';
 	}
 
@@ -127,6 +128,15 @@ class OYS_Emails {
 		return $html . '<p style="font-size:13px;color:#53635A">' . esc_html__( 'Join a few minutes early, set up where the camera sees your mat (or leave it off), and keep your microphone muted.', 'olivia-studio' ) . '</p>';
 	}
 
+	/** "To pay at the studio: $25" for bookings that are paid on the day. */
+	private static function due_html( array $rows ) {
+		$due = array_sum( array_map( fn( $r ) => $r && 'door' === $r->paid_with && '' === $r->collected_with ? (int) $r->due_cents : 0, $rows ) );
+		if ( ! $due ) {
+			return '';
+		}
+		return '<p style="margin:18px 0;padding:12px 14px;background:#DEE7D6;border-left:4px solid #2B5036"><b>' . sprintf( esc_html__( 'To pay at the studio: %s', 'olivia-studio' ), esc_html( oys_money( $due ) ) ) . '</b><br>' . esc_html( OYS_Settings::get( 'pay_later_note' ) ) . '</p>';
+	}
+
 	/* ---------- Customer emails ---------- */
 
 	/** "You + Bea, Cora" list for emails. */
@@ -183,6 +193,7 @@ class OYS_Emails {
 		$online = 'online' === oys_mode_for( $s, $host->mode );
 		$blocks = self::session_block( $s )
 			. self::guest_list_html( $all_g, sprintf( _n( 'Your guest (%d)', 'Your guests (%d)', count( $all_g ), 'olivia-studio' ), count( $all_g ) ) )
+			. self::due_html( array_merge( array( $host ), $all_g ) )
 			. self::join_html( $host, $s );
 		if ( OYS_Email_Templates::enabled( $key ) ) {
 			self::compose( $key, self::user_email( $host->user_id ), OYS_Email_Templates::vars_for( $host->user_id, $s ), $blocks, array( self::ics_file( $s, $host->id ) ), oys_account_url(), self::policy_html(), ! $online && 'private' !== $s->kind );
@@ -353,7 +364,9 @@ class OYS_Emails {
 
 	public static function private_offer( $request, $session ) {
 		$blocks = self::session_block( $session ) . '<p><b>' . esc_html( oys_money( $request->price_cents ) ) . '</b></p>'
-			. ( $request->admin_message ? '<p>' . nl2br( esc_html( $request->admin_message ) ) . '</p>' : '' );
+			. ( $request->admin_message ? '<p>' . nl2br( esc_html( $request->admin_message ) ) . '</p>' : '' )
+			. ( $session->note ? '<p><b>' . esc_html( $session->note ) . '</b></p>' : '' )
+			. ( OYS_Settings::get( 'private_note' ) ? '<p style="font-size:14px;color:#53635A">' . esc_html( OYS_Settings::get( 'private_note' ) ) . '</p>' : '' );
 		self::compose( 'private_offer', self::user_email( $request->user_id ), OYS_Email_Templates::vars_for( $request->user_id, $session ), $blocks, array(), oys_book_url( $session->id ) );
 	}
 
@@ -399,6 +412,11 @@ class OYS_Emails {
 	/* ---------- Studio emails ---------- */
 
 	/** A note to the studio; $type is its switch in Studio → Emails. */
+	/** A message the studio wrote to everyone in a class (roster → "Message everyone"). */
+	public static function class_message( $to, $session, $subject, $body_html ) {
+		return self::send( $to, $subject, $subject, $body_html . self::session_block( $session ), array(), array( __( 'My bookings', 'olivia-studio' ), oys_account_url() ) );
+	}
+
 	public static function admin_notice( $subject, $text, $type = 'studio_alerts' ) {
 		if ( ! OYS_Email_Templates::enabled( $type ) ) {
 			return false;

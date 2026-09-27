@@ -14,6 +14,8 @@ export type MyBooking = {
   in_window: boolean;
   /** null: not an online booking; '': opens 60 minutes before the class; otherwise the link. */
   join_url: string | null;
+  /** Still to pay at the studio (own spot and guests), in cents. */
+  due_cents?: number;
 };
 
 export type Session = {
@@ -38,12 +40,13 @@ export type Session = {
   status: string;
   closed_reason: string;
   my_booking: MyBooking | null;
+  pricing?: 'fixed' | 'donation';
   waitlist_position: number;
   web_url: string;
 };
 
 export type PayOption = {
-  method: 'membership' | 'credit' | 'card' | 'free';
+  method: 'membership' | 'credit' | 'card' | 'free' | 'door';
   label: string;
   detail: string;
   price_cents: number;
@@ -52,6 +55,8 @@ export type PayOption = {
 
 export type SessionDetail = {
   session: Session;
+  /** Donation classes: minimum, suggested amounts and the default, in cents. */
+  donation?: { min_cents: number; amounts: number[]; suggested_cents: number } | null;
   mode: Mode;
   spots_left: number;
   price_cents: number;
@@ -72,7 +77,7 @@ export type Pass = {
 };
 
 export type Me = {
-  user: { id: number; first_name: string; last_name: string; name: string; email: string; phone: string };
+  user: { id: number; first_name: string; last_name: string; name: string; email: string; phone: string; newsletter?: boolean };
   balances: { class: number; online: number; private: number };
   passes: Pass[];
   membership: {
@@ -91,7 +96,10 @@ export type Me = {
     max_guests: number;
     online_per_credit: number;
   };
-  links: Record<'account' | 'passes' | 'membership' | 'private' | 'pricing' | 'gifts' | 'website' | 'password' | 'signup', string>;
+  links: Record<'account' | 'passes' | 'membership' | 'private' | 'pricing' | 'gifts' | 'website' | 'password' | 'signup', string> & {
+    /** The studio's Facebook group ('' when not set). */
+    community?: string;
+  };
 };
 
 export type BookingItem = Session & {
@@ -208,7 +216,7 @@ export function createClient(
     session: (id: number, mode?: Mode) => request<SessionDetail>(`/sessions/${id}`, { query: { mode } }),
     book: (
       id: number,
-      args: { method: PayOption['method']; mode: Mode; guests?: Guest[]; accept_waiver?: boolean },
+      args: { method: PayOption['method']; mode: Mode; guests?: Guest[]; accept_waiver?: boolean; amount_cents?: number },
     ) => request<BookResult>(`/sessions/${id}/book`, { method: 'POST', body: args }),
     waitlist: (id: number, leave = false) =>
       request<{ session: Session }>(`/sessions/${id}/waitlist`, { method: 'POST', body: leave ? { do: 'leave' } : {} }),
@@ -216,6 +224,7 @@ export function createClient(
       request<{ bookings: BookingItem[] }>('/bookings', { query: { when: when === 'past' ? 'past' : undefined } }),
     cancel: (bookingId: number) =>
       request<{ outcome: string; message: string }>(`/bookings/${bookingId}/cancel`, { method: 'POST' }),
+    newsletter: (subscribe: boolean) => request<Me>('/newsletter', { method: 'POST', body: { subscribe } }),
     pushToken: (token: string, platform: string) =>
       request<{ ok: boolean }>('/push-token', { method: 'POST', body: { token, platform } }),
   };

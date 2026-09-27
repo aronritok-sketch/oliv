@@ -39,6 +39,7 @@ class OYS_App_API {
 			array( '/app/bookings', 'GET', 'bookings', $auth ),
 			array( '/app/bookings/(?P<id>\d+)/cancel', 'POST', 'cancel', $auth ),
 			array( '/app/push-token', 'POST', 'push_token', $auth ),
+			array( '/app/newsletter', 'POST', 'newsletter', $auth ),
 		);
 		foreach ( $r as $route ) {
 			register_rest_route( self::NS, $route[0], array(
@@ -169,6 +170,7 @@ class OYS_App_API {
 				'name'       => $u->display_name,
 				'email'      => $u->user_email,
 				'phone'      => (string) get_user_meta( $user_id, 'oys_phone', true ),
+				'newsletter' => '1' === (string) get_user_meta( $user_id, 'oys_marketing', true ),
 			),
 			'balances'   => array(
 				'class'   => OYS_Passes::balance( $user_id, 'class' ),
@@ -205,6 +207,7 @@ class OYS_App_API {
 				'website'    => home_url( '/' ),
 				'password'   => wp_lostpassword_url(),
 				'signup'     => oys_account_url(),
+				'community'  => oys_fb_group_url(),
 			),
 		);
 	}
@@ -256,7 +259,9 @@ class OYS_App_API {
 				'can_cancel' => 'confirmed' === $mine->status && $start > time(),
 				'in_window'  => OYS_Bookings::in_cancel_window( $mine, $s ),
 				'join_url'   => self::join_url( $mine, $s ),
+				'due_cents'  => array_sum( array_map( fn( $r ) => 'door' === $r->paid_with && '' === $r->collected_with ? (int) $r->due_cents : 0, array_merge( array( $mine ), $guests ) ) ),
 			) : null,
+			'pricing'         => oys_is_donation( $s ) ? 'donation' : 'fixed',
 			'waitlist_position' => $mine ? 0 : OYS_Bookings::waitlist_position( $user_id, $s->id ),
 			'web_url'         => oys_book_url( $s->id ),
 		);
@@ -302,6 +307,9 @@ class OYS_App_API {
 		}
 		$mode    = oys_mode_for( $s, sanitize_key( $req->get_param( 'mode' ) ?: 'studio' ) );
 		$price   = OYS_Schedule::price_for( $s, $mode );
+		if ( oys_is_donation( $s ) ) {
+			$price = max( $price, (int) OYS_Settings::get( 'donation_min_cents' ) ); // Suggested amount.
+		}
 		$kind    = OYS_Bookings::credit_kind( $s, $mode );
 		$credits = $s->credits_allowed ? OYS_Passes::available_for( $user_id, $s, $mode ) : 0;
 		$member  = OYS_Memberships::current_for( $user_id );
@@ -313,11 +321,15 @@ class OYS_App_API {
 			$options[] = array( 'method' => 'credit', 'label' => __( 'Use my pass', 'olivia-studio' ), 'detail' => 'online' === $kind ? sprintf( _n( '%d online class', '%d online classes', $credits, 'olivia-studio' ), $credits ) : sprintf( _n( '%d class left', '%d classes left', $credits, 'olivia-studio' ), $credits ), 'price_cents' => 0, 'available' => $credits );
 		}
 		if ( $price > 0 && OYS_Settings::payments_ready() ) {
-			$options[] = array( 'method' => 'card', 'label' => 'online' === $mode ? __( 'Pay by card (online ticket)', 'olivia-studio' ) : __( 'Pay by card', 'olivia-studio' ), 'detail' => __( 'Secure Stripe checkout opens in your browser', 'olivia-studio' ), 'price_cents' => $price );
+			$options[] = array( 'method' => 'card', 'label' => oys_is_donation( $s ) ? __( 'Give by card', 'olivia-studio' ) : ( 'online' === $mode ? __( 'Pay by card (online ticket)', 'olivia-studio' ) : __( 'Pay by card', 'olivia-studio' ) ), 'detail' => __( 'Secure Stripe checkout opens in your browser', 'olivia-studio' ), 'price_cents' => $price );
 		} elseif ( ! $price ) {
 			$options[] = array( 'method' => 'free', 'label' => __( 'Reserve my spot', 'olivia-studio' ), 'detail' => __( 'Free', 'olivia-studio' ), 'price_cents' => 0 );
 		}
+		if ( $price > 0 && true === OYS_Bookings::pay_later_allowed( $user_id, $s, $mode ) ) {
+			$options[] = array( 'method' => 'door', 'label' => oys_is_donation( $s ) ? __( 'Give at the studio', 'olivia-studio' ) : __( 'Pay at the studio', 'olivia-studio' ), 'detail' => (string) OYS_Settings::get( 'pay_later_note' ), 'price_cents' => $price );
+		}
 		return rest_ensure_response( array(
+			'donation'   => oys_is_donation( $s ) ? array( 'min_cents' => (int) OYS_Settings::get( 'donation_min_cents' ), 'amounts' => oys_donation_amounts(), 'suggested_cents' => $price ) : null,
 			'session'    => self::session_data( $s, $user_id ),
 			'mode'       => $mode,
 			'spots_left' => OYS_Schedule::spots_left( $s, $mode ),
@@ -331,7 +343,8 @@ class OYS_App_API {
 	}
 
 	/**
-	 * Book: { mode, method: membership|credit|free|card, guests: [{name,email}], accept_waiver }.
+	 * Book: { mode, method: membership|credit|free|card|door, guests: [{name,email}], accept_waiver,
+	 * amount_cents (donation classes: per person) }.
 	 * Returns { status: 'booked', session } or { status: 'checkout', url, order_id }.
 	 */
 	public static function book( WP_REST_Request $req ) {
@@ -358,6 +371,22 @@ class OYS_App_API {
 			return new WP_Error( 'oys_guest_email', __( 'Add an email for each online guest, so they get their own link to join.', 'olivia-studio' ), array( 'status' => 400 ) );
 		}
 		$price = OYS_Schedule::price_for( $s, $mode );
+		if ( oys_is_donation( $s ) && in_array( $method, array( 'card', 'door' ), true ) ) {
+			// Donation classes: what each person gives, at least the minimum.
+			$min   = (int) OYS_Settings::get( 'donation_min_cents' );
+			$price = min( 100000, (int) ( $p['amount_cents'] ?? max( OYS_Schedule::price_for( $s, $mode ), $min ) ) );
+			if ( $price < max( 1, $min ) ) {
+				return new WP_Error( 'oys_amount', sprintf( __( 'The minimum is %s per person.', 'olivia-studio' ), oys_money( $min ) ), array( 'status' => 400 ) );
+			}
+		}
+
+		if ( 'door' === $method ) {
+			$res = OYS_Bookings::book_party( $user_id, $s, array( 'method' => 'door', 'guests' => $guests, 'mode' => $mode, 'amount' => $price ) );
+			if ( is_wp_error( $res ) ) {
+				return self::error( $res, 409 );
+			}
+			return rest_ensure_response( array( 'status' => 'booked', 'session' => self::session_data( OYS_Schedule::get( $s->id ), $user_id ) ) );
+		}
 
 		if ( in_array( $method, array( 'credit', 'membership', 'free' ), true ) ) {
 			if ( 'free' === $method && $price ) {
@@ -374,7 +403,7 @@ class OYS_App_API {
 			if ( $price < 1 || ! OYS_Settings::payments_ready() ) {
 				return new WP_Error( 'oys_method', __( 'Card payment is not available for this class.', 'olivia-studio' ), array( 'status' => 400 ) );
 			}
-			$title = oys_session_title( $s ) . ( oys_is_hybrid( $s ) && 'online' === $mode ? ' ' . __( '(live online)', 'olivia-studio' ) : '' );
+			$title = oys_session_title( $s ) . ( oys_is_hybrid( $s ) && 'online' === $mode ? ' ' . __( '(live online)', 'olivia-studio' ) : '' ) . ( oys_is_donation( $s ) ? ' ' . __( '(donation)', 'olivia-studio' ) : '' );
 			$when  = oys_date( $s->starts_at, 'l, F j · g:i a' );
 			$lines = array( array( $title, $when, $price, 1 ) );
 			if ( $n ) {
@@ -466,6 +495,13 @@ class OYS_App_API {
 	}
 
 	/** Expo push token for this device (notifications come in a later version). */
+	/** Newsletter on/off from the app: { subscribe: bool }. */
+	public static function newsletter( WP_REST_Request $req ) {
+		$p = $req->get_json_params() ?: $req->get_params();
+		update_user_meta( get_current_user_id(), 'oys_marketing', empty( $p['subscribe'] ) ? '' : '1' );
+		return rest_ensure_response( self::me_data( get_current_user_id() ) );
+	}
+
 	public static function push_token( WP_REST_Request $req ) {
 		$p     = $req->get_json_params() ?: $req->get_params();
 		$token = sanitize_text_field( $p['token'] ?? '' );

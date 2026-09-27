@@ -110,7 +110,7 @@ class OYS_Frontend {
 				$out[] = '<li class="session session--' . esc_attr( $tone ) . ( $online ? ' session--online' : '' ) . '">'
 					. '<span class="session__time">' . esc_html( oys_time( $s->starts_at ) . ' – ' . oys_time( $s->ends_at ) ) . '</span>'
 					. '<span class="session__class">' . $title . '</span>'
-					. '<span class="session__place">' . ( $online ? '<span class="session__online">' . esc_html__( 'Online', 'olivia-studio' ) . '</span> ' . esc_html( $s->price_cents ? oys_money( $s->price_cents ) : '' ) : esc_html( $s->location ) . ( oys_is_hybrid( $s ) ? ' <span class="session__online">' . esc_html__( '+ Live online', 'olivia-studio' ) . '</span>' : '' ) ) . '</span>'
+					. '<span class="session__place">' . ( $online ? '<span class="session__online">' . esc_html__( 'Online', 'olivia-studio' ) . '</span> ' . esc_html( $s->price_cents || oys_is_donation( $s ) ? oys_price_label( $s ) : '' ) : esc_html( $s->location ) . ( oys_is_hybrid( $s ) ? ' <span class="session__online">' . esc_html__( '+ Live online', 'olivia-studio' ) . '</span>' : '' ) ) . ( oys_is_donation( $s ) && ! $online ? ' <span class="session__donation">' . esc_html__( 'By donation', 'olivia-studio' ) . '</span>' : '' ) . '</span>'
 					. ( $s->note ? '<span class="session__note">' . esc_html( $s->note ) . '</span>' : '' )
 					. ( $spots ? '<span class="session__spots' . ( $left < 1 ? ' is-full' : '' ) . '">' . esc_html( $spots ) . '</span>' : '' )
 					. $action . '</li>';
@@ -135,7 +135,7 @@ class OYS_Frontend {
 			$left = OYS_Schedule::spots_left( $s );
 			$out .= '<li class="event"><a href="' . esc_url( oys_book_url( $s->id ) ) . '"><span class="event__date event__date--' . $tones[ $i % 3 ] . '"><span>' . esc_html( wp_date( 'M', oys_ts( $s->starts_at ) ) ) . '</span><b>' . esc_html( wp_date( 'j', oys_ts( $s->starts_at ) ) ) . '</b></span>'
 				. '<span><span class="event__title">' . esc_html( oys_session_title( $s ) ) . '</span>'
-				. '<span class="event__meta">' . esc_html( oys_date( $s->starts_at, 'l, g:i a' ) . ' – ' . oys_time( $s->ends_at ) . ( $s->location ? ' · ' . $s->location : '' ) . ' · ' . ( $s->price_cents ? oys_money( $s->price_cents ) : __( 'Free', 'olivia-studio' ) ) ) . ( $left < 1 ? ' · ' . __( 'Full, waitlist open', 'olivia-studio' ) : '' ) . '</span></span>'
+				. '<span class="event__meta">' . esc_html( oys_date( $s->starts_at, 'l, g:i a' ) . ' – ' . oys_time( $s->ends_at ) . ( $s->location ? ' · ' . $s->location : '' ) . ' · ' . oys_price_label( $s ) ) . ( $left < 1 ? ' · ' . __( 'Full, waitlist open', 'olivia-studio' ) : '' ) . '</span></span>'
 				. '<span class="event__go" aria-hidden="true">' . oys_icon( 'arrow' ) . '</span></a></li>';
 		}
 		return $out . '</ul>';
@@ -151,7 +151,7 @@ class OYS_Frontend {
 		$cards  = array();
 		$online_price = (int) OYS_Settings::get( 'online_price_cents' );
 		$ratio        = OYS_Passes::online_per_credit();
-		$cards[] = array( 'tone' => 'paper', 'title' => __( 'Drop-in class', 'olivia-studio' ), 'price' => oys_money( $dropin ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array_filter( array( __( 'Any group class in person', 'olivia-studio' ), $online_price ? sprintf( __( 'Online classes: %s', 'olivia-studio' ), oys_money( $online_price ) ) : '', __( 'Bring friends: add guests when you book', 'olivia-studio' ) ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
+		$cards[] = array( 'tone' => 'paper', 'title' => __( 'Drop-in class', 'olivia-studio' ), 'price' => oys_money( $dropin ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array_filter( array( __( 'Any group class in person', 'olivia-studio' ), $online_price ? sprintf( __( 'Online classes: %s', 'olivia-studio' ), oys_money( $online_price ) ) : '', __( 'Bring friends: add guests when you book', 'olivia-studio' ), 'off' !== OYS_Settings::get( 'pay_later' ) ? __( 'Pay online or at the studio', 'olivia-studio' ) : '' ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
 		$tones = array( 'lilac', 'sun', 'pink' );
 		$i     = 0;
 		foreach ( OYS_Products::all( true ) as $p ) {
@@ -169,6 +169,9 @@ class OYS_Frontend {
 				}
 				if ( (int) $p['online_price_cents'] && (int) $p['online_price_cents'] !== (int) $p['price_cents'] ) {
 					$features[] = sprintf( __( 'Online: %s (60 minutes)', 'olivia-studio' ), oys_money( $p['online_price_cents'] ) );
+				}
+				if ( (int) OYS_Settings::get( 'private_first_extra_min' ) ) {
+					$features[] = sprintf( __( 'First session: plan about %d extra minutes to talk through your goals', 'olivia-studio' ), (int) OYS_Settings::get( 'private_first_extra_min' ) );
 				}
 			} elseif ( 'membership' === $p['kind'] ) {
 				$cta  = array( __( 'Join', 'olivia-studio' ), oys_page_url( 'book', array( 'product' => $p['id'] ) ) );
@@ -295,7 +298,7 @@ class OYS_Frontend {
 				. '<button type="button" class="oys-guestrow__remove" data-guest-remove aria-label="' . esc_attr__( 'Remove guest', 'olivia-studio' ) . '">×</button></div>';
 		}
 		return '<fieldset class="oys-guests" data-guests data-max="' . (int) $max . '"><legend>' . esc_html__( 'Bringing friends?', 'olivia-studio' ) . '</legend>'
-			. '<p class="oys-small">' . sprintf( esc_html__( 'Add up to %d guests. Each guest takes one spot and is paid from your pass or by card, together with your booking.', 'olivia-studio' ), (int) $max ) . '</p>'
+			. '<p class="oys-small">' . sprintf( esc_html__( 'Add up to %d guests. Each guest takes one spot and is paid the same way as your booking.', 'olivia-studio' ), (int) $max ) . '</p>'
 			. $rows . '<button type="button" class="btn btn--ghost btn--sm" data-guest-add>' . esc_html__( '+ Add a guest', 'olivia-studio' ) . '</button></fieldset>';
 	}
 
@@ -303,11 +306,56 @@ class OYS_Frontend {
 	private static function party_script() {
 		return '<script>(function(){document.querySelectorAll("[data-party]").forEach(function(f){var box=f.querySelector("[data-guests]");var rows=box?[].slice.call(box.querySelectorAll("[data-guest]")):[];var add=box&&box.querySelector("[data-guest-add]");var host=parseInt(f.getAttribute("data-host"),10);'
 			. 'function count(){return rows.filter(function(r){return !r.hidden&&r.querySelector("input[type=text]").value.trim()!=="";}).length;}'
-			. 'function upd(){var n=count(),people=host+n;f.querySelectorAll("[data-each]").forEach(function(el){var each=parseInt(el.getAttribute("data-each"),10),fixed=parseInt(el.getAttribute("data-fixed")||"0",10),mult=el.getAttribute("data-guests-only")?n:people;el.textContent="$"+((fixed+each*mult)/100).toFixed((fixed+each*mult)%100?2:0);});'
+			. 'function amount(){var r=f.querySelector("input[name=amount_pick]:checked");if(!r)return 0;if(r.value==="other"){var o=f.querySelector("input[name=amount_other]");return Math.round(parseFloat(o.value||"0")*100)||0;}return parseInt(r.value,10);}'
+			. 'function upd(){var n=count(),people=host+n;f.querySelectorAll("[data-each]").forEach(function(el){var a=el.getAttribute("data-each"),each=a==="donation"?amount():parseInt(a,10),fixed=parseInt(el.getAttribute("data-fixed")||"0",10),mult=el.getAttribute("data-guests-only")?n:people;el.textContent="$"+((fixed+each*mult)/100).toFixed((fixed+each*mult)%100?2:0);});'
 			. 'f.querySelectorAll("[data-needs]").forEach(function(el){var need=el.getAttribute("data-guests-only")?n:people,have=parseInt(el.getAttribute("data-needs"),10),opt=el.closest(".oys-option"),inp=opt.querySelector("input");var ok=have>=need;opt.classList.toggle("is-disabled",!ok);inp.disabled=!ok;if(!ok&&inp.checked){var o=f.querySelector(".oys-option:not(.is-disabled) input");if(o)o.checked=true;}});'
 			. 'var ps=f.querySelector("[data-party-size]");if(ps)ps.textContent=people;if(add)add.hidden=rows.every(function(r){return !r.hidden;});}'
 			. 'if(add)add.addEventListener("click",function(){var r=rows.find(function(r){return r.hidden;});if(r){r.hidden=false;r.querySelector("input").focus();}upd();});'
-			. 'rows.forEach(function(r){r.querySelector("[data-guest-remove]").addEventListener("click",function(){r.hidden=true;r.querySelectorAll("input").forEach(function(i){i.value="";});upd();});r.querySelectorAll("input").forEach(function(i){i.addEventListener("input",upd);});});upd();});})();</script>';
+			. 'rows.forEach(function(r){r.querySelector("[data-guest-remove]").addEventListener("click",function(){r.hidden=true;r.querySelectorAll("input").forEach(function(i){i.value="";});upd();});r.querySelectorAll("input").forEach(function(i){i.addEventListener("input",upd);});});'
+			. 'f.querySelectorAll("[name=amount_pick],[name=amount_other]").forEach(function(i){i.addEventListener(i.type==="radio"?"change":"input",function(){if(i.name==="amount_other"){var o=f.querySelector("[name=amount_pick][value=other]");if(o)o.checked=true;}upd();});});upd();});})();</script>';
+	}
+
+	/** Donation classes: choose how much to give (suggested amounts or your own, from the minimum). */
+	private static function donation_fields( $suggested ) {
+		$min     = (int) OYS_Settings::get( 'donation_min_cents' );
+		$amounts = oys_donation_amounts();
+		$pick    = in_array( $suggested, $amounts, true ) ? $suggested : $amounts[ min( 1, count( $amounts ) - 1 ) ];
+		$out     = '<fieldset class="oys-amounts"><legend>' . esc_html__( 'Pay what you like', 'olivia-studio' ) . '</legend><div class="oys-amounts__row">';
+		foreach ( $amounts as $a ) {
+			$out .= '<label class="oys-amount"><input type="radio" name="amount_pick" value="' . (int) $a . '"' . checked( $pick, $a, false ) . '><span>' . esc_html( oys_money( $a ) ) . '</span></label>';
+		}
+		$out .= '<label class="oys-amount oys-amount--other"><input type="radio" name="amount_pick" value="other"><span>' . esc_html__( 'Other', 'olivia-studio' ) . '</span></label>'
+			. '<label class="oys-amount__custom"><span class="sr-only">' . esc_html__( 'Your amount', 'olivia-studio' ) . '</span>$<input type="number" name="amount_other" id="oys-amount-other" min="' . esc_attr( $min / 100 ) . '" step="1" inputmode="decimal" placeholder="' . esc_attr( $min / 100 ) . '"></label></div>'
+			. '<p class="oys-small">' . sprintf( esc_html__( 'This class is by donation: give what feels right, from %s per person. Online by card or at the studio, whichever you prefer.', 'olivia-studio' ), esc_html( oys_money( $min ) ) ) . '</p></fieldset>';
+		return $out;
+	}
+
+	/** Chosen donation per person in cents, or WP_Error below the minimum. */
+	private static function donation_amount() {
+		$min  = (int) OYS_Settings::get( 'donation_min_cents' );
+		$pick = sanitize_text_field( wp_unslash( $_POST['amount_pick'] ?? '' ) );
+		$c    = 'other' === $pick ? oys_cents_from_input( wp_unslash( $_POST['amount_other'] ?? '' ) ) : (int) $pick;
+		if ( $c < max( 1, $min ) ) {
+			return new WP_Error( 'oys_amount', sprintf( __( 'The minimum is %s per person.', 'olivia-studio' ), oys_money( $min ) ) );
+		}
+		return min( $c, 100000 );
+	}
+
+	/** "Pay at the studio" option for the booking form: [method, label, price html, note], ['note' => why not], or null. */
+	private static function door_option( $user_id, $s, $mode, $price, $guests_only = false ) {
+		$ok = OYS_Bookings::pay_later_allowed( $user_id, $s, $mode );
+		if ( is_wp_error( $ok ) ) {
+			return 'oys_pay_later_blocked' === $ok->get_error_code() ? array( 'note' => $ok->get_error_message() ) : null;
+		}
+		$donation = oys_is_donation( $s );
+		$html     = '<span class="oys-option__price" data-each="' . ( $donation ? 'donation' : (int) $price ) . '"' . ( $guests_only ? ' data-guests-only="1"' : '' ) . '>' . esc_html( oys_money( $price ) ) . '</span>';
+		return array( 'door', $donation ? __( 'Give at the studio', 'olivia-studio' ) : __( 'Pay at the studio', 'olivia-studio' ), $html, (string) OYS_Settings::get( 'pay_later_note' ) );
+	}
+
+	/** Still to pay at the studio for a booking and its guests, in cents. */
+	private static function due_for( $booking ) {
+		$rows = array_merge( array( $booking ), OYS_Bookings::guests_of( $booking->id, array( 'confirmed' ) ) );
+		return array_sum( array_map( fn( $r ) => 'door' === $r->paid_with && '' === $r->collected_with ? (int) $r->due_cents : 0, $rows ) );
 	}
 
 	private static function render_session_checkout( $session_id ) {
@@ -321,7 +369,7 @@ class OYS_Frontend {
 		if ( ! $s || ! OYS_Privates::may_book( $user_id, $s ) ) {
 			return '<p class="oys-notice oys-notice--error">' . esc_html__( 'This class could not be found. Please pick another from the timetable.', 'olivia-studio' ) . '</p>';
 		}
-		$out = '<div class="oys-checkout">' . self::session_card( $s ) . '<div class="oys-checkout__main">';
+		$out = '<div class="oys-checkout">' . self::session_card( $s ) . '<div class="oys-checkout__main">' . ( 'private' === $s->kind ? self::private_note() : '' );
 
 		if ( ! $user_id ) {
 			return $out . self::auth_block( $here, __( 'You need an account to book, so you can manage or cancel your spot, bring guests and keep track of your passes. It takes a minute.', 'olivia-studio' ) ) . '</div></div>';
@@ -345,6 +393,10 @@ class OYS_Frontend {
 		$max_g     = 'private' === $s->kind ? 0 : (int) OYS_Settings::get( 'max_guests' );
 		$ready     = OYS_Settings::payments_ready();
 		$price     = OYS_Schedule::price_for( $s, $mode );
+		$donation  = oys_is_donation( $s );
+		if ( $donation ) {
+			$price = max( $price, (int) OYS_Settings::get( 'donation_min_cents' ) ); // The suggested amount.
+		}
 
 		// Already booked: confirmation, guests, and "bring more guests".
 		if ( $mine && 'pending' !== $mine->status ) {
@@ -357,7 +409,11 @@ class OYS_Frontend {
 			if ( $guests ) {
 				$out .= '<p><b>' . esc_html( sprintf( _n( 'Your guest: %s', 'Your guests: %s', count( $guests ), 'olivia-studio' ), implode( ', ', wp_list_pluck( $guests, 'guest_name' ) ) ) ) . '</b></p>';
 			}
-			$out .= '<p class="btn-row"><a class="btn btn--primary" href="' . esc_url( oys_account_url() ) . '">' . esc_html__( 'My bookings', 'olivia-studio' ) . '</a>' . self::ics_link( $mine->id ) . '</p></div>';
+			$due = self::due_for( $mine );
+			if ( $due ) {
+				$out .= '<p class="oys-due">' . sprintf( esc_html__( 'To pay at the studio: %s.', 'olivia-studio' ), '<b>' . esc_html( oys_money( $due ) ) . '</b>' ) . ' ' . esc_html( OYS_Settings::get( 'pay_later_note' ) ) . '</p>';
+			}
+			$out .= '<p class="btn-row"><a class="btn btn--primary" href="' . esc_url( oys_account_url() ) . '">' . esc_html__( 'My bookings', 'olivia-studio' ) . '</a>' . self::ics_link( $mine->id ) . '</p>' . oys_fb_group_link() . '</div>';
 			$room = min( $left, $max_g - count( $guests ) );
 			if ( ! $closed && $room > 0 ) {
 				$opts = array();
@@ -365,7 +421,11 @@ class OYS_Frontend {
 					$opts[] = '<label class="oys-option"><input type="radio" name="method" value="credit" checked><span class="oys-option__label">' . esc_html__( 'From my pass', 'olivia-studio' ) . ' <small>' . sprintf( esc_html__( '(%d left)', 'olivia-studio' ), $credits ) . '</small></span><span class="oys-option__price" data-needs="' . (int) $credits . '" data-guests-only="1">' . esc_html__( '1 class each', 'olivia-studio' ) . '</span></label>';
 				}
 				if ( $price > 0 && $ready ) {
-					$opts[] = '<label class="oys-option"><input type="radio" name="method" value="card"' . ( $credits > 0 ? '' : ' checked' ) . '><span class="oys-option__label">' . esc_html__( 'Pay by card', 'olivia-studio' ) . '</span><span class="oys-option__price" data-each="' . $price . '" data-guests-only="1">' . esc_html( oys_money( $price ) ) . '</span></label>';
+					$opts[] = '<label class="oys-option"><input type="radio" name="method" value="card"' . ( $credits > 0 ? '' : ' checked' ) . '><span class="oys-option__label">' . esc_html( $donation ? __( 'Give by card', 'olivia-studio' ) : __( 'Pay by card', 'olivia-studio' ) ) . '</span><span class="oys-option__price" data-each="' . ( $donation ? 'donation' : $price ) . '" data-guests-only="1">' . esc_html( oys_money( $price ) ) . '</span></label>';
+				}
+				$door = $price > 0 ? self::door_option( $user_id, $s, $mode, $price, true ) : null;
+				if ( $door && isset( $door[0] ) ) {
+					$opts[] = '<label class="oys-option"><input type="radio" name="method" value="door"' . ( $opts ? '' : ' checked' ) . '><span class="oys-option__label">' . esc_html( $door[1] ) . '<small>' . esc_html( $door[3] ) . '</small></span>' . $door[2] . '</label>';
 				}
 				if ( ! $price ) {
 					$opts[] = '<label class="oys-option"><input type="radio" name="method" value="free" checked><span class="oys-option__label">' . esc_html__( 'Reserve spots', 'olivia-studio' ) . '</span><span class="oys-option__price">' . esc_html__( 'Free', 'olivia-studio' ) . '</span></label>';
@@ -374,6 +434,7 @@ class OYS_Frontend {
 					$out .= self::form_open( 'oys_checkout', 'class="oys-card oys-pay" data-party data-host="0"' ) . '<h2>' . esc_html__( 'Bring guests', 'olivia-studio' ) . '</h2>'
 						. '<input type="hidden" name="session" value="' . (int) $s->id . '"><input type="hidden" name="add_guests" value="' . (int) $mine->id . '">'
 						. self::guest_fields( $room, 1 )
+						. ( $donation ? self::donation_fields( $price ) : '' )
 						. '<fieldset class="oys-options"><legend class="sr-only">' . esc_html__( 'Payment option', 'olivia-studio' ) . '</legend>' . implode( '', $opts ) . '</fieldset>'
 						. '<button class="btn btn--primary oys-submit" type="submit">' . esc_html__( 'Add guests', 'olivia-studio' ) . '</button></form>' . self::party_script();
 				}
@@ -439,8 +500,16 @@ class OYS_Frontend {
 				: sprintf( _n( 'Use my pass (%d class left)', 'Use my pass (%d classes left)', $credits, 'olivia-studio' ), $credits );
 			$options[] = array( 'credit', $label, '<span class="oys-option__price" data-needs="' . (int) $credits . '">' . esc_html( 'online' === $kind ? __( '1 online class each', 'olivia-studio' ) : __( '1 class each', 'olivia-studio' ) ) . '</span>', $conv_note );
 		}
+		$door_note = '';
 		if ( $price > 0 ) {
-			$options[] = array( 'card', 'private' === $s->kind ? __( 'Pay for this session', 'olivia-studio' ) : ( 'online' === $mode ? __( 'Pay by card (online ticket)', 'olivia-studio' ) : __( 'Pay by card (drop-in)', 'olivia-studio' ) ), '<span class="oys-option__price" data-each="' . $price . '">' . esc_html( oys_money( $price ) ) . '</span>', '' );
+			$card_label = $donation ? __( 'Give by card', 'olivia-studio' ) : ( 'private' === $s->kind ? __( 'Pay for this session', 'olivia-studio' ) : ( 'online' === $mode ? __( 'Pay by card (online ticket)', 'olivia-studio' ) : __( 'Pay by card (drop-in)', 'olivia-studio' ) ) );
+			$options[]  = array( 'card', $card_label, '<span class="oys-option__price" data-each="' . ( $donation ? 'donation' : $price ) . '">' . esc_html( oys_money( $price ) ) . '</span>', '' );
+			$door       = self::door_option( $user_id, $s, $mode, $price );
+			if ( $door && isset( $door[0] ) ) {
+				$options[] = $door;
+			} elseif ( $door ) {
+				$door_note = $door['note'];
+			}
 		} elseif ( ! $credits || ! $s->credits_allowed ) {
 			$options[] = array( 'free', __( 'Reserve my spot', 'olivia-studio' ), '<span class="oys-option__price">' . esc_html__( 'Free', 'olivia-studio' ) . '</span>', '' );
 		}
@@ -456,6 +525,7 @@ class OYS_Frontend {
 		$out .= self::form_open( 'oys_checkout', 'class="oys-card oys-pay" data-party data-host="1"' ) . '<h2>' . esc_html__( 'How would you like to book?', 'olivia-studio' ) . '</h2>'
 			. '<input type="hidden" name="session" value="' . (int) $s->id . '"><input type="hidden" name="mode" value="' . esc_attr( $mode ) . '">'
 			. self::guest_fields( min( $max_g, $left - 1 ) )
+			. ( $donation ? self::donation_fields( $price ) : '' )
 			. '<p class="oys-party">' . esc_html__( 'People in this booking:', 'olivia-studio' ) . ' <b data-party-size>1</b></p>'
 			. '<fieldset class="oys-options"><legend class="sr-only">' . esc_html__( 'Payment option', 'olivia-studio' ) . '</legend>';
 		foreach ( $options as $i => $o ) {
@@ -464,6 +534,9 @@ class OYS_Frontend {
 			$out       .= '<label class="oys-option' . ( $disabled ? ' is-disabled' : '' ) . '"><input type="radio" name="method" value="' . esc_attr( $o[0] ) . '"' . checked( 0, $i, false ) . disabled( $disabled, true, false ) . '><span class="oys-option__label">' . esc_html( $o[1] ) . ( $o[3] ? '<small>' . esc_html( $o[3] ) . '</small>' : '' ) . '</span>' . $o[2] . '</label>';
 		}
 		$out .= '</fieldset>';
+		if ( $door_note ) {
+			$out .= '<p class="oys-small">' . esc_html( $door_note ) . '</p>';
+		}
 		if ( ! $ready && ! $credits && ! $covered ) {
 			$out .= '<p class="oys-notice">' . esc_html__( 'Online payment is being set up. To book now, send a message and I\'ll hold your spot.', 'olivia-studio' ) . '</p>';
 		}
@@ -558,7 +631,7 @@ class OYS_Frontend {
 		if ( $order->receipt_url ) {
 			$html .= '<p><a class="text-link" href="' . esc_url( $order->receipt_url ) . '" target="_blank" rel="noopener">' . esc_html__( 'View receipt', 'olivia-studio' ) . '</a></p>';
 		}
-		return $html . '</div>';
+		return $html . oys_fb_group_link() . '</div>';
 	}
 
 	private static function ics_link( $booking_id ) {
@@ -616,6 +689,14 @@ class OYS_Frontend {
 			oys_flash( $res->get_error_message(), 'error' );
 			oys_redirect( $back );
 		};
+		// Donation classes: the amount each person gives (card or at the studio).
+		if ( oys_is_donation( $s ) && in_array( $method, array( 'card', 'door' ), true ) ) {
+			$price = self::donation_amount();
+			if ( is_wp_error( $price ) ) {
+				$fail( $price );
+			}
+			$title .= ' ' . __( '(donation)', 'olivia-studio' );
+		}
 		// With a personal Zoom link for everyone, online guests need an email to receive theirs.
 		if ( 'online' === $mode && $n && OYS_Zoom::personal_links() && array_filter( $guests, fn( $g ) => ! $g['email'] ) ) {
 			$fail( new WP_Error( 'oys_guest_email', __( 'Add an email for each online guest, so they get their own link to join.', 'olivia-studio' ) ) );
@@ -637,7 +718,7 @@ class OYS_Frontend {
 					'meta'         => array( 'guests' => wp_list_pluck( $guests, 'name' ) ),
 				), array( array( sprintf( __( 'Guest ticket: %s', 'olivia-studio' ), $title ), implode( ', ', wp_list_pluck( $guests, 'name' ) ) . ' · ' . oys_date( $s->starts_at, 'l, F j · g:i a' ), $price, $n ) ), $back, $guests, false, $host_id, $mode );
 			}
-			$res = OYS_Bookings::book_party( $user_id, $s, array( 'method' => $method, 'guest_method' => 'free' === $method && ! $price ? 'free' : 'credit', 'guests' => $guests, 'host_booking' => $host_id, 'mode' => $mode ) );
+			$res = OYS_Bookings::book_party( $user_id, $s, array( 'method' => $method, 'guest_method' => 'door' === $method ? 'door' : ( 'free' === $method && ! $price ? 'free' : 'credit' ), 'guests' => $guests, 'host_booking' => $host_id, 'mode' => $mode, 'amount' => $price ) );
 			if ( is_wp_error( $res ) ) {
 				$fail( $res );
 			}
@@ -646,6 +727,14 @@ class OYS_Frontend {
 		}
 
 		self::accept_waiver_or_back( $back );
+
+		if ( 'door' === $method ) {
+			$res = OYS_Bookings::book_party( $user_id, $s, array( 'method' => 'door', 'guests' => $guests, 'mode' => $mode, 'amount' => $price ) );
+			if ( is_wp_error( $res ) ) {
+				$fail( $res );
+			}
+			oys_redirect( $back );
+		}
 
 		if ( 'credit' === $method || ( 'free' === $method && ! $price ) ) {
 			$res = OYS_Bookings::book_party( $user_id, $s, array( 'method' => $method, 'guests' => $guests, 'mode' => $mode ) );
@@ -850,7 +939,8 @@ class OYS_Frontend {
 			. '<label class="field"><span>' . esc_html__( 'Password (8+ characters)', 'olivia-studio' ) . '</span><input type="password" name="password" id="oys-reg-password" required minlength="8" autocomplete="new-password"></label>'
 			. '<details class="oys-waiver"><summary>' . esc_html__( 'Participation agreement', 'olivia-studio' ) . '</summary><p>' . esc_html( OYS_Settings::get( 'waiver_text' ) ) . '</p></details>'
 			. '<label class="oys-check"><input type="checkbox" name="waiver" value="1" required> <span>' . esc_html__( 'I have read and accept the participation agreement.', 'olivia-studio' ) . '</span></label>'
-			. '<label class="oys-check"><input type="checkbox" name="marketing" value="1"> <span>' . esc_html__( 'Email me about new classes and events (a few times a month at most).', 'olivia-studio' ) . '</span></label>'
+			. '<label class="oys-check"><input type="checkbox" name="marketing" value="1"> <span>' . esc_html__( 'Email me the newsletter: new classes and events (a few times a month at most).', 'olivia-studio' ) . '</span></label>'
+			. oys_fb_group_link( __( 'And join our Facebook group', 'olivia-studio' ) )
 			. '<button class="btn btn--primary" type="submit">' . esc_html__( 'Create account', 'olivia-studio' ) . '</button></form>';
 		$is_login = 'login' === $view;
 		return '<div class="oys-tabs" data-oys-tabs><div class="oys-tabs__nav" role="tablist">'
@@ -904,7 +994,7 @@ class OYS_Frontend {
 		}
 		$out .= '<a href="' . esc_url( wp_logout_url( home_url( '/' ) ) ) . '" class="oys-logout">' . esc_html__( 'Log out', 'olivia-studio' ) . '</a></nav><div class="oys-account__body">';
 		$out .= call_user_func( array( __CLASS__, 'tab_' . $tab ), $user_id );
-		return $out . '</div></div>';
+		return $out . '</div>' . oys_fb_group_link() . '</div>';
 	}
 
 
@@ -941,6 +1031,7 @@ class OYS_Frontend {
 					. '<div class="oys-item__main"><h4>' . esc_html( oys_session_title( $s ) ) . ' <span class="badge">' . esc_html( $paid[ $b->paid_with ] ?? $b->paid_with ) . '</span>' . ( oys_is_hybrid( $s ) && 'online' === $b->mode ? ' <span class="badge badge--online">' . esc_html__( 'Online', 'olivia-studio' ) . '</span>' : '' ) . '</h4><p>' . esc_html( oys_date( $b->starts_at, 'l, g:i a' ) . ' – ' . oys_time( $b->ends_at ) . ( $b->location ? ' · ' . $b->location : '' ) ) . '</p>'
 					. ( ( $join = OYS_Bookings::join_link( $b, $s ) ) ? '<p><a class="btn btn--orchid btn--sm oys-join" href="' . esc_url( $join ) . '" target="_blank" rel="noopener">' . esc_html__( 'Join live online', 'olivia-studio' ) . '</a></p>' : ( 'online' === $b->mode ? '<p class="oys-small">' . esc_html__( 'Joining online: the link arrives before the class.', 'olivia-studio' ) . '</p>' : '' ) )
 					. $guests
+					. ( ( $due = self::due_for( $b ) ) ? '<p class="oys-due">' . sprintf( esc_html__( 'To pay at the studio: %s', 'olivia-studio' ), '<b>' . esc_html( oys_money( $due ) ) . '</b>' ) . '</p>' : '' )
 					. ( ! $in_time ? '<p class="oys-small">' . esc_html__( 'Inside the cancellation window', 'olivia-studio' ) . '</p>' : '' ) . '</div>'
 					. '<div class="oys-item__actions">' . $add . self::ics_link( $b->id ) . $cancel . '</div></li>';
 			}
@@ -1088,6 +1179,12 @@ class OYS_Frontend {
 		return $out . '<h3>' . esc_html__( 'Request a private session', 'olivia-studio' ) . '</h3>' . self::private_form();
 	}
 
+	/** The studio's note about private sessions (first session takes a little longer). */
+	public static function private_note() {
+		$note = trim( (string) OYS_Settings::get( 'private_note' ) );
+		return $note ? '<p class="oys-notice oys-private-note">' . oys_icon( 'clock' ) . '<span>' . esc_html( $note ) . '</span></p>' : '';
+	}
+
 	private static function private_form() {
 		$types = OYS_Privates::location_types();
 		$opts  = '';
@@ -1101,6 +1198,7 @@ class OYS_Frontend {
 			$dur   .= '<option value="' . $d . '">' . sprintf( esc_html__( '%d minutes', 'olivia-studio' ), $d ) . ( $price ? ' · ' . esc_html( oys_money( $price ) ) : '' ) . ( $oprice && $oprice !== $price ? ' · ' . esc_html( sprintf( __( 'online %s', 'olivia-studio' ), oys_money( $oprice ) ) ) : '' ) . '</option>';
 		}
 		return self::form_open( 'oys_private_request', 'class="oys-form oys-card"' )
+			. self::private_note()
 			. '<div class="form__row"><label class="field"><span>' . esc_html__( 'Length', 'olivia-studio' ) . '</span><select name="duration_min" id="oys-pr-duration">' . $dur . '</select></label>'
 			. '<label class="field"><span>' . esc_html__( 'How many people', 'olivia-studio' ) . '</span><input type="number" name="people" id="oys-pr-people" min="1" max="10" value="1"></label></div>'
 			. '<div class="form__row"><label class="field"><span>' . esc_html__( 'Where', 'olivia-studio' ) . '</span><select name="location_type" id="oys-pr-type">' . $opts . '</select></label>'
@@ -1123,7 +1221,8 @@ class OYS_Frontend {
 			. '<div class="form__row"><label class="field"><span>' . esc_html__( 'Emergency contact', 'olivia-studio' ) . '</span><input type="text" name="oys_emergency_name" id="oys-p-ename" value="' . $m( 'oys_emergency_name' ) . '"></label>'
 			. '<label class="field"><span>' . esc_html__( 'Emergency phone', 'olivia-studio' ) . '</span><input type="tel" name="oys_emergency_phone" id="oys-p-ephone" value="' . $m( 'oys_emergency_phone' ) . '"></label></div>'
 			. '<label class="field"><span>' . esc_html__( 'Injuries, pregnancy or health notes (only Olivia sees this)', 'olivia-studio' ) . '</span><textarea name="oys_health_notes" id="oys-p-health" rows="4">' . esc_textarea( get_user_meta( $user_id, 'oys_health_notes', true ) ) . '</textarea></label>'
-			. '<label class="oys-check"><input type="checkbox" name="oys_marketing" value="1"' . checked( '1', get_user_meta( $user_id, 'oys_marketing', true ), false ) . '> <span>' . esc_html__( 'Email me about new classes and events', 'olivia-studio' ) . '</span></label>'
+			. '<label class="oys-check"><input type="checkbox" name="oys_marketing" value="1"' . checked( '1', get_user_meta( $user_id, 'oys_marketing', true ), false ) . '> <span>' . esc_html__( 'Email me the newsletter: new classes and events', 'olivia-studio' ) . '</span></label>'
+			. oys_fb_group_link( __( 'And join our Facebook group', 'olivia-studio' ) )
 			. '<label class="field"><span>' . esc_html__( 'New password (leave empty to keep the current one)', 'olivia-studio' ) . '</span><input type="password" name="new_password" id="oys-p-pass" minlength="8" autocomplete="new-password"></label>'
 			. '<button class="btn btn--primary" type="submit">' . esc_html__( 'Save', 'olivia-studio' ) . '</button></form>';
 		$at   = get_user_meta( $user_id, 'oys_waiver_at', true );

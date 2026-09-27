@@ -72,6 +72,7 @@ export default function ClassDetail() {
       {mine ? (
         <Booked
           data={data}
+          currency={currency}
           onChanged={(text, tone) => {
             setMessage({ text, tone });
             void reload();
@@ -180,10 +181,16 @@ function BookForm({
   const [showWaiver, setShowWaiver] = useState(false);
   const [busy, setBusy] = useState(false);
   const [paying, setPaying] = useState(false);
+  const donation = data.donation ?? null;
+  const [amount, setAmount] = useState<number>(donation?.suggested_cents ?? 0);
+  const [otherText, setOtherText] = useState('');
 
   const option = data.options.find((o) => o.method === method) ?? null;
   const people = 1 + guests.length;
-  const total = option?.method === 'card' ? data.price_cents * people : 0;
+  // Donation classes: card and "at the studio" follow the amount chosen per person.
+  const each = (o: PayOption) => (donation && (o.method === 'card' || o.method === 'door') ? amount : o.price_cents);
+  const total = option && (option.method === 'card' || option.method === 'door') ? each(option) * people : 0;
+  const belowMin = !!donation && (option?.method === 'card' || option?.method === 'door') && amount < donation.min_cents;
   const creditsShort = option?.method === 'credit' && (option.available ?? 0) < people;
   const guestsIncomplete = guests.some((g) => !g.name.trim() || (data.guest_email_required && !g.email?.trim()));
   const tooMany = people > data.spots_left;
@@ -197,9 +204,16 @@ function BookForm({
         mode: data.mode,
         guests: guests.map((g) => ({ name: g.name.trim(), email: g.email?.trim() })),
         accept_waiver: data.waiver !== null ? waiverOk : undefined,
+        amount_cents: donation ? amount : undefined,
       });
       if (res.status === 'booked') {
-        onBooked(data.mode === 'online' ? 'You’re booked for the live class! Join from this page or My classes.' : 'You’re booked! See you on the mat.');
+        onBooked(
+          data.mode === 'online'
+            ? 'You’re booked for the live class! Join from this page or My classes.'
+            : option.method === 'door'
+              ? `You’re booked! Pay ${money(total, currency)} at the studio.`
+              : 'You’re booked! See you on the mat.',
+        );
       } else {
         setPaying(true);
         await WebBrowser.openBrowserAsync(res.url, { dismissButtonStyle: 'close', presentationStyle: WebBrowser.WebBrowserPresentationStyle.PAGE_SHEET });
@@ -220,6 +234,47 @@ function BookForm({
 
   return (
     <View style={{ gap: Spacing.lg }}>
+      {donation ? (
+        <View style={{ gap: Spacing.sm }}>
+          <T variant="label">Pay what you like</T>
+          <Row style={{ flexWrap: 'wrap' }}>
+            {donation.amounts.map((a) => {
+              const on = a === amount && !otherText;
+              return (
+                <Pressable
+                  key={a}
+                  testID={`amount-${a}`}
+                  accessibilityRole="radio"
+                  accessibilityState={{ checked: on }}
+                  onPress={() => {
+                    setOtherText('');
+                    setAmount(a);
+                  }}
+                  style={[styles.chip, on && styles.chipOn]}>
+                  <T style={[styles.chipText, on && { color: Colors.paper }]}>{money(a, currency)}</T>
+                </Pressable>
+              );
+            })}
+            <TextInput
+              testID="amount-other"
+              style={[styles.input, styles.other]}
+              placeholder="Other"
+              placeholderTextColor="#9AA39C"
+              keyboardType="decimal-pad"
+              value={otherText}
+              onChangeText={(t) => {
+                setOtherText(t);
+                const c = Math.round(parseFloat(t.replace(',', '.') || '0') * 100);
+                setAmount(c > 0 ? c : donation.suggested_cents);
+              }}
+            />
+          </Row>
+          <T variant="small" style={{ color: Colors.muted }}>
+            By donation: give what feels right, from {money(donation.min_cents, currency)} per person.
+          </T>
+        </View>
+      ) : null}
+
       <View style={{ gap: Spacing.sm }}>
         <T variant="label">Pay with</T>
         {data.options.map((o) => {
@@ -239,7 +294,7 @@ function BookForm({
                   {o.detail}
                 </T>
               </View>
-              {o.price_cents ? <T style={styles.price}>{money(o.price_cents, currency)}</T> : null}
+              {o.price_cents ? <T style={styles.price}>{money(each(o), currency)}</T> : null}
             </Pressable>
           );
         })}
@@ -313,16 +368,25 @@ function BookForm({
         </Card>
       ) : null}
 
+      {belowMin && donation ? <Notice tone="error" text={`The minimum is ${money(donation.min_cents, currency)} per person.`} /> : null}
       {creditsShort ? <Notice tone="error" text={`Your pass has ${plural(option?.available ?? 0, 'class', 'classes')} left for ${plural(people, 'person', 'people')}.`} /> : null}
       {tooMany ? <Notice tone="error" text={`Only ${plural(data.spots_left, 'spot is', 'spots are')} left.`} /> : null}
       {paying ? <Notice text="Finish the payment in the browser. Your spot is held for a few minutes." /> : null}
 
       <Button
         testID="book-submit"
-        title={option?.method === 'card' ? `Pay ${money(total, currency)} and book` : guests.length ? `Book for ${plural(people, 'person', 'people')}` : 'Book my spot'}
+        title={
+          option?.method === 'card'
+            ? `Pay ${money(total, currency)} and book`
+            : option?.method === 'door'
+              ? `Book · pay ${money(total, currency)} there`
+              : guests.length
+                ? `Book for ${plural(people, 'person', 'people')}`
+                : 'Book my spot'
+        }
         onPress={book}
         loading={busy}
-        disabled={!option || creditsShort || guestsIncomplete || tooMany || (data.waiver !== null && !waiverOk)}
+        disabled={!option || creditsShort || belowMin || guestsIncomplete || tooMany || (data.waiver !== null && !waiverOk)}
       />
     </View>
   );
@@ -330,7 +394,15 @@ function BookForm({
 
 /* ---------- Already booked ---------- */
 
-function Booked({ data, onChanged }: { data: SessionDetail; onChanged: (text: string, tone: 'success' | 'error' | 'info') => void }) {
+function Booked({
+  data,
+  currency,
+  onChanged,
+}: {
+  data: SessionDetail;
+  currency: string;
+  onChanged: (text: string, tone: 'success' | 'error' | 'info') => void;
+}) {
   const { api } = useAuth();
   const b = data.session.my_booking!;
   const [confirming, setConfirming] = useState(false);
@@ -358,6 +430,14 @@ function Booked({ data, onChanged }: { data: SessionDetail; onChanged: (text: st
         {b.mode === 'online' ? 'Joining live online' : 'In the studio'} · {b.paid_with}
         {b.guests.length ? ` · with ${b.guests.join(', ')}` : ''}
       </T>
+
+      {b.due_cents ? (
+        <View style={styles.due} testID="due">
+          <T variant="strong" style={{ color: Colors.moss }}>
+            To pay at the studio: {money(b.due_cents, currency)}
+          </T>
+        </View>
+      ) : null}
 
       {b.mode === 'online' ? <JoinButton url={b.join_url} /> : null}
 
@@ -455,4 +535,9 @@ const styles = StyleSheet.create({
   boxOn: { backgroundColor: Colors.forest },
   tick: { color: Colors.paper, fontFamily: Fonts.bold, fontSize: 14, lineHeight: 16 },
   confirm: { backgroundColor: Colors.paper, borderRadius: Radius.md, padding: Spacing.lg, gap: Spacing.sm },
+  due: { backgroundColor: Colors.mist, borderRadius: Radius.md, padding: Spacing.md },
+  chip: { minHeight: 44, paddingHorizontal: Spacing.lg, borderRadius: Radius.pill, borderWidth: 1.5, borderColor: Colors.forest, backgroundColor: Colors.card, alignItems: 'center', justifyContent: 'center' },
+  chipOn: { backgroundColor: Colors.forest },
+  chipText: { fontFamily: Fonts.semibold, fontSize: 16, color: Colors.forest },
+  other: { width: 96, minHeight: 44, borderRadius: Radius.pill, textAlign: 'center' },
 });

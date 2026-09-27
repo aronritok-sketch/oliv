@@ -21,7 +21,7 @@ $gift = function_exists( 'oys_page_url' ) ? oys_page_url( 'gifts' ) : oy_contact
 				<li><a href="<?php echo esc_url( oy_account_url() ); ?>"><?php esc_html_e( 'My account', 'olivia-yoga' ); ?></a></li>
 			</ul></nav>
 			<div><h2><?php esc_html_e( 'Say hello', 'olivia-yoga' ); ?></h2>
-				<ul class="footer__contact"><li><?php echo oy_icon( 'mail' ); // phpcs:ignore ?><a href="mailto:<?php echo esc_attr( OY_EMAIL ); ?>"><?php echo esc_html( OY_EMAIL ); ?></a></li><li><?php echo oy_icon( 'pin' ); // phpcs:ignore ?><span>Fort Myers, FL</span></li></ul>
+				<ul class="footer__contact"><li><?php echo oy_icon( 'mail' ); // phpcs:ignore ?><a href="mailto:<?php echo esc_attr( OY_EMAIL ); ?>"><?php echo esc_html( OY_EMAIL ); ?></a></li><li><?php echo oy_icon( 'pin' ); // phpcs:ignore ?><span>Fort Myers, FL</span></li><?php if ( function_exists( 'oys_fb_group_url' ) && oys_fb_group_url() ) : ?><li><?php echo oy_icon( 'facebook' ); // phpcs:ignore ?><a href="<?php echo esc_url( oys_fb_group_url() ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Join our Facebook group', 'olivia-yoga' ); ?></a></li><?php endif; ?></ul>
 				<p class="social"><a href="<?php echo esc_url( OY_INSTAGRAM ); ?>" rel="noopener" target="_blank"><?php echo oy_icon( 'instagram' ); // phpcs:ignore ?><span class="sr-only">Instagram</span></a><a href="<?php echo esc_url( OY_FACEBOOK ); ?>" rel="noopener" target="_blank"><?php echo oy_icon( 'facebook' ); // phpcs:ignore ?><span class="sr-only">Facebook</span></a></p>
 			</div>
 		</div>

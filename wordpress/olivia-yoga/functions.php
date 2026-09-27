@@ -120,7 +120,9 @@ function oy_page_aside( $slug ) {
 		case 'contact':
 			return '<div class="aside-card aside-card--forest"><div class="frame">' . oy_photo( 'olivia-leading-garden-class', '340px' ) . '</div><h2>' . esc_html__( 'Say hello', 'olivia-yoga' ) . '</h2><ul class="aside-list">'
 				. '<li>' . oy_icon( 'mail' ) . '<a href="mailto:' . esc_attr( OY_EMAIL ) . '">' . esc_html( OY_EMAIL ) . '</a></li><li>' . oy_icon( 'instagram' ) . '<a href="' . esc_url( OY_INSTAGRAM ) . '" target="_blank" rel="noopener">@oliivia_yoga</a></li>'
-				. '<li>' . oy_icon( 'facebook' ) . '<a href="' . esc_url( OY_FACEBOOK ) . '" target="_blank" rel="noopener">Facebook</a></li><li>' . oy_icon( 'pin' ) . '<span>Fort Myers, FL</span></li></ul>'
+				. '<li>' . oy_icon( 'facebook' ) . '<a href="' . esc_url( OY_FACEBOOK ) . '" target="_blank" rel="noopener">Facebook</a></li>'
+				. ( function_exists( 'oys_fb_group_url' ) && oys_fb_group_url() ? '<li>' . oy_icon( 'users' ) . '<a href="' . esc_url( oys_fb_group_url() ) . '" target="_blank" rel="noopener">' . esc_html__( 'Our Facebook group', 'olivia-yoga' ) . '</a></li>' : '' )
+				. '<li>' . oy_icon( 'pin' ) . '<span>Fort Myers, FL</span></li></ul>'
 				. '<p>' . esc_html__( 'Ready to book? Group classes and passes can be booked and paid online.', 'olivia-yoga' ) . '</p>' . oy_btn( oy_book_url(), __( 'Book a class', 'olivia-yoga' ), 'orchid' ) . '</div>';
 	}
 	return '';

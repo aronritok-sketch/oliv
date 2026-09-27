@@ -64,6 +64,14 @@
 - Tesztek: 227 integrációs + 150 böngészős + 17 app unit + 36 app végpont-ellenőrzés (iPhone-méretű ablakban).
 - Következő ötletek: push értesítések (emlékeztető, várólistás hely), natív bérletvásárlás, Zoom az appon belül.
 
+## 7. kör: Olivia kérései, 1. rész (2026-09-27)
+- **Fizetés a helyszínen:** mindenki foglalhat most, és fizethet a helyszínen (cash / Venmo / Zelle); 2 kihagyott, ki nem fizetett óra után csak előre. A névsorban „Paid: cash / other”.
+- **Adomány-alapú óra:** óránként bekapcsolható, min. $5, javasolt összegek; kártyával vagy a helyszínen.
+- **Üzenet a bejelentkezetteknek** egy gombbal (névsor, naptár), napló a névsorban.
+- **Magánóra:** jól látható szöveg, hogy az első alkalom tovább tart; ajánlatnál +15 perc blokkolva (nem számlázva).
+- **Facebook-csoport** link: hírlevél-pipa, foglalás után, fiók, levelek alja, lábléc, app. Hírlevél-kapcsoló az appban.
+- Hátra: 2. kör (helyszínek, minimum létszám, automatikus lemondás), 3. kör (kupon, szülinap, hűség-sorsolás, hírlevél AI-jal), 4. kör (oktatók, bevétel-megosztás).
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb.
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

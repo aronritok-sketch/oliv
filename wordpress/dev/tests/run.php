@@ -164,6 +164,9 @@ function make_session( $args = array() ) {
 		'online_url'         => $args['online_url'] ?? '',
 		'price_cents'     => $args['price'] ?? 2500,
 		'credits_allowed' => $args['credits_allowed'] ?? 1,
+		'pricing'         => $args['pricing'] ?? 'fixed',
+		'pay_later'       => $args['pay_later'] ?? 1,
+		'location'        => $args['location'] ?? '',
 		'status'          => 'scheduled',
 	) ) );
 }
@@ -727,11 +730,13 @@ test( 'reminders: two class reminders, online join link, pass about to expire', 
 	$s = make_session( array( 'in_hours' => 20 ) );
 	$id = OYS_Bookings::book_manual( $u, $s, 'comp', false );
 	$wpdb->update( $b, array( 'created_at' => oys_utc_plus( -3 * DAY_IN_SECONDS ) ), array( 'id' => $id ) );
-	$log = sent_mails( fn() => OYS_Cron::send_reminders() );
-	eq( 1, count( array_filter( $log, fn( $m ) => str_starts_with( $m['subject'], 'Reminder: Hatha Flow' ) ) ), 'first reminder sent' );
-	eq( 0, count( sent_mails( fn() => OYS_Cron::send_reminders() ) ), 'not sent twice' );
+	// Only count Rita's emails: the dev database may hold other classes with reminders due.
+	$rita = fn( $log ) => array_filter( $log, fn( $m ) => get_userdata( $u )->user_email === $m['to'] );
+	$log  = sent_mails( fn() => OYS_Cron::send_reminders() );
+	eq( 1, count( array_filter( $rita( $log ), fn( $m ) => str_starts_with( $m['subject'], 'Reminder: Hatha Flow' ) ) ), 'first reminder sent' );
+	eq( 0, count( $rita( sent_mails( fn() => OYS_Cron::send_reminders() ) ) ), 'not sent twice' );
 	$wpdb->update( OYS_Install::table( 'sessions' ), array( 'starts_at' => oys_utc_plus( HOUR_IN_SECONDS ), 'ends_at' => oys_utc_plus( 2 * HOUR_IN_SECONDS ) ), array( 'id' => $s->id ) );
-	eq( 1, count( sent_mails( fn() => OYS_Cron::send_reminders() ) ), 'second reminder on the day' );
+	eq( 1, count( $rita( sent_mails( fn() => OYS_Cron::send_reminders() ) ) ), 'second reminder on the day' );
 	// Online: join link shortly before, to the customer and a guest with an email.
 	OYS_Settings::update( array( 'zoom_auto' => 0 ) );
 	OYS_Settings::update( array( 'join_reminder_minutes' => 180 ) );
@@ -803,7 +808,7 @@ test( 'app api: schedule, book with a pass, card checkout, cancel, waiver', func
 	[ , $sched ] = api( 'GET', '/app/schedule?days=5', null, $tok );
 	ok( in_array( (int) $s->id, array_column( $sched['sessions'], 'id' ), true ), 'class in the schedule' );
 	[ , $detail ] = api( 'GET', '/app/sessions/' . $s->id, null, $tok );
-	eq( array( 'credit', 'card' ), array_column( $detail['options'], 'method' ), 'pass and card offered' );
+	eq( array( 'credit', 'card', 'door' ), array_column( $detail['options'], 'method' ), 'pass, card and pay at the studio offered' );
 	[ $code, $res ] = api( 'POST', '/app/sessions/' . $s->id . '/book', array( 'method' => 'credit', 'guests' => array( array( 'name' => 'Kim', 'email' => '' ) ) ), $tok );
 	eq( 200, $code, 'booked' );
 	eq( 'booked', $res['status'], 'status booked' );
@@ -869,6 +874,148 @@ test( 'app api: login lock applies to the app too', function () {
 	[ $code, $d ] = api( 'POST', '/app/login', array( 'email' => $u->user_email, 'password' => 'x-12345678' ) );
 	eq( 429, $code, 'locked after repeated failures' );
 	eq( 'oys_locked', $d['code'], 'locked code' );
+} );
+
+/* ---------- Round 1: pay at the studio, donations, messages, private first session ---------- */
+
+test( 'pay at the studio: book, guests, due amount, marked paid', function () {
+	OYS_Settings::update( array( 'pay_later' => 'all', 'pay_later_max_no_shows' => 2 ) );
+	$u  = make_user( 'Dora' );
+	$s  = make_session( array( 'price' => 2500 ) );
+	$id = OYS_Bookings::book_party( $u, $s, array( 'method' => 'door', 'guests' => guests( 'Gus' ), 'notify' => false ) );
+	ok( is_int( $id ), 'booked to pay at the studio' );
+	$b = OYS_Bookings::get( $id );
+	eq( 'door', $b->paid_with, 'paid with: at the studio' );
+	eq( 2500, (int) $b->due_cents, 'owes the drop-in price' );
+	eq( 2, seats( $s ), 'two seats taken (with the guest)' );
+	eq( 5000, OYS_Bookings::due_at_studio( $s->id ), 'to collect: two people' );
+	ok( OYS_Bookings::collect( $id, 'cash' ), 'marked paid' );
+	$b = OYS_Bookings::get( $id );
+	eq( 'cash', $b->collected_with, 'collected in cash' );
+	eq( 'attended', $b->status, 'paying at the studio means they came' );
+	eq( 2500, OYS_Bookings::due_at_studio( $s->id ), 'the guest still to pay' );
+	// Cancelling on time gives nothing back: nothing was paid.
+	$s2  = make_session( array( 'price' => 2500 ) );
+	$id2 = OYS_Bookings::book_party( $u, $s2, array( 'method' => 'door', 'notify' => false ) );
+	eq( 'none', OYS_Bookings::cancel( $id2, array( 'notify' => false ) ), 'cancel: nothing to return' );
+	eq( 0, OYS_Passes::balance( $u, 'class' ), 'no credit created' );
+	eq( 0, seats( $s2 ), 'seat released' );
+} );
+
+test( 'pay at the studio: rules (off, online, private, first class, missed classes)', function () {
+	$u  = make_user( 'Mia' );
+	$s  = make_session( array( 'price' => 2500 ) );
+	OYS_Settings::update( array( 'pay_later' => 'off' ) );
+	ok( is_wp_error( OYS_Bookings::pay_later_allowed( $u, $s ) ), 'off in settings' );
+	OYS_Settings::update( array( 'pay_later' => 'all', 'pay_later_max_no_shows' => 2 ) );
+	ok( true === OYS_Bookings::pay_later_allowed( $u, $s ), 'on for everyone' );
+	ok( is_wp_error( OYS_Bookings::pay_later_allowed( $u, make_session( array( 'pay_later' => 0 ) ) ) ), 'off for this class' );
+	ok( is_wp_error( OYS_Bookings::pay_later_allowed( $u, make_session( array( 'format' => 'online', 'price' => 600 ) ) ) ), 'not for online classes' );
+	$hy = make_session( array( 'format' => 'hybrid', 'online_price' => 600 ) );
+	ok( true === OYS_Bookings::pay_later_allowed( $u, $hy, 'studio' ) && is_wp_error( OYS_Bookings::pay_later_allowed( $u, $hy, 'online' ) ), 'hybrid: in the studio only' );
+	ok( is_wp_error( OYS_Bookings::pay_later_allowed( $u, make_session( array( 'kind' => 'private', 'capacity' => 1 ) ) ) ), 'not for private sessions' );
+	ok( is_wp_error( OYS_Bookings::pay_later_allowed( $u, make_session( array( 'price' => 0 ) ) ) ), 'free class: nothing to pay' );
+	ok( is_wp_error( OYS_Bookings::book_party( $u, make_session( array( 'pay_later' => 0 ) ), array( 'method' => 'door', 'notify' => false ) ) ), 'booking refused when not allowed' );
+	// Two missed unpaid classes: pay in advance from then on.
+	foreach ( array( 1, 2 ) as $i ) {
+		$id = OYS_Bookings::book_party( $u, make_session( array( 'price' => 2500 ) ), array( 'method' => 'door', 'notify' => false ) );
+		OYS_Bookings::set_attendance( $id, 'no_show' );
+	}
+	eq( 2, OYS_Bookings::pay_later_no_shows( $u ), 'two missed' );
+	$e = OYS_Bookings::pay_later_allowed( $u, $s );
+	ok( is_wp_error( $e ) && 'oys_pay_later_blocked' === $e->get_error_code(), 'blocked after two missed classes' );
+	update_user_meta( $u, 'oys_pay_later_reset', gmdate( 'Y-m-d H:i:s', time() + 1 ) );
+	ok( true === OYS_Bookings::pay_later_allowed( $u, $s ), 'allowed again after the studio resets it' );
+	// First class only.
+	OYS_Settings::update( array( 'pay_later' => 'first' ) );
+	$new = make_user( 'Nora' );
+	ok( true === OYS_Bookings::pay_later_allowed( $new, $s ), 'first class: allowed' );
+	OYS_Bookings::book_manual( $new, make_session(), 'comp', false );
+	ok( is_wp_error( OYS_Bookings::pay_later_allowed( $new, $s ) ), 'after the first class: pay in advance' );
+	OYS_Settings::update( array( 'pay_later' => 'all' ) );
+} );
+
+test( 'donations: amount per person, minimum, pay at the studio, app booking', function () {
+	OYS_Settings::update( array( 'pay_later' => 'all', 'donation_min_cents' => 500, 'donation_suggestions' => '5,10,15,20' ) );
+	$u   = make_user( 'Dana' );
+	$tok = OYS_App_API::issue_token( $u );
+	$s   = make_session( array( 'pricing' => 'donation', 'price' => 1000, 'credits_allowed' => 0 ) );
+	eq( 'By donation', oys_price_label( $s ), 'timetable label' );
+	eq( array( 500, 1000, 1500, 2000 ), oys_donation_amounts(), 'suggested amounts' );
+	[ , $d ] = api( 'GET', '/app/sessions/' . $s->id, null, $tok );
+	eq( 500, $d['donation']['min_cents'], 'app: minimum' );
+	eq( 1000, $d['donation']['suggested_cents'], 'app: suggestion' );
+	eq( array( 'card', 'door' ), array_column( $d['options'], 'method' ), 'app: give by card or at the studio' );
+	[ $code, $e ] = api( 'POST', '/app/sessions/' . $s->id . '/book', array( 'method' => 'card', 'mode' => 'studio', 'amount_cents' => 300, 'accept_waiver' => true ), $tok );
+	eq( 400, $code, 'below the minimum refused' );
+	[ $code, $r ] = api( 'POST', '/app/sessions/' . $s->id . '/book', array( 'method' => 'card', 'mode' => 'studio', 'amount_cents' => 1500, 'guests' => array( array( 'name' => 'Pal' ) ), 'accept_waiver' => true ), $tok );
+	eq( 'checkout', $r['status'], 'card: goes to Stripe' );
+	eq( 3000, (int) OYS_Orders::get( $r['order_id'] )->amount_cents, 'order: chosen amount × 2 people' );
+	OYS_Orders::mark_unpaid( $r['order_id'], 'expired' );
+	[ , $r ] = api( 'POST', '/app/sessions/' . $s->id . '/book', array( 'method' => 'door', 'mode' => 'studio', 'amount_cents' => 1200 ), $tok );
+	eq( 'booked', $r['status'], 'give at the studio: booked' );
+	eq( 1200, $r['session']['my_booking']['due_cents'], 'app shows what to give at the studio' );
+	eq( 1200, OYS_Bookings::due_at_studio( $s->id ), 'roster: to collect' );
+} );
+
+test( 'messages: everyone booked, guests with an email, waitlist, log', function () {
+	$s = make_session( array( 'capacity' => 2 ) );
+	$a = make_user( 'Ann' );
+	OYS_Bookings::book_party( $a, $s, array( 'method' => 'comp', 'guests' => array( array( 'name' => 'Gia', 'email' => 'gia@example.test' ) ), 'notify' => false ) );
+	$w = make_user( 'Wes' );
+	OYS_Bookings::join_waitlist( $w, $s->id );
+	ok( is_wp_error( OYS_Messages::send_to_session( $s->id, 'Hi', '' ) ), 'empty message refused' );
+	$log = sent_mails( function () use ( $s, &$n ) { $n = OYS_Messages::send_to_session( $s->id, 'About {class}', "Hi {first_name},\n\nbring a blanket." ); } );
+	eq( 2, $n, 'the customer and the guest with an email' );
+	eq( 'About Hatha Flow', $log[0]['subject'], 'placeholders in the subject' );
+	ok( str_contains( $log[0]['html'], 'Hi Ann' ) && str_contains( $log[1]['html'], 'Hi Gia' ), 'each person by name' );
+	eq( 3, OYS_Messages::send_to_session( $s->id, 'Change', 'Room 2 today.', array( 'waitlist' => true ) ), 'with the waitlist' );
+	eq( 2, OYS_Messages::send_to_session( $s->id, 'Just bookers', 'x', array( 'guests' => false, 'waitlist' => true ) ) - 0, 'without guests' );
+	eq( 3, count( OYS_Messages::for_session( $s->id ) ), 'messages are kept for the roster' );
+	eq( 0, count( OYS_Messages::recipients( make_session()->id ) ), 'nobody booked, nobody to write to' );
+} );
+
+test( 'private: first session gets extra time, note in the offer', function () {
+	global $wpdb;
+	$u = make_user( 'Pia' );
+	$wpdb->insert( OYS_Install::table( 'private_requests' ), array( 'user_id' => $u, 'duration_min' => 60, 'location_type' => 'home', 'preferred' => 'mornings', 'status' => 'new', 'created_at' => oys_now() ) );
+	$r = (int) $wpdb->insert_id;
+	ok( OYS_Privates::is_first( $u, $r ), 'first private session' );
+	$log = sent_mails( function () use ( $r, &$sid ) { $sid = OYS_Privates::offer( $r, wp_date( 'Y-m-d', time() + 3 * DAY_IN_SECONDS ) . 'T10:00', 60, 9500, 'Home', '', '', 15 ); } );
+	$s = OYS_Schedule::get( $sid );
+	eq( 75, ( oys_ts( $s->ends_at ) - oys_ts( $s->starts_at ) ) / 60, '60 minutes + 15 blocked' );
+	eq( 9500, (int) $s->price_cents, 'price unchanged' );
+	ok( str_contains( $s->note, '15 extra minutes' ), 'note on the session' );
+	ok( str_contains( $log[0]['html'], 'extra minutes to talk through your goals' ), 'the offer email explains it' );
+	OYS_Privates::mark_paid( $r, 0 );
+	ok( ! OYS_Privates::is_first( $u ), 'not first any more' );
+} );
+
+test( 'calendar and weekly classes keep donation and pay-at-the-studio settings', function () {
+	wp_set_current_user( 1 );
+	$date = wp_date( 'Y-m-d', time() + 2 * DAY_IN_SECONDS );
+	$req  = new WP_REST_Request( 'POST', '/oys/v1/admin/sessions' );
+	$req->set_body_params( array( 'kind' => 'group', 'class_slug' => 'hatha-flow', 'date' => $date, 'start' => '07:15', 'duration' => 60, 'capacity' => 10, 'price' => 1000, 'pricing' => 'donation', 'pay_later' => 0, 'repeat' => 'weekly' ) );
+	$res  = rest_do_request( $req )->get_data();
+	eq( 'donation', $res['session']['pricing'], 'donation saved' );
+	eq( false, $res['session']['pay_later'], 'pay at the studio off' );
+	$tpl = OYS_Schedule::template( OYS_Schedule::get( $res['session']['id'] )->template_id );
+	eq( 'donation', $tpl->pricing, 'weekly class is by donation' );
+	global $wpdb;
+	eq( 0, (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . OYS_Install::table( 'sessions' ) . " WHERE template_id = %d AND ( pricing <> 'donation' OR pay_later <> 0 )", $tpl->id ) ), 'every generated date too' );
+	wp_set_current_user( 0 );
+} );
+
+test( 'app api: newsletter and the Facebook group link', function () {
+	OYS_Settings::update( array( 'fb_group_url' => 'https://www.facebook.com/groups/485915674202871' ) );
+	$u   = make_user( 'Nel' );
+	$tok = OYS_App_API::issue_token( $u );
+	[ , $me ] = api( 'POST', '/app/newsletter', array( 'subscribe' => true ), $tok );
+	ok( $me['user']['newsletter'], 'subscribed' );
+	eq( 'https://www.facebook.com/groups/485915674202871', $me['links']['community'], 'group link for the app' );
+	[ , $me ] = api( 'POST', '/app/newsletter', array( 'subscribe' => false ), $tok );
+	ok( ! $me['user']['newsletter'], 'unsubscribed' );
+	ok( str_contains( OYS_Emails::preview( 'welcome' )[1], 'Facebook group' ), 'emails link the group' );
 } );
 
 test( 'helpers: money and periods', function () {

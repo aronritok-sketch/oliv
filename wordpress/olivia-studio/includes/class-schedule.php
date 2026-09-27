@@ -26,6 +26,7 @@ class OYS_Schedule {
 	public static function save_template( array $data, $id = 0 ) {
 		global $wpdb;
 		$t    = OYS_Install::table( 'templates' );
+		$old  = $id ? self::template( $id ) : null;
 		$data = array(
 			'class_slug'   => sanitize_title( $data['class_slug'] ?? '' ),
 			'weekday'      => min( 7, max( 1, (int) ( $data['weekday'] ?? 1 ) ) ),
@@ -38,6 +39,9 @@ class OYS_Schedule {
 			'online_price_cents' => max( 0, (int) ( $data['online_price_cents'] ?? 0 ) ),
 			'online_url'   => esc_url_raw( $data['online_url'] ?? '' ),
 			'price_cents'  => (int) ( $data['price_cents'] ?? 0 ),
+			// Forms that don't show these fields keep what the weekly class had.
+			'pricing'      => 'donation' === ( $data['pricing'] ?? ( $old->pricing ?? '' ) ) ? 'donation' : 'fixed',
+			'pay_later'    => array_key_exists( 'pay_later', $data ) ? ( empty( $data['pay_later'] ) ? 0 : 1 ) : (int) ( $old->pay_later ?? 1 ),
 			'note'         => sanitize_text_field( $data['note'] ?? '' ),
 			'active'       => empty( $data['active'] ) ? 0 : 1,
 			'valid_from'   => ! empty( $data['valid_from'] ) && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $data['valid_from'] ) ? $data['valid_from'] : null,
@@ -96,6 +100,8 @@ class OYS_Schedule {
 					'online_price_cents' => $tpl->online_price_cents,
 					'online_url'  => $tpl->online_url,
 					'price_cents' => $tpl->price_cents,
+					'pricing'     => $tpl->pricing ?: 'fixed',
+					'pay_later'   => (int) $tpl->pay_later,
 					'note'        => $tpl->note,
 					'template_id' => $tpl->id,
 					'tpl_slot'    => $slot,
@@ -164,7 +170,7 @@ class OYS_Schedule {
 		global $wpdb;
 		$t   = OYS_Install::table( 'sessions' );
 		$row = array();
-		foreach ( array( 'kind', 'class_slug', 'title', 'description', 'starts_at', 'ends_at', 'capacity', 'location', 'format', 'online_url', 'price_cents', 'online_capacity', 'online_price_cents', 'zoom_meeting_id', 'zoom_join_url', 'zoom_password', 'credits_allowed', 'note', 'status', 'template_id', 'tpl_slot' ) as $k ) {
+		foreach ( array( 'kind', 'class_slug', 'title', 'description', 'starts_at', 'ends_at', 'capacity', 'location', 'format', 'online_url', 'price_cents', 'online_capacity', 'online_price_cents', 'zoom_meeting_id', 'zoom_join_url', 'zoom_password', 'credits_allowed', 'pricing', 'pay_later', 'note', 'status', 'template_id', 'tpl_slot' ) as $k ) {
 			if ( array_key_exists( $k, $data ) ) {
 				$row[ $k ] = $data[ $k ];
 			}

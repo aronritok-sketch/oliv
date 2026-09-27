@@ -54,6 +54,8 @@ class OYS_Install {
 			price_cents int(10) unsigned NOT NULL DEFAULT 0,
 			online_capacity smallint(5) unsigned NOT NULL DEFAULT 0,
 			online_price_cents int(10) unsigned NOT NULL DEFAULT 0,
+			pricing varchar(10) NOT NULL DEFAULT 'fixed',
+			pay_later tinyint(1) unsigned NOT NULL DEFAULT 1,
 			note varchar(255) NOT NULL DEFAULT '',
 			active tinyint(1) unsigned NOT NULL DEFAULT 1,
 			valid_from date NULL,
@@ -82,6 +84,8 @@ class OYS_Install {
 			zoom_join_url varchar(500) NOT NULL DEFAULT '',
 			zoom_password varchar(64) NOT NULL DEFAULT '',
 			credits_allowed tinyint(1) unsigned NOT NULL DEFAULT 1,
+			pricing varchar(10) NOT NULL DEFAULT 'fixed',
+			pay_later tinyint(1) unsigned NOT NULL DEFAULT 1,
 			note varchar(255) NOT NULL DEFAULT '',
 			status varchar(20) NOT NULL DEFAULT 'scheduled',
 			template_id bigint(20) unsigned NOT NULL DEFAULT 0,
@@ -107,6 +111,8 @@ class OYS_Install {
 			mode varchar(10) NOT NULL DEFAULT 'studio',
 			join_url varchar(500) NOT NULL DEFAULT '',
 			zoom_registrant_id varchar(64) NOT NULL DEFAULT '',
+			due_cents int(10) unsigned NOT NULL DEFAULT 0,
+			collected_with varchar(20) NOT NULL DEFAULT '',
 			hold_expires datetime NULL,
 			reminder_sent tinyint(1) unsigned NOT NULL DEFAULT 0,
 			reminder2_sent tinyint(1) unsigned NOT NULL DEFAULT 0,
@@ -241,6 +247,19 @@ class OYS_Install {
 			type varchar(100) NOT NULL DEFAULT '',
 			received_at datetime NOT NULL,
 			PRIMARY KEY  (event_id)
+		) $c;" );
+
+		// Messages the studio sent to the people booked into a class (Studio → roster).
+		dbDelta( 'CREATE TABLE ' . self::table( 'messages' ) . " (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			session_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			sender_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			subject varchar(255) NOT NULL DEFAULT '',
+			body text NULL,
+			recipients int(10) unsigned NOT NULL DEFAULT 0,
+			created_at datetime NOT NULL,
+			PRIMARY KEY  (id),
+			KEY session_id (session_id)
 		) $c;" );
 	}
 

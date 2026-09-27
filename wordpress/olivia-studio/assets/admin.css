@@ -47,3 +47,6 @@
 .oys-email-preview iframe { width: 100%; height: 720px; border: 1px solid #c3c4c7; background: #F3F2EC; }
 .oys-vars code { display: inline-block; margin: 0 4px 4px 0; }
 .oys-email-actions { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-top: 12px; }
+.oys-due-tag { color: #9A4A10; }
+.oys-sent li { padding: 8px 0; border-bottom: 1px solid #dcdcde; }
+.oys-message { max-width: 760px; }

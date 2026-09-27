@@ -171,3 +171,24 @@
 .badge--online { background: var(--oys-lilac); color: var(--oys-ink); }
 .oys-join { margin-top: .35rem; }
 @media (max-width: 480px) { .oys-modes { grid-template-columns: 1fr; } }
+
+/* Donations, paying at the studio, community */
+.oys-amounts { border: 0; padding: 0; margin: 0 0 1.25rem; }
+.oys-amounts legend { font-weight: 700; margin-bottom: .5rem; }
+.oys-amounts__row { display: flex; flex-wrap: wrap; gap: .5rem; align-items: center; }
+.oys-amount { position: relative; }
+.oys-amount input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.oys-amount span { display: inline-flex; align-items: center; min-height: 44px; padding: .4rem 1rem; border: 2px solid var(--oys-ink); border-radius: 999px; background: var(--oys-paper); font-weight: 700; cursor: pointer; }
+.oys-amount input:checked + span { background: var(--oys-lilac); box-shadow: 3px 3px 0 var(--oys-ink); }
+.oys-amount input:focus-visible + span { outline: 3px solid var(--oys-orchid); outline-offset: 2px; }
+.oys-amount__custom { display: inline-flex; align-items: center; gap: .25rem; font-weight: 700; }
+.oys-amount__custom input { width: 5.5rem; min-height: 44px; padding: .35rem .6rem; border: 2px solid var(--oys-ink); border-radius: 6px; font: inherit; }
+.oys-amounts .oys-small { margin: .6rem 0 0; }
+.oys-due { padding: .7rem .9rem; border-left: 4px solid var(--oys-forest); background: var(--pale, #DEE7D6); }
+.session__donation { display: inline-block; margin-left: .35rem; padding: 0 .45rem; border: 1.5px solid currentColor; border-radius: 999px; font-size: .78em; font-weight: 700; }
+.oys-fb { margin: 1rem 0 0; }
+.oys-fb a { display: inline-flex; align-items: center; gap: .5rem; font-weight: 700; color: var(--oys-forest); text-decoration: underline; text-underline-offset: 3px; }
+.oys-fb .oys-icon { width: 22px; height: 22px; flex: none; padding: 3px; border-radius: 50%; background: #1877F2; color: #fff; stroke: #fff; }
+.oys-account > .oys-fb { margin-top: 1.5rem; }
+.oys-private-note { display: flex; gap: .6rem; align-items: flex-start; font-weight: 500; }
+.oys-private-note .oys-icon { width: 22px; height: 22px; flex: none; margin-top: 2px; }

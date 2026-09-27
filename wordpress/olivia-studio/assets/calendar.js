@@ -165,7 +165,8 @@
       + (s.format === 'online' ? '<i class="oys-ev__tag">Online</i>' : '')
       + (s.format === 'hybrid' ? '<i class="oys-ev__tag">+ Live ' + s.online_booked + '</i>' : '')
       + (s.kind === 'event' ? '<i class="oys-ev__tag">Event</i>' : '')
-      + (s.kind === 'private' ? '<i class="oys-ev__tag">Private</i>' : '');
+      + (s.kind === 'private' ? '<i class="oys-ev__tag">Private</i>' : '')
+      + (s.pricing === 'donation' ? '<i class="oys-ev__tag" title="By donation">♡</i>' : '');
     return '<div class="' + cls.join(' ') + '" data-id="' + s.id + '" tabindex="0" role="button" aria-label="' + esc(s.label + ', ' + longDate(s.date) + ' ' + clock(s.start)) + '"'
       + ' style="top:' + top + 'px;height:' + height + 'px;left:calc(' + (s._col || 0) * w + '% + 2px);width:calc(' + w + '% - 4px)">'
       + '<span class="oys-ev__time">' + clock(s.start) + ' – ' + clock(end) + '</span>'
@@ -230,7 +231,7 @@
   function openDrawer(s, preset) {
     closeDrawer();
     const isNew = !s;
-    const v = s || Object.assign({ kind: 'group', class_slug: classKeys[0] || '', title: '', description: '', date: C.today, start: '18:00', duration: 60, capacity: 12, location: '', format: 'studio', online_url: '', price: C.prices.group, credits_allowed: true, note: '', status: 'scheduled', booked: 0, people: [] }, preset || {});
+    const v = s || Object.assign({ kind: 'group', class_slug: classKeys[0] || '', title: '', description: '', date: C.today, start: '18:00', duration: 60, capacity: 12, location: '', format: 'studio', online_url: '', price: C.prices.group, credits_allowed: true, pricing: 'fixed', pay_later: true, note: '', status: 'scheduled', booked: 0, people: [] }, preset || {});
     const locked = !isNew && (v.status !== 'scheduled' || v.past);
     const d = document.createElement('aside');
     d.className = 'oys-drawer';
@@ -243,7 +244,8 @@
       if (v.series) html += '<p class="oys-drawer__series">↻ ' + esc(v.series.label) + (v.series.active ? '' : ' (stopped)') + '</p>';
       html += '<div class="oys-drawer__people"><div class="oys-meter"><span style="width:' + Math.min(100, v.booked / v.capacity * 100) + '%"></span></div><p><b>' + v.booked + ' / ' + v.capacity + '</b> ' + (v.format === 'hybrid' ? 'in the studio · <b>' + v.online_booked + (v.online_capacity ? ' / ' + v.online_capacity : '') + '</b> online' : 'booked') + (v.held ? ' · ' + v.held + ' paying now' : '') + (v.waitlist ? ' · ' + v.waitlist + ' on the waitlist' : '') + '</p>'
         + (v.people.length ? '<ul>' + v.people.map(p => '<li>' + esc(p) + '</li>').join('') + '</ul>' : '')
-        + '<p class="oys-drawer__links"><a class="button" href="' + esc(C.rosterUrl + v.id) + '">Roster &amp; attendance</a> <a class="button-link" href="' + esc(C.bookUrl + v.id) + '" target="_blank" rel="noopener">Booking page ↗</a></p>'
+        + (v.due ? '<p class="oys-drawer__due">To collect at the studio: <b>' + money(v.due) + '</b></p>' : '')
+        + '<p class="oys-drawer__links"><a class="button" href="' + esc(C.rosterUrl + v.id) + '">Roster &amp; attendance</a> ' + (v.booked && v.status === 'scheduled' ? '<a class="button" href="' + esc(C.rosterUrl + v.id) + '#message">Message everyone</a> ' : '') + '<a class="button-link" href="' + esc(C.bookUrl + v.id) + '" target="_blank" rel="noopener">Booking page ↗</a></p>'
         + (v.zoom && v.status === 'scheduled' ? '<p class="oys-drawer__zoom"><a class="button button-primary" href="' + esc(v.zoom.start) + '" target="_blank" rel="noopener">Start the Zoom class</a> <span>Meeting ' + esc(v.zoom.id) + '</span></p>' : '')
         + '</div>';
     }
@@ -258,8 +260,11 @@
     html += field('Location', '<input type="text" name="location" value="' + esc(v.location) + '" placeholder="Studio or address">', 'f-loc');
     html += field(C.zoom ? 'Online link (leave empty: a Zoom meeting is created automatically)' : 'Online link (Zoom, Meet…)', '<input type="url" name="online_url" value="' + esc(v.online_url) + '" placeholder="https://">', 'f-url');
     html += '<div class="oys-row f-online">' + field('Online spots (0 = no limit)', '<input type="number" name="online_capacity" min="0" value="' + (v.online_capacity || 0) + '">') + field('Online ticket (' + esc(C.currency) + ')', '<input type="number" name="online_price" min="0" step="0.01" value="' + ((v.format === 'hybrid' ? v.online_price : C.prices.online) / 100) + '">') + '</div>';
-    html += '<div class="oys-row">' + field('Spots', '<input type="number" name="capacity" min="1" value="' + v.capacity + '">') + field('Drop-in price (' + esc(C.currency) + ')', '<input type="number" name="price" min="0" step="0.01" value="' + (v.price / 100) + '">') + '</div>';
+    html += '<div class="oys-seg oys-seg--sm" role="radiogroup" aria-label="Price">' + [['fixed', 'Fixed price'], ['donation', 'By donation']].map(p => '<label><input type="radio" name="pricing" value="' + p[0] + '"' + ((v.pricing || 'fixed') === p[0] ? ' checked' : '') + '><span>' + p[1] + '</span></label>').join('') + '</div>';
+    html += '<div class="oys-row">' + field('Spots', '<input type="number" name="capacity" min="1" value="' + v.capacity + '">') + field('<span class="f-price-label">Drop-in price</span> (' + esc(C.currency) + ')', '<input type="number" name="price" min="0" step="0.01" value="' + (v.price / 100) + '">') + '</div>';
+    html += '<p class="description f-donation-note">People choose what to give (from ' + money(C.donationMin) + '), by card or at the studio. The price above is the suggested amount.</p>';
     html += '<label class="oys-check"><input type="checkbox" name="credits_allowed"' + (v.credits_allowed ? ' checked' : '') + '> Passes and memberships can be used</label>';
+    html += '<label class="oys-check f-paylater"><input type="checkbox" name="pay_later"' + (v.pay_later !== false ? ' checked' : '') + '> People can book now and pay at the studio' + (C.payLater === 'off' ? ' <small>(switched off in Settings)</small>' : '') + '</label>';
     html += field('Short note (shown on the timetable)', '<input type="text" name="note" value="' + esc(v.note) + '" placeholder="e.g. Bring a towel">');
     html += field('Description', '<textarea name="description" rows="3">' + esc(v.description) + '</textarea>', 'f-desc');
     if (isNew) html += field('Repeat', '<select name="repeat"><option value="none">Just this date</option><option value="weekly">Every week on ' + DAY_NAMES[weekday(v.date)] + '</option></select>', 'f-repeat');
@@ -282,6 +287,10 @@
       d.querySelector('.f-url').hidden = !online && !hybrid;
       d.querySelector('.f-online').hidden = !hybrid;
       d.querySelector('.f-hybrid-note').hidden = !hybrid;
+      const donation = (form.querySelector('[name=pricing]:checked') || {}).value === 'donation';
+      d.querySelector('.f-donation-note').hidden = !donation;
+      d.querySelector('.f-price-label').textContent = donation ? 'Suggested amount' : 'Drop-in price';
+      d.querySelector('.f-paylater').hidden = online || kind === 'private';
       const rep = d.querySelector('.f-repeat');
       if (rep) {
         rep.hidden = kind !== 'group';
@@ -332,6 +341,8 @@
       capacity: parseInt(form.capacity.value, 10) || 1,
       price: Math.round(parseFloat(form.price.value || '0') * 100),
       credits_allowed: form.credits_allowed.checked,
+      pricing: (form.querySelector('[name=pricing]:checked') || {}).value || 'fixed',
+      pay_later: form.pay_later.checked,
       note: form.note.value.trim(),
       repeat: form.repeat ? form.repeat.value : 'none',
     };

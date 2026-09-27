@@ -90,7 +90,7 @@ class OYS_Privates {
 	 * Staff offers a concrete time and price. Creates (or updates) the one-person session.
 	 * @return int|WP_Error session id
 	 */
-	public static function offer( $request_id, $starts_local, $duration_min, $price_cents, $location, $online_url = '', $message = '' ) {
+	public static function offer( $request_id, $starts_local, $duration_min, $price_cents, $location, $online_url = '', $message = '', $extra_min = 0 ) {
 		$request = self::get( $request_id );
 		if ( ! $request ) {
 			return new WP_Error( 'oys_missing', __( 'Request not found.', 'olivia-studio' ) );
@@ -104,7 +104,9 @@ class OYS_Privates {
 			'class_slug'      => 'private-yoga',
 			'title'           => sprintf( __( 'Private session (%d min)', 'olivia-studio' ), $duration_min ),
 			'starts_at'       => $start,
-			'ends_at'         => gmdate( 'Y-m-d H:i:s', oys_ts( $start ) + $duration_min * MINUTE_IN_SECONDS ),
+			// Extra minutes (first session: talking through goals) are blocked in the calendar, not charged.
+			'ends_at'         => gmdate( 'Y-m-d H:i:s', oys_ts( $start ) + ( $duration_min + max( 0, (int) $extra_min ) ) * MINUTE_IN_SECONDS ),
+			'note'            => $extra_min > 0 ? sprintf( __( 'Includes about %d extra minutes to talk through your goals.', 'olivia-studio' ), (int) $extra_min ) : '',
 			'capacity'        => 1,
 			'location'        => $location,
 			'format'          => 'online' === $request->location_type || ( $online_url && ! $location ) ? 'online' : 'studio',
@@ -124,6 +126,12 @@ class OYS_Privates {
 		) );
 		OYS_Emails::private_offer( self::get( $request_id ), OYS_Schedule::get( $session_id ) );
 		return $session_id;
+	}
+
+	/** Is this the customer's first private session (no private session booked before)? */
+	public static function is_first( $user_id, $except_request = 0 ) {
+		global $wpdb;
+		return ! $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM ' . OYS_Install::table( 'private_requests' ) . " WHERE user_id = %d AND status = 'booked' AND id <> %d LIMIT 1", $user_id, $except_request ) );
 	}
 
 	public static function decline( $request_id, $message = '' ) {

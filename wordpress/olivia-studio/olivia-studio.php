@@ -13,7 +13,7 @@
 defined( 'ABSPATH' ) || exit;
 
 define( 'OYS_VERSION', '1.1.0' );
-define( 'OYS_DB_VERSION', '5' );
+define( 'OYS_DB_VERSION', '6' );
 define( 'OYS_FILE', __FILE__ );
 define( 'OYS_DIR', plugin_dir_path( __FILE__ ) );
 define( 'OYS_URL', plugin_dir_url( __FILE__ ) );
@@ -29,6 +29,7 @@ require_once OYS_DIR . 'includes/class-orders.php';
 require_once OYS_DIR . 'includes/class-stripe.php';
 require_once OYS_DIR . 'includes/class-email-templates.php';
 require_once OYS_DIR . 'includes/class-emails.php';
+require_once OYS_DIR . 'includes/class-messages.php';
 require_once OYS_DIR . 'includes/class-customers.php';
 require_once OYS_DIR . 'includes/class-privates.php';
 require_once OYS_DIR . 'includes/class-gifts.php';

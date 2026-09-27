@@ -1,5 +1,5 @@
 import type { Session } from '../api';
-import { availability, dayTitle, groupByDay, money, plainText } from '../format';
+import { availability, dayTitle, groupByDay, money, plainText, priceLabel } from '../format';
 
 function session(over: Partial<Session> = {}): Session {
   return {
@@ -91,5 +91,13 @@ describe('availability', () => {
 describe('plainText', () => {
   it('turns simple HTML into text', () => {
     expect(plainText('<p>One &amp; two</p><p>Three<br>four</p>')).toBe('One & two\n\nThree\nfour');
+  });
+});
+
+describe('priceLabel', () => {
+  it('shows the price, free or by donation', () => {
+    expect(priceLabel(session())).toBe('$25');
+    expect(priceLabel(session({ price_cents: 0 }))).toBe('Free');
+    expect(priceLabel(session({ pricing: 'donation' }))).toBe('By donation');
   });
 });

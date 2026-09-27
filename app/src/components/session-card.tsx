@@ -34,6 +34,7 @@ export function SessionCard({ session: s, mode }: { session: Session; mode?: 'st
           <View style={styles.pills}>
             <Pill text={a.text} tone={a.tone} />
             {s.format !== 'studio' ? <Pill text={formatLabel(s.format)} tone="online" /> : null}
+            {s.pricing === 'donation' ? <Pill text="By donation" tone="neutral" /> : null}
           </View>
         </View>
       </Pressable>

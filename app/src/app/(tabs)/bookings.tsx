@@ -8,7 +8,7 @@ import { Button, Empty, Loading, Notice, Pill, Row, T } from '@/components/ui';
 import { Colors, Fonts, Radius, Spacing } from '@/constants/theme';
 import type { BookingItem } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
-import { dayTitle } from '@/lib/format';
+import { dayTitle, money } from '@/lib/format';
 import { useLoad } from '@/lib/use-load';
 
 const STATUS: Record<string, string> = {
@@ -87,6 +87,7 @@ function BookingCard({ item: b, past }: { item: BookingItem; past: boolean }) {
           <Row style={{ marginTop: 4 }}>
             {past ? <Pill text={STATUS[b.booking.status] ?? b.booking.status} tone={b.booking.status === 'attended' ? 'ok' : 'closed'} /> : null}
             {online ? <Pill text="Online" tone="online" /> : null}
+            {!past && b.my_booking?.due_cents ? <Pill text={`Pay ${money(b.my_booking.due_cents)} at the studio`} tone="low" /> : null}
           </Row>
         </Pressable>
       </Link>

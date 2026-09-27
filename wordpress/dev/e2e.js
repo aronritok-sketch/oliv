@@ -626,6 +626,68 @@ async function payOnMockStripe(page, button = '#pay') {
   check(php(`echo OYS_Email_Templates::get('booking_confirmed')['subject'];`) === 'Booked: {class}, {date_short}', 'reset to the original text');
   php(`OYS_Email_Templates::save('studio_payment', array('enabled'=>1)); OYS_Settings::update(array('reminder2_hours'=>0));`);
 
+  // 31. Pay at the studio: book without paying, the roster marks it paid, message everyone booked.
+  php(`OYS_Settings::update(array('pay_later'=>'all','pay_later_max_no_shows'=>2,'donation_min_cents'=>500,'donation_suggestions'=>'5,10,15,20','fb_group_url'=>'https://www.facebook.com/groups/485915674202871'));`);
+  const ps = fresh();
+  const rae = await (await browser.newContext({ viewport: { width: 1280, height: 900 } })).newPage();
+  await rae.goto(`${BASE}/book/?session=${ps}`);
+  check(await rae.isVisible('.oys-fb a[href*="facebook.com/groups/"]'), 'Facebook group link next to the newsletter sign-up');
+  await register(rae, 'Rae', `rae${stamp}@example.com`);
+  const raeId = php(`echo get_user_by('email','rae${stamp}@example.com')->ID;`);
+  check(await rae.isVisible('.oys-option:has-text("Pay at the studio")'), 'pay at the studio offered');
+  check(await rae.isVisible('text=Pay at the studio with cash, Venmo or Zelle.'), 'how to pay at the studio is explained');
+  await rae.check('input[value="door"]');
+  await rae.screenshot({ path: `${SHOTS}/21-pay-at-studio.png`, fullPage: true });
+  await Promise.all([rae.waitForNavigation(), rae.click('.oys-submit')]);
+  check(await rae.isVisible("text=You're booked"), 'booked without paying online');
+  check(await rae.isVisible('.oys-due:has-text("$25")'), 'booking page says $25 to pay at the studio');
+  const pb = JSON.parse(q(`SELECT paid_with, due_cents FROM {$wpdb->prefix}oys_bookings WHERE session_id=${ps} AND user_id=${raeId} AND status='confirmed'`))[0];
+  check(pb && pb.paid_with === 'door' && +pb.due_cents === 2500, 'stored as due at the studio');
+  check(mailSubjects().some(x => x && x.startsWith('Booked: Hatha Flow')), 'confirmation email sent');
+  await rae.goto(`${BASE}/account/`);
+  check(await rae.isVisible('.oys-due:has-text("$25")') && await rae.isVisible('.oys-account .oys-fb'), 'account shows what to pay and the Facebook group');
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-schedule&session=${ps}`);
+  check(await adm.isVisible('text=To collect at the studio: $25'), 'roster: $25 to collect');
+  await Promise.all([adm.waitForNavigation(), adm.click('button:has-text("Paid: cash")')]);
+  check(await adm.isVisible('text=Paid at the studio (cash)'), 'roster: marked paid in cash');
+  check(JSON.parse(q(`SELECT collected_with FROM {$wpdb->prefix}oys_bookings WHERE session_id=${ps} AND user_id=${raeId}`))[0].collected_with === 'cash', 'payment recorded');
+  const msgMark = mails().length;
+  await adm.fill('.oys-message textarea[name="body"]', 'Hi {first_name}, the parking lot is closed today, park on the street.');
+  await Promise.all([adm.waitForNavigation(), adm.click('button:has-text("Send the message")')]);
+  check(await adm.isVisible('text=Message sent to 1 person'), 'message sent to everyone booked');
+  const msg = mails().slice(msgMark).map(f => fs.readFileSync(path.join(WP_DIR, 'wp-content/mail-log', f), 'utf8')).find(h => h.includes('parking lot'));
+  check(!!msg && msg.includes('Hi Rae'), 'message email greets by name');
+  check(await adm.isVisible('.oys-sent:has-text("About Hatha Flow")'), 'sent message listed on the roster');
+  await adm.screenshot({ path: `${SHOTS}/22-roster-pay-message.png`, fullPage: true });
+
+  // 32. Donation class: pick an amount, minimum $5, card total follows the amount.
+  const dn = fresh();
+  php(`global $wpdb; $wpdb->update($wpdb->prefix.'oys_sessions', array('pricing'=>'donation','price_cents'=>1000,'credits_allowed'=>0), array('id'=>${dn}));`);
+  await rae.goto(`${BASE}/book/`);
+  check(await rae.isVisible('.session__donation'), 'timetable says "By donation"');
+  await rae.goto(`${BASE}/book/?session=${dn}`);
+  check(await rae.isVisible('text=Pay what you like'), 'donation amounts shown');
+  check(await rae.isVisible('.oys-option:has-text("Give by card")') && await rae.isVisible('.oys-option:has-text("Give at the studio")'), 'give by card or at the studio');
+  await rae.click('.oys-amount:has-text("$20")');
+  check((await rae.textContent('.oys-option:has(input[value="card"]) .oys-option__price')).trim() === '$20', 'card total follows the chosen amount');
+  await rae.fill('#oys-amount-other', '3');
+  check(await rae.$eval('#oys-amount-other', el => !el.checkValidity()), 'the browser stops amounts under $5');
+  await rae.$eval('#oys-amount-other', el => el.removeAttribute('min'));
+  await rae.check('input[value="card"]');
+  await Promise.all([rae.waitForNavigation(), rae.click('.oys-submit')]);
+  check(await rae.isVisible('text=The minimum is $5 per person.'), 'below the minimum refused');
+  await rae.click('.oys-amount:has-text("$15")');
+  await rae.check('input[value="card"]');
+  await rae.screenshot({ path: `${SHOTS}/23-donation.png`, fullPage: true });
+  await rae.click('.oys-submit');
+  await payOnMockStripe(rae);
+  check(await rae.isVisible("text=You're booked!"), 'donation paid by card');
+  check(+JSON.parse(q(`SELECT amount_cents FROM {$wpdb->prefix}oys_orders WHERE session_id=${dn} AND user_id=${raeId} AND status='paid'`))[0].amount_cents === 1500, 'order is the chosen $15');
+
+  // 33. Private sessions: the first-session note is on the request form.
+  await rae.goto(`${BASE}/account/?tab=private`);
+  check(await rae.isVisible('.oys-private-note:has-text("extra minutes to talk through your goals")'), 'private session note shown');
+
   // Screens for review.
   await a.goto(`${BASE}/schedule-pricing/`);
   await a.screenshot({ path: `${SHOTS}/10-schedule-pricing.png`, fullPage: true });

@@ -21,7 +21,7 @@ class OYS_Admin {
 			}
 		} );
 		$actions = array( 'save_session', 'cancel_session', 'roster', 'save_template', 'delete_template', 'generate', 'private_offer', 'private_decline',
-			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email' );
+			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'message', 'pay_later_reset' );
 		foreach ( $actions as $a ) {
 			add_action( 'admin_post_oys_admin_' . $a, array( __CLASS__, 'guard' ) );
 		}
@@ -229,7 +229,9 @@ class OYS_Admin {
 		echo '<tr><th>' . esc_html__( 'Where', 'olivia-studio' ) . '</th><td><select name="format">' . implode( '', array_map( fn( $k, $l ) => '<option value="' . esc_attr( $k ) . '"' . selected( $v->format ?: 'studio', $k, false ) . '>' . esc_html( $l ) . '</option>', array_keys( OYS_Schedule::formats() ), OYS_Schedule::formats() ) ) . '</select></td></tr>';
 		echo '<tr><th>' . esc_html__( 'Location', 'olivia-studio' ) . '</th><td><input class="regular-text" name="location" value="' . esc_attr( $v->location ) . '"></td></tr>';
 		echo '<tr><th>' . esc_html__( 'Online link (Zoom etc.)', 'olivia-studio' ) . '</th><td><input class="regular-text" type="url" name="online_url" value="' . esc_attr( $v->online_url ) . '"><p class="description">' . esc_html__( 'Only shown to people who booked.', 'olivia-studio' ) . '</p></td></tr>';
-		echo '<tr><th>' . esc_html__( 'Price', 'olivia-studio' ) . '</th><td><input name="price" value="' . esc_attr( $v->price_cents / 100 ) . '" class="small-text"> ' . esc_html( strtoupper( OYS_Settings::get( 'currency' ) ) ) . ' <label><input type="checkbox" name="credits_allowed" value="1"' . checked( 1, (int) $v->credits_allowed, false ) . '> ' . esc_html__( 'Class passes can be used', 'olivia-studio' ) . '</label></td></tr>';
+		echo '<tr><th>' . esc_html__( 'Price', 'olivia-studio' ) . '</th><td><input name="price" value="' . esc_attr( $v->price_cents / 100 ) . '" class="small-text"> ' . esc_html( strtoupper( OYS_Settings::get( 'currency' ) ) ) . ' <label><input type="checkbox" name="credits_allowed" value="1"' . checked( 1, (int) $v->credits_allowed, false ) . '> ' . esc_html__( 'Class passes can be used', 'olivia-studio' ) . '</label>'
+			. '<br><label><input type="checkbox" name="donation" value="1"' . checked( 'donation', $v->pricing ?? 'fixed', false ) . '> ' . esc_html__( 'By donation (the price is the suggested amount)', 'olivia-studio' ) . '</label>'
+			. '<br><label><input type="checkbox" name="pay_later" value="1"' . checked( 1, (int) ( $v->pay_later ?? 1 ), false ) . '> ' . esc_html__( 'People can pay at the studio', 'olivia-studio' ) . '</label></td></tr>';
 		echo '<tr><th>' . esc_html__( 'Short note', 'olivia-studio' ) . '</th><td><input class="regular-text" name="note" value="' . esc_attr( $v->note ) . '" placeholder="Sunrise on the sand, weather permitting"></td></tr>';
 		echo '</table>';
 		submit_button( $s ? __( 'Save session', 'olivia-studio' ) : __( 'Create session', 'olivia-studio' ) );
@@ -258,10 +260,12 @@ class OYS_Admin {
 			'ends_at'         => gmdate( 'Y-m-d H:i:s', oys_ts( $start ) + $dur * MINUTE_IN_SECONDS ),
 			'capacity'        => max( 1, (int) $_POST['capacity'] ),
 			'location'        => sanitize_text_field( wp_unslash( $_POST['location'] ) ),
-			'format'          => 'online' === ( $_POST['format'] ?? '' ) ? 'online' : 'studio',
+			'format'          => in_array( $_POST['format'] ?? '', array( 'online', 'hybrid' ), true ) ? sanitize_key( $_POST['format'] ) : 'studio',
 			'online_url'      => esc_url_raw( wp_unslash( $_POST['online_url'] ) ),
 			'price_cents'     => oys_cents_from_input( wp_unslash( $_POST['price'] ) ),
 			'credits_allowed' => empty( $_POST['credits_allowed'] ) ? 0 : 1,
+			'pricing'         => empty( $_POST['donation'] ) ? 'fixed' : 'donation',
+			'pay_later'       => empty( $_POST['pay_later'] ) ? 0 : 1,
 			'note'            => sanitize_text_field( wp_unslash( $_POST['note'] ) ),
 		);
 		if ( ! $id ) {
@@ -288,7 +292,9 @@ class OYS_Admin {
 		self::header( oys_session_title( $s ) . ' · ' . oys_date( $s->starts_at, 'D M j, g:i a' ), ' <a class="page-title-action" href="' . esc_url( admin_url( 'admin.php?page=oys-calendar&week=' . wp_date( 'Y-m-d', oys_ts( $s->starts_at ) ) . '&open=' . $id ) ) . '">' . esc_html__( 'Edit in calendar', 'olivia-studio' ) . '</a>' );
 		echo '<p>' . esc_html( oys_is_online( $s ) ? __( 'Online', 'olivia-studio' ) : $s->location ) . ' · ' . sprintf( esc_html__( '%1$d of %2$d booked', 'olivia-studio' ), (int) $s->booked, (int) $s->capacity )
 			. ( oys_is_hybrid( $s ) ? ' · ' . sprintf( esc_html__( '%1$d online (%2$s)', 'olivia-studio' ), (int) $s->online_booked, (int) $s->online_capacity ? sprintf( esc_html__( 'of %d', 'olivia-studio' ), (int) $s->online_capacity ) : esc_html__( 'no limit', 'olivia-studio' ) ) : '' )
-			. ' · ' . esc_html( $s->status ) . '</p>';
+			. ' · ' . esc_html( $s->status )
+			. ( oys_is_donation( $s ) ? ' · ' . esc_html__( 'by donation', 'olivia-studio' ) : '' )
+			. ( ( $due = OYS_Bookings::due_at_studio( $id ) ) ? ' · <b>' . sprintf( esc_html__( 'To collect at the studio: %s', 'olivia-studio' ), esc_html( oys_money( $due ) ) ) . '</b>' : '' ) . '</p>';
 		echo self::live_box( $s ); // phpcs:ignore
 		$bookings = OYS_Bookings::for_session( $id );
 		$st       = OYS_Bookings::statuses();
@@ -305,7 +311,7 @@ class OYS_Admin {
 			if ( oys_is_hybrid( $s ) && 'online' === $b->mode ) {
 				$name .= ' <span class="oys-online-tag">' . esc_html__( 'Online', 'olivia-studio' ) . '</span>';
 			}
-			echo '<tr' . ( $b->guest_of ? ' class="oys-guest-row"' : '' ) . '><td>' . $name . '</td><td>' . esc_html( $b->guest_of ? '' : get_user_meta( $b->user_id, 'oys_phone', true ) ) . '</td><td>' . esc_html( $labels[ $b->paid_with ] ?? $b->paid_with ) . '</td><td class="oys-health">' . esc_html( $b->guest_of ? '' : get_user_meta( $b->user_id, 'oys_health_notes', true ) ) . '</td><td>' . esc_html( $st[ $b->status ] ?? $b->status ) . '</td><td>'; // phpcs:ignore
+			echo '<tr' . ( $b->guest_of ? ' class="oys-guest-row"' : '' ) . '><td>' . $name . '</td><td>' . esc_html( $b->guest_of ? '' : get_user_meta( $b->user_id, 'oys_phone', true ) ) . '</td><td>' . self::paid_cell( $b, $id ) . '</td><td class="oys-health">' . esc_html( $b->guest_of ? '' : get_user_meta( $b->user_id, 'oys_health_notes', true ) ) . '</td><td>' . esc_html( $st[ $b->status ] ?? $b->status ) . '</td><td>'; // phpcs:ignore
 			if ( $active ) {
 				echo self::form( 'roster', 'class="oys-inline"' ) . '<input type="hidden" name="session" value="' . (int) $id . '"><input type="hidden" name="booking" value="' . (int) $b->id . '">' // phpcs:ignore
 					. '<button name="do" value="attended" class="button button-small' . ( 'attended' === $b->status ? ' button-primary' : '' ) . '">' . esc_html__( 'Here', 'olivia-studio' ) . '</button> '
@@ -323,8 +329,10 @@ class OYS_Admin {
 
 		echo '<h2>' . esc_html__( 'Add someone', 'olivia-studio' ) . '</h2>' . self::form( 'roster', 'class="oys-inline-form"' ) . '<input type="hidden" name="session" value="' . (int) $id . '"><input type="hidden" name="do" value="add">' // phpcs:ignore
 			. '<input type="email" name="email" required placeholder="' . esc_attr__( 'Email', 'olivia-studio' ) . '"> <input type="text" name="name" placeholder="' . esc_attr__( 'Name (new customers)', 'olivia-studio' ) . '"> '
-			. '<select name="paid_with"><option value="credit">' . esc_html__( 'Use their pass', 'olivia-studio' ) . '</option><option value="cash">' . esc_html__( 'Paid at the door', 'olivia-studio' ) . '</option><option value="comp">' . esc_html__( 'Complimentary', 'olivia-studio' ) . '</option></select> '
+			. '<select name="paid_with"><option value="credit">' . esc_html__( 'Use their pass', 'olivia-studio' ) . '</option><option value="cash">' . esc_html__( 'Paid at the door', 'olivia-studio' ) . '</option><option value="door">' . esc_html__( 'Will pay at the studio', 'olivia-studio' ) . '</option><option value="comp">' . esc_html__( 'Complimentary', 'olivia-studio' ) . '</option></select> '
 			. '<label><input type="checkbox" name="notify" value="1" checked> ' . esc_html__( 'Email confirmation', 'olivia-studio' ) . '</label> <button class="button button-primary">' . esc_html__( 'Add to roster', 'olivia-studio' ) . '</button></form>';
+
+		self::message_box( $s );
 
 		$wl = OYS_Bookings::waitlist( $id );
 		if ( $wl ) {
@@ -335,6 +343,57 @@ class OYS_Admin {
 			echo '</ol>';
 		}
 		echo '</div>';
+	}
+
+	/** Roster "Paid with" cell; pay-at-the-studio bookings get "Paid" buttons until collected. */
+	private static function paid_cell( $b, $session_id ) {
+		$labels = OYS_Bookings::paid_with_labels();
+		if ( 'door' !== $b->paid_with ) {
+			return esc_html( $labels[ $b->paid_with ] ?? $b->paid_with );
+		}
+		if ( $b->collected_with ) {
+			return esc_html( sprintf( __( 'Paid at the studio (%s)', 'olivia-studio' ), 'cash' === $b->collected_with ? __( 'cash', 'olivia-studio' ) : __( 'other', 'olivia-studio' ) ) ) . ' · ' . esc_html( oys_money( (int) $b->due_cents ) );
+		}
+		$out = '<b class="oys-due-tag">' . sprintf( esc_html__( 'Pays at the studio: %s', 'olivia-studio' ), esc_html( oys_money( (int) $b->due_cents ) ) ) . '</b>';
+		if ( in_array( $b->status, array( 'confirmed', 'attended', 'no_show' ), true ) ) {
+			$out .= '<br>' . self::form( 'roster', 'class="oys-inline"' ) . '<input type="hidden" name="session" value="' . (int) $session_id . '"><input type="hidden" name="booking" value="' . (int) $b->id . '">'
+				. '<button name="do" value="collect_cash" class="button button-small">' . esc_html__( 'Paid: cash', 'olivia-studio' ) . '</button> '
+				. '<button name="do" value="collect_other" class="button button-small">' . esc_html__( 'Paid: other', 'olivia-studio' ) . '</button></form>';
+		}
+		return $out;
+	}
+
+	/** Roster: write to everyone booked, and what was sent before. */
+	private static function message_box( $s ) {
+		echo '<h2 id="message">' . esc_html__( 'Message everyone booked', 'olivia-studio' ) . '</h2>';
+		if ( 'scheduled' === $s->status && oys_ts( $s->ends_at ) > time() - DAY_IN_SECONDS ) {
+			echo self::form( 'message', 'class="oys-form oys-message"' ) . '<input type="hidden" name="session" value="' . (int) $s->id . '">' // phpcs:ignore
+				. '<p><label>' . esc_html__( 'Subject', 'olivia-studio' ) . '<br><input class="large-text" name="subject" required value="' . esc_attr( sprintf( __( 'About %1$s on %2$s', 'olivia-studio' ), '{class}', '{day} {date_short}' ) ) . '"></label></p>'
+				. '<p><label>' . esc_html__( 'Message', 'olivia-studio' ) . '<br><textarea class="large-text" name="body" rows="5" required placeholder="' . esc_attr__( 'Hi {first_name}, …', 'olivia-studio' ) . '"></textarea></label></p>'
+				. '<p class="description">' . esc_html__( 'Everyone gets their own email, with the class details and a link to their bookings. You can use {first_name}, {class}, {day}, {date_short}, {time} and {location}.', 'olivia-studio' ) . '</p>'
+				. '<p><label><input type="checkbox" name="guests" value="1" checked> ' . esc_html__( 'Also guests who gave an email', 'olivia-studio' ) . '</label> &nbsp; <label><input type="checkbox" name="waitlist" value="1"> ' . esc_html__( 'Also the waitlist', 'olivia-studio' ) . '</label></p>'
+				. '<p><button class="button button-primary">' . esc_html__( 'Send the message', 'olivia-studio' ) . '</button></p></form>';
+		}
+		$sent = OYS_Messages::for_session( $s->id );
+		if ( $sent ) {
+			echo '<ul class="oys-plain oys-sent">';
+			foreach ( $sent as $m ) {
+				echo '<li><b>' . esc_html( $m->subject ) . '</b> · ' . esc_html( oys_date( $m->created_at, 'M j, g:i a' ) ) . ' · ' . esc_html( sprintf( _n( '%d person', '%d people', (int) $m->recipients, 'olivia-studio' ), (int) $m->recipients ) ) . '<br><small>' . esc_html( wp_trim_words( $m->body, 30 ) ) . '</small></li>';
+			}
+			echo '</ul>';
+		}
+	}
+
+	private static function do_message() {
+		$session_id = (int) $_POST['session'];
+		$res        = OYS_Messages::send_to_session( $session_id, wp_unslash( $_POST['subject'] ?? '' ), wp_unslash( $_POST['body'] ?? '' ), array( 'guests' => ! empty( $_POST['guests'] ), 'waitlist' => ! empty( $_POST['waitlist'] ) ) );
+		self::back( 'oys-schedule', array( 'session' => $session_id ), is_wp_error( $res ) ? $res->get_error_message() : sprintf( _n( 'Message sent to %d person.', 'Message sent to %d people.', $res, 'olivia-studio' ), $res ) );
+	}
+
+	private static function do_pay_later_reset() {
+		$user_id = (int) $_POST['user'];
+		update_user_meta( $user_id, 'oys_pay_later_reset', oys_now() );
+		self::back( 'oys-customers', array( 'user' => $user_id ), __( 'They can pay at the studio again.', 'olivia-studio' ) );
 	}
 
 	/** Online / hybrid class: the Zoom meeting (start as host, create) or the link typed in. */
@@ -369,8 +428,12 @@ class OYS_Admin {
 			}
 			$notify = ! empty( $_POST['notify'] );
 			$paid   = sanitize_key( $_POST['paid_with'] ?? 'comp' );
-			$res    = 'credit' === $paid ? OYS_Bookings::book_with_credit( $user_id, $session_id, $notify ) : OYS_Bookings::book_manual( $user_id, $session_id, in_array( $paid, array( 'cash', 'comp' ), true ) ? $paid : 'comp', $notify, true );
+			$res    = 'credit' === $paid ? OYS_Bookings::book_with_credit( $user_id, $session_id, $notify ) : OYS_Bookings::book_manual( $user_id, $session_id, in_array( $paid, array( 'cash', 'comp', 'door' ), true ) ? $paid : 'comp', $notify, true );
 			self::back( 'oys-schedule', array( 'session' => $session_id ), is_wp_error( $res ) ? $res->get_error_message() : __( 'Added to the roster.', 'olivia-studio' ) );
+		}
+		if ( in_array( $do, array( 'collect_cash', 'collect_other' ), true ) ) {
+			OYS_Bookings::collect( (int) $_POST['booking'], substr( $do, 8 ) );
+			self::back( 'oys-schedule', array( 'session' => $session_id ), __( 'Marked as paid.', 'olivia-studio' ) );
 		}
 		OYS_Bookings::set_attendance( (int) $_POST['booking'], $do );
 		self::back( 'oys-schedule', array( 'session' => $session_id ) );
@@ -467,6 +530,7 @@ class OYS_Admin {
 					echo '<h2>' . ( $s ? esc_html__( 'Change the offer', 'olivia-studio' ) : esc_html__( 'Send an offer', 'olivia-studio' ) ) . '</h2>' . self::form( 'private_offer' ) . '<input type="hidden" name="id" value="' . (int) $r->id . '"><table class="form-table">' // phpcs:ignore
 						. '<tr><th>' . esc_html__( 'Date and time', 'olivia-studio' ) . '</th><td><input type="datetime-local" name="starts" required value="' . esc_attr( $s ? oys_utc_to_local_input( $s->starts_at ) : '' ) . '"></td></tr>'
 						. '<tr><th>' . esc_html__( 'Length (min)', 'olivia-studio' ) . '</th><td><select name="duration">' . implode( '', array_map( fn( $d ) => '<option value="' . $d . '"' . selected( (int) $r->duration_min, $d, false ) . '>' . $d . '</option>', array( 60, 75, 90 ) ) ) . '</select></td></tr>'
+						. '<tr><th>' . esc_html__( 'Time to talk through goals', 'olivia-studio' ) . '</th><td><label><input type="checkbox" name="extra" value="1"' . checked( $s ? oys_ts( $s->ends_at ) - oys_ts( $s->starts_at ) > (int) $r->duration_min * 60 : OYS_Privates::is_first( $r->user_id, $r->id ), true, false ) . '> ' . sprintf( esc_html__( 'Block %s extra minutes (not charged)', 'olivia-studio' ), '<input type="number" name="extra_min" min="5" step="5" class="small-text" value="' . esc_attr( max( 5, (int) OYS_Settings::get( 'private_first_extra_min' ) ) ) . '">' ) . '</label><p class="description">' . esc_html( OYS_Privates::is_first( $r->user_id, $r->id ) ? __( 'First private session with this person.', 'olivia-studio' ) : __( 'They have had a private session before.', 'olivia-studio' ) ) . '</p></td></tr>'
 						. '<tr><th>' . esc_html__( 'Price', 'olivia-studio' ) . '</th><td><input name="price" class="small-text" value="' . esc_attr( $price / 100 ) . '"> ' . esc_html( strtoupper( OYS_Settings::get( 'currency' ) ) ) . '<p class="description">' . esc_html__( 'Small groups: set the total for the group.', 'olivia-studio' ) . '</p></td></tr>'
 						. '<tr><th>' . esc_html__( 'Location', 'olivia-studio' ) . '</th><td><input class="regular-text" name="location" value="' . esc_attr( $s ? $s->location : $r->address ) . '"></td></tr>'
 						. '<tr><th>' . esc_html__( 'Online link', 'olivia-studio' ) . '</th><td><input class="regular-text" type="url" name="online_url" value="' . esc_attr( $s ? $s->online_url : '' ) . '"></td></tr>'
@@ -493,7 +557,7 @@ class OYS_Admin {
 
 	private static function do_private_offer() {
 		$id  = (int) $_POST['id'];
-		$res = OYS_Privates::offer( $id, sanitize_text_field( wp_unslash( $_POST['starts'] ) ), max( 30, (int) $_POST['duration'] ), oys_cents_from_input( wp_unslash( $_POST['price'] ) ), sanitize_text_field( wp_unslash( $_POST['location'] ) ), esc_url_raw( wp_unslash( $_POST['online_url'] ) ), sanitize_textarea_field( wp_unslash( $_POST['message'] ) ) );
+		$res = OYS_Privates::offer( $id, sanitize_text_field( wp_unslash( $_POST['starts'] ) ), max( 30, (int) $_POST['duration'] ), oys_cents_from_input( wp_unslash( $_POST['price'] ) ), sanitize_text_field( wp_unslash( $_POST['location'] ) ), esc_url_raw( wp_unslash( $_POST['online_url'] ) ), sanitize_textarea_field( wp_unslash( $_POST['message'] ) ), empty( $_POST['extra'] ) ? 0 : max( 0, (int) ( $_POST['extra_min'] ?? 0 ) ) );
 		self::back( 'oys-private', array( 'request' => $id ), is_wp_error( $res ) ? $res->get_error_message() : __( 'Offer sent to the customer.', 'olivia-studio' ) );
 	}
 
@@ -535,7 +599,8 @@ class OYS_Admin {
 			. '<p><b>' . esc_html__( 'Emergency', 'olivia-studio' ) . ':</b> ' . $m( 'oys_emergency_name' ) . ' ' . $m( 'oys_emergency_phone' ) . '</p>' // phpcs:ignore
 			. '<p><b>' . esc_html__( 'Health notes', 'olivia-studio' ) . ':</b><br>' . nl2br( $m( 'oys_health_notes' ) ) . '</p>' // phpcs:ignore
 			. '<p><b>' . esc_html__( 'Agreement', 'olivia-studio' ) . ':</b> ' . ( OYS_Customers::has_waiver( $user_id ) ? esc_html( sprintf( __( 'accepted %s', 'olivia-studio' ), oys_date( get_user_meta( $user_id, 'oys_waiver_at', true ) ) ) ) : esc_html__( 'not accepted (current version)', 'olivia-studio' ) ) . '</p>'
-			. '<p><b>' . esc_html__( 'Marketing emails', 'olivia-studio' ) . ':</b> ' . ( get_user_meta( $user_id, 'oys_marketing', true ) ? esc_html__( 'yes', 'olivia-studio' ) : esc_html__( 'no', 'olivia-studio' ) ) . '</p></div>';
+			. '<p><b>' . esc_html__( 'Newsletter', 'olivia-studio' ) . ':</b> ' . ( get_user_meta( $user_id, 'oys_marketing', true ) ? esc_html__( 'yes', 'olivia-studio' ) : esc_html__( 'no', 'olivia-studio' ) ) . '</p>'
+			. self::pay_later_status( $user_id ) . '</div>';
 
 		echo '<div class="oys-box"><h2>' . esc_html__( 'Passes', 'olivia-studio' ) . '</h2><table class="widefat oys-table"><thead><tr><th>' . esc_html__( 'Pass', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Left', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Expires', 'olivia-studio' ) . '</th><th></th></tr></thead><tbody>';
 		foreach ( OYS_Passes::for_user( $user_id ) as $p ) {
@@ -564,6 +629,18 @@ class OYS_Admin {
 		echo '<h2>' . esc_html__( 'Payments', 'olivia-studio' ) . '</h2>';
 		self::orders_table( OYS_Orders::for_user( $user_id ) );
 		echo '</div>';
+	}
+
+	/** Customer page: missed pay-at-the-studio bookings, and the button to allow it again. */
+	private static function pay_later_status( $user_id ) {
+		$missed = OYS_Bookings::pay_later_no_shows( $user_id );
+		$max    = (int) OYS_Settings::get( 'pay_later_max_no_shows' );
+		$out    = '<p><b>' . esc_html__( 'Pay at the studio', 'olivia-studio' ) . ':</b> ';
+		if ( $max && $missed >= $max ) {
+			return $out . sprintf( esc_html__( 'paused: %d missed classes that weren\'t paid', 'olivia-studio' ), $missed ) . '</p>'
+				. self::form( 'pay_later_reset', 'class="oys-inline"' ) . '<input type="hidden" name="user" value="' . (int) $user_id . '"><button class="button button-small">' . esc_html__( 'Allow paying at the studio again', 'olivia-studio' ) . '</button></form>';
+		}
+		return $out . ( $missed ? sprintf( esc_html__( 'allowed (%d missed so far)', 'olivia-studio' ), $missed ) : esc_html__( 'allowed', 'olivia-studio' ) ) . '</p>';
 	}
 
 	private static function do_grant_pass() {
@@ -804,6 +881,21 @@ class OYS_Admin {
 		foreach ( $nums as $k => $l ) {
 			echo '<tr><th>' . esc_html( $l ) . '</th><td>' . $f( $k, 'number', 'small-text', 'min="0"' ) . '</td></tr>'; // phpcs:ignore
 		}
+		echo '</table><h2 id="pay-later">' . esc_html__( 'Paying at the studio and donations', 'olivia-studio' ) . '</h2><table class="form-table">';
+		echo '<tr><th>' . esc_html__( 'Who can book now and pay at the studio', 'olivia-studio' ) . '</th><td><select name="s[pay_later]">'
+			. '<option value="all"' . selected( $s['pay_later'], 'all', false ) . '>' . esc_html__( 'Everyone', 'olivia-studio' ) . '</option>'
+			. '<option value="first"' . selected( $s['pay_later'], 'first', false ) . '>' . esc_html__( 'Only for their first class', 'olivia-studio' ) . '</option>'
+			. '<option value="off"' . selected( $s['pay_later'], 'off', false ) . '>' . esc_html__( 'Nobody (pay in advance)', 'olivia-studio' ) . '</option></select>'
+			. '<p class="description">' . esc_html__( 'For in-person group classes and events. Each class can switch it off in the calendar (e.g. workshops). Mark the payment on the roster with "Paid: cash" or "Paid: other".', 'olivia-studio' ) . '</p></td></tr>';
+		echo '<tr><th>' . esc_html__( 'Pay in advance after this many missed classes', 'olivia-studio' ) . '</th><td>' . $f( 'pay_later_max_no_shows', 'number', 'small-text', 'min="0"' ) . '<p class="description">' . esc_html__( 'Classes they booked to pay at the studio and didn\'t come to (marked "No-show" on the roster). 0 = never. You can allow it again on the customer\'s page.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'How to pay at the studio (shown when booking and in emails)', 'olivia-studio' ) . '</th><td>' . $f( 'pay_later_note', 'text', 'large-text' ) . '</td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'Donation classes: minimum per person', 'olivia-studio' ) . '</th><td><input name="donation_min" class="small-text" value="' . esc_attr( $s['donation_min_cents'] / 100 ) . '"> ' . esc_html( strtoupper( $s['currency'] ) ) . '</td></tr>';
+		echo '<tr><th>' . esc_html__( 'Suggested donation amounts', 'olivia-studio' ) . '</th><td>' . $f( 'donation_suggestions', 'text', 'regular-text', 'placeholder="5,10,15,20"' ) . '<p class="description">' . esc_html__( 'Separated by commas. Make a class "by donation" in the calendar; people choose one of these or type their own amount, and pay by card or at the studio.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
+		echo '</table><h2>' . esc_html__( 'Private sessions', 'olivia-studio' ) . '</h2><table class="form-table">';
+		echo '<tr><th>' . esc_html__( 'Extra time for a first session (minutes)', 'olivia-studio' ) . '</th><td>' . $f( 'private_first_extra_min', 'number', 'small-text', 'min="0" step="5"' ) . '<p class="description">' . esc_html__( 'Added to the time you block when you send an offer to someone new, to talk through their goals. The price stays the same.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'Note shown with private sessions', 'olivia-studio' ) . '</th><td><textarea name="s[private_note]" rows="3" class="large-text">' . esc_textarea( $s['private_note'] ) . '</textarea><p class="description">' . esc_html__( 'Shown on the private session request form, prices and booking page, and in the offer email.', 'olivia-studio' ) . '</p></td></tr>';
+		echo '</table><h2>' . esc_html__( 'Community', 'olivia-studio' ) . '</h2><table class="form-table">';
+		echo '<tr><th>' . esc_html__( 'Facebook group link', 'olivia-studio' ) . '</th><td>' . $f( 'fb_group_url', 'url', 'large-text' ) . '<p class="description">' . esc_html__( 'Shown next to the newsletter sign-up, after booking, in the account, the app and at the bottom of every email. Leave empty to hide it.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
 		echo '</table><h2>' . esc_html__( 'Online classes', 'olivia-studio' ) . '</h2><table class="form-table">';
 		echo '<tr><th>' . esc_html__( 'Drop-in price for an online class', 'olivia-studio' ) . '</th><td><input name="online_price" class="small-text" value="' . esc_attr( $s['online_price_cents'] / 100 ) . '"> ' . esc_html( strtoupper( $s['currency'] ) ) . '<p class="description">' . esc_html__( 'Used for new online classes in the calendar; each class can still have its own price.', 'olivia-studio' ) . '</p></td></tr>';
 		echo '<tr><th>' . esc_html__( 'One class on a studio pass covers', 'olivia-studio' ) . '</th><td>' . $f( 'online_per_credit', 'number', 'small-text', 'min="1"' ) . ' ' . esc_html__( 'online classes', 'olivia-studio' ) . '<p class="description">' . esc_html__( 'When someone books an online class with a studio pass, one class from the pass turns into this many online classes (same expiry date); one is used and the rest stay in their account. Online passes are used first. Memberships include online classes, and they don\'t count towards a monthly class limit.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
@@ -970,7 +1062,9 @@ class OYS_Admin {
 			}
 			if ( is_int( $default ) ) {
 				$clean[ $k ] = max( 0, (int) $in[ $k ] );
-			} elseif ( in_array( $k, array( 'waiver_text', 'cancel_policy' ), true ) ) {
+			} elseif ( 'fb_group_url' === $k ) {
+				$clean[ $k ] = esc_url_raw( trim( $in[ $k ] ) );
+			} elseif ( in_array( $k, array( 'waiver_text', 'cancel_policy', 'private_note' ), true ) ) {
 				$clean[ $k ] = sanitize_textarea_field( $in[ $k ] );
 			} elseif ( in_array( $k, array( 'email_from', 'notify_email' ), true ) ) {
 				$clean[ $k ] = sanitize_email( $in[ $k ] );
@@ -989,6 +1083,12 @@ class OYS_Admin {
 		}
 		if ( isset( $_POST['online_price'] ) ) {
 			$clean['online_price_cents'] = oys_cents_from_input( wp_unslash( $_POST['online_price'] ) );
+		}
+		if ( isset( $_POST['donation_min'] ) ) {
+			$clean['donation_min_cents'] = oys_cents_from_input( wp_unslash( $_POST['donation_min'] ) );
+		}
+		if ( isset( $clean['pay_later'] ) ) {
+			$clean['pay_later'] = in_array( $clean['pay_later'], array( 'all', 'first', 'off' ), true ) ? $clean['pay_later'] : 'all';
 		}
 		OYS_Settings::update( $clean );
 		self::back( 'oys-settings', array(), __( 'Settings saved.', 'olivia-studio' ) );

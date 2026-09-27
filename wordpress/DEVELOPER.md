@@ -226,6 +226,7 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 | `location`, `online_url`, `note` | hely, online link (csak foglalóknak látszik), rövid megjegyzés |
 | `format` | `studio` (személyes) · `online` (élő közvetítés) · `hybrid` (stúdió + élő online) |
 | `online_capacity`, `online_price_cents` | hibrid óra online helyei (0 = korlátlan) és online jegyára |
+| `pricing`, `pay_later` | mint a `sessions`-ben; a generált alkalmak öröklik |
 | `active` | 0 = nem generál új alkalmat |
 | `valid_from` | az első dátum, amitől ismétlődik (a naptárból létrehozott heti óránál); NULL = azonnal |
 
@@ -243,6 +244,8 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 | `zoom_meeting_id`, `zoom_join_url`, `zoom_password` | automatikus Zoom meeting (6.13); `creating:<idő>` = épp most jön létre |
 | `template_id`, `tpl_slot` | melyik heti órából jött, és az **eredeti** időpontja; ha egy dátumot áthelyeznek vagy lemondanak, a `tpl_slot` marad, így a generálás nem hozza létre újra |
 | `credits_allowed` | 1 = bérletből foglalható |
+| `pricing` | `fixed` · `donation` (adomány: a `price_cents` csak javasolt összeg, 6.15) |
+| `pay_later` | 1 = helyszíni fizetéssel is foglalható (ha a beállítás engedi) |
 | `status` | `scheduled` · `cancelled` |
 | `template_id` | honnan generálódott (0 = egyedi). A generálás a (`template_id`, `starts_at`) páros alapján hagyja ki a már létezőt (indexelt, de nem UNIQUE) |
 
@@ -252,7 +255,8 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 |---|---|
 | — | **Egy sor = egy ember.** A foglaló saját sora `guest_of = 0`; az általa hozott vendégek külön sorok (lásd 6.8) |
 | `status` | lásd 6.2 állapotgép |
-| `paid_with` | `credit` · `membership` · `card` · `free` · `admin` · `cash` · `comp` |
+| `paid_with` | `credit` · `membership` · `card` · `free` · `door` (helyszínen fizet) · `admin` · `cash` · `comp` |
+| `due_cents`, `collected_with` | `door`: ennyit fizet a helyszínen (ár vagy választott adomány); `collected_with` = `cash` · `other` ha a névsorban „Paid”-re jelölték |
 | `pass_id` | melyik bérletből vont le kreditet (lemondáskor ide jár vissza) |
 | `membership_id` | ha tagsággal foglalt (a periódus-keret ebből számol) |
 | `mode` | `studio` · `online` – hogyan vesz részt (online-only órán mindig `online`; a vendég a foglalóét örökli) |
@@ -262,6 +266,8 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 | `order_id` | kártyás fizetés rendelése (egy rendeléshez több sor tartozhat: foglaló + vendégek) |
 | `hold_expires` | fizetés alatti tartás lejárata (csak `pending`) |
 | `reminder_sent`, `checked_in_at`, `cancelled_at`, `note` | |
+
+**`messages`** – a névsorból küldött „Message everyone” üzenetek: `session_id`, `sender_id`, `subject` (kitöltve), `body`, `recipients` (hány embernek ment), `created_at`.
 
 **`waitlist`** – (`session_id`, `user_id`) egyedi; `notified_at` = kapott-e „felszabadult hely” levelet.
 
@@ -312,6 +318,8 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 | user meta | `oys_phone`, `oys_area`, `oys_emergency_name`, `oys_emergency_phone`, `oys_health_notes`, `oys_marketing` | profil (`OYS_Customers::PROFILE_FIELDS`) |
 | user meta | `oys_waiver_version`, `oys_waiver_at`, `oys_waiver_ip` | nyilatkozat elfogadása |
 | user meta | `oys_stripe_customer_test`, `oys_stripe_customer_live` | Stripe customer ID módonként |
+| user meta | `oys_marketing` | hírlevél-feliratkozás (regisztráció, profil, app) |
+| user meta | `oys_pay_later_reset` | ettől az időponttól számolja újra a kihagyott helyszíni fizetéses órákat (admin „Allow paying at the studio again”) |
 | post meta (`oy_class`) | `oy_duration`, `oy_level`, `oy_intensity` (1–3), `oy_link`, `oy_aside_photo`, `oy_seo_title` | téma |
 | post meta (oldal) | `oy_seo_title`, `oy_seo_desc` | téma SEO |
 | post meta (`oy_faq`) | `oy_home` | főoldalon megjelenik-e |
@@ -593,6 +601,20 @@ Sorozat-módosításnál minden további dátum ugyanannyi nappal tolódik, mint
 - Képernyők: belépés; Órarend (szűrő: összes / stúdió / online); óra részletei és foglalás (hibrid módválasztó, fizetési mód, vendégek, nyilatkozat, várólista, lemondás, „Join the live class”); Saját óráim (közelgő / múlt); Bérletek (egyenlegek, bérletek, tagság); Profil.
 - A token az iOS Keychainben (`expo-secure-store`), weben (csak előnézet) localStorage-ban.
 - Vásárlás (bérlet, tagság, ajándék) és profilszerkesztés: a weboldal nyílik az appon belüli böngészőben – az App Store szabályai szerint fizikai szolgáltatás (jógaóra) fizethető külső fizetéssel; a digitális tartalom (pl. felvételek) eladása viszont Apple in-app vásárlást igényelne.
+
+### 6.15 Fizetés a helyszínen, adomány-alapú órák
+
+- **Helyszíni fizetés** (`paid_with = door`): a foglalás azonnal megerősített, a hely foglalt, `due_cents` = az ár (vagy a választott adomány). A névsorban „Paid: cash / Paid: other” → `OYS_Bookings::collect()` (`collected_with`, státusz `attended`). A naptár fiókja és a névsor mutatja a még beszedendő összeget (`due_at_studio()`).
+- **Ki foglalhat így** – `OYS_Bookings::pay_later_allowed()`: beállítás `pay_later` = `all` · `first` (csak az első óra) · `off`; az óra `pay_later` kapcsolója; csak stúdiós részvétel (online / hibrid online nem), magánóra nem, ingyenes óra nem. `pay_later_max_no_shows` (alap 2): ennyi „No-show”-ra jelölt, helyszíni fizetéses foglalás után csak előre fizethet (`oys_pay_later_blocked`); a vevő adatlapján visszaengedhető.
+- Lemondás: nincs mit visszaadni (outcome `none`), kredit nem keletkezik. Vendégek ugyanígy, fejenként `due_cents`.
+- **Adomány** (`pricing = donation`): a foglalásnál javasolt összegek (`donation_suggestions`) vagy saját összeg, minimum `donation_min_cents` (alap $5) – kártyával (Stripe, fejenkénti összeg × létszám) vagy a helyszínen. Bérlet/tagság továbbra is használható, ha az óra engedi. Órarendben „By donation”.
+- App API: az opciók közt `door`, a részletekben `donation {min_cents, amounts, suggested_cents}`, foglaláskor `amount_cents`; `my_booking.due_cents`.
+
+### 6.16 Üzenet a bejelentkezetteknek, magánóra első alkalom, közösség
+
+- **„Message everyone booked”** (névsor alja, a naptárból gombbal): `OYS_Messages::send_to_session()` – mindenki saját levelet kap (`{first_name}` és az órás helyőrzők), opcionálisan a vendégek e-mailjére és a várólistára is; napló a `messages` táblában. Hook: `oys_class_message_sent`.
+- **Magánóra**: a `private_note` szöveg a kérőűrlapon, az árlistán, a foglalóoldalon és az ajánlat-levélben; az ajánlatnál „Block N extra minutes” (alap `private_first_extra_min` = 15, első alkalomnál bepipálva – `OYS_Privates::is_first()`): a naptárban hosszabb idősáv, az ár nem változik, az alkalom megjegyzése elmagyarázza.
+- **Facebook-csoport** (`fb_group_url`): `oys_fb_group_link()` a hírlevél-pipa mellett, foglalás után, a fiókban, minden levél alján, a téma láblécében és az appban (`me.links.community`). Hírlevél on/off az appból: `POST /app/newsletter`.
 
 ---
 

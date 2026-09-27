@@ -128,3 +128,5 @@
 .oys-ev.is-hybrid { box-shadow: inset 0 -4px 0 #C6A3EE; }
 .oys-drawer__zoom { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 8px 0 0; }
 .oys-drawer__zoom span { color: #50575e; font-size: 12px; }
+.oys-seg--sm span { padding: 5px 6px; font-weight: 500; }
+.oys-drawer__due { margin: 6px 0 0; padding: 6px 10px; background: #FFF4E5; border-left: 3px solid #FF8C42; }

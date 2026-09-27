@@ -10,6 +10,9 @@
  *
  * Booking status: pending (payment hold) → confirmed → attended | no_show
  *                 pending → expired;  confirmed → cancelled | late_cancelled
+ *
+ * Paying at the studio: paid_with = 'door', due_cents = what they'll pay (the drop-in price or
+ * the donation they chose); the studio marks it paid on the roster (collected_with = cash|other).
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -221,7 +224,7 @@ class OYS_Bookings {
 	 * @return int|WP_Error the host booking id (or, when adding guests, the existing host id)
 	 */
 	public static function book_party( $user_id, $session, array $args = array() ) {
-		$args = wp_parse_args( $args, array( 'method' => 'credit', 'guests' => array(), 'guest_method' => '', 'host_booking' => 0, 'notify' => true, 'force' => false, 'mode' => 'studio' ) );
+		$args = wp_parse_args( $args, array( 'method' => 'credit', 'guests' => array(), 'guest_method' => '', 'host_booking' => 0, 'notify' => true, 'force' => false, 'mode' => 'studio', 'amount' => null ) );
 		if ( is_numeric( $session ) ) {
 			$session = OYS_Schedule::get( $session );
 		}
@@ -257,6 +260,13 @@ class OYS_Bookings {
 				? sprintf( _n( 'You need %d class on your pass for this booking.', 'You need %d classes on your pass for this booking.', $needs, 'olivia-studio' ), $needs )
 				: __( 'Passes can\'t be used for this session.', 'olivia-studio' ) );
 		}
+		if ( in_array( 'door', array( $with_host ? $args['method'] : '', $guests ? $guest_method : '' ), true ) && ! $args['force'] ) {
+			$door = self::pay_later_allowed( $user_id, $session, $mode );
+			if ( is_wp_error( $door ) ) {
+				return $door;
+			}
+		}
+		$due    = null === $args['amount'] ? OYS_Schedule::price_for( $session, $mode ) : max( 0, (int) $args['amount'] );
 		$member = null;
 		if ( $with_host && 'membership' === $args['method'] ) {
 			$member = OYS_Memberships::current_for( $user_id );
@@ -275,9 +285,11 @@ class OYS_Bookings {
 		}
 
 		$created = array();
-		$pay     = function ( $method ) use ( $user_id, $session, $member, $mode ) {
+		$pay     = function ( $method ) use ( $user_id, $session, $member, $mode, $due ) {
 			$row = array( 'paid_with' => $method, 'mode' => $mode );
-			if ( 'credit' === $method ) {
+			if ( 'door' === $method ) {
+				$row['due_cents'] = $due;
+			} elseif ( 'credit' === $method ) {
 				$row['pass_id'] = OYS_Passes::consume_for( $user_id, $session, $mode );
 				if ( ! $row['pass_id'] ) {
 					return null;
@@ -352,6 +364,64 @@ class OYS_Bookings {
 			return new WP_Error( 'oys_missing', __( 'Session not found.', 'olivia-studio' ) );
 		}
 		return self::book_party( $user_id, $session, array( 'method' => $paid_with, 'notify' => $notify, 'force' => $force, 'mode' => $mode ) );
+	}
+
+	/* ---------- Paying at the studio ---------- */
+
+	/** Bookings paid at the studio that the person didn't come to, since the studio last reset it. */
+	public static function pay_later_no_shows( $user_id ) {
+		global $wpdb;
+		$since = (string) get_user_meta( $user_id, 'oys_pay_later_reset', true );
+		return (int) $wpdb->get_var( $wpdb->prepare(
+			'SELECT COUNT(*) FROM ' . OYS_Install::table( 'bookings' ) . " WHERE user_id = %d AND guest_of = 0 AND paid_with = 'door' AND status = 'no_show' AND created_at > %s",
+			$user_id, $since ?: '1970-01-01 00:00:00'
+		) );
+	}
+
+	/** Has the customer ever had a spot (booked, attended or missed)? */
+	public static function has_booked_before( $user_id ) {
+		global $wpdb;
+		return (bool) $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM ' . OYS_Install::table( 'bookings' ) . " WHERE user_id = %d AND guest_of = 0 AND status IN ('confirmed','attended','no_show') LIMIT 1", $user_id ) );
+	}
+
+	/**
+	 * Can this customer book now and pay at the studio? Studio classes only (not online, not
+	 * private sessions), when the class allows it; Studio → Settings decides for whom (everyone
+	 * or first class only), and after too many missed unpaid bookings they pay in advance.
+	 * @return true|WP_Error
+	 */
+	public static function pay_later_allowed( $user_id, $session, $mode = 'studio' ) {
+		$rule = OYS_Settings::get( 'pay_later' );
+		if ( 'off' === $rule || ! $session || empty( $session->pay_later ) || 'private' === $session->kind || 'online' === oys_mode_for( $session, $mode ) ) {
+			return new WP_Error( 'oys_pay_later', __( 'Paying at the studio isn\'t available for this class.', 'olivia-studio' ) );
+		}
+		if ( ! oys_is_donation( $session ) && OYS_Schedule::price_for( $session, $mode ) < 1 ) {
+			return new WP_Error( 'oys_pay_later', __( 'This class is free: just reserve your spot.', 'olivia-studio' ) );
+		}
+		if ( 'first' === $rule && self::has_booked_before( $user_id ) ) {
+			return new WP_Error( 'oys_pay_later_first', __( 'Paying at the studio is for your first class. Please pay online or use a pass.', 'olivia-studio' ) );
+		}
+		$max = (int) OYS_Settings::get( 'pay_later_max_no_shows' );
+		if ( $max > 0 && self::pay_later_no_shows( $user_id ) >= $max ) {
+			return new WP_Error( 'oys_pay_later_blocked', __( 'You missed a few classes you had booked to pay at the studio, so please pay in advance for now.', 'olivia-studio' ) );
+		}
+		return true;
+	}
+
+	/** The studio received the payment for a pay-at-the-studio booking (and the person is here). */
+	public static function collect( $booking_id, $with = 'cash' ) {
+		$b = self::get( $booking_id );
+		if ( ! $b || 'door' !== $b->paid_with || ! in_array( $b->status, array( 'confirmed', 'attended', 'no_show' ), true ) ) {
+			return false;
+		}
+		self::set( $b->id, array( 'collected_with' => in_array( $with, array( 'cash', 'other' ), true ) ? $with : 'cash', 'status' => 'attended', 'checked_in_at' => $b->checked_in_at ?: oys_now() ) );
+		return true;
+	}
+
+	/** Still to be paid at the studio for a session, in cents. */
+	public static function due_at_studio( $session_id ) {
+		global $wpdb;
+		return (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COALESCE(SUM(due_cents),0) FROM ' . OYS_Install::table( 'bookings' ) . " WHERE session_id = %d AND paid_with = 'door' AND collected_with = '' AND status IN ('confirmed','attended')", $session_id ) );
 	}
 
 	/* ---------- Card payments: hold, confirm, release ---------- */
@@ -680,6 +750,7 @@ class OYS_Bookings {
 	public static function paid_with_labels() {
 		return array(
 			'credit'     => __( 'Pass', 'olivia-studio' ),
+			'door'       => __( 'Pays at the studio', 'olivia-studio' ),
 			'membership' => __( 'Membership', 'olivia-studio' ),
 			'card'       => __( 'Card', 'olivia-studio' ),
 			'free'       => __( 'Free', 'olivia-studio' ),

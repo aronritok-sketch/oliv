@@ -116,6 +116,50 @@ function oys_session_title( $session ) {
 	return $session->title ?: oys_class_title( $session->class_slug );
 }
 
+/** "Pay what you like" class: the price is only a suggestion, with a minimum for card payments. */
+function oys_is_donation( $session ) {
+	return $session && 'donation' === ( $session->pricing ?? 'fixed' );
+}
+
+/** Suggested donation amounts in cents (Studio → Settings), never below the minimum. */
+function oys_donation_amounts() {
+	$min = (int) OYS_Settings::get( 'donation_min_cents' );
+	$out = array();
+	foreach ( explode( ',', (string) OYS_Settings::get( 'donation_suggestions' ) ) as $v ) {
+		$c = oys_cents_from_input( trim( $v ) );
+		if ( $c >= $min && $c > 0 ) {
+			$out[] = $c;
+		}
+	}
+	$out = array_values( array_unique( $out ) );
+	sort( $out );
+	return $out ?: array( max( $min, 500 ) );
+}
+
+/** Price as shown on the timetable: "$25", "By donation" or "Free". */
+function oys_price_label( $session, $mode = 'studio' ) {
+	if ( oys_is_donation( $session ) ) {
+		return __( 'By donation', 'olivia-studio' );
+	}
+	$price = OYS_Schedule::price_for( $session, $mode );
+	return $price ? oys_money( $price ) : __( 'Free', 'olivia-studio' );
+}
+
+/** The studio's Facebook group (Studio → Settings), or ''. */
+function oys_fb_group_url() {
+	return esc_url_raw( (string) OYS_Settings::get( 'fb_group_url' ) );
+}
+
+/** "Join our Facebook group" link for forms, booking pages and the account. */
+function oys_fb_group_link( $text = '' ) {
+	$url = oys_fb_group_url();
+	if ( ! $url ) {
+		return '';
+	}
+	$text = $text ?: __( 'Join our Facebook group: class news, photos and a friendly community', 'olivia-studio' );
+	return '<p class="oys-fb"><a href="' . esc_url( $url ) . '" target="_blank" rel="noopener">' . oys_icon( 'facebook' ) . '<span>' . esc_html( $text ) . '</span></a></p>';
+}
+
 /** One-shot notices shown on the next page view (per user or per browser). */
 function oys_flash( $message, $type = 'ok' ) {
 	$key = oys_flash_key();
@@ -169,6 +213,9 @@ function oys_icon( $name ) {
 		'ticket'   => '<path d="M3.5 8.5a2 2 0 0 0 0 4v3.5h17v-3.5a2 2 0 0 1 0-4V5h-17z"/><path d="M14 5v11"/>',
 		'gift'     => '<rect x="3.5" y="9" width="17" height="11.5" rx="1"/><path d="M3.5 12.5h17M12 9v11.5"/><path d="M12 9c-1.5-3.5-5.5-4-5.5-1.5S9.5 9 12 9zm0 0c1.5-3.5 5.5-4 5.5-1.5S14.5 9 12 9z"/>',
 		'user'     => '<circle cx="12" cy="8" r="3.5"/><path d="M5 20c.8-3.8 3.6-6 7-6s6.2 2.2 7 6"/>',
+		'facebook' => '<path d="M14.5 8.5h2.5V5h-2.5C12 5 10.5 6.6 10.5 9v2H8v3.5h2.5V21H14v-6.5h2.6l.4-3.5h-3V9.3c0-.5.2-.8.5-.8z"/>',
+		'heart'    => '<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/>',
+		'mail'     => '<rect x="3.5" y="5.5" width="17" height="13" rx="1.5"/><path d="m4 7 8 6 8-6"/>',
 	);
 	return '<svg class="oys-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' . ( $icons[ $name ] ?? '' ) . '</svg>';
 }

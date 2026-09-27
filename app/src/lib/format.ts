@@ -51,6 +51,12 @@ export function availability(s: Session): { text: string; tone: 'ok' | 'low' | '
   return { text: `${s.spots_left} spots`, tone: 'ok' };
 }
 
+/** "$25" or "By donation" for a class card. */
+export function priceLabel(s: Session, currency = 'usd'): string {
+  if (s.pricing === 'donation') return 'By donation';
+  return s.price_cents ? money(s.price_cents, currency) : 'Free';
+}
+
 export function formatLabel(format: Session['format']): string {
   return format === 'online' ? 'Online' : format === 'hybrid' ? 'Studio + online' : 'Studio';
 }
