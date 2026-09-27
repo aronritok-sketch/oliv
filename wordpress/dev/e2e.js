@@ -790,9 +790,9 @@ async function payOnMockStripe(page, button = '#pay') {
   php(`OYS_Newsletter::process_queue(1000);`);
   const nl = mails().slice(nmark).map(f => fs.readFileSync(path.join(WP_DIR, 'wp-content/mail-log', f), 'utf8')).find(h => h.includes('Hi Rae') && h.includes('Sunday sunrise'));
   check(!!nl, 'subscriber got the newsletter, by name');
-  const unsub = (nl.match(/href="([^"]*oys_unsub=[^"]+)"/) || [])[1];
+  const unsub = ((nl || '').match(/href="([^"]*oys_unsub=[^"]+)"/) || [])[1];
   check(!!unsub, 'with an unsubscribe link');
-  await rae.goto(unsub.replace(/&amp;/g, '&'));
+  if (unsub) await rae.goto(unsub.replace(/&amp;/g, '&'));
   check(await rae.isVisible("text=You're unsubscribed"), 'one-click unsubscribe');
   check(php(`echo get_user_meta(${raeId}, 'oys_marketing', true);`) === '', 'no longer subscribed');
   php(`OYS_Settings::update(array('ai_api_key'=>''));`);
