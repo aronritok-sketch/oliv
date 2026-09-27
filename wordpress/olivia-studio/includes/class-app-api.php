@@ -366,7 +366,7 @@ class OYS_App_API {
 		}
 		$mode   = oys_mode_for( $s, sanitize_key( $p['mode'] ?? 'studio' ) );
 		$method = sanitize_key( $p['method'] ?? '' );
-		$guests = 'private' === $s->kind ? array() : OYS_Bookings::clean_guests( wp_list_pluck( (array) ( $p['guests'] ?? array() ), 'name' ), wp_list_pluck( (array) ( $p['guests'] ?? array() ), 'email' ) );
+		$guests = 'private' === $s->kind ? array() : OYS_Bookings::clean_guests( array_map( fn( $g ) => (string) ( $g['name'] ?? '' ), array_filter( (array) ( $p['guests'] ?? array() ), 'is_array' ) ), array_map( fn( $g ) => (string) ( $g['email'] ?? '' ), array_filter( (array) ( $p['guests'] ?? array() ), 'is_array' ) ) );
 		$n      = count( $guests );
 		if ( 'online' === $mode && $n && OYS_Zoom::personal_links() && array_filter( $guests, fn( $g ) => ! $g['email'] ) ) {
 			return new WP_Error( 'oys_guest_email', __( 'Add an email for each online guest, so they get their own link to join.', 'olivia-studio' ), array( 'status' => 400 ) );
