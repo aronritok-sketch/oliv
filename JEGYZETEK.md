@@ -70,7 +70,8 @@
 - **Üzenet a bejelentkezetteknek** egy gombbal (névsor, naptár), napló a névsorban.
 - **Magánóra:** jól látható szöveg, hogy az első alkalom tovább tart; ajánlatnál +15 perc blokkolva (nem számlázva).
 - **Facebook-csoport** link: hírlevél-pipa, foglalás után, fiók, levelek alja, lábléc, app. Hírlevél-kapcsoló az appban.
-- Hátra: 2. kör (helyszínek, minimum létszám, automatikus lemondás), 3. kör (kupon, szülinap, hűség-sorsolás, hírlevél AI-jal), 4. kör (oktatók, bevétel-megosztás).
+- **2. rész – helyszínek és minimum létszám:** Studio → Locations: helyszínenként minimum és döntési idő (alap 2 fő, 3 órával előtte; online külön). Óránként felülírható a naptárban (pl. reggeli óra 12 órával előtte). Kevés jelentkező → automatikus lemondás, mindenki visszakapja az óráját, és levelet kap más időpontokkal + „hozz egy barátot” tippel; előtte (alap 12 órával) „hozz egy barátot” levél. Olivia „Class is on” / „Cancelled automatically” levelet kap.
+- Hátra: 3. kör (kupon, szülinap, hűség-sorsolás, hírlevél AI-jal), 4. kör (oktatók, bevétel-megosztás).
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb.

@@ -65,6 +65,7 @@ export default function ClassDetail() {
 
       {s.description ? <T>{plainText(s.description)}</T> : null}
       {s.note ? <Notice text={plainText(s.note)} /> : null}
+      {s.minimum ? <Notice text={s.minimum} testID="minimum" /> : null}
       {message ? <Notice tone={message.tone} text={message.text} testID="class-message" /> : null}
 
       {hybrid && !mine ? <ModeSwitch data={data} mode={mode} onChange={(m) => { setMessage(null); setMode(m); }} currency={currency} /> : null}

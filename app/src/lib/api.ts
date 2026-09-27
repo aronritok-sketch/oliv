@@ -41,6 +41,8 @@ export type Session = {
   closed_reason: string;
   my_booking: MyBooking | null;
   pricing?: 'fixed' | 'donation';
+  /** "Goes ahead with 3 or more people…" when the class has a minimum, else ''. */
+  minimum?: string;
   waitlist_position: number;
   web_url: string;
 };

@@ -166,7 +166,8 @@
       + (s.format === 'hybrid' ? '<i class="oys-ev__tag">+ Live ' + s.online_booked + '</i>' : '')
       + (s.kind === 'event' ? '<i class="oys-ev__tag">Event</i>' : '')
       + (s.kind === 'private' ? '<i class="oys-ev__tag">Private</i>' : '')
-      + (s.pricing === 'donation' ? '<i class="oys-ev__tag" title="By donation">♡</i>' : '');
+      + (s.pricing === 'donation' ? '<i class="oys-ev__tag" title="By donation">♡</i>' : '')
+      + (s.minimum && s.minimum.short ? '<i class="oys-ev__tag oys-ev__tag--warn" title="Fewer than ' + s.minimum.people + ' booked; decided ' + esc(s.minimum.at) + '">min ' + s.minimum.people + '</i>' : '');
     return '<div class="' + cls.join(' ') + '" data-id="' + s.id + '" tabindex="0" role="button" aria-label="' + esc(s.label + ', ' + longDate(s.date) + ' ' + clock(s.start)) + '"'
       + ' style="top:' + top + 'px;height:' + height + 'px;left:calc(' + (s._col || 0) * w + '% + 2px);width:calc(' + w + '% - 4px)">'
       + '<span class="oys-ev__time">' + clock(s.start) + ' – ' + clock(end) + '</span>'
@@ -244,6 +245,7 @@
       if (v.series) html += '<p class="oys-drawer__series">↻ ' + esc(v.series.label) + (v.series.active ? '' : ' (stopped)') + '</p>';
       html += '<div class="oys-drawer__people"><div class="oys-meter"><span style="width:' + Math.min(100, v.booked / v.capacity * 100) + '%"></span></div><p><b>' + v.booked + ' / ' + v.capacity + '</b> ' + (v.format === 'hybrid' ? 'in the studio · <b>' + v.online_booked + (v.online_capacity ? ' / ' + v.online_capacity : '') + '</b> online' : 'booked') + (v.held ? ' · ' + v.held + ' paying now' : '') + (v.waitlist ? ' · ' + v.waitlist + ' on the waitlist' : '') + '</p>'
         + (v.people.length ? '<ul>' + v.people.map(p => '<li>' + esc(p) + '</li>').join('') + '</ul>' : '')
+        + (v.minimum && v.minimum.people && v.status === 'scheduled' ? '<p class="oys-drawer__min' + (v.minimum.short ? ' is-short' : '') + '">' + (v.minimum.state === 1 ? '✓ Confirmed: goes ahead' : 'Needs ' + v.minimum.people + ' to go ahead · decided ' + esc(v.minimum.at)) + '</p>' : '')
         + (v.due ? '<p class="oys-drawer__due">To collect at the studio: <b>' + money(v.due) + '</b></p>' : '')
         + '<p class="oys-drawer__links"><a class="button" href="' + esc(C.rosterUrl + v.id) + '">Roster &amp; attendance</a> ' + (v.booked && v.status === 'scheduled' ? '<a class="button" href="' + esc(C.rosterUrl + v.id) + '#message">Message everyone</a> ' : '') + '<a class="button-link" href="' + esc(C.bookUrl + v.id) + '" target="_blank" rel="noopener">Booking page ↗</a></p>'
         + (v.zoom && v.status === 'scheduled' ? '<p class="oys-drawer__zoom"><a class="button button-primary" href="' + esc(v.zoom.start) + '" target="_blank" rel="noopener">Start the Zoom class</a> <span>Meeting ' + esc(v.zoom.id) + '</span></p>' : '')
@@ -257,7 +259,8 @@
     const formats = { studio: 'In person', online: 'Online', hybrid: 'Both' };
     html += '<div class="oys-seg" role="radiogroup" aria-label="Where">' + Object.keys(formats).map(k => '<label><input type="radio" name="format" value="' + k + '"' + ((v.format || 'studio') === k ? ' checked' : '') + '><span>' + formats[k] + '</span></label>').join('') + '</div>';
     html += '<p class="description f-hybrid-note">In the studio and streamed live: people choose how they join.</p>';
-    html += field('Location', '<input type="text" name="location" value="' + esc(v.location) + '" placeholder="Studio or address">', 'f-loc');
+    html += field('Location', '<input type="text" name="location" list="oys-locations" value="' + esc(v.location) + '" placeholder="Studio or address">', 'f-loc');
+    html += '<datalist id="oys-locations">' + (C.locations || []).filter(l => l.id !== 'online').map(l => '<option value="' + esc(l.name) + '">').join('') + '</datalist>';
     html += field(C.zoom ? 'Online link (leave empty: a Zoom meeting is created automatically)' : 'Online link (Zoom, Meet…)', '<input type="url" name="online_url" value="' + esc(v.online_url) + '" placeholder="https://">', 'f-url');
     html += '<div class="oys-row f-online">' + field('Online spots (0 = no limit)', '<input type="number" name="online_capacity" min="0" value="' + (v.online_capacity || 0) + '">') + field('Online ticket (' + esc(C.currency) + ')', '<input type="number" name="online_price" min="0" step="0.01" value="' + ((v.format === 'hybrid' ? v.online_price : C.prices.online) / 100) + '">') + '</div>';
     html += '<div class="oys-seg oys-seg--sm" role="radiogroup" aria-label="Price">' + [['fixed', 'Fixed price'], ['donation', 'By donation']].map(p => '<label><input type="radio" name="pricing" value="' + p[0] + '"' + ((v.pricing || 'fixed') === p[0] ? ' checked' : '') + '><span>' + p[1] + '</span></label>').join('') + '</div>';
@@ -265,6 +268,10 @@
     html += '<p class="description f-donation-note">People choose what to give (from ' + money(C.donationMin) + '), by card or at the studio. The price above is the suggested amount.</p>';
     html += '<label class="oys-check"><input type="checkbox" name="credits_allowed"' + (v.credits_allowed ? ' checked' : '') + '> Passes and memberships can be used</label>';
     html += '<label class="oys-check f-paylater"><input type="checkbox" name="pay_later"' + (v.pay_later !== false ? ' checked' : '') + '> People can book now and pay at the studio' + (C.payLater === 'off' ? ' <small>(switched off in Settings)</small>' : '') + '</label>';
+    html += '<fieldset class="oys-min f-min"><legend>Minimum to go ahead</legend><div class="oys-row">'
+      + field('People (empty = location default)', '<input type="number" name="min_people" min="0" value="' + (v.min_people == null ? '' : v.min_people) + '" placeholder="">')
+      + field('Decide hours before', '<input type="number" name="decide_hours" min="1" value="' + (v.decide_hours == null ? '' : v.decide_hours) + '" placeholder="">') + '</div>'
+      + '<p class="description f-min-hint"></p></fieldset>';
     html += field('Short note (shown on the timetable)', '<input type="text" name="note" value="' + esc(v.note) + '" placeholder="e.g. Bring a towel">');
     html += field('Description', '<textarea name="description" rows="3">' + esc(v.description) + '</textarea>', 'f-desc');
     if (isNew) html += field('Repeat', '<select name="repeat"><option value="none">Just this date</option><option value="weekly">Every week on ' + DAY_NAMES[weekday(v.date)] + '</option></select>', 'f-repeat');
@@ -291,12 +298,23 @@
       d.querySelector('.f-donation-note').hidden = !donation;
       d.querySelector('.f-price-label').textContent = donation ? 'Suggested amount' : 'Drop-in price';
       d.querySelector('.f-paylater').hidden = online || kind === 'private';
+      d.querySelector('.f-min').hidden = kind === 'private';
+      const loc = online ? (C.locations || []).find(l => l.id === 'online') : (C.locations || []).find(l => l.id !== 'online' && l.name.toLowerCase() === form.location.value.trim().toLowerCase());
+      const defPeople = loc ? loc.min_people : +C.minDefault, defHours = loc ? loc.decide_hours : +C.decideDefault;
+      form.min_people.placeholder = kind === 'group' ? String(defPeople) : '0';
+      form.decide_hours.placeholder = String(defHours);
+      const people = form.min_people.value === '' ? (kind === 'group' ? defPeople : 0) : +form.min_people.value;
+      const hours = form.decide_hours.value === '' ? defHours : +form.decide_hours.value;
+      d.querySelector('.f-min-hint').innerHTML = people > 0
+        ? 'Cancelled automatically if fewer than <b>' + people + '</b> people are booked <b>' + hours + ' hours</b> before; everyone gets other dates. ' + (loc ? 'Default for ' + esc(loc.name) + '.' : '') + ' <a href="' + esc(C.locationsUrl) + '">Locations</a>'
+        : 'No minimum: the class always goes ahead.';
       const rep = d.querySelector('.f-repeat');
       if (rep) {
         rep.hidden = kind !== 'group';
         rep.querySelector('option[value=weekly]').textContent = 'Every week on ' + DAY_NAMES[weekday(form.date.value || C.today)];
       }
     };
+    form.addEventListener('input', e => { if (['location', 'min_people', 'decide_hours'].indexOf(e.target.name) >= 0) sync(); });
     form.addEventListener('change', e => {
       if (e.target.name === 'format' && isNew) {
         // New online classes default to the online price, in-person ones to the drop-in price.
@@ -343,6 +361,8 @@
       credits_allowed: form.credits_allowed.checked,
       pricing: (form.querySelector('[name=pricing]:checked') || {}).value || 'fixed',
       pay_later: form.pay_later.checked,
+      min_people: form.min_people.value === '' ? '' : parseInt(form.min_people.value, 10),
+      decide_hours: form.decide_hours.value === '' ? '' : parseInt(form.decide_hours.value, 10),
       note: form.note.value.trim(),
       repeat: form.repeat ? form.repeat.value : 'none',
     };

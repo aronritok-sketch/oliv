@@ -36,6 +36,10 @@ class OYS_Email_Templates {
 				'Cancelled: {class}, {date_short}', 'Class cancelled', "I'm sorry, this session has been cancelled. {reason}", '', 'Book another class', array( 'reason' ) ),
 			'guest_cancelled'   => array( __( 'Cancellation to a guest', 'olivia-studio' ), 'bookings', 'guest', __( 'To a guest with an email when their spot is cancelled', 'olivia-studio' ),
 				'Cancelled: {class}, {date_short}', 'Class cancelled', 'Hi {guest_name}, your spot in this class has been cancelled.', '', '', array( 'guest_name' ) ),
+			'class_cancelled_minimum' => array( __( 'Class cancelled: not enough people', 'olivia-studio' ), 'bookings', 'customer', __( 'When a class is cancelled automatically because fewer than the minimum signed up; with other dates to book', 'olivia-studio' ),
+				'Cancelled: {class}, {date_short}', 'Class cancelled', "Hi {first_name}, not enough people signed up for {class} on {day}, so it won't go ahead this time. I'm sorry!", 'I hope to see you at another class soon.', 'See the timetable' ),
+			'minimum_nudge'     => array( __( 'Bring a friend (class needs more people)', 'olivia-studio' ), 'bookings', 'customer', __( 'Before the decision time, when a class has fewer people than its minimum (hours set under Locations)', 'olivia-studio' ),
+				'{class} needs {missing}', 'Bring a friend?', "Hi {first_name}, {class} on {day} at {time} needs {missing} to go ahead. Know someone who'd enjoy it? Bring them along!", "If there still aren't enough people by {deadline}, the class is cancelled and your class goes back on your pass.", 'Book for a friend', array( 'missing', 'deadline' ) ),
 			'session_changed'   => array( __( 'Class time or place changed', 'olivia-studio' ), 'bookings', 'customer', __( 'When you move a class in the calendar and tick "email the people booked"', 'olivia-studio' ),
 				'Changed: {class}, {day} {date_short}, {time}', 'Your class has changed', "Hi {first_name}, there's a change to your class. Your spot is kept, nothing to do if the new details work for you.", "Can't make the new time? Cancel in your account and your class goes back on your pass (or you get a class credit).", 'My bookings' ),
 			'waitlist_promoted' => array( __( 'Moved in from the waitlist', 'olivia-studio' ), 'bookings', 'customer', __( 'When a spot opens and someone with a pass or membership is booked in automatically', 'olivia-studio' ),
@@ -79,6 +83,7 @@ class OYS_Email_Templates {
 			'studio_private'      => array( __( 'New private request', 'olivia-studio' ), 'studio', 'studio', __( 'Every private session request', 'olivia-studio' ) ),
 			'studio_cancellation' => array( __( 'Customer cancellations', 'olivia-studio' ), 'studio', 'studio', __( 'When a customer cancels', 'olivia-studio' ) ),
 			'studio_membership'   => array( __( 'Memberships', 'olivia-studio' ), 'studio', 'studio', __( 'New, cancelled and failed memberships', 'olivia-studio' ) ),
+			'studio_minimum'      => array( __( 'Minimum number of people', 'olivia-studio' ), 'studio', 'studio', __( 'At the decision time: the class is on, or it was cancelled for too few people', 'olivia-studio' ) ),
 			'studio_alerts'       => array( __( 'Problems that need you', 'olivia-studio' ), 'studio', 'studio', __( 'A class over capacity, a Zoom meeting that could not be created', 'olivia-studio' ) ),
 		);
 		$out = array();

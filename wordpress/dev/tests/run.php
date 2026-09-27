@@ -167,6 +167,8 @@ function make_session( $args = array() ) {
 		'pricing'         => $args['pricing'] ?? 'fixed',
 		'pay_later'       => $args['pay_later'] ?? 1,
 		'location'        => $args['location'] ?? '',
+		'min_people'      => $args['min_people'] ?? null,
+		'decide_hours'    => $args['decide_hours'] ?? null,
 		'status'          => 'scheduled',
 	) ) );
 }
@@ -1016,6 +1018,96 @@ test( 'app api: newsletter and the Facebook group link', function () {
 	[ , $me ] = api( 'POST', '/app/newsletter', array( 'subscribe' => false ), $tok );
 	ok( ! $me['user']['newsletter'], 'unsubscribed' );
 	ok( str_contains( OYS_Emails::preview( 'welcome' )[1], 'Facebook group' ), 'emails link the group' );
+} );
+
+/* ---------- Round 2: locations and the minimum number of people ---------- */
+
+test( 'locations: rules by place, online, class override, events and privates', function () {
+	OYS_Settings::update( array( 'min_people_default' => 2, 'decide_hours_default' => 3 ) );
+	OYS_Locations::save_all( array(
+		array( 'name' => 'Riverside Studio', 'address' => '1 River Rd', 'min_people' => 4, 'decide_hours' => 12 ),
+		array( 'id' => 'online', 'name' => 'Online', 'min_people' => 3, 'decide_hours' => 2 ),
+		array( 'name' => '' ),
+	) );
+	eq( array( 'riverside-studio', 'online' ), array_keys( OYS_Locations::all() ), 'places saved, empty rows dropped' );
+	eq( array( 4, 12 ), OYS_Locations::rule( make_session( array( 'location' => 'riverside studio' ) ) ), 'place rule (name matched without case)' );
+	eq( array( 3, 2 ), OYS_Locations::rule( make_session( array( 'format' => 'online', 'price' => 600 ) ) ), 'online rule' );
+	eq( array( 2, 3 ), OYS_Locations::rule( make_session( array( 'location' => 'Beach' ) ) ), 'unknown place: defaults' );
+	eq( array( 6, 1 ), OYS_Locations::rule( make_session( array( 'location' => 'Riverside Studio', 'min_people' => 6, 'decide_hours' => 1 ) ) ), 'the class sets its own' );
+	eq( 0, OYS_Locations::rule( make_session( array( 'location' => 'Riverside Studio', 'min_people' => 0 ) ) )[0], 'minimum 0: always goes ahead' );
+	eq( 0, OYS_Locations::rule( make_session( array( 'kind' => 'event' ) ) )[0], 'events only with their own minimum' );
+	eq( 5, OYS_Locations::rule( make_session( array( 'kind' => 'event', 'min_people' => 5 ) ) )[0], 'event with a minimum' );
+	eq( 0, OYS_Locations::rule( make_session( array( 'kind' => 'private', 'capacity' => 1, 'min_people' => 2 ) ) )[0], 'never for private sessions' );
+	delete_option( OYS_Locations::OPTION );
+} );
+
+test( 'minimum: too few people → cancelled with other dates; enough → the class is on', function () {
+	global $wpdb;
+	OYS_Settings::update( array( 'min_people_default' => 2, 'decide_hours_default' => 3, 'min_nudge_hours' => 0 ) );
+	$u     = make_user( 'Lou' );
+	$pid   = OYS_Passes::grant( $u, array( 'credits' => 2 ) );
+	$short = make_session( array( 'in_hours' => 2, 'location' => 'Beach' ) );
+	$alt   = make_session( array( 'in_hours' => 50, 'location' => 'Beach' ) );
+	OYS_Bookings::book_with_credit( $u, $short, false );
+	$fine  = make_session( array( 'in_hours' => 2.5, 'location' => 'Beach' ) );
+	OYS_Bookings::book_party( make_user(), $fine, array( 'method' => 'comp', 'guests' => guests( 'Kim' ), 'notify' => false ) );
+	$later = make_session( array( 'in_hours' => 30, 'location' => 'Beach' ) );
+	OYS_Bookings::book_manual( make_user(), $later, 'comp', false );
+	$log = sent_mails( fn() => OYS_Locations::run() );
+	eq( 'cancelled', OYS_Schedule::get( $short->id )->status, 'one person of two: cancelled' );
+	eq( 2, (int) OYS_Schedule::get( $short->id )->min_state, 'marked as cancelled for too few people' );
+	eq( 2, OYS_Passes::balance( $u, 'class' ), 'the class is back on the pass' );
+	$mine = array_values( array_filter( $log, fn( $m ) => get_userdata( $u )->user_email === $m['to'] ) );
+	eq( 1, count( $mine ), 'the customer gets one email' );
+	ok( str_contains( $mine[0]['html'], 'not enough people signed up' ), 'it says why' );
+	ok( str_contains( $mine[0]['html'], oys_book_url( $fine->id ) ), 'with the next date of the class at the same place' );
+	ok( str_contains( $mine[0]['html'], 'Join another class instead' ), 'under "join another class"' );
+	ok( str_contains( $mine[0]['html'], 'bring a friend' ), 'and a bring-a-friend tip' );
+	ok( (bool) array_filter( $log, fn( $m ) => str_starts_with( $m['subject'], '[Studio] Cancelled automatically:' ) ), 'the studio is told' );
+	eq( 'scheduled', OYS_Schedule::get( $fine->id )->status, 'two people (with a guest): goes ahead' );
+	eq( 1, (int) OYS_Schedule::get( $fine->id )->min_state, 'marked as confirmed' );
+	ok( (bool) array_filter( $log, fn( $m ) => str_starts_with( $m['subject'], '[Studio] Class is on:' ) ), 'the studio hears it is on' );
+	eq( 0, (int) OYS_Schedule::get( $later->id )->min_state, 'not decided before its time' );
+	eq( 0, count( array_filter( sent_mails( fn() => OYS_Locations::run() ), fn( $m ) => str_contains( $m['subject'], 'Hatha' ) && in_array( $m['to'], array( get_userdata( $u )->user_email ), true ) ) ), 'decided once' );
+	// Moving a confirmed class decides it again.
+	OYS_Schedule::save( array( 'starts_at' => oys_utc_plus( 26 * HOUR_IN_SECONDS ), 'ends_at' => oys_utc_plus( 27 * HOUR_IN_SECONDS ) ), $fine->id );
+	eq( 0, (int) OYS_Schedule::get( $fine->id )->min_state, 'moved: decided again later' );
+	// Empty class: cancelled quietly.
+	$empty = make_session( array( 'in_hours' => 1.5, 'location' => 'Beach' ) );
+	OYS_Locations::run();
+	eq( 'cancelled', OYS_Schedule::get( $empty->id )->status, 'nobody booked: cancelled' );
+} );
+
+test( 'minimum: bring-a-friend email before the decision, once', function () {
+	OYS_Settings::update( array( 'min_people_default' => 3, 'decide_hours_default' => 3, 'min_nudge_hours' => 12 ) );
+	$u = make_user( 'Fay' );
+	$s = make_session( array( 'in_hours' => 10, 'location' => 'Beach' ) );
+	OYS_Bookings::book_manual( $u, $s, 'comp', false );
+	$log  = sent_mails( fn() => OYS_Locations::run() );
+	$mine = array_values( array_filter( $log, fn( $m ) => get_userdata( $u )->user_email === $m['to'] ) );
+	eq( 1, count( $mine ), 'bring-a-friend email' );
+	eq( 'Hatha Flow needs 2 more people', $mine[0]['subject'], 'says how many are missing' );
+	ok( str_contains( $mine[0]['html'], oys_book_url( $s->id ) ), 'with the link to share' );
+	eq( 'scheduled', OYS_Schedule::get( $s->id )->status, 'not decided yet' );
+	eq( 0, count( array_filter( sent_mails( fn() => OYS_Locations::run() ), fn( $m ) => get_userdata( $u )->user_email === $m['to'] ) ), 'sent once' );
+	ok( str_contains( OYS_Locations::notice( OYS_Schedule::get( $s->id ) ), 'goes ahead with 3 or more people' ), 'booking page explains the minimum' );
+	OYS_Settings::update( array( 'min_people_default' => 2, 'min_nudge_hours' => 12 ) );
+} );
+
+test( 'minimum: set in the calendar, kept by weekly classes', function () {
+	wp_set_current_user( 1 );
+	$req = new WP_REST_Request( 'POST', '/oys/v1/admin/sessions' );
+	$req->set_body_params( array( 'kind' => 'group', 'class_slug' => 'hatha-flow', 'date' => wp_date( 'Y-m-d', time() + 2 * DAY_IN_SECONDS ), 'start' => '06:30', 'duration' => 60, 'capacity' => 10, 'price' => 2500, 'min_people' => 4, 'decide_hours' => 12, 'repeat' => 'weekly' ) );
+	$res = rest_do_request( $req )->get_data();
+	eq( 4, $res['session']['min_people'], 'minimum saved' );
+	eq( 12, $res['session']['minimum']['hours'], 'decision 12 hours before' );
+	$tpl = OYS_Schedule::template( OYS_Schedule::get( $res['session']['id'] )->template_id );
+	eq( array( 4, 12 ), array( (int) $tpl->min_people, (int) $tpl->decide_hours ), 'weekly class keeps it' );
+	$req = new WP_REST_Request( 'POST', '/oys/v1/admin/sessions/' . $res['session']['id'] );
+	$req->set_body_params( array_merge( $res['session'], array( 'min_people' => '', 'decide_hours' => '' ) ) );
+	$res = rest_do_request( $req )->get_data();
+	eq( null, $res['session']['min_people'], 'cleared: back to the location default' );
+	wp_set_current_user( 0 );
 } );
 
 test( 'helpers: money and periods', function () {

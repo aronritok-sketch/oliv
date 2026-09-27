@@ -468,7 +468,8 @@ async function payOnMockStripe(page, button = '#pay') {
   // 28. Admin calendar: add a class by clicking, move it by dragging, weekly class, change the series, stop it.
   const adm = await (await browser.newContext({ viewport: { width: 1440, height: 1000 } })).newPage();
   adm.on('pageerror', e => console.log('Calendar JS error:', e.message));
-  await adm.goto(`${BASE}/wp-login.php`);
+  // Straight to the studio pages: the WordPress dashboard fetches news from the internet, which can be slow.
+  await adm.goto(`${BASE}/wp-login.php?redirect_to=${encodeURIComponent(BASE + "/wp-admin/admin.php?page=oys")}`);
   await adm.fill('#user_login', 'admin');
   await adm.fill('#user_pass', 'admin12345');
   await Promise.all([adm.waitForNavigation(), adm.click('#wp-submit')]);
@@ -687,6 +688,44 @@ async function payOnMockStripe(page, button = '#pay') {
   // 33. Private sessions: the first-session note is on the request form.
   await rae.goto(`${BASE}/account/?tab=private`);
   check(await rae.isVisible('.oys-private-note:has-text("extra minutes to talk through your goals")'), 'private session note shown');
+
+  // 34. Locations and the minimum number of people: set per place, shown on the booking page,
+  //     the calendar knows the rule, and a short class is cancelled with other dates.
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-locations`);
+  const locRows = await adm.$$('.oys-locations tbody tr');
+  const blank = locRows.length - 2;
+  await adm.fill(`input[name="loc[${blank}][name]"]`, 'E2E Beach');
+  await adm.fill(`input[name="loc[${blank}][address]"]`, 'Fort Myers Beach');
+  await adm.fill(`input[name="loc[${blank}][min_people]"]`, '3');
+  await adm.fill(`input[name="loc[${blank}][decide_hours]"]`, '12');
+  await Promise.all([adm.waitForNavigation(), adm.click('button:has-text("Save locations"), input[value="Save locations"]')]);
+  check(await adm.isVisible('text=Locations saved.'), 'location saved');
+  check(php(`$l = OYS_Locations::all()['e2e-beach'] ?? null; echo $l ? $l['min_people'] . '/' . $l['decide_hours'] : '';`) === '3/12', 'minimum 3, decided 12 hours before');
+  await adm.screenshot({ path: `${SHOTS}/24-locations.png`, fullPage: true });
+  const mn = fresh();
+  php(`global $wpdb; $wpdb->update($wpdb->prefix.'oys_sessions', array('location'=>'E2E Beach'), array('id'=>${mn}));`);
+  await rae.goto(`${BASE}/book/?session=${mn}`);
+  check(await rae.isVisible('.oys-min-note:has-text("goes ahead with 3 or more people")'), 'booking page explains the minimum');
+  const mnDay = php(`echo wp_date('Y-m-d', oys_ts(OYS_Schedule::get(${mn})->starts_at));`);
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-calendar&week=${mnDay}&open=${mn}`);
+  await adm.waitForSelector('.oys-drawer');
+  check(await adm.isVisible('.oys-drawer__min:has-text("Needs 3 to go ahead")'), 'calendar shows the rule');
+  check((await adm.getAttribute('.oys-drawer [name=min_people]', 'placeholder')) === '3', 'calendar: the place default as placeholder');
+  check(await adm.isVisible('.oys-drawer .f-min-hint:has-text("12 hours")'), 'calendar explains when it is decided');
+  await adm.screenshot({ path: `${SHOTS}/25-calendar-minimum.png` });
+  await adm.click('.oys-drawer__x');
+  // Rae books it, then the decision time comes with only her booked.
+  await rae.goto(`${BASE}/book/?session=${mn}`);
+  await rae.check('input[value="door"]');
+  await Promise.all([rae.waitForNavigation(), rae.click('.oys-submit')]);
+  php(`global $wpdb; $t = time() + 5 * HOUR_IN_SECONDS; $wpdb->update($wpdb->prefix.'oys_sessions', array('starts_at'=>gmdate('Y-m-d H:i:s',$t),'ends_at'=>gmdate('Y-m-d H:i:s',$t+3600)), array('id'=>${mn}));`);
+  const cmark = mails().length;
+  php(`OYS_Locations::run();`);
+  check(php(`echo OYS_Schedule::get(${mn})->status;`) === 'cancelled', 'too few people: cancelled automatically');
+  const cmail = mails().slice(cmark).map(f => fs.readFileSync(path.join(WP_DIR, 'wp-content/mail-log', f), 'utf8')).find(h => h.includes('not enough people signed up'));
+  check(!!cmail && cmail.includes('Join another class instead') && cmail.includes('bring a friend'), 'email offers other dates and a bring-a-friend tip');
+  check(mailSubjects().some(x => x && x.startsWith('[Studio] Cancelled automatically:')), 'the studio is told');
+  php(`delete_option('oys_locations');`);
 
   // Screens for review.
   await a.goto(`${BASE}/schedule-pricing/`);

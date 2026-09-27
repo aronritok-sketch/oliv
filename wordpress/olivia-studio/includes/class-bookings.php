@@ -572,11 +572,12 @@ class OYS_Bookings {
 	 * Cancel a booking. Cancelling the customer's own row cancels their guests too;
 	 * a guest row can also be cancelled on its own.
 	 * $opts: by_studio (bool) — the studio cancelled, so the class always comes back;
-	 *        reason (string); notify (bool, default true)
+	 *        reason (string); notify (bool, default true);
+	 *        email (template key instead of the default), email_extra (html added to the email)
 	 * @return string|WP_Error outcome of the row: returned | credit | membership | late | none
 	 */
 	public static function cancel( $booking_id, array $opts = array() ) {
-		$opts    = wp_parse_args( $opts, array( 'by_studio' => false, 'reason' => '', 'notify' => true ) );
+		$opts    = wp_parse_args( $opts, array( 'by_studio' => false, 'reason' => '', 'notify' => true, 'email' => '', 'email_extra' => '' ) );
 		$booking = self::get( $booking_id );
 		if ( ! $booking ) {
 			return new WP_Error( 'oys_missing', __( 'Booking not found.', 'olivia-studio' ) );
@@ -606,7 +607,7 @@ class OYS_Bookings {
 			$outcomes[ $b->id ] = self::cancel_row( $b, $session, $on_time );
 		}
 		if ( $opts['notify'] ) {
-			OYS_Emails::booking_cancelled( $booking_id, $outcomes[ $booking_id ], $opts['by_studio'], $opts['reason'], array_keys( $outcomes ) );
+			OYS_Emails::booking_cancelled( $booking_id, $outcomes[ $booking_id ], $opts['by_studio'], $opts['reason'], array_keys( $outcomes ), $opts['email'], $opts['email_extra'] );
 		}
 		foreach ( $outcomes as $id => $outcome ) {
 			do_action( 'oys_booking_cancelled', $id, $outcome );

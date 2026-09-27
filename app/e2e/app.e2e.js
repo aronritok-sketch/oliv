@@ -113,6 +113,7 @@ const tid = (id) => `[data-testid="${id}"]`;
   await page.click(tid(`session-${setup.studio}`));
   await page.waitForSelector(tid('pay-credit'));
   check(await page.isVisible('text=5 classes left'), 'pass option shows the credits left');
+  check(await page.isVisible(`${tid('minimum')} >> text=goes ahead with 2 or more people`), 'the minimum number of people is explained');
   check(await page.isVisible(tid('pay-card')), 'card option offered too');
   check(await page.isDisabled(tid('book-submit')), 'booking waits for the agreement');
   await shot('03-class');

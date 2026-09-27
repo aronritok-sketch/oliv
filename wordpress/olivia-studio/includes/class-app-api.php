@@ -262,6 +262,7 @@ class OYS_App_API {
 				'due_cents'  => array_sum( array_map( fn( $r ) => 'door' === $r->paid_with && '' === $r->collected_with ? (int) $r->due_cents : 0, array_merge( array( $mine ), $guests ) ) ),
 			) : null,
 			'pricing'         => oys_is_donation( $s ) ? 'donation' : 'fixed',
+			'minimum'         => OYS_Locations::notice( $s ),
 			'waitlist_position' => $mine ? 0 : OYS_Bookings::waitlist_position( $user_id, $s->id ),
 			'web_url'         => oys_book_url( $s->id ),
 		);

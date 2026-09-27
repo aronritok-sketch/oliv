@@ -269,6 +269,10 @@ class OYS_Frontend {
 		if ( $s->note ) {
 			$html .= '<p class="session__note">' . esc_html( $s->note ) . '</p>';
 		}
+		$min = OYS_Locations::notice( $s );
+		if ( $min ) {
+			$html .= '<p class="oys-min-note">' . oys_icon( 'users' ) . '<span>' . esc_html( $min ) . '</span></p>';
+		}
 		return $html . '</div>';
 	}
 

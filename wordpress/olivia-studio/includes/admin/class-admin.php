@@ -21,7 +21,7 @@ class OYS_Admin {
 			}
 		} );
 		$actions = array( 'save_session', 'cancel_session', 'roster', 'save_template', 'delete_template', 'generate', 'private_offer', 'private_decline',
-			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'message', 'pay_later_reset' );
+			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'message', 'pay_later_reset', 'save_locations' );
 		foreach ( $actions as $a ) {
 			add_action( 'admin_post_oys_admin_' . $a, array( __CLASS__, 'guard' ) );
 		}
@@ -41,6 +41,7 @@ class OYS_Admin {
 			'oys-orders'    => array( __( 'Payments', 'olivia-studio' ), 'page_orders' ),
 			'oys-gifts'     => array( __( 'Gift cards', 'olivia-studio' ), 'page_gifts' ),
 			'oys-products'  => array( __( 'Prices & passes', 'olivia-studio' ), 'page_products' ),
+			'oys-locations' => array( __( 'Locations', 'olivia-studio' ), 'page_locations' ),
 			'oys-emails'    => array( __( 'Emails & reminders', 'olivia-studio' ), 'page_emails' ),
 			'oys-settings'  => array( __( 'Settings', 'olivia-studio' ), 'page_settings' ),
 		);
@@ -919,6 +920,55 @@ class OYS_Admin {
 		echo '</table><h2>' . esc_html__( 'Emails', 'olivia-studio' ) . '</h2><p>' . wp_kses_post( sprintf( __( 'Sender, reminders and the text of every automatic email are in <a href="%s">Studio → Emails &amp; reminders</a>.', 'olivia-studio' ), esc_url( admin_url( 'admin.php?page=oys-emails' ) ) ) ) . '</p>';
 		submit_button();
 		echo '</form>' . self::form( 'zoom_test', 'id="oys-zoom-test"' ) . '</form></div>'; // phpcs:ignore
+	}
+
+	/* ======================================================================
+	   Locations and minimum numbers
+	   ====================================================================== */
+
+	public static function page_locations() {
+		self::header( __( 'Locations', 'olivia-studio' ) );
+		$s = OYS_Settings::all();
+		echo '<p style="max-width:780px">' . esc_html__( 'Each place can have its own minimum number of people. At the decision time before a class, if fewer people are booked, the class is cancelled automatically: everyone gets their class back and an email with other dates (the next one at the same place, other classes in the next days and a live online class). If enough people are booked, you get a "class is on" email. A class in the calendar can set its own minimum and decision time; a class at a place not listed here uses the defaults below.', 'olivia-studio' ) . '</p>';
+		echo self::form( 'save_locations' ) . '<table class="widefat striped oys-table oys-locations"><thead><tr><th>' . esc_html__( 'Name (as typed on the class)', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Address', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Minimum people', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Decide (hours before)', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Classes in the next 4 weeks', 'olivia-studio' ) . '</th></tr></thead><tbody>'; // phpcs:ignore
+		$rows   = array_values( OYS_Locations::all() );
+		$rows[] = array( 'id' => '', 'name' => '', 'address' => '', 'min_people' => (int) $s['min_people_default'], 'decide_hours' => (int) $s['decide_hours_default'] );
+		$rows[] = $rows[ count( $rows ) - 1 ];
+		$count  = array();
+		foreach ( OYS_Schedule::query( array( 'from' => oys_now(), 'to' => oys_utc_plus( 28 * DAY_IN_SECONDS ), 'status' => 'scheduled' ) ) as $x ) {
+			$l = OYS_Locations::for_session( $x );
+			$k = $l ? $l['id'] : '';
+			$count[ $k ] = ( $count[ $k ] ?? 0 ) + 1;
+		}
+		foreach ( $rows as $i => $l ) {
+			$online = 'online' === $l['id'];
+			echo '<tr><td><input type="hidden" name="loc[' . $i . '][id]" value="' . esc_attr( $l['id'] ) . '">'
+				. ( $online ? '<b>' . esc_html__( 'Online classes', 'olivia-studio' ) . '</b><input type="hidden" name="loc[' . $i . '][name]" value="' . esc_attr( $l['name'] ) . '">' : '<input class="regular-text" name="loc[' . $i . '][name]" value="' . esc_attr( $l['name'] ) . '" placeholder="' . esc_attr__( 'e.g. Riverside studio', 'olivia-studio' ) . '">' ) . '</td>'
+				. '<td>' . ( $online ? '—' : '<input class="regular-text" name="loc[' . $i . '][address]" value="' . esc_attr( $l['address'] ) . '">' ) . '</td>'
+				. '<td><input type="number" min="0" class="small-text" name="loc[' . $i . '][min_people]" value="' . (int) $l['min_people'] . '"></td>'
+				. '<td><input type="number" min="1" class="small-text" name="loc[' . $i . '][decide_hours]" value="' . (int) $l['decide_hours'] . '"></td>'
+				. '<td>' . ( $l['id'] ? (int) ( $count[ $l['id'] ] ?? 0 ) : '' ) . '</td></tr>';
+		}
+		echo '</tbody></table><p class="description">' . esc_html__( 'Minimum 0 = the class always goes ahead. To remove a place, clear its name. Empty rows add new places.', 'olivia-studio' ) . '</p>';
+		if ( ! empty( $count[''] ) ) {
+			echo '<p>' . sprintf( esc_html__( '%d upcoming classes are at a place that isn\'t listed; they use the defaults below.', 'olivia-studio' ), (int) $count[''] ) . '</p>';
+		}
+		echo '<h2>' . esc_html__( 'Defaults', 'olivia-studio' ) . '</h2><table class="form-table">'
+			. '<tr><th>' . esc_html__( 'Minimum people (places not listed)', 'olivia-studio' ) . '</th><td><input type="number" min="0" class="small-text" name="min_people_default" value="' . (int) $s['min_people_default'] . '"></td></tr>'
+			. '<tr><th>' . esc_html__( 'Decide (hours before, places not listed)', 'olivia-studio' ) . '</th><td><input type="number" min="1" class="small-text" name="decide_hours_default" value="' . (int) $s['decide_hours_default'] . '"></td></tr>'
+			. '<tr><th>' . esc_html__( '"Bring a friend" email', 'olivia-studio' ) . '</th><td>' . sprintf( esc_html__( '%s hours before the decision, to the people booked when a class is short (0 = off)', 'olivia-studio' ), '<input type="number" min="0" class="small-text" name="min_nudge_hours" value="' . (int) $s['min_nudge_hours'] . '">' ) . '</td></tr></table>';
+		submit_button( __( 'Save locations', 'olivia-studio' ) );
+		echo '</form></div>';
+	}
+
+	private static function do_save_locations() {
+		OYS_Locations::save_all( array_values( (array) wp_unslash( $_POST['loc'] ?? array() ) ) );
+		OYS_Settings::update( array(
+			'min_people_default'   => max( 0, (int) ( $_POST['min_people_default'] ?? 2 ) ),
+			'decide_hours_default' => max( 1, (int) ( $_POST['decide_hours_default'] ?? 3 ) ),
+			'min_nudge_hours'      => max( 0, (int) ( $_POST['min_nudge_hours'] ?? 0 ) ),
+		) );
+		self::back( 'oys-locations', array(), __( 'Locations saved.', 'olivia-studio' ) );
 	}
 
 	/* ======================================================================

@@ -39,6 +39,7 @@ class OYS_Cron {
 		OYS_Bookings::expire_holds();
 		self::send_reminders();
 		self::send_join_reminders();
+		OYS_Locations::run();
 	}
 
 	public static function hourly() {

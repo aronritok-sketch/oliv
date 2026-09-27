@@ -130,3 +130,8 @@
 .oys-drawer__zoom span { color: #50575e; font-size: 12px; }
 .oys-seg--sm span { padding: 5px 6px; font-weight: 500; }
 .oys-drawer__due { margin: 6px 0 0; padding: 6px 10px; background: #FFF4E5; border-left: 3px solid #FF8C42; }
+.oys-min { border: 1px solid #dcdcde; border-radius: 6px; padding: 8px 10px 4px; margin: 0; }
+.oys-min legend { font-weight: 600; padding: 0 4px; }
+.oys-drawer__min { margin: 6px 0 0; padding: 6px 10px; background: #EEF3EA; border-left: 3px solid #2B5036; }
+.oys-drawer__min.is-short { background: #FFF4E5; border-left-color: #FF8C42; }
+.oys-ev__tag--warn { background: #FF8C42 !important; color: #12231A !important; }

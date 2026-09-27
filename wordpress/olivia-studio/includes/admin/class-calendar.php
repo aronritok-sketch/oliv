@@ -65,6 +65,10 @@ class OYS_Calendar {
 			'zoom'      => OYS_Zoom::enabled(),
 			'donationMin' => (int) OYS_Settings::get( 'donation_min_cents' ),
 			'payLater'  => OYS_Settings::get( 'pay_later' ),
+			'locations' => array_values( OYS_Locations::all() ),
+			'minDefault'    => (int) OYS_Settings::get( 'min_people_default' ),
+			'decideDefault' => (int) OYS_Settings::get( 'decide_hours_default' ),
+			'locationsUrl' => admin_url( 'admin.php?page=oys-locations' ),
 			'rosterUrl' => admin_url( 'admin.php?page=oys-schedule&session=' ),
 			'listUrl'   => admin_url( 'admin.php?page=oys-schedule&view=list' ),
 			'bookUrl'   => oys_page_url( 'book', array( 'session' => '' ) ),
@@ -144,11 +148,27 @@ class OYS_Calendar {
 			'credits_allowed' => (bool) $s->credits_allowed,
 			'pricing'         => $s->pricing ?: 'fixed',
 			'pay_later'       => (bool) $s->pay_later,
+			'min_people'      => null === $s->min_people ? null : (int) $s->min_people,
+			'decide_hours'    => null === $s->decide_hours ? null : (int) $s->decide_hours,
+			'minimum'         => self::minimum_out( $s ),
 			'due'             => OYS_Bookings::due_at_studio( $s->id ),
 			'note'            => $s->note,
 			'status'          => $s->status,
 			'past'            => oys_ts( $s->ends_at ) < time(),
 			'series'          => $series,
+		);
+	}
+
+	/** The go-ahead rule as the calendar shows it. */
+	private static function minimum_out( $s ) {
+		[ $people, $hours ] = OYS_Locations::rule( $s );
+		$at = OYS_Locations::decide_at( $s );
+		return array(
+			'people' => $people,
+			'hours'  => $hours,
+			'state'  => (int) $s->min_state,
+			'at'     => $at ? wp_date( 'D g:i a', $at ) : '',
+			'short'  => $people && 'scheduled' === $s->status && ! $s->min_state && OYS_Locations::people( $s ) < $people,
 		);
 	}
 
@@ -193,6 +213,8 @@ class OYS_Calendar {
 			'credits_allowed' => array_key_exists( 'credits_allowed', $p ) ? ( empty( $p['credits_allowed'] ) ? 0 : 1 ) : 1,
 			'pricing'         => 'donation' === ( $p['pricing'] ?? ( $current->pricing ?? 'fixed' ) ) ? 'donation' : 'fixed',
 			'pay_later'       => array_key_exists( 'pay_later', $p ) ? ( empty( $p['pay_later'] ) ? 0 : 1 ) : (int) ( $current->pay_later ?? 1 ),
+			'min_people'      => array_key_exists( 'min_people', $p ) ? OYS_Schedule::nullable_int( $p['min_people'] ) : ( $current->min_people ?? null ),
+			'decide_hours'    => array_key_exists( 'decide_hours', $p ) ? OYS_Schedule::nullable_int( $p['decide_hours'], 1 ) : ( $current->decide_hours ?? null ),
 			'note'            => sanitize_text_field( $p['note'] ?? '' ),
 			// Helpers for the caller, not columns.
 			'_date'           => $date,
@@ -276,6 +298,8 @@ class OYS_Calendar {
 			'online_price_cents' => $d['online_price_cents'],
 			'pricing'      => $d['pricing'],
 			'pay_later'    => $d['pay_later'],
+			'min_people'   => $d['min_people'],
+			'decide_hours' => $d['decide_hours'],
 			'note'         => $d['note'],
 			'active'       => 1,
 		);

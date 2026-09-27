@@ -218,7 +218,7 @@ class OYS_Emails {
 	/**
 	 * $ids = every row cancelled together (the customer's own and their guests').
 	 */
-	public static function booking_cancelled( $booking_id, $outcome, $by_studio = false, $reason = '', array $ids = array() ) {
+	public static function booking_cancelled( $booking_id, $outcome, $by_studio = false, $reason = '', array $ids = array(), $key = '', $extra = '' ) {
 		$b = OYS_Bookings::get( $booking_id );
 		$s = OYS_Schedule::get( $b->session_id );
 		$rows   = array_filter( array_map( array( 'OYS_Bookings', 'get' ), $ids ?: array( $booking_id ) ) );
@@ -242,10 +242,10 @@ class OYS_Emails {
 		if ( ! empty( $messages[ $outcome ] ) ) {
 			$blocks .= '<p><b>' . esc_html( $messages[ $outcome ] ) . '</b></p>';
 		}
-		self::compose( $by_studio ? 'class_cancelled' : 'booking_cancelled', self::user_email( $b->user_id ), $vars, $blocks, array(), oys_page_url( 'book' ) );
+		self::compose( $key ?: ( $by_studio ? 'class_cancelled' : 'booking_cancelled' ), self::user_email( $b->user_id ), $vars, $blocks . $extra, array(), oys_page_url( 'book' ) );
 		foreach ( $rows as $r ) {
 			if ( $r->guest_of && $r->guest_email ) {
-				self::compose( 'guest_cancelled', $r->guest_email, array_merge( $vars, array( 'guest_name' => $r->guest_name, 'first_name' => $r->guest_name ) ), self::session_block( $s ) );
+				self::compose( 'guest_cancelled', $r->guest_email, array_merge( $vars, array( 'guest_name' => $r->guest_name, 'first_name' => $r->guest_name ) ), self::session_block( $s ) . $extra );
 			}
 		}
 		if ( ! $by_studio ) {
@@ -412,6 +412,16 @@ class OYS_Emails {
 	/* ---------- Studio emails ---------- */
 
 	/** A note to the studio; $type is its switch in Studio → Emails. */
+	/** "Bring a friend": the class needs $missing more people by the decision time. */
+	public static function minimum_nudge( $booking, $session, $missing, $decide_at ) {
+		$vars = array_merge( OYS_Email_Templates::vars_for( $booking->user_id, $session ), array(
+			'missing'  => sprintf( _n( '%d more person', '%d more people', $missing, 'olivia-studio' ), $missing ),
+			'deadline' => wp_date( 'l g:i a', $decide_at ),
+		) );
+		$blocks = self::session_block( $session ) . '<p style="font-size:14px;color:#53635A">' . esc_html__( 'Share this link with a friend, or add them as your guest from your booking:', 'olivia-studio' ) . '<br><a href="' . esc_url( oys_book_url( $session->id ) ) . '" style="color:#2B5036;word-break:break-all">' . esc_html( oys_book_url( $session->id ) ) . '</a></p>';
+		return self::compose( 'minimum_nudge', self::user_email( $booking->user_id ), $vars, $blocks, array(), oys_book_url( $session->id ) );
+	}
+
 	/** A message the studio wrote to everyone in a class (roster → "Message everyone"). */
 	public static function class_message( $to, $session, $subject, $body_html ) {
 		return self::send( $to, $subject, $subject, $body_html . self::session_block( $session ), array(), array( __( 'My bookings', 'olivia-studio' ), oys_account_url() ) );

@@ -42,6 +42,9 @@ class OYS_Schedule {
 			// Forms that don't show these fields keep what the weekly class had.
 			'pricing'      => 'donation' === ( $data['pricing'] ?? ( $old->pricing ?? '' ) ) ? 'donation' : 'fixed',
 			'pay_later'    => array_key_exists( 'pay_later', $data ) ? ( empty( $data['pay_later'] ) ? 0 : 1 ) : (int) ( $old->pay_later ?? 1 ),
+			// NULL = the location's minimum and decision time.
+			'min_people'   => array_key_exists( 'min_people', $data ) ? self::nullable_int( $data['min_people'] ) : ( $old->min_people ?? null ),
+			'decide_hours' => array_key_exists( 'decide_hours', $data ) ? self::nullable_int( $data['decide_hours'], 1 ) : ( $old->decide_hours ?? null ),
 			'note'         => sanitize_text_field( $data['note'] ?? '' ),
 			'active'       => empty( $data['active'] ) ? 0 : 1,
 			'valid_from'   => ! empty( $data['valid_from'] ) && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $data['valid_from'] ) ? $data['valid_from'] : null,
@@ -53,6 +56,11 @@ class OYS_Schedule {
 			$id = (int) $wpdb->insert_id;
 		}
 		return $id;
+	}
+
+	/** '' or null → null; otherwise an int of at least $min. */
+	public static function nullable_int( $v, $min = 0 ) {
+		return null === $v || '' === $v ? null : max( $min, (int) $v );
 	}
 
 	public static function delete_template( $id ) {
@@ -102,6 +110,8 @@ class OYS_Schedule {
 					'price_cents' => $tpl->price_cents,
 					'pricing'     => $tpl->pricing ?: 'fixed',
 					'pay_later'   => (int) $tpl->pay_later,
+					'min_people'  => $tpl->min_people,
+					'decide_hours' => $tpl->decide_hours,
 					'note'        => $tpl->note,
 					'template_id' => $tpl->id,
 					'tpl_slot'    => $slot,
@@ -170,13 +180,18 @@ class OYS_Schedule {
 		global $wpdb;
 		$t   = OYS_Install::table( 'sessions' );
 		$row = array();
-		foreach ( array( 'kind', 'class_slug', 'title', 'description', 'starts_at', 'ends_at', 'capacity', 'location', 'format', 'online_url', 'price_cents', 'online_capacity', 'online_price_cents', 'zoom_meeting_id', 'zoom_join_url', 'zoom_password', 'credits_allowed', 'pricing', 'pay_later', 'note', 'status', 'template_id', 'tpl_slot' ) as $k ) {
+		foreach ( array( 'kind', 'class_slug', 'title', 'description', 'starts_at', 'ends_at', 'capacity', 'location', 'format', 'online_url', 'price_cents', 'online_capacity', 'online_price_cents', 'zoom_meeting_id', 'zoom_join_url', 'zoom_password', 'credits_allowed', 'pricing', 'pay_later', 'min_people', 'decide_hours', 'min_state', 'nudge_sent', 'note', 'status', 'template_id', 'tpl_slot' ) as $k ) {
 			if ( array_key_exists( $k, $data ) ) {
 				$row[ $k ] = $data[ $k ];
 			}
 		}
 		if ( $id ) {
 			$before = self::get( $id );
+			// Moved to another time, or the minimum changed: the go-ahead decision is made again.
+			if ( $before && ( ( isset( $row['starts_at'] ) && $row['starts_at'] !== $before->starts_at ) || ( array_key_exists( 'min_people', $row ) && (string) $row['min_people'] !== (string) $before->min_people ) || ( array_key_exists( 'decide_hours', $row ) && (string) $row['decide_hours'] !== (string) $before->decide_hours ) ) && ! isset( $row['min_state'] ) && 1 === (int) $before->min_state ) {
+				$row['min_state']  = 0;
+				$row['nudge_sent'] = 0;
+			}
 			$wpdb->update( $t, $row, array( 'id' => $id ) );
 			/** Fires after a session changed (time, place, format, status…); Zoom keeps its meeting in step. */
 			do_action( 'oys_session_saved', (int) $id, $before );
@@ -284,7 +299,7 @@ class OYS_Schedule {
 	 * Cancel a whole session (studio side): every booking gets its class back
 	 * (credit returned, or studio credit for card payments) and people are emailed.
 	 */
-	public static function cancel_session( $session_id, $reason = '' ) {
+	public static function cancel_session( $session_id, $reason = '', array $opts = array() ) {
 		$session = self::get( $session_id );
 		if ( ! $session || 'cancelled' === $session->status ) {
 			return 0;
@@ -296,7 +311,7 @@ class OYS_Schedule {
 			if ( ! in_array( $fresh->status, array( 'confirmed', 'pending' ), true ) ) {
 				continue; // Already cancelled together with its host booking.
 			}
-			OYS_Bookings::cancel( $booking->id, array( 'by_studio' => true, 'reason' => $reason ) );
+			OYS_Bookings::cancel( $booking->id, array_merge( $opts, array( 'by_studio' => true, 'reason' => $reason ) ) );
 			$n++;
 		}
 		OYS_Bookings::clear_waitlist( $session_id );

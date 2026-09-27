@@ -226,7 +226,7 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 | `location`, `online_url`, `note` | hely, online link (csak foglalóknak látszik), rövid megjegyzés |
 | `format` | `studio` (személyes) · `online` (élő közvetítés) · `hybrid` (stúdió + élő online) |
 | `online_capacity`, `online_price_cents` | hibrid óra online helyei (0 = korlátlan) és online jegyára |
-| `pricing`, `pay_later` | mint a `sessions`-ben; a generált alkalmak öröklik |
+| `pricing`, `pay_later`, `min_people`, `decide_hours` | mint a `sessions`-ben; a generált alkalmak öröklik |
 | `active` | 0 = nem generál új alkalmat |
 | `valid_from` | az első dátum, amitől ismétlődik (a naptárból létrehozott heti óránál); NULL = azonnal |
 
@@ -246,6 +246,8 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 | `credits_allowed` | 1 = bérletből foglalható |
 | `pricing` | `fixed` · `donation` (adomány: a `price_cents` csak javasolt összeg, 6.15) |
 | `pay_later` | 1 = helyszíni fizetéssel is foglalható (ha a beállítás engedi) |
+| `min_people`, `decide_hours` | saját minimum létszám és döntési idő (NULL = a helyszíné, 6.17; `min_people` 0 = nincs minimum) |
+| `min_state`, `nudge_sent` | 0 = még nem döntött · 1 = megy · 2 = lemondva kevés jelentkező miatt; „hozz egy barátot” levél elment-e |
 | `status` | `scheduled` · `cancelled` |
 | `template_id` | honnan generálódott (0 = egyedi). A generálás a (`template_id`, `starts_at`) páros alapján hagyja ki a már létezőt (indexelt, de nem UNIQUE) |
 
@@ -314,6 +316,7 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 | Hol | Kulcs | Mit |
 |---|---|---|
 | option | `oys_settings`, `oys_products`, `oys_db_version`, `oys_page_{book,account,gifts}` | konfiguráció |
+| option | `oys_locations` | helyszínek: `id`, `name`, `address`, `min_people`, `decide_hours` (+ beépített `online`) |
 | transient | `oys_rl_{ip,user,signup}_*` | belépés/regisztráció számlálók (15 perc) |
 | user meta | `oys_phone`, `oys_area`, `oys_emergency_name`, `oys_emergency_phone`, `oys_health_notes`, `oys_marketing` | profil (`OYS_Customers::PROFILE_FIELDS`) |
 | user meta | `oys_waiver_version`, `oys_waiver_at`, `oys_waiver_ip` | nyilatkozat elfogadása |
@@ -615,6 +618,17 @@ Sorozat-módosításnál minden további dátum ugyanannyi nappal tolódik, mint
 - **„Message everyone booked”** (névsor alja, a naptárból gombbal): `OYS_Messages::send_to_session()` – mindenki saját levelet kap (`{first_name}` és az órás helyőrzők), opcionálisan a vendégek e-mailjére és a várólistára is; napló a `messages` táblában. Hook: `oys_class_message_sent`.
 - **Magánóra**: a `private_note` szöveg a kérőűrlapon, az árlistán, a foglalóoldalon és az ajánlat-levélben; az ajánlatnál „Block N extra minutes” (alap `private_first_extra_min` = 15, első alkalomnál bepipálva – `OYS_Privates::is_first()`): a naptárban hosszabb idősáv, az ár nem változik, az alkalom megjegyzése elmagyarázza.
 - **Facebook-csoport** (`fb_group_url`): `oys_fb_group_link()` a hírlevél-pipa mellett, foglalás után, a fiókban, minden levél alján, a téma láblécében és az appban (`me.links.community`). Hírlevél on/off az appból: `POST /app/newsletter`.
+
+### 6.17 Helyszínek és minimum létszám
+
+`OYS_Locations` (`includes/class-locations.php`), admin: Studio → Locations.
+
+- **Szabály** (`rule()`): a hely (a `sessions.location` név szerinti egyezése, kis-nagybetű mindegy; online órán a beépített `online` hely) `min_people` / `decide_hours` értéke, ha az órán nincs saját; ismeretlen helyen a `min_people_default` (2) / `decide_hours_default` (3). Csoportos órára mindig, eseményre csak saját minimummal, magánórára soha. 0 = mindig megy.
+- **Döntés** (`run()`, a 5 perces cronban): a `starts_at − decide_hours` időpontban `decide()`: foglalt emberek (vendégek, online is) ≥ minimum → `min_state = 1`, a stúdió „Class is on” levelet kap; kevesebb → `min_state = 2`, `OYS_Schedule::cancel_session()` a `class_cancelled_minimum` sablonnal és `alternatives_html()` blokkal (ugyanaz az óra ugyanott a következő időpontban, más órák a következő 3 napban, egy élő online óra, és egy „hozz egy barátot” tipp); mindenki visszakapja az óráját (bérlet vissza, kártyásnak kredit, helyszíni fizetésnél nincs mit). A döntést feltételes UPDATE foglalja le (két cron-futás nem dönt kétszer).
+- **„Bring a friend”** (`nudge()`): a döntés előtt `min_nudge_hours` órával (alap 12, 0 = ki), ha van foglaló, de kevés: `minimum_nudge` levél a foglalóknak a megosztható linkkel. Egyszer.
+- Ha egy már megerősített órát áthelyeznek vagy a minimumát átírják, újra dönt (`min_state = 0`).
+- A foglalóoldal és az app mondja: „goes ahead with N or more people… cancelled by <idő>”. A naptárban „min N” jelölés, ha kevés a foglalás; a fiókban a szabály és a döntés ideje.
+- Hookok: `oys_class_confirmed( $session_id, $people )`, `oys_class_cancelled_minimum( $session_id, $people )`. `OYS_Bookings::cancel()` új opciói: `email` (sablonkulcs), `email_extra` (HTML a levél végére); `cancel_session( $id, $reason, $opts )` továbbadja.
 
 ---
 
