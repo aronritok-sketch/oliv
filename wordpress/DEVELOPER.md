@@ -269,6 +269,12 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 | `hold_expires` | fizetés alatti tartás lejárata (csak `pending`) |
 | `reminder_sent`, `checked_in_at`, `cancelled_at`, `note` | |
 
+**`coupons`** – kedvezménykódok: `code` (UNIQUE, nagybetűs), `user_id` (0 = bárki; szülinapi kód = a vevőé), `kind` (`percent` · `amount`), `value` (% vagy cent), `applies` (`all` · `passes` · `classes`), `max_uses` (0 = korlátlan), `used`, `expires_at`, `source` (`manual` · `birthday`), `note`.
+
+**`newsletters`** / **`newsletter_queue`** – hírlevél (`subject`, `preheader`, `body` a saját egyszerű formátumban, gomb, `status` `draft` → `sending` → `sent`, `total`/`sent`) és a küldési sor (feliratkozónként egy sor, `status` `queued` · `sending` · `sent` · `skipped`; (`newsletter_id`, `user_id`) UNIQUE).
+
+**`raffles`** – hűség-sorsolás periódusonként: `period_key` (UNIQUE, pl. `2026-H2`), `label`, `starts_at`/`ends_at`, `tickets_total`, `entrants`, `winner_id`, `winner_tickets`, `pass_id` (a nyeremény), `newsletter_id` (bejelentés), `drawn_at`.
+
 **`messages`** – a névsorból küldött „Message everyone” üzenetek: `session_id`, `sender_id`, `subject` (kitöltve), `body`, `recipients` (hány embernek ment), `created_at`.
 
 **`waitlist`** – (`session_id`, `user_id`) egyedi; `notified_at` = kapott-e „felszabadult hely” levelet.
@@ -321,7 +327,8 @@ Minden tábla prefixe `{$wpdb->prefix}oys_` (a kódban: `OYS_Install::table( 'bo
 | user meta | `oys_phone`, `oys_area`, `oys_emergency_name`, `oys_emergency_phone`, `oys_health_notes`, `oys_marketing` | profil (`OYS_Customers::PROFILE_FIELDS`) |
 | user meta | `oys_waiver_version`, `oys_waiver_at`, `oys_waiver_ip` | nyilatkozat elfogadása |
 | user meta | `oys_stripe_customer_test`, `oys_stripe_customer_live` | Stripe customer ID módonként |
-| user meta | `oys_marketing` | hírlevél-feliratkozás (regisztráció, profil, app) |
+| user meta | `oys_marketing` | hírlevél-feliratkozás (regisztráció, profil, app; leiratkozó link törli) |
+| user meta | `oys_birthday`, `oys_birthday_sent` | születésnap `MM-DD` (opcionális, profil), melyik évben kapott már kódot |
 | user meta | `oys_pay_later_reset` | ettől az időponttól számolja újra a kihagyott helyszíni fizetéses órákat (admin „Allow paying at the studio again”) |
 | post meta (`oy_class`) | `oy_duration`, `oy_level`, `oy_intensity` (1–3), `oy_link`, `oy_aside_photo`, `oy_seo_title` | téma |
 | post meta (oldal) | `oy_seo_title`, `oy_seo_desc` | téma SEO |
@@ -629,6 +636,18 @@ Sorozat-módosításnál minden további dátum ugyanannyi nappal tolódik, mint
 - Ha egy már megerősített órát áthelyeznek vagy a minimumát átírják, újra dönt (`min_state = 0`).
 - A foglalóoldal és az app mondja: „goes ahead with N or more people… cancelled by <idő>”. A naptárban „min N” jelölés, ha kevés a foglalás; a fiókban a szabály és a döntés ideje.
 - Hookok: `oys_class_confirmed( $session_id, $people )`, `oys_class_cancelled_minimum( $session_id, $people )`. `OYS_Bookings::cancel()` új opciói: `email` (sablonkulcs), `email_extra` (HTML a levél végére); `cancel_session( $id, $reason, $opts )` továbbadja.
+
+### 6.18 Kuponok, szülinapi ajándék, hűség-sorsolás
+
+- **Kupon** (`OYS_Coupons`, admin: Studio → Coupons & rewards): kártyás bérletvásárlásnál és órafizetésnél (tagságnál nem). A „Have a discount code?” mezőt a `for_checkout()` érvényesíti (lejárat, használatok, kinek szól, mire), és levonja a Stripe-tételekből (százalék minden tételből; fix összeg az elsőkből); a rendelés `meta`-ja: `coupon_id`, `coupon_code`, `discount_cents`. A használat az `oys_order_paid`-nél számolódik. 100%-os kód: `start_checkout()` Stripe nélkül `mark_paid()`-ot hív és a köszönőoldalra visz. A vevő saját aktív kódja automatikusan kitöltődik.
+- **Szülinap** (`OYS_Rewards::send_birthdays()`, óránkénti cron): a profilban opcionális hónap+nap; a napján (stúdió-időzóna, feb. 29 → nem szökőévben feb. 28) személyes `BDAY-…` kód (`birthday_percent`, `birthday_days` napig), évente egyszer, a `birthday` sablonnal.
+- **Hűség-sorsolás** (`OYS_Rewards`): periódus `raffle_period` = `half` (jan–jún, júl–dec) · `year` · `quarter` · `off`, stúdió-időzóna szerint. Jegy = a periódusban véget ért, `attended` vagy `confirmed` saját foglalás (no-show és lemondás nem). A periódus vége utáni első óránkénti cronban `run_draw()` → `draw()`: a `raffles` sor egyedi kulcsa garantálja az egyszeri húzást; `pick()` jegyarányos véletlen (`random_int`); a nyertes megkapja a `raffle_prize` terméket (`source = raffle`) és a `raffle_winner` levelet; `raffle_announce` esetén a `raffle_announcement` sablonból név nélküli hírlevél megy a feliratkozóknak. A fiók Bérletek füle és az app mutatja a saját jegyeket.
+
+### 6.19 Hírlevél és AI-vázlat
+
+- **`OYS_Newsletter`** (admin: Studio → Newsletter): vázlat → előnézet (iframe) → tesztlevél → „Send to N subscribers”. A küldés sorba állítja a feliratkozókat (`oys_marketing = 1`), a 5 perces cron `newsletter_batch` (alap 50) levelet küld futásonként; minden sort feltételes UPDATE-tel foglal (nincs dupla küldés), és küldés előtt újra ellenőrzi a feliratkozást. Szövegformátum (`render()`): üres sor = bekezdés, `## ` címsor, `- ` lista, `**félkövér**`, `[szöveg](https://…)`, puszta URL → link; `{first_name}` személyre szabva. Minden levélben aláírt leiratkozó link (`?oys_unsub=<uid>.<hmac>`, bejelentkezés nélkül) és `List-Unsubscribe` fejléc.
+- **AI-vázlat** (`OYS_AI::draft_newsletter( $brief, $draft )`): `POST https://api.anthropic.com/v1/messages` `wp_remote_post`-tal (SDK nélkül, mint a Stripe/Zoom). Fejlécek: `x-api-key`, `anthropic-version: 2023-06-01`, `anthropic-beta: server-side-fallback-2026-07-01`. Törzs: `model` (`ai_model`, alap `claude-opus-5`), `max_tokens` 16000, `fallbacks: "default"`, `output_config: { effort: "medium", format: { type: "json_schema", schema } }` (subject, preheader, body, button_label). A rendszerprompt Olivia hangján, a következő 3 hét órarendjével kontextusként; csak a megadott dátumokat/árakat használhatja. `stop_reason = refusal` / `max_tokens` → érthető hiba. Kulcs: `ai_api_key` beállítás vagy `OYS_ANTHROPIC_API_KEY` konstans; tesztekhez `OYS_ANTHROPIC_API_URL` (a `dev/mock-stripe.php` `/anthropic/v1/messages` útvonala szimulálja).
+- Élesben SMTP / tranzakciós levelező plugin kell (pl. Brevo, Postmark, Amazon SES), különben a tömeges levelek spambe mehetnek.
 
 ---
 

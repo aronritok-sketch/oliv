@@ -61,8 +61,22 @@ export function Button({
   );
 }
 
-export function Card({ children, style, tone = 'plain' }: { children: ReactNode; style?: StyleProp<ViewStyle>; tone?: 'plain' | 'forest' | 'mist' | 'lilac' }) {
-  return <View style={[styles.card, cardTones[tone], style]}>{children}</View>;
+export function Card({
+  children,
+  style,
+  tone = 'plain',
+  testID,
+}: {
+  children: ReactNode;
+  style?: StyleProp<ViewStyle>;
+  tone?: 'plain' | 'forest' | 'mist' | 'lilac';
+  testID?: string;
+}) {
+  return (
+    <View testID={testID} style={[styles.card, cardTones[tone], style]}>
+      {children}
+    </View>
+  );
 }
 
 export function Pill({ text: label, tone = 'neutral', testID }: { text: string; tone?: 'neutral' | 'ok' | 'low' | 'full' | 'closed' | 'mine' | 'online'; testID?: string }) {

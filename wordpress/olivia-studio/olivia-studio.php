@@ -13,7 +13,7 @@
 defined( 'ABSPATH' ) || exit;
 
 define( 'OYS_VERSION', '1.1.0' );
-define( 'OYS_DB_VERSION', '7' );
+define( 'OYS_DB_VERSION', '8' );
 define( 'OYS_FILE', __FILE__ );
 define( 'OYS_DIR', plugin_dir_path( __FILE__ ) );
 define( 'OYS_URL', plugin_dir_url( __FILE__ ) );
@@ -31,6 +31,10 @@ require_once OYS_DIR . 'includes/class-email-templates.php';
 require_once OYS_DIR . 'includes/class-emails.php';
 require_once OYS_DIR . 'includes/class-messages.php';
 require_once OYS_DIR . 'includes/class-locations.php';
+require_once OYS_DIR . 'includes/class-coupons.php';
+require_once OYS_DIR . 'includes/class-rewards.php';
+require_once OYS_DIR . 'includes/class-newsletter.php';
+require_once OYS_DIR . 'includes/class-ai.php';
 require_once OYS_DIR . 'includes/class-customers.php';
 require_once OYS_DIR . 'includes/class-privates.php';
 require_once OYS_DIR . 'includes/class-gifts.php';
@@ -65,6 +69,8 @@ add_action( 'plugins_loaded', function () {
 	OYS_Calendar::init();
 	OYS_Zoom::init();
 	OYS_App_API::init();
+	OYS_Coupons::init();
+	OYS_Newsletter::init();
 	if ( is_admin() ) {
 		OYS_Admin::init();
 	}

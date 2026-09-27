@@ -209,6 +209,8 @@ class OYS_App_API {
 				'signup'     => oys_account_url(),
 				'community'  => oys_fb_group_url(),
 			),
+			'raffle'     => OYS_Rewards::status( $user_id ),
+			'coupons'    => array_map( fn( $c ) => array( 'code' => $c->code, 'label' => OYS_Coupons::label( $c ), 'expires' => $c->expires_at ? self::iso( $c->expires_at ) : null, 'birthday' => 'birthday' === $c->source ), OYS_Coupons::for_user( $user_id ) ),
 		);
 	}
 

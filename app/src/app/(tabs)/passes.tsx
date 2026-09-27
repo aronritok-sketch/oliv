@@ -70,6 +70,34 @@ export default function Passes() {
             )}
           </View>
 
+          {(me.coupons ?? []).map((c) => (
+            <Card key={c.code} tone="lilac" style={{ gap: 2 }}>
+              <T variant="label" style={{ color: Colors.moss }}>
+                {c.birthday ? 'Birthday gift' : 'Your code'}
+              </T>
+              <T style={styles.code} testID="coupon-code">
+                {c.code}
+              </T>
+              <T variant="small">
+                {c.label}
+                {c.expires ? ` · until ${shortDate(c.expires)}` : ''} · filled in when you pay by card on the website
+              </T>
+            </Card>
+          ))}
+
+          {me.raffle ? (
+            <Card testID="raffle">
+              <T variant="label">Loyalty draw</T>
+              <Row>
+                <T style={styles.balanceN}>{me.raffle.tickets}</T>
+                <T variant="strong">{me.raffle.tickets === 1 ? 'ticket' : 'tickets'}</T>
+              </Row>
+              <T variant="small" style={{ color: Colors.muted }}>
+                Every class you come to in {me.raffle.label} is one ticket. On {me.raffle.draw} one is drawn for {me.raffle.prize || 'a free pass'}.
+              </T>
+            </Card>
+          ) : null}
+
           <Button title="Buy a pass" onPress={() => open(me.links.passes)} testID="buy-pass" />
           {!me.membership ? <Button kind="secondary" title="Become a member" onPress={() => open(me.links.membership)} /> : null}
           <Button kind="ghost" title="Gift a class to a friend" onPress={() => open(me.links.gifts)} />
@@ -120,6 +148,7 @@ const styles = StyleSheet.create({
   balance: { flex: 1, backgroundColor: Colors.mist, borderRadius: Radius.lg, padding: Spacing.lg, gap: 2 },
   balanceN: { fontFamily: Fonts.display, fontSize: 44, lineHeight: 50, color: Colors.forest },
   left: { fontFamily: Fonts.bold, fontSize: 22, color: Colors.forest },
+  code: { fontFamily: Fonts.display, fontSize: 28, letterSpacing: 2, color: Colors.moss },
   bar: { height: 8, borderRadius: 4, backgroundColor: Colors.mist, overflow: 'hidden' },
   fill: { height: 8, borderRadius: 4, backgroundColor: Colors.forest },
 });

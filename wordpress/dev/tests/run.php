@@ -1110,6 +1110,185 @@ test( 'minimum: set in the calendar, kept by weekly classes', function () {
 	wp_set_current_user( 0 );
 } );
 
+/* ---------- Round 3: coupons, birthday, loyalty draw, newsletter, AI drafts ---------- */
+
+test( 'coupons: validate, discount lines, count a use when paid, 100% needs no Stripe', function () {
+	$u  = make_user( 'Cora' );
+	$u2 = make_user( 'Other' );
+	$id = OYS_Coupons::create( array( 'code' => 'spring-20', 'kind' => 'percent', 'value' => 20, 'max_uses' => 1 ) );
+	eq( 'SPRING-20', OYS_Coupons::get( $id )->code, 'codes are upper case' );
+	ok( is_wp_error( OYS_Coupons::create( array( 'code' => 'SPRING-20' ) ) ), 'codes are unique' );
+	ok( is_wp_error( OYS_Coupons::validate( 'nope', $u, 'passes' ) ), 'unknown code refused' );
+	[ $order, $lines ] = OYS_Coupons::for_checkout( ' spring-20 ', $u, 'passes', array( 'amount_cents' => 11000, 'description' => '5-class pass', 'type' => 'pack' ), array( array( '5-class pass', '', 11000, 1 ) ) );
+	eq( 8800, $order['amount_cents'], '20% off $110' );
+	eq( 8800, $lines[0][2], 'receipt line discounted' );
+	ok( str_contains( $lines[0][1], 'SPRING-20' ), 'receipt shows the code' );
+	eq( 2200, $order['meta']['discount_cents'], 'discount stored on the order' );
+	// Fixed amount across a party (host + 2 guests at $25): $10 comes off.
+	$amt = OYS_Coupons::get( OYS_Coupons::create( array( 'kind' => 'amount', 'value' => 1000, 'applies' => 'classes' ) ) );
+	[ $l2, $off ] = OYS_Coupons::apply_lines( $amt, array( array( 'Class', '', 2500, 1 ), array( 'Guests', '', 2500, 2 ) ) );
+	eq( 1000, $off, '$10 off in total' );
+	ok( is_wp_error( OYS_Coupons::validate( $amt->code, $u, 'passes' ) ), 'a classes code is refused for passes' );
+	// Personal code.
+	$mine = OYS_Coupons::create( array( 'kind' => 'percent', 'value' => 15, 'user_id' => $u ) );
+	ok( is_wp_error( OYS_Coupons::validate( OYS_Coupons::get( $mine )->code, $u2, 'classes' ) ), 'someone else\'s code refused' );
+	// Used once when the order is paid.
+	$oid = OYS_Orders::create( array_merge( $order, array( 'user_id' => $u, 'product_id' => 'pack-5' ) ) );
+	OYS_Orders::mark_paid( $oid );
+	eq( 1, (int) OYS_Coupons::get( $id )->used, 'use counted' );
+	ok( is_wp_error( OYS_Coupons::validate( 'SPRING-20', $u, 'passes' ) ), 'used up' );
+	// 100% off: fulfilled without Stripe.
+	$free = OYS_Coupons::get( OYS_Coupons::create( array( 'kind' => 'percent', 'value' => 100, 'applies' => 'passes' ) ) );
+	[ $o3, $l3 ] = OYS_Coupons::for_checkout( $free->code, $u, 'passes', array( 'user_id' => $u, 'type' => 'pack', 'product_id' => 'pack-5', 'description' => '5-class pass', 'amount_cents' => 11000 ), array( array( '5-class pass', '', 11000, 1 ) ) );
+	$calls = count( $GLOBALS['stripe_calls'] );
+	$url   = OYS_Stripe::start_checkout( OYS_Orders::create( $o3 ), '5-class pass', '', $l3 );
+	ok( str_contains( $url, 'oys_return=success' ), 'straight to the thank-you page' );
+	eq( $calls, count( $GLOBALS['stripe_calls'] ), 'Stripe not called' );
+	eq( 5 + 5, OYS_Passes::balance( $u, 'class' ), 'both passes in the account' );
+} );
+
+test( 'birthday: code on the day, once a year, filled in at checkout', function () {
+	OYS_Settings::update( array( 'birthday_on' => 1, 'birthday_percent' => 25, 'birthday_days' => 30 ) );
+	$u = make_user( 'Bibi' );
+	OYS_Rewards::set_birthday( $u, (int) wp_date( 'n' ), (int) wp_date( 'j' ) );
+	$o = make_user( 'NotToday' );
+	OYS_Rewards::set_birthday( $o, (int) wp_date( 'n', time() + 5 * DAY_IN_SECONDS ), (int) wp_date( 'j', time() + 5 * DAY_IN_SECONDS ) );
+	OYS_Rewards::set_birthday( make_user(), 2, 31 );
+	$log  = sent_mails( fn() => OYS_Rewards::send_birthdays() );
+	$mine = array_values( array_filter( $log, fn( $m ) => get_userdata( $u )->user_email === $m['to'] ) );
+	eq( 1, count( $mine ), 'birthday email' );
+	eq( 'Happy birthday, Bibi!', $mine[0]['subject'], 'subject' );
+	$c = OYS_Coupons::for_user( $u );
+	eq( 1, count( $c ), 'a personal code' );
+	eq( 25, (int) $c[0]->value, '25% off' );
+	ok( str_contains( $mine[0]['html'], $c[0]->code ), 'the code is in the email' );
+	eq( 0, count( OYS_Coupons::for_user( $o ) ), 'not before the day' );
+	eq( '', OYS_Rewards::birthday( make_user() ), 'optional' );
+	eq( 0, count( array_filter( sent_mails( fn() => OYS_Rewards::send_birthdays() ), fn( $m ) => get_userdata( $u )->user_email === $m['to'] ) ), 'once a year' );
+} );
+
+test( 'loyalty draw: a ticket per class, weighted draw once, prize and anonymous newsletter', function () {
+	global $wpdb;
+	OYS_Settings::update( array( 'raffle_period' => 'half', 'raffle_prize' => 'pack-5', 'raffle_announce' => 1 ) );
+	// Periods follow the calendar.
+	$jan = ( new DateTimeImmutable( '2026-02-10 12:00', wp_timezone() ) )->getTimestamp();
+	$p   = OYS_Rewards::period( $jan );
+	eq( '2026-H1', $p[0], 'first half-year key' );
+	eq( '2026-07-01', wp_date( 'Y-m-d', oys_ts( $p[2] ) ), 'ends on July 1' );
+	eq( '2026-Q1', OYS_Rewards::period( $jan, 3 )[0], 'quarters' );
+	// Last period: Ann came to 3 classes, Ben to 1 (plus a missed one that doesn't count).
+	[ $key, $start, $end ] = OYS_Rewards::period( oys_ts( OYS_Rewards::period()[1] ) - DAY_IN_SECONDS );
+	$wpdb->delete( OYS_Install::table( 'raffles' ), array( 'period_key' => $key ) );
+	$ann = make_user( 'Ann' );
+	$ben = make_user( 'Ben' );
+	update_user_meta( $ann, 'oys_marketing', '1' );
+	$past = function ( $user, $status ) use ( $start ) {
+		global $wpdb;
+		$s  = make_session();
+		$t  = oys_ts( $start ) + 7 * DAY_IN_SECONDS + wp_rand( 0, 1000 ) * 60;
+		$wpdb->update( OYS_Install::table( 'sessions' ), array( 'starts_at' => gmdate( 'Y-m-d H:i:s', $t ), 'ends_at' => gmdate( 'Y-m-d H:i:s', $t + 3600 ) ), array( 'id' => $s->id ) );
+		$id = OYS_Bookings::book_manual( $user, $s->id, 'comp', false, true );
+		OYS_Bookings::set_attendance( $id, $status );
+	};
+	$past( $ann, 'attended' );
+	$past( $ann, 'attended' );
+	$past( $ann, 'attended' );
+	$past( $ben, 'attended' );
+	$past( $ben, 'no_show' );
+	$rows = array_column( array_map( fn( $r ) => (array) $r, OYS_Rewards::standings( $start, $end ) ), 'tickets', 'user_id' );
+	eq( 3, (int) $rows[ $ann ], 'Ann: 3 tickets' );
+	eq( 1, (int) $rows[ $ben ], 'Ben: 1 ticket (no-show not counted)' );
+	$before = OYS_Passes::balance( $ann, 'class' ) + OYS_Passes::balance( $ben, 'class' );
+	$log    = sent_mails( function () use ( &$draw ) { $draw = OYS_Rewards::run_draw(); } );
+	ok( $draw && in_array( (int) $draw->winner_id, array_map( 'intval', array_keys( $rows ) ), true ), 'a winner among those with tickets' );
+	eq( array_sum( $rows ), (int) $draw->tickets_total, 'all tickets in the hat' );
+	eq( $before + 5, OYS_Passes::balance( $ann, 'class' ) + OYS_Passes::balance( $ben, 'class' ), 'the winner got a 5-class pass' );
+	ok( (bool) array_filter( $log, fn( $m ) => str_starts_with( $m['subject'], 'You won:' ) ), 'winner emailed' );
+	$n = OYS_Newsletter::get( $draw->newsletter_id );
+	ok( $n && 'sending' === $n->status, 'announcement newsletter queued' );
+	ok( ! str_contains( $n->body, 'Ann' ) && ! str_contains( $n->body, 'Ben' ), 'without names' );
+	ok( null === OYS_Rewards::run_draw(), 'drawn once' );
+	// Many draws: each ticket is one chance (Ann should win about 3 in 4).
+	$wins = 0;
+	$pool = array( (object) array( 'user_id' => 1, 'tickets' => 3 ), (object) array( 'user_id' => 2, 'tickets' => 1 ) );
+	for ( $i = 0; $i < 2000; $i++ ) {
+		$wins += 1 === (int) OYS_Rewards::pick( $pool )->user_id ? 1 : 0;
+	}
+	ok( $wins > 1380 && $wins < 1620, "weighted by tickets (3 of 4 tickets won $wins of 2000)" );
+	eq( 0, OYS_Rewards::tickets( $ann ), 'new period: tickets start again' );
+} );
+
+test( 'newsletter: format, queue in batches, unsubscribe, subscribers only', function () {
+	$html = OYS_Newsletter::render( "Hi {first_name},\n\n## New class\nSunday sunrise **on the beach**.\n\n- One\n- Two\n\n[Book now](https://example.test/book) or https://example.test" );
+	ok( str_contains( $html, '<h2' ) && str_contains( $html, '<b>on the beach</b>' ) && str_contains( $html, '<li' ) && str_contains( $html, 'href="https://example.test/book"' ), 'headings, bold, lists and links' );
+	ok( ! str_contains( OYS_Newsletter::render( '<script>x</script>' ), '<script>' ), 'escaped' );
+	$a = make_user( 'Sub' );
+	$b = make_user( 'NoSub' );
+	$c = make_user( 'Sub2' );
+	update_user_meta( $a, 'oys_marketing', '1' );
+	update_user_meta( $c, 'oys_marketing', '1' );
+	$id = OYS_Newsletter::save( array( 'subject' => 'News for {first_name}', 'body' => "Hi {first_name},\n\nclasses!", 'button_label' => 'Book', 'button_url' => 'https://example.test/book' ) );
+	$subs = count( OYS_Newsletter::subscribers() );
+	eq( $subs, OYS_Newsletter::send( $id ), 'queued for every subscriber' );
+	ok( is_wp_error( OYS_Newsletter::send( $id ) ), 'sent once' );
+	update_user_meta( $c, 'oys_marketing', '' ); // Unsubscribed after it was queued.
+	$log = sent_mails( fn() => OYS_Newsletter::process_queue( 1000 ) );
+	$to  = array_column( $log, 'to' );
+	ok( in_array( get_userdata( $a )->user_email, $to, true ), 'subscriber emailed' );
+	ok( ! in_array( get_userdata( $b )->user_email, $to, true ) && ! in_array( get_userdata( $c )->user_email, $to, true ), 'nobody else' );
+	$mine = array_values( array_filter( $log, fn( $m ) => get_userdata( $a )->user_email === $m['to'] ) )[0];
+	eq( 'News for Sub', $mine['subject'], 'personal subject' );
+	ok( str_contains( $mine['html'], 'oys_unsub=' . $a . '.' ), 'unsubscribe link' );
+	eq( 'sent', OYS_Newsletter::get( $id )->status, 'done' );
+	eq( 0, count( sent_mails( fn() => OYS_Newsletter::process_queue( 1000 ) ) ), 'nothing sent twice' );
+	// The unsubscribe link works without logging in; a forged one doesn't.
+	preg_match( '/oys_unsub=([0-9]+\.[a-f0-9]+)/', $mine['html'], $m );
+	$_GET['oys_unsub'] = $a . '.bad';
+	add_filter( 'wp_die_handler', fn() => function ( $msg, $t, $args ) { throw new RuntimeException( 'die:' . ( $args['response'] ?? 0 ) ); } );
+	try { OYS_Newsletter::maybe_unsubscribe(); } catch ( RuntimeException $e ) { eq( 'die:400', $e->getMessage(), 'forged link refused' ); }
+	$_GET['oys_unsub'] = $m[1];
+	try { OYS_Newsletter::maybe_unsubscribe(); } catch ( RuntimeException $e ) { eq( 'die:200', $e->getMessage(), 'unsubscribe page' ); }
+	eq( '', get_user_meta( $a, 'oys_marketing', true ), 'unsubscribed' );
+	unset( $_GET['oys_unsub'] );
+	remove_all_filters( 'wp_die_handler' );
+} );
+
+test( 'AI newsletter draft: request shape, structured answer, errors', function () {
+	OYS_Settings::update( array( 'ai_api_key' => 'sk-ant-test', 'ai_model' => 'claude-opus-5' ) );
+	make_session( array( 'kind' => 'event', 'min_people' => 0 ) );
+	$sent = null;
+	$reply = array( 'stop_reason' => 'end_turn', 'content' => array( array( 'type' => 'text', 'text' => wp_json_encode( array( 'subject' => 'Sunrise on the sand', 'preheader' => 'A new Sunday class', 'body' => "Hi {first_name},\n\nSee you Sunday!\n\nOlivia", 'button_label' => 'Book a class' ) ) ) ) );
+	$code  = 200;
+	$fake  = function ( $pre, $args, $url ) use ( &$sent, &$reply, &$code ) {
+		if ( ! str_starts_with( $url, OYS_AI::api_url() ) ) {
+			return $pre;
+		}
+		$sent = array( 'headers' => $args['headers'], 'body' => json_decode( $args['body'], true ) );
+		return array( 'headers' => array(), 'body' => wp_json_encode( $reply ), 'response' => array( 'code' => $code, 'message' => 'OK' ), 'cookies' => array(), 'filename' => null );
+	};
+	add_filter( 'pre_http_request', $fake, 5, 3 );
+	$d = OYS_AI::draft_newsletter( 'New sunrise class on Sundays' );
+	eq( 'Sunrise on the sand', $d['subject'], 'subject from the structured answer' );
+	ok( str_contains( $d['body'], '{first_name}' ), 'keeps the name placeholder' );
+	eq( 'claude-opus-5', $sent['body']['model'], 'model' );
+	eq( 'sk-ant-test', $sent['headers']['x-api-key'], 'API key header' );
+	eq( '2023-06-01', $sent['headers']['anthropic-version'], 'API version header' );
+	eq( 'server-side-fallback-2026-07-01', $sent['headers']['anthropic-beta'], 'fallback beta header' );
+	eq( 'default', $sent['body']['fallbacks'], 'server-side fallbacks' );
+	eq( 'json_schema', $sent['body']['output_config']['format']['type'], 'structured output' );
+	ok( str_contains( $sent['body']['messages'][0]['content'], 'Schedule for the next three weeks' ), 'timetable as context' );
+	ok( ! isset( $sent['body']['thinking'] ) && ! isset( $sent['body']['temperature'] ), 'no removed parameters' );
+	$reply = array( 'stop_reason' => 'refusal', 'content' => array() );
+	ok( is_wp_error( OYS_AI::draft_newsletter( 'x' ) ), 'refusal handled' );
+	$code  = 401;
+	$reply = array( 'type' => 'error', 'error' => array( 'type' => 'authentication_error', 'message' => 'invalid x-api-key' ) );
+	$e = OYS_AI::draft_newsletter( 'x' );
+	ok( is_wp_error( $e ) && str_contains( $e->get_error_message(), 'API key' ), 'bad key explained' );
+	remove_filter( 'pre_http_request', $fake, 5 );
+	OYS_Settings::update( array( 'ai_api_key' => '' ) );
+	ok( is_wp_error( OYS_AI::draft_newsletter( 'x' ) ), 'no key: asks for one' );
+} );
+
 test( 'helpers: money and periods', function () {
 	eq( '$25', oys_money( 2500, 'usd' ), 'whole dollars' );
 	eq( '$25.50', oys_money( 2550, 'usd' ), 'cents' );

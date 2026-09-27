@@ -50,3 +50,5 @@
 .oys-due-tag { color: #9A4A10; }
 .oys-sent li { padding: 8px 0; border-bottom: 1px solid #dcdcde; }
 .oys-message { max-width: 760px; }
+.oys-nl__ai { max-width: 760px; background: #F7F2FD; border-color: #C6A3EE; }
+.oys-nl__form { max-width: 760px; }

@@ -9,13 +9,17 @@ defined( 'ABSPATH' ) || exit;
 class OYS_Emails {
 
 	public static function send( $to, $subject, $heading, $body_html, $attachments = array(), $cta = null ) {
+		return self::send_raw( $to, $subject, self::wrap( $heading, $body_html, $cta ), array(), $attachments );
+	}
+
+	/** Send ready HTML (already wrapped) with the studio as the sender. */
+	public static function send_raw( $to, $subject, $html, array $extra_headers = array(), $attachments = array() ) {
 		$from_name = OYS_Settings::get( 'email_from_name' );
 		$from      = OYS_Settings::get( 'email_from' );
-		$headers   = array( 'Content-Type: text/html; charset=UTF-8' );
+		$headers   = array_merge( array( 'Content-Type: text/html; charset=UTF-8' ), $extra_headers );
 		if ( $from ) {
 			$headers[] = sprintf( 'From: %s <%s>', $from_name, $from );
 		}
-		$html = self::wrap( $heading, $body_html, $cta );
 		$sent = wp_mail( $to, $subject, $html, $headers, $attachments );
 		foreach ( $attachments as $file ) {
 			if ( str_contains( $file, 'oys-tmp' ) ) {
@@ -26,12 +30,19 @@ class OYS_Emails {
 		return $sent;
 	}
 
-	private static function wrap( $heading, $body, $cta ) {
+	/** A newsletter in the studio's email look, with a hidden preview line and an unsubscribe link. */
+	public static function newsletter_html( $heading, $preheader, $body, $cta, $unsubscribe_url ) {
+		$pre  = $preheader ? '<div style="display:none;max-height:0;overflow:hidden;opacity:0">' . esc_html( $preheader ) . '</div>' : '';
+		$foot = '<br><a href="' . esc_url( $unsubscribe_url ) . '" style="color:#53635A">' . esc_html__( 'Unsubscribe from the newsletter', 'olivia-studio' ) . '</a>';
+		return str_replace( '<body style="', '<body data-newsletter="1" style="', self::wrap( $heading, $body, $cta, $foot, $pre ) );
+	}
+
+	private static function wrap( $heading, $body, $cta, $footer_extra = '', $preheader = '' ) {
 		$button = '';
 		if ( $cta ) {
 			$button = '<p style="margin:28px 0 8px"><a href="' . esc_url( $cta[1] ) . '" style="display:inline-block;background:#2B5036;color:#F3F2EC;text-decoration:none;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:13px;padding:14px 22px;border-radius:999px">' . esc_html( $cta[0] ) . '</a></p>';
 		}
-		return '<!doctype html><html><body style="margin:0;background:#F3F2EC;font-family:Arial,Helvetica,sans-serif;color:#26352B">'
+		return '<!doctype html><html><body style="margin:0;background:#F3F2EC;font-family:Arial,Helvetica,sans-serif;color:#26352B">' . $preheader
 			. '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F3F2EC;padding:24px 12px"><tr><td align="center">'
 			. '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FBFBF8;border:2px solid #12231A">'
 			. '<tr><td style="background:#2B5036;padding:18px 24px;color:#F3F2EC;font-weight:700;font-size:20px;letter-spacing:.04em;text-transform:uppercase">' . esc_html( OYS_Settings::get( 'email_from_name' ) ) . '</td></tr>'
@@ -42,6 +53,7 @@ class OYS_Emails {
 			. '</td></tr><tr><td style="padding:16px 24px;border-top:2px solid #12231A;font-size:12px;color:#53635A">'
 			. esc_html( get_bloginfo( 'name' ) ) . ' · <a href="' . esc_url( home_url( '/' ) ) . '" style="color:#2B5036">' . esc_html( wp_parse_url( home_url(), PHP_URL_HOST ) ) . '</a> · <a href="' . esc_url( oys_account_url() ) . '" style="color:#2B5036">' . esc_html__( 'My account', 'olivia-studio' ) . '</a>'
 			. ( oys_fb_group_url() ? ' · <a href="' . esc_url( oys_fb_group_url() ) . '" style="color:#2B5036">' . esc_html__( 'Facebook group', 'olivia-studio' ) . '</a>' : '' )
+			. $footer_extra
 			. '</td></tr></table></td></tr></table></body></html>';
 	}
 
@@ -412,6 +424,28 @@ class OYS_Emails {
 	/* ---------- Studio emails ---------- */
 
 	/** A note to the studio; $type is its switch in Studio → Emails. */
+	/** Birthday code (from the `birthday` template). */
+	public static function birthday( $user_id, $coupon ) {
+		$vars   = array_merge( OYS_Email_Templates::vars_for( $user_id ), array(
+			'percent' => (int) $coupon->value . '%',
+			'code'    => $coupon->code,
+			'expires' => $coupon->expires_at ? oys_date( $coupon->expires_at, 'F j' ) : '',
+		) );
+		$blocks = '<p style="margin:22px 0;padding:16px;text-align:center;background:#DEE7D6;border:2px dashed #2B5036;font-size:22px;font-weight:700;letter-spacing:.12em">' . esc_html( $coupon->code ) . '</p>'
+			. '<p style="font-size:14px;color:#53635A">' . esc_html__( 'It\'s filled in for you when you buy a pass or pay for a class by card while logged in.', 'olivia-studio' ) . '</p>';
+		return self::compose( 'birthday', self::user_email( $user_id ), $vars, $blocks, array(), oys_page_url( 'book' ) );
+	}
+
+	/** The loyalty draw's winner (from the `raffle_winner` template). */
+	public static function raffle_winner( $user_id, $product, $tickets, $period ) {
+		$vars = array_merge( OYS_Email_Templates::vars_for( $user_id ), array(
+			'prize'   => $product['name'] ?? __( 'a free pass', 'olivia-studio' ),
+			'tickets' => $tickets,
+			'period'  => $period,
+		) );
+		return self::compose( 'raffle_winner', self::user_email( $user_id ), $vars, '', array(), oys_account_url( 'passes' ) );
+	}
+
 	/** "Bring a friend": the class needs $missing more people by the decision time. */
 	public static function minimum_nudge( $booking, $session, $missing, $decide_at ) {
 		$vars = array_merge( OYS_Email_Templates::vars_for( $booking->user_id, $session ), array(

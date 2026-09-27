@@ -41,6 +41,7 @@ define( 'WP_DEBUG', true ); define( 'WP_DEBUG_LOG', true ); define( 'WP_DEBUG_DI
 define( 'WP_HOME', 'http://127.0.0.1:8080' ); define( 'WP_SITEURL', 'http://127.0.0.1:8080' );
 define( 'OYS_STRIPE_API_BASE', 'http://127.0.0.1:8090' );
 define( 'OYS_ZOOM_API_BASE', 'http://127.0.0.1:8090/zoom/v2' ); define( 'OYS_ZOOM_OAUTH_URL', 'http://127.0.0.1:8090/zoom/oauth/token' );
+define( 'OYS_ANTHROPIC_API_URL', 'http://127.0.0.1:8090/anthropic/v1/messages' );
 define( 'DISABLE_WP_CRON', true );
 define( 'AUTOMATIC_UPDATER_DISABLED', true );
 if ( ! defined( 'ABSPATH' ) ) { define( 'ABSPATH', __DIR__ . '/' ); }

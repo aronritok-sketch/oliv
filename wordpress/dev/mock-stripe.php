@@ -18,6 +18,10 @@
  *                define( 'OYS_ZOOM_OAUTH_URL', 'http://127.0.0.1:8090/zoom/oauth/token' );
  * Plugin settings: Account ID "acc_mock", Client ID "zoom_client", Client Secret "zoom_secret".
  *   /zoom/_meetings              every meeting and registrant (for tests)
+ *
+ * And a Claude (Anthropic Messages API) stand-in for the newsletter drafts:
+ * wp-config.php: define( 'OYS_ANTHROPIC_API_URL', 'http://127.0.0.1:8090/anthropic/v1/messages' );
+ * API key "sk-ant-mock". Answers with a structured newsletter that quotes the brief.
  */
 
 const WEBHOOK_URL    = 'http://127.0.0.1:8080/wp-json/oys/v1/stripe-webhook';
@@ -41,6 +45,29 @@ parse_str( file_get_contents( 'php://input' ), $body );
 parse_str( $_SERVER['QUERY_STRING'] ?? '', $query );
 
 /* ---------- Zoom ---------- */
+if ( '/anthropic/v1/messages' === $path ) {
+	unlock();
+	$req = json_decode( file_get_contents( 'php://input' ), true ) ?: array();
+	if ( 'sk-ant-mock' !== ( $_SERVER['HTTP_X_API_KEY'] ?? '' ) ) {
+		out( array( 'type' => 'error', 'error' => array( 'type' => 'authentication_error', 'message' => 'invalid x-api-key' ) ), 401 );
+		exit;
+	}
+	$ask   = (string) ( $req['messages'][0]['content'] ?? '' );
+	$brief = trim( preg_replace( '/^.*(brief for this newsletter:|Olivia\'s note:)/s', '', $ask ) );
+	$brief = trim( strtok( $brief, "\n" ) );
+	$body  = "Hi {first_name},\n\n" . $brief . "\n\n## Coming up\n- Sunrise flow on the beach\n- Full moon flow\n\nSee you on the mat,\nOlivia";
+	out( array(
+		'id'          => 'msg_mock',
+		'type'        => 'message',
+		'role'        => 'assistant',
+		'model'       => $req['model'] ?? '',
+		'stop_reason' => 'end_turn',
+		'content'     => array( array( 'type' => 'text', 'text' => json_encode( array( 'subject' => 'News from the studio', 'preheader' => 'What is coming up', 'body' => $body, 'button_label' => 'Book a class' ) ) ) ),
+		'usage'       => array( 'input_tokens' => 100, 'output_tokens' => 80 ),
+	) );
+	exit;
+}
+
 if ( str_starts_with( $path, '/zoom/' ) ) {
 	$json = json_decode( file_get_contents( 'php://input' ) ?: 'null', true ) ?: array();
 	if ( '/zoom/oauth/token' === $path ) {

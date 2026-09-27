@@ -71,7 +71,8 @@
 - **Magánóra:** jól látható szöveg, hogy az első alkalom tovább tart; ajánlatnál +15 perc blokkolva (nem számlázva).
 - **Facebook-csoport** link: hírlevél-pipa, foglalás után, fiók, levelek alja, lábléc, app. Hírlevél-kapcsoló az appban.
 - **2. rész – helyszínek és minimum létszám:** Studio → Locations: helyszínenként minimum és döntési idő (alap 2 fő, 3 órával előtte; online külön). Óránként felülírható a naptárban (pl. reggeli óra 12 órával előtte). Kevés jelentkező → automatikus lemondás, mindenki visszakapja az óráját, és levelet kap más időpontokkal + „hozz egy barátot” tippel; előtte (alap 12 órával) „hozz egy barátot” levél. Olivia „Class is on” / „Cancelled automatically” levelet kap.
-- Hátra: 3. kör (kupon, szülinap, hűség-sorsolás, hírlevél AI-jal), 4. kör (oktatók, bevétel-megosztás).
+- **3. rész – kuponok, szülinap, sorsolás, hírlevél:** kedvezménykódok (%, $; bérletre/órára; használatszám, lejárat); szülinapi kód automatikusan (alap 20%, 30 napig; a születésnap opcionális a profilban); hűség-sorsolás félévente (minden óra egy sorsjegy, a nyertes 5 alkalmas bérletet kap, név nélküli hírlevél mindenkinek); hírlevél az adminból, AI-vázlattal (Claude, API-kulcs kell: console.anthropic.com), tesztlevél, kötegelt küldés, egykattintásos leiratkozás.
+- Hátra: 4. kör (oktatók, bevétel-megosztás).
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb.

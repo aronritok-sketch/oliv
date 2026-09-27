@@ -727,6 +727,76 @@ async function payOnMockStripe(page, button = '#pay') {
   check(mailSubjects().some(x => x && x.startsWith('[Studio] Cancelled automatically:')), 'the studio is told');
   php(`delete_option('oys_locations');`);
 
+  // 35. Discount code made in the admin, used on a pass by card.
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-rewards`);
+  check(await adm.isVisible('h2:has-text("Loyalty draw")'), 'rewards page: loyalty draw');
+  const couponCode = `E2E${String(stamp).slice(-6)}`;
+  await adm.fill('input[name="code"]', couponCode);
+  await adm.fill('input[name="value"]', '10');
+  await adm.selectOption('select[name="applies"]', 'passes');
+  await Promise.all([adm.waitForNavigation(), adm.click('button:has-text("Create code")')]);
+  check(await adm.isVisible(`text=Code ${couponCode} created.`), 'discount code created');
+  await rae.goto(`${BASE}/book/?product=pack-5`);
+  await rae.click('.oys-coupon summary').catch(() => {});
+  await rae.fill('#oys-coupon', couponCode.toLowerCase());
+  await rae.click('.oys-submit');
+  await payOnMockStripe(rae);
+  const po = JSON.parse(q(`SELECT amount_cents FROM {$wpdb->prefix}oys_orders WHERE user_id=${raeId} AND product_id='pack-5' AND status='paid' ORDER BY id DESC LIMIT 1`))[0];
+  check(po && +po.amount_cents === 9900, 'pass bought with 10% off ($99)');
+  check(php(`echo OYS_Coupons::by_code('${couponCode}')->used;`) === '1', 'code use counted');
+  await rae.goto(`${BASE}/book/?product=pack-5`);
+  await rae.click('.oys-coupon summary').catch(() => {});
+  await rae.fill('#oys-coupon', 'NOPE-123');
+  await Promise.all([rae.waitForNavigation(), rae.click('.oys-submit')]);
+  check(await rae.isVisible("text=That code isn't valid."), 'wrong code explained');
+
+  // 36. Birthday: set in the profile (optional), gift code on the day, filled in at checkout.
+  await rae.goto(`${BASE}/account/?tab=profile`);
+  const today = php(`echo wp_date('n') . '|' . wp_date('j');`).split('|');
+  await rae.selectOption('#oys-p-bmonth', today[0]);
+  await rae.selectOption('#oys-p-bday', today[1]);
+  await rae.check('input[name="oys_marketing"]');
+  await Promise.all([rae.waitForNavigation(), rae.click('form:has(#oys-p-bmonth) button[type="submit"]')]);
+  check(php(`echo get_user_meta(${raeId}, 'oys_birthday', true);`) === `${today[0].padStart(2, '0')}-${today[1].padStart(2, '0')}`, 'birthday saved in the profile');
+  php(`OYS_Settings::update(array('birthday_on'=>1,'birthday_percent'=>20,'birthday_days'=>30)); delete_user_meta(${raeId}, 'oys_birthday_sent'); OYS_Rewards::send_birthdays();`);
+  check(mailSubjects().some(x => x === 'Happy birthday, Rae!'), 'birthday email with a gift code');
+  await rae.goto(`${BASE}/account/?tab=passes`);
+  check(await rae.isVisible('.oys-gift-code:has-text("20% off")'), 'account shows the birthday code');
+  check(await rae.isVisible('.oys-raffle:has-text("ticket")'), 'account shows the loyalty draw tickets');
+  await rae.goto(`${BASE}/book/?product=pack-5`);
+  check((await rae.inputValue('#oys-coupon')).startsWith('BDAY-'), 'birthday code filled in at checkout');
+  await rae.screenshot({ path: `${SHOTS}/26-birthday-code.png`, fullPage: true });
+
+  // 37. Newsletter written with AI (Claude stand-in), tested, sent in batches, unsubscribe.
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-newsletter`);
+  await adm.fill('input[name="ai_api_key"]', 'sk-ant-mock');
+  await Promise.all([adm.waitForNavigation(), adm.click('#submit, button:has-text("Save AI settings"), input[value="Save AI settings"]')]);
+  check(await adm.isVisible('text=AI settings saved.'), 'AI key saved');
+  await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-newsletter&edit=0`);
+  await adm.fill('textarea[name="brief"]', 'Our new Sunday sunrise class starts next week.');
+  await Promise.all([adm.waitForNavigation({ timeout: 60000 }), adm.click('button:has-text("Write a new draft")')]);
+  check(await adm.isVisible('text=Draft written.'), 'AI draft written');
+  check((await adm.inputValue('input[name="subject"]')) === 'News from the studio', 'subject from the AI');
+  check((await adm.inputValue('textarea[name="body"]')).includes('Our new Sunday sunrise class starts next week.'), 'body follows the brief');
+  const nlFrame = await adm.$('iframe.oys-preview');
+  check(!!nlFrame && (await adm.getAttribute('iframe.oys-preview', 'srcdoc')).includes('Coming up'), 'email preview');
+  await adm.screenshot({ path: `${SHOTS}/27-newsletter-ai.png`, fullPage: true });
+  await Promise.all([adm.waitForNavigation(), adm.click('button:has-text("Send a test")')]);
+  check(mailSubjects().some(x => x === '[Test] News from the studio'), 'test newsletter sent');
+  adm.once('dialog', d => d.accept());
+  await Promise.all([adm.waitForNavigation(), adm.click('button:has-text("Send to")')]);
+  check(await adm.isVisible('text=goes out over the next few minutes'), 'newsletter queued');
+  const nmark = mails().length;
+  php(`OYS_Newsletter::process_queue(1000);`);
+  const nl = mails().slice(nmark).map(f => fs.readFileSync(path.join(WP_DIR, 'wp-content/mail-log', f), 'utf8')).find(h => h.includes('Hi Rae') && h.includes('Sunday sunrise'));
+  check(!!nl, 'subscriber got the newsletter, by name');
+  const unsub = (nl.match(/href="([^"]*oys_unsub=[^"]+)"/) || [])[1];
+  check(!!unsub, 'with an unsubscribe link');
+  await rae.goto(unsub.replace(/&amp;/g, '&'));
+  check(await rae.isVisible("text=You're unsubscribed"), 'one-click unsubscribe');
+  check(php(`echo get_user_meta(${raeId}, 'oys_marketing', true);`) === '', 'no longer subscribed');
+  php(`OYS_Settings::update(array('ai_api_key'=>''));`);
+
   // Screens for review.
   await a.goto(`${BASE}/schedule-pricing/`);
   await a.screenshot({ path: `${SHOTS}/10-schedule-pricing.png`, fullPage: true });

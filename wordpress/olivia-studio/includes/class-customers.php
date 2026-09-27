@@ -151,6 +151,9 @@ class OYS_Customers {
 			$raw = wp_unslash( $_POST[ $key ] ?? '' );
 			update_user_meta( $user_id, $key, 'oys_health_notes' === $key ? sanitize_textarea_field( $raw ) : sanitize_text_field( $raw ) );
 		}
+		if ( isset( $_POST['bday_month'] ) ) {
+			OYS_Rewards::set_birthday( $user_id, $_POST['bday_month'], $_POST['bday_day'] ?? 0 );
+		}
 		$new_pass = (string) wp_unslash( $_POST['new_password'] ?? '' );
 		if ( $new_pass ) {
 			if ( strlen( $new_pass ) < 8 ) {

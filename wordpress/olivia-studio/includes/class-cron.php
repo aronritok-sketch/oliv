@@ -40,11 +40,14 @@ class OYS_Cron {
 		self::send_reminders();
 		self::send_join_reminders();
 		OYS_Locations::run();
+		OYS_Newsletter::process_queue();
 	}
 
 	public static function hourly() {
 		OYS_Schedule::generate();
 		self::send_pass_expiry();
+		OYS_Rewards::send_birthdays();
+		OYS_Rewards::run_draw();
 	}
 
 	/**

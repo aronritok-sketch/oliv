@@ -222,6 +222,7 @@ const tid = (id) => `[data-testid="${id}"]`;
   await page.waitForSelector(tid('balance-class'));
   check((await page.textContent(tid('balance-class'))).startsWith('4'), 'passes tab shows 4 studio classes');
   check(await page.isVisible('text=5-class pass'), 'pass listed');
+  check(await page.isVisible(`${tid('raffle')} >> text=Loyalty draw`), 'loyalty draw tickets shown');
   await shot('09-passes');
   await page.goto(`${APP}/profile`);
   await page.waitForSelector(tid('logout'));

@@ -62,6 +62,13 @@ class OYS_Email_Templates {
 				'{from} sent you a yoga gift', 'A gift for you', 'Hi {recipient}, {from} sent you a gift: {gift}.', 'Create a free account (or log in), open "Passes" and enter the code. Then book whenever you like.', 'Redeem my gift', array( 'recipient', 'from', 'gift' ) ),
 			'gift_receipt'      => array( __( 'Gift card receipt', 'olivia-studio' ), 'account', 'customer', __( 'To the buyer of a gift card', 'olivia-studio' ),
 				'Your gift card was sent', 'Gift sent', 'Thank you! Your gift card was sent to {recipient_email}.', '', '', array( 'recipient_email' ) ),
+			// Rewards
+			'birthday'          => array( __( 'Birthday gift code', 'olivia-studio' ), 'account', 'customer', __( 'On the birthday of customers who added it to their profile (percentage and days under Coupons & rewards)', 'olivia-studio' ),
+				'Happy birthday, {first_name}!', 'Happy birthday', "Happy birthday, {first_name}! Here's a little gift from me: {percent} off a class pass or a drop-in class, until {expires}.", 'Enjoy your day, and see you on the mat!', 'Use my gift', array( 'percent', 'code', 'expires' ) ),
+			'raffle_winner'     => array( __( 'Loyalty draw: the winner', 'olivia-studio' ), 'account', 'customer', __( 'To the customer whose ticket was drawn', 'olivia-studio' ),
+				'You won: {prize}!', 'You won!', "Congratulations, {first_name}! You came to {tickets} classes in {period}, and your ticket was drawn: {prize} is now in your account. Thank you for practicing with me so faithfully!", '', 'See my passes', array( 'prize', 'tickets', 'period' ) ),
+			'raffle_announcement' => array( __( 'Loyalty draw: newsletter to everyone', 'olivia-studio' ), 'account', 'customer', __( 'Sent to the newsletter subscribers after the draw (no names); the heading is the preview line', 'olivia-studio' ),
+				'The {period} draw: {prize} has a new home', 'Every class is a ticket', "Hi {first_name},\n\nthe {period} draw is done: {prize} went to one of our most dedicated students ({tickets} tickets from {entrants} of you were in the hat).\n\nA new round has started: every class you come to until {next_draw} is one more ticket.", 'See you on the mat!', 'Book a class', array( 'period', 'prize', 'tickets', 'entrants', 'next_draw' ) ),
 			// Private sessions
 			'private_request_received' => array( __( 'Private request received', 'olivia-studio' ), 'private', 'customer', __( 'When someone sends a private session request', 'olivia-studio' ),
 				'Your private session request', 'Request received', "Thank you for your request. I'll reply within one working day with a suggested time and price. You can pay and confirm from the email or your account.", '', 'View my requests' ),

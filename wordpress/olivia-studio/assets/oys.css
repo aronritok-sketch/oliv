@@ -194,3 +194,12 @@
 .oys-private-note .oys-icon { width: 22px; height: 22px; flex: none; margin-top: 2px; }
 .oys-min-note { display: flex; gap: .5rem; align-items: flex-start; margin: 1rem 0 0; font-size: .92rem; }
 .oys-min-note .oys-icon { width: 20px; height: 20px; flex: none; margin-top: 2px; }
+.oys-gift-code, .oys-raffle { margin: 0 0 1.25rem; }
+.oys-gift-code__code { font-family: var(--f-display, sans-serif); font-size: 1.8rem; letter-spacing: .08em; margin: .2rem 0; }
+.oys-raffle__n { font-size: 1.1rem; margin: .2rem 0; }
+.oys-raffle__n b { font-family: var(--f-display, sans-serif); font-size: 2.4rem; color: var(--oys-forest); margin-right: .25rem; }
+.oys-birthday { border: 0; padding: 0; margin: 0 0 1rem; }
+.oys-birthday legend { font-weight: 700; margin-bottom: .4rem; }
+.oys-coupon { margin: 0 0 1rem; }
+.oys-coupon summary { cursor: pointer; font-weight: 700; color: var(--oys-forest); }
+.oys-coupon .field { margin-top: .6rem; }

@@ -107,6 +107,11 @@ class OYS_Stripe {
 		$hold  = max( 30, (int) OYS_Settings::get( 'hold_minutes' ) ); // Stripe's minimum is 30 minutes.
 
 		$return = oys_page_url( 'book', array_filter( array( 'oys_order' => $order_id, 'oys_key' => self::order_key( $order_id ), 'app' => empty( $order->meta['app'] ) ? '' : 1 ) ) );
+		if ( (int) $order->amount_cents <= 0 ) {
+			// Nothing to pay (a 100% code): fulfil straight away, no Stripe page.
+			OYS_Orders::mark_paid( $order_id );
+			return add_query_arg( 'oys_return', 'success', $return );
+		}
 		$params = array(
 			'mode'                => 'payment',
 			'client_reference_id' => (string) $order_id,

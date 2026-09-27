@@ -98,6 +98,10 @@ export type Me = {
     max_guests: number;
     online_per_credit: number;
   };
+  /** Loyalty draw: classes this period = tickets. */
+  raffle?: { tickets: number; label: string; draw: string; prize: string } | null;
+  /** The customer's own discount codes (birthday gift…). */
+  coupons?: { code: string; label: string; expires: string | null; birthday: boolean }[];
   links: Record<'account' | 'passes' | 'membership' | 'private' | 'pricing' | 'gifts' | 'website' | 'password' | 'signup', string> & {
     /** The studio's Facebook group ('' when not set). */
     community?: string;

@@ -255,6 +255,71 @@ class OYS_Install {
 			PRIMARY KEY  (event_id)
 		) $c;" );
 
+		// Discount codes (birthday gifts, prizes, promotions); card payments only.
+		dbDelta( 'CREATE TABLE ' . self::table( 'coupons' ) . " (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			code varchar(40) NOT NULL,
+			user_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			kind varchar(10) NOT NULL DEFAULT 'percent',
+			value int(10) unsigned NOT NULL DEFAULT 0,
+			applies varchar(10) NOT NULL DEFAULT 'all',
+			max_uses int(10) unsigned NOT NULL DEFAULT 1,
+			used int(10) unsigned NOT NULL DEFAULT 0,
+			expires_at datetime NULL,
+			source varchar(20) NOT NULL DEFAULT 'manual',
+			note varchar(255) NOT NULL DEFAULT '',
+			created_at datetime NOT NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY code (code),
+			KEY user_id (user_id)
+		) $c;" );
+
+		// Newsletters and their sending queue (one row per subscriber).
+		dbDelta( 'CREATE TABLE ' . self::table( 'newsletters' ) . " (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			subject varchar(255) NOT NULL DEFAULT '',
+			preheader varchar(255) NOT NULL DEFAULT '',
+			body longtext NULL,
+			button_label varchar(100) NOT NULL DEFAULT '',
+			button_url varchar(500) NOT NULL DEFAULT '',
+			status varchar(20) NOT NULL DEFAULT 'draft',
+			total int(10) unsigned NOT NULL DEFAULT 0,
+			sent int(10) unsigned NOT NULL DEFAULT 0,
+			created_by bigint(20) unsigned NOT NULL DEFAULT 0,
+			created_at datetime NOT NULL,
+			queued_at datetime NULL,
+			sent_at datetime NULL,
+			PRIMARY KEY  (id)
+		) $c;" );
+		dbDelta( 'CREATE TABLE ' . self::table( 'newsletter_queue' ) . " (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			newsletter_id bigint(20) unsigned NOT NULL,
+			user_id bigint(20) unsigned NOT NULL,
+			status varchar(20) NOT NULL DEFAULT 'queued',
+			sent_at datetime NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY newsletter_user (newsletter_id,user_id),
+			KEY status (status)
+		) $c;" );
+
+		// Loyalty draws, one per period.
+		dbDelta( 'CREATE TABLE ' . self::table( 'raffles' ) . " (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			period_key varchar(20) NOT NULL,
+			label varchar(60) NOT NULL DEFAULT '',
+			starts_at datetime NOT NULL,
+			ends_at datetime NOT NULL,
+			tickets_total int(10) unsigned NOT NULL DEFAULT 0,
+			entrants int(10) unsigned NOT NULL DEFAULT 0,
+			winner_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			winner_tickets int(10) unsigned NOT NULL DEFAULT 0,
+			pass_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			newsletter_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			drawn_at datetime NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY period_key (period_key)
+		) $c;" );
+
 		// Messages the studio sent to the people booked into a class (Studio → roster).
 		dbDelta( 'CREATE TABLE ' . self::table( 'messages' ) . " (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,

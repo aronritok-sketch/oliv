@@ -356,6 +356,16 @@ class OYS_Frontend {
 		return array( 'door', $donation ? __( 'Give at the studio', 'olivia-studio' ) : __( 'Pay at the studio', 'olivia-studio' ), $html, (string) OYS_Settings::get( 'pay_later_note' ) );
 	}
 
+	/** "Have a code?" for card payments; the customer's own gift code is filled in. */
+	private static function coupon_field( $user_id ) {
+		$mine  = $user_id ? OYS_Coupons::for_user( $user_id ) : array();
+		$first = $mine[0] ?? null;
+		$hint  = $first ? sprintf( __( 'Your gift: %1$s with code %2$s%3$s. It\'s filled in for you.', 'olivia-studio' ), OYS_Coupons::label( $first ), $first->code, $first->expires_at ? ' ' . sprintf( __( '(until %s)', 'olivia-studio' ), oys_date( $first->expires_at, 'M j' ) ) : '' ) : '';
+		return '<details class="oys-coupon"' . ( $first ? ' open' : '' ) . '><summary>' . esc_html__( 'Have a discount code?', 'olivia-studio' ) . '</summary>'
+			. '<label class="field"><span>' . esc_html__( 'Code (for card payments)', 'olivia-studio' ) . '</span><input type="text" name="coupon" id="oys-coupon" autocomplete="off" autocapitalize="characters" value="' . esc_attr( $first ? $first->code : '' ) . '"></label>'
+			. ( $hint ? '<p class="oys-small">' . esc_html( $hint ) . '</p>' : '' ) . '</details>';
+	}
+
 	/** Still to pay at the studio for a booking and its guests, in cents. */
 	private static function due_for( $booking ) {
 		$rows = array_merge( array( $booking ), OYS_Bookings::guests_of( $booking->id, array( 'confirmed' ) ) );
@@ -541,6 +551,9 @@ class OYS_Frontend {
 		if ( $door_note ) {
 			$out .= '<p class="oys-small">' . esc_html( $door_note ) . '</p>';
 		}
+		if ( $price > 0 && $ready ) {
+			$out .= self::coupon_field( $user_id );
+		}
 		if ( ! $ready && ! $credits && ! $covered ) {
 			$out .= '<p class="oys-notice">' . esc_html__( 'Online payment is being set up. To book now, send a message and I\'ll hold your spot.', 'olivia-studio' ) . '</p>';
 		}
@@ -587,6 +600,7 @@ class OYS_Frontend {
 		}
 		$out .= self::form_open( 'oys_buy', 'class="oys-card oys-pay"' ) . '<h2>' . esc_html__( 'Buy this pass', 'olivia-studio' ) . '</h2><input type="hidden" name="product" value="' . esc_attr( $p['id'] ) . '">'
 			. '<p>' . esc_html__( 'After paying, book any class from the timetable in one click. You can use your pass for guests you bring, too.', 'olivia-studio' ) . '</p>'
+			. self::coupon_field( get_current_user_id() )
 			. self::waiver_field()
 			. '<button class="btn btn--primary oys-submit" type="submit">' . sprintf( esc_html__( 'Pay %s', 'olivia-studio' ), esc_html( oys_money( $p['price_cents'] ) ) ) . '</button>'
 			. '<p class="oys-secure">' . esc_html__( 'Card payments are processed securely by Stripe. Apple Pay and Google Pay are accepted.', 'olivia-studio' ) . '</p></form>';
@@ -819,6 +833,12 @@ class OYS_Frontend {
 
 	/** Hold the seats (customer and/or guests), create the order, send the customer to Stripe. */
 	private static function start_paid_booking( $user_id, $s, array $order, array $lines, $back, array $guests = array(), $include_host = true, $host_booking = 0, $mode = 'studio' ) {
+		$with_code = OYS_Coupons::for_checkout( wp_unslash( $_POST['coupon'] ?? '' ), $user_id, 'pack' === $order['type'] ? 'passes' : 'classes', $order, $lines );
+		if ( is_wp_error( $with_code ) ) {
+			oys_flash( $with_code->get_error_message(), 'error' );
+			oys_redirect( $back );
+		}
+		[ $order, $lines ] = $with_code;
 		$order_id = OYS_Orders::create( array_merge( array( 'user_id' => $user_id, 'session_id' => $s->id ), $order ) );
 		$first    = OYS_Bookings::hold( $user_id, $s, $order_id, $guests, $include_host, $host_booking, $mode );
 		if ( is_wp_error( $first ) ) {
@@ -850,14 +870,19 @@ class OYS_Frontend {
 			oys_redirect( $back );
 		}
 		self::accept_waiver_or_back( $back );
-		$order_id = OYS_Orders::create( array(
+		$with_code = OYS_Coupons::for_checkout( wp_unslash( $_POST['coupon'] ?? '' ), $user_id, 'passes', array(
 			'user_id'      => $user_id,
 			'type'         => 'pack',
 			'product_id'   => $p['id'],
 			'description'  => $p['name'],
 			'amount_cents' => (int) $p['price_cents'],
-		) );
-		$url = OYS_Stripe::start_checkout( $order_id, $p['name'], $p['description'] );
+		), array( array( $p['name'], $p['description'], (int) $p['price_cents'], 1 ) ) );
+		if ( is_wp_error( $with_code ) ) {
+			oys_flash( $with_code->get_error_message(), 'error' );
+			oys_redirect( $back );
+		}
+		$order_id = OYS_Orders::create( $with_code[0] );
+		$url = OYS_Stripe::start_checkout( $order_id, $p['name'], $p['description'], $with_code[1] );
 		if ( is_wp_error( $url ) ) {
 			OYS_Orders::update( $order_id, array( 'status' => 'failed' ) );
 			oys_flash( $url->get_error_message(), 'error' );
@@ -1133,6 +1158,7 @@ class OYS_Frontend {
 			}
 			$out .= '</div>';
 		}
+		$out .= self::rewards_html( $user_id );
 		$out .= '<div class="oys-card oys-redeem"><h3>' . esc_html__( 'Redeem a gift card', 'olivia-studio' ) . '</h3>' . self::form_open( 'oys_gift_redeem', 'class="oys-form oys-form--row"' )
 			. '<label class="field"><span>' . esc_html__( 'Gift code', 'olivia-studio' ) . '</span><input type="text" name="code" id="oys-gift-code" placeholder="OY-ABCD-EFGH" required autocapitalize="characters"></label>'
 			. '<button class="btn btn--primary" type="submit">' . esc_html__( 'Redeem', 'olivia-studio' ) . '</button></form></div>';
@@ -1143,6 +1169,21 @@ class OYS_Frontend {
 				$out .= '<li><span><b>' . esc_html( $p['name'] ) . '</b> ' . esc_html( $p['description'] ) . '</span><a class="btn btn--dark btn--sm" href="' . esc_url( oys_page_url( 'book', array( 'product' => $p['id'] ) ) ) . '">' . esc_html( oys_money( $p['price_cents'] ) ) . '</a></li>';
 			}
 			$out .= '</ul>';
+		}
+		return $out;
+	}
+
+	/** Account: the loyalty draw (tickets this period) and the customer's own discount codes. */
+	private static function rewards_html( $user_id ) {
+		$out = '';
+		foreach ( OYS_Coupons::for_user( $user_id ) as $c ) {
+			$out .= '<div class="oys-card oys-gift-code"><p class="kicker">' . esc_html( 'birthday' === $c->source ? __( 'Birthday gift', 'olivia-studio' ) : __( 'Your code', 'olivia-studio' ) ) . '</p><p class="oys-gift-code__code">' . esc_html( $c->code ) . '</p><p>' . esc_html( OYS_Coupons::label( $c ) ) . ( $c->expires_at ? ' · ' . sprintf( esc_html__( 'until %s', 'olivia-studio' ), esc_html( oys_date( $c->expires_at, 'M j' ) ) ) : '' ) . ' · ' . esc_html__( 'filled in when you pay by card', 'olivia-studio' ) . '</p></div>';
+		}
+		$r = OYS_Rewards::status( $user_id );
+		if ( $r ) {
+			$out .= '<div class="oys-card oys-raffle"><p class="kicker">' . esc_html__( 'Loyalty draw', 'olivia-studio' ) . '</p>'
+				. '<p class="oys-raffle__n"><b>' . (int) $r['tickets'] . '</b> ' . esc_html( _n( 'ticket', 'tickets', (int) $r['tickets'], 'olivia-studio' ) ) . '</p>'
+				. '<p>' . sprintf( esc_html__( 'Every class you come to in %1$s is one ticket. On %2$s one ticket is drawn for %3$s.', 'olivia-studio' ), esc_html( $r['label'] ), esc_html( $r['draw'] ), '<b>' . esc_html( $r['prize'] ?: __( 'a free pass', 'olivia-studio' ) ) . '</b>' ) . '</p></div>';
 		}
 		return $out;
 	}
@@ -1213,6 +1254,22 @@ class OYS_Frontend {
 			. '<p class="oys-small">' . esc_html__( 'Nothing is charged now. You\'ll get a suggested time and price to confirm.', 'olivia-studio' ) . '</p></form>';
 	}
 
+	/** Optional birthday (month and day), for the birthday gift. */
+	private static function birthday_field( $user_id ) {
+		[ $m, $d ] = array_map( 'intval', array_pad( explode( '-', OYS_Rewards::birthday( $user_id ) ), 2, 0 ) );
+		$months    = '<option value="">' . esc_html__( 'Month', 'olivia-studio' ) . '</option>';
+		for ( $i = 1; $i <= 12; $i++ ) {
+			$months .= '<option value="' . $i . '"' . selected( $m, $i, false ) . '>' . esc_html( wp_date( 'F', gmmktime( 12, 0, 0, $i, 1, 2024 ), new DateTimeZone( 'UTC' ) ) ) . '</option>';
+		}
+		$days = '<option value="">' . esc_html__( 'Day', 'olivia-studio' ) . '</option>';
+		for ( $i = 1; $i <= 31; $i++ ) {
+			$days .= '<option value="' . $i . '"' . selected( $d, $i, false ) . '>' . $i . '</option>';
+		}
+		$gift = (int) OYS_Settings::get( 'birthday_on' ) ? sprintf( __( 'Optional. On your birthday you get a %d%% gift code.', 'olivia-studio' ), (int) OYS_Settings::get( 'birthday_percent' ) ) : __( 'Optional.', 'olivia-studio' );
+		return '<fieldset class="oys-birthday"><legend>' . esc_html__( 'Birthday', 'olivia-studio' ) . '</legend><div class="form__row"><label class="field"><span class="sr-only">' . esc_html__( 'Month', 'olivia-studio' ) . '</span><select name="bday_month" id="oys-p-bmonth">' . $months . '</select></label>'
+			. '<label class="field"><span class="sr-only">' . esc_html__( 'Day', 'olivia-studio' ) . '</span><select name="bday_day" id="oys-p-bday">' . $days . '</select></label></div><p class="oys-small">' . esc_html( $gift ) . '</p></fieldset>';
+	}
+
 	private static function tab_profile( $user_id ) {
 		$u   = get_userdata( $user_id );
 		$m   = fn( $k ) => esc_attr( get_user_meta( $user_id, $k, true ) );
@@ -1225,6 +1282,7 @@ class OYS_Frontend {
 			. '<div class="form__row"><label class="field"><span>' . esc_html__( 'Emergency contact', 'olivia-studio' ) . '</span><input type="text" name="oys_emergency_name" id="oys-p-ename" value="' . $m( 'oys_emergency_name' ) . '"></label>'
 			. '<label class="field"><span>' . esc_html__( 'Emergency phone', 'olivia-studio' ) . '</span><input type="tel" name="oys_emergency_phone" id="oys-p-ephone" value="' . $m( 'oys_emergency_phone' ) . '"></label></div>'
 			. '<label class="field"><span>' . esc_html__( 'Injuries, pregnancy or health notes (only Olivia sees this)', 'olivia-studio' ) . '</span><textarea name="oys_health_notes" id="oys-p-health" rows="4">' . esc_textarea( get_user_meta( $user_id, 'oys_health_notes', true ) ) . '</textarea></label>'
+			. self::birthday_field( $user_id )
 			. '<label class="oys-check"><input type="checkbox" name="oys_marketing" value="1"' . checked( '1', get_user_meta( $user_id, 'oys_marketing', true ), false ) . '> <span>' . esc_html__( 'Email me the newsletter: new classes and events', 'olivia-studio' ) . '</span></label>'
 			. oys_fb_group_link( __( 'And join our Facebook group', 'olivia-studio' ) )
 			. '<label class="field"><span>' . esc_html__( 'New password (leave empty to keep the current one)', 'olivia-studio' ) . '</span><input type="password" name="new_password" id="oys-p-pass" minlength="8" autocomplete="new-password"></label>'
