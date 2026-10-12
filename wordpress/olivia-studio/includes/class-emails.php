@@ -8,6 +8,58 @@ defined( 'ABSPATH' ) || exit;
 
 class OYS_Emails {
 
+	/**
+	 * Customer emails are written in the customer's language (the one they last used on the site):
+	 * OYS_Emails::booking_confirmed( … ) etc. arrive here and run with that language switched on.
+	 */
+	public static function __callStatic( $name, $args ) {
+		if ( ! method_exists( __CLASS__, $name ) ) {
+			throw new BadMethodCallException( 'OYS_Emails::' . $name );
+		}
+		$user = self::recipient_of( $name, $args );
+		$lang = $user ? OYS_I18n::lang_for( $user ) : OYS_I18n::current();
+		return OYS_I18n::with( $lang, fn() => self::$name( ...$args ) );
+	}
+
+	/** The user (id or email) an email goes to, from the arguments it was called with. */
+	private static function recipient_of( $name, array $args ) {
+		$a   = $args[0] ?? null;
+		$uid = fn( $row ) => $row ? (int) ( $row->user_id ?? 0 ) : 0;
+		switch ( $name ) {
+			case 'booking_confirmed':
+			case 'booking_cancelled':
+			case 'waitlist_promoted':
+			case 'reminder':
+			case 'join_reminder':
+				return $uid( OYS_Bookings::get( $a ) );
+			case 'session_changed':
+			case 'minimum_nudge':
+				return $uid( is_object( $a ) ? $a : OYS_Bookings::get( $a ) );
+			case 'guest_invite':
+				return is_object( $a ) && $a->guest_of ? $uid( OYS_Bookings::get( $a->guest_of ) ) : 0;
+			case 'waitlist_spot_open':
+			case 'welcome':
+			case 'birthday':
+			case 'raffle_winner':
+				return (int) $a;
+			case 'pass_expiring':
+				return $uid( OYS_Passes::get( $a ) );
+			case 'pass_purchased':
+				return $uid( OYS_Orders::get( $a ) );
+			case 'gift_card':
+				$known = is_object( $a ) ? get_user_by( 'email', (string) $a->recipient_email ) : null;
+				return $known ? (int) $known->ID : ( is_object( $a ) ? (int) $a->purchaser_id : 0 );
+			case 'gift_receipt':
+				return $uid( $args[1] ?? null );
+			case 'private_request_received':
+			case 'private_offer':
+			case 'private_declined':
+				return $uid( is_object( $a ) ? $a : OYS_Privates::get( $a ) );
+			default:
+				return $uid( OYS_Memberships::get( $a ) );
+		}
+	}
+
 	public static function send( $to, $subject, $heading, $body_html, $attachments = array(), $cta = null ) {
 		return self::send_raw( $to, $subject, self::wrap( $heading, $body_html, $cta ), array(), $attachments );
 	}
@@ -106,7 +158,7 @@ class OYS_Emails {
 			'DTSTAMP:' . gmdate( 'Ymd\THis\Z' ),
 			'DTSTART:' . gmdate( 'Ymd\THis\Z', oys_ts( $session->starts_at ) ),
 			'DTEND:' . gmdate( 'Ymd\THis\Z', oys_ts( $session->ends_at ) ),
-			'SUMMARY:' . $esc( oys_session_title( $session ) . ' — ' . OYS_Settings::get( 'email_from_name' ) ),
+			'SUMMARY:' . $esc( oys_session_title( $session ) . ' · ' . OYS_Settings::get( 'email_from_name' ) ),
 			'LOCATION:' . $esc( $live ? ( $join ?: 'Online' ) : $session->location ),
 			'DESCRIPTION:' . $esc( $desc ),
 			'BEGIN:VALARM', 'TRIGGER:-PT2H', 'ACTION:DISPLAY', 'DESCRIPTION:Yoga in 2 hours', 'END:VALARM',
@@ -193,7 +245,7 @@ class OYS_Emails {
 	 * $ids = the rows just confirmed (the customer's own and/or guests'). When only guests were
 	 * added, the email says so.
 	 */
-	public static function booking_confirmed( $booking_id, array $ids = array() ) {
+	protected static function booking_confirmed( $booking_id, array $ids = array() ) {
 		$host = OYS_Bookings::get( $booking_id );
 		if ( ! $host ) {
 			return;
@@ -223,7 +275,7 @@ class OYS_Emails {
 	}
 
 	/** A guest who gave an email gets the details and a calendar invite (no account needed). */
-	public static function guest_invite( $g, $s ) {
+	protected static function guest_invite( $g, $s ) {
 		if ( ! OYS_Email_Templates::enabled( 'guest_invite' ) ) {
 			return;
 		}
@@ -235,7 +287,7 @@ class OYS_Emails {
 	/**
 	 * $ids = every row cancelled together (the customer's own and their guests').
 	 */
-	public static function booking_cancelled( $booking_id, $outcome, $by_studio = false, $reason = '', array $ids = array(), $key = '', $extra = '' ) {
+	protected static function booking_cancelled( $booking_id, $outcome, $by_studio = false, $reason = '', array $ids = array(), $key = '', $extra = '' ) {
 		$b = OYS_Bookings::get( $booking_id );
 		$s = OYS_Schedule::get( $b->session_id );
 		$rows   = array_filter( array_map( array( 'OYS_Bookings', 'get' ), $ids ?: array( $booking_id ) ) );
@@ -272,7 +324,7 @@ class OYS_Emails {
 		}
 	}
 
-	public static function waitlist_promoted( $booking_id ) {
+	protected static function waitlist_promoted( $booking_id ) {
 		if ( ! OYS_Email_Templates::enabled( 'waitlist_promoted' ) ) {
 			return;
 		}
@@ -282,12 +334,12 @@ class OYS_Emails {
 		self::compose( 'waitlist_promoted', self::user_email( $b->user_id ), $vars, self::session_block( $s ) . self::join_html( $b, $s ), array( self::ics_file( $s, $booking_id ) ), oys_account_url() );
 	}
 
-	public static function waitlist_spot_open( $user_id, $session ) {
+	protected static function waitlist_spot_open( $user_id, $session ) {
 		self::compose( 'waitlist_spot_open', self::user_email( $user_id ), OYS_Email_Templates::vars_for( $user_id, $session ), self::session_block( $session ), array(), oys_book_url( $session->id ) );
 	}
 
 	/** The studio moved a class (new time, day or place): to the person who booked, or to a guest with an email. */
-	public static function session_changed( $booking, $session, $before ) {
+	protected static function session_changed( $booking, $session, $before ) {
 		if ( ! OYS_Email_Templates::enabled( 'session_changed' ) ) {
 			return;
 		}
@@ -302,7 +354,7 @@ class OYS_Emails {
 		self::compose( 'session_changed', $to, $vars, $blocks, array( self::ics_file( $session, $booking->id ) ), $guest ? '' : oys_account_url(), '', ! $guest );
 	}
 
-	public static function reminder( $booking_id ) {
+	protected static function reminder( $booking_id ) {
 		$b = OYS_Bookings::get( $booking_id );
 		$s = OYS_Schedule::get( $b->session_id );
 		$blocks = self::session_block( $s ) . self::guest_list_html( OYS_Bookings::guests_of( $b->id, array( 'confirmed' ) ), __( 'Coming with you', 'olivia-studio' ) ) . self::join_html( $b, $s );
@@ -310,7 +362,7 @@ class OYS_Emails {
 	}
 
 	/** Shortly before an online or hybrid class: the join link, to the customer or a guest with an email. */
-	public static function join_reminder( $booking_id ) {
+	protected static function join_reminder( $booking_id ) {
 		$b = OYS_Bookings::get( $booking_id );
 		$s = OYS_Schedule::get( $b->session_id );
 		$link = OYS_Bookings::join_link( $b, $s );
@@ -325,50 +377,50 @@ class OYS_Emails {
 	}
 
 	/** Unused classes on a pass are about to expire. */
-	public static function pass_expiring( $pass_id ) {
+	protected static function pass_expiring( $pass_id ) {
 		$p = OYS_Passes::get( $pass_id );
 		if ( ! $p ) {
 			return false;
 		}
 		$vars = array_merge( OYS_Email_Templates::vars_for( $p->user_id ), array(
-			'pass'         => $p->name,
+			'pass'         => oys_t( $p->name ),
 			'classes_left' => sprintf( _n( '%d class', '%d classes', (int) $p->credits_left, 'olivia-studio' ), (int) $p->credits_left ),
 			'expires'      => oys_date( $p->expires_at, get_option( 'date_format' ) ),
 		) );
 		return self::compose( 'pass_expiring', self::user_email( $p->user_id ), $vars, '', array(), home_url( '/schedule-pricing/' ) );
 	}
 
-	public static function pass_purchased( $order_id, $pass_id ) {
+	protected static function pass_purchased( $order_id, $pass_id ) {
 		$o      = OYS_Orders::get( $order_id );
 		$p      = OYS_Passes::get( $pass_id );
-		$blocks = '<p><b>' . esc_html( $p->name ) . '</b><br>' . sprintf( esc_html__( '%1$d classes · valid until %2$s', 'olivia-studio' ), (int) $p->credits_total, esc_html( $p->expires_at ? oys_date( $p->expires_at, get_option( 'date_format' ) ) : __( 'no expiry', 'olivia-studio' ) ) ) . '</p>'
+		$blocks = '<p><b>' . esc_html( oys_t( $p->name ) ) . '</b><br>' . sprintf( esc_html__( '%1$d classes · valid until %2$s', 'olivia-studio' ), (int) $p->credits_total, esc_html( $p->expires_at ? oys_date( $p->expires_at, get_option( 'date_format' ) ) : __( 'no expiry', 'olivia-studio' ) ) ) . '</p>'
 			. '<p>' . sprintf( esc_html__( 'Paid: %s', 'olivia-studio' ), esc_html( oys_money( $o->amount_cents, $o->currency ) ) ) . ( $o->receipt_url ? ' · <a href="' . esc_url( $o->receipt_url ) . '">' . esc_html__( 'Receipt', 'olivia-studio' ) . '</a>' : '' ) . '</p>';
-		self::compose( 'pass_purchased', self::user_email( $o->user_id ), array_merge( OYS_Email_Templates::vars_for( $o->user_id ), array( 'pass' => $p->name ) ), $blocks, array(), home_url( '/schedule-pricing/' ) );
+		self::compose( 'pass_purchased', self::user_email( $o->user_id ), array_merge( OYS_Email_Templates::vars_for( $o->user_id ), array( 'pass' => oys_t( $p->name ) ) ), $blocks, array(), home_url( '/schedule-pricing/' ) );
 	}
 
-	public static function welcome( $user_id ) {
+	protected static function welcome( $user_id ) {
 		self::compose( 'welcome', self::user_email( $user_id ), OYS_Email_Templates::vars_for( $user_id ), '', array(), oys_account_url() );
 	}
 
-	public static function gift_card( $gift ) {
+	protected static function gift_card( $gift ) {
 		$product = OYS_Products::get( $gift->product_id );
 		$vars    = array_merge( OYS_Email_Templates::vars_for(), array(
 			'recipient'  => $gift->recipient_name ?: __( 'there', 'olivia-studio' ),
 			'first_name' => $gift->recipient_name ?: __( 'there', 'olivia-studio' ),
 			'from'       => self::first_name( $gift->purchaser_id ),
-			'gift'       => $product ? $product['name'] : $gift->product_id,
+			'gift'       => $product ? oys_product_name( $product ) : $gift->product_id,
 		) );
 		$blocks = ( $gift->message ? '<blockquote style="margin:18px 0;padding:14px 18px;background:#ECE1FA;border:2px solid #12231A">' . nl2br( esc_html( $gift->message ) ) . '</blockquote>' : '' )
 			. '<p>' . esc_html__( 'Your gift code:', 'olivia-studio' ) . '</p><p style="font-size:26px;font-weight:700;letter-spacing:.12em;background:#FF72B6;display:inline-block;padding:8px 14px;border:2px solid #12231A">' . esc_html( $gift->code ) . '</p>';
 		self::compose( 'gift_card', $gift->recipient_email, $vars, $blocks, array(), oys_account_url( 'passes' ) );
 	}
 
-	public static function gift_receipt( $gift, $order ) {
+	protected static function gift_receipt( $gift, $order ) {
 		$blocks = '<p>' . esc_html__( 'Code:', 'olivia-studio' ) . ' <b>' . esc_html( $gift->code ) . '</b> · ' . esc_html( oys_money( $order->amount_cents, $order->currency ) ) . ( $order->receipt_url ? ' · <a href="' . esc_url( $order->receipt_url ) . '">' . esc_html__( 'Receipt', 'olivia-studio' ) . '</a>' : '' ) . '</p>';
 		self::compose( 'gift_receipt', self::user_email( $order->user_id ), array_merge( OYS_Email_Templates::vars_for( $order->user_id ), array( 'recipient_email' => $gift->recipient_email ) ), $blocks );
 	}
 
-	public static function private_request_received( $request ) {
+	protected static function private_request_received( $request ) {
 		self::compose( 'private_request_received', self::user_email( $request->user_id ), OYS_Email_Templates::vars_for( $request->user_id ), '', array(), oys_account_url( 'private' ) );
 		if ( ! OYS_Email_Templates::enabled( 'studio_private' ) ) {
 			return;
@@ -381,7 +433,7 @@ class OYS_Emails {
 		self::send( OYS_Settings::get( 'notify_email' ), __( 'New private session request', 'olivia-studio' ), __( 'New private request', 'olivia-studio' ), $admin, array(), array( __( 'Open in dashboard', 'olivia-studio' ), admin_url( 'admin.php?page=oys-private&request=' . (int) $request->id ) ) );
 	}
 
-	public static function private_offer( $request, $session ) {
+	protected static function private_offer( $request, $session ) {
 		$blocks = self::session_block( $session ) . '<p><b>' . esc_html( oys_money( $request->price_cents ) ) . '</b></p>'
 			. ( $request->admin_message ? '<p>' . nl2br( esc_html( $request->admin_message ) ) . '</p>' : '' )
 			. ( $session->note ? '<p><b>' . esc_html( $session->note ) . '</b></p>' : '' )
@@ -389,7 +441,7 @@ class OYS_Emails {
 		self::compose( 'private_offer', self::user_email( $request->user_id ), OYS_Email_Templates::vars_for( $request->user_id, $session ), $blocks, array(), oys_book_url( $session->id ) );
 	}
 
-	public static function private_declined( $request, $message = '' ) {
+	protected static function private_declined( $request, $message = '' ) {
 		self::compose( 'private_declined', self::user_email( $request->user_id ), OYS_Email_Templates::vars_for( $request->user_id ), $message ? '<p>' . nl2br( esc_html( $message ) ) . '</p>' : '' );
 	}
 
@@ -402,26 +454,26 @@ class OYS_Emails {
 		return '<p><b>' . esc_html( $m->name ) . '</b><br>' . esc_html( $what ) . ( $price ? ' · ' . esc_html( $price ) : '' ) . '</p>';
 	}
 
-	public static function membership_started( $membership_id ) {
+	protected static function membership_started( $membership_id ) {
 		$m      = OYS_Memberships::get( $membership_id );
 		$blocks = self::membership_block( $m ) . ( $m->current_period_end ? '<p>' . sprintf( esc_html__( 'Next renewal: %s.', 'olivia-studio' ), esc_html( oys_date( $m->current_period_end, get_option( 'date_format' ) ) ) ) . '</p>' : '' );
 		self::compose( 'membership_started', self::user_email( $m->user_id ), OYS_Email_Templates::vars_for( $m->user_id ), $blocks, array(), oys_page_url( 'book' ) );
 		self::admin_notice( __( 'New membership', 'olivia-studio' ), sprintf( '%s joined: %s', self::first_name( $m->user_id ), $m->name ), 'studio_membership' );
 	}
 
-	public static function membership_cancel_scheduled( $membership_id ) {
+	protected static function membership_cancel_scheduled( $membership_id ) {
 		$m    = OYS_Memberships::get( $membership_id );
 		$vars = array_merge( OYS_Email_Templates::vars_for( $m->user_id ), array( 'ends' => oys_date( $m->current_period_end, get_option( 'date_format' ) ) ) );
 		self::compose( 'membership_cancel_scheduled', self::user_email( $m->user_id ), $vars, self::membership_block( $m ), array(), oys_account_url( 'membership' ) );
 		self::admin_notice( __( 'Membership cancelled', 'olivia-studio' ), sprintf( '%s cancelled %s (ends %s).', self::first_name( $m->user_id ), $m->name, oys_date( $m->current_period_end ) ), 'studio_membership' );
 	}
 
-	public static function membership_ended( $membership_id ) {
+	protected static function membership_ended( $membership_id ) {
 		$m = OYS_Memberships::get( $membership_id );
 		self::compose( 'membership_ended', self::user_email( $m->user_id ), OYS_Email_Templates::vars_for( $m->user_id ), self::membership_block( $m ), array(), home_url( '/schedule-pricing/' ) );
 	}
 
-	public static function membership_payment_failed( $membership_id, $invoice_url = '' ) {
+	protected static function membership_payment_failed( $membership_id, $invoice_url = '' ) {
 		$m      = OYS_Memberships::get( $membership_id );
 		$blocks = self::membership_block( $m ) . ( $invoice_url ? '<p><a href="' . esc_url( $invoice_url ) . '">' . esc_html__( 'Pay the invoice now', 'olivia-studio' ) . '</a></p>' : '' );
 		self::compose( 'membership_payment_failed', self::user_email( $m->user_id ), OYS_Email_Templates::vars_for( $m->user_id ), $blocks, array(), oys_account_url( 'membership' ) );
@@ -432,7 +484,7 @@ class OYS_Emails {
 
 	/** A note to the studio; $type is its switch in Studio → Emails. */
 	/** Birthday code (from the `birthday` template). */
-	public static function birthday( $user_id, $coupon ) {
+	protected static function birthday( $user_id, $coupon ) {
 		$vars   = array_merge( OYS_Email_Templates::vars_for( $user_id ), array(
 			'percent' => (int) $coupon->value . '%',
 			'code'    => $coupon->code,
@@ -444,7 +496,7 @@ class OYS_Emails {
 	}
 
 	/** The loyalty draw's winner (from the `raffle_winner` template). */
-	public static function raffle_winner( $user_id, $product, $tickets, $period ) {
+	protected static function raffle_winner( $user_id, $product, $tickets, $period ) {
 		$vars = array_merge( OYS_Email_Templates::vars_for( $user_id ), array(
 			'prize'   => $product['name'] ?? __( 'a free pass', 'olivia-studio' ),
 			'tickets' => $tickets,
@@ -454,7 +506,7 @@ class OYS_Emails {
 	}
 
 	/** "Bring a friend": the class needs $missing more people by the decision time. */
-	public static function minimum_nudge( $booking, $session, $missing, $decide_at ) {
+	protected static function minimum_nudge( $booking, $session, $missing, $decide_at ) {
 		$vars = array_merge( OYS_Email_Templates::vars_for( $booking->user_id, $session ), array(
 			'missing'  => sprintf( _n( '%d more person', '%d more people', $missing, 'olivia-studio' ), $missing ),
 			'deadline' => wp_date( 'l g:i a', $decide_at ),

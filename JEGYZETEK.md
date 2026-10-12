@@ -75,12 +75,26 @@
 - **4. rész – oktatók és bevétel-megosztás:** Studio → Teachers: oktató felvétele (név, rövid leírás, bemutatkozás, fotók, részesedés %), weboldali Teachers oldal, órára kiosztás a naptárban („with Anna” az órarendben, foglalóoldalon, levelekben, appban). Az oktató saját belépést kap: látja a saját óráira bejelentkezetteket, jelöli a jelenlétet és a helyszíni fizetést, üzenetet küld nekik (a válasz hozzá megy), szerkeszti a profilját, és havi elszámolást lát. **Pénz:** ha az oktató összeköti a saját Stripe-fiókját, a kártyás óradíj egyenesen hozzá megy (ő az eladó), Olivia része automatikusan díjként jön Oliviának – így Olivia nem számláz és nem vall be más bevételét. Bérlet/tagság/készpénz: havi elszámolás (ki mennyivel tartozik, CSV a könyvelőnek). Könyvelővel egyeztetni (1099-K / 1099-NEC).
 - Tesztek: 460 integrációs + 236 böngészős + 18 app unit + 49 app végpont-ellenőrzés.
 
+## 8. kör: Olivia módosításai (Google Doc) + saját fotók + 3 nyelv (2026-10-12)
+- **Nyelvek:** angol, magyar, spanyol. Címek: `/` (EN), `/hu/`, `/es/`; nyelvválasztó fejlécben, menüben, láblécben; hreflang. Saját megoldás (nem WPML/Polylang). Oldalak, órák, cikkek, GYIK, események fordítása a szerkesztő „Translations” dobozában. Felület: `.po` fájlok (`languages/`). Az ügyfél-e-mailek a vendég nyelvén mennek; az e-mail szövegek nyelvenként szerkeszthetők (fülek). Az admin angol marad.
+- **Titulus:** „Yoga Teacher | Movement & Wellness Coach” + „Yoga • Mobility • Prenatal Fitness • Meditation • Private Singing Bowl Massage” (hero névkártya, lábléc, szerzői doboz, Person schema).
+- **Tipográfia, levegősség:** Anton címek maradnak, szöveg: Quicksand (finomabb, kerekebb). Nagyobb sorköz, puhább kártyák, vékonyabb vonalak.
+- **Kivéve:** forgó „Beginners welcome” matrica, futószalag, „Certified hatha yoga teacher since 2023” felirat, szint-sávok és szintek, csillag-felsorolásjelek, minden nagykötőjel (—) a szövegekből.
+- **Fotók:** csak Olivia képei (Drive + a régi Google Sites eseményfotói), a moodboard szerint színkorrigálva; az órák listaképe = az óra oldalának képe.
+- **Órák:** Hatha 60–90, Slow flow 90 (minden szint), Sportolóknak 60/75/90, Online 60/75/90, Kismamatorna 30/45/60; szint helyett az óra nyelve (privátnál „English or Hungarian”). Új: Prenatal Fitness, Private Singing Bowl Massage; „Sound Yoga & Meditation”. Művészi piktogramok négyzetek nélkül.
+- **Órarend-sor újratervezve** (időblokk, nyelv-chip, kiemelt Book gomb). **Átfedés-tiltás:** két óra nem lehet egyszerre (naptár, admin, heti generálás). Telefonon lebegő „Book a class” gomb.
+- **About:** szakmaibb (személyi edző, masszőr, SMR, kismama-fitnesz képzés, Fitmummy logó) + személyes történet. Nevek: Kovacs (ékezet nélkül), Prana, Buda Perinatal Center.
+- **Events:** 27 korábbi esemény fotóval, évenként; főoldalon csík. **Journal:** Olivia 24 írása a saját grafikáival (magyar eredeti + angol, spanyol fordítás).
+- **Légzés-szekció** újragondolva: lótusz, ami belégzésre kinyílik, kilégzésre összecsukódik (4 be, 6 ki, 3 kör); mobilon a szöveg az animáció fölött.
+- **Kapcsolat űrlap** elegánsabb (téma-chipek), **árak** csoportosítva (csoportos / tagság / privát és csapat), privát oldalsáv elfér desktopon.
+- Tesztek: 540 integrációs + 252 böngészős ellenőrzés (új: nyelvek, átfedés-tiltás, nagykötőjel nélküli oldalak, lebegő gomb) + 18 app unit.
+- **Teendők:** a dev oldalon Megjelenés → Olivia setup → *Refresh the content*; a régi, egymást fedő hétfő 18:00-s Hatha törlése a naptárból; a spanyol szövegeket és a magyar fordításokat Olivia nézze át; a Fitmummy felirat pontos szövege („Prenatal & postnatal fitness training: Fitmummy method”) Oliviával egyeztetendő.
+
 ## Következő kör – nyitott pontok / ötletek
-- Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb.
+- Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
 - Valódi Stripe teszt-fiókkal végigpróbálni (a fejlesztői környezetből a Stripe nem érhető el, szimulátorral tesztelt).
 - Főoldal szövegeinek szerkeszthetővé tétele a Customizerben.
 - Ügyfél-visszajelzés a színarányokra (mennyi pink / lila / barack).
-- Hero: címsor mérete, a matrica és a névkártya elhelyezése.
 - Mobil finomhangolás (hero, órarend, árkártyák).
 - Élesítés előtt továbbra is: SITE_URL, foglalási rendszer, valós órarend és árak (most MINTA adatok).

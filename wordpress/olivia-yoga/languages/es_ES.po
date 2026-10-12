@@ -1,0 +1,1090 @@
+# Spanish translation of olivia-yoga.
+# Source file: edit here, then run wordpress/dev/build-translations.php.
+
+msgid ""
+msgstr ""
+"Project-Id-Version: olivia-yoga\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: olivia-yoga\n"
+
+#: home.php:8
+#: front-page.php:149
+#: single.php:13
+msgid "Journal"
+msgstr "Diario"
+
+#: index.php:7
+msgid "Search: %s"
+msgstr "Búsqueda: %s"
+
+#: index.php:16
+msgid "Nothing found."
+msgstr "No se encontró nada."
+
+#: front-page.php:11
+msgid "Group & online classes"
+msgstr "Clases grupales y en línea"
+
+#: front-page.php:11
+msgid "Hatha flow and slow flow every week in Fort Myers, plus live classes online."
+msgstr "Hatha flow y slow flow cada semana en Fort Myers, además de clases en vivo en línea."
+
+#: front-page.php:12
+msgid "Private yoga & prenatal"
+msgstr "Yoga privado y prenatal"
+
+#: front-page.php:12
+msgid "One-on-one at your home, lanai or on the beach, and prenatal fitness for moms-to-be."
+msgstr "Sesiones individuales en tu casa, lanai o en la playa, y fitness prenatal para futuras mamás."
+
+#: front-page.php:13
+#: inc/shortcodes.php:118
+msgid "Singing bowl massage"
+msgstr "Masaje con cuencos"
+
+#: front-page.php:13
+msgid "Deep rest and guided meditation with Tibetan singing bowls, in a private session."
+msgstr "Descanso profundo y meditación guiada con cuencos tibetanos, en una sesión privada."
+
+#: front-page.php:14
+#: footer.php:17
+#: functions.php:55
+msgid "Teams & athletes"
+msgstr "Equipos y deportistas"
+
+#: front-page.php:14
+msgid "Office yoga, team building and mobility work for sport."
+msgstr "Yoga en la oficina, team building y movilidad para el deporte."
+
+#: front-page.php:17
+msgid "Your home or lanai"
+msgstr "Tu casa o lanai"
+
+#: front-page.php:17
+msgid "No driving, no parking, no crowd. Just room for a mat and a little quiet."
+msgstr "Sin manejar, sin estacionar, sin multitudes. Solo espacio para un mat y un poco de calma."
+
+#: front-page.php:18
+msgid "On the beach"
+msgstr "En la playa"
+
+#: front-page.php:18
+msgid "Sunrise or sunset on the sand at Fort Myers Beach, Sanibel or wherever your towel is."
+msgstr "Amanecer o atardecer en la arena de Fort Myers Beach, Sanibel o donde esté tu toalla."
+
+#: front-page.php:19
+msgid "Condo & HOA clubhouses"
+msgstr "Clubs de condominios y HOA"
+
+#: front-page.php:19
+msgid "A regular class for your community, paced for your residents."
+msgstr "Una clase regular para tu comunidad, al ritmo de sus residentes."
+
+#: front-page.php:20
+msgid "Online"
+msgstr "En línea"
+
+#: front-page.php:20
+msgid "Live and one-on-one from wherever you are, with the same attention to detail."
+msgstr "En vivo e individual desde donde estés, con la misma atención al detalle."
+
+#: front-page.php:23
+msgid "Send a request"
+msgstr "Envía una solicitud"
+
+#: front-page.php:23
+msgid "Tell me where you are and which days suit you. It takes two minutes."
+msgstr "Cuéntame dónde estás y qué días te vienen bien. Son dos minutos."
+
+#: front-page.php:24
+msgid "Get a time and price"
+msgstr "Recibe horario y precio"
+
+#: front-page.php:24
+msgid "I reply within a day with a suggested session, ready to confirm."
+msgstr "Te respondo en un día con una sesión propuesta, lista para confirmar."
+
+#: front-page.php:25
+msgid "Confirm online"
+msgstr "Confirma en línea"
+
+#: front-page.php:25
+msgid "Pay by card or use a private-session credit. You get a calendar invite."
+msgstr "Paga con tarjeta o usa un crédito de sesión privada. Recibes una invitación de calendario."
+
+#: front-page.php:26
+msgid "Keep going"
+msgstr "Continúa"
+
+#: front-page.php:26
+msgid "Single sessions or a 5-session pack, at your rhythm."
+msgstr "Sesiones sueltas o un paquete de 5, a tu ritmo."
+
+#: front-page.php:32
+msgid "Fort Myers · Southwest Florida"
+msgstr "Fort Myers · Suroeste de Florida"
+
+#: front-page.php:33
+msgctxt "hero title, line 1"
+msgid "Flow"
+msgstr "Flow"
+
+#: front-page.php:33
+msgctxt "hero title, line 2"
+msgid "yoga"
+msgstr "yoga"
+
+#: front-page.php:33
+msgctxt "hero title, line 3"
+msgid "in Fort Myers"
+msgstr "en Fort Myers"
+
+#: front-page.php:34
+msgid "Yoga, mobility and prenatal fitness with Olivia Kovacs: dynamic yet gentle group classes, private sessions at your home, lanai or on the beach, meditation and singing bowl massage."
+msgstr "Yoga, movilidad y fitness prenatal con Olivia Kovacs: clases grupales dinámicas pero suaves, sesiones privadas en tu casa, lanai o en la playa, meditación y masaje con cuencos."
+
+#: front-page.php:35
+#: front-page.php:157
+#: single.php:18
+msgid "Book a class"
+msgstr "Reservar clase"
+
+#: front-page.php:35
+msgid "Private session"
+msgstr "Sesión privada"
+
+#: front-page.php:45
+msgid "Ways to practice"
+msgstr "Formas de practicar"
+
+#: front-page.php:55
+msgid "Meet your teacher"
+msgstr "Conoce a tu profesora"
+
+#: front-page.php:62
+msgid "Meet Olivia"
+msgstr "Conoce a Olivia"
+
+#: front-page.php:62
+msgid "See all classes"
+msgstr "Ver todas las clases"
+
+#: front-page.php:66
+msgid "Awareness"
+msgstr "Conciencia"
+
+#: front-page.php:66
+msgid "I notice. I see. I observe. I allow. And then I respond."
+msgstr "Me doy cuenta. Veo. Observo. Permito. Y luego respondo."
+
+#: front-page.php:67
+msgid "Control"
+msgstr "Control"
+
+#: front-page.php:67
+msgid "I want to steer it. I grip it, regulate it, push it down."
+msgstr "Quiero dirigirlo. Lo agarro, lo regulo, lo reprimo."
+
+#: front-page.php:68
+msgid "The most important difference yoga has taught me so far."
+msgstr "La diferencia más importante que el yoga me ha enseñado hasta ahora."
+
+#: front-page.php:73
+msgid "Classes in Fort Myers"
+msgstr "Clases en Fort Myers"
+
+#: front-page.php:73
+msgid "Breathwork, strength, stretching, balance, a real flow state and a long relaxation in every class. Choose the pace that suits you today."
+msgstr "Respiración, fuerza, estiramiento, equilibrio, un verdadero estado de flow y una larga relajación en cada clase. Elige el ritmo que hoy te sienta bien."
+
+#: front-page.php:73
+#: footer.php:17
+#: single-oy_class.php:12
+msgid "Classes"
+msgstr "Clases"
+
+#: front-page.php:78
+msgid "sun: effort, heat, strength"
+msgstr "sol: esfuerzo, calor, fuerza"
+
+#: front-page.php:78
+msgid "moon: ease, cool, surrender"
+msgstr "luna: soltura, frescura, entrega"
+
+#: front-page.php:80
+msgid "What hatha means"
+msgstr "Qué significa hatha"
+
+#: front-page.php:81
+msgid "Ha is the sun. Tha is the moon."
+msgstr "Ha es el sol. Tha es la luna."
+
+#: front-page.php:82
+msgid "Hatha yoga balances the active and the receptive in us: effort and ease, strength and surrender. When that balance tips, we feel it first as tension or restlessness."
+msgstr "El hatha yoga equilibra lo activo y lo receptivo en nosotros: esfuerzo y soltura, fuerza y entrega. Cuando ese equilibrio se inclina, lo sentimos primero como tensión o inquietud."
+
+#: front-page.php:83
+msgid "On the mat we use the body to find the balance again. The poses are a doorway to meditation, a more dynamic doorway, and only one of the eight limbs of yoga."
+msgstr "En el mat usamos el cuerpo para reencontrar el equilibrio. Las posturas son una puerta a la meditación, una puerta más dinámica, y solo una de las ocho ramas del yoga."
+
+#: front-page.php:84
+msgid "Read more about hatha yoga"
+msgstr "Más sobre el hatha yoga"
+
+#: front-page.php:90
+#: footer.php:17
+#: functions.php:53
+msgid "Private yoga"
+msgstr "Yoga privado"
+
+#: front-page.php:91
+msgid "Your own class, wherever you breathe best"
+msgstr "Tu propia clase, donde mejor respiras"
+
+#: front-page.php:92
+msgid "Private yoga in Fort Myers is built around one body: yours. We talk about how you move, where you hold tension and what you want to feel afterwards. Then I plan the class for exactly that."
+msgstr "El yoga privado en Fort Myers se construye alrededor de un solo cuerpo: el tuyo. Hablamos de cómo te mueves, dónde guardas la tensión y qué quieres sentir después. Luego planeo la clase justo para eso."
+
+#: front-page.php:94
+msgid "Prenatal fitness and singing bowl massage can be booked as private sessions too, in English or Hungarian."
+msgstr "El fitness prenatal y el masaje con cuencos también se reservan como sesiones privadas, en inglés o húngaro."
+
+#: front-page.php:99
+#: functions.php:140
+msgid "Request a private session"
+msgstr "Solicitar sesión privada"
+
+#: front-page.php:99
+msgid "How it works"
+msgstr "Cómo funciona"
+
+#: front-page.php:104
+msgid "This week"
+msgstr "Esta semana"
+
+#: front-page.php:104
+msgid "Weekly group classes"
+msgstr "Clases grupales semanales"
+
+#: front-page.php:104
+msgid "Book in a minute. Beginners are welcome in every class."
+msgstr "Reserva en un minuto. Principiantes bienvenidos en todas las clases."
+
+#: front-page.php:104
+msgid "Full schedule & pricing"
+msgstr "Horario completo y precios"
+
+#: front-page.php:108
+msgid "Breathing exercise"
+msgstr "Ejercicio de respiración"
+
+#: front-page.php:111
+msgid "Simple pricing"
+msgstr "Precios sencillos"
+
+#: front-page.php:111
+msgid "Pay per class, save with a pass or membership, or give someone a gift card."
+msgstr "Paga por clase, ahorra con un bono o membresía, o regala una tarjeta de regalo."
+
+#: front-page.php:111
+msgid "Prices in USD"
+msgstr "Precios en USD"
+
+#: front-page.php:116
+#: footer.php:20
+#: inc/content-types.php:28
+msgid "FAQ"
+msgstr "Preguntas"
+
+#: front-page.php:116
+msgid "Am I flexible enough for yoga?"
+msgstr "¿Soy lo bastante flexible para el yoga?"
+
+#: front-page.php:116
+msgid "The question everyone asks first, and a few others."
+msgstr "La pregunta que todos hacen primero, y algunas más."
+
+#: front-page.php:116
+msgid "All questions"
+msgstr "Todas las preguntas"
+
+#: front-page.php:121
+#: footer.php:17
+#: functions.php:56
+msgid "Events"
+msgstr "Eventos"
+
+#: front-page.php:121
+msgid "Sound yoga, live music & festival flows"
+msgstr "Yoga sonoro, música en vivo y flows de festival"
+
+#: front-page.php:121
+msgid "Special classes where handpan, tongue drum or singing bowls lead the movement, followed by guided meditation."
+msgstr "Clases especiales donde el handpan, el tambor de lengüeta o los cuencos guían el movimiento, seguidas de meditación guiada."
+
+#: front-page.php:121
+msgid "All events"
+msgstr "Todos los eventos"
+
+#: front-page.php:126
+msgid "Earlier events"
+msgstr "Eventos anteriores"
+
+#: front-page.php:137
+msgid "Moments on the mat"
+msgstr "Momentos en el mat"
+
+#: front-page.php:137
+msgid "Studio flows, garden classes, festival pavilions and the sea. Every class looks a little different; the feeling afterwards is the same."
+msgstr "Flows en el estudio, clases en el jardín, pabellones de festival y el mar. Cada clase se ve un poco distinta; la sensación después es la misma."
+
+#: front-page.php:142
+msgid "Southwest Florida"
+msgstr "Suroeste de Florida"
+
+#: front-page.php:142
+msgid "Where I teach around Fort Myers"
+msgstr "Dónde enseño en Fort Myers y alrededores"
+
+#: front-page.php:142
+msgid "Group classes in Fort Myers; private sessions at homes, clubhouses, offices and beaches across Southwest Florida."
+msgstr "Clases grupales en Fort Myers; sesiones privadas en casas, clubes, oficinas y playas de todo el suroeste de Florida."
+
+#: front-page.php:149
+msgid "From the journal"
+msgstr "Del diario"
+
+#: front-page.php:149
+msgid "All articles"
+msgstr "Todos los artículos"
+
+#: front-page.php:155
+msgid "Your mat is waiting"
+msgstr "Tu mat te espera"
+
+#: front-page.php:156
+msgid "Try a group class, request a private session, or just send a question. Beginners very welcome."
+msgstr "Prueba una clase grupal, pide una sesión privada o simplemente envía una pregunta. Principiantes muy bienvenidos."
+
+#: front-page.php:157
+msgid "Send a message"
+msgstr "Enviar un mensaje"
+
+#: single.php:12
+msgid "%d min read"
+msgstr "%d min de lectura"
+
+#: single.php:22
+msgid "Keep reading"
+msgstr "Sigue leyendo"
+
+#: footer.php:11
+msgid "Dynamic yet gentle. Just enough of everything."
+msgstr "Dinámico pero suave. Justo lo necesario de todo."
+
+#: footer.php:16
+#: footer.php:16
+msgid "Practice"
+msgstr "Práctica"
+
+#: footer.php:17
+#: functions.php:54
+msgid "Schedule & pricing"
+msgstr "Horario y precios"
+
+#: footer.php:19
+#: footer.php:19
+msgid "More"
+msgstr "Más"
+
+#: footer.php:20
+msgid "About Olivia"
+msgstr "Sobre Olivia"
+
+#: footer.php:20
+#: functions.php:59
+msgid "Contact"
+msgstr "Contacto"
+
+#: footer.php:21
+msgid "Gift cards"
+msgstr "Tarjetas de regalo"
+
+#: footer.php:22
+#: header.php:14
+msgid "My account"
+msgstr "Mi cuenta"
+
+#: footer.php:24
+#: functions.php:149
+msgid "Say hello"
+msgstr "Escríbeme"
+
+#: footer.php:25
+msgid "Join our Facebook group"
+msgstr "Únete a nuestro grupo de Facebook"
+
+#: footer.php:32
+msgid "Privacy"
+msgstr "Privacidad"
+
+#: footer.php:33
+msgid "Yoga is not a substitute for medical care. If you have a health condition or are pregnant, talk to your doctor before starting a new practice."
+msgstr "El yoga no sustituye la atención médica. Si tienes una condición de salud o estás embarazada, habla con tu médico antes de empezar una nueva práctica."
+
+#: footer.php:37
+msgid "Quick actions"
+msgstr "Acciones rápidas"
+
+#: footer.php:38
+#: inc/shortcodes.php:200
+msgid "Book"
+msgstr "Reservar"
+
+#: footer.php:39
+msgid "Private"
+msgstr "Privado"
+
+#: footer.php:40
+msgid "Account"
+msgstr "Cuenta"
+
+#: 404.php:4
+msgid "This page has drifted downstream"
+msgstr "Esta página se fue río abajo"
+
+#: 404.php:4
+msgid "The link may be old or mistyped. Take a breath and choose where to go next."
+msgstr "Puede que el enlace sea antiguo o tenga un error. Respira y elige a dónde ir."
+
+#: 404.php:4
+msgid "Not found"
+msgstr "No encontrado"
+
+#: 404.php:6
+msgid "Go to the home page"
+msgstr "Ir a la página de inicio"
+
+#: 404.php:6
+msgid "See the classes"
+msgstr "Ver las clases"
+
+#: template-parts/cards.php:16
+msgid "Read"
+msgstr "Leer"
+
+#: single-oy_class.php:21
+msgid "Next dates"
+msgstr "Próximas fechas"
+
+#: single-oy_class.php:30
+msgid "Ask for a session"
+msgstr "Pide una sesión"
+
+#: single-oy_class.php:30
+msgid "Book this class"
+msgstr "Reservar esta clase"
+
+#: single-oy_class.php:35
+msgid "Other classes"
+msgstr "Otras clases"
+
+#: functions.php:29
+msgid "Main menu"
+msgstr "Menú principal"
+
+#: functions.php:57
+msgid "About"
+msgstr "Sobre mí"
+
+#: functions.php:64
+msgid "All classes"
+msgstr "Todas las clases"
+
+#: functions.php:87
+msgid "Show %s"
+msgstr "Mostrar %s"
+
+#: functions.php:117
+msgid "Hatha yoga teacher, Yoga Alliance International certified (2023)"
+msgstr "Profesora de hatha yoga, certificada por Yoga Alliance International (2023)"
+
+#: functions.php:118
+msgid "Samadhi Yoga Studio, Budapest, with Ádám Diószegi"
+msgstr "Samadhi Yoga Studio, Budapest, con Ádám Diószegi"
+
+#: functions.php:119
+msgid "Tibetan singing bowl and sound massage practitioner"
+msgstr "Terapeuta de cuencos tibetanos y masaje sonoro"
+
+#: functions.php:120
+msgid "Prenatal & postnatal fitness training"
+msgstr "Formación en fitness prenatal y posparto"
+
+#: functions.php:121
+msgid "Personal trainer and massage therapist background"
+msgstr "Experiencia como entrenadora personal y masajista"
+
+#: functions.php:122
+msgid "Self-myofascial release (SMR) course"
+msgstr "Curso de liberación miofascial (SMR)"
+
+#: functions.php:134
+msgid "Training"
+msgstr "Formación"
+
+#: functions.php:134
+msgid "Practice with me"
+msgstr "Practica conmigo"
+
+#: functions.php:137
+msgid "Private sessions"
+msgstr "Sesiones privadas"
+
+#: functions.php:137
+msgid "From %s"
+msgstr "Desde %s"
+
+#: functions.php:138
+msgid "60, 75 or 90 minutes at your home, lanai, clubhouse, on the beach or online. Prenatal fitness and singing bowl massage too."
+msgstr "60, 75 o 90 minutos en tu casa, lanai, club, en la playa o en línea. También fitness prenatal y masaje con cuencos."
+
+#: functions.php:139
+msgid "In English or Hungarian"
+msgstr "En inglés o húngaro"
+
+#: functions.php:139
+msgid "Reply within a day"
+msgstr "Respuesta en un día"
+
+#: functions.php:141
+msgid "Areas I travel to"
+msgstr "Zonas a las que voy"
+
+#: functions.php:143
+msgid "Plan a session for your team"
+msgstr "Planea una sesión para tu equipo"
+
+#: functions.php:143
+msgid "Tell me your team size, location and goals. I will send a proposal with pricing."
+msgstr "Cuéntame el tamaño del equipo, el lugar y los objetivos. Te envío una propuesta con precios."
+
+#: functions.php:143
+msgid "Request a proposal"
+msgstr "Solicitar propuesta"
+
+#: functions.php:145
+msgid "Hear about the next one"
+msgstr "Entérate del próximo"
+
+#: functions.php:145
+msgid "Sound yoga, live-music flows and outdoor sessions are announced here and on Instagram first."
+msgstr "El yoga sonoro, los flows con música en vivo y las sesiones al aire libre se anuncian primero aquí y en Instagram."
+
+#: functions.php:145
+msgid "Follow on Instagram"
+msgstr "Sígueme en Instagram"
+
+#: functions.php:147
+msgid "Still wondering?"
+msgstr "¿Todavía con dudas?"
+
+#: functions.php:147
+msgid "Send your question. I am happy to help you choose the right class."
+msgstr "Envía tu pregunta. Con gusto te ayudo a elegir la clase adecuada."
+
+#: functions.php:147
+msgid "Ask a question"
+msgstr "Haz una pregunta"
+
+#: functions.php:152
+msgid "Our Facebook group"
+msgstr "Nuestro grupo de Facebook"
+
+#: functions.php:153
+msgid "English, Hungarian"
+msgstr "Inglés, húngaro"
+
+#: functions.php:154
+msgid "Ready to book? Group classes and passes can be booked and paid online."
+msgstr "¿Lista para reservar? Las clases grupales y los bonos se reservan y pagan en línea."
+
+#: inc/i18n.php:112
+#: inc/translations-admin.php:25
+#: inc/content-types.php:84
+msgid "Language"
+msgstr "Idioma"
+
+#: inc/helpers.php:142
+msgid "Yoga Teacher | Movement & Wellness Coach"
+msgstr "Profesora de yoga | Coach de movimiento y bienestar"
+
+#: inc/helpers.php:146
+msgid "Yoga"
+msgstr "Yoga"
+
+#: inc/helpers.php:146
+msgid "Mobility"
+msgstr "Movilidad"
+
+#: inc/helpers.php:146
+msgid "Prenatal Fitness"
+msgstr "Fitness prenatal"
+
+#: inc/helpers.php:146
+msgid "Meditation"
+msgstr "Meditación"
+
+#: inc/helpers.php:146
+msgid "Private Singing Bowl Massage"
+msgstr "Masaje privado con cuencos"
+
+#: inc/helpers.php:201
+msgid "Home"
+msgstr "Inicio"
+
+#: inc/helpers.php:206
+msgid "Breadcrumb"
+msgstr "Ruta de navegación"
+
+#: inc/shortcodes.php:91
+msgid "Breathe in"
+msgstr "Inhala"
+
+#: inc/shortcodes.php:92
+msgid "Breathe out"
+msgstr "Exhala"
+
+#: inc/shortcodes.php:93
+msgid "Ready?"
+msgstr "¿Lista?"
+
+#: inc/shortcodes.php:94
+msgid "Breath %1$d of %2$d"
+msgstr "Respiración %1$d de %2$d"
+
+#: inc/shortcodes.php:95
+msgid "Welcome back. Notice how you feel now. That is how every class begins."
+msgstr "Bienvenida de vuelta. Nota cómo te sientes ahora. Así empieza cada clase."
+
+#: inc/shortcodes.php:96
+msgid "Stop"
+msgstr "Parar"
+
+#: inc/shortcodes.php:100
+msgid "Try it now · 30 seconds"
+msgstr "Pruébalo ahora · 30 segundos"
+
+#: inc/shortcodes.php:101
+msgid "Before you decide, take three breaths with me"
+msgstr "Antes de decidir, respira tres veces conmigo"
+
+#: inc/shortcodes.php:102
+msgid "A longer exhale is the quickest way to tell your nervous system it is safe to slow down. Follow the lotus: it opens as you breathe in and folds as you breathe out."
+msgstr "Una exhalación más larga es la forma más rápida de decirle a tu sistema nervioso que puede desacelerar. Sigue el loto: se abre al inhalar y se cierra al exhalar."
+
+#: inc/shortcodes.php:103
+msgid "counts in, through the nose"
+msgstr "tiempos al inhalar, por la nariz"
+
+#: inc/shortcodes.php:103
+msgid "counts out, slow and soft"
+msgstr "tiempos al exhalar, lento y suave"
+
+#: inc/shortcodes.php:103
+msgid "rounds, then notice the difference"
+msgstr "rondas, luego nota la diferencia"
+
+#: inc/shortcodes.php:104
+msgid "Start breathing"
+msgstr "Empezar"
+
+#: inc/shortcodes.php:115
+msgid "Group class"
+msgstr "Clase grupal"
+
+#: inc/shortcodes.php:117
+msgid "Prenatal fitness"
+msgstr "Fitness prenatal"
+
+#: inc/shortcodes.php:119
+msgid "Teams & companies"
+msgstr "Equipos y empresas"
+
+#: inc/shortcodes.php:120
+msgid "Athletes & mobility"
+msgstr "Deportistas y movilidad"
+
+#: inc/shortcodes.php:121
+msgid "Event or retreat"
+msgstr "Evento o retiro"
+
+#: inc/shortcodes.php:122
+msgid "Gift card"
+msgstr "Tarjeta de regalo"
+
+#: inc/shortcodes.php:123
+msgid "Something else"
+msgstr "Otra cosa"
+
+#: inc/shortcodes.php:135
+msgid "Thank you, your message is on its way. I will reply as soon as I can, usually within a day."
+msgstr "Gracias, tu mensaje va en camino. Te responderé lo antes posible, normalmente en un día."
+
+#: inc/shortcodes.php:136
+msgid "Please fill in your name, a valid email and a message."
+msgstr "Por favor, escribe tu nombre, un email válido y un mensaje."
+
+#: inc/shortcodes.php:139
+msgid "Fill in this field."
+msgstr "Completa este campo."
+
+#: inc/shortcodes.php:140
+msgid "Enter an email address like name@example.com."
+msgstr "Escribe un email como nombre@ejemplo.com."
+
+#: inc/shortcodes.php:146
+msgid "What would you like to talk about?"
+msgstr "¿De qué te gustaría hablar?"
+
+#: inc/shortcodes.php:147
+msgid "Your name"
+msgstr "Tu nombre"
+
+#: inc/shortcodes.php:148
+msgid "Email"
+msgstr "Email"
+
+#: inc/shortcodes.php:149
+msgid "Phone (optional)"
+msgstr "Teléfono (opcional)"
+
+#: inc/shortcodes.php:150
+msgid "Your area (optional)"
+msgstr "Tu zona (opcional)"
+
+#: inc/shortcodes.php:150
+msgid "McGregor, Cape Coral, Fort Myers Beach…"
+msgstr "McGregor, Cape Coral, Fort Myers Beach…"
+
+#: inc/shortcodes.php:151
+msgid "Message"
+msgstr "Mensaje"
+
+#: inc/shortcodes.php:151
+msgid "Tell me a little about your practice, any injuries or a pregnancy I should know about, and when you would like to start."
+msgstr "Cuéntame un poco sobre tu práctica, lesiones o embarazo que deba saber, y cuándo te gustaría empezar."
+
+#: inc/shortcodes.php:152
+msgid "Send message"
+msgstr "Enviar mensaje"
+
+#: inc/shortcodes.php:153
+msgid "I only use your details to reply to you."
+msgstr "Solo uso tus datos para responderte."
+
+#: inc/shortcodes.php:194
+msgid "The timetable is coming soon."
+msgstr "El horario llegará pronto."
+
+#: inc/shortcodes.php:198
+msgid "Book a private session"
+msgstr "Reservar sesión privada"
+
+#: inc/shortcodes.php:199
+msgid "Buy a gift card"
+msgstr "Comprar tarjeta de regalo"
+
+#: inc/shortcodes.php:208
+msgid "Prenatal & postnatal fitness training: Fitmummy method"
+msgstr "Formación en fitness prenatal y posparto: método Fitmummy"
+
+#: inc/seo.php:15
+msgid "Yoga, mobility and prenatal fitness in Fort Myers, FL: hatha flow and slow flow classes, private yoga at your home, lanai or on the beach, meditation and singing bowl massage with Olivia Kovacs."
+msgstr "Yoga, movilidad y fitness prenatal en Fort Myers, FL: clases de hatha flow y slow flow, yoga privado en tu casa, lanai o en la playa, meditación y masaje con cuencos con Olivia Kovacs."
+
+#: inc/seo.php:30
+msgid "Yoga in Fort Myers, FL: Hatha Flow, Private Yoga & Prenatal Fitness | Olivia Kovacs"
+msgstr "Yoga en Fort Myers, FL: Hatha Flow, yoga privado y fitness prenatal | Olivia Kovacs"
+
+#: header.php:12
+msgid "Skip to content"
+msgstr "Saltar al contenido"
+
+#: header.php:14
+msgid "Log in"
+msgstr "Entrar"
+
+#: header.php:15
+msgid "Yoga & movement · Fort Myers"
+msgstr "Yoga y movimiento · Fort Myers"
+
+#: header.php:20
+msgid "Main"
+msgstr "Principal"
+
+#: header.php:25
+msgid "Menu"
+msgstr "Menú"
+
+#: header.php:30
+msgid "Mobile"
+msgstr "Móvil"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A gong and singing bowls set up for a sound yoga class"
+msgstr "Un gong y cuencos preparados para una clase de yoga sonoro"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A group class in a bright studio full of plants"
+msgstr "Una clase grupal en un estudio luminoso lleno de plantas"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A group practicing in a studio with prayer flags"
+msgstr "Un grupo practicando en un estudio con banderas de oración"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A group raising their arms in a riverside pavilion"
+msgstr "Un grupo levantando los brazos en un pabellón junto al río"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A private yoga session in tree pose"
+msgstr "Una sesión privada de yoga en postura del árbol"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A seated group class in a white studio"
+msgstr "Una clase grupal sentada en un estudio blanco"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A student in plank on a green mat outdoors"
+msgstr "Una alumna en plancha sobre un mat verde al aire libre"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A student in three-legged dog under a festival canopy"
+msgstr "Una alumna en perro de tres patas bajo una carpa de festival"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A team building yoga class in a sports hall"
+msgstr "Una clase de yoga de team building en un pabellón deportivo"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A team in tree pose in a sports hall"
+msgstr "Un equipo en postura del árbol en un pabellón deportivo"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A team yoga session with live handpan in an office"
+msgstr "Una sesión de yoga en equipo con handpan en vivo en una oficina"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "An evening yoga class on a lawn under string lights"
+msgstr "Una clase de yoga al atardecer en el césped bajo guirnaldas de luces"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "An outdoor group class in low lunges"
+msgstr "Una clase grupal al aire libre en estocada baja"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Athletes doing mobility yoga in a sports hall"
+msgstr "Deportistas haciendo yoga de movilidad en un pabellón"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Close portrait of Olivia Kovacs in soft sunlight"
+msgstr "Retrato cercano de Olivia Kovacs con luz suave"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs adjusting a student in downward dog"
+msgstr "Olivia Kovacs ajustando a una alumna en perro boca abajo"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs balancing on a rock above a wide landscape"
+msgstr "Olivia Kovacs en equilibrio sobre una roca frente a un amplio paisaje"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs coaching a pregnant client on a fitness ball"
+msgstr "Olivia Kovacs entrenando a una clienta embarazada con una pelota de fitness"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs demonstrating a backbend in an outdoor class"
+msgstr "Olivia Kovacs mostrando una extensión de espalda en una clase al aire libre"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs giving a relaxing massage"
+msgstr "Olivia Kovacs dando un masaje relajante"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs guiding a private yoga session"
+msgstr "Olivia Kovacs guiando una sesión privada de yoga"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in a crescent lunge in front of a mandala"
+msgstr "Olivia Kovacs en estocada alta frente a un mandala"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in a deep squat on an outdoor yoga deck"
+msgstr "Olivia Kovacs en sentadilla profunda en una terraza de yoga al aire libre"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in a side plank variation on a wooden deck"
+msgstr "Olivia Kovacs en una variante de plancha lateral sobre una terraza de madera"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in a side stretch by the sea"
+msgstr "Olivia Kovacs en un estiramiento lateral junto al mar"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in a side stretch leading a festival class"
+msgstr "Olivia Kovacs en un estiramiento lateral guiando una clase en un festival"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in a standing forward fold"
+msgstr "Olivia Kovacs en flexión hacia delante de pie"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in a warrior pose in a meadow at sunset"
+msgstr "Olivia Kovacs en postura del guerrero en un prado al atardecer"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in dancer pose in a living room"
+msgstr "Olivia Kovacs en postura del bailarín en una sala"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in dancer pose on the beach"
+msgstr "Olivia Kovacs en postura del bailarín en la playa"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs leading a hatha flow class on a wooden deck by the lake"
+msgstr "Olivia Kovacs guiando una clase de hatha flow en una terraza de madera junto al lago"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs looking out over the river at golden hour"
+msgstr "Olivia Kovacs mirando el río en la hora dorada"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs on a terrace at sunset, looking into the distance"
+msgstr "Olivia Kovacs en una terraza al atardecer, mirando a lo lejos"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs reaching up in a bright studio"
+msgstr "Olivia Kovacs estirándose hacia arriba en un estudio luminoso"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs reaching up with a garden class"
+msgstr "Olivia Kovacs estirándose hacia arriba con una clase en el jardín"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs resting in child's pose"
+msgstr "Olivia Kovacs descansando en postura del niño"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs seated in front of a large outdoor festival class"
+msgstr "Olivia Kovacs sentada frente a una gran clase al aire libre en un festival"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs stretching her arms up in warm evening light"
+msgstr "Olivia Kovacs estirando los brazos con la cálida luz de la tarde"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs teaching a seated class in a park"
+msgstr "Olivia Kovacs enseñando una clase sentada en un parque"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs teaching online yoga from her living room"
+msgstr "Olivia Kovacs enseñando yoga en línea desde su sala"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs with her arms raised against the sky"
+msgstr "Olivia Kovacs con los brazos alzados contra el cielo"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Portrait of yoga teacher Olivia Kovacs smiling at sunset"
+msgstr "Retrato de la profesora de yoga Olivia Kovacs sonriendo al atardecer"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Silhouette of Olivia Kovacs against an orange sunset"
+msgstr "Silueta de Olivia Kovacs contra un atardecer naranja"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Silhouettes of a class in a riverside pavilion"
+msgstr "Siluetas de una clase en un pabellón junto al río"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Students balancing in bird dog during an outdoor class"
+msgstr "Alumnos en equilibrio en perro-pájaro durante una clase al aire libre"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Students in downward dog on a wooden deck"
+msgstr "Alumnos en perro boca abajo sobre una terraza de madera"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Students resting in child's pose on a wooden floor"
+msgstr "Alumnos descansando en postura del niño sobre el suelo de madera"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Students resting in final relaxation in a dim studio"
+msgstr "Alumnos en la relajación final en un estudio en penumbra"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Sun rays through trees at an outdoor festival"
+msgstr "Rayos de sol entre los árboles en un festival al aire libre"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Tibetan singing bowls lined up in a yoga studio"
+msgstr "Cuencos tibetanos alineados en un estudio de yoga"
+
+#: inc/content-types.php
+msgid "Most popular"
+msgstr "Más popular"

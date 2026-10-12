@@ -66,6 +66,7 @@ class OYS_Calendar {
 			'donationMin' => (int) OYS_Settings::get( 'donation_min_cents' ),
 			'payLater'  => OYS_Settings::get( 'pay_later' ),
 			'locations' => array_values( OYS_Locations::all() ),
+			'langs'     => array_map( fn( $l ) => $l['name'], OYS_I18n::LANGS ),
 			'minDefault'    => (int) OYS_Settings::get( 'min_people_default' ),
 			'decideDefault' => (int) OYS_Settings::get( 'decide_hours_default' ),
 			'locationsUrl' => admin_url( 'admin.php?page=oys-locations' ),
@@ -157,6 +158,7 @@ class OYS_Calendar {
 			'due'             => OYS_Bookings::due_at_studio( $s->id ),
 			'teacher_id'      => (int) $s->teacher_id,
 			'teacher'         => OYS_Teachers::name_for( $s ),
+			'lang'            => $s->lang ?: 'en',
 			'note'            => $s->note,
 			'status'          => $s->status,
 			'past'            => oys_ts( $s->ends_at ) < time(),
@@ -221,6 +223,7 @@ class OYS_Calendar {
 			'min_people'      => array_key_exists( 'min_people', $p ) ? OYS_Schedule::nullable_int( $p['min_people'] ) : ( $current->min_people ?? null ),
 			'decide_hours'    => array_key_exists( 'decide_hours', $p ) ? OYS_Schedule::nullable_int( $p['decide_hours'], 1 ) : ( $current->decide_hours ?? null ),
 			'teacher_id'      => array_key_exists( 'teacher_id', $p ) ? OYS_Teachers::valid_id( $p['teacher_id'] ) : (int) ( $current->teacher_id ?? 0 ),
+			'lang'            => array_key_exists( 'lang', $p ) ? oys_valid_lang( $p['lang'] ) : ( $current->lang ?? 'en' ),
 			'note'            => sanitize_text_field( $p['note'] ?? '' ),
 			// Helpers for the caller, not columns.
 			'_date'           => $date,
@@ -252,13 +255,22 @@ class OYS_Calendar {
 				return new WP_Error( 'oys_past', __( 'That time has already passed.', 'olivia-studio' ), array( 'status' => 400 ) );
 			}
 			if ( 'weekly' === ( $p['repeat'] ?? '' ) && 'group' === $d['kind'] ) {
-				$tpl = OYS_Schedule::save_template( self::template_fields( $d, true ) );
+				$fields = self::template_fields( $d, true );
+				$clash  = OYS_Schedule::template_overlap( $fields['weekday'], $fields['start_time'], $fields['duration_min'], $fields['teacher_id'] ) ?: OYS_Schedule::overlap( $d['starts_at'], $d['ends_at'], $d['teacher_id'] );
+				if ( $clash ) {
+					return self::clash_error( $clash );
+				}
+				$tpl = OYS_Schedule::save_template( $fields );
 				OYS_Schedule::generate();
 				global $wpdb;
 				$sid = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT id FROM ' . OYS_Install::table( 'sessions' ) . ' WHERE template_id = %d ORDER BY starts_at LIMIT 1', $tpl ) );
 				// Credits and description aren't part of a weekly template; keep what was entered on the dates.
 				$wpdb->update( OYS_Install::table( 'sessions' ), array( 'credits_allowed' => $d['credits_allowed'], 'description' => $d['description'] ), array( 'template_id' => $tpl ) );
 				return self::done( $sid, sprintf( __( 'Weekly class created: %d dates added.', 'olivia-studio' ), self::count_series( $tpl ) ) );
+			}
+			$clash = OYS_Schedule::overlap( $d['starts_at'], $d['ends_at'], $d['teacher_id'] );
+			if ( $clash ) {
+				return self::clash_error( $clash );
 			}
 			$sid = OYS_Schedule::save( array_merge( self::columns( $d ), array( 'status' => 'scheduled' ) ) );
 			return self::done( $sid, __( 'Session created.', 'olivia-studio' ) );
@@ -271,11 +283,22 @@ class OYS_Calendar {
 		}
 
 		if ( 'series' === ( $p['scope'] ?? '' ) && $current->template_id ) {
+			$fields = self::template_fields( $d );
+			$clash  = OYS_Schedule::template_overlap( $fields['weekday'], $fields['start_time'], $fields['duration_min'], $fields['teacher_id'], $current->template_id );
+			if ( $clash ) {
+				return self::clash_error( $clash );
+			}
 			$n = self::update_series( $current, $d, $notify );
 			return self::done( $id, trim( sprintf( _n( 'Weekly class updated (%d date).', 'Weekly class updated (%d dates).', $n, 'olivia-studio' ), $n ) . ' ' . $note ) );
 		}
 
 		$moved = $d['starts_at'] !== $current->starts_at || $d['ends_at'] !== $current->ends_at || $d['location'] !== $current->location || $d['format'] !== ( $current->format ?: 'studio' ) || $d['online_url'] !== $current->online_url;
+		if ( 'scheduled' === $current->status ) {
+			$clash = OYS_Schedule::overlap( $d['starts_at'], $d['ends_at'], $d['teacher_id'], $id );
+			if ( $clash ) {
+				return self::clash_error( $clash );
+			}
+		}
 		OYS_Schedule::save( self::columns( $d ), $id );
 		$sent = $moved && $notify ? self::notify_change( $id, $current ) : 0;
 		$msg  = __( 'Saved.', 'olivia-studio' );
@@ -283,6 +306,11 @@ class OYS_Calendar {
 			$msg .= ' ' . sprintf( _n( '%d person was emailed.', '%d people were emailed.', $sent, 'olivia-studio' ), $sent );
 		}
 		return self::done( $id, trim( $msg . ' ' . $note ) );
+	}
+
+	/** One teacher, two places at once: refuse, and say which date is in the way. */
+	private static function clash_error( $clash ) {
+		return new WP_Error( 'oys_overlap', sprintf( __( 'This overlaps with %s. One teacher can only lead one class at a time: choose another time, or another teacher.', 'olivia-studio' ), OYS_Schedule::clash_label( $clash ) ), array( 'status' => 409 ) );
 	}
 
 	private static function done( $session_id, $message ) {
@@ -307,6 +335,7 @@ class OYS_Calendar {
 			'min_people'   => $d['min_people'],
 			'decide_hours' => $d['decide_hours'],
 			'teacher_id'   => $d['teacher_id'],
+			'lang'         => $d['lang'],
 			'note'         => $d['note'],
 			'active'       => 1,
 		);

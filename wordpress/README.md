@@ -73,6 +73,13 @@ Két rész, mindkettő a WordPress adminban tölthető fel ZIP-ként (`dist/`):
 3. Account ID, Client ID, Client Secret → *Studio → Settings → Zoom* (vagy `wp-config.php`: `OYS_ZOOM_ACCOUNT_ID`, `OYS_ZOOM_CLIENT_ID`, `OYS_ZOOM_CLIENT_SECRET`), majd **Test the connection**.
 4. Egy teszt online órán végigpróbálni: foglalás online → a levélben Zoom-link → a névsorban „Start the Zoom class (host)”.
 
+## Nyelvek (angol, magyar, spanyol)
+
+- A weboldal három nyelven érhető el: angol (`/`), magyar (`/hu/`), spanyol (`/es/`). A nyelvválasztó a fejlécben, a mobil menüben és a láblécben van.
+- **Szövegek fordítása:** egy oldal, óra, cikk, GYIK vagy korábbi esemény szerkesztőjében, a „Translations” dobozban (magyar és spanyol cím, kivonat, szöveg, SEO). Ami üres, ott az angol jelenik meg.
+- **E-mailek:** a vendég azon a nyelven kapja a leveleket, amelyiken az oldalt használja. Studio → Emails & reminders → Edit text: nyelvenként külön fül.
+- **Tartalom frissítése:** Megjelenés → Olivia setup → *Refresh the content* felülírja a témával jött oldalakat, órákat, GYIK-et, cikkeket és eseményeket a legújabb szövegekkel és fotókkal (a saját kézzel felvett oldalakhoz, foglalásokhoz, órarendhez nem nyúl).
+
 ## Élesítés előtti lista
 
 - [ ] Valós órarend (*Studio → Calendar*), árak, bérlet-érvényesség, tagsági csomagok, online ár és átváltás (1 alkalom = hány online óra), vendég-limit (*Prices & passes, Settings*). A mostani adatok MINTA adatok (tagság: $119 korlátlan, $85 havi 4 óra).

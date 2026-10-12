@@ -1,4 +1,4 @@
-# Fejlesztői dokumentáció – Olivia Kovács Yoga (WordPress)
+# Fejlesztői dokumentáció – Olivia Kovacs Yoga (WordPress)
 
 Ez a dokumentum annak szól, aki a kódot továbbfejleszti vagy üzemelteti. A felhasználói telepítési és élesítési lépések a [README.md](README.md)-ben vannak; itt azt írjuk le, **hogyan működik belülről** és **hogyan kell hozzányúlni**.
 
@@ -17,13 +17,15 @@ Tartalom
 11. [E-mailek](#11-e-mailek)
 12. [Hookok (bővítési pontok)](#12-hookok-bővítési-pontok)
 13. [Téma: olivia-yoga](#13-téma-olivia-yoga)
-14. [Statikus előnézet (src/build.py)](#14-statikus-előnézet-srcbuildpy)
+14. [Statikus előnézet (src/build.py) – régi](#14-statikus-előnézet-srcbuildpy--régi)
 15. [Biztonság](#15-biztonság)
 16. [Tesztelés](#16-tesztelés)
 17. [Kiadás és telepítés](#17-kiadás-és-telepítés)
 18. [Gyakori bővítések – receptek](#18-gyakori-bővítések--receptek)
 19. [Ismert korlátok, technikai adósság](#19-ismert-korlátok-technikai-adósság)
 20. [Konvenciók](#20-konvenciók)
+21. [Többnyelvűség (angol, magyar, spanyol)](#21-többnyelvűség-angol-magyar-spanyol)
+22. [Tartalom, fotók, átfedés-tiltás (8. kör)](#22-tartalom-fotók-átfedés-tiltás-8-kör)
 
 ---
 
@@ -59,7 +61,7 @@ flowchart LR
 
 ```
 oliv/
-├── src/                     Statikus előnézet generátora (Python) – dizájn-referencia
+├── src/                     RÉGI statikus prototípus (8. kör óta nem frissül, lásd 14.)
 │   ├── build.py
 │   ├── content.json         Jóváhagyott szövegek (oldalak, órák, GYIK, cikkek, minta órarend/árak)
 │   ├── site.css / site.js   Az „Urban flow” dizájn forrása
@@ -100,6 +102,7 @@ oliv/
     │       ├── class-email-templates.php  Az automatikus levelek szerkeszthető szövegei, ki/be kapcsolói
     │       ├── class-app-api.php      Mobilapp REST API (oys/v1/app/*), tokenes belépés
     │       ├── admin/class-calendar.php   Admin naptár (REST + oldal)
+    │       ├── class-i18n.php         Nyelvek (EN/HU/ES): /hu/ és /es/ címek, nyelvváltás e-mailekhez
     │       ├── class-cron.php         Háttérfeladatok
     │       ├── class-frontend.php     Shortcode-ok és nyilvános űrlapkezelők
     │       ├── class-privacy.php      WP adatexport / törlés
@@ -114,13 +117,16 @@ oliv/
         ├── home.php / single.php      Napló (blog) lista és cikk
         ├── index.php / 404.php
         ├── template-parts/cards.php   Cikk-kártyák
-        ├── inc/helpers.php            Markup segédek (fotó, matrica, futószalag, gomb, oldalfej)
-        ├── inc/content-types.php      oy_class, oy_faq CPT + meta boxok + plugin-szűrők
+        ├── inc/helpers.php            Markup segédek (fotó, ikon, piktogram, gomb, oldalfej, névkártya)
+        ├── inc/i18n.php               Tartalom fordítása (oy_{lang}_{mező} meta), nyelvválasztó, hreflang
+        ├── inc/translations-admin.php „Translations” doboz a szerkesztőben (HU/ES mezők)
+        ├── inc/content-types.php      oy_class, oy_faq, oy_moment (korábbi események) CPT + meta boxok
         ├── inc/shortcodes.php         oy_* shortcode-ok, kapcsolati űrlap
         ├── inc/seo.php                Title, meta, OG, JSON-LD
         ├── inc/demo-import.php        Megjelenés → Olivia setup (tartalombetöltő)
-        ├── demo/content.json          A betöltő forrása (= src/content.json másolata)
-        └── assets/                    site.css (dizájn), wp.css (WP kiegészítések), site.js, img/
+        ├── demo/content.json          A betöltő forrása (angol + hu/es, generált, lásd 22.)
+        ├── languages/                 hu_HU / es_ES: .po (forrás), .mo, .l10n.php
+        └── assets/                    site.css (dizájn), wp.css (WP kiegészítések), site.js, img/ (Olivia fotói, színkorrigálva)
 ```
 
 ---
@@ -853,24 +859,25 @@ add_action( 'oys_booking_confirmed', function ( $booking_id ) {
 
 ### 13.2 Tartalomtípusok
 
-- **`oy_class`** (Óratípusok, `/yoga-classes/{slug}/`): cím, kivonat (a listában a leírás), tartalom, kiemelt kép, sorrend (`menu_order`), meta box: hossz, szint, intenzitás, „link oldalra”, SEO cím. **A slug a kulcs**, amit a plugin sablonjai és alkalmai (`class_slug`) használnak – ne nevezd át, ha már van hozzá órarend.
+- **`oy_class`** (Óratípusok, `/yoga-classes/{slug}/`): cím, kivonat (a listában a leírás), tartalom, kiemelt kép, sorrend (`menu_order`), meta box: hossz (`oy_duration`, pl. „60 to 90 min”), nyelv (`oy_lang`, pl. „English or Hungarian”), „link oldalra”, oldalsáv-fotó, SEO cím. (A szint és az intenzitás a 8. körben megszűnt.) **A slug a kulcs**, amit a plugin sablonjai és alkalmai (`class_slug`) használnak – ne nevezd át, ha már van hozzá órarend.
 - **`oy_faq`** (GYIK): kérdés = cím, válasz = tartalom, „főoldalon” jelölő, sorrend.
+- **`oy_moment`** (Korábbi események, Events oldal `#past-events`, főoldali csík): cím, rövid leírás, kiemelt kép, `oy_date` (Y-m-d), `oy_place`. Évenként csoportosítva jelenik meg (`[oy_moments]`).
 
 ### 13.3 Dizájn és CSS
 
-- `assets/site.css` – az „Urban flow” dizájn (azonos a `src/site.css`-sel; **a forrás a `src/site.css`**, módosítás után másold át, vagy fordítva – tartsd szinkronban).
+- `assets/site.css` – a dizájn. **A 8. kör óta ez az egyetlen forrás** (a `src/site.css` régi).
 - `assets/wp.css` – csak WordPress-specifikus kiegészítések (szerkesztői tartalom szélessége, WP menü, admin sáv, lapozás).
 - `olivia-studio/assets/oys.css` – a plugin felületei; színeit `--oys-*` változókból veszi, amelyek a téma tokenjeire mutatnak, fallback értékekkel.
-- Színtokenek (`:root`): `--forest #2B5036`, `--moss #1B3324`, `--fern`, `--sage`, `--pale`, `--paper`, `--ink`, `--lilac #C6A3EE`, `--pink #FF72B6`, `--orchid #D92B86` (fehér szöveggel is olvasható), `--sun #FF8C42`. Betűk: Anton (címek), Archivo (szöveg, `wdth` tengely a címkékhez).
+- Színtokenek (`:root`): `--forest #2B5036`, `--moss #1B3324`, `--fern`, `--sage`, `--pale`, `--paper`, `--ink`, `--lilac #C6A3EE`, `--pink #FF72B6`, `--orchid #D92B86` (fehér szöveggel is olvasható), `--sun #FF8C42`. Betűk: Anton (címek), Quicksand 400–700 (szöveg; finomabb, kerekebb, nőiesebb; 8. kör).
 - Színrotáció: `OY_ACCENTS = [lilac, pink, sun, sage]` (téma) és ugyanez a plugin kártyáin.
 
 ### 13.4 Segédfüggvények (`inc/helpers.php`)
 
-`oy_photo( $key_or_attachment_id, $sizes, $eager, $alt )` (theme-kép kulcs → srcset 600/1200; szám → médiatár), `oy_post_photo()`, `oy_icon()`, `oy_btn()`, `oy_sticker()`, `oy_marquee()`, `oy_badge()`, `oy_kicker()`, `oy_section_head()`, `oy_page_head()`, `oy_crumbs()`, `oy_intensity()`, URL-ek: `oy_page_link()`, `oy_book_url()`, `oy_private_url()`, `oy_account_url()`, `oy_contact_url()`, és `oy_resolve_tokens()` (a `content.json` `{{page:…}}`, `{{class:…}}`, `{{contact:…}}`, `{{private}}` tokenjei).
+`oy_photo( $key_or_attachment_id, $sizes, $eager, $alt )` (theme-kép kulcs → srcset 600/1200; szám → médiatár; az alt szöveg fordítva), `oy_post_photo()`, `oy_icon()` (UI ikonok és 48-as művészi piktogramok: home, beach, clubhouse, online, group, lotus, bowl, prenatal, mobility, massage, team, care), `oy_pictogram( $icon, $tone )` (folt alakú háttérrel; shortcode: `[oy_picto icon="lotus" tone="lilac"]`), `oy_btn()`, `oy_kicker()`, `oy_section_head()`, `oy_page_head()`, `oy_crumbs()`, `oy_class_facts()` (hossz + nyelv chipek), `oy_title_line()` / `oy_specialities()` (titulus és szakterületek), `oy_name_card()`, URL-ek: `oy_page_link()`, `oy_book_url()`, `oy_private_url()`, `oy_account_url()`, `oy_contact_url()`, és `oy_resolve_tokens()` (a `content.json` `{{page:…}}`, `{{class:…}}`, `{{contact:…}}`, `{{private}}` tokenjei).
 
 ### 13.5 Tartalombetöltő (`inc/demo-import.php`)
 
-Megjelenés → Olivia setup. Sorrend: óratípusok → oldalak (tokenek feloldásával, kiemelt képpel, SEO metával) → óratípus-szövegek → GYIK → cikkek → „Main” menü → (ha aktív a plugin) heti sablonok + alkalmak + minta esemény. **Slug alapján idempotens**: meglévőt nem ír felül. A képeket egyszer importálja a médiatárba (`oy_key` meta alapján). Csak a `hello-world` slugú 1-es posztot törli.
+Megjelenés → Olivia setup. Sorrend: óratípusok → oldalak (tokenek feloldásával, kiemelt képpel, SEO metával) → óratípus-szövegek → GYIK → cikkek (kategória HU/ES névvel term metában) → korábbi események → „Main” menü → (ha aktív a plugin, és még nincs órarend) heti sablonok nyelvvel + alkalmak + minta esemény (vasárnap, hogy ne ütközzön). Minden elem a HU/ES fordításait is megkapja (`oy_hu_*`, `oy_es_*` meta). **Két mód**: *Set up* (slug alapján idempotens, meglévőt nem ír felül) és *Refresh the content* (a témával jött oldalakat, órákat, GYIK-et, cikkeket, eseményeket felülírja, a menüt újraépíti, a már nem használt képeket törli; kézzel felvett oldalakhoz, foglalásokhoz, órarendhez nem nyúl). A képeket egyszer importálja a médiatárba (`oy_key` meta alapján). Csak a `hello-world` slugú 1-es posztot törli.
 
 ### 13.6 SEO (`inc/seo.php`)
 
@@ -878,9 +885,11 @@ Document title (`oy_seo_title` meta), meta description (`oy_seo_desc` vagy kivon
 
 ---
 
-## 14. Statikus előnézet (src/build.py)
+## 14. Statikus előnézet (src/build.py) – RÉGI
 
-A WordPress előtti dizájn-prototípus, ma dizájn-referenciaként és gyors előnézetként használjuk.
+> **A 8. kör óta nem frissül.** A dizájn, a szövegek és a fotók forrása a téma (`assets/`, `demo/content.json`, `languages/`). A `src/` és a `site/` csak a korábbi prototípus emlékének maradt; ne innen dolgozz.
+
+A WordPress előtti dizájn-prototípus.
 
 ```bash
 pip install pillow
@@ -1009,12 +1018,13 @@ A `ci.sh` automatikusan futtatja, ha az `APP_DIST` a webes build mappájára mut
 
 ## 19. Ismert korlátok, technikai adósság
 
-- Admin és e-mail szövegek csak angolul (fordítás előkészítve, fájl még nincs).
+- Az admin (Studio menü) csak angolul van; a látogatói felület és az ügyfél-e-mailek angolul, magyarul és spanyolul.
 - Tagság: csomagváltás (upgrade/downgrade) a Stripe ügyfélportálon át nincs bekötve – most lemondás + új csatlakozás; szüneteltetés (pause) csak a Stripe-ban. Az ajándékkártya termék-alapú (nem pénzösszeg), tagság nem ajándékozható.
 - Vendég csak a foglalóval együtt jöhet (önálló vendégfiók nincs); a tagság a vendéget nem fedezi.
 - Privát kredit csak 60 perces alkalomra jó; 75/90 percnél kártyás fizetés. Online magánórára is jó (az ügyfél „drágábban” használja).
 - Zoom: élő fiókkal nem teszteltük (a fejlesztői környezetből a Zoom nem érhető el), csak szimulátorral; élesítés előtt egy valódi Server-to-Server apppal végig kell próbálni. Felvétel / visszanézés nincs.
-- E-mail szövegek egy nyelven (angolul) szerkeszthetők; a levél elrendezése (keret, színek) kódban van.
+- A levél elrendezése (keret, színek) kódban van. A hírlevél és a sorsolási hírlevél egy nyelvű (amit Olivia ír).
+- A WordPress saját HU/ES nyelvi csomagját (dátumok, hónapnevek) a plugin az első admin-belépéskor letölti; ha a tárhely ezt tiltja, a Beállítások → Általános → Webhely nyelve menüben egyszer kiválasztva telepíthető.
 - Naptár: csak heti ismétlés (kéthetente / havonta nincs), visszavonás (undo) nincs; a klasszikus táblás szerkesztők megmaradtak tartaléknak.
 - Online kredit átváltása egyirányú (online → stúdió nincs), és a töredék nem vész el, de csak online órára használható.
 - A főoldal szekcióinak szövegei a `front-page.php`-ben vannak (a „Meet your teacher” kivételével); szerkeszthetővé tételük (Customizer / blokkok) a következő kör.
@@ -1029,7 +1039,29 @@ A `ci.sh` automatikusan futtatja, ha az `APP_DIST` a webes build mappájára mut
 ## 20. Konvenciók
 
 - **Kódstílus**: WordPress Coding Standards (tabok, `array()`, Yoda-feltételek, `snake_case`). Prefixek: plugin `oys_` / `OYS_`, téma `oy_` / `OY_`.
-- **Nyelv**: kód, kommentek, UI szövegek angolul; felhasználói dokumentáció magyarul.
+- **Nyelv**: kód, kommentek, UI szövegek angolul (forrás); HU/ES fordítás `.po` fájlokban; felhasználói dokumentáció magyarul. Tartalomban nincs nagykötőjel (—): a megrendelő kérése, teszt figyeli.
 - **Adat**: UTC datetime, cent, slug-alapú hivatkozás az óratípusokra.
 - **Állapotváltás**: mindig feltételes `UPDATE … WHERE status = …` és az érintett sorok számának ellenőrzése, ha kétszer nem történhet meg (fizetés, beváltás, kredit levonás).
 - **Git**: fejlesztési ág `claude/nifty-ramanujan-3zifiu`; a `preview.html` generált és gitignore-olt, a `dist/` ZIP-ek kiadáskor frissülnek.
+
+---
+
+## 21. Többnyelvűség (angol, magyar, spanyol)
+
+**Saját réteg, külső plugin nélkül** (döntés: WPML/Polylang drága és nehéz a pluginnal együtt; a mi igényünk egyszerű).
+
+- **Címek**: angol = előtag nélkül (`/about/`), magyar = `/hu/about/`, spanyol = `/es/about/`. Az `OYS_I18n::boot()` (plugin, a betöltéskor) leveszi az előtagot a `REQUEST_URI`-ról, beállítja a nyelvet, a `locale` szűrővel a fordításokat, a `home_url` szűrővel minden belső linket (a REST API, feed, sitemap kivétel), és kikapcsolja a canonical átirányítást. Űrlapkezelők (`admin-post.php`, `admin-ajax.php`) a hivatkozó oldal nyelvét (vagy a `lang`/`oys_lang` mezőt) veszik át. A wp-admin mindig az admin nyelvén marad.
+- **Felület szövegei**: gettext, `.po` → `.mo` + `.l10n.php` (`olivia-yoga/languages/{locale}.*`, `olivia-studio/languages/olivia-studio-{locale}.*`). Fordítás után: `WP_DIR=… php wordpress/dev/build-translations.php`, és mindhárom fájlt commitold. Adatként tárolt szövegek (képek alt szövege, termék nevek és jellemzők, alap e-mail szövegek, helyszínek, megjegyzések) `oy_t()` / `oys_t()` segítségével mennek át a fordításon; ezek is a `.po`-ban vannak (`#. … stored as data`).
+- **Tartalom**: oldal, óratípus, cikk, GYIK, korábbi esemény HU/ES változata post metában: `oy_hu_title`, `oy_hu_excerpt`, `oy_hu_content`, `oy_hu_seo_title`, `oy_hu_seo_desc`, `oy_hu_duration`, `oy_hu_lang`, `oy_hu_place` (és `oy_es_*`). Szerkesztés: a szerkesztő alatti **Translations** dobozban. A `the_title`, `get_the_excerpt`, `the_content` (0-s prioritás), `single_post_title`, menü és kategórianév (term meta `oy_hu_name`) szűrők cserélik; ha nincs fordítás, az angol jelenik meg. A fordított szövegben lévő belső linkeket az `oy_localize_links()` a látogató nyelvére állítja.
+- **Nyelvválasztó**: fejléc, mobil menü, lábléc (`oy_lang_switcher()`), és `hreflang` + `x-default` a `<head>`-ben.
+- **E-mailek**: minden ügyfél-levél a címzett nyelvén megy (`OYS_Emails::__callStatic` → `OYS_I18n::with( lang_for( címzett ) )`). A nyelvet a felhasználó `oys_lang` metája tárolja: regisztrációkor és minden belépett oldalletöltéskor frissül; ha még nincs, az aktuális oldal nyelve. Az `OYS_I18n::with()` akkor is vált, ha a WordPress saját nyelvi csomagja hiányzik (szűrőkkel és a szövegtartományok újratöltésével).
+- **E-mail szövegek nyelvenként**: Studio → Emails & reminders → Edit text, fülek: English / Hungarian / Spanish. Az alap szövegek le vannak fordítva; a módosítás nyelvenként tárolódik (`oys_email_templates[key]` = angol, `[key][tr][hu]` = magyar). A ki/be kapcsoló közös.
+- **Az óra nyelve**: a heti sablonok és az alkalmak `lang` mezője (`en`/`hu`/`es`, alap: `en`), naptárban „Taught in”, az órarendben nyelv-chip.
+
+## 22. Tartalom, fotók, átfedés-tiltás (8. kör)
+
+- **Szövegek forrása**: a `demo/content.json` generált fájl (angol a felső szinten, `hu`/`es` alatta). A generátor (Python, a fejlesztői gépen volt) nincs a repóban; a JSON-t közvetlenül is lehet szerkeszteni, utána a betöltő *Refresh* módja viszi fel. Olivia 24 saját írása magyar eredetiből (`original: "hu"`) angol és spanyol fordítással, a saját grafikáival (`oy_art` meta: a kép egészében látszik, nem vágjuk).
+- **Fotók**: kizárólag Olivia képei (Drive mappa + a régi Google Sites eseményfotói), a moodboard szerint színkorrigálva (meleg fehéregyensúly, a zöld és kék tompítása, matt görbe, meleg osztott tónus, finom szemcse). 600 és 1200 px, kulcsok és alt szövegek az `assets/img/images.json`-ban; `past-event-01…27` és `journal-01…24` sorozatok.
+- **Átfedés-tiltás**: egy oktatónak két órája nem fedheti egymást. `OYS_Schedule::overlap()` (alkalmak) és `template_overlap()` (heti sablonok). A naptár REST 409 `oys_overlap` hibát ad, a klasszikus admin űrlapok hibaüzenettel visszadobnak, a `generate()` kihagyja azt a heti időpontot, ami egy egyszeri alkalommal ütközne.
+- **Foglalás gomb**: a fejlécben 640 px felett mindig látszik; telefonon lebegő „Book a class” gomb (`.book-fab`), ami a lábléc, az órarend és a CTA fölött elbújik.
+

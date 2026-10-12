@@ -1528,6 +1528,82 @@ test( 'statement: what each visit is worth and who owes whom', function () {
 	eq( 1000, OYS_Connect::credit_value( (object) array( 'order_id' => 0, 'source' => 'admin' ), (object) array( 'price_cents' => 1000, 'format' => 'studio' ) ), 'free credit: class price' );
 } );
 
+test( 'languages: addresses, translated texts and the switch back', function () {
+	$home = untrailingslashit( get_option( 'home' ) );
+	eq( $home . '/hu/about/', OYS_I18n::prefix( $home . '/about/', 'hu' ), 'Hungarian address' );
+	eq( $home . '/about/', OYS_I18n::prefix( $home . '/es/about/', 'en' ), 'English has no prefix' );
+	eq( 'es', OYS_I18n::lang_from_url( $home . '/es/book/?x=1' ), 'language read from an address' );
+	eq( 'Óra foglalása', OYS_I18n::with( 'hu', fn() => __( 'Book a class', 'olivia-studio' ) ), 'plugin text in Hungarian' );
+	eq( 'Reservar clase', OYS_I18n::with( 'es', fn() => __( 'Book a class', 'olivia-yoga' ) ), 'theme text in Spanish' );
+	ok( str_contains( OYS_I18n::with( 'hu', fn() => home_url( '/about/' ) ), '/hu/about/' ), 'links inside Hungarian pages stay Hungarian' );
+	ok( ! str_contains( OYS_I18n::with( 'hu', fn() => rest_url( 'oys/v1/' ) ), '/hu/' ), 'the API address has no language' );
+	eq( 'Book a class', __( 'Book a class', 'olivia-studio' ), 'back to English afterwards' );
+	eq( 'en', oys_valid_lang( 'xx' ), 'unknown class language falls back to English' );
+	$s = make_session();
+	OYS_Schedule::save( array( 'lang' => 'hu' ), $s->id );
+	eq( 'hu', OYS_Schedule::get( $s->id )->lang, 'a class remembers the language it is taught in' );
+} );
+
+test( 'languages: emails in the customer\'s language, texts edited per language', function () {
+	$u = make_user( 'Kata' );
+	update_user_meta( $u, 'oys_lang', 'hu' );
+	$mails = sent_mails( fn() => OYS_Emails::welcome( $u ) );
+	ok( $mails && str_contains( $mails[0]['subject'], 'Üdv' ), 'welcome email in Hungarian' );
+	ok( $mails && str_contains( $mails[0]['html'], 'Szia Kata' ), 'Hungarian greeting' );
+	update_user_meta( $u, 'oys_lang', 'es' );
+	$mails = sent_mails( fn() => OYS_Emails::welcome( $u ) );
+	ok( $mails && str_contains( $mails[0]['subject'], 'Bienvenida' ), 'welcome email in Spanish' );
+	eq( 'Foglalva: {class}, {date_short}', OYS_Email_Templates::get( 'booking_confirmed', 'hu' )['subject'], 'translated default subject' );
+	OYS_Email_Templates::save( 'booking_confirmed', array( 'subject' => 'Saját tárgy {class}' ), 'hu' );
+	eq( 'Saját tárgy {class}', OYS_Email_Templates::get( 'booking_confirmed', 'hu' )['subject'], 'Hungarian text edited' );
+	eq( 'Booked: {class}, {date_short}', OYS_Email_Templates::get( 'booking_confirmed', 'en' )['subject'], 'English untouched' );
+	ok( OYS_Email_Templates::get( 'booking_confirmed', 'hu' )['customized'] && ! OYS_Email_Templates::get( 'booking_confirmed', 'en' )['customized'], 'edited flag per language' );
+	OYS_Email_Templates::save( 'booking_confirmed', array( 'enabled' => 0 ), 'hu' );
+	ok( ! OYS_Email_Templates::get( 'booking_confirmed', 'en' )['enabled'], 'on/off is shared by all languages' );
+	OYS_Email_Templates::reset( 'booking_confirmed', 'hu' );
+	eq( 'Foglalva: {class}, {date_short}', OYS_Email_Templates::get( 'booking_confirmed', 'hu' )['subject'], 'reset to the translated original' );
+	$new = make_user( 'Ana' );
+	delete_user_meta( $new, 'oys_lang' );
+	eq( 'en', OYS_I18n::lang_for( $new ), 'no language yet: the page language (English here)' );
+} );
+
+test( 'schedule: two classes cannot overlap', function () {
+	$day   = ( new DateTimeImmutable( 'today', wp_timezone() ) )->modify( '+13 days' );
+	$start = oys_local_to_utc( $day->format( 'Y-m-d' ) . ' 10:00' );
+	$s     = OYS_Schedule::get( OYS_Schedule::save( array( 'kind' => 'group', 'class_slug' => 'hatha-flow', 'starts_at' => $start, 'ends_at' => gmdate( 'Y-m-d H:i:s', oys_ts( $start ) + 3600 ), 'capacity' => 10, 'price_cents' => 2500, 'status' => 'scheduled' ) ) );
+	$t     = oys_ts( $s->starts_at );
+	ok( OYS_Schedule::overlap( gmdate( 'Y-m-d H:i:s', $t + 1800 ), gmdate( 'Y-m-d H:i:s', $t + 5400 ) ), 'half an hour later clashes' );
+	ok( ! OYS_Schedule::overlap( gmdate( 'Y-m-d H:i:s', $t + 3600 ), gmdate( 'Y-m-d H:i:s', $t + 7200 ) ), 'right after it is fine' );
+	ok( ! OYS_Schedule::overlap( $s->starts_at, $s->ends_at, 0, $s->id ), 'a class does not clash with itself' );
+	$res = OYS_Calendar::rest_save( cal_req( array( 'kind' => 'group', 'class_slug' => 'slow-flow', 'date' => $day->format( 'Y-m-d' ), 'start' => '10:30', 'duration' => 60, 'capacity' => 10, 'format' => 'studio', 'price' => 2500 ) ) );
+	ok( is_wp_error( $res ) && 409 === ( $res->get_error_data()['status'] ?? 0 ), 'the calendar refuses an overlapping class' );
+	$tpl = OYS_Schedule::save_template( array( 'class_slug' => 'hatha-flow', 'weekday' => 7, 'start_time' => '05:00', 'duration_min' => 60, 'active' => 1 ) );
+	ok( OYS_Schedule::template_overlap( 7, '05:30', 60 ), 'weekly classes clash too' );
+	ok( ! OYS_Schedule::template_overlap( 7, '06:00', 60 ), 'back to back is fine' );
+	ok( ! OYS_Schedule::template_overlap( 7, '05:00', 60, 0, $tpl ), 'a weekly class does not clash with itself' );
+} );
+
+test( 'content: three languages, no em dashes, past events and journal', function () {
+	$data = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content.json' ), true );
+	ok( ! str_contains( wp_json_encode( $data, JSON_UNESCAPED_UNICODE ), '—' ), 'no em dash anywhere in the copy' );
+	foreach ( array( 'pages', 'classes', 'posts' ) as $kind ) {
+		foreach ( $data[ $kind ] as $slug => $item ) {
+			ok( ! empty( $item['hu']['title'] ) && ! empty( $item['es']['title'] ), "$kind/$slug has Hungarian and Spanish titles" );
+		}
+	}
+	eq( 27, count( $data['moments'] ), 'past events' );
+	$about = get_page_by_path( 'about' );
+	if ( $about ) {
+		eq( 'Rólam', OYS_I18n::with( 'hu', fn() => get_the_title( $about ) ), 'page title in Hungarian' );
+		ok( str_contains( OYS_I18n::with( 'es', fn() => oy_post_content( $about ) ), 'clases grupales semanales' ), 'Spanish copy' );
+	}
+	$moments = oy_moments( 3 );
+	ok( count( $moments ) === 3 && has_post_thumbnail( $moments[0] ), 'past events come with photos' );
+	ok( str_contains( oy_localize_links( '<a href="' . home_url( '/contact/' ) . '">x</a>' ), '/contact/' ), 'links unchanged in English' );
+	$hu = OYS_I18n::with( 'hu', fn() => oy_localize_links( '<a href="' . untrailingslashit( get_option( 'home' ) ) . '/contact/?topic=prenatal">x</a><img src="' . get_template_directory_uri() . '/assets/img/x.jpg">' ) );
+	ok( str_contains( $hu, '/hu/contact/?topic=prenatal' ), 'links in Hungarian copy point to Hungarian pages' );
+} );
+
 test( 'helpers: money and periods', function () {
 	eq( '$25', oys_money( 2500, 'usd' ), 'whole dollars' );
 	eq( '$25.50', oys_money( 2550, 'usd' ), 'cents' );

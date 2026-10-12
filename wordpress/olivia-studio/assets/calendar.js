@@ -233,7 +233,7 @@
   function openDrawer(s, preset) {
     closeDrawer();
     const isNew = !s;
-    const v = s || Object.assign({ kind: 'group', class_slug: classKeys[0] || '', title: '', description: '', date: C.today, start: '18:00', duration: 60, capacity: 12, location: '', format: 'studio', online_url: '', price: C.prices.group, credits_allowed: true, pricing: 'fixed', pay_later: true, teacher_id: 0, note: '', status: 'scheduled', booked: 0, people: [] }, preset || {});
+    const v = s || Object.assign({ kind: 'group', class_slug: classKeys[0] || '', title: '', description: '', date: C.today, start: '18:00', duration: 60, capacity: 12, location: '', format: 'studio', online_url: '', price: C.prices.group, credits_allowed: true, pricing: 'fixed', pay_later: true, teacher_id: 0, lang: 'en', note: '', status: 'scheduled', booked: 0, people: [] }, preset || {});
     const locked = !isNew && (v.status !== 'scheduled' || v.past);
     const d = document.createElement('aside');
     d.className = 'oys-drawer';
@@ -277,7 +277,8 @@
       + field('People (empty = location default)', '<input type="number" name="min_people" min="0" value="' + (v.min_people == null ? '' : v.min_people) + '" placeholder="">')
       + field('Decide hours before', '<input type="number" name="decide_hours" min="1" value="' + (v.decide_hours == null ? '' : v.decide_hours) + '" placeholder="">') + '</div>'
       + '<p class="description f-min-hint"></p></fieldset>';
-    html += field('Short note (shown on the timetable)', '<input type="text" name="note" value="' + esc(v.note) + '" placeholder="e.g. Bring a towel">');
+    html += '<div class="oys-row">' + field('Short note (shown on the timetable)', '<input type="text" name="note" value="' + esc(v.note) + '" placeholder="e.g. Bring a towel">')
+      + field('Taught in', '<select name="lang">' + Object.keys(C.langs || { en: 'English' }).map(k => '<option value="' + k + '"' + ((v.lang || 'en') === k ? ' selected' : '') + '>' + esc((C.langs || {})[k] || k) + '</option>').join('') + '</select>') + '</div>';
     html += field('Description', '<textarea name="description" rows="3">' + esc(v.description) + '</textarea>', 'f-desc');
     if (isNew) html += field('Repeat', '<select name="repeat"><option value="none">Just this date</option><option value="weekly">Every week on ' + DAY_NAMES[weekday(v.date)] + '</option></select>', 'f-repeat');
     html += '</form></div><div class="oys-drawer__foot">';
@@ -370,6 +371,7 @@
       decide_hours: form.decide_hours.value === '' ? '' : parseInt(form.decide_hours.value, 10),
       teacher_id: form.teacher_id ? parseInt(form.teacher_id.value, 10) || 0 : undefined, // No picker (no teachers): the server keeps the class's teacher.
       note: form.note.value.trim(),
+      lang: form.lang ? form.lang.value : 'en',
       repeat: form.repeat ? form.repeat.value : 'none',
     };
   }

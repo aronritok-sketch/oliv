@@ -7,8 +7,8 @@ $posts = $args['posts'] ?? array();
 ?>
 <div class="cards">
 	<?php foreach ( $posts as $i => $p ) : $cat = get_the_category( $p->ID ); ?>
-	<article class="card card--<?php echo esc_attr( OY_ACCENTS[ $i % 4 ] ); ?>"><a href="<?php echo esc_url( get_permalink( $p ) ); ?>">
-		<div class="card__media"><?php echo oy_post_photo( $p->ID, 'olivia-riverside-profile', '(min-width: 960px) 30vw, 92vw' ); // phpcs:ignore ?></div>
+	<article class="card card--<?php echo esc_attr( OY_ACCENTS[ $i % 4 ] ); ?><?php echo get_post_meta( $p->ID, 'oy_art', true ) ? ' card--art' : ''; ?>"><a href="<?php echo esc_url( get_permalink( $p ) ); ?>">
+		<div class="card__media"><?php echo oy_post_photo( $p->ID, 'olivia-terrace-profile', '(min-width: 960px) 30vw, 92vw' ); // phpcs:ignore ?></div>
 		<div class="card__body">
 			<?php if ( $cat ) : ?><span class="card__cat"><?php echo esc_html( $cat[0]->name ); ?></span><?php endif; ?>
 			<h3 class="card__title"><?php echo esc_html( get_the_title( $p ) ); ?></h3>

@@ -46,6 +46,7 @@ class OYS_Schedule {
 			'min_people'   => array_key_exists( 'min_people', $data ) ? self::nullable_int( $data['min_people'] ) : ( $old->min_people ?? null ),
 			'decide_hours' => array_key_exists( 'decide_hours', $data ) ? self::nullable_int( $data['decide_hours'], 1 ) : ( $old->decide_hours ?? null ),
 			'teacher_id'   => array_key_exists( 'teacher_id', $data ) ? max( 0, (int) $data['teacher_id'] ) : (int) ( $old->teacher_id ?? 0 ),
+			'lang'         => array_key_exists( 'lang', $data ) ? oys_valid_lang( $data['lang'] ) : ( $old->lang ?? 'en' ),
 			'note'         => sanitize_text_field( $data['note'] ?? '' ),
 			'active'       => empty( $data['active'] ) ? 0 : 1,
 			'valid_from'   => ! empty( $data['valid_from'] ) && preg_match( '/^\d{4}-\d{2}-\d{2}$/', $data['valid_from'] ) ? $data['valid_from'] : null,
@@ -97,6 +98,10 @@ class OYS_Schedule {
 				if ( $exists ) {
 					continue;
 				}
+				// A one-off date already holds this teacher's time: leave the weekly date out.
+				if ( self::overlap( $slot, $start->modify( '+' . (int) $tpl->duration_min . ' minutes' )->format( 'Y-m-d H:i:s' ), (int) $tpl->teacher_id ) ) {
+					continue;
+				}
 				$wpdb->insert( $s, array(
 					'kind'        => 'group',
 					'class_slug'  => $tpl->class_slug,
@@ -114,6 +119,7 @@ class OYS_Schedule {
 					'min_people'  => $tpl->min_people,
 					'decide_hours' => $tpl->decide_hours,
 					'teacher_id'  => (int) $tpl->teacher_id,
+					'lang'        => $tpl->lang ?: 'en',
 					'note'        => $tpl->note,
 					'template_id' => $tpl->id,
 					'tpl_slot'    => $slot,
@@ -186,7 +192,7 @@ class OYS_Schedule {
 		global $wpdb;
 		$t   = OYS_Install::table( 'sessions' );
 		$row = array();
-		foreach ( array( 'kind', 'class_slug', 'title', 'description', 'starts_at', 'ends_at', 'capacity', 'location', 'format', 'online_url', 'price_cents', 'online_capacity', 'online_price_cents', 'zoom_meeting_id', 'zoom_join_url', 'zoom_password', 'credits_allowed', 'pricing', 'pay_later', 'min_people', 'decide_hours', 'min_state', 'nudge_sent', 'teacher_id', 'note', 'status', 'template_id', 'tpl_slot' ) as $k ) {
+		foreach ( array( 'kind', 'class_slug', 'title', 'description', 'starts_at', 'ends_at', 'capacity', 'location', 'format', 'online_url', 'price_cents', 'online_capacity', 'online_price_cents', 'zoom_meeting_id', 'zoom_join_url', 'zoom_password', 'credits_allowed', 'pricing', 'pay_later', 'min_people', 'decide_hours', 'min_state', 'nudge_sent', 'teacher_id', 'lang', 'note', 'status', 'template_id', 'tpl_slot' ) as $k ) {
 			if ( array_key_exists( $k, $data ) ) {
 				$row[ $k ] = $data[ $k ];
 			}
@@ -206,6 +212,42 @@ class OYS_Schedule {
 		$row['created_at'] = oys_now();
 		$wpdb->insert( $t, $row );
 		return (int) $wpdb->insert_id;
+	}
+
+	/**
+	 * Another scheduled date of the same teacher that overlaps this time (UTC), or null.
+	 * One teacher can't be in two places: the calendar and the weekly timetable refuse such a date.
+	 */
+	public static function overlap( $starts_at, $ends_at, $teacher_id = 0, $exclude_id = 0 ) {
+		global $wpdb;
+		return $wpdb->get_row( $wpdb->prepare(
+			'SELECT * FROM ' . OYS_Install::table( 'sessions' ) . " WHERE status = 'scheduled' AND teacher_id = %d AND id <> %d AND starts_at < %s AND ends_at > %s ORDER BY starts_at LIMIT 1",
+			(int) $teacher_id, (int) $exclude_id, $ends_at, $starts_at
+		) );
+	}
+
+	/** Another active weekly class of the same teacher on the same day that overlaps, or null. */
+	public static function template_overlap( $weekday, $start_time, $duration_min, $teacher_id = 0, $exclude_id = 0 ) {
+		$from = (int) substr( $start_time, 0, 2 ) * 60 + (int) substr( $start_time, 3, 2 );
+		$to   = $from + (int) $duration_min;
+		foreach ( self::templates( true ) as $t ) {
+			if ( (int) $t->id === (int) $exclude_id || (int) $t->weekday !== (int) $weekday || (int) $t->teacher_id !== (int) $teacher_id ) {
+				continue;
+			}
+			$a = (int) substr( $t->start_time, 0, 2 ) * 60 + (int) substr( $t->start_time, 3, 2 );
+			if ( $a < $to && $a + (int) $t->duration_min > $from ) {
+				return $t;
+			}
+		}
+		return null;
+	}
+
+	/** "Slow Flow, Mon 5:45 pm" for messages about a clash. */
+	public static function clash_label( $s ) {
+		if ( isset( $s->weekday ) ) {
+			return sprintf( '%s, %s %s', oys_class_title( $s->class_slug ), self::weekdays()[ (int) $s->weekday ] ?? '', $s->start_time );
+		}
+		return sprintf( '%s, %s', oys_session_title( $s ), oys_date( $s->starts_at, 'D M j, g:i a' ) );
 	}
 
 	/** Why a session can't be booked right now, or '' if it can. */

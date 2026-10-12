@@ -123,22 +123,35 @@ class OYS_Email_Templates {
 		);
 	}
 
-	/** The email as it will be sent: saved texts over the defaults, plus `enabled`. */
-	public static function get( $key ) {
+	const FIELDS = array( 'subject', 'heading', 'message', 'closing', 'button' );
+
+	/**
+	 * The email as it will be sent: saved texts over the defaults, plus `enabled`.
+	 * Each language has its own texts: the defaults come translated from languages/*.mo and the
+	 * studio's edits are kept per language (English at the top level, others under `tr`).
+	 */
+	public static function get( $key, $lang = null ) {
 		$all = self::registry();
 		if ( ! isset( $all[ $key ] ) ) {
 			return null;
 		}
+		$lang  = $lang ?? ( class_exists( 'OYS_I18n' ) ? OYS_I18n::current() : 'en' );
 		$saved = get_option( self::OPTION, array() );
 		$saved = is_array( $saved ) && isset( $saved[ $key ] ) && is_array( $saved[ $key ] ) ? $saved[ $key ] : array();
 		$t     = $all[ $key ];
-		foreach ( array( 'subject', 'heading', 'message', 'closing', 'button' ) as $f ) {
-			if ( isset( $saved[ $f ] ) && ( '' !== trim( $saved[ $f ] ) || in_array( $f, array( 'closing', 'button' ), true ) ) ) {
-				$t[ $f ] = $saved[ $f ];
+		if ( 'en' !== $lang && $t['editable'] ) {
+			$defaults = array_intersect_key( $t, array_flip( self::FIELDS ) );
+			$t        = array_merge( $t, OYS_I18n::with( $lang, fn() => array_map( fn( $v ) => '' === $v ? '' : translate( $v, 'olivia-studio' ), $defaults ) ) ); // phpcs:ignore WordPress.WP.I18n
+		}
+		$over = 'en' === $lang ? $saved : (array) ( $saved['tr'][ $lang ] ?? array() );
+		foreach ( self::FIELDS as $f ) {
+			if ( isset( $over[ $f ] ) && ( '' !== trim( $over[ $f ] ) || in_array( $f, array( 'closing', 'button' ), true ) ) ) {
+				$t[ $f ] = $over[ $f ];
 			}
 		}
+		$t['lang']       = $lang;
 		$t['enabled']    = ! isset( $saved['enabled'] ) || (int) $saved['enabled'];
-		$t['customized'] = (bool) array_intersect_key( $saved, array_flip( array( 'subject', 'heading', 'message', 'closing', 'button' ) ) );
+		$t['customized'] = (bool) array_intersect_key( $over, array_flip( self::FIELDS ) );
 		return $t;
 	}
 
@@ -147,20 +160,36 @@ class OYS_Email_Templates {
 		return $t && $t['enabled'];
 	}
 
-	public static function save( $key, array $fields ) {
+	/** Save texts for one language ('en' by default); `enabled` is shared by all languages. */
+	public static function save( $key, array $fields, $lang = 'en' ) {
 		$saved = get_option( self::OPTION, array() );
 		$saved = is_array( $saved ) ? $saved : array();
-		$saved[ $key ] = array_merge( $saved[ $key ] ?? array(), $fields );
+		$row   = $saved[ $key ] ?? array();
+		if ( isset( $fields['enabled'] ) ) {
+			$row['enabled'] = $fields['enabled'];
+			unset( $fields['enabled'] );
+		}
+		if ( 'en' === $lang ) {
+			$row = array_merge( $row, $fields );
+		} elseif ( $fields ) {
+			$row['tr'][ $lang ] = array_merge( $row['tr'][ $lang ] ?? array(), $fields );
+		}
+		$saved[ $key ] = $row;
 		update_option( self::OPTION, $saved, false );
 	}
 
-	/** Back to the default texts (keeps on/off). */
-	public static function reset( $key ) {
+	/** Back to the default texts of one language (keeps on/off and the other languages). */
+	public static function reset( $key, $lang = 'en' ) {
 		$saved = get_option( self::OPTION, array() );
-		if ( isset( $saved[ $key ] ) ) {
-			$saved[ $key ] = array_intersect_key( $saved[ $key ], array( 'enabled' => 1 ) );
-			update_option( self::OPTION, $saved, false );
+		if ( ! isset( $saved[ $key ] ) ) {
+			return;
 		}
+		if ( 'en' === $lang ) {
+			$saved[ $key ] = array_intersect_key( $saved[ $key ], array( 'enabled' => 1, 'tr' => 1 ) );
+		} else {
+			unset( $saved[ $key ]['tr'][ $lang ] );
+		}
+		update_option( self::OPTION, $saved, false );
 	}
 
 	/** Placeholder values that most emails share. */

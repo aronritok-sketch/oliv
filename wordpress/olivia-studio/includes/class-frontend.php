@@ -45,7 +45,7 @@ class OYS_Frontend {
 	}
 
 	private static function current_url() {
-		return home_url( add_query_arg( array() ) );
+		return OYS_I18n::request_url();
 	}
 
 	/* ======================================================================
@@ -79,7 +79,7 @@ class OYS_Frontend {
 			$head = '<h3><abbr title="' . esc_attr( wp_date( 'l, F j', $day->getTimestamp() ) ) . '">' . esc_html( wp_date( 'D', $day->getTimestamp() ) ) . '</abbr><small>' . esc_html( wp_date( 'M j', $day->getTimestamp() ) ) . '</small></h3>';
 			if ( ! $list ) {
 				if ( 'yes' === $atts['empty_days'] ) {
-					$out[] = '<div class="day is-empty">' . $head . '<p>' . esc_html__( 'No group classes — private sessions available on request.', 'olivia-studio' ) . '</p></div>';
+					$out[] = '<div class="day is-empty">' . $head . '<p>' . esc_html__( 'No group classes today. Private sessions are available on request.', 'olivia-studio' ) . '</p></div>';
 				}
 				continue;
 			}
@@ -101,19 +101,25 @@ class OYS_Frontend {
 				} elseif ( OYS_Schedule::closed_reason( $s ) ) {
 					$action = '<span class="session__status">' . esc_html__( 'Booking closed', 'olivia-studio' ) . '</span>';
 				} elseif ( $left < 1 ) {
-					$action = '<a class="session__book" href="' . esc_url( oys_book_url( $s->id ) ) . '">' . esc_html__( 'Full · join waitlist', 'olivia-studio' ) . oys_icon( 'arrow' ) . '</a>';
+					$action = '<a class="session__book session__book--wait" href="' . esc_url( oys_book_url( $s->id ) ) . '">' . esc_html__( 'Join the waitlist', 'olivia-studio' ) . oys_icon( 'arrow' ) . '</a>';
 				} else {
 					$action = '<a class="session__book" href="' . esc_url( oys_book_url( $s->id ) ) . '">' . esc_html__( 'Book', 'olivia-studio' ) . '<span class="sr-only"> ' . $plain . ', ' . esc_html( oys_date( $s->starts_at, 'l g:i a' ) ) . '</span>' . oys_icon( 'arrow' ) . '</a>';
 				}
-				$spots = $left < 1 ? __( 'Full', 'olivia-studio' ) : ( $left <= 3 ? sprintf( _n( '%d spot left', '%d spots left', $left, 'olivia-studio' ), $left ) : '' );
+				$spots  = $left < 1 ? __( 'Full', 'olivia-studio' ) : ( $left <= 3 ? sprintf( _n( '%d spot left', '%d spots left', $left, 'olivia-studio' ), $left ) : '' );
 				$online = oys_is_online( $s );
-				$out[] = '<li class="session session--' . esc_attr( $tone ) . ( $online ? ' session--online' : '' ) . '">'
-					. '<span class="session__time">' . esc_html( oys_time( $s->starts_at ) . ' – ' . oys_time( $s->ends_at ) ) . '</span>'
-					. '<span class="session__class">' . $title . OYS_Teachers::card_line( $s ) . '</span>'
-					. '<span class="session__place">' . ( $online ? '<span class="session__online">' . esc_html__( 'Online', 'olivia-studio' ) . '</span> ' . esc_html( $s->price_cents || oys_is_donation( $s ) ? oys_price_label( $s ) : '' ) : esc_html( $s->location ) . ( oys_is_hybrid( $s ) ? ' <span class="session__online">' . esc_html__( '+ Live online', 'olivia-studio' ) . '</span>' : '' ) ) . ( oys_is_donation( $s ) && ! $online ? ' <span class="session__donation">' . esc_html__( 'By donation', 'olivia-studio' ) . '</span>' : '' ) . '</span>'
-					. ( $s->note ? '<span class="session__note">' . esc_html( $s->note ) . '</span>' : '' )
-					. ( $spots ? '<span class="session__spots' . ( $left < 1 ? ' is-full' : '' ) . '">' . esc_html( $spots ) . '</span>' : '' )
-					. $action . '</li>';
+				$lang   = oys_valid_lang( $s->lang ?? 'en' );
+				$tags   = ( $online ? '<span class="session__online">' . esc_html__( 'Online', 'olivia-studio' ) . '</span>' : '' )
+					. ( oys_is_hybrid( $s ) ? '<span class="session__online">' . esc_html__( '+ Live online', 'olivia-studio' ) . '</span>' : '' )
+					. ( oys_is_donation( $s ) ? '<span class="session__donation">' . esc_html__( 'By donation', 'olivia-studio' ) . '</span>' : '' )
+					. '<span class="session__lang" title="' . esc_attr( sprintf( __( 'Taught in %s', 'olivia-studio' ), translate( OYS_I18n::LANGS[ $lang ]['name'], 'olivia-studio' ) ) ) . '">' . esc_html( oys_lang_short( $lang ) ) . '</span>' // phpcs:ignore WordPress.WP.I18n
+					. ( $s->note ? '<span class="session__note">' . esc_html( oys_t( $s->note ) ) . '</span>' : '' );
+				$minutes = (int) round( ( oys_ts( $s->ends_at ) - oys_ts( $s->starts_at ) ) / 60 );
+				$out[]   = '<li class="session session--' . esc_attr( $tone ) . ( $online ? ' session--online' : '' ) . '">'
+					. '<span class="session__time"><b>' . esc_html( oys_time( $s->starts_at ) ) . '</b><small>' . esc_html( sprintf( __( '%d min', 'olivia-studio' ), $minutes ) ) . '</small></span>'
+					. '<span class="session__body"><span class="session__class">' . $title . OYS_Teachers::card_line( $s ) . '</span>'
+					. '<span class="session__place">' . esc_html( $online ? ( $s->price_cents || oys_is_donation( $s ) ? oys_price_label( $s ) : '' ) : oys_t( $s->location ) ) . ' <span class="sr-only">' . esc_html( oys_time( $s->starts_at ) . ' – ' . oys_time( $s->ends_at ) ) . '</span></span>'
+					. '<span class="session__tags">' . $tags . '</span></span>'
+					. '<span class="session__actions">' . ( $spots ? '<span class="session__spots' . ( $left < 1 ? ' is-full' : '' ) . '">' . esc_html( $spots ) . '</span>' : '' ) . $action . '</span></li>';
 			}
 			$out[] = '</ul></div>';
 		}
@@ -135,7 +141,7 @@ class OYS_Frontend {
 			$left = OYS_Schedule::spots_left( $s );
 			$out .= '<li class="event"><a href="' . esc_url( oys_book_url( $s->id ) ) . '"><span class="event__date event__date--' . $tones[ $i % 3 ] . '"><span>' . esc_html( wp_date( 'M', oys_ts( $s->starts_at ) ) ) . '</span><b>' . esc_html( wp_date( 'j', oys_ts( $s->starts_at ) ) ) . '</b></span>'
 				. '<span><span class="event__title">' . esc_html( oys_session_title( $s ) ) . '</span>'
-				. '<span class="event__meta">' . esc_html( oys_date( $s->starts_at, 'l, g:i a' ) . ' – ' . oys_time( $s->ends_at ) . ( $s->location ? ' · ' . $s->location : '' ) . ' · ' . oys_price_label( $s ) ) . ( $left < 1 ? ' · ' . __( 'Full, waitlist open', 'olivia-studio' ) : '' ) . '</span></span>'
+				. '<span class="event__meta">' . esc_html( oys_date( $s->starts_at, 'l, g:i a' ) . ' – ' . oys_time( $s->ends_at ) . ( $s->location ? ' · ' . oys_t( $s->location ) : '' ) . ' · ' . oys_price_label( $s ) ) . ( $left < 1 ? ' · ' . __( 'Full, waitlist open', 'olivia-studio' ) : '' ) . '</span></span>'
 				. '<span class="event__go" aria-hidden="true">' . oys_icon( 'arrow' ) . '</span></a></li>';
 		}
 		return $out . '</ul>';
@@ -164,7 +170,7 @@ class OYS_Frontend {
 				$unit = sprintf( __( '%d minutes', 'olivia-studio' ), (int) $p['duration_min'] );
 				foreach ( OYS_Products::all( true ) as $q ) {
 					if ( 'private_single' === $q['kind'] && 60 !== (int) $q['duration_min'] ) {
-						$features[] = sprintf( '%d minutes: %s', (int) $q['duration_min'], oys_money( $q['price_cents'] ) );
+						$features[] = sprintf( __( '%1$d minutes: %2$s', 'olivia-studio' ), (int) $q['duration_min'], oys_money( $q['price_cents'] ) );
 					}
 				}
 				if ( (int) $p['online_price_cents'] && (int) $p['online_price_cents'] !== (int) $p['price_cents'] ) {
@@ -183,17 +189,33 @@ class OYS_Frontend {
 					$features[] = sprintf( __( 'Online classes: 1 class = %d online', 'olivia-studio' ), $ratio );
 				}
 			}
-			$cards[] = array( 'tone' => $p['featured'] ? 'forest' : $tones[ $i++ % 3 ], 'title' => $p['name'], 'price' => oys_money( $p['price_cents'] ), 'unit' => $unit, 'features' => $features, 'cta' => $cta, 'featured' => (bool) $p['featured'] );
+			$group   = 'membership' === $p['kind'] ? 'members' : ( in_array( $p['kind'], array( 'private_single', 'private_pack' ), true ) ? 'private' : 'classes' );
+			$cards[] = array( 'tone' => $p['featured'] ? 'forest' : $tones[ $i++ % 3 ], 'title' => oys_product_name( $p ), 'price' => oys_money( $p['price_cents'] ), 'unit' => $unit, 'features' => array_map( 'oys_product_text', $features ), 'cta' => $cta, 'featured' => (bool) $p['featured'], 'group' => $group );
 		}
-		$cards[] = array( 'tone' => 'pink', 'title' => __( 'Teams & companies', 'olivia-studio' ), 'price' => __( 'Custom', 'olivia-studio' ), 'unit' => __( 'quote', 'olivia-studio' ), 'features' => array( __( 'On-site, outdoors or online', 'olivia-studio' ), __( 'One-off or weekly', 'olivia-studio' ), __( 'Sports teams and clubs too', 'olivia-studio' ) ), 'cta' => array( __( 'Request a proposal', 'olivia-studio' ), apply_filters( 'oys_corporate_contact_url', home_url( '/contact/?topic=corporate#book' ) ) ), 'featured' => false );
+		$cards[] = array( 'tone' => 'pink', 'title' => __( 'Teams & companies', 'olivia-studio' ), 'price' => __( 'Custom', 'olivia-studio' ), 'unit' => __( 'quote', 'olivia-studio' ), 'features' => array( __( 'On-site, outdoors or online', 'olivia-studio' ), __( 'One-off or weekly', 'olivia-studio' ), __( 'Sports teams and clubs too', 'olivia-studio' ) ), 'cta' => array( __( 'Request a proposal', 'olivia-studio' ), apply_filters( 'oys_corporate_contact_url', home_url( '/contact/?topic=corporate#book' ) ) ), 'featured' => false, 'group' => 'private' );
 
-		$out = '<div class="pricing oys-pricing">';
+		$groups = array(
+			'classes' => array( __( 'Group classes', 'olivia-studio' ), __( 'Drop in, or save with a pass. Use passes in the studio or online.', 'olivia-studio' ), array() ),
+			'members' => array( __( 'Memberships', 'olivia-studio' ), __( 'A monthly rhythm, billed automatically. Cancel any time.', 'olivia-studio' ), array() ),
+			'private' => array( __( 'Private & teams', 'olivia-studio' ), __( 'One-on-one sessions, packs, and classes for your team.', 'olivia-studio' ), array() ),
+		);
 		foreach ( $cards as $c ) {
-			$out .= '<article class="price price--' . esc_attr( $c['tone'] ) . '">'
-				. ( $c['featured'] ? apply_filters( 'oys_featured_badge', '<span class="price__tag">' . esc_html__( 'Most popular', 'olivia-studio' ) . '</span>' ) : '' )
-				. '<h3>' . esc_html( $c['title'] ) . '</h3><p class="price__amount">' . esc_html( $c['price'] ) . '</p><p class="price__unit">' . esc_html( $c['unit'] ) . '</p>'
-				. '<ul>' . implode( '', array_map( fn( $f ) => '<li>' . esc_html( $f ) . '</li>', $c['features'] ) ) . '</ul>'
-				. '<a class="btn ' . ( $c['featured'] ? 'btn--orchid' : 'btn--dark' ) . '" href="' . esc_url( $c['cta'][1] ) . '">' . esc_html( $c['cta'][0] ) . '</a></article>';
+			$groups[ $c['group'] ?? 'classes' ][2][] = $c;
+		}
+		$out = '<div class="pricing oys-pricing">';
+		foreach ( $groups as $key => $g ) {
+			if ( ! $g[2] ) {
+				continue;
+			}
+			$out .= '<section class="price-group price-group--' . esc_attr( $key ) . '"><header class="price-group__head"><h3>' . esc_html( $g[0] ) . '</h3><p>' . esc_html( $g[1] ) . '</p></header><div class="price-group__cards" style="--n:' . min( 3, count( $g[2] ) ) . '">';
+			foreach ( $g[2] as $c ) {
+				$out .= '<article class="price price--' . esc_attr( $c['tone'] ) . '">'
+					. ( $c['featured'] ? apply_filters( 'oys_featured_badge', '<span class="price__tag">' . esc_html__( 'Most popular', 'olivia-studio' ) . '</span>' ) : '' )
+					. '<h4>' . esc_html( $c['title'] ) . '</h4><p class="price__amount">' . esc_html( $c['price'] ) . '</p><p class="price__unit">' . esc_html( $c['unit'] ) . '</p>'
+					. '<ul>' . implode( '', array_map( fn( $f ) => '<li>' . esc_html( $f ) . '</li>', $c['features'] ) ) . '</ul>'
+					. '<a class="btn ' . ( $c['featured'] ? 'btn--orchid' : 'btn--dark' ) . '" href="' . esc_url( $c['cta'][1] ) . '">' . esc_html( $c['cta'][0] ) . '</a></article>';
+			}
+			$out .= '</div></section>';
 		}
 		return $out . '</div>';
 	}
@@ -249,7 +271,7 @@ class OYS_Frontend {
 		if ( oys_is_online( $s ) ) {
 			$rows[] = array( 'pin', __( 'Online, live. The link is in your confirmation email and your account.', 'olivia-studio' ) );
 		} elseif ( $s->location ) {
-			$rows[] = array( 'pin', $s->location );
+			$rows[] = array( 'pin', oys_t( $s->location ) );
 		}
 		if ( oys_is_hybrid( $s ) ) {
 			$rows[] = array( 'screen', __( 'Also streamed live: join from home if you prefer.', 'olivia-studio' ) );
@@ -274,7 +296,7 @@ class OYS_Frontend {
 			$html .= '<div class="oys-desc">' . wpautop( esc_html( $s->description ) ) . '</div>';
 		}
 		if ( $s->note ) {
-			$html .= '<p class="session__note">' . esc_html( $s->note ) . '</p>';
+			$html .= '<p class="session__note">' . esc_html( oys_t( $s->note ) ) . '</p>';
 		}
 		$min = OYS_Locations::notice( $s );
 		if ( $min ) {
@@ -1203,7 +1225,7 @@ class OYS_Frontend {
 		$st  = OYS_Orders::statuses();
 		$out = '<h3>' . esc_html__( 'Payments', 'olivia-studio' ) . '</h3><table class="oys-table"><thead><tr><th>' . esc_html__( 'Date', 'olivia-studio' ) . '</th><th>' . esc_html__( 'What', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Amount', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Receipt', 'olivia-studio' ) . '</th></tr></thead><tbody>';
 		foreach ( $orders as $o ) {
-			$out .= '<tr><td>' . esc_html( oys_date( $o->paid_at ?: $o->created_at, 'M j, Y' ) ) . '</td><td>' . esc_html( $o->description ) . ( 'paid' !== $o->status ? ' <span class="badge">' . esc_html( $st[ $o->status ] ?? $o->status ) . '</span>' : '' ) . '</td><td class="num">' . esc_html( oys_money( $o->amount_cents, $o->currency ) ) . '</td><td>' . ( $o->receipt_url ? '<a class="text-link" href="' . esc_url( $o->receipt_url ) . '" target="_blank" rel="noopener">' . esc_html__( 'Receipt', 'olivia-studio' ) . '</a>' : '—' ) . '</td></tr>';
+			$out .= '<tr><td>' . esc_html( oys_date( $o->paid_at ?: $o->created_at, 'M j, Y' ) ) . '</td><td>' . esc_html( $o->description ) . ( 'paid' !== $o->status ? ' <span class="badge">' . esc_html( $st[ $o->status ] ?? $o->status ) . '</span>' : '' ) . '</td><td class="num">' . esc_html( oys_money( $o->amount_cents, $o->currency ) ) . '</td><td>' . ( $o->receipt_url ? '<a class="text-link" href="' . esc_url( $o->receipt_url ) . '" target="_blank" rel="noopener">' . esc_html__( 'Receipt', 'olivia-studio' ) . '</a>' : '' ) . '</td></tr>';
 		}
 		return $out . '</tbody></table>';
 	}

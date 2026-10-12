@@ -1,0 +1,3388 @@
+# Spanish translation of olivia-studio.
+# Source file: edit here, then run wordpress/dev/build-translations.php.
+
+msgid ""
+msgstr ""
+"Project-Id-Version: olivia-studio\n"
+"Language: es_ES\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: olivia-studio\n"
+
+#: includes/class-customers.php:79
+msgid "Enter your first name."
+msgstr "Escribe tu nombre."
+
+#: includes/class-customers.php:82
+msgid "Enter an email address like name@example.com."
+msgstr "Escribe un email como nombre@ejemplo.com."
+
+#: includes/class-customers.php:84
+msgid "There is already an account for %s. Log in instead, or reset your password."
+msgstr "Ya existe una cuenta para %s. Inicia sesión o restablece tu contraseña."
+
+#: includes/class-customers.php:87
+msgid "Choose a password with at least 8 characters."
+msgstr "Elige una contraseña de al menos 8 caracteres."
+
+#: includes/class-customers.php:90
+msgid "Please read and accept the participation agreement."
+msgstr "Por favor, lee y acepta el acuerdo de participación."
+
+#: includes/class-customers.php:93
+msgid "Something went wrong. Please try again."
+msgstr "Algo salió mal. Inténtalo de nuevo."
+
+#: includes/class-customers.php:96
+msgid "Too many new accounts from this connection. Please try again later or contact us."
+msgstr "Demasiadas cuentas nuevas desde esta conexión. Inténtalo más tarde o contáctanos."
+
+#: includes/class-customers.php:125
+msgid "Welcome, %s! Your account is ready."
+msgstr "¡Bienvenida, %s! Tu cuenta está lista."
+
+#: includes/class-customers.php:138
+msgid "That email and password don't match. Try again or reset your password."
+msgstr "El email y la contraseña no coinciden. Inténtalo de nuevo o restablece tu contraseña."
+
+#: includes/class-customers.php:163
+msgid "Your new password needs at least 8 characters. Nothing else was changed about your password."
+msgstr "Tu nueva contraseña necesita al menos 8 caracteres. Tu contraseña no ha cambiado."
+
+#: includes/class-customers.php:169
+#: includes/admin/class-teachers-admin.php:605
+msgid "Profile saved."
+msgstr "Perfil guardado."
+
+#: includes/class-customers.php:185
+msgid "Enter a valid email address."
+msgstr "Escribe un email válido."
+
+#: includes/class-stripe.php:38
+#: includes/class-connect.php:76
+msgid "Online payments are not set up yet."
+msgstr "Los pagos en línea aún no están configurados."
+
+#: includes/class-stripe.php:64
+msgid "We couldn't reach the payment provider. Please try again in a moment."
+msgstr "No pudimos conectar con el proveedor de pagos. Inténtalo en un momento."
+
+#: includes/class-stripe.php:71
+msgid "The payment could not be started. Please try again or contact us."
+msgstr "No se pudo iniciar el pago. Inténtalo de nuevo o contáctanos."
+
+#: includes/class-stripe.php:285
+msgid "This order has no card payment to refund."
+msgstr ""
+
+#: includes/class-teachers.php:96
+msgid "Add the teacher's name."
+msgstr ""
+
+#: includes/class-teachers.php:100
+msgid "That email address doesn't look right."
+msgstr ""
+
+#: includes/class-teachers.php:182
+msgid "Photos must be JPG, PNG, GIF or WebP images."
+msgstr ""
+
+#: includes/class-teachers.php:224
+msgid "Add the teacher's email address first."
+msgstr ""
+
+#: includes/class-teachers.php:228
+msgid "This email belongs to a studio manager account."
+msgstr ""
+
+#: includes/class-teachers.php:232
+msgid "This account is already linked to another teacher."
+msgstr ""
+
+#: includes/class-teachers.php:300
+#: includes/admin/class-admin.php:344
+#: includes/class-frontend.php:291
+msgid "with %s"
+msgstr "con %s"
+
+#: includes/admin/class-admin.php:40
+#: includes/admin/class-admin.php:660
+#: includes/admin/class-admin.php:713
+msgid "Memberships"
+msgstr "Membresías"
+
+#: includes/admin/class-admin.php:41
+#: includes/admin/class-admin.php:672
+#: includes/admin/class-admin.php:764
+msgid "Payments"
+msgstr "Pagos"
+
+#: includes/admin/class-admin.php:42
+#: includes/admin/class-admin.php:816
+#: includes/class-install.php:383
+msgid "Gift cards"
+msgstr "Tarjetas de regalo"
+
+#: includes/admin/class-admin.php:184
+#: includes/admin/class-admin.php:344
+#: includes/admin/class-teachers-admin.php:476
+msgid "Guest"
+msgstr "Invitado"
+
+#: includes/admin/class-admin.php:197
+#: includes/admin/class-teachers-admin.php:444
+#: includes/class-emails.php:115
+msgid "When"
+msgstr "Cuándo"
+
+#: includes/admin/class-admin.php:197
+#: includes/admin/class-teachers-admin.php:444
+#: includes/class-bookings.php:775
+msgid "Booked"
+msgstr "Reservado"
+
+#: includes/admin/class-admin.php:197
+#: includes/admin/class-admin.php:336
+#: includes/admin/class-admin.php:569
+msgid "Status"
+msgstr "Estado"
+
+#: includes/admin/class-admin.php:222
+#: includes/class-frontend.php:1048
+msgid "Upcoming"
+msgstr "Próximas"
+
+#: includes/admin/class-admin.php:240
+#: includes/admin/class-admin.php:491
+#: includes/admin/class-teachers-admin.php:300
+msgid "Class"
+msgstr "Clase"
+
+#: includes/admin/class-admin.php:249
+#: includes/class-frontend.php:1278
+#: includes/class-emails.php:121
+msgid "Where"
+msgstr "Dónde"
+
+#: includes/admin/class-admin.php:257
+#: includes/admin/class-teachers-admin.php:130
+#: includes/admin/class-teachers-admin.php:173
+msgid "Teacher"
+msgstr "Profesora"
+
+#: includes/admin/class-admin.php:328
+#: includes/admin/class-admin.php:347
+#: includes/admin/class-teachers-admin.php:448
+msgid "Online"
+msgstr "En línea"
+
+#: includes/admin/class-admin.php:336
+#: includes/admin/class-admin.php:625
+#: includes/admin/class-admin.php:840
+msgid "Name"
+msgstr "Nombre"
+
+#: includes/admin/class-admin.php:336
+#: includes/admin/class-admin.php:625
+#: includes/class-frontend.php:1309
+msgid "Phone"
+msgstr "Teléfono"
+
+#: includes/admin/class-admin.php:353
+#: includes/admin/class-teachers-admin.php:491
+#: includes/class-bookings.php:777
+msgid "No-show"
+msgstr "No asistió"
+
+#: includes/admin/class-admin.php:355
+#: includes/class-frontend.php:1075
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: includes/admin/class-admin.php:366
+#: includes/admin/class-admin.php:625
+#: includes/admin/class-admin.php:1293
+msgid "Email"
+msgstr "Email"
+
+#: includes/admin/class-admin.php:367
+#: includes/class-bookings.php:792
+msgid "Complimentary"
+msgstr "Cortesía"
+
+#: includes/admin/class-admin.php:439
+#: includes/class-frontend.php:504
+msgid "Live online"
+msgstr "En vivo en línea"
+
+#: includes/admin/class-admin.php:491
+#: includes/class-frontend.php:1293
+#: includes/class-frontend.php:1299
+msgid "Day"
+msgstr "Día"
+
+#: includes/admin/class-admin.php:491
+#: includes/class-orders.php:200
+msgid "Drop-in"
+msgstr "Clase suelta"
+
+#: includes/admin/class-admin.php:491
+#: includes/class-memberships.php:382
+msgid "Active"
+msgstr "Activo"
+
+#: includes/admin/class-admin.php:507
+#: includes/admin/class-admin.php:854
+#: includes/admin/class-admin.php:1065
+msgid "Save"
+msgstr "Guardar"
+
+#: includes/admin/class-admin.php:509
+#: includes/admin/class-teachers-admin.php:253
+#: includes/class-frontend.php:1082
+msgid "Remove"
+msgstr "Quitar"
+
+#: includes/admin/class-admin.php:565
+#: includes/class-emails.php:430
+msgid "people"
+msgstr "personas"
+
+#: includes/admin/class-admin.php:566
+#: includes/class-emails.php:431
+msgid "Preferred times"
+msgstr "Horarios preferidos"
+
+#: includes/admin/class-admin.php:567
+#: includes/class-emails.php:432
+msgid "Notes"
+msgstr "Notas"
+
+#: includes/admin/class-admin.php:593
+#: includes/class-frontend.php:506
+msgid "Open"
+msgstr "Abierto"
+
+#: includes/admin/class-admin.php:641
+#: includes/class-frontend.php:1027
+msgid "Profile"
+msgstr "Perfil"
+
+#: includes/admin/class-admin.php:648
+#: includes/class-frontend.php:1022
+msgid "Passes"
+msgstr "Bonos"
+
+#: includes/admin/class-admin.php:648
+#: includes/class-bookings.php:786
+#: includes/class-orders.php:201
+msgid "Pass"
+msgstr "Bono"
+
+#: includes/admin/class-admin.php:654
+#: includes/class-passes.php:152
+#: includes/class-frontend.php:198
+msgid "Group classes"
+msgstr "Clases grupales"
+
+#: includes/admin/class-admin.php:654
+#: includes/admin/class-admin.php:693
+#: includes/admin/class-admin.php:939
+msgid "Private sessions"
+msgstr "Sesiones privadas"
+
+#: includes/admin/class-admin.php:664
+#: includes/class-privacy.php:40
+#: includes/class-email-templates.php:117
+msgid "Bookings"
+msgstr "Reservas"
+
+#: includes/admin/class-admin.php:664
+#: includes/admin/class-admin.php:780
+#: includes/admin/class-admin.php:1145
+msgid "Date"
+msgstr "Fecha"
+
+#: includes/admin/class-admin.php:681
+#: includes/class-app-api.php:333
+#: includes/class-frontend.php:385
+msgid "Pay at the studio"
+msgstr "Pagar en el estudio"
+
+#: includes/admin/class-admin.php:727
+#: includes/class-frontend.php:1149
+msgid "Plan"
+msgstr "Plan"
+
+#: includes/admin/class-admin.php:780
+#: includes/class-privacy.php:48
+#: includes/class-frontend.php:1226
+msgid "What"
+msgstr "Qué"
+
+#: includes/admin/class-admin.php:780
+#: includes/class-privacy.php:49
+#: includes/class-frontend.php:1226
+msgid "Amount"
+msgstr "Importe"
+
+#: includes/admin/class-admin.php:788
+#: includes/class-frontend.php:1226
+#: includes/class-frontend.php:1228
+msgid "Receipt"
+msgstr "Recibo"
+
+#: includes/admin/class-admin.php:797
+#: includes/class-frontend.php:1223
+msgid "No payments yet."
+msgstr "Aún no hay pagos."
+
+#: includes/admin/class-admin.php:944
+#: includes/admin/class-admin.php:990
+#: includes/class-passes.php:153
+msgid "Online classes"
+msgstr "Clases en línea"
+
+#: includes/admin/class-admin.php:1026
+#: includes/class-frontend.php:1213
+msgid "Loyalty draw"
+msgstr "Sorteo de fidelidad"
+
+#: includes/admin/class-admin.php:1062
+#: includes/class-frontend.php:1209
+msgid "Birthday gift"
+msgstr "Regalo de cumpleaños"
+
+#: includes/admin/class-admin.php:1167
+#: includes/admin/class-admin.php:1187
+#: includes/class-frontend.php:160
+msgid "Book a class"
+msgstr "Reservar clase"
+
+#: includes/admin/class-admin.php:1285
+#: includes/class-email-templates.php:118
+msgid "Reminders"
+msgstr "Recordatorios"
+
+#: includes/admin/class-admin.php:1286
+#: includes/class-email-templates.php:50
+msgid "Class reminder"
+msgstr "Recordatorio de clase"
+
+#: includes/admin/class-admin.php:1289
+#: includes/class-email-templates.php:54
+msgid "Pass about to expire"
+msgstr "Bono a punto de vencer"
+
+#: includes/admin/class-teachers-admin.php:103
+#: includes/class-frontend.php:1289
+#: includes/class-frontend.php:1298
+msgid "Month"
+msgstr "Mes"
+
+#: includes/admin/class-teachers-admin.php:136
+#: includes/class-frontend.php:187
+#: includes/class-emails.php:387
+msgid "%d class"
+msgid_plural "%d classes"
+msgstr[0] "%d clase"
+msgstr[1] "%d clases"
+
+#: includes/admin/class-teachers-admin.php:238
+#: includes/class-frontend.php:1049
+msgid "Account"
+msgstr "Cuenta"
+
+#: includes/admin/class-teachers-admin.php:300
+#: includes/class-orders.php:190
+msgid "Paid"
+msgstr "Pagado"
+
+#: includes/admin/class-teachers-admin.php:447
+#: includes/class-bookings.php:778
+#: includes/class-privates.php:180
+msgid "Cancelled"
+msgstr "Cancelada"
+
+#: includes/class-messages.php:54
+#: includes/class-bookings.php:547
+#: includes/class-app-api.php:310
+msgid "This class could not be found."
+msgstr "No se encontró esta clase."
+
+#: includes/class-gifts.php:52
+msgid "Choose a gift."
+msgstr "Elige un regalo."
+
+#: includes/class-gifts.php:56
+msgid "Enter the recipient's email address."
+msgstr "Escribe el email de quien recibe el regalo."
+
+#: includes/class-gifts.php:63
+#: includes/class-gifts.php:67
+msgid "Gift card: %s"
+msgstr "Tarjeta de regalo: %s"
+
+#: includes/class-gifts.php:67
+msgid "For %s"
+msgstr "Para %s"
+
+#: includes/class-gifts.php:105
+msgid "That code isn't valid or has already been used. Check for typos: codes look like OY-ABCD-EFGH."
+msgstr "Ese código no es válido o ya se usó. Revisa si hay errores: los códigos son como OY-ABCD-EFGH."
+
+#: includes/class-gifts.php:109
+msgid "This gift can't be redeemed online. Please contact us."
+msgstr "Este regalo no se puede canjear en línea. Por favor, contáctanos."
+
+#: includes/class-gifts.php:114
+#: includes/class-coupons.php:97
+msgid "This code has already been used."
+msgstr "Este código ya se usó."
+
+#: includes/class-gifts.php:128
+msgid "Gift redeemed: %s is now in your account."
+msgstr "Regalo canjeado: %s ya está en tu cuenta."
+
+#: includes/class-products.php:109
+msgid "per year"
+msgstr "al año"
+
+#: includes/class-products.php:109
+msgid "per month"
+msgstr "al mes"
+
+#: includes/class-products.php:111
+msgid "every %d year"
+msgid_plural "every %d years"
+msgstr[0] "cada %d año"
+msgstr[1] "cada %d años"
+
+#: includes/class-products.php:111
+msgid "every %d month"
+msgid_plural "every %d months"
+msgstr[0] "cada %d mes"
+msgstr[1] "cada %d meses"
+
+#: includes/class-products.php:137
+msgid "Class pass (group classes)"
+msgstr ""
+
+#: includes/class-products.php:138
+msgid "Intro offer (new students only)"
+msgstr ""
+
+#: includes/class-products.php:139
+msgid "Online class pass"
+msgstr ""
+
+#: includes/class-products.php:140
+msgid "Private session pack"
+msgstr ""
+
+#: includes/class-products.php:141
+msgid "Single private session (price list and gifts)"
+msgstr ""
+
+#: includes/class-products.php:142
+msgid "Membership (monthly or yearly subscription)"
+msgstr ""
+
+#: includes/class-newsletter.php:44
+msgid "This unsubscribe link is not valid."
+msgstr "Este enlace para darse de baja no es válido."
+
+#: includes/class-newsletter.php:47
+msgid "You're unsubscribed"
+msgstr "Te diste de baja"
+
+#: includes/class-newsletter.php:47
+msgid "You won't get the newsletter any more. Booking emails and reminders still arrive. Changed your mind? Tick the newsletter box in your account."
+msgstr "Ya no recibirás el boletín. Los emails de reservas y recordatorios siguen llegando. ¿Cambiaste de idea? Marca la casilla del boletín en tu cuenta."
+
+#: includes/class-newsletter.php:47
+#: includes/class-install.php:382
+#: includes/class-frontend.php:654
+msgid "My account"
+msgstr "Mi cuenta"
+
+#: includes/class-newsletter.php:47
+msgid "Unsubscribed"
+msgstr "Baja confirmada"
+
+#: includes/class-newsletter.php:118
+#: includes/class-emails.php:408
+#: includes/class-emails.php:409
+msgid "there"
+msgstr "a ti"
+
+#: includes/class-newsletter.php:133
+#: includes/class-newsletter.php:140
+msgid "This newsletter was already sent."
+msgstr ""
+
+#: includes/class-newsletter.php:136
+msgid "Write a subject and a message first."
+msgstr ""
+
+#: includes/class-newsletter.php:207
+#: includes/class-frontend.php:1215
+#: includes/class-emails.php:501
+msgid "a free pass"
+msgstr "un bono gratis"
+
+#: includes/class-install.php:367
+msgid "Studio customer"
+msgstr ""
+
+#: includes/class-install.php:369
+msgid "Studio manager"
+msgstr ""
+
+#: includes/class-install.php:371
+msgid "Studio teacher"
+msgstr ""
+
+#: includes/class-install.php:381
+#: includes/class-frontend.php:106
+msgid "Book"
+msgstr "Reservar"
+
+#: includes/class-bookings.php:151
+msgid "Only %d spot is left. Bring fewer guests or join the waitlist."
+msgid_plural "Only %d spots are left. Bring fewer guests or join the waitlist."
+msgstr[0] "Solo queda %d lugar. Trae menos invitados o únete a la lista de espera."
+msgstr[1] "Solo quedan %d lugares. Trae menos invitados o únete a la lista de espera."
+
+#: includes/class-bookings.php:154
+msgid "The online spots for this class are taken."
+msgstr "Los lugares en línea de esta clase están ocupados."
+
+#: includes/class-bookings.php:157
+msgid "The studio is full. You can still join live online, or join the waitlist."
+msgstr "El estudio está lleno. Aún puedes unirte en vivo en línea o a la lista de espera."
+
+#: includes/class-bookings.php:159
+msgid "Sorry, this class is full. You can join the waitlist."
+msgstr "Lo siento, esta clase está llena. Puedes unirte a la lista de espera."
+
+#: includes/class-bookings.php:179
+msgid "%1$s (guest of %2$s)"
+msgstr "%1$s (invitado de %2$s)"
+
+#: includes/class-bookings.php:245
+#: includes/class-bookings.php:444
+msgid "Book your own spot first, then add guests."
+msgstr "Reserva primero tu lugar y luego añade invitados."
+
+#: includes/class-bookings.php:252
+#: includes/class-bookings.php:454
+#: includes/class-frontend.php:758
+msgid "Add at least one guest name."
+msgstr "Añade al menos el nombre de un invitado."
+
+#: includes/class-bookings.php:260
+msgid "You need %d class on your pass for this booking."
+msgid_plural "You need %d classes on your pass for this booking."
+msgstr[0] "Necesitas %d clase en tu bono para esta reserva."
+msgstr[1] "Necesitas %d clases en tu bono para esta reserva."
+
+#: includes/class-bookings.php:261
+msgid "Passes can't be used for this session."
+msgstr "Los bonos no se pueden usar para esta sesión."
+
+#: includes/class-bookings.php:318
+msgid "You don't have a valid pass for this class."
+msgstr "No tienes un bono válido para esta clase."
+
+#: includes/class-bookings.php:327
+msgid "Not enough classes on your pass for all guests."
+msgstr "No hay suficientes clases en tu bono para todos los invitados."
+
+#: includes/class-bookings.php:335
+msgid "You've used all classes of this period."
+msgstr "Ya usaste todas las clases de este periodo."
+
+#: includes/class-bookings.php:364
+msgid "Session not found."
+msgstr "No se encontró la sesión."
+
+#: includes/class-bookings.php:396
+msgid "Paying at the studio isn't available for this class."
+msgstr "Pagar en el estudio no está disponible para esta clase."
+
+#: includes/class-bookings.php:399
+msgid "This class is free: just reserve your spot."
+msgstr "Esta clase es gratis: solo reserva tu lugar."
+
+#: includes/class-bookings.php:402
+msgid "Paying at the studio is for your first class. Please pay online or use a pass."
+msgstr "Pagar en el estudio es para tu primera clase. Paga en línea o usa un bono."
+
+#: includes/class-bookings.php:406
+msgid "You missed a few classes you had booked to pay at the studio, so please pay in advance for now."
+msgstr "Faltaste a algunas clases reservadas para pagar en el estudio, así que por ahora paga por adelantado."
+
+#: includes/class-bookings.php:487
+msgid "Class is over capacity by one"
+msgstr ""
+
+#: includes/class-bookings.php:488
+msgid "A payment for booking #%d arrived after its hold expired and the class had filled up in the meantime. The booking was confirmed anyway."
+msgstr ""
+
+#: includes/class-bookings.php:554
+msgid "You're already booked into this class."
+msgstr "Ya tienes reserva en esta clase."
+
+#: includes/class-bookings.php:557
+msgid "You have an unfinished card payment for this class. Continue it, or start again from the class page."
+msgstr "Tienes un pago con tarjeta sin terminar para esta clase. Continúalo o empieza de nuevo desde la página de la clase."
+
+#: includes/class-bookings.php:583
+#: includes/class-app-api.php:485
+msgid "Booking not found."
+msgstr "No se encontró la reserva."
+
+#: includes/class-bookings.php:590
+msgid "This booking can no longer be cancelled."
+msgstr "Esta reserva ya no se puede cancelar."
+
+#: includes/class-bookings.php:594
+msgid "This class has already started."
+msgstr "Esta clase ya empezó."
+
+#: includes/class-bookings.php:631
+msgid "Private session credit"
+msgstr "Crédito de sesión privada"
+
+#: includes/class-bookings.php:631
+msgid "Online class credit"
+msgstr "Crédito de clase en línea"
+
+#: includes/class-bookings.php:631
+#: includes/class-bookings.php:667
+#: includes/class-passes.php:14
+msgid "Class credit"
+msgstr "Crédito de clase"
+
+#: includes/class-bookings.php:774
+msgid "Awaiting payment"
+msgstr "Pendiente de pago"
+
+#: includes/class-bookings.php:776
+msgid "Attended"
+msgstr "Asistió"
+
+#: includes/class-bookings.php:779
+msgid "Late cancel"
+msgstr "Cancelación tardía"
+
+#: includes/class-bookings.php:780
+msgid "Not completed"
+msgstr "No completado"
+
+#: includes/class-bookings.php:787
+msgid "Pays at the studio"
+msgstr "Paga en el estudio"
+
+#: includes/class-bookings.php:788
+#: includes/class-email-templates.php:121
+#: includes/class-orders.php:204
+msgid "Membership"
+msgstr "Membresía"
+
+#: includes/class-bookings.php:789
+msgid "Card"
+msgstr "Tarjeta"
+
+#: includes/class-bookings.php:790
+#: includes/class-app-api.php:330
+#: includes/helpers.php:173
+msgid "Free"
+msgstr "Gratis"
+
+#: includes/class-bookings.php:791
+msgid "Cash"
+msgstr "Efectivo"
+
+#: includes/class-bookings.php:793
+msgid "Added by studio"
+msgstr "Añadido por el estudio"
+
+#: includes/class-security.php:48
+msgid "Too many failed attempts. Please wait 15 minutes, or reset your password."
+msgstr "Demasiados intentos fallidos. Espera 15 minutos o restablece tu contraseña."
+
+#: includes/class-email-templates.php:27
+msgid "Booking confirmation"
+msgstr ""
+
+#: includes/class-email-templates.php:27
+msgid "Right after booking or paying; with a calendar file and the join link for online"
+msgstr ""
+
+#: includes/class-email-templates.php:29
+msgid "Guests added"
+msgstr "Invitados añadidos"
+
+#: includes/class-email-templates.php:29
+msgid "When someone adds guests to their booking later"
+msgstr ""
+
+#: includes/class-email-templates.php:31
+msgid "Invitation to a guest"
+msgstr ""
+
+#: includes/class-email-templates.php:31
+msgid "To a guest who was given an email address"
+msgstr ""
+
+#: includes/class-email-templates.php:33
+msgid "Booking cancelled by the customer"
+msgstr ""
+
+#: includes/class-email-templates.php:33
+msgid "When someone cancels their booking or removes a guest"
+msgstr ""
+
+#: includes/class-email-templates.php:35
+msgid "Class cancelled by the studio"
+msgstr ""
+
+#: includes/class-email-templates.php:35
+msgid "When you cancel a class or a booking; the reason you type is added"
+msgstr ""
+
+#: includes/class-email-templates.php:37
+msgid "Cancellation to a guest"
+msgstr ""
+
+#: includes/class-email-templates.php:37
+msgid "To a guest with an email when their spot is cancelled"
+msgstr ""
+
+#: includes/class-email-templates.php:39
+msgid "Class cancelled: not enough people"
+msgstr ""
+
+#: includes/class-email-templates.php:39
+msgid "When a class is cancelled automatically because fewer than the minimum signed up; with other dates to book"
+msgstr ""
+
+#: includes/class-email-templates.php:41
+msgid "Bring a friend (class needs more people)"
+msgstr ""
+
+#: includes/class-email-templates.php:41
+msgid "Before the decision time, when a class has fewer people than its minimum (hours set under Locations)"
+msgstr ""
+
+#: includes/class-email-templates.php:43
+msgid "Class time or place changed"
+msgstr ""
+
+#: includes/class-email-templates.php:43
+msgid "When you move a class in the calendar and tick \"email the people booked\""
+msgstr ""
+
+#: includes/class-email-templates.php:45
+msgid "Moved in from the waitlist"
+msgstr ""
+
+#: includes/class-email-templates.php:45
+msgid "When a spot opens and someone with a pass or membership is booked in automatically"
+msgstr ""
+
+#: includes/class-email-templates.php:47
+msgid "A spot opened (waitlist)"
+msgstr ""
+
+#: includes/class-email-templates.php:47
+msgid "When a spot opens for someone on the waitlist who can't be booked in automatically"
+msgstr ""
+
+#: includes/class-email-templates.php:50
+msgid "Before the class, at the times set under Reminders"
+msgstr ""
+
+#: includes/class-email-templates.php:52
+msgid "Online: link before the class"
+msgstr ""
+
+#: includes/class-email-templates.php:52
+msgid "To everyone joining online, shortly before the class starts"
+msgstr ""
+
+#: includes/class-email-templates.php:54
+msgid "When unused classes on a pass are about to expire (days set under Reminders)"
+msgstr ""
+
+#: includes/class-email-templates.php:57
+msgid "Welcome (new account)"
+msgstr ""
+
+#: includes/class-email-templates.php:57
+msgid "When someone creates an account"
+msgstr ""
+
+#: includes/class-email-templates.php:59
+msgid "Pass bought"
+msgstr ""
+
+#: includes/class-email-templates.php:59
+msgid "After buying a class pass"
+msgstr ""
+
+#: includes/class-email-templates.php:61
+msgid "Gift card to the recipient"
+msgstr ""
+
+#: includes/class-email-templates.php:61
+msgid "To the person who receives a gift card"
+msgstr ""
+
+#: includes/class-email-templates.php:63
+msgid "Gift card receipt"
+msgstr ""
+
+#: includes/class-email-templates.php:63
+msgid "To the buyer of a gift card"
+msgstr ""
+
+#: includes/class-email-templates.php:66
+msgid "Birthday gift code"
+msgstr ""
+
+#: includes/class-email-templates.php:66
+msgid "On the birthday of customers who added it to their profile (percentage and days under Coupons & rewards)"
+msgstr ""
+
+#: includes/class-email-templates.php:68
+msgid "Loyalty draw: the winner"
+msgstr ""
+
+#: includes/class-email-templates.php:68
+msgid "To the customer whose ticket was drawn"
+msgstr ""
+
+#: includes/class-email-templates.php:70
+msgid "Loyalty draw: newsletter to everyone"
+msgstr ""
+
+#: includes/class-email-templates.php:70
+msgid "Sent to the newsletter subscribers after the draw (no names); the heading is the preview line"
+msgstr ""
+
+#: includes/class-email-templates.php:73
+msgid "Private request received"
+msgstr ""
+
+#: includes/class-email-templates.php:73
+msgid "When someone sends a private session request"
+msgstr ""
+
+#: includes/class-email-templates.php:75
+msgid "Private session offer"
+msgstr ""
+
+#: includes/class-email-templates.php:75
+msgid "When you send an offer with a time and price"
+msgstr ""
+
+#: includes/class-email-templates.php:77
+msgid "Private request declined"
+msgstr ""
+
+#: includes/class-email-templates.php:77
+msgid "When you decline a request; your message is added"
+msgstr ""
+
+#: includes/class-email-templates.php:80
+msgid "Membership started"
+msgstr ""
+
+#: includes/class-email-templates.php:80
+msgid "When a membership becomes active"
+msgstr ""
+
+#: includes/class-email-templates.php:82
+msgid "Membership will end"
+msgstr ""
+
+#: includes/class-email-templates.php:82
+msgid "When a membership is cancelled at the end of the period"
+msgstr ""
+
+#: includes/class-email-templates.php:84
+msgid "Membership ended"
+msgstr "Membresía terminada"
+
+#: includes/class-email-templates.php:84
+msgid "When a membership has ended"
+msgstr ""
+
+#: includes/class-email-templates.php:86
+#: includes/class-emails.php:480
+msgid "Membership payment failed"
+msgstr ""
+
+#: includes/class-email-templates.php:86
+msgid "When a monthly payment is declined"
+msgstr ""
+
+#: includes/class-email-templates.php:89
+#: includes/class-emails.php:555
+msgid "New payment"
+msgstr ""
+
+#: includes/class-email-templates.php:89
+msgid "Every payment received"
+msgstr ""
+
+#: includes/class-email-templates.php:90
+#: includes/class-emails.php:433
+msgid "New private request"
+msgstr ""
+
+#: includes/class-email-templates.php:90
+msgid "Every private session request"
+msgstr ""
+
+#: includes/class-email-templates.php:91
+msgid "Customer cancellations"
+msgstr ""
+
+#: includes/class-email-templates.php:91
+msgid "When a customer cancels"
+msgstr ""
+
+#: includes/class-email-templates.php:92
+msgid "New, cancelled and failed memberships"
+msgstr ""
+
+#: includes/class-email-templates.php:93
+msgid "Minimum number of people"
+msgstr ""
+
+#: includes/class-email-templates.php:93
+msgid "At the decision time: the class is on, or it was cancelled for too few people"
+msgstr ""
+
+#: includes/class-email-templates.php:94
+msgid "Problems that need you"
+msgstr ""
+
+#: includes/class-email-templates.php:94
+msgid "A class over capacity, a Zoom meeting that could not be created"
+msgstr ""
+
+#: includes/class-email-templates.php:119
+msgid "Account, passes and gifts"
+msgstr ""
+
+#: includes/class-email-templates.php:122
+msgid "Notifications to the studio"
+msgstr ""
+
+#: includes/class-orders.php:189
+#: includes/class-memberships.php:380
+msgid "Checkout started"
+msgstr "Pago iniciado"
+
+#: includes/class-orders.php:191
+msgid "Abandoned"
+msgstr "Abandonado"
+
+#: includes/class-orders.php:192
+msgid "Failed"
+msgstr "Fallido"
+
+#: includes/class-orders.php:193
+msgid "Refunded"
+msgstr "Reembolsado"
+
+#: includes/class-orders.php:194
+msgid "Partly refunded"
+msgstr "Reembolsado en parte"
+
+#: includes/class-orders.php:202
+#: includes/class-frontend.php:1342
+#: includes/class-frontend.php:1347
+msgid "Gift card"
+msgstr "Tarjeta de regalo"
+
+#: includes/class-orders.php:203
+#: includes/class-schedule.php:373
+msgid "Private session"
+msgstr "Sesión privada"
+
+#: includes/class-app-api.php:322
+#: includes/class-frontend.php:537
+msgid "%d left this period"
+msgstr "quedan %d en este periodo"
+
+#: includes/class-app-api.php:325
+#: includes/class-frontend.php:187
+msgid "%d online class"
+msgid_plural "%d online classes"
+msgstr[0] "%d clase en línea"
+msgstr[1] "%d clases en línea"
+
+#: includes/class-app-api.php:328
+#: includes/class-frontend.php:467
+#: includes/class-frontend.php:548
+msgid "Give by card"
+msgstr "Donar con tarjeta"
+
+#: includes/class-app-api.php:328
+#: includes/class-frontend.php:548
+msgid "Pay by card (online ticket)"
+msgstr "Pagar con tarjeta (entrada en línea)"
+
+#: includes/class-app-api.php:328
+#: includes/class-frontend.php:467
+msgid "Pay by card"
+msgstr "Pagar con tarjeta"
+
+#: includes/class-app-api.php:330
+#: includes/class-frontend.php:557
+msgid "Reserve my spot"
+msgstr "Reservar mi lugar"
+
+#: includes/class-app-api.php:333
+#: includes/class-frontend.php:385
+msgid "Give at the studio"
+msgstr "Donar en el estudio"
+
+#: includes/class-app-api.php:375
+#: includes/class-frontend.php:749
+msgid "Add an email for each online guest, so they get their own link to join."
+msgstr "Añade un email para cada invitado en línea, así recibe su propio enlace."
+
+#: includes/class-app-api.php:383
+#: includes/class-frontend.php:372
+msgid "The minimum is %s per person."
+msgstr "El mínimo es %s por persona."
+
+#: includes/class-app-api.php:410
+#: includes/class-frontend.php:734
+msgid "(live online)"
+msgstr "(en vivo en línea)"
+
+#: includes/class-app-api.php:410
+#: includes/class-frontend.php:745
+msgid "(donation)"
+msgstr "(donativo)"
+
+#: includes/class-app-api.php:414
+#: includes/class-frontend.php:766
+#: includes/class-frontend.php:811
+msgid "Guest ticket: %s"
+msgstr "Entrada de invitado: %s"
+
+#: includes/class-app-api.php:422
+#: includes/class-frontend.php:833
+#: includes/class-frontend.php:854
+msgid "(+%d guest)"
+msgid_plural "(+%d guests)"
+msgstr[0] "(+%d invitado)"
+msgstr[1] "(+%d invitados)"
+
+#: includes/class-app-api.php:492
+#: includes/class-frontend.php:935
+msgid "Cancelled. The class is back on your pass."
+msgstr "Cancelada. La clase volvió a tu bono."
+
+#: includes/class-app-api.php:494
+#: includes/class-frontend.php:938
+msgid "Cancelled. It won't count towards your membership."
+msgstr "Cancelada. No cuenta para tu membresía."
+
+#: includes/class-app-api.php:496
+#: includes/class-frontend.php:939
+msgid "Cancelled."
+msgstr "Cancelada."
+
+#: includes/helpers.php:170
+#: includes/class-frontend.php:113
+msgid "By donation"
+msgstr "Por donativo"
+
+#: includes/helpers.php:187
+msgid "Join our Facebook group: class news, photos and a friendly community"
+msgstr "Únete a nuestro grupo de Facebook: noticias de clases, fotos y una comunidad amable"
+
+#: includes/class-passes.php:135
+msgid "Online classes (from %s)"
+msgstr "Clases en línea (desde %s)"
+
+#: includes/class-passes.php:167
+msgid "Returned class credit"
+msgstr "Crédito de clase devuelto"
+
+#: includes/class-frontend.php:82
+msgid "No group classes today. Private sessions are available on request."
+msgstr "Hoy no hay clases grupales. Las sesiones privadas están disponibles a pedido."
+
+#: includes/class-frontend.php:98
+#: includes/class-frontend.php:447
+msgid "You're booked"
+msgstr "Tienes tu reserva"
+
+#: includes/class-frontend.php:100
+msgid "Waitlist #%d"
+msgstr "Lista de espera #%d"
+
+#: includes/class-frontend.php:102
+msgid "Booking closed"
+msgstr "Reservas cerradas"
+
+#: includes/class-frontend.php:104
+#: includes/class-frontend.php:527
+msgid "Join the waitlist"
+msgstr "Unirme a la lista de espera"
+
+#: includes/class-frontend.php:108
+#: includes/class-frontend.php:281
+#: includes/class-frontend.php:506
+msgid "Full"
+msgstr "Completa"
+
+#: includes/class-frontend.php:108
+#: includes/class-frontend.php:281
+#: includes/class-frontend.php:506
+msgid "%d spot left"
+msgid_plural "%d spots left"
+msgstr[0] "queda %d lugar"
+msgstr[1] "quedan %d lugares"
+
+#: includes/class-frontend.php:112
+msgid "+ Live online"
+msgstr "+ En vivo en línea"
+
+#: includes/class-frontend.php:114
+msgid "Taught in %s"
+msgstr "Se imparte en %s"
+
+#: includes/class-frontend.php:118
+msgid "%d min"
+msgstr "%d min"
+
+#: includes/class-frontend.php:127
+msgid "New dates are coming soon."
+msgstr "Pronto habrá nuevas fechas."
+
+#: includes/class-frontend.php:136
+msgid "The next events will be announced here and on Instagram first."
+msgstr "Los próximos eventos se anunciarán primero aquí y en Instagram."
+
+#: includes/class-frontend.php:144
+msgid "Full, waitlist open"
+msgstr "Completa, lista de espera abierta"
+
+#: includes/class-frontend.php:160
+msgid "Drop-in class"
+msgstr "Clase suelta"
+
+#: includes/class-frontend.php:160
+msgid "per class"
+msgstr "por clase"
+
+#: includes/class-frontend.php:160
+msgid "Any group class in person"
+msgstr "Cualquier clase grupal presencial"
+
+#: includes/class-frontend.php:160
+msgid "Online classes: %s"
+msgstr "Clases en línea: %s"
+
+#: includes/class-frontend.php:160
+msgid "Bring friends: add guests when you book"
+msgstr "Trae amigos: añade invitados al reservar"
+
+#: includes/class-frontend.php:160
+msgid "Pay online or at the studio"
+msgstr "Paga en línea o en el estudio"
+
+#: includes/class-frontend.php:169
+#: includes/class-frontend.php:1253
+msgid "Request a private session"
+msgstr "Solicitar sesión privada"
+
+#: includes/class-frontend.php:170
+#: includes/class-frontend.php:1272
+msgid "%d minutes"
+msgstr "%d minutos"
+
+#: includes/class-frontend.php:173
+msgid "%1$d minutes: %2$s"
+msgstr "%1$d minutos: %2$s"
+
+#: includes/class-frontend.php:177
+msgid "Online: %s (60 minutes)"
+msgstr "En línea: %s (60 minutos)"
+
+#: includes/class-frontend.php:180
+msgid "First session: plan about %d extra minutes to talk through your goals"
+msgstr "Primera sesión: cuenta con unos %d minutos extra para hablar de tus objetivos"
+
+#: includes/class-frontend.php:183
+#: includes/class-frontend.php:623
+msgid "Join"
+msgstr "Unirme"
+
+#: includes/class-frontend.php:186
+msgid "Claim the intro offer"
+msgstr "Quiero la oferta de bienvenida"
+
+#: includes/class-frontend.php:186
+msgid "Buy now"
+msgstr "Comprar"
+
+#: includes/class-frontend.php:187
+msgid "per pack"
+msgstr "por paquete"
+
+#: includes/class-frontend.php:189
+msgid "Online classes: 1 class = %d online"
+msgstr "Clases en línea: 1 clase = %d en línea"
+
+#: includes/class-frontend.php:195
+msgid "Teams & companies"
+msgstr "Equipos y empresas"
+
+#: includes/class-frontend.php:195
+msgid "Custom"
+msgstr "A medida"
+
+#: includes/class-frontend.php:195
+msgid "quote"
+msgstr "presupuesto"
+
+#: includes/class-frontend.php:195
+msgid "On-site, outdoors or online"
+msgstr "En sitio, al aire libre o en línea"
+
+#: includes/class-frontend.php:195
+msgid "One-off or weekly"
+msgstr "Puntual o semanal"
+
+#: includes/class-frontend.php:195
+msgid "Sports teams and clubs too"
+msgstr "También equipos y clubes deportivos"
+
+#: includes/class-frontend.php:195
+msgid "Request a proposal"
+msgstr "Solicitar propuesta"
+
+#: includes/class-frontend.php:198
+msgid "Drop in, or save with a pass. Use passes in the studio or online."
+msgstr "Ven a una clase suelta o ahorra con un bono. Úsalo en el estudio o en línea."
+
+#: includes/class-frontend.php:199
+msgid "A monthly rhythm, billed automatically. Cancel any time."
+msgstr "Un ritmo mensual, con cobro automático. Cancela cuando quieras."
+
+#: includes/class-frontend.php:200
+msgid "Private & teams"
+msgstr "Privado y equipos"
+
+#: includes/class-frontend.php:200
+msgid "One-on-one sessions, packs, and classes for your team."
+msgstr "Sesiones individuales, paquetes y clases para tu equipo."
+
+#: includes/class-frontend.php:213
+msgid "Most popular"
+msgstr "Más popular"
+
+#: includes/class-frontend.php:263
+msgid "Choose a class from the timetable below. Beginners are welcome in every class."
+msgstr "Elige una clase del horario de abajo. Principiantes bienvenidos en todas las clases."
+
+#: includes/class-frontend.php:272
+msgid "Online, live. The link is in your confirmation email and your account."
+msgstr "En línea, en vivo. El enlace está en tu email de confirmación y en tu cuenta."
+
+#: includes/class-frontend.php:277
+msgid "Also streamed live: join from home if you prefer."
+msgstr "También en vivo: únete desde casa si prefieres."
+
+#: includes/class-frontend.php:281
+msgid "Studio:"
+msgstr "Estudio:"
+
+#: includes/class-frontend.php:283
+msgid "Studio + live online"
+msgstr "Estudio + en vivo en línea"
+
+#: includes/class-frontend.php:293
+msgid "About %s"
+msgstr "Sobre %s"
+
+#: includes/class-frontend.php:309
+msgid "Log in or create an account"
+msgstr "Inicia sesión o crea una cuenta"
+
+#: includes/class-frontend.php:316
+#: includes/class-frontend.php:998
+#: includes/class-frontend.php:1320
+msgid "Participation agreement"
+msgstr "Acuerdo de participación"
+
+#: includes/class-frontend.php:317
+#: includes/class-frontend.php:999
+msgid "I have read and accept the participation agreement."
+msgstr "He leído y acepto el acuerdo de participación."
+
+#: includes/class-frontend.php:328
+msgid "Guest %d"
+msgstr "Invitado %d"
+
+#: includes/class-frontend.php:330
+msgid "Email (optional, for their invite)"
+msgstr "Email (opcional, para su invitación)"
+
+#: includes/class-frontend.php:331
+msgid "Remove guest"
+msgstr "Quitar invitado"
+
+#: includes/class-frontend.php:333
+msgid "Bringing friends?"
+msgstr "¿Traes amigos?"
+
+#: includes/class-frontend.php:334
+msgid "Add up to %d guests. Each guest takes one spot and is paid the same way as your booking."
+msgstr "Añade hasta %d invitados. Cada invitado ocupa un lugar y se paga igual que tu reserva."
+
+#: includes/class-frontend.php:335
+msgid "+ Add a guest"
+msgstr "+ Añadir invitado"
+
+#: includes/class-frontend.php:356
+msgid "Pay what you like"
+msgstr "Paga lo que quieras"
+
+#: includes/class-frontend.php:360
+msgid "Other"
+msgstr "Otro"
+
+#: includes/class-frontend.php:361
+msgid "Your amount"
+msgstr "Tu importe"
+
+#: includes/class-frontend.php:362
+msgid "This class is by donation: give what feels right, from %s per person. Online by card or at the studio, whichever you prefer."
+msgstr "Esta clase es por donativo: da lo que te parezca justo, desde %s por persona. En línea con tarjeta o en el estudio, como prefieras."
+
+#: includes/class-frontend.php:392
+msgid "Your gift: %1$s with code %2$s%3$s. It's filled in for you."
+msgstr "Tu regalo: %1$s con el código %2$s%3$s. Ya está aplicado."
+
+#: includes/class-frontend.php:392
+msgid "(until %s)"
+msgstr "(hasta el %s)"
+
+#: includes/class-frontend.php:393
+msgid "Have a discount code?"
+msgstr "¿Tienes un código de descuento?"
+
+#: includes/class-frontend.php:394
+msgid "Code (for card payments)"
+msgstr "Código (para pagos con tarjeta)"
+
+#: includes/class-frontend.php:410
+msgid "Log in to see and confirm your private session."
+msgstr "Inicia sesión para ver y confirmar tu sesión privada."
+
+#: includes/class-frontend.php:413
+msgid "This class could not be found. Please pick another from the timetable."
+msgstr "No se encontró esta clase. Elige otra del horario."
+
+#: includes/class-frontend.php:418
+msgid "You need an account to book, so you can manage or cancel your spot, bring guests and keep track of your passes. It takes a minute."
+msgstr "Necesitas una cuenta para reservar, así puedes gestionar o cancelar tu lugar, traer invitados y ver tus bonos. Es un minuto."
+
+#: includes/class-frontend.php:435
+msgid "Online classes cost less: one class from your pass covers %d online classes, and the rest stay on your account."
+msgstr "Las clases en línea cuestan menos: una clase de tu bono cubre %d clases en línea y el resto queda en tu cuenta."
+
+#: includes/class-frontend.php:447
+msgid "You're joining live online. The link is here and in your account; it's also in your reminder email."
+msgstr "Te unes en vivo en línea. El enlace está aquí y en tu cuenta; también en tu email de recordatorio."
+
+#: includes/class-frontend.php:447
+msgid "See you on the mat. You'll find this booking in your account."
+msgstr "Nos vemos en el mat. Encontrarás esta reserva en tu cuenta."
+
+#: includes/class-frontend.php:450
+#: includes/class-emails.php:190
+#: includes/class-emails.php:584
+msgid "Join the live class"
+msgstr "Entrar a la clase en vivo"
+
+#: includes/class-frontend.php:453
+msgid "Your guest: %s"
+msgid_plural "Your guests: %s"
+msgstr[0] "Tu invitado: %s"
+msgstr[1] "Tus invitados: %s"
+
+#: includes/class-frontend.php:457
+msgid "To pay at the studio: %s."
+msgstr "A pagar en el estudio: %s."
+
+#: includes/class-frontend.php:459
+#: includes/class-frontend.php:670
+#: includes/class-emails.php:521
+msgid "My bookings"
+msgstr "Mis reservas"
+
+#: includes/class-frontend.php:464
+msgid "From my pass"
+msgstr "De mi bono"
+
+#: includes/class-frontend.php:464
+msgid "(%d left)"
+msgstr "(quedan %d)"
+
+#: includes/class-frontend.php:464
+#: includes/class-frontend.php:544
+msgid "1 class each"
+msgstr "1 clase por persona"
+
+#: includes/class-frontend.php:474
+msgid "Reserve spots"
+msgstr "Reservar lugares"
+
+#: includes/class-frontend.php:477
+msgid "Bring guests"
+msgstr "Traer invitados"
+
+#: includes/class-frontend.php:481
+#: includes/class-frontend.php:573
+msgid "Payment option"
+msgstr "Forma de pago"
+
+#: includes/class-frontend.php:482
+msgid "Add guests"
+msgstr "Añadir invitados"
+
+#: includes/class-frontend.php:495
+msgid "Your payment wasn't finished"
+msgstr "Tu pago no se completó"
+
+#: includes/class-frontend.php:496
+msgid "You started paying for this class but didn't complete it, so you're not booked yet and nothing was charged."
+msgstr "Empezaste a pagar esta clase pero no terminaste, así que aún no tienes reserva y no se cobró nada."
+
+#: includes/class-frontend.php:497
+#: includes/class-frontend.php:1357
+msgid "Continue to payment"
+msgstr "Continuar al pago"
+
+#: includes/class-frontend.php:498
+msgid "Or choose again below: the unfinished payment is cancelled automatically."
+msgstr "O elige de nuevo abajo: el pago sin terminar se cancela automáticamente."
+
+#: includes/class-frontend.php:503
+msgid "How would you like to join?"
+msgstr "¿Cómo te gustaría unirte?"
+
+#: includes/class-frontend.php:504
+msgid "In the studio"
+msgstr "En el estudio"
+
+#: includes/class-frontend.php:514
+msgid "Online spots are taken"
+msgstr "Los lugares en línea están ocupados"
+
+#: includes/class-frontend.php:514
+msgid "All online spots for this class are booked."
+msgstr "Todos los lugares en línea de esta clase están reservados."
+
+#: includes/class-frontend.php:518
+msgid "The studio is full"
+msgstr "El estudio está lleno"
+
+#: includes/class-frontend.php:518
+msgid "This class is full"
+msgstr "Esta clase está llena"
+
+#: includes/class-frontend.php:520
+msgid "Join live online instead"
+msgstr "Únete en vivo en línea"
+
+#: includes/class-frontend.php:523
+msgid "You're number %d on the waitlist. If a spot opens and you have a pass or membership, you're booked in automatically and we email you. Otherwise we email you so you can book first."
+msgstr "Eres el número %d en la lista de espera. Si se libera un lugar y tienes bono o membresía, te reservamos automáticamente y te avisamos por email. Si no, te escribimos para que reserves primero."
+
+#: includes/class-frontend.php:524
+msgid "Leave the waitlist"
+msgstr "Salir de la lista de espera"
+
+#: includes/class-frontend.php:526
+msgid "Join the waitlist. If a spot opens and you have a pass or membership, you're booked in automatically. Otherwise we email you straight away."
+msgstr "Únete a la lista de espera. Si se libera un lugar y tienes bono o membresía, te reservamos automáticamente. Si no, te escribimos enseguida."
+
+#: includes/class-frontend.php:537
+msgid "unlimited"
+msgstr "ilimitado"
+
+#: includes/class-frontend.php:538
+msgid "Use my membership (%s)"
+msgstr "Usar mi membresía (%s)"
+
+#: includes/class-frontend.php:538
+msgid "Included"
+msgstr "Incluido"
+
+#: includes/class-frontend.php:538
+msgid "Guests are paid from your pass if you have enough classes, otherwise by card."
+msgstr "Los invitados se pagan con tu bono si tienes suficientes clases; si no, con tarjeta."
+
+#: includes/class-frontend.php:542
+msgid "Use my pass (%d online class)"
+msgid_plural "Use my pass (%d online classes)"
+msgstr[0] "Usar mi bono (%d clase en línea)"
+msgstr[1] "Usar mi bono (%d clases en línea)"
+
+#: includes/class-frontend.php:543
+msgid "Use my pass (%d class left)"
+msgid_plural "Use my pass (%d classes left)"
+msgstr[0] "Usar mi bono (queda %d clase)"
+msgstr[1] "Usar mi bono (quedan %d clases)"
+
+#: includes/class-frontend.php:544
+msgid "1 online class each"
+msgstr "1 clase en línea por persona"
+
+#: includes/class-frontend.php:548
+msgid "Pay for this session"
+msgstr "Pagar esta sesión"
+
+#: includes/class-frontend.php:548
+msgid "Pay by card (drop-in)"
+msgstr "Pagar con tarjeta (clase suelta)"
+
+#: includes/class-frontend.php:564
+msgid "Buy %s and use it for this booking"
+msgstr "Compra %s y úsalo para esta reserva"
+
+#: includes/class-frontend.php:568
+msgid "How would you like to book?"
+msgstr "¿Cómo quieres reservar?"
+
+#: includes/class-frontend.php:572
+msgid "People in this booking:"
+msgstr "Personas en esta reserva:"
+
+#: includes/class-frontend.php:587
+msgid "Online payment is being set up. To book now, send a message and I'll hold your spot."
+msgstr "El pago en línea se está configurando. Para reservar ahora, envía un mensaje y te guardo el lugar."
+
+#: includes/class-frontend.php:591
+msgid "Continue"
+msgstr "Continuar"
+
+#: includes/class-frontend.php:592
+#: includes/class-frontend.php:635
+msgid "Card payments are processed securely by Stripe. Apple Pay and Google Pay are accepted."
+msgstr "Los pagos con tarjeta los procesa Stripe de forma segura. Se aceptan Apple Pay y Google Pay."
+
+#: includes/class-frontend.php:600
+msgid "This pass is not available."
+msgstr "Este bono no está disponible."
+
+#: includes/class-frontend.php:611
+msgid "Your membership lives in your account, where you book classes, see renewals and manage billing."
+msgstr "Tu membresía está en tu cuenta, donde reservas clases, ves las renovaciones y gestionas los pagos."
+
+#: includes/class-frontend.php:611
+msgid "Your pass lives in your account, where you can see how many classes are left and book with one click."
+msgstr "Tu bono está en tu cuenta, donde ves cuántas clases quedan y reservas con un clic."
+
+#: includes/class-frontend.php:614
+msgid "The intro offer is for first-time students. Have a look at the class passes instead."
+msgstr "La oferta de bienvenida es para quienes vienen por primera vez. Mira los bonos de clases."
+
+#: includes/class-frontend.php:617
+msgid "You already have an active membership."
+msgstr "Ya tienes una membresía activa."
+
+#: includes/class-frontend.php:617
+msgid "Manage it in your account"
+msgstr "Gestiónala en tu cuenta"
+
+#: includes/class-frontend.php:620
+msgid "Online payment is being set up. Please send a message to buy a pass."
+msgstr "El pago en línea se está configurando. Envía un mensaje para comprar un bono."
+
+#: includes/class-frontend.php:624
+msgid "You pay %1$s today, then %1$s %2$s until you cancel. Cancel any time in your account; you keep access until the end of the paid period."
+msgstr "Hoy pagas %1$s y luego %1$s %2$s hasta que canceles. Cancela cuando quieras en tu cuenta; mantienes el acceso hasta el final del periodo pagado."
+
+#: includes/class-frontend.php:626
+msgid "Join for %s"
+msgstr "Unirme por %s"
+
+#: includes/class-frontend.php:627
+msgid "Recurring payments are processed securely by Stripe. Update your card or cancel from your account."
+msgstr "Los pagos recurrentes los procesa Stripe de forma segura. Actualiza tu tarjeta o cancela desde tu cuenta."
+
+#: includes/class-frontend.php:630
+msgid "Buy this pass"
+msgstr "Comprar este bono"
+
+#: includes/class-frontend.php:631
+msgid "After paying, book any class from the timetable in one click. You can use your pass for guests you bring, too."
+msgstr "Después de pagar, reserva cualquier clase del horario con un clic. También puedes usar el bono para tus invitados."
+
+#: includes/class-frontend.php:634
+msgid "Pay %s"
+msgstr "Pagar %s"
+
+#: includes/class-frontend.php:643
+msgid "This link is not valid."
+msgstr "Este enlace no es válido."
+
+#: includes/class-frontend.php:651
+msgid "Payment cancelled"
+msgstr "Pago cancelado"
+
+#: includes/class-frontend.php:651
+msgid "Nothing was charged and your spot was released."
+msgstr "No se cobró nada y tu lugar quedó libre."
+
+#: includes/class-frontend.php:651
+msgid "Try again"
+msgstr "Intentar de nuevo"
+
+#: includes/class-frontend.php:654
+msgid "Payment processing"
+msgstr "Procesando el pago"
+
+#: includes/class-frontend.php:654
+msgid "Your payment is being confirmed. You'll get an email as soon as it goes through, and it will show in your account."
+msgstr "Estamos confirmando tu pago. Recibirás un email en cuanto se complete y aparecerá en tu cuenta."
+
+#: includes/class-frontend.php:659
+msgid "Back to the app"
+msgstr "Volver a la app"
+
+#: includes/class-frontend.php:666
+msgid "Guest added!"
+msgid_plural "Guests added!"
+msgstr[0] "¡Invitado añadido!"
+msgstr[1] "¡Invitados añadidos!"
+
+#: includes/class-frontend.php:666
+msgid "You're booked!"
+msgstr "¡Tienes tu reserva!"
+
+#: includes/class-frontend.php:666
+msgid "%1$s on %2$s. A confirmation with a calendar invite is on its way to your inbox."
+msgstr "%1$s el %2$s. Te enviamos una confirmación con invitación de calendario."
+
+#: includes/class-frontend.php:668
+msgid "Guest: %s"
+msgid_plural "Guests: %s"
+msgstr[0] "Invitado: %s"
+msgstr[1] "Invitados: %s"
+
+#: includes/class-frontend.php:672
+msgid "Gift sent!"
+msgstr "¡Regalo enviado!"
+
+#: includes/class-frontend.php:672
+msgid "We emailed the gift card to %s and sent you a receipt."
+msgstr "Enviamos la tarjeta de regalo a %s y a ti el recibo."
+
+#: includes/class-frontend.php:674
+msgid "Welcome, member!"
+msgstr "¡Bienvenida a la membresía!"
+
+#: includes/class-frontend.php:674
+msgid "Your membership is active. Choose \"Use my membership\" when you book a class."
+msgstr "Tu membresía está activa. Elige \"Usar mi membresía\" al reservar una clase."
+
+#: includes/class-frontend.php:674
+msgid "My membership"
+msgstr "Mi membresía"
+
+#: includes/class-frontend.php:676
+msgid "Your pass is ready"
+msgstr "Tu bono está listo"
+
+#: includes/class-frontend.php:676
+msgid "Book any class from the timetable in one click."
+msgstr "Reserva cualquier clase del horario con un clic."
+
+#: includes/class-frontend.php:679
+msgid "View receipt"
+msgstr "Ver recibo"
+
+#: includes/class-frontend.php:686
+msgid "Add to calendar"
+msgstr "Añadir al calendario"
+
+#: includes/class-frontend.php:701
+#: includes/class-memberships.php:149
+msgid "Please accept the participation agreement to continue."
+msgstr "Acepta el acuerdo de participación para continuar."
+
+#: includes/class-frontend.php:719
+msgid "Your earlier payment for this class went through, so you're already booked."
+msgstr "Tu pago anterior para esta clase se completó, así que ya tienes reserva."
+
+#: includes/class-frontend.php:763
+#: includes/class-frontend.php:808
+msgid "Guest ticket: %1$s, %2$s"
+msgid_plural "Guest tickets (%3$d): %1$s, %2$s"
+msgstr[0] "Entrada de invitado: %1$s, %2$s"
+msgstr[1] "Entradas de invitados (%3$d): %1$s, %2$s"
+
+#: includes/class-frontend.php:772
+msgid "%d guest added."
+msgid_plural "%d guests added."
+msgstr[0] "%d invitado añadido."
+msgstr[1] "%d invitados añadidos."
+
+#: includes/class-frontend.php:845
+#: includes/class-frontend.php:898
+msgid "The intro offer is for first-time students."
+msgstr "La oferta de bienvenida es para quienes vienen por primera vez."
+
+#: includes/class-frontend.php:848
+msgid "%1$s has %2$d classes, which isn't enough for %3$d people. Choose a bigger pass or pay by card."
+msgstr "%1$s tiene %2$d clases, no alcanza para %3$d personas. Elige un bono mayor o paga con tarjeta."
+
+#: includes/class-frontend.php:850
+msgid "Includes your spot in %s"
+msgstr "Incluye tu lugar en %s"
+
+#: includes/class-frontend.php:850
+msgid "and %d guest"
+msgid_plural "and %d guests"
+msgstr[0] "y %d invitado"
+msgstr[1] "y %d invitados"
+
+#: includes/class-frontend.php:936
+msgid "Cancelled. You have a class credit to use for another class."
+msgstr "Cancelada. Tienes un crédito para usar en otra clase."
+
+#: includes/class-frontend.php:937
+msgid "Cancelled. Because it was inside the cancellation window, the class counts as used."
+msgstr "Cancelada. Como fue dentro del plazo de cancelación, la clase cuenta como usada."
+
+#: includes/class-frontend.php:952
+msgid "You left the waitlist."
+msgstr "Saliste de la lista de espera."
+
+#: includes/class-frontend.php:955
+msgid "You're on the waitlist. We'll email you if a spot opens."
+msgstr "Estás en la lista de espera. Te escribiremos si se libera un lugar."
+
+#: includes/class-frontend.php:966
+msgid "Not found."
+msgstr "No encontrado."
+
+#: includes/class-frontend.php:987
+msgid "Password"
+msgstr "Contraseña"
+
+#: includes/class-frontend.php:988
+msgid "Log in"
+msgstr "Entrar"
+
+#: includes/class-frontend.php:989
+msgid "Forgot your password?"
+msgstr "¿Olvidaste tu contraseña?"
+
+#: includes/class-frontend.php:993
+#: includes/class-frontend.php:1306
+msgid "First name"
+msgstr "Nombre"
+
+#: includes/class-frontend.php:994
+#: includes/class-frontend.php:1307
+msgid "Last name"
+msgstr "Apellido"
+
+#: includes/class-frontend.php:996
+msgid "Phone (optional)"
+msgstr "Teléfono (opcional)"
+
+#: includes/class-frontend.php:997
+msgid "Password (8+ characters)"
+msgstr "Contraseña (8+ caracteres)"
+
+#: includes/class-frontend.php:1000
+msgid "Email me the newsletter: new classes and events (a few times a month at most)."
+msgstr "Envíame el boletín: nuevas clases y eventos (unas pocas veces al mes como máximo)."
+
+#: includes/class-frontend.php:1001
+#: includes/class-frontend.php:1316
+msgid "And join our Facebook group"
+msgstr "Y únete a nuestro grupo de Facebook"
+
+#: includes/class-frontend.php:1002
+msgid "Create account"
+msgstr "Crear cuenta"
+
+#: includes/class-frontend.php:1005
+msgid "I'm new here"
+msgstr "Soy nueva aquí"
+
+#: includes/class-frontend.php:1006
+msgid "I have an account"
+msgstr "Ya tengo cuenta"
+
+#: includes/class-frontend.php:1016
+msgid "Book and cancel classes, bring guests, see your passes, membership and receipts, and request private sessions."
+msgstr "Reserva y cancela clases, trae invitados, consulta tus bonos, membresía y recibos, y pide sesiones privadas."
+
+#: includes/class-frontend.php:1025
+msgid "History"
+msgstr "Historial"
+
+#: includes/class-frontend.php:1040
+msgid "Hi, %s"
+msgstr "Hola, %s"
+
+#: includes/class-frontend.php:1045
+msgid "Classes on passes"
+msgstr "Clases en bonos"
+
+#: includes/class-frontend.php:1053
+msgid "Log out"
+msgstr "Salir"
+
+#: includes/class-frontend.php:1062
+msgid "Upcoming bookings"
+msgstr "Próximas reservas"
+
+#: includes/class-frontend.php:1064
+msgid "No upcoming classes yet."
+msgstr "Aún no tienes próximas clases."
+
+#: includes/class-frontend.php:1064
+msgid "See the timetable"
+msgstr "Ver el horario"
+
+#: includes/class-frontend.php:1070
+msgid "Cancel this booking?"
+msgstr "¿Cancelar esta reserva?"
+
+#: includes/class-frontend.php:1070
+msgid "It's inside the cancellation window, so this class will count as used. Cancel anyway?"
+msgstr "Está dentro del plazo de cancelación, así que la clase contará como usada. ¿Cancelar de todos modos?"
+
+#: includes/class-frontend.php:1072
+msgid "Cancel your booking and your guests' spots?"
+msgstr "¿Cancelar tu reserva y los lugares de tus invitados?"
+
+#: includes/class-frontend.php:1072
+msgid "It's inside the cancellation window, so your and your guests' classes count as used. Cancel anyway?"
+msgstr "Está dentro del plazo de cancelación, así que tus clases y las de tus invitados cuentan como usadas. ¿Cancelar de todos modos?"
+
+#: includes/class-frontend.php:1081
+msgid "Remove %s from this class?"
+msgstr "¿Quitar a %s de esta clase?"
+
+#: includes/class-frontend.php:1087
+msgid "+ Guests"
+msgstr "+ Invitados"
+
+#: includes/class-frontend.php:1090
+msgid "Join live online"
+msgstr "Entrar en vivo en línea"
+
+#: includes/class-frontend.php:1090
+msgid "Joining online: the link arrives before the class."
+msgstr "Te unes en línea: el enlace llega antes de la clase."
+
+#: includes/class-frontend.php:1092
+#: includes/class-emails.php:204
+msgid "To pay at the studio: %s"
+msgstr "A pagar en el estudio: %s"
+
+#: includes/class-frontend.php:1093
+msgid "Inside the cancellation window"
+msgstr "Dentro del plazo de cancelación"
+
+#: includes/class-frontend.php:1100
+msgid "Waitlists"
+msgstr "Listas de espera"
+
+#: includes/class-frontend.php:1102
+msgid "You're #%d"
+msgstr "Eres el #%d"
+
+#: includes/class-frontend.php:1103
+msgid "Leave"
+msgstr "Salir"
+
+#: includes/class-frontend.php:1120
+msgid "Your membership"
+msgstr "Tu membresía"
+
+#: includes/class-frontend.php:1122
+msgid "Your last payment didn't go through. Please update your card to keep your membership."
+msgstr "Tu último pago no se completó. Actualiza tu tarjeta para mantener tu membresía."
+
+#: includes/class-frontend.php:1124
+msgid "Classes this period"
+msgstr "Clases en este periodo"
+
+#: includes/class-frontend.php:1124
+msgid "%1$d of %2$d used"
+msgstr "%1$d de %2$d usadas"
+
+#: includes/class-frontend.php:1124
+msgid "%d · unlimited"
+msgstr "%d · ilimitado"
+
+#: includes/class-frontend.php:1125
+msgid "Current period"
+msgstr "Periodo actual"
+
+#: includes/class-frontend.php:1126
+msgid "Ends on"
+msgstr "Termina el"
+
+#: includes/class-frontend.php:1126
+msgid "Renews on"
+msgstr "Se renueva el"
+
+#: includes/class-frontend.php:1131
+msgid "Update card & invoices"
+msgstr "Tarjeta y facturas"
+
+#: includes/class-frontend.php:1132
+msgid "Keep my membership"
+msgstr "Mantener mi membresía"
+
+#: includes/class-frontend.php:1132
+msgid "Cancel membership"
+msgstr "Cancelar membresía"
+
+#: includes/class-frontend.php:1132
+msgid "Your membership will end on %s and won't renew. Continue?"
+msgstr "Tu membresía terminará el %s y no se renovará. ¿Continuar?"
+
+#: includes/class-frontend.php:1133
+msgid "Your membership covers you. Guests you bring are paid from your pass or by card."
+msgstr "Tu membresía te cubre a ti. Tus invitados se pagan con tu bono o con tarjeta."
+
+#: includes/class-frontend.php:1136
+msgid "Become a member"
+msgstr "Hazte miembro"
+
+#: includes/class-frontend.php:1144
+msgid "Memberships are not available right now."
+msgstr "Las membresías no están disponibles ahora."
+
+#: includes/class-frontend.php:1149
+msgid "Earlier memberships"
+msgstr "Membresías anteriores"
+
+#: includes/class-frontend.php:1149
+msgid "Started"
+msgstr "Inicio"
+
+#: includes/class-frontend.php:1149
+#: includes/class-memberships.php:386
+msgid "Ended"
+msgstr "Fin"
+
+#: includes/class-frontend.php:1162
+msgid "Class history"
+msgstr "Historial de clases"
+
+#: includes/class-frontend.php:1162
+msgid "Your past classes will show here."
+msgstr "Aquí aparecerán tus clases pasadas."
+
+#: includes/class-frontend.php:1164
+msgid "Class history (%d)"
+msgstr "Historial de clases (%d)"
+
+#: includes/class-frontend.php:1174
+msgid "Passes and credits"
+msgstr "Bonos y créditos"
+
+#: includes/class-frontend.php:1176
+msgid "No passes yet."
+msgstr "Aún no tienes bonos."
+
+#: includes/class-frontend.php:1181
+msgid "Expired"
+msgstr "Vencido"
+
+#: includes/class-frontend.php:1181
+msgid "Used up"
+msgstr "Agotado"
+
+#: includes/class-frontend.php:1186
+msgid "Use by %s"
+msgstr "Úsalo antes del %s"
+
+#: includes/class-frontend.php:1186
+msgid "No expiry"
+msgstr "Sin vencimiento"
+
+#: includes/class-frontend.php:1191
+msgid "Redeem a gift card"
+msgstr "Canjear tarjeta de regalo"
+
+#: includes/class-frontend.php:1192
+msgid "Gift code"
+msgstr "Código de regalo"
+
+#: includes/class-frontend.php:1193
+msgid "Redeem"
+msgstr "Canjear"
+
+#: includes/class-frontend.php:1196
+msgid "Buy a pass"
+msgstr "Comprar un bono"
+
+#: includes/class-frontend.php:1209
+msgid "Your code"
+msgstr "Tu código"
+
+#: includes/class-frontend.php:1209
+msgid "until %s"
+msgstr "hasta el %s"
+
+#: includes/class-frontend.php:1209
+msgid "filled in when you pay by card"
+msgstr "se aplica al pagar con tarjeta"
+
+#: includes/class-frontend.php:1214
+msgid "ticket"
+msgid_plural "tickets"
+msgstr[0] "boleto"
+msgstr[1] "boletos"
+
+#: includes/class-frontend.php:1215
+msgid "Every class you come to in %1$s is one ticket. On %2$s one ticket is drawn for %3$s."
+msgstr "Cada clase a la que vienes en %1$s es un boleto. El %2$s se sortea un boleto para %3$s."
+
+#: includes/class-frontend.php:1239
+msgid "Your requests"
+msgstr "Tus solicitudes"
+
+#: includes/class-frontend.php:1242
+msgid "Requested %s"
+msgstr "Solicitado el %s"
+
+#: includes/class-frontend.php:1245
+msgid "Confirm and pay"
+msgstr "Confirmar y pagar"
+
+#: includes/class-frontend.php:1247
+msgid "Private session, %d min"
+msgstr "Sesión privada, %d min"
+
+#: includes/class-frontend.php:1272
+msgid "online %s"
+msgstr "en línea %s"
+
+#: includes/class-frontend.php:1276
+msgid "Length"
+msgstr "Duración"
+
+#: includes/class-frontend.php:1277
+msgid "How many people"
+msgstr "Cuántas personas"
+
+#: includes/class-frontend.php:1279
+msgid "Address or area"
+msgstr "Dirección o zona"
+
+#: includes/class-frontend.php:1279
+msgid "e.g. McGregor Blvd, Fort Myers Beach"
+msgstr "p. ej. McGregor Blvd, Fort Myers Beach"
+
+#: includes/class-frontend.php:1280
+msgid "Days and times that suit you"
+msgstr "Días y horarios que te convienen"
+
+#: includes/class-frontend.php:1280
+msgid "e.g. Tuesday or Thursday mornings, or Saturday at sunrise"
+msgstr "p. ej. martes o jueves por la mañana, o sábado al amanecer"
+
+#: includes/class-frontend.php:1281
+msgid "Anything I should know? (goals, injuries, experience)"
+msgstr "¿Algo que deba saber? (objetivos, lesiones, experiencia)"
+
+#: includes/class-frontend.php:1282
+msgid "Send request"
+msgstr "Enviar solicitud"
+
+#: includes/class-frontend.php:1283
+msgid "Nothing is charged now. You'll get a suggested time and price to confirm."
+msgstr "Ahora no se cobra nada. Recibirás un horario y precio sugeridos para confirmar."
+
+#: includes/class-frontend.php:1297
+msgid "Optional. On your birthday you get a %d%% gift code."
+msgstr "Opcional. En tu cumpleaños recibes un código de regalo del %d%%."
+
+#: includes/class-frontend.php:1297
+msgid "Optional."
+msgstr "Opcional."
+
+#: includes/class-frontend.php:1298
+msgid "Birthday"
+msgstr "Cumpleaños"
+
+#: includes/class-frontend.php:1305
+msgid "Your details"
+msgstr "Tus datos"
+
+#: includes/class-frontend.php:1310
+msgid "Your area"
+msgstr "Tu zona"
+
+#: includes/class-frontend.php:1311
+msgid "Emergency contact"
+msgstr "Contacto de emergencia"
+
+#: includes/class-frontend.php:1312
+msgid "Emergency phone"
+msgstr "Teléfono de emergencia"
+
+#: includes/class-frontend.php:1313
+msgid "Injuries, pregnancy or health notes (only Olivia sees this)"
+msgstr "Lesiones, embarazo o notas de salud (solo Olivia lo ve)"
+
+#: includes/class-frontend.php:1315
+msgid "Email me the newsletter: new classes and events"
+msgstr "Envíame el boletín: nuevas clases y eventos"
+
+#: includes/class-frontend.php:1317
+msgid "New password (leave empty to keep the current one)"
+msgstr "Nueva contraseña (déjala vacía para mantener la actual)"
+
+#: includes/class-frontend.php:1322
+msgid "Accepted on %s."
+msgstr "Aceptado el %s."
+
+#: includes/class-frontend.php:1322
+msgid "Read it again"
+msgstr "Leer de nuevo"
+
+#: includes/class-frontend.php:1324
+msgid "Accept"
+msgstr "Aceptar"
+
+#: includes/class-frontend.php:1348
+msgid "Log in or create an account to buy a gift card. Your receipt and the gift code are kept there."
+msgstr "Inicia sesión o crea una cuenta para comprar una tarjeta de regalo. Allí se guardan tu recibo y el código."
+
+#: includes/class-frontend.php:1351
+msgid "Online gift cards are coming soon. Send a message to order one now."
+msgstr "Las tarjetas de regalo en línea llegan pronto. Envía un mensaje para pedir una ahora."
+
+#: includes/class-frontend.php:1353
+msgid "Choose a gift"
+msgstr "Elige un regalo"
+
+#: includes/class-frontend.php:1354
+msgid "Recipient's name"
+msgstr "Nombre de quien recibe"
+
+#: includes/class-frontend.php:1355
+msgid "Recipient's email"
+msgstr "Email de quien recibe"
+
+#: includes/class-frontend.php:1356
+msgid "Personal message (optional)"
+msgstr "Mensaje personal (opcional)"
+
+#: includes/class-frontend.php:1358
+msgid "The gift card is emailed to the recipient right after payment. You get the receipt."
+msgstr "La tarjeta de regalo se envía por email a quien la recibe justo después del pago. Tú recibes el recibo."
+
+#: includes/class-frontend.php:1365
+msgid "Create a free account to request a private session. You'll get a suggested time and price, and confirm with one click."
+msgstr "Crea una cuenta gratis para pedir una sesión privada. Recibirás un horario y precio sugeridos y confirmas con un clic."
+
+#: includes/class-locations.php:153
+#: includes/class-locations.php:157
+msgid "Class is on: %s"
+msgstr "La clase se realiza: %s"
+
+#: includes/class-locations.php:154
+#: includes/class-locations.php:157
+msgid "%1$d person is booked (minimum %2$d), so the class goes ahead."
+msgid_plural "%1$d people are booked (minimum %2$d), so the class goes ahead."
+msgstr[0] "Hay %1$d persona reservada (mínimo %2$d), así que la clase se realiza."
+msgstr[1] "Hay %1$d personas reservadas (mínimo %2$d), así que la clase se realiza."
+
+#: includes/class-locations.php:161
+msgid "Not enough people signed up, so it won't go ahead this time."
+msgstr "No se apuntaron suficientes personas, así que esta vez no se realiza."
+
+#: includes/class-locations.php:164
+#: includes/class-locations.php:168
+msgid "Cancelled automatically: %s"
+msgstr ""
+
+#: includes/class-locations.php:165
+msgid "Only %1$d booked (minimum %2$d). Everyone was emailed with other dates and got their class back."
+msgstr ""
+
+#: includes/class-locations.php:168
+msgid "Only %1$d booked (minimum %2$d), so the class was cancelled and everyone was emailed. No need to come in."
+msgstr ""
+
+#: includes/class-locations.php:239
+msgid "Join another class instead"
+msgstr "Únete a otra clase"
+
+#: includes/class-locations.php:241
+msgid "live online"
+msgstr "en vivo en línea"
+
+#: includes/class-locations.php:241
+msgid "or live online"
+msgstr "o en vivo en línea"
+
+#: includes/class-locations.php:246
+msgid "Tip: bring a friend next time. Booking together helps a class go ahead, and friends can join as your guests when you book."
+msgstr "Consejo: la próxima vez trae a una amiga. Reservar juntas ayuda a que la clase se realice, y tus amigos pueden venir como invitados."
+
+#: includes/class-locations.php:257
+msgid "This class is confirmed: it goes ahead."
+msgstr "Esta clase está confirmada: se realiza."
+
+#: includes/class-locations.php:262
+msgid "This class goes ahead with %1$d or more people. If fewer sign up, it's cancelled by %2$s and we let you know; your class comes back to you."
+msgstr "Esta clase se realiza con %1$d o más personas. Si se apuntan menos, se cancela antes del %2$s y te avisamos; tu clase te vuelve."
+
+#: includes/class-emails.php:88
+msgid "Unsubscribe from the newsletter"
+msgstr "Darse de baja del boletín"
+
+#: includes/class-emails.php:107
+msgid "Facebook group"
+msgstr "Grupo de Facebook"
+
+#: includes/class-emails.php:121
+msgid "Online (live)"
+msgstr "En línea (en vivo)"
+
+#: includes/class-emails.php:188
+msgid "You're joining online."
+msgstr "Te unes en línea."
+
+#: includes/class-emails.php:188
+msgid "The link to join comes in your reminder email and is in your account before the class."
+msgstr "El enlace para unirte llega en tu email de recordatorio y está en tu cuenta antes de la clase."
+
+#: includes/class-emails.php:193
+msgid "Passcode:"
+msgstr "Código de acceso:"
+
+#: includes/class-emails.php:195
+msgid "Join a few minutes early, set up where the camera sees your mat (or leave it off), and keep your microphone muted."
+msgstr "Entra unos minutos antes, ubícate donde la cámara vea tu mat (o déjala apagada) y mantén el micrófono silenciado."
+
+#: includes/class-emails.php:262
+msgid "Your guest (%d)"
+msgid_plural "Your guests (%d)"
+msgstr[0] "Tu invitado (%d)"
+msgstr[1] "Tus invitados (%d)"
+
+#: includes/class-emails.php:273
+msgid "New booking: %s"
+msgstr ""
+
+#: includes/class-emails.php:274
+msgid "%1$s booked (%2$d person). %3$d of %4$d spots are taken."
+msgid_plural "%1$s booked (%2$d people). %3$d of %4$d spots are taken."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/class-emails.php:283
+msgid "Please arrive 10 minutes early."
+msgstr "Por favor, llega 10 minutos antes."
+
+#: includes/class-emails.php:298
+msgid "Your guest %s has been removed from this class."
+msgstr "Tu invitado %s fue quitado de esta clase."
+
+#: includes/class-emails.php:302
+msgid "Guests cancelled with you"
+msgstr "Invitados cancelados contigo"
+
+#: includes/class-emails.php:305
+msgid "The classes are back on your pass."
+msgstr "Las clases volvieron a tu bono."
+
+#: includes/class-emails.php:305
+msgid "The class is back on your pass."
+msgstr "La clase volvió a tu bono."
+
+#: includes/class-emails.php:306
+msgid "You have a class credit to use within %d days."
+msgstr "Tienes un crédito de clase para usar en %d días."
+
+#: includes/class-emails.php:307
+msgid "This class won't count towards your membership."
+msgstr "Esta clase no cuenta para tu membresía."
+
+#: includes/class-emails.php:308
+msgid "Your card payment is being refunded; it usually shows on your statement within 5–10 days."
+msgstr "Tu pago con tarjeta se está reembolsando; normalmente aparece en tu estado de cuenta en 5 a 10 días."
+
+#: includes/class-emails.php:309
+msgid "Because this was inside the cancellation window, the class counts as used."
+msgstr "Como fue dentro del plazo de cancelación, la clase cuenta como usada."
+
+#: includes/class-emails.php:322
+#: includes/class-emails.php:323
+msgid "Cancellation: %s"
+msgstr ""
+
+#: includes/class-emails.php:322
+msgid "%1$s cancelled (%2$d person)."
+msgid_plural "%1$s cancelled (%2$d people)."
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/class-emails.php:323
+msgid "person"
+msgid_plural "people"
+msgstr[0] "persona"
+msgstr[1] "personas"
+
+#: includes/class-emails.php:333
+msgid "It's covered by your membership."
+msgstr "Está cubierta por tu membresía."
+
+#: includes/class-emails.php:333
+msgid "One class was taken from your pass."
+msgstr "Se descontó una clase de tu bono."
+
+#: includes/class-emails.php:352
+msgid "Before:"
+msgstr "Antes:"
+
+#: includes/class-emails.php:353
+msgid "Now:"
+msgstr "Ahora:"
+
+#: includes/class-emails.php:360
+msgid "Coming with you"
+msgstr "Vienen contigo"
+
+#: includes/class-emails.php:396
+msgid "%1$d classes · valid until %2$s"
+msgstr "%1$d clases · válido hasta %2$s"
+
+#: includes/class-emails.php:396
+msgid "no expiry"
+msgstr "sin vencimiento"
+
+#: includes/class-emails.php:397
+msgid "Paid: %s"
+msgstr "Pagado: %s"
+
+#: includes/class-emails.php:414
+msgid "Your gift code:"
+msgstr "Tu código de regalo:"
+
+#: includes/class-emails.php:419
+msgid "Code:"
+msgstr "Código:"
+
+#: includes/class-emails.php:433
+msgid "New private session request"
+msgstr ""
+
+#: includes/class-emails.php:433
+msgid "Open in dashboard"
+msgstr ""
+
+#: includes/class-emails.php:453
+msgid "%d group class per period"
+msgid_plural "%d group classes per period"
+msgstr[0] "%d clase grupal por periodo"
+msgstr[1] "%d clases grupales por periodo"
+
+#: includes/class-emails.php:453
+msgid "Unlimited group classes"
+msgstr "Clases grupales ilimitadas"
+
+#: includes/class-emails.php:459
+msgid "Next renewal: %s."
+msgstr "Próxima renovación: %s."
+
+#: includes/class-emails.php:461
+msgid "New membership"
+msgstr ""
+
+#: includes/class-emails.php:468
+msgid "Membership cancelled"
+msgstr "Membresía cancelada"
+
+#: includes/class-emails.php:478
+msgid "Pay the invoice now"
+msgstr "Pagar la factura ahora"
+
+#: includes/class-emails.php:494
+msgid "It's filled in for you when you buy a pass or pay for a class by card while logged in."
+msgstr "Se aplica automáticamente cuando compras un bono o pagas una clase con tarjeta con tu sesión iniciada."
+
+#: includes/class-emails.php:511
+msgid "%d more person"
+msgid_plural "%d more people"
+msgstr[0] "%d persona más"
+msgstr[1] "%d personas más"
+
+#: includes/class-emails.php:514
+msgid "Share this link with a friend, or add them as your guest from your booking:"
+msgstr "Comparte este enlace con una amiga o añádela como invitada desde tu reserva:"
+
+#: includes/class-emails.php:537
+msgid "Open your classes"
+msgstr "Abrir tus clases"
+
+#: includes/class-emails.php:543
+msgid "Hi %s,"
+msgstr "Hola, %s:"
+
+#: includes/class-emails.php:544
+msgid "You now have a teacher login at %s. There you can see who is booked into your classes, write to them, keep your profile and photos up to date, connect your Stripe account for card payments and see your monthly statement."
+msgstr ""
+
+#: includes/class-emails.php:545
+msgid "Set your password with the button below, then log in. Your classes are under Teaching."
+msgstr ""
+
+#: includes/class-emails.php:546
+msgid "Your teacher login at %s"
+msgstr ""
+
+#: includes/class-emails.php:546
+msgid "Welcome to the team"
+msgstr ""
+
+#: includes/class-emails.php:546
+msgid "Set your password"
+msgstr ""
+
+#: includes/class-emails.php:557
+msgid "Paid to the teacher's own Stripe account; your fee: %s."
+msgstr ""
+
+#: includes/class-emails.php:558
+msgid "Open orders"
+msgstr ""
+
+#: includes/class-memberships.php:113
+msgid "Your membership isn't active."
+msgstr "Tu membresía no está activa."
+
+#: includes/class-memberships.php:116
+msgid "Memberships can't be used for this session."
+msgstr "Las membresías no se pueden usar para esta sesión."
+
+#: includes/class-memberships.php:123
+msgid "Your membership ends before this class."
+msgstr "Tu membresía termina antes de esta clase."
+
+#: includes/class-memberships.php:124
+msgid "This class is in your next billing period. You can book it from %s."
+msgstr "Esta clase está en tu próximo periodo de facturación. Puedes reservarla desde el %s."
+
+#: includes/class-memberships.php:127
+msgid "You've used all %d classes of this period. Your next period starts %s."
+msgstr "Ya usaste las %d clases de este periodo. Tu próximo periodo empieza el %s."
+
+#: includes/class-memberships.php:144
+msgid "You already have an active membership. You can change or cancel it in your account."
+msgstr "Ya tienes una membresía activa. Puedes cambiarla o cancelarla en tu cuenta."
+
+#: includes/class-memberships.php:158
+msgid "Membership: %s (first payment)"
+msgstr "Membresía: %s (primer pago)"
+
+#: includes/class-memberships.php:266
+msgid "Your membership has ended."
+msgstr "Tu membresía terminó."
+
+#: includes/class-memberships.php:289
+msgid "Membership: %s (renewal)"
+msgstr "Membresía: %s (renovación)"
+
+#: includes/class-memberships.php:364
+msgid "The billing page is not available right now. Please try again or contact us."
+msgstr "La página de facturación no está disponible ahora. Inténtalo de nuevo o contáctanos."
+
+#: includes/class-memberships.php:370
+msgid "Your membership will end on %s. You can keep booking until then."
+msgstr "Tu membresía terminará el %s. Puedes seguir reservando hasta entonces."
+
+#: includes/class-memberships.php:372
+msgid "Welcome back! Your membership will renew as usual."
+msgstr "¡Qué bien que sigues! Tu membresía se renovará como siempre."
+
+#: includes/class-memberships.php:381
+msgid "Trial"
+msgstr "Prueba"
+
+#: includes/class-memberships.php:383
+msgid "Payment failed"
+msgstr "Pago fallido"
+
+#: includes/class-memberships.php:384
+msgid "Unpaid"
+msgstr "Sin pagar"
+
+#: includes/class-memberships.php:385
+msgid "Paused"
+msgstr "En pausa"
+
+#: includes/class-coupons.php:22
+msgid "Passes and classes"
+msgstr ""
+
+#: includes/class-coupons.php:23
+msgid "Passes only"
+msgstr ""
+
+#: includes/class-coupons.php:24
+msgid "Drop-in classes only"
+msgstr ""
+
+#: includes/class-coupons.php:61
+msgid "That code already exists."
+msgstr ""
+
+#: includes/class-coupons.php:88
+msgid "That code isn't valid. Check the spelling and try again."
+msgstr "Ese código no es válido. Revisa cómo está escrito e inténtalo de nuevo."
+
+#: includes/class-coupons.php:91
+msgid "This code belongs to another account."
+msgstr "Este código pertenece a otra cuenta."
+
+#: includes/class-coupons.php:94
+msgid "This code has expired."
+msgstr "Este código venció."
+
+#: includes/class-coupons.php:100
+msgid "This code is for passes."
+msgstr "Este código es para bonos."
+
+#: includes/class-coupons.php:100
+msgid "This code is for drop-in classes."
+msgstr "Este código es para clases sueltas."
+
+#: includes/class-coupons.php:107
+msgid "%d%% off"
+msgstr "%d%% de descuento"
+
+#: includes/class-coupons.php:107
+msgid "%s off"
+msgstr "%s de descuento"
+
+#: includes/class-coupons.php:130
+msgid "code %1$s (%2$s)"
+msgstr "código %1$s (%2$s)"
+
+#: includes/class-privates.php:49
+msgid "My home or lanai"
+msgstr "Mi casa o lanai"
+
+#: includes/class-privates.php:50
+msgid "On the beach"
+msgstr "En la playa"
+
+#: includes/class-privates.php:51
+msgid "Condo / HOA clubhouse"
+msgstr "Club del condominio / HOA"
+
+#: includes/class-privates.php:52
+msgid "Office"
+msgstr "Oficina"
+
+#: includes/class-privates.php:78
+msgid "Tell me a few days and times that suit you."
+msgstr "Dime algunos días y horarios que te convengan."
+
+#: includes/class-privates.php:85
+msgid "Request sent. I'll reply within one working day with a time and price."
+msgstr "Solicitud enviada. Te respondo en un día hábil con horario y precio."
+
+#: includes/class-privates.php:96
+msgid "Request not found."
+msgstr "No se encontró la solicitud."
+
+#: includes/class-privates.php:100
+msgid "Choose a date and time."
+msgstr ""
+
+#: includes/class-privates.php:105
+msgid "Private session (%d min)"
+msgstr "Sesión privada (%d min)"
+
+#: includes/class-privates.php:109
+msgid "Includes about %d extra minutes to talk through your goals."
+msgstr "Incluye unos %d minutos extra para hablar de tus objetivos."
+
+#: includes/class-privates.php:176
+msgid "New"
+msgstr "Nueva"
+
+#: includes/class-privates.php:177
+msgid "Offer sent"
+msgstr "Oferta enviada"
+
+#: includes/class-privates.php:179
+msgid "Declined"
+msgstr "Rechazada"
+
+#: includes/class-schedule.php:256
+msgid "This class is no longer available."
+msgstr "Esta clase ya no está disponible."
+
+#: includes/class-schedule.php:260
+msgid "Online booking for this class has closed."
+msgstr "La reserva en línea para esta clase está cerrada."
+
+#: includes/class-schedule.php:371
+msgid "Group class"
+msgstr "Clase grupal"
+
+#: includes/class-schedule.php:372
+msgid "Event / workshop"
+msgstr "Evento / taller"
+
+#: includes/class-schedule.php:379
+msgid "In person"
+msgstr "Presencial"
+
+#: includes/class-schedule.php:380
+msgid "Online (live stream)"
+msgstr "En línea (transmisión en vivo)"
+
+#: includes/class-schedule.php:381
+msgid "In person + live online"
+msgstr "Presencial + en vivo en línea"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Booked: {class}, {date_short}"
+msgstr "Reservado: {class}, {date_short}"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Hi {first_name}, you're booked. See you on the mat!"
+msgstr "¡Hola, {first_name}! Tienes tu lugar. ¡Nos vemos en el mat!"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Please arrive 10 minutes early. Bring a mat if you have one, water, and a warm layer for the relaxation."
+msgstr "Por favor, llega 10 minutos antes. Trae un mat si tienes, agua y algo de abrigo para la relajación."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Manage booking"
+msgstr "Gestionar reserva"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Guests added: {class}, {date_short}"
+msgstr "Invitados añadidos: {class}, {date_short}"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Hi {first_name}, your guests are booked in with you."
+msgstr "¡Hola, {first_name}! Tus invitados están reservados contigo."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "{host} booked you into {class}"
+msgstr "{host} te reservó en {class}"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "You're coming to yoga"
+msgstr "Vienes a yoga"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Hi {guest_name}, {host} booked you a spot. See you on the mat!"
+msgstr "¡Hola, {guest_name}! {host} te reservó un lugar. ¡Nos vemos en el mat!"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "New to yoga? Tell Olivia before class about any injuries or health conditions."
+msgstr "¿Eres nueva en el yoga? Antes de la clase cuéntale a Olivia si tienes lesiones o condiciones de salud."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "About the classes"
+msgstr "Sobre las clases"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Cancelled: {class}, {date_short}"
+msgstr "Cancelada: {class}, {date_short}"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Booking cancelled"
+msgstr "Reserva cancelada"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Your booking has been cancelled."
+msgstr "Tu reserva fue cancelada."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Book another class"
+msgstr "Reserva otra clase"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Class cancelled"
+msgstr "Clase cancelada"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "I'm sorry, this session has been cancelled. {reason}"
+msgstr "Lo siento, esta sesión fue cancelada. {reason}"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Hi {guest_name}, your spot in this class has been cancelled."
+msgstr "¡Hola, {guest_name}! Tu lugar en esta clase fue cancelado."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Hi {first_name}, not enough people signed up for {class} on {day}, so it won't go ahead this time. I'm sorry!"
+msgstr "¡Hola, {first_name}! No se apuntaron suficientes personas a {class} del {day}, así que esta vez no se realiza. ¡Lo siento!"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "I hope to see you at another class soon."
+msgstr "Espero verte pronto en otra clase."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "{class} needs {missing}"
+msgstr "A {class} le faltan {missing}"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Bring a friend?"
+msgstr "¿Traes a una amiga?"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Hi {first_name}, {class} on {day} at {time} needs {missing} to go ahead. Know someone who'd enjoy it? Bring them along!"
+msgstr "¡Hola, {first_name}! A {class} del {day} a las {time} le faltan {missing} para realizarse. ¿Conoces a alguien a quien le gustaría? ¡Tráela!"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "If there still aren't enough people by {deadline}, the class is cancelled and your class goes back on your pass."
+msgstr "Si para el {deadline} sigue sin haber suficientes personas, la clase se cancela y tu clase vuelve a tu bono."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Book for a friend"
+msgstr "Reserva para una amiga"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Changed: {class}, {day} {date_short}, {time}"
+msgstr "Cambio: {class}, {day} {date_short}, {time}"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Your class has changed"
+msgstr "Tu clase cambió"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Hi {first_name}, there's a change to your class. Your spot is kept, nothing to do if the new details work for you."
+msgstr "¡Hola, {first_name}! Hay un cambio en tu clase. Tu lugar se mantiene; si los nuevos detalles te sirven, no tienes que hacer nada."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Can't make the new time? Cancel in your account and your class goes back on your pass (or you get a class credit)."
+msgstr "¿No puedes en el nuevo horario? Cancela en tu cuenta y la clase vuelve a tu bono (o recibes un crédito)."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "You're in: {class}, {date_short}"
+msgstr "Ya tienes lugar: {class}, {date_short}"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "You're off the waitlist"
+msgstr "Saliste de la lista de espera"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Good news: a spot opened up and you're in. {how}"
+msgstr "Buenas noticias: se liberó un lugar y ya estás dentro. {how}"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Can't make it after all? Cancel from your account so the next person can come."
+msgstr "¿Al final no puedes? Cancela desde tu cuenta para que pueda venir la siguiente persona."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "A spot opened: {class}, {date_short}"
+msgstr "Se liberó un lugar: {class}, {date_short}"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "A spot is free"
+msgstr "Hay un lugar libre"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "A spot just opened in a class you're waiting for. It goes to whoever books first."
+msgstr "Se acaba de liberar un lugar en una clase que esperas. Es para quien reserve primero."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Book now"
+msgstr "Reservar ahora"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Reminder: {class}, {day} {time}"
+msgstr "Recordatorio: {class}, {day} {time}"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "See you soon"
+msgstr "Nos vemos pronto"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Hi {first_name}, a quick reminder about your class."
+msgstr "¡Hola, {first_name}! Un recordatorio rápido de tu clase."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Can't come? Please cancel in your account so someone on the waitlist can take your spot."
+msgstr "¿No puedes venir? Cancela en tu cuenta para que alguien de la lista de espera tome tu lugar."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Starting soon: {class} (live online), {time}"
+msgstr "Empieza pronto: {class} (en vivo en línea), {time}"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Your class starts soon"
+msgstr "Tu clase empieza pronto"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Hi {first_name}, the live class starts at {time}. Here's your link to join."
+msgstr "¡Hola, {first_name}! La clase en vivo empieza a las {time}. Aquí tienes tu enlace."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Set up where the camera sees your mat (or keep it off) and keep your microphone muted."
+msgstr "Ubícate donde la cámara vea tu mat (o déjala apagada) y mantén el micrófono silenciado."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Your {pass} expires on {expires}"
+msgstr "Tu {pass} vence el {expires}"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Use your classes"
+msgstr "Usa tus clases"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Hi {first_name}, you still have {classes_left} on your {pass}, valid until {expires}. Book a class so they don't go to waste."
+msgstr "¡Hola, {first_name}! Aún tienes {classes_left} en tu {pass}, válido hasta el {expires}. Reserva una clase para no perderlas."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Welcome to {studio}"
+msgstr "Bienvenida a {studio}"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Welcome"
+msgstr "Bienvenida"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Hi {first_name}, welcome! Your account is ready."
+msgstr "¡Hola, {first_name}, bienvenida! Tu cuenta está lista."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "From your account you can book and cancel classes, see your passes and receipts, and request private sessions."
+msgstr "Desde tu cuenta puedes reservar y cancelar clases, ver tus bonos y recibos, y pedir sesiones privadas."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Go to my account"
+msgstr "Ir a mi cuenta"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Thank you! Your pass is ready to use."
+msgstr "¡Gracias! Tu bono está listo para usar."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "{from} sent you a yoga gift"
+msgstr "{from} te envió un regalo de yoga"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "A gift for you"
+msgstr "Un regalo para ti"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Hi {recipient}, {from} sent you a gift: {gift}."
+msgstr "¡Hola, {recipient}! {from} te envió un regalo: {gift}."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Create a free account (or log in), open \"Passes\" and enter the code. Then book whenever you like."
+msgstr "Crea una cuenta gratis (o inicia sesión), abre \"Bonos\" y escribe el código. Luego reserva cuando quieras."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Redeem my gift"
+msgstr "Canjear mi regalo"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Your gift card was sent"
+msgstr "Tu tarjeta de regalo fue enviada"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Gift sent"
+msgstr "Regalo enviado"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Thank you! Your gift card was sent to {recipient_email}."
+msgstr "¡Gracias! Tu tarjeta de regalo se envió a {recipient_email}."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Happy birthday, {first_name}!"
+msgstr "¡Feliz cumpleaños, {first_name}!"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Happy birthday"
+msgstr "Feliz cumpleaños"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Happy birthday, {first_name}! Here's a little gift from me: {percent} off a class pass or a drop-in class, until {expires}."
+msgstr "¡Feliz cumpleaños, {first_name}! Aquí tienes un pequeño regalo: {percent} de descuento en un bono o una clase suelta, hasta el {expires}."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Enjoy your day, and see you on the mat!"
+msgstr "¡Disfruta tu día, y nos vemos en el mat!"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Use my gift"
+msgstr "Usar mi regalo"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "You won: {prize}!"
+msgstr "¡Ganaste: {prize}!"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "You won!"
+msgstr "¡Ganaste!"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Congratulations, {first_name}! You came to {tickets} classes in {period}, and your ticket was drawn: {prize} is now in your account. Thank you for practicing with me so faithfully!"
+msgstr "¡Felicidades, {first_name}! Viniste a {tickets} clases en {period} y salió tu boleto: {prize} ya está en tu cuenta. ¡Gracias por practicar conmigo con tanta constancia!"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "See my passes"
+msgstr "Ver mis bonos"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "The {period} draw: {prize} has a new home"
+msgstr "El sorteo de {period}: {prize} tiene nueva dueña"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Every class is a ticket"
+msgstr "Cada clase es un boleto"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid ""
+"Hi {first_name},\n"
+"\n"
+"the {period} draw is done: {prize} went to one of our most dedicated students ({tickets} tickets from {entrants} of you were in the hat).\n"
+"\n"
+"A new round has started: every class you come to until {next_draw} is one more ticket."
+msgstr ""
+"Hola, {first_name}:\n"
+"\n"
+"el sorteo de {period} ya se hizo: {prize} fue para una de nuestras alumnas más constantes (había {tickets} boletos de {entrants} de ustedes).\n"
+"\n"
+"Empezó una nueva ronda: cada clase a la que vengas hasta el {next_draw} es un boleto más."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "See you on the mat!"
+msgstr "¡Nos vemos en el mat!"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Your private session request"
+msgstr "Tu solicitud de sesión privada"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Request received"
+msgstr "Solicitud recibida"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Thank you for your request. I'll reply within one working day with a suggested time and price. You can pay and confirm from the email or your account."
+msgstr "Gracias por tu solicitud. Te respondo en un día hábil con un horario y precio sugeridos. Puedes pagar y confirmar desde el email o tu cuenta."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "View my requests"
+msgstr "Ver mis solicitudes"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Your private session: please confirm"
+msgstr "Tu sesión privada: por favor, confirma"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Your private session"
+msgstr "Tu sesión privada"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Here is your private session. Confirm it by paying below (or with a private session credit if you have one)."
+msgstr "Aquí está tu sesión privada. Confírmala pagando abajo (o con un crédito de sesión privada si tienes)."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "About your private session request"
+msgstr "Sobre tu solicitud de sesión privada"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "About your request"
+msgstr "Sobre tu solicitud"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Thank you for your request. Unfortunately I can't offer a session for it this time."
+msgstr "Gracias por tu solicitud. Lamentablemente esta vez no puedo ofrecerte una sesión."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Your membership is active"
+msgstr "Tu membresía está activa"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Welcome, member"
+msgstr "Bienvenida a la membresía"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Welcome to the membership, {first_name}! You can book group classes straight away: choose \"Use my membership\" when you book."
+msgstr "¡Bienvenida a la membresía, {first_name}! Ya puedes reservar clases grupales: elige \"Usar mi membresía\" al reservar."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "You can cancel any time in your account; you keep access until the end of the paid period."
+msgstr "Puedes cancelar cuando quieras en tu cuenta; mantienes el acceso hasta el final del periodo pagado."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Your membership will end"
+msgstr "Tu membresía terminará"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Your membership won't renew. You can keep booking classes until {ends}."
+msgstr "Tu membresía no se renovará. Puedes seguir reservando clases hasta el {ends}."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Changed your mind? Resume it in your account before that date."
+msgstr "¿Cambiaste de idea? Reactívala en tu cuenta antes de esa fecha."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Resume membership"
+msgstr "Reactivar membresía"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Your membership has ended"
+msgstr "Tu membresía terminó"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Your membership has ended. Thank you for practicing with me! You can join again or buy a class pass any time."
+msgstr "Tu membresía terminó. ¡Gracias por practicar conmigo! Puedes volver a unirte o comprar un bono cuando quieras."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "See prices"
+msgstr "Ver precios"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Action needed: membership payment failed"
+msgstr "Acción necesaria: falló el pago de la membresía"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "We couldn't take this month's membership payment. Your card may have expired or been declined. Stripe will try again over the next few days; please update your card so your membership continues."
+msgstr "No pudimos cobrar la membresía de este mes. Puede que tu tarjeta haya vencido o haya sido rechazada. Stripe lo intentará de nuevo en los próximos días; actualiza tu tarjeta para que tu membresía continúe."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Update my card"
+msgstr "Actualizar mi tarjeta"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "New student intro: 2 classes"
+msgstr "Bienvenida para nuevos alumnos: 2 clases"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Two group classes within 30 days, for your first visit."
+msgstr "Dos clases grupales en 30 días, para tu primera visita."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "2 group classes"
+msgstr "2 clases grupales"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Use within 30 days"
+msgstr "Úsalo en 30 días"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "New students only"
+msgstr "Solo para nuevos alumnos"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "5-class pass"
+msgstr "Bono de 5 clases"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Five group classes, in person or online. Save $15."
+msgstr "Cinco clases grupales, presenciales o en línea. Ahorra $15."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Save $15"
+msgstr "Ahorra $15"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Use for any group class"
+msgstr "Para cualquier clase grupal"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Valid for 90 days"
+msgstr "Válido por 90 días"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Also available as a gift card"
+msgstr "También como tarjeta de regalo"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Online 10-class pass"
+msgstr "Bono en línea de 10 clases"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Ten live online classes, $5 a class."
+msgstr "Diez clases en vivo en línea, $5 por clase."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "10 live online classes"
+msgstr "10 clases en vivo en línea"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Join from anywhere"
+msgstr "Únete desde cualquier lugar"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Valid for 6 months"
+msgstr "Válido por 6 meses"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Private session, 60 minutes"
+msgstr "Sesión privada, 60 minutos"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "One-on-one at your home, lanai, clubhouse, on the beach or online."
+msgstr "Individual en tu casa, lanai, club, en la playa o en línea."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "At your home, lanai, beach or online"
+msgstr "En tu casa, lanai, playa o en línea"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Planned around your goals"
+msgstr "Planeada según tus objetivos"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Private session, 75 minutes"
+msgstr "Sesión privada, 75 minutos"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Private session, 90 minutes"
+msgstr "Sesión privada, 90 minutos"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Unlimited monthly"
+msgstr "Ilimitado mensual"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Every group class, every week. Renews monthly; cancel any time."
+msgstr "Todas las clases grupales, cada semana. Se renueva cada mes; cancela cuando quieras."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "In person or online"
+msgstr "Presencial o en línea"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Cancel any time"
+msgstr "Cancela cuando quieras"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "4 classes a month"
+msgstr "4 clases al mes"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "A steady weekly practice. Renews monthly; cancel any time."
+msgstr "Una práctica semanal constante. Se renueva cada mes; cancela cuando quieras."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "4 group classes each month"
+msgstr "4 clases grupales cada mes"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "5 private sessions"
+msgstr "5 sesiones privadas"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Five 60-minute private sessions. Save $50."
+msgstr "Cinco sesiones privadas de 60 minutos. Ahorra $50."
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "5 × 60 minutes"
+msgstr "5 × 60 minutos"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Save $50"
+msgstr "Ahorra $50"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "A plan that builds session by session"
+msgstr "Un plan que crece sesión a sesión"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Fort Myers (exact place shared on booking)"
+msgstr "Fort Myers (el lugar exacto se comparte al reservar)"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Online (Zoom)"
+msgstr "En línea (Zoom)"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Fort Myers Beach"
+msgstr "Fort Myers Beach"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Fort Myers"
+msgstr "Fort Myers"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Singing bowls and gong"
+msgstr "Cuencos y gong"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Sunrise on the sand, weather permitting"
+msgstr "Amanecer en la arena, si el tiempo lo permite"
+
+#: data
+#. Default text stored as data (email template, product or timetable).
+msgid "Live-Music Slow Flow with Handpan"
+msgstr "Slow flow con música en vivo y handpan"

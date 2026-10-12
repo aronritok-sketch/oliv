@@ -53,7 +53,7 @@ async function payOnMockStripe(page, button = '#pay') {
   a.on('pageerror', e => console.log('JS error:', e.message));
 
   // Pick the next two bookable group sessions.
-  const sessions = JSON.parse(q("SELECT id, capacity FROM wp_oys_sessions WHERE kind='group' AND status='scheduled' AND booked=0 AND starts_at > DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 DAY) ORDER BY starts_at LIMIT 3"));
+  const sessions = JSON.parse(q("SELECT id, capacity FROM wp_oys_sessions WHERE kind='group' AND format='studio' AND status='scheduled' AND booked=0 AND starts_at > DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 DAY) ORDER BY starts_at LIMIT 3"));
   const [s1, s2, s3] = sessions.map(s => s.id);
 
   // 1. Guest books a drop-in: sign up on the booking page, pay by card.
@@ -173,7 +173,7 @@ async function payOnMockStripe(page, button = '#pay') {
   check(await cpage.isVisible("text=isn't valid or has already been used"), 'gift code cannot be used twice');
 
   // 8. Payment returns before the webhook: the return page fulfils; the late webhook is a no-op.
-  const s4 = JSON.parse(q(`SELECT id FROM wp_oys_sessions WHERE kind='group' AND status='scheduled' AND booked=0 AND id NOT IN (${s1},${s2},${s3}) AND starts_at > DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 DAY) ORDER BY starts_at LIMIT 1`))[0].id;
+  const s4 = JSON.parse(q(`SELECT id FROM wp_oys_sessions WHERE kind='group' AND format='studio' AND status='scheduled' AND booked=0 AND id NOT IN (${s1},${s2},${s3}) AND starts_at > DATE_ADD(UTC_TIMESTAMP(), INTERVAL 1 DAY) ORDER BY starts_at LIMIT 1`))[0].id;
   await cpage.goto(`${BASE}/book/?session=${s4}`);
   await cpage.check('input[value="card"]');
   await cpage.click('.oys-submit');
@@ -501,10 +501,28 @@ async function payOnMockStripe(page, button = '#pay') {
   await adm.waitForSelector('.oys-toast');
   const created = JSON.parse(q(`SELECT id, format, price_cents FROM wp_oys_sessions WHERE online_url='https://zoom.example/j/2' ORDER BY id DESC LIMIT 1`))[0];
   check(created && created.format === 'online' && +created.price_cents === 600, 'online class created from the calendar');
-  // Drag it to Thursday 07:00.
+  // Drag it onto Thursday 07:30, where the demo timetable already has Yoga for Athletes: refused.
   await adm.waitForSelector(`.oys-ev[data-id="${created.id}"]`);
+  const drag = async (to) => {
+    const b = await adm.locator(`.oys-ev[data-id="${created.id}"]`).boundingBox();
+    await adm.mouse.move(b.x + 20, b.y + 10);
+    await adm.mouse.down();
+    await adm.mouse.move(b.x + 40, b.y + 30, { steps: 4 });
+    await adm.mouse.move(to.x, to.y, { steps: 12 });
+    await adm.mouse.up();
+  };
+  const athletes = php(`global $wpdb; echo count(array_filter($wpdb->get_col("SELECT starts_at FROM {$wpdb->prefix}oys_sessions WHERE class_slug='yoga-for-athletes' AND status='scheduled'"), fn($t) => wp_date('Y-m-d H:i', oys_ts($t)) === '${thu} 07:30'));`);
+  if (+athletes) {
+    await drag(await slotY(thu, '07:30'));
+    await adm.waitForSelector('.oys-toast', { timeout: 5000 }).catch(() => {});
+    const still = JSON.parse(q(`SELECT starts_at FROM wp_oys_sessions WHERE id=${created.id}`))[0];
+    check(php(`echo wp_date('Y-m-d H:i', oys_ts('${still.starts_at}'));`) === `${wed} 06:00`, 'two classes cannot overlap: the move is refused');
+    await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-calendar&week=${week}`);
+    await adm.waitForSelector(`.oys-ev[data-id="${created.id}"]`);
+  }
+  // Drag it to Thursday 10:00.
   const evBox = await adm.locator(`.oys-ev[data-id="${created.id}"]`).boundingBox();
-  pt = await slotY(thu, '07:00');
+  pt = await slotY(thu, '10:00');
   await adm.mouse.move(evBox.x + 20, evBox.y + 10);
   await adm.mouse.down();
   await adm.mouse.move(evBox.x + 40, evBox.y + 30, { steps: 4 });
@@ -512,7 +530,7 @@ async function payOnMockStripe(page, button = '#pay') {
   await adm.mouse.up();
   await adm.waitForSelector('.oys-toast:has-text("Saved")', { timeout: 5000 }).catch(() => {});
   const movedRow = JSON.parse(q(`SELECT starts_at FROM wp_oys_sessions WHERE id=${created.id}`))[0];
-  check(php(`echo wp_date('Y-m-d H:i', oys_ts('${movedRow.starts_at}'));`) === `${thu} 07:00`, 'dragging moves the class');
+  check(php(`echo wp_date('Y-m-d H:i', oys_ts('${movedRow.starts_at}'));`) === `${thu} 10:00`, 'dragging moves the class');
   // A weekly class on Friday 08:00.
   await adm.goto(`${BASE}/wp-admin/admin.php?page=oys-calendar&week=${week}`);
   await adm.waitForSelector('.oys-cal__grid');
@@ -920,6 +938,34 @@ async function payOnMockStripe(page, button = '#pay') {
   check(php(`echo OYS_Bookings::cancel(${lenaBooking});`) === 'refunded', 'cancelled in time: refunded');
   const refund = JSON.parse(execSync('curl -s http://127.0.0.1:8090/_state').toString()).refunds.pop();
   check(refund && refund.account === acct && refund.refund_application_fee === 'true' && refund.amount === 2500, 'refund on the teacher\'s account, studio fee returned');
+
+  // Three languages: Hungarian and Spanish addresses, translated texts and copy, switcher, hreflang.
+  const lang = await (await browser.newContext({ viewport: { width: 1440, height: 900 } })).newPage();
+  await lang.goto(`${BASE}/hu/`);
+  check(await lang.getAttribute('html', 'lang') === 'hu-HU', 'Hungarian page: html lang');
+  check(await lang.isVisible('.header-cta:has-text("Óra foglalása")'), 'Hungarian page: header button translated');
+  check(await lang.locator('link[rel=alternate][hreflang="es-ES"]').count() === 1, 'Hungarian page: hreflang to Spanish');
+  const huLinks = await lang.$$eval('.nav a', as => as.map(x => x.getAttribute('href')));
+  check(huLinks.length > 3 && huLinks.every(h => h.includes('/hu/')), 'Hungarian menu stays in Hungarian');
+  await lang.click('.langs--header a[hreflang="es-ES"]');
+  await lang.waitForLoadState();
+  check(lang.url() === `${BASE}/es/` && await lang.isVisible('.header-cta:has-text("Reservar clase")'), 'language switcher to Spanish');
+  await lang.goto(`${BASE}/es/about/`);
+  check((await lang.textContent('h1')).includes('Sobre Olivia'), 'Spanish page title');
+  await lang.goto(`${BASE}/hu/yoga-classes/hatha-flow/`);
+  check(await lang.isVisible('.chips :text("60–90 perc")'), 'class length in Hungarian');
+  for (const path of ['/', '/about/', '/private-yoga/', '/events/', '/hu/', '/es/']) {
+    await lang.goto(BASE + path);
+    const text = await lang.evaluate(() => document.querySelector('main').innerText);
+    check(!text.includes('\u2014'), `no em dash on ${path}`);
+  }
+  await lang.goto(`${BASE}/events/`);
+  check(await lang.locator('.moments .moment img').count() >= 20, 'past events with photos');
+  await phone.goto(`${BASE}/`);
+  check(await phone.isVisible('.book-fab'), 'phones: floating Book button');
+  await phone.screenshot({ path: `${SHOTS}/40-phone-home.png` });
+  await lang.goto(`${BASE}/hu/`);
+  await lang.screenshot({ path: `${SHOTS}/41-home-hu.png`, fullPage: true });
 
   // Screens for review.
   await a.goto(`${BASE}/schedule-pricing/`);

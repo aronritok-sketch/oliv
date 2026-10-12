@@ -12,11 +12,11 @@ function oy_seo_plugin_active() {
 
 function oy_meta_description() {
 	if ( is_front_page() ) {
-		return 'Hatha flow and slow flow yoga classes in Fort Myers, FL, plus private one-on-one yoga at your home, lanai or on the beach. Beginner-friendly. Book with Olivia Kovács.';
+		return __( 'Yoga, mobility and prenatal fitness in Fort Myers, FL: hatha flow and slow flow classes, private yoga at your home, lanai or on the beach, meditation and singing bowl massage with Olivia Kovacs.', 'olivia-yoga' );
 	}
 	if ( is_singular() ) {
 		$id   = get_queried_object_id();
-		$desc = get_post_meta( $id, 'oy_seo_desc', true ) ?: get_the_excerpt( $id );
+		$desc = oy_tr( $id, 'seo_desc' ) ?: ( oy_translating() ? get_the_excerpt( $id ) : ( get_post_meta( $id, 'oy_seo_desc', true ) ?: get_the_excerpt( $id ) ) );
 		return wp_strip_all_tags( $desc );
 	}
 	return get_bloginfo( 'description' );
@@ -27,10 +27,11 @@ add_filter( 'pre_get_document_title', function ( $title ) {
 		return $title;
 	}
 	if ( is_front_page() ) {
-		return 'Yoga in Fort Myers, FL — Hatha Flow & Private Yoga | Olivia Kovács';
+		return __( 'Yoga in Fort Myers, FL: Hatha Flow, Private Yoga & Prenatal Fitness | Olivia Kovacs', 'olivia-yoga' );
 	}
 	if ( is_singular() ) {
-		$custom = get_post_meta( get_queried_object_id(), 'oy_seo_title', true );
+		$id     = get_queried_object_id();
+		$custom = oy_tr( $id, 'seo_title' ) ?: ( oy_translating() ? '' : get_post_meta( $id, 'oy_seo_title', true ) );
 		if ( $custom ) {
 			return $custom;
 		}
@@ -45,7 +46,7 @@ add_action( 'wp_head', function () {
 	$desc = oy_meta_description();
 	$url  = is_singular() ? get_permalink() : home_url( add_query_arg( array() ) );
 	echo '<meta name="description" content="' . esc_attr( $desc ) . '">' . "\n";
-	echo '<meta property="og:site_name" content="Olivia Kovács Yoga"><meta property="og:locale" content="en_US">';
+	echo '<meta property="og:site_name" content="Olivia Kovacs Yoga"><meta property="og:locale" content="' . esc_attr( oy_languages()[ oy_lang() ]['locale'] ?? 'en_US' ) . '">';
 	echo '<meta property="og:type" content="' . ( is_singular( 'post' ) ? 'article' : 'website' ) . '">';
 	echo '<meta property="og:title" content="' . esc_attr( wp_get_document_title() ) . '"><meta property="og:description" content="' . esc_attr( $desc ) . '"><meta property="og:url" content="' . esc_url( $url ) . '">';
 	if ( is_singular() && has_post_thumbnail() ) {
@@ -55,16 +56,16 @@ add_action( 'wp_head', function () {
 
 	$site  = home_url( '/' );
 	$graph = array(
-		array( '@type' => 'WebSite', '@id' => $site . '#website', 'url' => $site, 'name' => 'Olivia Kovács Yoga', 'inLanguage' => 'en-US' ),
+		array( '@type' => 'WebSite', '@id' => $site . '#website', 'url' => $site, 'name' => 'Olivia Kovacs Yoga', 'inLanguage' => oy_languages()[ oy_lang() ]['html'] ?? 'en-US' ),
 		array(
 			'@type'       => array( 'LocalBusiness', 'HealthAndBeautyBusiness' ),
 			'@id'         => $site . '#business',
-			'name'        => 'Olivia Kovács Yoga',
+			'name'        => 'Olivia Kovacs Yoga',
 			'url'         => $site,
 			'email'       => OY_EMAIL,
 			'priceRange'  => '$$',
 			'sameAs'      => array( OY_INSTAGRAM, OY_FACEBOOK ),
-			'description' => 'Hatha flow, slow flow and private yoga in Fort Myers, FL.',
+			'description' => 'Yoga, mobility, prenatal fitness, meditation and private singing bowl massage in Fort Myers, FL.',
 			'address'     => array( '@type' => 'PostalAddress', 'addressLocality' => 'Fort Myers', 'addressRegion' => 'FL', 'addressCountry' => 'US' ),
 			'areaServed'  => array_merge( array( array( '@type' => 'City', 'name' => 'Fort Myers, FL' ) ), array_map( fn( $a ) => array( '@type' => 'Place', 'name' => $a ), OY_AREAS ) ),
 			'founder'     => array( '@id' => $site . '#olivia' ),
@@ -72,15 +73,16 @@ add_action( 'wp_head', function () {
 		array(
 			'@type'         => 'Person',
 			'@id'           => $site . '#olivia',
-			'name'          => 'Olivia Kovács',
-			'jobTitle'      => 'Hatha yoga teacher',
+			'name'          => 'Olivia Kovacs',
+			'jobTitle'      => 'Yoga Teacher | Movement & Wellness Coach',
+			'knowsAbout'    => array( 'Yoga', 'Mobility', 'Prenatal Fitness', 'Meditation', 'Singing Bowl Massage' ),
 			'sameAs'        => array( OY_INSTAGRAM, OY_FACEBOOK ),
 			'hasCredential' => array( '@type' => 'EducationalOccupationalCredential', 'name' => 'Hatha yoga teacher certification (2023)', 'recognizedBy' => array( '@type' => 'Organization', 'name' => 'Yoga Alliance International' ) ),
 		),
 	);
 	if ( is_page( 'faq' ) ) {
 		$faqs    = get_posts( array( 'post_type' => 'oy_faq', 'numberposts' => 50, 'orderby' => 'menu_order', 'order' => 'ASC' ) );
-		$graph[] = array( '@type' => 'FAQPage', 'mainEntity' => array_map( fn( $f ) => array( '@type' => 'Question', 'name' => $f->post_title, 'acceptedAnswer' => array( '@type' => 'Answer', 'text' => wp_strip_all_tags( $f->post_content ) ) ), $faqs ) );
+		$graph[] = array( '@type' => 'FAQPage', 'mainEntity' => array_map( fn( $f ) => array( '@type' => 'Question', 'name' => get_the_title( $f ), 'acceptedAnswer' => array( '@type' => 'Answer', 'text' => wp_strip_all_tags( oy_post_content( $f ) ) ) ), $faqs ) );
 	}
 	if ( is_singular( 'post' ) ) {
 		$graph[] = array( '@type' => 'BlogPosting', 'headline' => get_the_title(), 'datePublished' => get_the_date( 'c' ), 'author' => array( '@id' => $site . '#olivia' ), 'mainEntityOfPage' => get_permalink() );

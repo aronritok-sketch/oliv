@@ -132,7 +132,7 @@ class OYS_Zoom {
 
 	private static function meeting_fields( $s ) {
 		return array(
-			'topic'      => mb_substr( oys_session_title( $s ) . ' — ' . OYS_Settings::get( 'email_from_name' ), 0, 190 ),
+			'topic'      => mb_substr( oys_session_title( $s ) . ' · ' . OYS_Settings::get( 'email_from_name' ), 0, 190 ),
 			'type'       => 2,
 			'start_time' => gmdate( 'Y-m-d\TH:i:s\Z', oys_ts( $s->starts_at ) ),
 			'duration'   => max( 15, (int) round( ( oys_ts( $s->ends_at ) - oys_ts( $s->starts_at ) ) / 60 ) ),

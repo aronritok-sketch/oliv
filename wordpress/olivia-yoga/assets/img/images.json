@@ -1,164 +1,608 @@
 {
- "olivia-golden-hour-prayer": {
-  "alt": "Olivia Kov\u00e1cs in prayer pose with golden sunlight through the trees",
-  "pos": "50% 40%",
+ "hero-lakeside-deck-class": {
+  "alt": "Olivia Kovacs leading a hatha flow class on a wooden deck by the lake",
+  "pos": "50% 60%",
   "w": 1200,
-  "h": 1031
+  "h": 927
  },
- "olivia-arms-raised-sunset": {
-  "alt": "Olivia Kov\u00e1cs stretching her arms up in warm evening light",
-  "pos": "50% 30%",
-  "w": 768,
-  "h": 960
- },
- "olivia-riverside-portrait": {
-  "alt": "Portrait of yoga teacher Olivia Kov\u00e1cs by the river at sunset",
+ "olivia-golden-hour-arms": {
+  "alt": "Olivia Kovacs stretching her arms up in warm evening light",
   "pos": "50% 30%",
   "w": 1200,
   "h": 1500
  },
  "olivia-riverside-profile": {
-  "alt": "Olivia Kov\u00e1cs looking out over the river at golden hour",
-  "pos": "40% 30%",
+  "alt": "Olivia Kovacs looking out over the river at golden hour",
+  "pos": "45% 30%",
   "w": 1200,
   "h": 1500
  },
- "olivia-studio-mat": {
-  "alt": "Olivia Kov\u00e1cs smiling in the studio with her yoga mat",
-  "pos": "50% 25%",
+ "olivia-sunset-smile": {
+  "alt": "Portrait of yoga teacher Olivia Kovacs smiling at sunset",
+  "pos": "62% 35%",
+  "w": 1200,
+  "h": 900
+ },
+ "olivia-sea-side-stretch": {
+  "alt": "Olivia Kovacs in a side stretch by the sea",
+  "pos": "40% 40%",
+  "w": 1200,
+  "h": 675
+ },
+ "olivia-sky-arms": {
+  "alt": "Olivia Kovacs with her arms raised against the sky",
+  "pos": "45% 45%",
   "w": 1200,
   "h": 1200
  },
- "tree-pose-meadow": {
-  "alt": "Standing balance pose in a sunlit meadow",
-  "pos": "50% 40%",
-  "w": 640,
-  "h": 960
- },
- "dancer-pose-forest": {
-  "alt": "Dancer pose among autumn trees",
-  "pos": "50% 45%",
-  "w": 720,
-  "h": 960
- },
- "dancer-pose-beach": {
-  "alt": "Dancer pose on the sand by the sea",
-  "pos": "55% 50%",
-  "w": 1200,
-  "h": 900
- },
- "hatha-flow-group-warrior": {
-  "alt": "Group hatha flow class holding a warrior pose",
-  "pos": "50% 45%",
-  "w": 1200,
-  "h": 1600
- },
- "group-class-chair-pose": {
-  "alt": "Group yoga class in chair pose in a bright studio",
-  "pos": "50% 50%",
-  "w": 1200,
-  "h": 900
- },
- "hatha-flow-studio-class": {
-  "alt": "Hatha flow class in a studio with prayer flags",
-  "pos": "50% 45%",
-  "w": 1200,
-  "h": 1600
- },
- "final-relaxation": {
-  "alt": "Students resting in relaxation at the end of class",
-  "pos": "50% 55%",
-  "w": 1200,
-  "h": 1600
- },
- "sound-yoga-gong-bowls": {
-  "alt": "Gong and singing bowls set up for a sound yoga class",
-  "pos": "50% 50%",
-  "w": 1200,
-  "h": 1598
- },
- "evening-slow-flow": {
-  "alt": "Evening slow flow class in the studio",
-  "pos": "50% 50%",
-  "w": 1200,
-  "h": 1432
- },
- "small-group-class": {
-  "alt": "Small yoga class in a cozy studio",
-  "pos": "50% 55%",
-  "w": 1080,
-  "h": 1920
- },
- "outdoor-class-garden": {
-  "alt": "Outdoor group yoga class in a garden",
-  "pos": "50% 45%",
-  "w": 1200,
-  "h": 900
- },
- "olivia-outdoor-class": {
-  "alt": "Olivia Kov\u00e1cs smiling during an outdoor group class",
+ "olivia-sunlit-portrait": {
+  "alt": "Close portrait of Olivia Kovacs in soft sunlight",
   "pos": "60% 40%",
   "w": 1200,
   "h": 900
  },
- "outdoor-bridge-pose": {
-  "alt": "Outdoor class moving into bridge pose",
+ "olivia-garland-deck": {
+  "alt": "Olivia Kovacs in a deep squat on an outdoor yoga deck",
   "pos": "50% 55%",
-  "w": 1200,
-  "h": 900
- },
- "evening-lawn-yoga": {
-  "alt": "Evening outdoor yoga class on a lawn",
-  "pos": "50% 45%",
-  "w": 1200,
-  "h": 900
- },
- "team-yoga-outdoors": {
-  "alt": "Group of adults stretching together at an outdoor session",
-  "pos": "50% 45%",
-  "w": 1200,
-  "h": 900
- },
- "festival-pavilion-class": {
-  "alt": "Open-air yoga pavilion by the water during a festival class",
-  "pos": "50% 50%",
-  "w": 1200,
-  "h": 900
- },
- "festival-pavilion-arms": {
-  "alt": "Festival yoga class raising arms in an open-air pavilion",
-  "pos": "50% 50%",
-  "w": 1200,
-  "h": 900
- },
- "festival-dance": {
-  "alt": "Festival crowd dancing together under the trees",
-  "pos": "50% 40%",
   "w": 1200,
   "h": 1600
  },
- "teaching-in-pavilion": {
-  "alt": "Olivia Kov\u00e1cs demonstrating a squat in an open-air pavilion",
+ "olivia-side-plank-deck": {
+  "alt": "Olivia Kovacs in a side plank variation on a wooden deck",
+  "pos": "50% 45%",
+  "w": 1200,
+  "h": 1553
+ },
+ "olivia-forward-fold": {
+  "alt": "Olivia Kovacs in a standing forward fold",
   "pos": "50% 50%",
   "w": 1200,
   "h": 1600
  },
- "garden-yoga-evening": {
-  "alt": "Evening yoga in a garden under string lights",
+ "olivia-meadow-warrior": {
+  "alt": "Olivia Kovacs in a warrior pose in a meadow at sunset",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 1199
+ },
+ "olivia-rock-balance": {
+  "alt": "Olivia Kovacs balancing on a rock above a wide landscape",
+  "pos": "50% 45%",
+  "w": 1200,
+  "h": 900
+ },
+ "olivia-dancer-home": {
+  "alt": "Olivia Kovacs in dancer pose in a living room",
+  "pos": "40% 45%",
+  "w": 1178,
+  "h": 1113
+ },
+ "olivia-studio-standing": {
+  "alt": "Olivia Kovacs reaching up in a bright studio",
+  "pos": "50% 40%",
+  "w": 1200,
+  "h": 798
+ },
+ "olivia-mandala-lunge": {
+  "alt": "Olivia Kovacs in a crescent lunge in front of a mandala",
+  "pos": "50% 55%",
+  "w": 999,
+  "h": 1600
+ },
+ "online-yoga-living-room": {
+  "alt": "Olivia Kovacs teaching online yoga from her living room",
   "pos": "50% 55%",
   "w": 1200,
   "h": 900
  },
- "olivia-leading-garden-class": {
-  "alt": "Olivia Kov\u00e1cs leading an outdoor class in a garden",
-  "pos": "40% 40%",
+ "olivia-childs-pose": {
+  "alt": "Olivia Kovacs resting in child's pose",
+  "pos": "50% 60%",
+  "w": 1200,
+  "h": 1600
+ },
+ "olivia-sunset-silhouette": {
+  "alt": "Silhouette of Olivia Kovacs against an orange sunset",
+  "pos": "50% 50%",
+  "w": 1200,
+  "h": 943
+ },
+ "deck-down-dog": {
+  "alt": "Students in downward dog on a wooden deck",
+  "pos": "50% 50%",
+  "w": 1200,
+  "h": 927
+ },
+ "deck-bird-dog": {
+  "alt": "Students balancing in bird dog during an outdoor class",
+  "pos": "50% 50%",
+  "w": 1200,
+  "h": 927
+ },
+ "deck-plank": {
+  "alt": "A student in plank on a green mat outdoors",
+  "pos": "50% 45%",
+  "w": 1200,
+  "h": 1553
+ },
+ "deck-three-leg-dog": {
+  "alt": "A student in three-legged dog under a festival canopy",
+  "pos": "45% 50%",
+  "w": 1200,
+  "h": 927
+ },
+ "pavilion-arms-up": {
+  "alt": "A group raising their arms in a riverside pavilion",
+  "pos": "50% 55%",
   "w": 1200,
   "h": 900
  },
- "festival-seated": {
-  "alt": "Seated yoga at an outdoor festival",
-  "pos": "50% 40%",
+ "festival-seated-teacher": {
+  "alt": "Olivia Kovacs seated in front of a large outdoor festival class",
+  "pos": "50% 60%",
+  "w": 1200,
+  "h": 1600
+ },
+ "festival-side-stretch": {
+  "alt": "Olivia Kovacs in a side stretch leading a festival class",
+  "pos": "50% 55%",
+  "w": 1200,
+  "h": 1600
+ },
+ "garden-class-arms-up": {
+  "alt": "Olivia Kovacs reaching up with a garden class",
+  "pos": "35% 45%",
   "w": 1200,
   "h": 900
+ },
+ "garden-class-lunges": {
+  "alt": "An outdoor group class in low lunges",
+  "pos": "60% 50%",
+  "w": 1200,
+  "h": 679
+ },
+ "garden-class-bridge": {
+  "alt": "Olivia Kovacs demonstrating a backbend in an outdoor class",
+  "pos": "30% 55%",
+  "w": 1200,
+  "h": 669
+ },
+ "studio-group-flow": {
+  "alt": "A group practicing in a studio with prayer flags",
+  "pos": "50% 50%",
+  "w": 1000,
+  "h": 1193
+ },
+ "studio-relaxation": {
+  "alt": "Students resting in final relaxation in a dim studio",
+  "pos": "50% 55%",
+  "w": 800,
+  "h": 1066
+ },
+ "studio-childs-pose": {
+  "alt": "Students resting in child's pose on a wooden floor",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 1035
+ },
+ "singing-bowls-studio": {
+  "alt": "Tibetan singing bowls lined up in a yoga studio",
+  "pos": "50% 60%",
+  "w": 1200,
+  "h": 1600
+ },
+ "gong-and-bowls": {
+  "alt": "A gong and singing bowls set up for a sound yoga class",
+  "pos": "50% 45%",
+  "w": 800,
+  "h": 1066
+ },
+ "singing-bowl-massage": {
+  "alt": "Olivia Kovacs giving a relaxing massage",
+  "pos": "55% 40%",
+  "w": 800,
+  "h": 931
+ },
+ "private-tree-pose": {
+  "alt": "A private yoga session in tree pose",
+  "pos": "50% 40%",
+  "w": 1067,
+  "h": 1600
+ },
+ "private-side-angle": {
+  "alt": "Olivia Kovacs guiding a private yoga session",
+  "pos": "50% 50%",
+  "w": 1200,
+  "h": 900
+ },
+ "private-down-dog-adjust": {
+  "alt": "Olivia Kovacs adjusting a student in downward dog",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 478
+ },
+ "prenatal-ball-training": {
+  "alt": "Olivia Kovacs coaching a pregnant client on a fitness ball",
+  "pos": "50% 50%",
+  "w": 500,
+  "h": 750
+ },
+ "team-handpan-session": {
+  "alt": "A team yoga session with live handpan in an office",
+  "pos": "50% 50%",
+  "w": 1200,
+  "h": 900
+ },
+ "team-tree-pose-gym": {
+  "alt": "A team in tree pose in a sports hall",
+  "pos": "50% 50%",
+  "w": 1080,
+  "h": 1440
+ },
+ "team-warriors-gym": {
+  "alt": "A team building yoga class in a sports hall",
+  "pos": "50% 55%",
+  "w": 1080,
+  "h": 810
+ },
+ "athletes-mobility": {
+  "alt": "Athletes doing mobility yoga in a sports hall",
+  "pos": "50% 40%",
+  "w": 1080,
+  "h": 1440
+ },
+ "beach-dancer-pose": {
+  "alt": "Olivia Kovacs in dancer pose on the beach",
+  "pos": "50% 50%",
+  "w": 1200,
+  "h": 900
+ },
+ "evening-lawn-class": {
+  "alt": "An evening yoga class on a lawn under string lights",
+  "pos": "50% 50%",
+  "w": 1200,
+  "h": 900
+ },
+ "festival-sun-rays": {
+  "alt": "Sun rays through trees at an outdoor festival",
+  "pos": "50% 50%",
+  "w": 1200,
+  "h": 800
+ },
+ "studio-plants-class": {
+  "alt": "A group class in a bright studio full of plants",
+  "pos": "50% 50%",
+  "w": 1200,
+  "h": 1600
+ },
+ "white-studio-class": {
+  "alt": "A seated group class in a white studio",
+  "pos": "50% 50%",
+  "w": 1200,
+  "h": 800
+ },
+ "pavilion-silhouettes": {
+  "alt": "Silhouettes of a class in a riverside pavilion",
+  "pos": "50% 55%",
+  "w": 1200,
+  "h": 900
+ },
+ "park-class-seated": {
+  "alt": "Olivia Kovacs teaching a seated class in a park",
+  "pos": "55% 55%",
+  "w": 1200,
+  "h": 626
+ },
+ "olivia-terrace-profile": {
+  "alt": "Olivia Kovacs on a terrace at sunset, looking into the distance",
+  "pos": "55% 35%",
+  "w": 1200,
+  "h": 900
+ },
+ "past-event-01": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 1200,
+  "h": 643
+ },
+ "past-event-02": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-03": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-04": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 1066,
+  "h": 572
+ },
+ "past-event-05": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 1066,
+  "h": 572
+ },
+ "past-event-06": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-07": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-08": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-09": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-10": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-11": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-12": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 600,
+  "h": 322
+ },
+ "past-event-13": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-14": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-15": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-16": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-17": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-18": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-19": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-20": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-21": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-22": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-23": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-24": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-25": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-26": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "past-event-27": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 429
+ },
+ "journal-01": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 900,
+  "h": 849
+ },
+ "journal-02": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 595
+ },
+ "journal-03": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 795,
+  "h": 600
+ },
+ "journal-04": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 992
+ },
+ "journal-05": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 667,
+  "h": 746
+ },
+ "journal-06": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 791,
+  "h": 739
+ },
+ "journal-07": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 798,
+  "h": 600
+ },
+ "journal-08": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 798,
+  "h": 800
+ },
+ "journal-09": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 1000,
+  "h": 966
+ },
+ "journal-10": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 603,
+  "h": 664
+ },
+ "journal-11": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 591
+ },
+ "journal-12": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 643,
+  "h": 532
+ },
+ "journal-13": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 1069,
+  "h": 1080
+ },
+ "journal-14": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 754,
+  "h": 557
+ },
+ "journal-15": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 719,
+  "h": 531
+ },
+ "journal-16": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 583,
+  "h": 800
+ },
+ "journal-17": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 600,
+  "h": 671
+ },
+ "journal-18": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 600,
+  "h": 895
+ },
+ "journal-19": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 600,
+  "h": 769
+ },
+ "journal-20": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 600,
+  "h": 619
+ },
+ "journal-21": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 600,
+  "h": 799
+ },
+ "journal-22": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 600,
+  "h": 737
+ },
+ "journal-23": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 540,
+  "h": 604
+ },
+ "journal-24": {
+  "alt": "",
+  "pos": "50% 50%",
+  "w": 600,
+  "h": 682
  }
 }

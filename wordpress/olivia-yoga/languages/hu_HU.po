@@ -1,0 +1,1090 @@
+# Hungarian translation of olivia-yoga.
+# Source file: edit here, then run wordpress/dev/build-translations.php.
+
+msgid ""
+msgstr ""
+"Project-Id-Version: olivia-yoga\n"
+"Language: hu_HU\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Domain: olivia-yoga\n"
+
+#: home.php:8
+#: front-page.php:149
+#: single.php:13
+msgid "Journal"
+msgstr "Napló"
+
+#: index.php:7
+msgid "Search: %s"
+msgstr "Keresés: %s"
+
+#: index.php:16
+msgid "Nothing found."
+msgstr "Nincs találat."
+
+#: front-page.php:11
+msgid "Group & online classes"
+msgstr "Csoportos és online órák"
+
+#: front-page.php:11
+msgid "Hatha flow and slow flow every week in Fort Myers, plus live classes online."
+msgstr "Hatha flow és slow flow minden héten Fort Myersben, valamint élő online órák."
+
+#: front-page.php:12
+msgid "Private yoga & prenatal"
+msgstr "Privát jóga és kismamatorna"
+
+#: front-page.php:12
+msgid "One-on-one at your home, lanai or on the beach, and prenatal fitness for moms-to-be."
+msgstr "Egyéni óra nálad otthon, a teraszon vagy a tengerparton, és kismamatorna várandós anyukáknak."
+
+#: front-page.php:13
+#: inc/shortcodes.php:118
+msgid "Singing bowl massage"
+msgstr "Hangtálmasszázs"
+
+#: front-page.php:13
+msgid "Deep rest and guided meditation with Tibetan singing bowls, in a private session."
+msgstr "Mély pihenés és vezetett meditáció tibeti hangtálakkal, privát alkalomként."
+
+#: front-page.php:14
+#: footer.php:17
+#: functions.php:55
+msgid "Teams & athletes"
+msgstr "Csapatoknak és sportolóknak"
+
+#: front-page.php:14
+msgid "Office yoga, team building and mobility work for sport."
+msgstr "Irodai jóga, csapatépítés és mobilitásfejlesztés sportolóknak."
+
+#: front-page.php:17
+msgid "Your home or lanai"
+msgstr "Otthon vagy a teraszon"
+
+#: front-page.php:17
+msgid "No driving, no parking, no crowd. Just room for a mat and a little quiet."
+msgstr "Nincs autózás, parkolás, tömeg. Csak egy matracnyi hely és egy kis csend."
+
+#: front-page.php:18
+msgid "On the beach"
+msgstr "A tengerparton"
+
+#: front-page.php:18
+msgid "Sunrise or sunset on the sand at Fort Myers Beach, Sanibel or wherever your towel is."
+msgstr "Napfelkelte vagy naplemente a homokon Fort Myers Beachen, Sanibelen, vagy ahol a törölköződ van."
+
+#: front-page.php:19
+msgid "Condo & HOA clubhouses"
+msgstr "Társasházi és lakóközösségi klubházak"
+
+#: front-page.php:19
+msgid "A regular class for your community, paced for your residents."
+msgstr "Rendszeres óra a közösségednek, a lakók tempójához igazítva."
+
+#: front-page.php:20
+msgid "Online"
+msgstr "Online"
+
+#: front-page.php:20
+msgid "Live and one-on-one from wherever you are, with the same attention to detail."
+msgstr "Élőben és négyszemközt, bárhol is vagy, ugyanazzal a figyelemmel."
+
+#: front-page.php:23
+msgid "Send a request"
+msgstr "Küldj egy kérést"
+
+#: front-page.php:23
+msgid "Tell me where you are and which days suit you. It takes two minutes."
+msgstr "Írd meg, merre vagy, és mely napok jók neked. Két perc az egész."
+
+#: front-page.php:24
+msgid "Get a time and price"
+msgstr "Kapsz időpontot és árat"
+
+#: front-page.php:24
+msgid "I reply within a day with a suggested session, ready to confirm."
+msgstr "Egy napon belül válaszolok egy javasolt időponttal, amit csak jóvá kell hagynod."
+
+#: front-page.php:25
+msgid "Confirm online"
+msgstr "Visszaigazolás online"
+
+#: front-page.php:25
+msgid "Pay by card or use a private-session credit. You get a calendar invite."
+msgstr "Fizess kártyával vagy használj privát alkalmat a bérletedből. Naptármeghívót is kapsz."
+
+#: front-page.php:26
+msgid "Keep going"
+msgstr "Folytasd"
+
+#: front-page.php:26
+msgid "Single sessions or a 5-session pack, at your rhythm."
+msgstr "Egyes alkalmak vagy 5 alkalmas bérlet, a saját ritmusodban."
+
+#: front-page.php:32
+msgid "Fort Myers · Southwest Florida"
+msgstr "Fort Myers · Délnyugat-Florida"
+
+#: front-page.php:33
+msgctxt "hero title, line 1"
+msgid "Flow"
+msgstr "Flow"
+
+#: front-page.php:33
+msgctxt "hero title, line 2"
+msgid "yoga"
+msgstr "jóga"
+
+#: front-page.php:33
+msgctxt "hero title, line 3"
+msgid "in Fort Myers"
+msgstr "Fort Myersben"
+
+#: front-page.php:34
+msgid "Yoga, mobility and prenatal fitness with Olivia Kovacs: dynamic yet gentle group classes, private sessions at your home, lanai or on the beach, meditation and singing bowl massage."
+msgstr "Jóga, mobilitás és kismamatorna Olivia Kovacs-szal: dinamikus, mégis gyengéd csoportos órák, privát órák nálad otthon, a teraszon vagy a tengerparton, meditáció és hangtálmasszázs."
+
+#: front-page.php:35
+#: front-page.php:157
+#: single.php:18
+msgid "Book a class"
+msgstr "Óra foglalása"
+
+#: front-page.php:35
+msgid "Private session"
+msgstr "Privát óra"
+
+#: front-page.php:45
+msgid "Ways to practice"
+msgstr "Így gyakorolhatsz"
+
+#: front-page.php:55
+msgid "Meet your teacher"
+msgstr "Ismerd meg az oktatód"
+
+#: front-page.php:62
+msgid "Meet Olivia"
+msgstr "Ismerd meg Oliviát"
+
+#: front-page.php:62
+msgid "See all classes"
+msgstr "Összes óra"
+
+#: front-page.php:66
+msgid "Awareness"
+msgstr "Tudatosság"
+
+#: front-page.php:66
+msgid "I notice. I see. I observe. I allow. And then I respond."
+msgstr "Észreveszem. Látom. Megfigyelem. Megengedem. És aztán válaszolok."
+
+#: front-page.php:67
+msgid "Control"
+msgstr "Kontroll"
+
+#: front-page.php:67
+msgid "I want to steer it. I grip it, regulate it, push it down."
+msgstr "Irányítani akarom. Megszorítom, szabályozom, elnyomom."
+
+#: front-page.php:68
+msgid "The most important difference yoga has taught me so far."
+msgstr "A legfontosabb különbség, amit a jóga eddig megtanított nekem."
+
+#: front-page.php:73
+msgid "Classes in Fort Myers"
+msgstr "Órák Fort Myersben"
+
+#: front-page.php:73
+msgid "Breathwork, strength, stretching, balance, a real flow state and a long relaxation in every class. Choose the pace that suits you today."
+msgstr "Légzés, erősítés, nyújtás, egyensúly, igazi flow élmény és hosszú relaxáció minden órán. Válaszd azt a tempót, ami ma jól esik."
+
+#: front-page.php:73
+#: footer.php:17
+#: single-oy_class.php:12
+msgid "Classes"
+msgstr "Órák"
+
+#: front-page.php:78
+msgid "sun: effort, heat, strength"
+msgstr "nap: erőfeszítés, hő, erő"
+
+#: front-page.php:78
+msgid "moon: ease, cool, surrender"
+msgstr "hold: könnyedség, hűvösség, elengedés"
+
+#: front-page.php:80
+msgid "What hatha means"
+msgstr "Mit jelent a hatha"
+
+#: front-page.php:81
+msgid "Ha is the sun. Tha is the moon."
+msgstr "A ha a nap. A tha a hold."
+
+#: front-page.php:82
+msgid "Hatha yoga balances the active and the receptive in us: effort and ease, strength and surrender. When that balance tips, we feel it first as tension or restlessness."
+msgstr "A hatha jóga egyensúlyba hozza bennünk az aktívat és a befogadót: az erőfeszítést és a könnyedséget, az erőt és az elengedést. Ha ez az egyensúly felborul, először feszültségként vagy nyugtalanságként érezzük."
+
+#: front-page.php:83
+msgid "On the mat we use the body to find the balance again. The poses are a doorway to meditation, a more dynamic doorway, and only one of the eight limbs of yoga."
+msgstr "A matracon a testünk segítségével találjuk meg újra az egyensúlyt. A pózok kaput nyitnak a meditáció felé, egy dinamikusabb kaput, és a jóga nyolc ágának csak egyikét jelentik."
+
+#: front-page.php:84
+msgid "Read more about hatha yoga"
+msgstr "Bővebben a hatha jógáról"
+
+#: front-page.php:90
+#: footer.php:17
+#: functions.php:53
+msgid "Private yoga"
+msgstr "Privát jóga"
+
+#: front-page.php:91
+msgid "Your own class, wherever you breathe best"
+msgstr "A saját órád, ott, ahol a legjobban tudsz lélegezni"
+
+#: front-page.php:92
+msgid "Private yoga in Fort Myers is built around one body: yours. We talk about how you move, where you hold tension and what you want to feel afterwards. Then I plan the class for exactly that."
+msgstr "A privát jóga Fort Myersben egyetlen testre épül: a tiédre. Beszélünk arról, hogyan mozogsz, hol tartod a feszültséget és mit szeretnél érezni utána. Aztán pontosan erre tervezem az órát."
+
+#: front-page.php:94
+msgid "Prenatal fitness and singing bowl massage can be booked as private sessions too, in English or Hungarian."
+msgstr "Kismamatorna és hangtálmasszázs is foglalható privát alkalomként, angolul vagy magyarul."
+
+#: front-page.php:99
+#: functions.php:140
+msgid "Request a private session"
+msgstr "Privát óra kérése"
+
+#: front-page.php:99
+msgid "How it works"
+msgstr "Hogyan működik"
+
+#: front-page.php:104
+msgid "This week"
+msgstr "Ezen a héten"
+
+#: front-page.php:104
+msgid "Weekly group classes"
+msgstr "Heti csoportos órák"
+
+#: front-page.php:104
+msgid "Book in a minute. Beginners are welcome in every class."
+msgstr "Egy perc alatt foglalhatsz. Kezdőket minden órára szeretettel várok."
+
+#: front-page.php:104
+msgid "Full schedule & pricing"
+msgstr "Teljes órarend és árak"
+
+#: front-page.php:108
+msgid "Breathing exercise"
+msgstr "Légzőgyakorlat"
+
+#: front-page.php:111
+msgid "Simple pricing"
+msgstr "Egyszerű árak"
+
+#: front-page.php:111
+msgid "Pay per class, save with a pass or membership, or give someone a gift card."
+msgstr "Fizess alkalmanként, spórolj bérlettel vagy tagsággal, vagy ajándékozz utalványt."
+
+#: front-page.php:111
+msgid "Prices in USD"
+msgstr "Árak USD-ben"
+
+#: front-page.php:116
+#: footer.php:20
+#: inc/content-types.php:28
+msgid "FAQ"
+msgstr "GYIK"
+
+#: front-page.php:116
+msgid "Am I flexible enough for yoga?"
+msgstr "Elég hajlékony vagyok a jógához?"
+
+#: front-page.php:116
+msgid "The question everyone asks first, and a few others."
+msgstr "A kérdés, amit mindenki elsőként feltesz, és még néhány."
+
+#: front-page.php:116
+msgid "All questions"
+msgstr "Összes kérdés"
+
+#: front-page.php:121
+#: footer.php:17
+#: functions.php:56
+msgid "Events"
+msgstr "Események"
+
+#: front-page.php:121
+msgid "Sound yoga, live music & festival flows"
+msgstr "Hangjóga, élőzene és fesztiválflow-k"
+
+#: front-page.php:121
+msgid "Special classes where handpan, tongue drum or singing bowls lead the movement, followed by guided meditation."
+msgstr "Különleges órák, ahol handpan, nyelves dob vagy hangtálak vezetik a mozgást, utána vezetett meditációval."
+
+#: front-page.php:121
+msgid "All events"
+msgstr "Összes esemény"
+
+#: front-page.php:126
+msgid "Earlier events"
+msgstr "Korábbi események"
+
+#: front-page.php:137
+msgid "Moments on the mat"
+msgstr "Pillanatok a matracon"
+
+#: front-page.php:137
+msgid "Studio flows, garden classes, festival pavilions and the sea. Every class looks a little different; the feeling afterwards is the same."
+msgstr "Termi flow-k, kerti órák, fesztiválpavilonok és a tenger. Minden óra kicsit másképp néz ki, az utána érzett érzés ugyanaz."
+
+#: front-page.php:142
+msgid "Southwest Florida"
+msgstr "Délnyugat-Florida"
+
+#: front-page.php:142
+msgid "Where I teach around Fort Myers"
+msgstr "Hol tanítok Fort Myers környékén"
+
+#: front-page.php:142
+msgid "Group classes in Fort Myers; private sessions at homes, clubhouses, offices and beaches across Southwest Florida."
+msgstr "Csoportos órák Fort Myersben; privát órák otthonokban, klubházakban, irodákban és tengerparton Délnyugat-Floridában."
+
+#: front-page.php:149
+msgid "From the journal"
+msgstr "A naplóból"
+
+#: front-page.php:149
+msgid "All articles"
+msgstr "Összes írás"
+
+#: front-page.php:155
+msgid "Your mat is waiting"
+msgstr "Vár a matracod"
+
+#: front-page.php:156
+msgid "Try a group class, request a private session, or just send a question. Beginners very welcome."
+msgstr "Próbálj ki egy csoportos órát, kérj privát órát, vagy csak küldj egy kérdést. Kezdőket nagy szeretettel várok."
+
+#: front-page.php:157
+msgid "Send a message"
+msgstr "Írj üzenetet"
+
+#: single.php:12
+msgid "%d min read"
+msgstr "%d perc olvasás"
+
+#: single.php:22
+msgid "Keep reading"
+msgstr "Olvass tovább"
+
+#: footer.php:11
+msgid "Dynamic yet gentle. Just enough of everything."
+msgstr "Dinamikus, mégis gyengéd. Pont elég mindenből."
+
+#: footer.php:16
+#: footer.php:16
+msgid "Practice"
+msgstr "Gyakorlás"
+
+#: footer.php:17
+#: functions.php:54
+msgid "Schedule & pricing"
+msgstr "Órarend és árak"
+
+#: footer.php:19
+#: footer.php:19
+msgid "More"
+msgstr "Továbbiak"
+
+#: footer.php:20
+msgid "About Olivia"
+msgstr "Oliviáról"
+
+#: footer.php:20
+#: functions.php:59
+msgid "Contact"
+msgstr "Kapcsolat"
+
+#: footer.php:21
+msgid "Gift cards"
+msgstr "Ajándékutalványok"
+
+#: footer.php:22
+#: header.php:14
+msgid "My account"
+msgstr "Fiókom"
+
+#: footer.php:24
+#: functions.php:149
+msgid "Say hello"
+msgstr "Írj nekem"
+
+#: footer.php:25
+msgid "Join our Facebook group"
+msgstr "Csatlakozz a Facebook-csoportunkhoz"
+
+#: footer.php:32
+msgid "Privacy"
+msgstr "Adatvédelem"
+
+#: footer.php:33
+msgid "Yoga is not a substitute for medical care. If you have a health condition or are pregnant, talk to your doctor before starting a new practice."
+msgstr "A jóga nem helyettesíti az orvosi ellátást. Ha egészségügyi problémád van vagy várandós vagy, új gyakorlás előtt beszélj az orvosoddal."
+
+#: footer.php:37
+msgid "Quick actions"
+msgstr "Gyors műveletek"
+
+#: footer.php:38
+#: inc/shortcodes.php:200
+msgid "Book"
+msgstr "Foglalás"
+
+#: footer.php:39
+msgid "Private"
+msgstr "Privát"
+
+#: footer.php:40
+msgid "Account"
+msgstr "Fiók"
+
+#: 404.php:4
+msgid "This page has drifted downstream"
+msgstr "Ezt az oldalt elsodorta a víz"
+
+#: 404.php:4
+msgid "The link may be old or mistyped. Take a breath and choose where to go next."
+msgstr "Lehet, hogy a link régi vagy elírták. Vegyél egy levegőt, és válaszd ki, merre tovább."
+
+#: 404.php:4
+msgid "Not found"
+msgstr "Nem található"
+
+#: 404.php:6
+msgid "Go to the home page"
+msgstr "Ugrás a főoldalra"
+
+#: 404.php:6
+msgid "See the classes"
+msgstr "Az órák"
+
+#: template-parts/cards.php:16
+msgid "Read"
+msgstr "Olvasd el"
+
+#: single-oy_class.php:21
+msgid "Next dates"
+msgstr "Következő időpontok"
+
+#: single-oy_class.php:30
+msgid "Ask for a session"
+msgstr "Kérj időpontot"
+
+#: single-oy_class.php:30
+msgid "Book this class"
+msgstr "Foglald le ezt az órát"
+
+#: single-oy_class.php:35
+msgid "Other classes"
+msgstr "További órák"
+
+#: functions.php:29
+msgid "Main menu"
+msgstr "Főmenü"
+
+#: functions.php:57
+msgid "About"
+msgstr "Rólam"
+
+#: functions.php:64
+msgid "All classes"
+msgstr "Összes óra"
+
+#: functions.php:87
+msgid "Show %s"
+msgstr "%s megjelenítése"
+
+#: functions.php:117
+msgid "Hatha yoga teacher, Yoga Alliance International certified (2023)"
+msgstr "Hatha jógaoktató, Yoga Alliance International minősítéssel (2023)"
+
+#: functions.php:118
+msgid "Samadhi Yoga Studio, Budapest, with Ádám Diószegi"
+msgstr "Samadhi Jógastúdió, Budapest, Diószegi Ádámmal"
+
+#: functions.php:119
+msgid "Tibetan singing bowl and sound massage practitioner"
+msgstr "Tibeti hangtál- és hangmasszázs-terapeuta"
+
+#: functions.php:120
+msgid "Prenatal & postnatal fitness training"
+msgstr "Várandós és szülés utáni fitnesz képzés"
+
+#: functions.php:121
+msgid "Personal trainer and massage therapist background"
+msgstr "Személyi edzői és masszőri háttér"
+
+#: functions.php:122
+msgid "Self-myofascial release (SMR) course"
+msgstr "SMR (önmasszázs, myofasciális lazítás) tanfolyam"
+
+#: functions.php:134
+msgid "Training"
+msgstr "Képzések"
+
+#: functions.php:134
+msgid "Practice with me"
+msgstr "Gyakorolj velem"
+
+#: functions.php:137
+msgid "Private sessions"
+msgstr "Privát órák"
+
+#: functions.php:137
+msgid "From %s"
+msgstr "%s-tól"
+
+#: functions.php:138
+msgid "60, 75 or 90 minutes at your home, lanai, clubhouse, on the beach or online. Prenatal fitness and singing bowl massage too."
+msgstr "60, 75 vagy 90 perc nálad otthon, a teraszon, a klubházban, a tengerparton vagy online. Kismamatorna és hangtálmasszázs is."
+
+#: functions.php:139
+msgid "In English or Hungarian"
+msgstr "Angolul vagy magyarul"
+
+#: functions.php:139
+msgid "Reply within a day"
+msgstr "Válasz egy napon belül"
+
+#: functions.php:141
+msgid "Areas I travel to"
+msgstr "Ahová kijárok"
+
+#: functions.php:143
+msgid "Plan a session for your team"
+msgstr "Tervezzünk órát a csapatodnak"
+
+#: functions.php:143
+msgid "Tell me your team size, location and goals. I will send a proposal with pricing."
+msgstr "Írd meg a csapat létszámát, a helyszínt és a céljaitokat. Küldök egy ajánlatot árakkal."
+
+#: functions.php:143
+msgid "Request a proposal"
+msgstr "Ajánlatot kérek"
+
+#: functions.php:145
+msgid "Hear about the next one"
+msgstr "Értesülj a következőről"
+
+#: functions.php:145
+msgid "Sound yoga, live-music flows and outdoor sessions are announced here and on Instagram first."
+msgstr "A hangjóga, az élőzenés flow-k és a szabadtéri órák itt és az Instagramon jelennek meg először."
+
+#: functions.php:145
+msgid "Follow on Instagram"
+msgstr "Kövess Instagramon"
+
+#: functions.php:147
+msgid "Still wondering?"
+msgstr "Még gondolkodsz?"
+
+#: functions.php:147
+msgid "Send your question. I am happy to help you choose the right class."
+msgstr "Küldd el a kérdésed. Szívesen segítek kiválasztani a neked való órát."
+
+#: functions.php:147
+msgid "Ask a question"
+msgstr "Kérdezz"
+
+#: functions.php:152
+msgid "Our Facebook group"
+msgstr "Facebook-csoportunk"
+
+#: functions.php:153
+msgid "English, Hungarian"
+msgstr "Angol, magyar"
+
+#: functions.php:154
+msgid "Ready to book? Group classes and passes can be booked and paid online."
+msgstr "Foglalnál? A csoportos órák és a bérletek online foglalhatók és fizethetők."
+
+#: inc/i18n.php:112
+#: inc/translations-admin.php:25
+#: inc/content-types.php:84
+msgid "Language"
+msgstr "Nyelv"
+
+#: inc/helpers.php:142
+msgid "Yoga Teacher | Movement & Wellness Coach"
+msgstr "Jógaoktató | Mozgás- és wellness coach"
+
+#: inc/helpers.php:146
+msgid "Yoga"
+msgstr "Jóga"
+
+#: inc/helpers.php:146
+msgid "Mobility"
+msgstr "Mobilitás"
+
+#: inc/helpers.php:146
+msgid "Prenatal Fitness"
+msgstr "Kismamatorna"
+
+#: inc/helpers.php:146
+msgid "Meditation"
+msgstr "Meditáció"
+
+#: inc/helpers.php:146
+msgid "Private Singing Bowl Massage"
+msgstr "Privát hangtálmasszázs"
+
+#: inc/helpers.php:201
+msgid "Home"
+msgstr "Főoldal"
+
+#: inc/helpers.php:206
+msgid "Breadcrumb"
+msgstr "Morzsamenü"
+
+#: inc/shortcodes.php:91
+msgid "Breathe in"
+msgstr "Belégzés"
+
+#: inc/shortcodes.php:92
+msgid "Breathe out"
+msgstr "Kilégzés"
+
+#: inc/shortcodes.php:93
+msgid "Ready?"
+msgstr "Kezdhetjük?"
+
+#: inc/shortcodes.php:94
+msgid "Breath %1$d of %2$d"
+msgstr "%1$d. légzés a %2$d-ból"
+
+#: inc/shortcodes.php:95
+msgid "Welcome back. Notice how you feel now. That is how every class begins."
+msgstr "Üdv újra itt. Figyeld meg, hogy érzed most magad. Így kezdődik minden óra."
+
+#: inc/shortcodes.php:96
+msgid "Stop"
+msgstr "Állj"
+
+#: inc/shortcodes.php:100
+msgid "Try it now · 30 seconds"
+msgstr "Próbáld ki most · 30 másodperc"
+
+#: inc/shortcodes.php:101
+msgid "Before you decide, take three breaths with me"
+msgstr "Mielőtt döntesz, vegyél velem három levegőt"
+
+#: inc/shortcodes.php:102
+msgid "A longer exhale is the quickest way to tell your nervous system it is safe to slow down. Follow the lotus: it opens as you breathe in and folds as you breathe out."
+msgstr "A hosszabb kilégzés a leggyorsabb módja annak, hogy jelezd az idegrendszerednek: biztonságos lelassulni. Kövesd a lótuszt: belégzésre kinyílik, kilégzésre összecsukódik."
+
+#: inc/shortcodes.php:103
+msgid "counts in, through the nose"
+msgstr "ütem belégzés, orron át"
+
+#: inc/shortcodes.php:103
+msgid "counts out, slow and soft"
+msgstr "ütem kilégzés, lassan és lágyan"
+
+#: inc/shortcodes.php:103
+msgid "rounds, then notice the difference"
+msgstr "kör, aztán figyeld meg a különbséget"
+
+#: inc/shortcodes.php:104
+msgid "Start breathing"
+msgstr "Kezdjük"
+
+#: inc/shortcodes.php:115
+msgid "Group class"
+msgstr "Csoportos óra"
+
+#: inc/shortcodes.php:117
+msgid "Prenatal fitness"
+msgstr "Kismamatorna"
+
+#: inc/shortcodes.php:119
+msgid "Teams & companies"
+msgstr "Csapatok és cégek"
+
+#: inc/shortcodes.php:120
+msgid "Athletes & mobility"
+msgstr "Sportolók és mobilitás"
+
+#: inc/shortcodes.php:121
+msgid "Event or retreat"
+msgstr "Esemény vagy elvonulás"
+
+#: inc/shortcodes.php:122
+msgid "Gift card"
+msgstr "Ajándékutalvány"
+
+#: inc/shortcodes.php:123
+msgid "Something else"
+msgstr "Valami más"
+
+#: inc/shortcodes.php:135
+msgid "Thank you, your message is on its way. I will reply as soon as I can, usually within a day."
+msgstr "Köszönöm, az üzeneted úton van. Amint tudok, válaszolok, általában egy napon belül."
+
+#: inc/shortcodes.php:136
+msgid "Please fill in your name, a valid email and a message."
+msgstr "Kérlek, add meg a neved, egy érvényes e-mail-címet és az üzenetet."
+
+#: inc/shortcodes.php:139
+msgid "Fill in this field."
+msgstr "Töltsd ki ezt a mezőt."
+
+#: inc/shortcodes.php:140
+msgid "Enter an email address like name@example.com."
+msgstr "Adj meg egy e-mail-címet, például nev@pelda.hu."
+
+#: inc/shortcodes.php:146
+msgid "What would you like to talk about?"
+msgstr "Miről beszélnél?"
+
+#: inc/shortcodes.php:147
+msgid "Your name"
+msgstr "Neved"
+
+#: inc/shortcodes.php:148
+msgid "Email"
+msgstr "E-mail"
+
+#: inc/shortcodes.php:149
+msgid "Phone (optional)"
+msgstr "Telefon (nem kötelező)"
+
+#: inc/shortcodes.php:150
+msgid "Your area (optional)"
+msgstr "Környék (nem kötelező)"
+
+#: inc/shortcodes.php:150
+msgid "McGregor, Cape Coral, Fort Myers Beach…"
+msgstr "McGregor, Cape Coral, Fort Myers Beach…"
+
+#: inc/shortcodes.php:151
+msgid "Message"
+msgstr "Üzenet"
+
+#: inc/shortcodes.php:151
+msgid "Tell me a little about your practice, any injuries or a pregnancy I should know about, and when you would like to start."
+msgstr "Írj egy kicsit a gyakorlásodról, sérülésről vagy várandósságról, amiről tudnom kell, és hogy mikor kezdenél."
+
+#: inc/shortcodes.php:152
+msgid "Send message"
+msgstr "Üzenet küldése"
+
+#: inc/shortcodes.php:153
+msgid "I only use your details to reply to you."
+msgstr "Az adataidat csak a válaszhoz használom."
+
+#: inc/shortcodes.php:194
+msgid "The timetable is coming soon."
+msgstr "Az órarend hamarosan érkezik."
+
+#: inc/shortcodes.php:198
+msgid "Book a private session"
+msgstr "Privát óra foglalása"
+
+#: inc/shortcodes.php:199
+msgid "Buy a gift card"
+msgstr "Ajándékutalvány vásárlása"
+
+#: inc/shortcodes.php:208
+msgid "Prenatal & postnatal fitness training: Fitmummy method"
+msgstr "Várandós és szülés utáni fitnesz képzés: Fitmummy módszer"
+
+#: inc/seo.php:15
+msgid "Yoga, mobility and prenatal fitness in Fort Myers, FL: hatha flow and slow flow classes, private yoga at your home, lanai or on the beach, meditation and singing bowl massage with Olivia Kovacs."
+msgstr "Jóga, mobilitás és kismamatorna Fort Myersben (Florida): hatha flow és slow flow órák, privát jóga otthon, a teraszon vagy a tengerparton, meditáció és hangtálmasszázs Olivia Kovacs-szal."
+
+#: inc/seo.php:30
+msgid "Yoga in Fort Myers, FL: Hatha Flow, Private Yoga & Prenatal Fitness | Olivia Kovacs"
+msgstr "Jóga Fort Myersben: Hatha Flow, privát jóga és kismamatorna | Olivia Kovacs"
+
+#: header.php:12
+msgid "Skip to content"
+msgstr "Ugrás a tartalomra"
+
+#: header.php:14
+msgid "Log in"
+msgstr "Belépés"
+
+#: header.php:15
+msgid "Yoga & movement · Fort Myers"
+msgstr "Jóga és mozgás · Fort Myers"
+
+#: header.php:20
+msgid "Main"
+msgstr "Fő"
+
+#: header.php:25
+msgid "Menu"
+msgstr "Menü"
+
+#: header.php:30
+msgid "Mobile"
+msgstr "Mobil"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A gong and singing bowls set up for a sound yoga class"
+msgstr "Gong és hangtálak egy hangjóga órához előkészítve"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A group class in a bright studio full of plants"
+msgstr "Csoportos óra egy világos, növényekkel teli teremben"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A group practicing in a studio with prayer flags"
+msgstr "Csoport gyakorol egy imazászlókkal díszített teremben"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A group raising their arms in a riverside pavilion"
+msgstr "Csoport karemelésben egy folyóparti pavilonban"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A private yoga session in tree pose"
+msgstr "Privát jógaóra fa pózban"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A seated group class in a white studio"
+msgstr "Ülő csoportos óra egy fehér teremben"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A student in plank on a green mat outdoors"
+msgstr "Gyakorló plankban egy zöld matracon a szabadban"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A student in three-legged dog under a festival canopy"
+msgstr "Gyakorló háromlábú kutyában egy fesztiválsátor alatt"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A team building yoga class in a sports hall"
+msgstr "Csapatépítő jógaóra egy sportcsarnokban"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A team in tree pose in a sports hall"
+msgstr "Csapat fa pózban egy sportcsarnokban"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "A team yoga session with live handpan in an office"
+msgstr "Csapatjóga élő handpannel egy irodában"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "An evening yoga class on a lawn under string lights"
+msgstr "Esti jógaóra a gyepen fényfüzérek alatt"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "An outdoor group class in low lunges"
+msgstr "Szabadtéri csoportos óra alacsony kitörésben"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Athletes doing mobility yoga in a sports hall"
+msgstr "Sportolók mobilitásjógája egy sportcsarnokban"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Close portrait of Olivia Kovacs in soft sunlight"
+msgstr "Közeli portré Olivia Kovacsról lágy napfényben"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs adjusting a student in downward dog"
+msgstr "Olivia Kovacs igazít egy gyakorlót lefelé néző kutyában"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs balancing on a rock above a wide landscape"
+msgstr "Olivia Kovacs egyensúlyoz egy sziklán a táj fölött"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs coaching a pregnant client on a fitness ball"
+msgstr "Olivia Kovacs egy várandós vendéggel dolgozik fitneszlabdán"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs demonstrating a backbend in an outdoor class"
+msgstr "Olivia Kovacs hátrahajlást mutat egy szabadtéri órán"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs giving a relaxing massage"
+msgstr "Olivia Kovacs relaxáló masszázst ad"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs guiding a private yoga session"
+msgstr "Olivia Kovacs privát jógaórát vezet"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in a crescent lunge in front of a mandala"
+msgstr "Olivia Kovacs magas kitörésben egy mandala előtt"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in a deep squat on an outdoor yoga deck"
+msgstr "Olivia Kovacs mély guggolásban egy szabadtéri jógateraszon"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in a side plank variation on a wooden deck"
+msgstr "Olivia Kovacs oldalsó plank változatban egy fateraszon"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in a side stretch by the sea"
+msgstr "Olivia Kovacs oldalnyújtásban a tengerparton"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in a side stretch leading a festival class"
+msgstr "Olivia Kovacs oldalnyújtásban fesztiválórát vezet"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in a standing forward fold"
+msgstr "Olivia Kovacs álló előrehajlásban"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in a warrior pose in a meadow at sunset"
+msgstr "Olivia Kovacs harcos pózban egy réten naplementekor"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in dancer pose in a living room"
+msgstr "Olivia Kovacs táncos pózban a nappaliban"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs in dancer pose on the beach"
+msgstr "Olivia Kovacs táncos pózban a tengerparton"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs leading a hatha flow class on a wooden deck by the lake"
+msgstr "Olivia Kovacs hatha flow órát vezet egy tóparti fateraszon"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs looking out over the river at golden hour"
+msgstr "Olivia Kovacs a folyót nézi az aranyórában"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs on a terrace at sunset, looking into the distance"
+msgstr "Olivia Kovacs egy teraszon naplementekor, a távolba néz"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs reaching up in a bright studio"
+msgstr "Olivia Kovacs felfelé nyújtózik egy világos teremben"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs reaching up with a garden class"
+msgstr "Olivia Kovacs felfelé nyújtózik egy kerti órán"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs resting in child's pose"
+msgstr "Olivia Kovacs gyermekpózban pihen"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs seated in front of a large outdoor festival class"
+msgstr "Olivia Kovacs ül egy nagy szabadtéri fesztiválóra előtt"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs stretching her arms up in warm evening light"
+msgstr "Olivia Kovacs felnyújtott karokkal a meleg esti fényben"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs teaching a seated class in a park"
+msgstr "Olivia Kovacs ülő órát tart egy parkban"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs teaching online yoga from her living room"
+msgstr "Olivia Kovacs online jógát tanít a nappalijából"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Olivia Kovacs with her arms raised against the sky"
+msgstr "Olivia Kovacs felemelt karokkal az ég előtt"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Portrait of yoga teacher Olivia Kovacs smiling at sunset"
+msgstr "Olivia Kovacs jógaoktató mosolyog naplementekor"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Silhouette of Olivia Kovacs against an orange sunset"
+msgstr "Olivia Kovacs sziluettje a narancssárga naplementében"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Silhouettes of a class in a riverside pavilion"
+msgstr "Egy óra sziluettjei egy folyóparti pavilonban"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Students balancing in bird dog during an outdoor class"
+msgstr "Gyakorlók madár-kutya egyensúlyban egy szabadtéri órán"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Students in downward dog on a wooden deck"
+msgstr "Gyakorlók lefelé néző kutyában egy fateraszon"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Students resting in child's pose on a wooden floor"
+msgstr "Gyakorlók gyermekpózban pihennek a fapadlón"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Students resting in final relaxation in a dim studio"
+msgstr "Gyakorlók a záró relaxációban egy félhomályos teremben"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Sun rays through trees at an outdoor festival"
+msgstr "Napsugarak a fák között egy szabadtéri fesztiválon"
+
+#: assets/img/images.json
+#. Photo description (alt text).
+msgid "Tibetan singing bowls lined up in a yoga studio"
+msgstr "Sorba állított tibeti hangtálak egy jógateremben"
+
+#: inc/content-types.php
+msgid "Most popular"
+msgstr "Legnépszerűbb"

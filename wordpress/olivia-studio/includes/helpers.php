@@ -109,11 +109,39 @@ function oys_mode_for( $session, $mode = 'studio' ) {
 	return oys_is_hybrid( $session ) && 'online' === $mode ? 'online' : 'studio';
 }
 
+/**
+ * A text stored as data (a product name, a feature line, a default location…) in the visitor's
+ * language, when languages/olivia-studio-{locale}.mo has it. Texts Olivia types in herself stay as typed.
+ */
+function oys_t( $text ) {
+	$text = (string) $text;
+	return '' === $text || 'en' === oys_lang() ? $text : translate( $text, 'olivia-studio' ); // phpcs:ignore WordPress.WP.I18n
+}
+
+function oys_product_name( $product ) {
+	return oys_t( is_array( $product ) ? ( $product['name'] ?? '' ) : (string) ( $product->name ?? '' ) );
+}
+
+function oys_product_text( $text ) {
+	return oys_t( $text );
+}
+
+/** A language code the site knows (en, hu, es); anything else is English. */
+function oys_valid_lang( $lang ) {
+	$lang = sanitize_key( (string) $lang );
+	return isset( OYS_I18n::LANGS[ $lang ] ) ? $lang : 'en';
+}
+
+/** Short label for the language a class is taught in (EN, HU, ES). */
+function oys_lang_short( $lang ) {
+	return OYS_I18n::LANGS[ oys_valid_lang( $lang ) ]['short'];
+}
+
 function oys_session_title( $session ) {
 	if ( ! $session ) {
 		return '';
 	}
-	return $session->title ?: oys_class_title( $session->class_slug );
+	return $session->title ? oys_t( $session->title ) : oys_class_title( $session->class_slug );
 }
 
 /** "Pay what you like" class: the price is only a suggestion, with a minimum for card payments. */

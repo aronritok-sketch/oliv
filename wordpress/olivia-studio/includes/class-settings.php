@@ -66,11 +66,11 @@ class OYS_Settings {
 			'zoom_auto'               => 1,
 			'zoom_personal'           => 0,
 			'zoom_waiting_room'       => 0,
-			'email_from_name'         => 'Olivia Kovács Yoga',
+			'email_from_name'         => 'Olivia Kovacs Yoga',
 			'email_from'              => get_option( 'admin_email' ),
 			'notify_email'            => get_option( 'admin_email' ),
 			'waiver_version'          => '2026-09',
-			'waiver_text'             => "I understand that yoga includes physical movement and that there is a risk of injury. I confirm I am in good health or have my doctor's approval to practice, and I will tell Olivia about injuries, pregnancy or health conditions before class. I will listen to my body, rest whenever I need to, and take responsibility for my own practice. I release Olivia Kovács Yoga from liability for injury, except in cases of gross negligence.",
+			'waiver_text'             => "I understand that yoga includes physical movement and that there is a risk of injury. I confirm I am in good health or have my doctor's approval to practice, and I will tell Olivia about injuries, pregnancy or health conditions before class. I will listen to my body, rest whenever I need to, and take responsibility for my own practice. I release Olivia Kovacs Yoga from liability for injury, except in cases of gross negligence.",
 			'cancel_policy'           => 'Cancel up to 12 hours before a group class and the class goes back on your pass. Paid for a drop-in? You get a class credit instead. Later cancellations and no-shows use the class. Private sessions can be moved or cancelled up to 24 hours before.',
 		);
 	}
