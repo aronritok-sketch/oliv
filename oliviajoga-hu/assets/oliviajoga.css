@@ -269,3 +269,263 @@
 .oj-events-all .moments__year { margin: 2rem 0 0; }
 .oj-more .btn-row .btn { white-space: nowrap; }
 .oj-block--wide { max-width: 980px; }
+
+/* ==========================================================================
+   Round 2 (Olivia's notes, 2026-11-05)
+   ========================================================================== */
+:root { --f-serif: "Fraunces", "Georgia", serif; }
+
+/* The new logo (assets/brand): a soft retro wordmark from Olivia's moodboard */
+.oj-brand { gap: 0; }
+.oj-brand .brand__logo { width: auto; height: 50px; color: var(--ink); display: block; overflow: visible; }
+.oj-brand .brand__logo path:last-child { transition: transform .6s var(--ease); }
+.oj-brand:hover .brand__logo path:last-child { transform: translateX(-6px); }
+.nav-open .site-header .oj-brand .brand__logo { color: var(--paper); }
+@media (max-width: 600px) { .oj-brand .brand__logo { height: 42px; } }
+.oj-foot-logo { display: inline-block; color: var(--paper); margin-bottom: 1.4rem; }
+.oj-foot-logo__svg { width: 210px; height: auto; display: block; }
+
+/* Transparent pictures stay transparent (the theme gives photos a pale placeholder colour) */
+img.photo[src$=".webp"] { background: transparent; }
+
+/* Headings: more room between the lines, so the accents of Á, É, Ő… don't touch the line above */
+h1, h2, .page-head .page-head__title, .oj-h2, .oj-display, .oj-title__h, .oj-loc .oj-loc__seo, .oj-needs h3,
+.oj-pre .oj-pre__statement, .oj-event .oj-event__title, .oj-map .oj-map__title, .oj-quotes h1, .oj-quotes h2, .namecard__name,
+.oj-alert h2, .drawer li a, .oj-loc .oj-loc__place, .oj-reach .oj-reach__h { line-height: 1.18; letter-spacing: .015em; }
+.page-head .page-head__title { line-height: 1.06; padding-top: .08em; }
+.page-head--long .page-head__title { line-height: 1.12; }
+.hero__title { line-height: 1.04; }
+.hero__title mark { line-height: 1.12; padding-top: .04em; }
+.oj-h2.is-long, .oj-title .is-long { line-height: 1.25; }
+
+/* Home: every photo black and white, except the gift card (Olivia) */
+.is-home main .photo { filter: grayscale(1) contrast(1.06); }
+.is-home main .keep-color .photo { filter: none; }
+
+/* Home hero: Olivia's "hero" photo; the two places get the same button; a little motion */
+.oj-hero .oj-hero-photo { aspect-ratio: 800 / 618; }
+.oj-hero .oj-hero-photo img { transform-origin: 60% 50%; }
+.oj-twins { display: flex; flex-wrap: wrap; gap: .8rem; max-width: 560px; }
+.oj-twins .btn { flex: 1 1 15rem; justify-content: center; text-align: center; min-height: 3.6rem; }
+@media (max-width: 600px) { .oj-twins .btn { font-size: .78rem; letter-spacing: .08em; padding-inline: 1rem; white-space: nowrap; } }
+.oj-squiggle { width: min(220px, 50%); height: auto; margin: -.6rem 0 1.6rem; overflow: visible; }
+.oj-squiggle path { fill: none; stroke: var(--orchid); stroke-width: 4; stroke-linecap: round; }
+.oj-ring { position: absolute; right: -6px; top: -34px; width: clamp(108px, 12vw, 150px); aspect-ratio: 1; z-index: 3; color: var(--ink); }
+.oj-ring svg { width: 100%; height: 100%; overflow: visible; }
+.oj-ring text { font: 700 15.5px/1 var(--f-text); letter-spacing: .14em; fill: currentColor; }
+.oj-ring__dot { position: absolute; inset: 37%; border-radius: 50%; background: var(--orchid); box-shadow: 0 0 0 10px var(--paper); }
+@media (max-width: 959px) { .oj-ring { right: 4px; top: -46px; } }
+@media (prefers-reduced-motion: no-preference) {
+	.oj-rise { opacity: 0; transform: translateY(26px); animation: oj-rise .9s var(--ease) forwards; animation-delay: calc(var(--d, 0) * .12s + .1s); }
+	@keyframes oj-rise { to { opacity: 1; transform: none; } }
+	.oj-draw path { stroke-dasharray: 260; stroke-dashoffset: 260; animation: oj-draw 1.4s .6s var(--ease) forwards; }
+	@keyframes oj-draw { to { stroke-dashoffset: 0; } }
+	.oj-hero .oj-hero-photo img { animation: oj-breathe 16s ease-in-out infinite alternate; }
+	@keyframes oj-breathe { from { transform: scale(1.02); } to { transform: scale(1.1) translateX(-1.5%); } }
+	.oj-ring svg { animation: oj-spin 22s linear infinite; }
+	@keyframes oj-spin { to { transform: rotate(360deg); } }
+	.oj-ring__dot { animation: oj-pulse 3.2s ease-in-out infinite; }
+	@keyframes oj-pulse { 50% { transform: scale(.82); } }
+}
+
+/* Home: Olivia's favourite photos, a mosaic, and a slow band of words */
+.oj-gallery { padding: clamp(24px, 4vw, 48px) 0 clamp(48px, 7vw, 96px); overflow: hidden; }
+.oj-mosaic { display: grid; gap: clamp(.6rem, 1.4vw, 1.1rem); grid-template-columns: repeat(2, 1fr); grid-auto-rows: clamp(140px, 30vw, 220px); }
+.oj-mosaic__tile { margin: 0; overflow: hidden; border-radius: var(--radius); background: var(--pale); position: relative; }
+.oj-mosaic__tile img { width: 100%; height: 100%; object-fit: cover; transform: translateY(var(--drift, 0px)) scale(1.16); transition: transform .9s var(--ease), filter .6s var(--ease); }
+.oj-mosaic__tile:hover img { transform: translateY(var(--drift, 0px)) scale(1.22); }
+.oj-mosaic__tile--big { grid-column: span 2; grid-row: span 2; }
+.oj-mosaic__tile--tall { grid-row: span 2; }
+@media (min-width: 900px) {
+	.oj-mosaic { grid-template-columns: 1.6fr 1fr 1fr; grid-auto-rows: clamp(150px, 16vw, 230px); }
+	.oj-mosaic__tile--big { grid-column: 1; grid-row: span 2; }
+	.oj-mosaic__tile--wide { grid-column: span 1; }
+	.oj-mosaic__tile:nth-child(4) { grid-column: 1; }
+	.oj-mosaic__tile:nth-child(5) { grid-column: 2 / span 2; }
+}
+.oj-mosaic__tile--big::after { content: ""; position: absolute; left: 1.2rem; bottom: 1.2rem; width: 54px; height: 54px; border-radius: 50%; background: var(--orchid); mix-blend-mode: multiply; opacity: .85; }
+.oj-marquee { margin-top: clamp(2rem, 4vw, 3.2rem); border-block: 1px solid var(--rule); overflow: hidden; white-space: nowrap; padding: .9rem 0; }
+.oj-marquee__track { display: inline-flex; align-items: center; gap: 1.6rem; font-family: var(--f-serif); font-style: italic; font-weight: 600; font-variation-settings: "SOFT" 100, "WONK" 1; font-size: clamp(1.6rem, 1.2rem + 1.6vw, 2.6rem); color: var(--forest); padding-left: 1.6rem; }
+.oj-marquee__track i { font-style: normal; color: var(--orchid); font-size: .7em; }
+@media (prefers-reduced-motion: no-preference) {
+	.oj-marquee__track { animation: oj-marquee 38s linear infinite; }
+	@keyframes oj-marquee { to { transform: translateX(-33.333%); } }
+	.js .oj-mosaic__tile[data-reveal] { clip-path: inset(12% 0 0 0 round var(--radius)); opacity: .4; transition: clip-path 1.1s var(--ease), opacity 1.1s var(--ease), transform .9s var(--ease); transition-delay: calc(var(--i, 0) * .08s); }
+	.js .oj-mosaic__tile[data-reveal].is-in { clip-path: inset(0 0 0 0 round var(--radius)); opacity: 1; }
+}
+
+/* Home: "Miért jóga?" – the cut-out photo has no background on purpose */
+.intro__visual .oj-art img[src$=".webp"], .oj-together__art .oj-art img[src$=".webp"] { mix-blend-mode: normal; }
+
+/* Home: "Gyakoroljunk együtt!" – the words in a rhythm */
+.oj-together__text { display: grid; gap: 1.4rem; align-content: start; }
+.oj-together__text > .oj-h2 { margin: 0; }
+.oj-lead { font-family: var(--f-serif); font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 36; font-weight: 500; font-size: clamp(1.25rem, 1.1rem + .6vw, 1.55rem); line-height: 1.5; color: var(--ink); margin: 0; max-width: 40ch; }
+.oj-notes { display: grid; gap: 1rem; }
+@media (min-width: 700px) { .oj-notes { grid-template-columns: 1fr 1fr; } }
+.oj-note { margin: 0; background: var(--card); border-radius: var(--radius); padding: 1.2rem 1.3rem 1.25rem; position: relative; line-height: 1.65; font-size: .98rem; }
+.oj-note__mark { display: block; color: var(--orchid); font-size: 1.3rem; line-height: 1; margin-bottom: .5rem; }
+.oj-note:nth-child(2) .oj-note__mark { color: var(--forest); }
+.oj-pull { margin: 0; padding: .2rem 0 .2rem 1.4rem; border-left: 3px solid var(--orchid); }
+.oj-pull p { margin: 0; font-family: var(--f-serif); font-style: italic; font-variation-settings: "SOFT" 100, "WONK" 1; font-weight: 500; font-size: clamp(1.1rem, 1rem + .4vw, 1.3rem); line-height: 1.55; color: var(--forest); }
+.oj-cta-card { margin-top: clamp(2rem, 4vw, 3rem); background: var(--forest); color: var(--paper); border-radius: var(--radius); padding: clamp(1.6rem, 3.5vw, 2.6rem); display: grid; gap: 1.2rem 3rem; align-items: center; position: relative; overflow: hidden; }
+.oj-cta-card::after { content: ""; position: absolute; right: -50px; bottom: -70px; width: 220px; height: 220px; border-radius: 58% 42% 55% 45% / 47% 58% 42% 53%; background: var(--orchid); opacity: .35; }
+@media (min-width: 900px) { .oj-cta-card { grid-template-columns: 1fr auto; } }
+.oj-cta-card .oj-cta-card__h { font-family: var(--f-text); text-transform: none; letter-spacing: 0; font-size: clamp(1.15rem, 1rem + .6vw, 1.45rem); line-height: 1.5; font-weight: 600; color: var(--paper); margin: 0; max-width: 52ch; position: relative; z-index: 1; }
+.oj-cta-card .oj-cta-card__h a { color: var(--pink); }
+.oj-cta-card .oj-cta-card__h br { display: none; }
+.oj-cta-card .btn-row { margin: 0; position: relative; z-index: 1; }
+
+/* Home: questions – compact numbered cards, all closed */
+.oj-faq-wrap { padding-block: clamp(56px, 8vw, 104px); }
+.oj-faq-head { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1rem 2rem; margin-bottom: 2rem; }
+.oj-faq-head .oj-display { margin: 0; }
+.oj-faq-head p { margin: 0; }
+.oj-faq { display: grid; gap: .8rem; align-items: start; }
+@media (min-width: 900px) { .oj-faq { grid-template-columns: 1fr 1fr; gap: 1rem; } }
+.oj-faq__item { --soft: var(--lilac-soft); --tone: var(--lilac); background: var(--soft); border-radius: var(--radius); transition: background .3s var(--ease), box-shadow .3s var(--ease); }
+.oj-faq__item--pink { --soft: var(--pink-soft); --tone: var(--pink); }
+.oj-faq__item--sun { --soft: var(--sun-soft); --tone: var(--sun); }
+.oj-faq__item--sage { --soft: var(--sage-soft); --tone: var(--sage); }
+.oj-faq__item[open] { background: var(--card); box-shadow: inset 0 0 0 2px var(--soft), var(--shadow); }
+.oj-faq__item summary { list-style: none; cursor: pointer; display: grid; grid-template-columns: auto 1fr auto; gap: .9rem; align-items: center; padding: 1rem 1.1rem 1rem 1.2rem; }
+.oj-faq__item summary::-webkit-details-marker { display: none; }
+.oj-faq__n { font-family: var(--f-display); font-size: 1.5rem; line-height: 1; color: var(--orchid); min-width: 2ch; }
+.oj-faq__item .oj-q { font: 700 1rem/1.4 var(--f-text); color: var(--ink); margin: 0; }
+.oj-faq__item summary svg { width: 30px; height: 30px; padding: 6px; border-radius: 50%; background: var(--card); color: var(--ink); transition: transform .35s var(--ease), background .3s; flex: none; }
+.oj-faq__item[open] summary svg { transform: rotate(45deg); background: var(--tone); }
+.oj-faq__item .answer { padding: 0 1.3rem 1.3rem 3.6rem; font-size: .95rem; line-height: 1.7; }
+.oj-faq__item .answer .is-long, .oj-faq__item .answer h3 { font-size: 1rem; line-height: 1.55; }
+@media (max-width: 600px) { .oj-faq__item .answer { padding-left: 1.2rem; } }
+
+/* Home: gift card – the subtitle as a ticket, the two notes as steps */
+.oj-gift { position: relative; overflow: hidden; }
+.oj-gift::before { content: ""; position: absolute; left: -80px; top: -90px; width: 260px; height: 260px; border-radius: 50%; border: 2px dashed var(--sun); opacity: .5; }
+.oj-gift__art { position: relative; }
+.oj-gift__bow { position: absolute; right: -6px; top: -14px; font-size: 2.2rem; color: var(--orchid); line-height: 1; }
+@media (prefers-reduced-motion: no-preference) {
+	.oj-gift__art img { transition: transform .6s var(--ease); }
+	.oj-gift:hover .oj-gift__art img { transform: rotate(0deg) scale(1.02); }
+	.oj-gift__bow { animation: oj-spin 9s linear infinite; }
+}
+.oj-gift__body { display: grid; gap: 1.1rem; align-content: start; position: relative; }
+.oj-gift__body .oj-h2 { margin: 0; }
+.oj-ticket { margin: 0; display: inline-flex; justify-self: start; }
+.oj-ticket span { display: inline-block; background: var(--card); border: 2px dashed var(--orchid); border-radius: 12px; padding: .55rem 1.1rem; font-family: var(--f-serif); font-style: italic; font-weight: 600; font-variation-settings: "SOFT" 100, "WONK" 1; font-size: clamp(1.05rem, 1rem + .4vw, 1.3rem); color: var(--ink); transform: rotate(-1.5deg); }
+.oj-gift__intro { margin: 0; font-weight: 700; color: var(--forest); }
+.oj-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: .8rem; counter-reset: none; }
+.oj-steps li { display: grid; grid-template-columns: auto 1fr; gap: .9rem; align-items: start; background: rgba(255, 255, 255, .55); border-radius: 14px; padding: .9rem 1rem; }
+.oj-steps p { margin: 0; font-size: .96rem; line-height: 1.65; }
+.oj-steps__n { width: 32px; height: 32px; border-radius: 50%; background: var(--sun); color: var(--ink); display: grid; place-items: center; font: 700 .95rem/1 var(--f-text); }
+.oj-gift__body .btn-row { margin: .4rem 0 0; }
+
+/* Home: reviews in three fixed columns (Gergely alone in the middle) */
+.oj-reviews--cols { columns: auto; display: grid; gap: 1.25rem; align-items: start; }
+@media (min-width: 900px) { .oj-reviews--cols { grid-template-columns: 1fr 1.15fr 1fr; } }
+.oj-reviews__col { display: grid; gap: 1.25rem; align-content: start; }
+.oj-reviews__col .oj-review { margin: 0; }
+.oj-review--feature { padding: 2rem 1.9rem 1.8rem; }
+.oj-review--feature blockquote p { font-family: var(--f-serif); font-weight: 500; font-variation-settings: "SOFT" 100, "WONK" 0; font-size: 1.12rem; line-height: 1.6; }
+@media (prefers-reduced-motion: no-preference) {
+	.oj-review { transition: transform .35s var(--ease), box-shadow .35s var(--ease); }
+	.oj-review:hover { transform: translateY(-4px) rotate(-.4deg); box-shadow: 0 22px 40px -26px rgba(18, 35, 26, .55); }
+}
+
+/* Keyword headings with places (Árak, Bejelentkezés, Kapcsolat): a label line and place chips */
+.seo-h { display: flex; flex-wrap: wrap; gap: .55rem .6rem; align-items: center; }
+.seo-h .seo-h__lead { flex-basis: 100%; font-family: var(--f-serif); font-style: italic; font-weight: 600; font-variation-settings: "SOFT" 100, "WONK" 1; text-transform: none; letter-spacing: 0; }
+.seo-h .seo-h__place { display: inline-flex; align-items: center; gap: .45rem; background: var(--card); color: var(--ink); border-radius: 999px; padding: .45rem .95rem .45rem .7rem; font: 600 .98rem/1.2 var(--f-text); text-transform: none; letter-spacing: 0; box-shadow: 0 1px 0 var(--line); }
+.seo-h .seo-h__place svg { width: 18px; height: 18px; color: var(--orchid); flex: none; }
+.seo-h .seo-h__place strong { font-weight: 800; }
+.page-head .seo-h.oj-head__sub { max-width: 34rem; margin-top: .4rem; }
+.page-head .seo-h .seo-h__lead { font-size: clamp(1.35rem, 1.1rem + 1vw, 1.9rem); line-height: 1.3; color: var(--ink); margin-bottom: .2rem; }
+
+/* Árak: one length (60 perc), no extra button */
+.oj-pricing .price-group { border-top: 0; }
+
+/* Rólam: the story as numbered chapters, the big sentences as statements */
+.oj-about { gap: clamp(2.5rem, 5vw, 4.5rem); }
+.oj-timeline { list-style: none; margin: 0; padding: 0; display: grid; gap: clamp(1.5rem, 3vw, 2.4rem); position: relative; }
+.oj-timeline::before { content: ""; position: absolute; left: 27px; top: 10px; bottom: 10px; width: 2px; background: linear-gradient(var(--lilac), var(--pink), var(--sun)); border-radius: 2px; }
+.oj-chapter { display: grid; grid-template-columns: 56px 1fr; gap: clamp(1rem, 3vw, 2.2rem); align-items: start; position: relative; }
+.oj-chapter__n { width: 56px; height: 56px; border-radius: 50%; background: var(--card); box-shadow: inset 0 0 0 2px var(--lilac); display: grid; place-items: center; font: 400 1.35rem/1 var(--f-display); color: var(--orchid); position: relative; z-index: 1; }
+.oj-chapter__body { background: var(--card); border-radius: var(--radius); padding: clamp(1.3rem, 3vw, 2.2rem); box-shadow: 0 1px 0 var(--line); max-width: 78ch; }
+.oj-chapter:nth-child(even) .oj-chapter__n { box-shadow: inset 0 0 0 2px var(--pink); }
+.oj-chapter:nth-child(3n) .oj-chapter__n { box-shadow: inset 0 0 0 2px var(--sun); }
+.oj-chapter__lead { font-family: var(--f-serif); font-weight: 600; font-variation-settings: "SOFT" 100, "WONK" 0, "opsz" 30; font-size: clamp(1.15rem, 1.05rem + .5vw, 1.4rem); line-height: 1.45; color: var(--ink); }
+.oj-chapter__body p:not(.oj-chapter__lead) { color: var(--ink-soft, #2f3d34); }
+@media (min-width: 1000px) {
+	.oj-timeline:not(.oj-timeline--single) { grid-template-columns: 1fr 1fr; column-gap: 3rem; }
+	.oj-timeline--single .oj-chapter__body { max-width: 860px; }
+	.oj-timeline--single::before { display: none; }
+	.oj-timeline:not(.oj-timeline--single)::before { left: 50%; }
+	.oj-timeline:not(.oj-timeline--single) .oj-chapter:nth-child(odd) { grid-column: 1; }
+	.oj-timeline:not(.oj-timeline--single) .oj-chapter:nth-child(even) { grid-column: 2; margin-top: 4.5rem; }
+}
+.oj-statements { display: grid; gap: 1.25rem; }
+@media (min-width: 900px) { .oj-statements { grid-template-columns: repeat(var(--n), minmax(0, 1fr)); } }
+.oj-statement { --soft: var(--lilac-soft); --tone: var(--lilac); margin: 0; background: var(--soft); border-radius: var(--radius); padding: clamp(1.6rem, 3.5vw, 2.6rem); position: relative; overflow: hidden; }
+.oj-statement--pink { --soft: var(--pink-soft); --tone: var(--pink); }
+.oj-statement--sun { --soft: var(--sun-soft); --tone: var(--sun); }
+.oj-statement--sage { --soft: var(--sage-soft); --tone: var(--sage); }
+.oj-statement::after { content: ""; position: absolute; right: -40px; bottom: -50px; width: 150px; height: 150px; background: var(--tone); opacity: .35; border-radius: 58% 42% 55% 45% / 47% 58% 42% 53%; }
+.oj-statement__mark { width: 40px; height: 40px; color: var(--tone); fill: currentColor; stroke: none; margin-bottom: .6rem; }
+.oj-statement .oj-statement__h, .oj-statement .is-long { font-family: var(--f-serif); font-weight: 700; text-transform: none; letter-spacing: -.005em; font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 72; font-size: clamp(1.4rem, 1.1rem + 1.1vw, 2.1rem); line-height: 1.25; color: var(--ink); margin: 0; max-width: 30ch; position: relative; z-index: 1; }
+.oj-statement__p { margin-top: 1rem; position: relative; z-index: 1; }
+.oj-statement__p p { margin: 0; font-weight: 600; }
+
+/* Események: a landscape frame for the head photo, card photos not stretched */
+.oj-head--landscape .page-head__photo .frame { aspect-ratio: 800 / 429; }
+@media (min-width: 900px) {
+	.oj-event { align-items: center; }
+	.oj-event__media { align-self: center; background: transparent; }
+	.oj-event__media img { width: 100%; aspect-ratio: auto; min-height: 0; height: auto; }
+}
+
+/* A jógáról - Tőlem: the white of the pictures is see-through now */
+.oj-cards--journal .oj-card__media { background: transparent; }
+.oj-cards--journal .oj-card__media img[src$=".webp"] { object-fit: cover; }
+.has-art-photo .page-head__photo .frame > img { filter: drop-shadow(0 18px 24px rgba(18, 35, 26, .18)); }
+
+/* Posts: a proper title, quiet lists, and the button in the side column fits */
+.is-post .entry > h3:first-of-type, .is-post .entry > h2:first-child + h3 { font-family: var(--f-serif); font-weight: 800; font-variation-settings: "SOFT" 100, "WONK" 1, "opsz" 96; font-size: clamp(1.8rem, 1.3rem + 2vw, 2.8rem); line-height: 1.15; letter-spacing: -.01em; color: var(--ink); margin: .2rem 0 1.2rem; max-width: 24ch; }
+.is-post .entry > h3 strong { font-weight: inherit; }
+.is-post .entry { font-size: 1.06rem; line-height: 1.8; }
+.is-post .entry > h3 ~ h3 { font-family: var(--f-text); font-size: 1.25rem; margin-top: 2rem; }
+.is-post .entry ul li { margin: .3rem 0; }
+.is-post .entry > p:first-of-type { font-family: var(--f-serif); font-style: italic; font-variation-settings: "SOFT" 100, "WONK" 1; font-size: 1.3rem; color: var(--forest); }
+.oj-more .btn-row .btn { white-space: nowrap; width: 100%; justify-content: center; font-size: .76rem; letter-spacing: .06em; padding-inline: .9rem; }
+
+/* Bejelentkezés: the booking widget in the middle, tall enough not to scroll on its own */
+.oj-booking { display: flex; justify-content: center; }
+.oj-embed--motibro { width: 100%; max-width: 780px; box-shadow: var(--shadow); }
+.oj-embed--motibro iframe { height: 1080px; }
+.oj-places-card { background: var(--pink-soft); border-radius: var(--radius); padding: clamp(1.6rem, 4vw, 2.8rem); display: grid; gap: 1.6rem; max-width: 980px; width: 100%; justify-self: center; }
+.oj-places-card .seo-h { margin: 0; font-size: 1rem; }
+.oj-places-card .seo-h__lead { font-size: clamp(1.6rem, 1.3rem + 1.3vw, 2.4rem); line-height: 1.2; color: var(--ink); }
+.oj-places-card .seo-h__place { font-size: clamp(1rem, .95rem + .3vw, 1.2rem); padding: .65rem 1.2rem .65rem .9rem; }
+.oj-places-card .btn-row { margin: 0; }
+
+/* Kapcsolat: the two places in two coloured boxes with times and map; a few warm words instead of the form */
+.oj-locs--contact { margin-top: 0; }
+.oj-loc--contact { gap: .2rem; }
+.oj-loc .seo-h.oj-loc__kw { position: relative; z-index: 1; margin: 0 0 .9rem; font-size: 1rem; }
+.oj-loc .seo-h.oj-loc__kw .seo-h__lead { font-size: 1.1rem; color: var(--ink); }
+.oj-loc .oj-loc__place { position: relative; z-index: 1; font-family: var(--f-display); font-weight: 400; text-transform: uppercase; font-size: clamp(1.9rem, 1.5rem + 1.6vw, 2.8rem); line-height: 1.08; margin: 0 0 1.2rem; max-width: 16ch; }
+.oj-slot--2 { grid-template-columns: 5.5rem 1fr; }
+.oj-slot--2 span:nth-child(2) { font-family: var(--f-display); font-size: 1.6rem; line-height: 1; color: var(--ink); }
+.oj-loc__note { position: relative; z-index: 1; margin: .6rem 0 0; font-size: .92rem; font-weight: 600; color: var(--ink); }
+.oj-loc--contact .btn-row { margin-top: 1.2rem; padding-top: 0; }
+.oj-loc--contact .oj-embed { margin-top: 1.4rem; position: relative; z-index: 1; }
+.oj-reach { display: grid; gap: 2rem; align-items: center; background: var(--forest); color: var(--paper); border-radius: var(--radius); padding: clamp(1.8rem, 5vw, 3.6rem); position: relative; overflow: hidden; }
+@media (min-width: 900px) { .oj-reach { grid-template-columns: 1.4fr 1fr; } }
+.oj-reach .oj-reach__h { font-family: var(--f-display); font-weight: 400; text-transform: uppercase; color: var(--paper); font-size: var(--step-3); margin: 0 0 1rem; }
+.oj-reach .oj-reach__h strong { font-weight: inherit; }
+.oj-reach__invite { font-family: var(--f-serif); font-variation-settings: "SOFT" 100, "WONK" 1; font-weight: 500; font-size: clamp(1.15rem, 1.05rem + .5vw, 1.45rem); line-height: 1.55; margin: 0 0 1.6rem; max-width: 46ch; color: #E3EBDF; }
+.oj-reach .btn--ghost { color: var(--paper); border-color: rgba(243, 242, 236, .5); }
+.oj-reach__mark { color: var(--paper); opacity: .95; justify-self: center; }
+.oj-reach__logo { width: min(320px, 70vw); height: auto; }
+@media (prefers-reduced-motion: no-preference) {
+	.oj-reach__logo path:last-child { animation: oj-wave 4s ease-in-out infinite alternate; }
+	@keyframes oj-wave { to { transform: translateX(-10px); } }
+}
