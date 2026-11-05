@@ -111,6 +111,13 @@
 - **Kész:** `oliviajoga-hu/` – statikus oldal mind a 33 régi címen (`/rólam`, `/árak`, `/a-nyújtás-hatása` …), szó szerinti title-ökkel, szöveggel, címsorszintekkel és kép-altokkal; Motibro, Google Forms, térképek, Motibro-widget változatlan. A képként tárolt árak, vélemények és az „Ami nem szükséges” grafika valódi szöveg lett. Ellenőrzés: `oliviajoga-hu/tools/check.py` (2355 ellenőrzés). Részletek: `oliviajoga-hu/README.md`.
 - **Nyitott:** tárhely (ma ELIN.hu, 301 a Google Sites-ra), Search Console, a régi Google Site kivezetése; jóváhagyás után WordPressre (olivia-yoga téma) ugyanezekkel a címekkel.
 
+## 12. kör: SEO OS kutatás (16-os projekt) + versenytárs-összefoglaló Oliviának (2026-11-05)
+- **Kérés (Áron):** a félbemaradt SEO OS kutatás folytatása; összefoglaló Oliviának a magyar online jógás versenytársakról, linkkel a SEO OS-ből, CRM-csetben.
+- **SEO OS 16 („Online jóga Magyarország – piackutatás”):** 19 versenytárs, szolgáltatások és üzleti profil beállítva, állapot: *researching*. A 1 435 kulcsszóból 537 kizárva, okkal (visszavonható a Kulcsszavak fülön): 277 nincs keresési adat, 72 más jelentés („joga” = jog, fitnesz-edzés, külföldi), 59 termék, 61 helyi és 35 stúdiókeresés (nem online), 31 kis keresés, 3 angol / near me. Aktív: 898.
+- **Az AI-elemzés nem fut le:** a worker kétszer is a klaszterezésnél (embedding) állt le, 3-3 próbálkozás után („A feladat többször megszakadt”, 33649: 1 435 kw, 33684: 898 kw). A 14-es projekt (1 390 kw) is 0 elemzettnél áll. SEO OS-hiba (hlprv), valószínűleg memória; a kutatás lépés addig nyitott.
+- **Dokumentumok a projektben:** 47 – novemberi piackutatás (2026-11-03); 48 – „Versenytársak – online jóga Magyarországon” (5 oldal: élő online órák árai, videótárak, ki van elöl a Google-ben, mit jelent ez Oliviának, fő keresési témák). Olivia a 48-as linkjét CRM-csetben kapta (Áron nevében).
+- **DataForSEO:** a 2026-11-05-i SERP-lekérés hibás adatot adott (csak google.com), és 30 napig gyorsítótárban marad; a versenytárs-adatok a 11-03-i SERP-ből vannak.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
