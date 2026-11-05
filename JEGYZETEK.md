@@ -106,6 +106,11 @@
 - **Órarend:** az ő mostani hatha flow idősávjai, online: K 20:00–21:00, Sze 18:30–19:30, Sze 20:00–21:00. **MINTA maradt:** Cs 19:00 Slow Flow és a magánóra-árak (12 000 / 14 500 / 17 000 Ft, 5 alkalom 55 000 Ft). A kismamatorna egyeztetett időpontban, négyszemközt vagy kiscsoportban (nincs heti fix óra).
 - **Téma 3.1.1.**
 
+## 11. kör: oliviajoga.hu új frontend (2026-11-05)
+- **Kérés (Áron):** Olivia mostani magyar oldalának (oliviajoga.hu → Google Sites) új frontend az új dizájnban; a linkstruktúra, a SEO-oldalak, az elnevezések és a szöveg maradjon, csak új UX.
+- **Kész:** `oliviajoga-hu/` – statikus oldal mind a 33 régi címen (`/rólam`, `/árak`, `/a-nyújtás-hatása` …), szó szerinti title-ökkel, szöveggel, címsorszintekkel és kép-altokkal; Motibro, Google Forms, térképek, Motibro-widget változatlan. A képként tárolt árak, vélemények és az „Ami nem szükséges” grafika valódi szöveg lett. Ellenőrzés: `oliviajoga-hu/tools/check.py` (2355 ellenőrzés). Részletek: `oliviajoga-hu/README.md`.
+- **Nyitott:** tárhely (ma ELIN.hu, 301 a Google Sites-ra), Search Console, a régi Google Site kivezetése; jóváhagyás után WordPressre (olivia-yoga téma) ugyanezekkel a címekkel.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
