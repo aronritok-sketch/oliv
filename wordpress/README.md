@@ -48,10 +48,11 @@ Két rész, mindkettő a WordPress adminban tölthető fel ZIP-ként (`dist/`):
 2. **Bővítmények → Új → Feltöltés:** `dist/olivia-studio.zip` → Bekapcsolás.
    (Létrehozza a táblákat és a *Book*, *My account*, *Gift cards* oldalakat.)
 3. **Megjelenés → Témák → Feltöltés:** `dist/olivia-yoga.zip` → Bekapcsolás.
-4. **Megjelenés → Olivia setup → „Set up the site content”.** Betölti az oldalakat, óratípusokat, GYIK-et, cikkeket, képeket a médiatárba, a menüt és a heti órarendet. Többször is futtatható, meglévőt nem ír felül.
-5. **Beállítások → Közvetlen hivatkozások:** „Bejegyzés neve”.
-6. **E-mail:** telepíts egy SMTP-bővítményt (pl. *WP Mail SMTP*, *FluentSMTP*) és egy tranzakciós levelezőt (Postmark, Brevo, Amazon SES), különben a levelek spambe mennek.
-7. **Cron:** a tárhelyen állíts be valódi cront 5 percenként: `wget -q -O - https://DOMAIN/wp-cron.php?doing_wp_cron` és a `wp-config.php`-ba `define( 'DISABLE_WP_CRON', true );` – így a helyfoglalások lejárata és az emlékeztetők pontosan futnak.
+4. **Csak a magyar online változathoz (Olivia Jóga – Online):** Megjelenés → Olivia setup → *Edition* → „Olivia Jóga – Online” → *Switch edition*. Ez magyarra, forintra és budapesti időre állítja az oldalt, és a magyar online tartalmat tölti be. A Fort Myers-i oldalnál hagyd ki ezt a lépést.
+5. **Megjelenés → Olivia setup → „Set up the site content”.** Betölti az oldalakat, óratípusokat, GYIK-et, cikkeket, képeket a médiatárba, a menüt és a heti órarendet. Többször is futtatható, meglévőt nem ír felül.
+6. **Beállítások → Közvetlen hivatkozások:** „Bejegyzés neve”.
+7. **E-mail:** telepíts egy SMTP-bővítményt (pl. *WP Mail SMTP*, *FluentSMTP*) és egy tranzakciós levelezőt (Postmark, Brevo, Amazon SES), különben a levelek spambe mennek.
+8. **Cron:** a tárhelyen állíts be valódi cront 5 percenként: `wget -q -O - https://DOMAIN/wp-cron.php?doing_wp_cron` és a `wp-config.php`-ba `define( 'DISABLE_WP_CRON', true );` – így a helyfoglalások lejárata és az emlékeztetők pontosan futnak.
 
 ## Stripe beállítása
 

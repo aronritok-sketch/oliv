@@ -1065,3 +1065,22 @@ A `ci.sh` automatikusan futtatja, ha az `APP_DIST` a webes build mappájára mut
 - **Átfedés-tiltás**: egy oktatónak két órája nem fedheti egymást. `OYS_Schedule::overlap()` (alkalmak) és `template_overlap()` (heti sablonok). A naptár REST 409 `oys_overlap` hibát ad, a klasszikus admin űrlapok hibaüzenettel visszadobnak, a `generate()` kihagyja azt a heti időpontot, ami egy egyszeri alkalommal ütközne.
 - **Foglalás gomb**: a fejlécben 640 px felett mindig látszik; telefonon lebegő „Book a class” gomb (`.book-fab`), ami a lábléc, az órarend és a CTA fölött elbújik.
 
+## 23. Kiadások: Fort Myers és „Olivia Jóga – Online” (9. kör)
+
+Ugyanaz a téma és plugin két változatot szolgál ki (Áron, 2026-11-05: „első körben csak Magyarországon indulunk online … hagyd meg a mostani struktúrát”).
+
+| | `fort-myers` (alap) | `hu-online` |
+|---|---|---|
+| Név | Olivia Kovacs Yoga | Olivia Jóga – Online |
+| Nyelvek | angol (előtag nélkül), `/hu/`, `/es/` | csak magyar, előtag nélkül |
+| Órák | stúdió, hibrid, online, strand, privát | csak élő online (Zoom) és online magánóra |
+| Címek | `/about/`, `/schedule-pricing/` … | `/rolam/`, `/orarend-es-arak/`, `/online-jogaorak/{óra}/`, `/online-maganora/`, `/gyik/`, `/kapcsolat/`, `/naplo/`, `/foglalas/`, `/fiokom/`, `/ajandekutalvany/` |
+| Pénznem, időzóna | USD, America/New_York | HUF (`2 500 Ft`), Europe/Budapest, 24 órás idő |
+| Tartalom | `olivia-yoga/demo/content.json` | `olivia-yoga/demo/content-hu-online.json` |
+
+- **Választás:** Megjelenés → Olivia setup → *Edition* (`oy_edition` option; a `wp-config.php` `OY_EDITION` konstansa felülírja). A váltás (`oy_switch_edition()`) a tartalomfájl `setup` blokkjából beállítja a plugin nyelveit, pénznemét, árait, termékeit, helyszíneit és a WordPress időzónáját és dátumformátumát. **Friss oldalon** használd, a tartalom betöltése előtt; utána *Set up the site content*. Fejlesztőként: `OY_SITE_EDITION=hu-online php …/dev/setup-site.php`.
+- **Plugin (1.4.0):** Studio → Settings → *Languages* (`languages`, `default_lang`): egy nyelvnél nincs előtag és nyelvválasztó; a fő nyelv nem angol is lehet, ilyenkor a felület a `.mo` fájlokból jön. *Online only* (`online_only`): az árlista élő online alkalmi jeggyel indul, nincs „Teams & companies” kártya, a magánóra-kérés nem kér címet. `oys_money()` forintban `2 500 Ft`; `oys_date_format()` magyar locale-nál a dátumokat magyar sorrendbe és 24 órás időre írja.
+- **Téma (3.1.0):** `inc/edition.php` (`oy_edition()`, `oy_online_only()`, `oy_page_slug()` / `oy_page_key()` a magyar címekhez, `oy_site_name()`); online főoldal: `template-parts/front-online.php`; fejléc, lábléc, menü, oldalsávok, SEO (Organization + Service, Magyarország, nincs Fort Myers), kapcsolati űrlap témái az online kiadáshoz igazodnak. A tartalom a fő nyelven van a bejegyzésben, a „Translations” doboz egy nyelvnél nem jelenik meg.
+- **A `content-hu-online.json`** a jóváhagyott magyar szövegekből készült, online-ra átírva (Rólam, órák, GYIK, 25 napló-írás; a Fort Myers-i cikkek nélkül). **Az órarend és az árak MINTA** (esti magyar idő = napközben Fort Myersben); Olivia véglegesíti.
+- **Visszaváltás** Fort Myersre nem állítja vissza a plugin beállításait (a `content.json`-nak nincs `setup` blokkja): Studio → Settings-ben kézzel.
+

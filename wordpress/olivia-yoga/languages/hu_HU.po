@@ -1088,3 +1088,160 @@ msgstr "Sorba állított tibeti hangtálak egy jógateremben"
 #: inc/content-types.php
 msgid "Most popular"
 msgstr "Legnépszerűbb"
+
+# Olivia Jóga – Online (hu-online edition)
+msgid "Online classes"
+msgstr "Online órák"
+
+msgid "Private online sessions"
+msgstr "Online magánóra"
+
+msgid "Online, from anywhere"
+msgstr "Online, bárhonnan"
+
+msgid "60, 75 or 90 minutes, live on video, planned around your body and your goals. Prenatal fitness too."
+msgstr "60, 75 vagy 90 perc élőben, videón, a testedre és a céljaidra tervezve. Kismamatorna is."
+
+msgid "In Hungarian"
+msgstr "Magyarul"
+
+msgid "Online, in Hungarian"
+msgstr "Online, magyarul"
+
+msgid "Online · live classes in Hungarian"
+msgstr "Online · élő órák magyarul"
+
+msgid "Live online yoga classes in Hungarian with Olivia Kovacs: hatha flow, slow flow and prenatal fitness from home on Zoom, plus private online sessions. Beginners welcome."
+msgstr "Élő online jógaórák magyarul Kovacs Oliviával: hatha flow, slow flow és kismamatorna otthonról, Zoomon, és online magánóra. Kezdőket is szeretettel várok."
+
+msgid "Online Yoga Classes, Live in Hungarian: Hatha Flow, Slow Flow & Prenatal | Olivia Jóga"
+msgstr "Online jógaóra élőben, magyarul: hatha flow, slow flow, kismama | Olivia Jóga"
+
+msgid "Live online yoga classes in Hungarian: hatha flow, slow flow, prenatal fitness and private online sessions with Olivia Kovacs."
+msgstr "Élő online jógaórák magyarul: hatha flow, slow flow, kismamatorna és online magánóra Kovacs Oliviával."
+
+msgid "Live online yoga classes"
+msgstr "Élő online jógaórák"
+
+msgid "Live online class"
+msgstr "Élő online óra"
+
+msgid "Private online session"
+msgstr "Online magánóra"
+
+msgid "Live group classes"
+msgstr "Élő csoportos órák"
+
+msgid "Hatha flow and slow flow every week, live on Zoom, in Hungarian time."
+msgstr "Hatha flow és slow flow minden héten, élőben, Zoomon, magyar idő szerint."
+
+msgid "One-on-one on video, planned around your body, your goals and your week."
+msgstr "Négyszemközt, videón, a testedre, a céljaidra és a hetedre tervezve."
+
+msgid "Prenatal fitness online"
+msgstr "Kismamatorna online"
+
+msgid "Safe, joyful movement for moms-to-be, privately or in a small group."
+msgstr "Biztonságos, örömteli mozgás várandósan, négyszemközt vagy kiscsoportban."
+
+msgid "Breathing, the eight limbs of yoga and practice notes to read between classes."
+msgstr "Légzés, a jóga nyolc ága és gondolatok a gyakorlásról, két óra között olvasgatni."
+
+msgid "A quiet corner"
+msgstr "Egy csendes sarok"
+
+msgid "Room for a mat, and a door you can close for an hour."
+msgstr "Egy jógamatracnyi hely, és egy ajtó, amit egy órára becsukhatsz."
+
+msgid "A mat, a cushion and a blanket"
+msgstr "Matrac, párna és pléd"
+
+msgid "The cushion and blanket are for the long relaxation at the end."
+msgstr "A párna és a pléd a hosszú relaxációhoz kell, az óra végén."
+
+msgid "A phone, tablet or laptop"
+msgstr "Telefon, tablet vagy laptop"
+
+msgid "Any device with a camera that runs Zoom. A bigger screen is easier to follow."
+msgstr "Bármilyen kamerás eszköz, amin fut a Zoom. Nagyobb képernyőn könnyebb követni."
+
+msgid "Camera on, if you like"
+msgstr "Kamera, ha szeretnéd"
+
+msgid "If I can see you, I can help you with the poses. Only I see your picture."
+msgstr "Ha látlak, tudok segíteni a pózokban. A képedet csak én látom."
+
+msgid "Choose a class"
+msgstr "Válassz órát"
+
+msgid "Book from the timetable with a drop-in, a pass or a membership."
+msgstr "Foglalj az órarendből alkalmi jeggyel, bérlettel vagy tagsággal."
+
+msgid "Get the link"
+msgstr "Megkapod a linket"
+
+msgid "The Zoom link comes by email and is waiting in your account."
+msgstr "A Zoom-linket e-mailben kapod, és a fiókodban is megtalálod."
+
+msgid "Roll out your mat"
+msgstr "Leteríted a matracot"
+
+msgid "Join a few minutes early so we can say hello before we start."
+msgstr "Csatlakozz pár perccel korábban, hogy kezdés előtt köszönhessünk egymásnak."
+
+msgid "Practice together, live"
+msgstr "Együtt gyakorlunk, élőben"
+
+msgid "I guide you in real time and adjust the class to the people in it."
+msgstr "Valós időben vezetlek, és az órát a résztvevőkhöz igazítom."
+
+msgid "Live online yoga · in Hungarian"
+msgstr "Élő online jóga · magyarul"
+
+msgid "Live online yoga classes in Hungarian with Olivia Kovacs: dynamic yet gentle hatha flow, slow flow and prenatal fitness from your living room, on Zoom. Beginners very welcome."
+msgstr "Élő online jógaórák magyarul Kovacs Oliviával: dinamikus, mégis gyengéd hatha flow, slow flow és kismamatorna a nappalidból, Zoomon. Kezdőket is szeretettel várok."
+
+msgid "Breathwork, strength, stretching, balance, a real flow state and a long relaxation in every class, live on Zoom. Choose the pace that suits you today."
+msgstr "Légzés, erősítés, nyújtás, egyensúly, igazi flow élmény és hosszú relaxáció minden órán, élőben, Zoomon. Válaszd azt a tempót, ami ma jólesik."
+
+msgid "How online classes work"
+msgstr "Így működik az online óra"
+
+msgid "A real class, just in your living room"
+msgstr "Igazi óra, csak a nappalidban"
+
+msgid "This is not a video to follow. We practice together, at the same time: I watch, guide and adjust, and you can ask anything before and after class."
+msgstr "Ez nem egy videó, amit követsz. Együtt gyakorlunk, ugyanabban az időben: figyellek, vezetlek, igazítok, és óra előtt és után bármit kérdezhetsz."
+
+msgid "Questions about online classes"
+msgstr "Kérdések az online órákról"
+
+msgid "Weekly live classes"
+msgstr "Heti élő órák"
+
+msgid "Times are in Hungarian time. Book in a minute; beginners are welcome in every class."
+msgstr "Az időpontok magyar idő szerint értendők. Egy perc a foglalás, és kezdőket minden órára szeretettel várok."
+
+msgid "Pay per class, save with an online pass or membership, or give someone a gift card."
+msgstr "Fizess alkalmanként, spórolj online bérlettel vagy tagsággal, vagy ajándékozz utalványt."
+
+msgid "Prices in forints"
+msgstr "Árak forintban"
+
+msgid "Can yoga really work online?"
+msgstr "Tényleg működik a jóga online?"
+
+msgid "Join a live online class, request a private session, or just send a question. Beginners very welcome."
+msgstr "Gyere el egy élő online órára, kérj magánórát, vagy csak küldd el a kérdésed. Kezdőket is szeretettel várok."
+
+msgctxt "online hero title, line 1"
+msgid "Online"
+msgstr "Online"
+
+msgctxt "online hero title, line 2"
+msgid "yoga"
+msgstr "jóga"
+
+msgctxt "online hero title, line 3"
+msgid "live, from home"
+msgstr "élőben, otthonról"

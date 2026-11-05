@@ -25,7 +25,17 @@ function oy_setup_page() {
 	if ( isset( $_GET['done'] ) ) {
 		echo '<div class="notice notice-success"><p>' . esc_html( wp_unslash( $_GET['done'] ) ) . '</p></div>';
 	}
-	echo '<p>' . esc_html__( 'Creates the pages, class types, FAQs, journal posts, past events, photos and menus from the approved site copy in English, Hungarian and Spanish, and the weekly timetable in the booking plugin. Items that already exist are not changed, so it is safe to run again.', 'olivia-yoga' ) . '</p>';
+	echo '<h2>' . esc_html__( 'Edition', 'olivia-yoga' ) . '</h2><p>' . esc_html__( 'Which version of the site this is. Switching sets the languages, currency, prices and time zone for that edition; do it on a fresh site, before setting up the content.', 'olivia-yoga' ) . '</p>';
+	echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="oy_edition">';
+	wp_nonce_field( 'oy_edition' );
+	echo '<select name="edition"' . ( defined( 'OY_EDITION' ) ? ' disabled' : '' ) . '>';
+	foreach ( OY_EDITIONS as $key => $label ) {
+		echo '<option value="' . esc_attr( $key ) . '"' . selected( oy_edition(), $key, false ) . '>' . esc_html( $label ) . '</option>';
+	}
+	echo '</select> ';
+	submit_button( __( 'Switch edition', 'olivia-yoga' ), 'secondary', 'submit', false, defined( 'OY_EDITION' ) ? array( 'disabled' => 'disabled' ) : null );
+	echo '</form><h2>' . esc_html__( 'Content', 'olivia-yoga' ) . '</h2>';
+	echo '<p>' . esc_html__( 'Creates the pages, class types, FAQs, journal posts, past events, photos and menus from the approved site copy of this edition, and the weekly timetable in the booking plugin. Items that already exist are not changed, so it is safe to run again.', 'olivia-yoga' ) . '</p>';
 	echo '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="oy_import">';
 	wp_nonce_field( 'oy_import' );
 	submit_button( __( 'Set up the site content', 'olivia-yoga' ), 'primary', 'submit', false );
@@ -36,6 +46,17 @@ function oy_setup_page() {
 	submit_button( __( 'Refresh the content', 'olivia-yoga' ), 'secondary', 'submit', false );
 	echo '</form></div>';
 }
+
+add_action( 'admin_post_oy_edition', function () {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( 'Forbidden', 403 );
+	}
+	check_admin_referer( 'oy_edition' );
+	$log = defined( 'OY_EDITION' ) ? array() : oy_switch_edition( sanitize_key( wp_unslash( $_POST['edition'] ?? '' ) ) );
+	flush_rewrite_rules();
+	wp_safe_redirect( admin_url( 'themes.php?page=oy-setup&done=' . rawurlencode( implode( ' · ', $log ) ) ) );
+	exit;
+} );
 
 add_action( 'admin_post_oy_import', function () {
 	if ( ! current_user_can( 'manage_options' ) ) {
@@ -118,7 +139,8 @@ function oy_import_next_weekday( $weekday, $days ) {
 }
 
 function oy_import_all( $refresh = false ) {
-	$data = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content.json' ), true );
+	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+	$data += array( 'moments' => array(), 'events' => array(), 'posts' => array(), 'faqs' => array(), 'sessions' => array() );
 	$log  = array();
 	@set_time_limit( 600 );
 
@@ -158,6 +180,10 @@ function oy_import_all( $refresh = false ) {
 	$ids = array();
 	$new = array();
 	foreach ( OY_PAGE_SLUGS as $key => $slug ) {
+		if ( empty( $data['pages'][ $key ] ) ) {
+			continue;
+		}
+		$slug     = oy_page_slug( $slug );
 		$existing = get_page_by_path( $slug );
 		if ( $existing ) {
 			$ids[ $key ] = $existing->ID;
@@ -172,7 +198,7 @@ function oy_import_all( $refresh = false ) {
 	foreach ( $new as $key => $yes ) {
 		$p       = $data['pages'][ $key ];
 		$content = oy_resolve_tokens( $p['content'] );
-		if ( 'private-yoga' === $key ) {
+		if ( 'private-yoga' === $key && false === strpos( $content, '[oys_private_request]' ) ) {
 			$content .= "\n<h2>" . 'Request your session' . "</h2>\n[oys_private_request]";
 		}
 		wp_update_post( wp_slash( array( 'ID' => $ids[ $key ], 'post_title' => $p['title'], 'post_content' => $content, 'post_excerpt' => $p['excerpt'] ?? '' ) ) );
@@ -184,14 +210,22 @@ function oy_import_all( $refresh = false ) {
 			}
 		}
 		oy_import_translations( $ids[ $key ], $p, array( 'title' => 'title', 'excerpt' => 'excerpt', 'content' => 'content', 'seo_title' => 'seo_title', 'seo_desc' => 'seo_desc' ), true );
-		$slug = OY_PAGE_SLUGS[ $key ];
-		if ( isset( OY_PAGE_PHOTO[ $slug ] ) ) {
-			set_post_thumbnail( $ids[ $key ], oy_import_image( OY_PAGE_PHOTO[ $slug ] ) );
+		$photo = $p['photo'] ?? ( OY_PAGE_PHOTO[ OY_PAGE_SLUGS[ $key ] ] ?? '' );
+		if ( $photo ) {
+			set_post_thumbnail( $ids[ $key ], oy_import_image( $photo ) );
 		}
 	}
-	foreach ( array( 'book', 'account', 'gift-cards' ) as $slug ) {
-		$pg = get_page_by_path( $slug );
-		if ( $pg && ( $refresh || ! has_post_thumbnail( $pg ) ) ) {
+	// The booking plugin's own pages: the edition's title and address, and a photo.
+	foreach ( array( 'book' => 'book', 'account' => 'account', 'gifts' => 'gift-cards' ) as $key => $slug ) {
+		$pg = get_post( (int) get_option( 'oys_page_' . $key ) ) ?: get_page_by_path( $slug );
+		if ( ! $pg ) {
+			continue;
+		}
+		$own = $data['studio_pages'][ $key ] ?? array();
+		if ( $own && ( $refresh || $pg->post_name !== $own['slug'] ) ) {
+			wp_update_post( wp_slash( array_filter( array( 'ID' => $pg->ID, 'post_title' => $own['title'] ?? '', 'post_name' => $own['slug'] ?? '', 'post_content' => $own['content'] ?? '' ) ) ) );
+		}
+		if ( $refresh || ! has_post_thumbnail( $pg ) ) {
 			set_post_thumbnail( $pg, oy_import_image( OY_PAGE_PHOTO[ $slug ] ) );
 		}
 	}
@@ -221,7 +255,7 @@ function oy_import_all( $refresh = false ) {
 			update_post_meta( $id, 'oy_home', '1' === (string) $f['home'] ? '1' : '' );
 			$tr = array();
 			foreach ( array( 'hu', 'es' ) as $l ) {
-				$tr[ $l ] = array( 'title' => $f[ $l ]['q'], 'content' => wpautop( esc_html( $f[ $l ]['a'] ) ) );
+				$tr[ $l ] = array( 'title' => $f[ $l ]['q'] ?? '', 'content' => isset( $f[ $l ]['a'] ) ? wpautop( esc_html( $f[ $l ]['a'] ) ) : '' );
 			}
 			oy_import_translations( $id, $tr, array( 'title' => 'title', 'content' => 'content' ) );
 		}
@@ -285,7 +319,7 @@ function oy_import_all( $refresh = false ) {
 		set_post_thumbnail( $id, oy_import_image( $m['photo'] ) );
 		$tr = array();
 		foreach ( array( 'hu', 'es' ) as $l ) {
-			$tr[ $l ] = array( 'title' => $m[ $l ]['title'], 'place' => $m[ $l ]['place'], 'content' => wpautop( esc_html( $m[ $l ]['text'] ) ) );
+			$tr[ $l ] = array( 'title' => $m[ $l ]['title'] ?? '', 'place' => $m[ $l ]['place'] ?? '', 'content' => isset( $m[ $l ]['text'] ) ? wpautop( esc_html( $m[ $l ]['text'] ) ) : '' );
 		}
 		oy_import_translations( $id, $tr, array( 'title' => 'title', 'place' => 'place', 'content' => 'content' ) );
 		$moments++;
@@ -308,15 +342,18 @@ function oy_import_all( $refresh = false ) {
 			'menu-item-status'    => 'publish',
 			'menu-item-parent-id' => $parent,
 		) ) );
-		$classes = $add( 'Classes', 0, get_post( $ids['classes'] ) );
+		$labels  = $data['menu'] ?? array( 'classes' => 'Classes', 'private-yoga' => 'Private yoga', 'schedule-pricing' => 'Schedule & pricing', 'corporate-yoga' => 'Teams & athletes', 'events' => 'Events', 'about' => 'About', 'journal' => 'Journal', 'contact' => 'Contact' );
+		$classes = $add( $labels['classes'] ?? 'Classes', 0, get_post( $ids['classes'] ) );
 		foreach ( oy_classes() as $c ) {
 			if ( ! get_post_meta( $c->ID, 'oy_link', true ) ) {
 				$add( '', $classes, $c );
 			}
 		}
-		$labels = array( 'private-yoga' => 'Private yoga', 'schedule-pricing' => 'Schedule & pricing', 'corporate-yoga' => 'Teams & athletes', 'events' => 'Events', 'about' => 'About', 'journal' => 'Journal', 'contact' => 'Contact' );
+		unset( $labels['classes'] );
 		foreach ( $labels as $key => $label ) {
-			$add( $label, 0, get_post( $ids[ $key ] ) );
+			if ( ! empty( $ids[ $key ] ) ) {
+				$add( $label, 0, get_post( $ids[ $key ] ) );
+			}
 		}
 		set_theme_mod( 'nav_menu_locations', array_merge( (array) get_theme_mod( 'nav_menu_locations', array() ), array( 'primary' => $menu ) ) );
 		$log[] = 'menu';
@@ -345,11 +382,11 @@ function oy_import_all( $refresh = false ) {
 				'weekday'         => (int) $s['day'],
 				'start_time'      => sprintf( '%02d:%02d', $sh, $sm ),
 				'duration_min'    => ( $eh * 60 + $em ) - ( $sh * 60 + $sm ),
-				'capacity'        => 12,
+				'capacity'        => (int) ( $s['capacity'] ?? 12 ),
 				'location'        => $s['location'],
 				'format'          => $s['format'] ?? 'studio',
-				'online_capacity' => 'studio' === ( $s['format'] ?? 'studio' ) ? 0 : 20,
-				'price_cents'     => 'online' === ( $s['format'] ?? '' ) ? 1500 : 2500,
+				'online_capacity' => 'studio' === ( $s['format'] ?? 'studio' ) ? 0 : (int) ( $s['online_capacity'] ?? 20 ),
+				'price_cents'     => isset( $s['price'] ) ? oys_cents_from_input( $s['price'] ) : ( 'online' === ( $s['format'] ?? '' ) ? 1500 : 2500 ),
 				'lang'            => $s['lang'] ?? 'en',
 				'note'            => $s['note'],
 				'active'          => 1,

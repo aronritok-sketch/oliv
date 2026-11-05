@@ -35,6 +35,9 @@ function oy_tr_fields_for( $type ) {
 }
 
 add_action( 'add_meta_boxes', function () {
+	if ( count( oy_languages() ) < 2 ) {
+		return; // One language: the post itself is the only version.
+	}
 	foreach ( OY_TR_TYPES as $type ) {
 		add_meta_box( 'oy_translations', __( 'Translations', 'olivia-yoga' ), 'oy_translations_box', $type, 'normal', 'default' );
 	}
@@ -42,7 +45,7 @@ add_action( 'add_meta_boxes', function () {
 
 function oy_translations_box( $post ) {
 	wp_nonce_field( 'oy_tr', 'oy_tr_nonce' );
-	$langs  = array_diff_key( oy_languages(), array( 'en' => 1 ) );
+	$langs  = array_diff_key( oy_languages(), array( oy_default_lang() => 1 ) );
 	$fields = oy_tr_fields_for( $post->post_type );
 	echo '<p class="description">' . esc_html__( 'The Hungarian and Spanish site show these versions. Leave a field empty and the English original is shown there.', 'olivia-yoga' ) . '</p>';
 	echo '<div class="oy-tr">';
@@ -75,7 +78,7 @@ add_action( 'save_post', function ( $post_id, $post ) {
 	}
 	$in     = (array) wp_unslash( $_POST['oy_tr'] ?? array() ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 	$fields = oy_tr_fields_for( $post->post_type );
-	foreach ( array_keys( array_diff_key( oy_languages(), array( 'en' => 1 ) ) ) as $code ) {
+	foreach ( array_keys( array_diff_key( oy_languages(), array( oy_default_lang() => 1 ) ) ) as $code ) {
 		foreach ( array_keys( $fields ) as $field ) {
 			$raw   = (string) ( $in[ $code ][ $field ] ?? '' );
 			$value = 'content' === $field ? wp_kses_post( $raw ) : ( in_array( $field, array( 'excerpt', 'seo_desc' ), true ) ? sanitize_textarea_field( $raw ) : sanitize_text_field( $raw ) );

@@ -3386,3 +3386,22 @@ msgstr "Napfelkelte a homokon, ha az idő engedi"
 #. Default text stored as data (email template, product or timetable).
 msgid "Live-Music Slow Flow with Handpan"
 msgstr "Élőzenés slow flow handpannel"
+
+# Online only
+msgid "Live online class"
+msgstr "Élő online óra"
+
+msgid "Any live online group class"
+msgstr "Bármelyik élő online csoportos óra"
+
+msgid "Join from home on Zoom"
+msgstr "Otthonról, Zoomon"
+
+msgid "The link comes by email and is in your account"
+msgstr "A linket e-mailben kapod, és a fiókodban is megtalálod"
+
+msgid "Drop in to a live class, or save with an online pass."
+msgstr "Gyere alkalmi jeggyel egy élő órára, vagy spórolj online bérlettel."
+
+msgid "One-on-one online sessions and packs, planned around you."
+msgstr "Négyszemközti online órák és csomagok, rád szabva."

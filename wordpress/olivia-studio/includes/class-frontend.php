@@ -76,7 +76,7 @@ class OYS_Frontend {
 			$day  = $today->modify( "+$d days" );
 			$key  = $day->format( 'Y-m-d' );
 			$list = $by_day[ $key ] ?? array();
-			$head = '<h3><abbr title="' . esc_attr( wp_date( 'l, F j', $day->getTimestamp() ) ) . '">' . esc_html( wp_date( 'D', $day->getTimestamp() ) ) . '</abbr><small>' . esc_html( wp_date( 'M j', $day->getTimestamp() ) ) . '</small></h3>';
+			$head = '<h3><abbr title="' . esc_attr( wp_date( oys_date_format( 'l, F j' ), $day->getTimestamp() ) ) . '">' . esc_html( wp_date( 'D', $day->getTimestamp() ) ) . '</abbr><small>' . esc_html( wp_date( oys_date_format( 'M j' ), $day->getTimestamp() ) ) . '</small></h3>';
 			if ( ! $list ) {
 				if ( 'yes' === $atts['empty_days'] ) {
 					$out[] = '<div class="day is-empty">' . $head . '<p>' . esc_html__( 'No group classes today. Private sessions are available on request.', 'olivia-studio' ) . '</p></div>';
@@ -157,7 +157,12 @@ class OYS_Frontend {
 		$cards  = array();
 		$online_price = (int) OYS_Settings::get( 'online_price_cents' );
 		$ratio        = OYS_Passes::online_per_credit();
-		$cards[] = array( 'tone' => 'paper', 'title' => __( 'Drop-in class', 'olivia-studio' ), 'price' => oys_money( $dropin ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array_filter( array( __( 'Any group class in person', 'olivia-studio' ), $online_price ? sprintf( __( 'Online classes: %s', 'olivia-studio' ), oys_money( $online_price ) ) : '', __( 'Bring friends: add guests when you book', 'olivia-studio' ), 'off' !== OYS_Settings::get( 'pay_later' ) ? __( 'Pay online or at the studio', 'olivia-studio' ) : '' ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
+		$online_only  = (bool) OYS_Settings::get( 'online_only' );
+		if ( $online_only ) {
+			$cards[] = array( 'tone' => 'paper', 'title' => __( 'Live online class', 'olivia-studio' ), 'price' => oys_money( $online_price ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array( __( 'Any live online group class', 'olivia-studio' ), __( 'Join from home on Zoom', 'olivia-studio' ), __( 'The link comes by email and is in your account', 'olivia-studio' ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
+		} else {
+			$cards[] = array( 'tone' => 'paper', 'title' => __( 'Drop-in class', 'olivia-studio' ), 'price' => oys_money( $dropin ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array_filter( array( __( 'Any group class in person', 'olivia-studio' ), $online_price ? sprintf( __( 'Online classes: %s', 'olivia-studio' ), oys_money( $online_price ) ) : '', __( 'Bring friends: add guests when you book', 'olivia-studio' ), 'off' !== OYS_Settings::get( 'pay_later' ) ? __( 'Pay online or at the studio', 'olivia-studio' ) : '' ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
+		}
 		$tones = array( 'lilac', 'sun', 'pink' );
 		$i     = 0;
 		foreach ( OYS_Products::all( true ) as $p ) {
@@ -192,12 +197,15 @@ class OYS_Frontend {
 			$group   = 'membership' === $p['kind'] ? 'members' : ( in_array( $p['kind'], array( 'private_single', 'private_pack' ), true ) ? 'private' : 'classes' );
 			$cards[] = array( 'tone' => $p['featured'] ? 'forest' : $tones[ $i++ % 3 ], 'title' => oys_product_name( $p ), 'price' => oys_money( $p['price_cents'] ), 'unit' => $unit, 'features' => array_map( 'oys_product_text', $features ), 'cta' => $cta, 'featured' => (bool) $p['featured'], 'group' => $group );
 		}
-		$cards[] = array( 'tone' => 'pink', 'title' => __( 'Teams & companies', 'olivia-studio' ), 'price' => __( 'Custom', 'olivia-studio' ), 'unit' => __( 'quote', 'olivia-studio' ), 'features' => array( __( 'On-site, outdoors or online', 'olivia-studio' ), __( 'One-off or weekly', 'olivia-studio' ), __( 'Sports teams and clubs too', 'olivia-studio' ) ), 'cta' => array( __( 'Request a proposal', 'olivia-studio' ), apply_filters( 'oys_corporate_contact_url', home_url( '/contact/?topic=corporate#book' ) ) ), 'featured' => false, 'group' => 'private' );
+		$teams = $online_only ? null : array( 'tone' => 'pink', 'title' => __( 'Teams & companies', 'olivia-studio' ), 'price' => __( 'Custom', 'olivia-studio' ), 'unit' => __( 'quote', 'olivia-studio' ), 'features' => array( __( 'On-site, outdoors or online', 'olivia-studio' ), __( 'One-off or weekly', 'olivia-studio' ), __( 'Sports teams and clubs too', 'olivia-studio' ) ), 'cta' => array( __( 'Request a proposal', 'olivia-studio' ), apply_filters( 'oys_corporate_contact_url', home_url( '/contact/?topic=corporate#book' ) ) ), 'featured' => false, 'group' => 'private' );
+		if ( $teams ) {
+			$cards[] = $teams;
+		}
 
 		$groups = array(
-			'classes' => array( __( 'Group classes', 'olivia-studio' ), __( 'Drop in, or save with a pass. Use passes in the studio or online.', 'olivia-studio' ), array() ),
+			'classes' => array( __( 'Group classes', 'olivia-studio' ), $online_only ? __( 'Drop in to a live class, or save with an online pass.', 'olivia-studio' ) : __( 'Drop in, or save with a pass. Use passes in the studio or online.', 'olivia-studio' ), array() ),
 			'members' => array( __( 'Memberships', 'olivia-studio' ), __( 'A monthly rhythm, billed automatically. Cancel any time.', 'olivia-studio' ), array() ),
-			'private' => array( __( 'Private & teams', 'olivia-studio' ), __( 'One-on-one sessions, packs, and classes for your team.', 'olivia-studio' ), array() ),
+			'private' => array( $online_only ? __( 'Private sessions', 'olivia-studio' ) : __( 'Private & teams', 'olivia-studio' ), $online_only ? __( 'One-on-one online sessions and packs, planned around you.', 'olivia-studio' ) : __( 'One-on-one sessions, packs, and classes for your team.', 'olivia-studio' ), array() ),
 		);
 		foreach ( $cards as $c ) {
 			$groups[ $c['group'] ?? 'classes' ][2][] = $c;
@@ -1260,7 +1268,8 @@ class OYS_Frontend {
 	}
 
 	private static function private_form() {
-		$types = OYS_Privates::location_types();
+		$types       = OYS_Privates::location_types();
+		$online_only = (bool) OYS_Settings::get( 'online_only' );
 		$opts  = '';
 		foreach ( $types as $k => $v ) {
 			$opts .= '<option value="' . esc_attr( $k ) . '">' . esc_html( $v ) . '</option>';
@@ -1275,8 +1284,8 @@ class OYS_Frontend {
 			. self::private_note()
 			. '<div class="form__row"><label class="field"><span>' . esc_html__( 'Length', 'olivia-studio' ) . '</span><select name="duration_min" id="oys-pr-duration">' . $dur . '</select></label>'
 			. '<label class="field"><span>' . esc_html__( 'How many people', 'olivia-studio' ) . '</span><input type="number" name="people" id="oys-pr-people" min="1" max="10" value="1"></label></div>'
-			. '<div class="form__row"><label class="field"><span>' . esc_html__( 'Where', 'olivia-studio' ) . '</span><select name="location_type" id="oys-pr-type">' . $opts . '</select></label>'
-			. '<label class="field"><span>' . esc_html__( 'Address or area', 'olivia-studio' ) . '</span><input type="text" name="address" id="oys-pr-address" placeholder="' . esc_attr__( 'e.g. McGregor Blvd, Fort Myers Beach', 'olivia-studio' ) . '"></label></div>'
+			. ( $online_only ? '<input type="hidden" name="location_type" value="online"><input type="hidden" name="address" value="">' : '<div class="form__row"><label class="field"><span>' . esc_html__( 'Where', 'olivia-studio' ) . '</span><select name="location_type" id="oys-pr-type">' . $opts . '</select></label>'
+			. '<label class="field"><span>' . esc_html__( 'Address or area', 'olivia-studio' ) . '</span><input type="text" name="address" id="oys-pr-address" placeholder="' . esc_attr__( 'e.g. McGregor Blvd, Fort Myers Beach', 'olivia-studio' ) . '"></label></div>' )
 			. '<label class="field"><span>' . esc_html__( 'Days and times that suit you', 'olivia-studio' ) . '</span><textarea name="preferred" id="oys-pr-preferred" rows="3" required placeholder="' . esc_attr__( 'e.g. Tuesday or Thursday mornings, or Saturday at sunrise', 'olivia-studio' ) . '"></textarea></label>'
 			. '<label class="field"><span>' . esc_html__( 'Anything I should know? (goals, injuries, experience)', 'olivia-studio' ) . '</span><textarea name="notes" id="oys-pr-notes" rows="4"></textarea></label>'
 			. '<button class="btn btn--primary" type="submit">' . esc_html__( 'Send request', 'olivia-studio' ) . '</button>'

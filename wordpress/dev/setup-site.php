@@ -40,6 +40,10 @@ if ( 'olivia-yoga' !== get_stylesheet() ) {
 
 require_once get_template_directory() . '/inc/demo-import.php';
 wp_set_current_user( 1 );
+// OY_SITE_EDITION=hu-online builds the Hungarian online edition (Olivia Jóga – Online) instead.
+if ( getenv( 'OY_SITE_EDITION' ) && getenv( 'OY_SITE_EDITION' ) !== oy_edition() ) {
+	echo implode( ', ', oy_switch_edition( getenv( 'OY_SITE_EDITION' ) ) ) . "\n";
+}
 echo 'Imported: ' . implode( ', ', oy_import_all() ) . "\n";
 
 OYS_Settings::update( array( 'stripe_mode' => 'test', 'stripe_test_secret' => 'sk_test_mock', 'stripe_test_webhook' => 'whsec_mock', 'stripe_test_connect_webhook' => 'whsec_connect_mock' ) );

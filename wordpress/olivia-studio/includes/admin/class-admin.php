@@ -911,6 +911,17 @@ class OYS_Admin {
 		echo '<tr><th>' . esc_html__( 'Live webhook signing secret', 'olivia-studio' ) . '</th><td>' . $f( 'stripe_live_webhook', 'password', 'regular-text', 'autocomplete="off" placeholder="whsec_…"' ) . '</td></tr>'; // phpcs:ignore
 		echo '<tr><th>' . esc_html__( 'Webhook URL', 'olivia-studio' ) . '</th><td><code>' . esc_html( $hook ) . '</code><p class="description">' . esc_html__( 'In Stripe → Developers → Webhooks, add this URL with the events: checkout.session.completed, checkout.session.async_payment_succeeded, checkout.session.async_payment_failed, checkout.session.expired, charge.refunded, customer.subscription.updated, customer.subscription.deleted, invoice.paid, invoice.payment_failed. For memberships also turn on the Customer portal (Settings → Billing → Customer portal).', 'olivia-studio' ) . '</p></td></tr>';
 		echo '<tr><th>' . esc_html__( 'Currency', 'olivia-studio' ) . '</th><td>' . $f( 'currency', 'text', 'small-text', 'maxlength="3"' ) . '</td></tr>'; // phpcs:ignore
+		echo '</table><h2>' . esc_html__( 'Languages', 'olivia-studio' ) . '</h2><table class="form-table">';
+		$site_langs = OYS_I18n::languages();
+		echo '<tr><th>' . esc_html__( 'The site is offered in', 'olivia-studio' ) . '</th><td>';
+		foreach ( OYS_I18n::LANGS as $code => $l ) {
+			echo '<label style="margin-right:1em"><input type="checkbox" name="oys_langs[]" value="' . esc_attr( $code ) . '"' . checked( isset( $site_langs[ $code ] ), true, false ) . '> ' . esc_html( $l['native'] ) . '</label>';
+		}
+		echo '</td></tr><tr><th>' . esc_html__( 'Main language', 'olivia-studio' ) . '</th><td><select name="s[default_lang]">';
+		foreach ( OYS_I18n::LANGS as $code => $l ) {
+			echo '<option value="' . esc_attr( $code ) . '"' . selected( OYS_I18n::default_lang(), $code, false ) . '>' . esc_html( $l['native'] ) . '</option>';
+		}
+		echo '</select><p class="description">' . esc_html__( 'Its addresses have no language prefix, and the site\'s own pages and posts are written in it. The other languages get /hu/ or /es/ addresses; with a single language there is no language switcher.', 'olivia-studio' ) . '</p></td></tr>';
 		echo '</table><h2>' . esc_html__( 'Booking rules', 'olivia-studio' ) . '</h2><table class="form-table">';
 		$nums = array(
 			'cancel_hours'          => __( 'Free cancellation until (hours before a group class)', 'olivia-studio' ),
@@ -942,6 +953,7 @@ class OYS_Admin {
 		echo '</table><h2>' . esc_html__( 'Community', 'olivia-studio' ) . '</h2><table class="form-table">';
 		echo '<tr><th>' . esc_html__( 'Facebook group link', 'olivia-studio' ) . '</th><td>' . $f( 'fb_group_url', 'url', 'large-text' ) . '<p class="description">' . esc_html__( 'Shown next to the newsletter sign-up, after booking, in the account, the app and at the bottom of every email. Leave empty to hide it.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
 		echo '</table><h2>' . esc_html__( 'Online classes', 'olivia-studio' ) . '</h2><table class="form-table">';
+		echo '<tr><th>' . esc_html__( 'Online only', 'olivia-studio' ) . '</th><td><label><input type="hidden" name="s[online_only]" value="0"><input type="checkbox" name="s[online_only]" value="1"' . checked( 1, (int) $s['online_only'], false ) . '> ' . esc_html__( 'Only live online classes (no studio): the price list shows the online drop-in and online passes', 'olivia-studio' ) . '</label></td></tr>';
 		echo '<tr><th>' . esc_html__( 'Drop-in price for an online class', 'olivia-studio' ) . '</th><td><input name="online_price" class="small-text" value="' . esc_attr( $s['online_price_cents'] / 100 ) . '"> ' . esc_html( strtoupper( $s['currency'] ) ) . '<p class="description">' . esc_html__( 'Used for new online classes in the calendar; each class can still have its own price.', 'olivia-studio' ) . '</p></td></tr>';
 		echo '<tr><th>' . esc_html__( 'One class on a studio pass covers', 'olivia-studio' ) . '</th><td>' . $f( 'online_per_credit', 'number', 'small-text', 'min="1"' ) . ' ' . esc_html__( 'online classes', 'olivia-studio' ) . '<p class="description">' . esc_html__( 'When someone books an online class with a studio pass, one class from the pass turns into this many online classes (same expiry date); one is used and the rest stay in their account. Online passes are used first. Memberships include online classes, and they don\'t count towards a monthly class limit.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
 		echo '</table><h2 id="zoom">' . esc_html__( 'Zoom (live online classes)', 'olivia-studio' ) . '</h2>';
@@ -1448,6 +1460,14 @@ class OYS_Admin {
 		}
 		if ( isset( $clean['pay_later'] ) ) {
 			$clean['pay_later'] = in_array( $clean['pay_later'], array( 'all', 'first', 'off' ), true ) ? $clean['pay_later'] : 'all';
+		}
+		if ( isset( $_POST['oys_langs'] ) ) {
+			$langs              = array_values( array_intersect( array_keys( OYS_I18n::LANGS ), array_map( 'sanitize_key', (array) wp_unslash( $_POST['oys_langs'] ) ) ) );
+			$clean['languages'] = implode( ',', $langs ?: array_keys( OYS_I18n::LANGS ) );
+		}
+		if ( isset( $clean['default_lang'] ) ) {
+			$langs                 = explode( ',', $clean['languages'] ?? implode( ',', array_keys( OYS_I18n::languages() ) ) );
+			$clean['default_lang'] = in_array( $clean['default_lang'], $langs, true ) ? $clean['default_lang'] : $langs[0];
 		}
 		OYS_Settings::update( $clean );
 		self::back( 'oys-settings', array(), __( 'Settings saved.', 'olivia-studio' ) );

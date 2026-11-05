@@ -1,12 +1,15 @@
 <?php
 /**
  * Class types (oy_class), FAQs (oy_faq) and past events (oy_moment), editable in wp-admin.
- * Class pages live at /yoga-classes/{slug}/; the "Classes" overview is a normal page.
+ * Class pages live at /yoga-classes/{slug}/ (on the online edition /online-jogaorak/{slug}/); the "Classes"
+ * overview is a normal page.
  */
 
 defined( 'ABSPATH' ) || exit;
 
-add_action( 'init', function () {
+add_action( 'init', 'oy_register_content_types' );
+
+function oy_register_content_types() {
 	register_post_type( 'oy_class', array(
 		'labels'       => array(
 			'name'          => __( 'Class types', 'olivia-yoga' ),
@@ -19,7 +22,7 @@ add_action( 'init', function () {
 		'menu_icon'    => 'dashicons-heart',
 		'menu_position'=> 21,
 		'supports'     => array( 'title', 'editor', 'excerpt', 'thumbnail', 'page-attributes' ),
-		'rewrite'      => array( 'slug' => 'yoga-classes', 'with_front' => false ),
+		'rewrite'      => array( 'slug' => oy_page_slug( 'yoga-classes' ), 'with_front' => false ),
 		'has_archive'  => false,
 	) );
 	register_post_type( 'oy_faq', array(
@@ -56,7 +59,7 @@ add_action( 'init', function () {
 	foreach ( array( 'oy_date', 'oy_place' ) as $key ) {
 		register_post_meta( 'oy_moment', $key, array( 'type' => 'string', 'single' => true, 'show_in_rest' => true ) );
 	}
-} );
+}
 
 /* ---------- Meta boxes ---------- */
 

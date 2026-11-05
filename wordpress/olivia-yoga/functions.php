@@ -5,11 +5,12 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OY_VERSION', '3.0.0' );
+define( 'OY_VERSION', '3.1.0' );
 define( 'OY_EMAIL', 'olivia.kovacs6@gmail.com' );
 define( 'OY_INSTAGRAM', 'https://www.instagram.com/oliivia_yoga/' );
 define( 'OY_FACEBOOK', 'https://www.facebook.com/oliviajogaoktato' );
 
+require_once get_template_directory() . '/inc/edition.php';
 require_once get_template_directory() . '/inc/i18n.php';
 require_once get_template_directory() . '/inc/helpers.php';
 require_once get_template_directory() . '/inc/content-types.php';
@@ -49,6 +50,16 @@ add_filter( 'excerpt_more', fn() => '…' );
 
 /** Main menu entries when none is assigned in Appearance → Menus. */
 function oy_menu_items() {
+	if ( oy_online_only() ) {
+		return array(
+			'schedule-pricing' => __( 'Schedule & pricing', 'olivia-yoga' ),
+			'private-yoga'     => __( 'Private online sessions', 'olivia-yoga' ),
+			'about'            => __( 'About', 'olivia-yoga' ),
+			'faq'              => __( 'FAQ', 'olivia-yoga' ),
+			'journal'          => __( 'Journal', 'olivia-yoga' ),
+			'contact'          => __( 'Contact', 'olivia-yoga' ),
+		);
+	}
 	return array(
 		'private-yoga'     => __( 'Private yoga', 'olivia-yoga' ),
 		'schedule-pricing' => __( 'Schedule & pricing', 'olivia-yoga' ),
@@ -88,6 +99,14 @@ add_filter( 'walker_nav_menu_start_el', function ( $html, $item, $depth, $args )
 	}
 	return $html;
 }, 10, 4 );
+
+// WordPress marks the journal page as the parent of every single item, class pages included; only posts belong to it.
+add_filter( 'nav_menu_css_class', function ( $classes, $item ) {
+	if ( is_singular() && ! is_singular( 'post' ) && (int) $item->object_id === (int) get_option( 'page_for_posts' ) ) {
+		$classes = array_values( array_diff( (array) $classes, array( 'current_page_parent' ) ) );
+	}
+	return $classes;
+}, 10, 2 );
 
 add_filter( 'nav_menu_link_attributes', function ( $atts, $item ) {
 	if ( $item->current ) {
@@ -134,7 +153,14 @@ function oy_page_aside( $slug ) {
 			return '<div class="aside-card"><div class="frame">' . oy_photo( 'olivia-riverside-profile', '340px' ) . '</div><h2>' . esc_html__( 'Training', 'olivia-yoga' ) . '</h2>' . oy_training_list() . oy_btn( oy_book_url(), __( 'Practice with me', 'olivia-yoga' ), 'orchid' ) . '</div>';
 		case 'private-yoga':
 			$price = class_exists( 'OYS_Products' ) ? OYS_Products::private_price_for( 60 ) : 9500;
-			return '<div class="aside-card aside-card--forest aside-card--compact"><p class="aside-card__kicker">' . esc_html__( 'Private sessions', 'olivia-yoga' ) . '</p><h2>' . esc_html( sprintf( __( 'From %s', 'olivia-yoga' ), '$' . number_format( $price / 100 ) ) ) . '</h2>'
+			$price = function_exists( 'oys_money' ) ? oys_money( $price ) : '$' . number_format( $price / 100 );
+			if ( oy_online_only() ) {
+				return '<div class="aside-card aside-card--forest aside-card--compact"><p class="aside-card__kicker">' . esc_html__( 'Private online sessions', 'olivia-yoga' ) . '</p><h2>' . esc_html( sprintf( __( 'From %s', 'olivia-yoga' ), $price ) ) . '</h2>'
+					. '<p>' . esc_html__( '60, 75 or 90 minutes, live on video, planned around your body and your goals. Prenatal fitness too.', 'olivia-yoga' ) . '</p>'
+					. '<ul class="aside-list aside-list--light"><li>' . oy_icon( 'globe' ) . esc_html__( 'In Hungarian', 'olivia-yoga' ) . '</li><li>' . oy_icon( 'clock' ) . esc_html__( 'Reply within a day', 'olivia-yoga' ) . '</li></ul>'
+					. oy_btn( oy_private_url(), __( 'Request a private session', 'olivia-yoga' ), 'orchid' ) . '</div>';
+			}
+			return '<div class="aside-card aside-card--forest aside-card--compact"><p class="aside-card__kicker">' . esc_html__( 'Private sessions', 'olivia-yoga' ) . '</p><h2>' . esc_html( sprintf( __( 'From %s', 'olivia-yoga' ), $price ) ) . '</h2>'
 				. '<p>' . esc_html__( '60, 75 or 90 minutes at your home, lanai, clubhouse, on the beach or online. Prenatal fitness and singing bowl massage too.', 'olivia-yoga' ) . '</p>'
 				. '<ul class="aside-list aside-list--light"><li>' . oy_icon( 'globe' ) . esc_html__( 'In English or Hungarian', 'olivia-yoga' ) . '</li><li>' . oy_icon( 'clock' ) . esc_html__( 'Reply within a day', 'olivia-yoga' ) . '</li></ul>'
 				. oy_btn( oy_private_url(), __( 'Request a private session', 'olivia-yoga' ), 'orchid' ) . '</div>'
@@ -150,7 +176,9 @@ function oy_page_aside( $slug ) {
 				. '<li>' . oy_icon( 'mail' ) . '<a href="mailto:' . esc_attr( OY_EMAIL ) . '">' . esc_html( OY_EMAIL ) . '</a></li><li>' . oy_icon( 'instagram' ) . '<a href="' . esc_url( OY_INSTAGRAM ) . '" target="_blank" rel="noopener">@oliivia_yoga</a></li>'
 				. '<li>' . oy_icon( 'facebook' ) . '<a href="' . esc_url( OY_FACEBOOK ) . '" target="_blank" rel="noopener">Facebook</a></li>'
 				. ( function_exists( 'oys_fb_group_url' ) && oys_fb_group_url() ? '<li>' . oy_icon( 'group', 'icon' ) . '<a href="' . esc_url( oys_fb_group_url() ) . '" target="_blank" rel="noopener">' . esc_html__( 'Our Facebook group', 'olivia-yoga' ) . '</a></li>' : '' )
-				. '<li>' . oy_icon( 'pin' ) . '<span>Fort Myers, FL</span></li><li>' . oy_icon( 'globe' ) . '<span>' . esc_html__( 'English, Hungarian', 'olivia-yoga' ) . '</span></li></ul>'
+				. ( oy_online_only()
+					? '<li>' . oy_icon( 'globe' ) . '<span>' . esc_html__( 'Online, in Hungarian', 'olivia-yoga' ) . '</span></li></ul>'
+					: '<li>' . oy_icon( 'pin' ) . '<span>Fort Myers, FL</span></li><li>' . oy_icon( 'globe' ) . '<span>' . esc_html__( 'English, Hungarian', 'olivia-yoga' ) . '</span></li></ul>' )
 				. '<p>' . esc_html__( 'Ready to book? Group classes and passes can be booked and paid online.', 'olivia-yoga' ) . '</p>' . oy_btn( oy_book_url(), __( 'Book a class', 'olivia-yoga' ), 'orchid' ) . '</div>';
 	}
 	return '';

@@ -6,7 +6,7 @@ defined( 'ABSPATH' ) || exit;
 get_header();
 while ( have_posts() ) :
 	the_post();
-	$slug   = get_post_field( 'post_name' );
+	$slug   = oy_page_key( get_post_field( 'post_name' ) );
 	$studio = oy_is_studio_page();
 	$aside  = $studio ? '' : oy_page_aside( $slug );
 	$photo  = $studio && 'gifts' !== $studio ? '' : oy_post_photo( get_the_ID(), '', '(min-width: 960px) 36vw, 90vw', true );

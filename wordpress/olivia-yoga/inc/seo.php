@@ -11,6 +11,9 @@ function oy_seo_plugin_active() {
 }
 
 function oy_meta_description() {
+	if ( is_front_page() && oy_online_only() ) {
+		return __( 'Live online yoga classes in Hungarian with Olivia Kovacs: hatha flow, slow flow and prenatal fitness from home on Zoom, plus private online sessions. Beginners welcome.', 'olivia-yoga' );
+	}
 	if ( is_front_page() ) {
 		return __( 'Yoga, mobility and prenatal fitness in Fort Myers, FL: hatha flow and slow flow classes, private yoga at your home, lanai or on the beach, meditation and singing bowl massage with Olivia Kovacs.', 'olivia-yoga' );
 	}
@@ -27,7 +30,9 @@ add_filter( 'pre_get_document_title', function ( $title ) {
 		return $title;
 	}
 	if ( is_front_page() ) {
-		return __( 'Yoga in Fort Myers, FL: Hatha Flow, Private Yoga & Prenatal Fitness | Olivia Kovacs', 'olivia-yoga' );
+		return oy_online_only()
+			? __( 'Online Yoga Classes, Live in Hungarian: Hatha Flow, Slow Flow & Prenatal | Olivia Jóga', 'olivia-yoga' )
+			: __( 'Yoga in Fort Myers, FL: Hatha Flow, Private Yoga & Prenatal Fitness | Olivia Kovacs', 'olivia-yoga' );
 	}
 	if ( is_singular() ) {
 		$id     = get_queried_object_id();
@@ -46,18 +51,36 @@ add_action( 'wp_head', function () {
 	$desc = oy_meta_description();
 	$url  = is_singular() ? get_permalink() : home_url( add_query_arg( array() ) );
 	echo '<meta name="description" content="' . esc_attr( $desc ) . '">' . "\n";
-	echo '<meta property="og:site_name" content="Olivia Kovacs Yoga"><meta property="og:locale" content="' . esc_attr( oy_languages()[ oy_lang() ]['locale'] ?? 'en_US' ) . '">';
+	echo '<meta property="og:site_name" content="' . esc_attr( oy_site_name() ) . '"><meta property="og:locale" content="' . esc_attr( oy_languages()[ oy_lang() ]['locale'] ?? 'en_US' ) . '">';
 	echo '<meta property="og:type" content="' . ( is_singular( 'post' ) ? 'article' : 'website' ) . '">';
 	echo '<meta property="og:title" content="' . esc_attr( wp_get_document_title() ) . '"><meta property="og:description" content="' . esc_attr( $desc ) . '"><meta property="og:url" content="' . esc_url( $url ) . '">';
 	if ( is_singular() && has_post_thumbnail() ) {
 		echo '<meta property="og:image" content="' . esc_url( get_the_post_thumbnail_url( null, 'large' ) ) . '">';
 	}
-	echo '<meta name="twitter:card" content="summary_large_image"><meta name="geo.region" content="US-FL"><meta name="geo.placename" content="Fort Myers">' . "\n";
+	echo '<meta name="twitter:card" content="summary_large_image">' . ( oy_online_only() ? '' : '<meta name="geo.region" content="US-FL"><meta name="geo.placename" content="Fort Myers">' ) . "\n";
 
-	$site  = home_url( '/' );
-	$graph = array(
-		array( '@type' => 'WebSite', '@id' => $site . '#website', 'url' => $site, 'name' => 'Olivia Kovacs Yoga', 'inLanguage' => oy_languages()[ oy_lang() ]['html'] ?? 'en-US' ),
-		array(
+	$site     = home_url( '/' );
+	$business = oy_online_only()
+		? array(
+			'@type'       => 'Organization',
+			'@id'         => $site . '#business',
+			'name'        => oy_site_name(),
+			'url'         => $site,
+			'email'       => OY_EMAIL,
+			'sameAs'      => array( OY_INSTAGRAM, OY_FACEBOOK ),
+			'description' => __( 'Live online yoga classes in Hungarian: hatha flow, slow flow, prenatal fitness and private online sessions with Olivia Kovacs.', 'olivia-yoga' ),
+			'areaServed'  => array( '@type' => 'Country', 'name' => 'Hungary' ),
+			'knowsLanguage' => 'hu',
+			'founder'     => array( '@id' => $site . '#olivia' ),
+			'makesOffer'  => array(
+				'@type'       => 'Offer',
+				'itemOffered' => array( '@type' => 'Service', 'name' => __( 'Live online yoga classes', 'olivia-yoga' ), 'serviceType' => 'Online yoga class', 'areaServed' => array( '@type' => 'Country', 'name' => 'Hungary' ), 'availableChannel' => array( '@type' => 'ServiceChannel', 'name' => 'Zoom', 'serviceUrl' => oy_page_link( 'schedule-pricing' ) ) ),
+			),
+		)
+		: null;
+	$graph    = array(
+		array( '@type' => 'WebSite', '@id' => $site . '#website', 'url' => $site, 'name' => oy_site_name(), 'inLanguage' => oy_languages()[ oy_lang() ]['html'] ?? 'en-US' ),
+		$business ?? array(
 			'@type'       => array( 'LocalBusiness', 'HealthAndBeautyBusiness' ),
 			'@id'         => $site . '#business',
 			'name'        => 'Olivia Kovacs Yoga',
@@ -80,7 +103,7 @@ add_action( 'wp_head', function () {
 			'hasCredential' => array( '@type' => 'EducationalOccupationalCredential', 'name' => 'Hatha yoga teacher certification (2023)', 'recognizedBy' => array( '@type' => 'Organization', 'name' => 'Yoga Alliance International' ) ),
 		),
 	);
-	if ( is_page( 'faq' ) ) {
+	if ( is_page( oy_page_slug( 'faq' ) ) ) {
 		$faqs    = get_posts( array( 'post_type' => 'oy_faq', 'numberposts' => 50, 'orderby' => 'menu_order', 'order' => 'ASC' ) );
 		$graph[] = array( '@type' => 'FAQPage', 'mainEntity' => array_map( fn( $f ) => array( '@type' => 'Question', 'name' => get_the_title( $f ), 'acceptedAnswer' => array( '@type' => 'Answer', 'text' => wp_strip_all_tags( oy_post_content( $f ) ) ) ), $faqs ) );
 	}

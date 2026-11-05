@@ -23,8 +23,30 @@ function oys_date( $utc, $format = null ) {
 	if ( ! $utc ) {
 		return '';
 	}
-	$format = $format ?: get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
+	$format = $format ? oys_date_format( $format ) : get_option( 'date_format' ) . ' ' . get_option( 'time_format' );
 	return wp_date( $format, oys_ts( $utc ) );
+}
+
+/**
+ * The code's date formats are American (Nov 7, 6:00 pm). In Hungarian the order and the clock differ
+ * (nov. 7. 18:00), so the formats are rewritten while the locale is Hungarian.
+ */
+function oys_date_format( $format ) {
+	if ( 0 !== strpos( get_locale(), 'hu' ) ) {
+		return $format;
+	}
+	$map = array(
+		'M j, Y g:i a'   => 'Y. M j. G:i',
+		'D M j, g:i a'   => 'M j., D G:i',
+		'l, F j · g:i a' => 'F j., l · G:i',
+		'M j, g:i a'     => 'M j. G:i',
+		'M j, Y'         => 'Y. M j.',
+		'l, F j'         => 'F j., l',
+		'l, g:i a'       => 'l G:i',
+		'F j'            => 'F j.',
+		'M j'            => 'M j.',
+	);
+	return $map[ $format ] ?? str_replace( array( 'g:i a', 'g a' ), array( 'G:i', 'G' ), $format );
 }
 
 function oys_time( $utc ) {
@@ -46,15 +68,19 @@ function oys_utc_to_local_input( $utc ) {
 
 function oys_money( $cents, $currency = null ) {
 	$currency = strtoupper( $currency ?: OYS_Settings::get( 'currency' ) );
-	$symbols  = array( 'USD' => '$', 'EUR' => '€', 'GBP' => '£', 'HUF' => 'Ft ' );
-	$sym      = $symbols[ $currency ] ?? $currency . ' ';
 	$amount   = $cents / 100;
-	$str      = fmod( $amount, 1.0 ) === 0.0 ? number_format_i18n( $amount ) : number_format_i18n( $amount, 2 );
+	if ( 'HUF' === $currency ) {
+		// Forints: whole amounts, the sign after the number, thousands with a space (2 500 Ft).
+		return number_format( round( $amount ), 0, ',', "\u{00A0}" ) . "\u{00A0}Ft";
+	}
+	$symbols = array( 'USD' => '$', 'EUR' => '€', 'GBP' => '£' );
+	$sym     = $symbols[ $currency ] ?? $currency . ' ';
+	$str     = fmod( $amount, 1.0 ) === 0.0 ? number_format_i18n( $amount ) : number_format_i18n( $amount, 2 );
 	return $sym . $str;
 }
 
 function oys_cents_from_input( $value ) {
-	$value = str_replace( array( '$', ',', ' ' ), '', (string) $value );
+	$value = str_replace( array( '$', ',', ' ', "\u{00A0}", 'Ft', 'ft' ), '', (string) $value );
 	return max( 0, (int) round( (float) $value * 100 ) );
 }
 

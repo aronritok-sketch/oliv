@@ -17,6 +17,11 @@ function oy_lang() {
 	return function_exists( 'oys_lang' ) ? oys_lang() : 'en';
 }
 
+/** The site's main language: its pages and posts are written in it (English, or Hungarian on the online edition). */
+function oy_default_lang() {
+	return function_exists( 'oys_default_lang' ) ? oys_default_lang() : 'en';
+}
+
 function oy_languages() {
 	return function_exists( 'oys_languages' ) ? oys_languages() : array( 'en' => array( 'locale' => 'en_US', 'name' => 'English', 'native' => 'English', 'short' => 'EN', 'html' => 'en-US' ) );
 }
@@ -37,7 +42,7 @@ function oy_tr_key( $field, $lang ) {
 /** A translated field of a post in the current language ('' when English or not translated). */
 function oy_tr( $post_id, $field, $lang = null ) {
 	$lang = $lang ?? oy_lang();
-	if ( 'en' === $lang || ! $post_id ) {
+	if ( oy_default_lang() === $lang || ! $post_id ) {
 		return '';
 	}
 	return (string) get_post_meta( (int) $post_id, oy_tr_key( $field, $lang ), true );
@@ -49,9 +54,9 @@ function oy_post_content( $post ) {
 	return $post ? ( oy_tr( $post->ID, 'content' ) ?: $post->post_content ) : '';
 }
 
-/** Is a Hungarian or Spanish visitor looking at the public site? */
+/** Is a visitor looking at the public site in a language other than the one the content is written in? */
 function oy_translating() {
-	return 'en' !== oy_lang() && ! ( is_admin() && ! wp_doing_ajax() ) && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST && ! empty( $_GET['context'] ) && 'edit' === $_GET['context'] ); // phpcs:ignore
+	return oy_default_lang() !== oy_lang() && ! ( is_admin() && ! wp_doing_ajax() ) && ! ( defined( 'REST_REQUEST' ) && REST_REQUEST && ! empty( $_GET['context'] ) && 'edit' === $_GET['context'] ); // phpcs:ignore
 }
 
 add_filter( 'the_title', function ( $title, $post_id = 0 ) {
@@ -114,13 +119,13 @@ function oy_lang_switcher( $cls = 'langs' ) {
 
 // Search engines: the same page in each language.
 add_action( 'wp_head', function () {
-	if ( ! function_exists( 'oys_url_in' ) || is_404() || is_search() ) {
+	if ( ! function_exists( 'oys_url_in' ) || is_404() || is_search() || count( oy_languages() ) < 2 ) {
 		return;
 	}
 	foreach ( oy_languages() as $code => $l ) {
 		echo '<link rel="alternate" hreflang="' . esc_attr( $l['html'] ) . '" href="' . esc_url( oys_url_in( $code ) ) . '">' . "\n";
 	}
-	echo '<link rel="alternate" hreflang="x-default" href="' . esc_url( oys_url_in( 'en' ) ) . '">' . "\n";
+	echo '<link rel="alternate" hreflang="x-default" href="' . esc_url( oys_url_in( oy_default_lang() ) ) . '">' . "\n";
 }, 2 );
 
 /** Links inside translated copy point to the same page in the visitor's language. */

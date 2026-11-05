@@ -90,6 +90,14 @@
 - Tesztek: 540 integrációs + 252 böngészős ellenőrzés (új: nyelvek, átfedés-tiltás, nagykötőjel nélküli oldalak, lebegő gomb) + 18 app unit.
 - **Teendők:** a dev oldalon Megjelenés → Olivia setup → *Refresh the content*; a régi, egymást fedő hétfő 18:00-s Hatha törlése a naptárból; a spanyol szövegeket és a magyar fordításokat Olivia nézze át; a Fitmummy felirat pontos szövege („Prenatal & postnatal fitness training: Fitmummy method”) Oliviával egyeztetendő.
 
+## 9. kör: „Olivia Jóga – Online”, magyar online kiadás (2026-11-05)
+- **Döntés (Áron):** első körben csak Magyarországon indulunk, online; a mostani (Fort Myers, 3 nyelvű) szerkezet megmarad, ahhoz akkor térünk vissza, amikor Fort Myersben is lesz élő oktatás.
+- **Új kiadás** ugyanabban a témában és pluginban: `hu-online` (Megjelenés → Olivia setup → Edition). Csak magyar, előtag nélkül, magyar címekkel (`/orarend-es-arak/`, `/online-jogaorak/` …), forintban, budapesti idő szerint, csak élő online órák és online magánóra. Tartalom: `olivia-yoga/demo/content-hu-online.json`. Részletek: `wordpress/DEVELOPER.md` 23. fejezet.
+- **Plugin 1.4.0:** nyelvek beállítása (egy nyelv, nem angol fő nyelv), *Online only*, forint (`2 500 Ft`), magyar dátumformátum; javítás: almappás telepítésnél a /hu/ és /es/ oldalak 404-et adtak (1.3.1).
+- **Téma 3.1.0:** online főoldal, online menü, lábléc, SEO; a témafotók alt szövege a látogató nyelvén; a „Napló” menüpont nem aktív az óraoldalakon.
+- **MINTA:** heti 5 online óra (H 18:00 Hatha, K 19:00 Slow, Sze 18:30 Kismama, Cs 18:00 Hatha, Szo 16:00 Slow); árak: alkalmi 2 500 Ft, 5 alkalmas 11 000 Ft, 10 alkalmas 20 000 Ft, korlátlan havi 12 900 Ft, havi 4 óra 8 400 Ft, magánóra 60/75/90 perc 12 000 / 14 500 / 17 000 Ft, 5 magánóra 55 000 Ft (a piackutatás szerinti sávban). Olivia véglegesíti.
+- **Teendők:** Olivia nézze át a szövegeket, az órarendet és az árakat; Zoom-fiók; domain (pl. oliviajoga-online); a VPS dev oldal (`dev.helloprovision.com/<slug>`) a `projects.json`-ba felveendő, amikor a VPS él.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -35,6 +35,13 @@ function oy_photo( $src, $sizes = '100vw', $eager = false, $alt = null ) {
 		}
 		if ( null !== $alt ) {
 			$attrs['alt'] = $alt;
+		} else {
+			// A theme photo whose alt text is still the original: show it in the visitor's language.
+			$key  = (string) get_post_meta( (int) $src, 'oy_key', true );
+			$imgs = $key ? oy_images() : array();
+			if ( ! empty( $imgs[ $key ]['alt'] ) && get_post_meta( (int) $src, '_wp_attachment_image_alt', true ) === $imgs[ $key ]['alt'] ) {
+				$attrs['alt'] = oy_t( $imgs[ $key ]['alt'] );
+			}
 		}
 		$pos = get_post_meta( (int) $src, 'oy_pos', true );
 		if ( $pos ) {
@@ -143,6 +150,9 @@ function oy_title_line() {
 }
 
 function oy_specialities() {
+	if ( oy_online_only() ) {
+		return array( __( 'Yoga', 'olivia-yoga' ), __( 'Mobility', 'olivia-yoga' ), __( 'Prenatal Fitness', 'olivia-yoga' ), __( 'Meditation', 'olivia-yoga' ) );
+	}
 	return array( __( 'Yoga', 'olivia-yoga' ), __( 'Mobility', 'olivia-yoga' ), __( 'Prenatal Fitness', 'olivia-yoga' ), __( 'Meditation', 'olivia-yoga' ), __( 'Private Singing Bowl Massage', 'olivia-yoga' ) );
 }
 
@@ -152,12 +162,13 @@ function oy_specialities_line( $cls = 'specialities' ) {
 
 /** Name card: name, title line and specialities. */
 function oy_name_card( $cls = '' ) {
-	return '<div class="namecard ' . esc_attr( $cls ) . '"><p class="namecard__name">Olivia Kovacs</p><p class="namecard__title">' . esc_html( oy_title_line() ) . '</p>' . oy_specialities_line( 'namecard__spec' ) . '</div>';
+	return '<div class="namecard ' . esc_attr( $cls ) . '"><p class="namecard__name">' . ( oy_online_only() ? 'Kovacs Olivia' : 'Olivia Kovacs' ) . '</p><p class="namecard__title">' . esc_html( oy_title_line() ) . '</p>' . oy_specialities_line( 'namecard__spec' ) . '</div>';
 }
 
 /* ---------- URLs used across templates ---------- */
 
 function oy_page_link( $slug, $anchor = '' ) {
+	$slug = oy_page_slug( $slug );
 	$page = get_page_by_path( $slug );
 	$url  = $page ? get_permalink( $page ) : home_url( '/' . $slug . '/' );
 	return $anchor ? $url . '#' . $anchor : $url;

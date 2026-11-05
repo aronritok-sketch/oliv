@@ -1617,6 +1617,64 @@ test( 'content: three languages, no em dashes, past events and journal', functio
 	ok( str_contains( $hu, '/hu/contact/?topic=prenatal' ), 'links in Hungarian copy point to Hungarian pages' );
 } );
 
+test( 'one-language site: Hungarian only, no address prefix, forints', function () {
+	$home = untrailingslashit( get_option( 'home' ) );
+	eq( 'en', OYS_I18n::default_lang(), 'English is the main language by default' );
+	eq( array( 'en', 'hu', 'es' ), array_keys( OYS_I18n::languages() ), 'three languages by default' );
+	OYS_Settings::update( array( 'languages' => 'hu', 'default_lang' => 'hu', 'currency' => 'huf' ) );
+	try {
+		eq( array( 'hu' ), array_keys( OYS_I18n::languages() ), 'only Hungarian' );
+		eq( 'hu', OYS_I18n::default_lang(), 'Hungarian is the main language' );
+		eq( array(), OYS_I18n::others(), 'no language has a prefix' );
+		eq( $home . '/about/', OYS_I18n::prefix( $home . '/about/', 'hu' ), 'Hungarian addresses have no prefix' );
+		eq( $home . '/', OYS_I18n::prefix( $home . '/', 'hu' ), 'the home address is untouched' );
+		eq( 'hu', OYS_I18n::lang_from_url( $home . '/rolam/' ), 'every address is Hungarian' );
+		eq( "2\u{00A0}500\u{00A0}Ft", oys_money( 250000 ), 'forints: the sign after the number, a space between thousands' );
+		eq( 250000, oys_cents_from_input( "2\u{00A0}500 Ft" ), 'forint input parsed' );
+		eq( 'M j., D G:i', OYS_I18n::with( 'hu', fn() => oys_date_format( 'D M j, g:i a' ) ), 'Hungarian date order and 24-hour clock' );
+		eq( 'D M j, g:i a', oys_date_format( 'D M j, g:i a' ), 'English formats untouched' );
+		OYS_Settings::update( array( 'online_only' => 1, 'online_price_cents' => 250000 ) );
+		$pricing = do_shortcode( '[oys_pricing]' );
+		ok( str_contains( $pricing, 'Live online class' ) && ! str_contains( $pricing, 'Teams &amp; companies' ), 'online only: the price list starts with the live online class, no teams card' );
+		ok( str_contains( $pricing, "2\u{00A0}500\u{00A0}Ft" ), 'online drop-in price in forints' );
+	} finally {
+		OYS_Settings::update( array( 'languages' => 'en,hu,es', 'default_lang' => 'en', 'currency' => 'usd', 'online_only' => 0, 'online_price_cents' => 600 ) );
+	}
+	eq( 'en', OYS_I18n::default_lang(), 'back to English' );
+} );
+
+test( 'online edition: Hungarian addresses and its own copy', function () {
+	require_once get_template_directory() . '/inc/demo-import.php';
+	eq( 'fort-myers', oy_edition(), 'the Fort Myers site is the default edition' );
+	eq( 'about', oy_page_slug( 'about' ), 'Fort Myers addresses unchanged' );
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		eq( 'rolam', oy_page_slug( 'about' ), 'online edition: Hungarian address' );
+		eq( 'schedule-pricing', oy_page_key( 'orarend-es-arak' ), 'and back to the theme\'s own slug' );
+		eq( 'Olivia Jóga – Online', oy_site_name(), 'site name' );
+		ok( '' === oy_areas_list(), 'no Fort Myers areas' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+	$data = json_decode( (string) file_get_contents( oy_content_file( 'hu-online' ) ), true );
+	$text = wp_json_encode( $data, JSON_UNESCAPED_UNICODE );
+	ok( is_array( $data ) && ! str_contains( $text, '—' ), 'online copy: valid, no em dash' );
+	ok( ! str_contains( $text, 'Fort Myers' ) && ! str_contains( $text, 'lanai' ), 'online copy: no Fort Myers content' );
+	ok( empty( array_diff( array_keys( $data['pages'] ), array_keys( OY_PAGE_SLUGS ) ) ), 'online pages are theme pages' );
+	foreach ( $data['sessions'] as $s ) {
+		ok( isset( $data['classes'][ $s['class'] ] ) && 'online' === $s['format'], 'timetable: ' . $s['class'] . ' is an online class of this edition' );
+	}
+	preg_match_all( '/\{\{(page|class):([a-z0-9\-]+)\}\}/', $text, $m, PREG_SET_ORDER );
+	foreach ( $m as $token ) {
+		ok( isset( $data[ 'page' === $token[1] ? 'pages' : 'classes' ][ $token[2] ] ), 'link target exists in this edition: ' . $token[0] );
+	}
+	$kinds = array( 'online_pack', 'membership', 'private_single', 'private_pack' );
+	foreach ( $data['setup']['products'] as $id => $p ) {
+		ok( in_array( $p['kind'], $kinds, true ) && 0 === $p['price_cents'] % 100, "product $id: online kind, whole forints" );
+	}
+	eq( 'hu', $data['setup']['studio']['default_lang'], 'the edition switches the site to Hungarian' );
+} );
+
 test( 'helpers: money and periods', function () {
 	eq( '$25', oys_money( 2500, 'usd' ), 'whole dollars' );
 	eq( '$25.50', oys_money( 2550, 'usd' ), 'cents' );

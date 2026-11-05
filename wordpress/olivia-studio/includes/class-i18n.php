@@ -21,6 +21,7 @@ class OYS_I18n {
 		'hu' => array( 'locale' => 'hu_HU', 'name' => 'Hungarian', 'native' => 'Magyar', 'short' => 'HU', 'html' => 'hu-HU' ),
 		'es' => array( 'locale' => 'es_ES', 'name' => 'Spanish', 'native' => 'Español', 'short' => 'ES', 'html' => 'es-ES' ),
 	);
+	/** The language the texts in the code are written in (gettext source, email defaults). */
 	const DEFAULT_LANG = 'en';
 	const META         = 'oys_lang';
 
@@ -34,6 +35,7 @@ class OYS_I18n {
 	public static function boot() {
 		self::$uri       = (string) ( $_SERVER['REQUEST_URI'] ?? '/' );
 		self::$home_path = rtrim( (string) wp_parse_url( (string) get_option( 'home' ), PHP_URL_PATH ), '/' );
+		self::$lang      = self::default_lang();
 		if ( defined( 'WP_CLI' ) || wp_doing_cron() ) {
 			return;
 		}
@@ -43,13 +45,13 @@ class OYS_I18n {
 			if ( in_array( $script, array( 'admin-post.php', 'admin-ajax.php' ), true ) ) {
 				$from = self::lang_from_url( (string) wp_get_raw_referer() );
 				$post = sanitize_key( $_POST['oys_lang'] ?? ( $_POST['lang'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification
-				self::set( isset( self::LANGS[ $post ] ) ? $post : $from );
+				self::set( isset( self::languages()[ $post ] ) ? $post : $from );
 			}
 			return;
 		}
 		$path = (string) wp_parse_url( self::$uri, PHP_URL_PATH );
 		$rest = substr( $path, strlen( self::$home_path ) );
-		if ( preg_match( '#^/(' . implode( '|', array_keys( self::others() ) ) . ')(/|$)#', $rest, $m ) ) {
+		if ( self::others() && preg_match( '#^/(' . implode( '|', array_keys( self::others() ) ) . ')(/|$)#', $rest, $m ) ) {
 			$_SERVER['REQUEST_URI'] = self::$home_path . '/' . ltrim( substr( self::$uri, strlen( self::$home_path ) + strlen( $m[1] ) + 1 ), '/' );
 			// Some servers (PHP's built-in server, nginx with fastcgi_split_path_info) also pass the path as
 			// PATH_INFO, which WordPress prefers to REQUEST_URI: take the prefix off there too.
@@ -64,16 +66,24 @@ class OYS_I18n {
 			self::set( $m[1] );
 		} elseif ( 'wp-login.php' === $script ) {
 			self::set( self::lang_from_url( (string) wp_get_raw_referer() ) );
+		} else {
+			self::set( self::default_lang() );
 		}
 	}
 
 	private static function set( $lang ) {
-		if ( ! isset( self::LANGS[ $lang ] ) || self::DEFAULT_LANG === $lang ) {
+		if ( ! isset( self::languages()[ $lang ] ) ) {
 			return;
 		}
-		self::$lang   = $lang;
+		self::$lang = $lang;
+		if ( self::DEFAULT_LANG !== $lang ) {
+			// The texts in the code are English: any other language, the site's main one included, comes from the .mo files.
+			add_filter( 'locale', array( __CLASS__, 'locale_filter' ), 1 );
+		}
+		if ( self::default_lang() === $lang ) {
+			return;
+		}
 		self::$active = true;
-		add_filter( 'locale', array( __CLASS__, 'locale_filter' ), 1 );
 		add_filter( 'home_url', array( __CLASS__, 'home_url_filter' ), 10, 2 );
 		// WP::parse_request() strips home_url()'s path off the request. The prefix is already gone from the
 		// request, so the home path has to stay plain while WordPress parses it; otherwise, with the site in
@@ -114,13 +124,34 @@ class OYS_I18n {
 		return self::$lang;
 	}
 
+	/** The languages the site is offered in (setting `languages`; all of them when not set). */
 	public static function languages() {
-		return self::LANGS;
+		$saved = get_option( 'oys_settings', array() );
+		$codes = is_array( $saved ) ? ( $saved['languages'] ?? '' ) : '';
+		$codes = is_array( $codes ) ? $codes : array_filter( array_map( 'trim', explode( ',', (string) $codes ) ) );
+		$langs = array();
+		foreach ( $codes as $code ) {
+			if ( isset( self::LANGS[ $code ] ) ) {
+				$langs[ $code ] = self::LANGS[ $code ];
+			}
+		}
+		return $langs ?: self::LANGS;
 	}
 
-	/** Languages other than the default (the ones with a URL prefix). */
+	/**
+	 * The site's main language (setting `default_lang`, English when not set): its addresses have no
+	 * prefix, and the site's own pages and posts are written in it.
+	 */
+	public static function default_lang() {
+		$saved = get_option( 'oys_settings', array() );
+		$lang  = is_array( $saved ) ? (string) ( $saved['default_lang'] ?? '' ) : '';
+		$langs = self::languages();
+		return isset( $langs[ $lang ] ) ? $lang : ( isset( $langs[ self::DEFAULT_LANG ] ) ? self::DEFAULT_LANG : (string) array_key_first( $langs ) );
+	}
+
+	/** Languages other than the main one (the ones with a URL prefix); none on a one-language site. */
 	public static function others() {
-		return array_diff_key( self::LANGS, array( self::DEFAULT_LANG => 1 ) );
+		return array_diff_key( self::languages(), array( self::default_lang() => 1 ) );
 	}
 
 	public static function locale_of( $lang ) {
@@ -132,19 +163,23 @@ class OYS_I18n {
 		$path = (string) wp_parse_url( $url, PHP_URL_PATH );
 		$host = wp_parse_url( $url, PHP_URL_HOST );
 		if ( $host && wp_parse_url( (string) get_option( 'home' ), PHP_URL_HOST ) !== $host ) {
-			return self::DEFAULT_LANG;
+			return self::default_lang();
 		}
-		if ( preg_match( '#^' . preg_quote( self::$home_path, '#' ) . '/(' . implode( '|', array_keys( self::others() ) ) . ')(/|$)#', $path, $m ) ) {
+		if ( self::others() && preg_match( '#^' . preg_quote( self::$home_path, '#' ) . '/(' . implode( '|', array_keys( self::others() ) ) . ')(/|$)#', $path, $m ) ) {
 			return $m[1];
 		}
-		return self::DEFAULT_LANG;
+		return self::default_lang();
 	}
 
 	/** Put a URL on this site into the given language (adds, swaps or removes the prefix). */
 	public static function prefix( $url, $lang ) {
-		$home  = untrailingslashit( (string) get_option( 'home' ) );
-		$plain = preg_replace( '#^' . preg_quote( $home, '#' ) . '/(' . implode( '|', array_keys( self::others() ) ) . ')(?=/|$|\?|\#)#', $home, $url );
-		if ( 0 !== strpos( $plain, $home ) || self::DEFAULT_LANG === $lang || ! isset( self::LANGS[ $lang ] ) ) {
+		$home   = untrailingslashit( (string) get_option( 'home' ) );
+		$others = self::others();
+		if ( ! $others ) {
+			return $url; // One language: addresses never carry a prefix.
+		}
+		$plain = preg_replace( '#^' . preg_quote( $home, '#' ) . '/(' . implode( '|', array_keys( $others ) ) . ')(?=/|$|\?|\#)#', $home, $url );
+		if ( 0 !== strpos( $plain, $home ) || ! isset( $others[ $lang ] ) ) {
 			return $plain;
 		}
 		$rest = substr( $plain, strlen( $home ) );
@@ -188,7 +223,7 @@ class OYS_I18n {
 	 * Used for emails, which are often sent from a webhook, a cron job or the admin.
 	 */
 	public static function with( $lang, callable $fn ) {
-		$lang = isset( self::LANGS[ $lang ] ) ? $lang : self::DEFAULT_LANG;
+		$lang = isset( self::LANGS[ $lang ] ) ? $lang : self::default_lang();
 		if ( $lang === self::$lang ) {
 			return $fn();
 		}
@@ -246,6 +281,11 @@ function oys_is_admin_screen() {
 
 function oys_lang() {
 	return OYS_I18n::current();
+}
+
+/** The site's main language (no address prefix; the site's own content is written in it). */
+function oys_default_lang() {
+	return OYS_I18n::default_lang();
 }
 
 function oys_languages() {

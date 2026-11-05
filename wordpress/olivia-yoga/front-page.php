@@ -5,6 +5,11 @@
 
 defined( 'ABSPATH' ) || exit;
 get_header();
+if ( oy_online_only() ) {
+	get_template_part( 'template-parts/front-online' );
+	get_footer();
+	return;
+}
 
 $studio = fn( $sc ) => shortcode_exists( $sc ) ? do_shortcode( '[' . $sc . ']' ) : '';
 $ways   = array(
