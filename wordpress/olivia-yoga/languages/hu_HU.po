@@ -1112,13 +1112,13 @@ msgid "Online · live classes in Hungarian"
 msgstr "Online · élő órák magyarul"
 
 msgid "Live online yoga classes in Hungarian with Olivia Kovacs: hatha flow, slow flow and prenatal fitness from home on Zoom, plus private online sessions. Beginners welcome."
-msgstr "Élő online jógaórák magyarul Kovacs Oliviával: hatha flow, slow flow és kismamatorna otthonról, Zoomon, és online magánóra. Kezdőket is szeretettel várok."
+msgstr "Élő online jógaórák magyarul Kovács Olíviával: hatha flow, slow flow és kismamatorna otthonról, Zoomon, és online magánóra. Kezdőket is szeretettel várok."
 
 msgid "Online Yoga Classes, Live in Hungarian: Hatha Flow, Slow Flow & Prenatal | Olivia Jóga"
 msgstr "Online jógaóra élőben, magyarul: hatha flow, slow flow, kismama | Olivia Jóga"
 
 msgid "Live online yoga classes in Hungarian: hatha flow, slow flow, prenatal fitness and private online sessions with Olivia Kovacs."
-msgstr "Élő online jógaórák magyarul: hatha flow, slow flow, kismamatorna és online magánóra Kovacs Oliviával."
+msgstr "Élő online jógaórák magyarul: hatha flow, slow flow, kismamatorna és online magánóra Kovács Olíviával."
 
 msgid "Live online yoga classes"
 msgstr "Élő online jógaórák"
@@ -1174,8 +1174,8 @@ msgstr "Ha látlak, tudok segíteni a pózokban. A képedet csak én látom."
 msgid "Choose a class"
 msgstr "Válassz órát"
 
-msgid "Book from the timetable with a drop-in, a pass or a membership."
-msgstr "Foglalj az órarendből alkalmi jeggyel, bérlettel vagy tagsággal."
+msgid "Book from the timetable with a drop-in or a class pass."
+msgstr "Foglalj az órarendből alkalmi jeggyel vagy bérlettel."
 
 msgid "Get the link"
 msgstr "Megkapod a linket"
@@ -1199,7 +1199,7 @@ msgid "Live online yoga · in Hungarian"
 msgstr "Élő online jóga · magyarul"
 
 msgid "Live online yoga classes in Hungarian with Olivia Kovacs: dynamic yet gentle hatha flow, slow flow and prenatal fitness from your living room, on Zoom. Beginners very welcome."
-msgstr "Élő online jógaórák magyarul Kovacs Oliviával: dinamikus, mégis gyengéd hatha flow, slow flow és kismamatorna a nappalidból, Zoomon. Kezdőket is szeretettel várok."
+msgstr "Élő online jógaórák magyarul Kovács Olíviával: dinamikus, mégis gyengéd hatha flow, slow flow és kismamatorna a nappalidból, Zoomon. Kezdőket is szeretettel várok."
 
 msgid "Breathwork, strength, stretching, balance, a real flow state and a long relaxation in every class, live on Zoom. Choose the pace that suits you today."
 msgstr "Légzés, erősítés, nyújtás, egyensúly, igazi flow élmény és hosszú relaxáció minden órán, élőben, Zoomon. Válaszd azt a tempót, ami ma jólesik."
@@ -1222,8 +1222,8 @@ msgstr "Heti élő órák"
 msgid "Times are in Hungarian time. Book in a minute; beginners are welcome in every class."
 msgstr "Az időpontok magyar idő szerint értendők. Egy perc a foglalás, és kezdőket minden órára szeretettel várok."
 
-msgid "Pay per class, save with an online pass or membership, or give someone a gift card."
-msgstr "Fizess alkalmanként, spórolj online bérlettel vagy tagsággal, vagy ajándékozz utalványt."
+msgid "Pay per class, save with a 5-class pass, or give someone a gift card."
+msgstr "Fizess alkalmanként, spórolj az 5 alkalmas bérlettel, vagy ajándékozz utalványt."
 
 msgid "Prices in forints"
 msgstr "Árak forintban"

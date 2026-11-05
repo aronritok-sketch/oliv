@@ -1,5 +1,5 @@
 {
-	"_note": "Olivia Jóga – Online: a magyar, csak online kiadás tartalma (oy_edition = hu-online). Az órarend és az árak MINTA, Olivia véglegesíti.",
+	"_note": "Olivia Jóga – Online: a magyar, csak online kiadás tartalma (oy_edition = hu-online). Szövegek Olivia régi oldaláról (oliviajoga.hu); a csoportos árak és a hatha flow időpontok az ő mostani adatai, a csütörtöki slow flow és a magánóra-árak MINTA.",
 	"setup": {
 		"options": {
 			"timezone_string": "Europe/Budapest",
@@ -7,86 +7,38 @@
 			"time_format": "H:i",
 			"start_of_week": 1,
 			"blogname": "Olivia Jóga – Online",
-			"blogdescription": "Élő online jógaórák magyarul Kovacs Oliviával"
+			"blogdescription": "Élő online jógaórák magyarul Kovács Olíviával"
 		},
 		"studio": {
 			"languages": "hu",
 			"default_lang": "hu",
 			"currency": "huf",
 			"online_only": 1,
-			"online_price_cents": 250000,
+			"online_price_cents": 300000,
 			"pay_later": "off",
 			"donation_min_cents": 100000,
 			"donation_suggestions": "1000,2000,3000,5000",
-			"settle_membership_cents": 250000,
+			"settle_membership_cents": 300000,
 			"email_from_name": "Olivia Jóga – Online",
-			"waiver_text": "Tudomásul veszem, hogy a jóga testmozgással jár, és ezzel sérülésveszély is együtt jár. Kijelentem, hogy egészséges vagyok, vagy az orvosom jóváhagyta a gyakorlást, és óra előtt szólok Oliviának, ha sérülésem van, várandós vagyok vagy egészségügyi problémám van. Odafigyelek a testemre, pihenek, amikor szükségem van rá, és a saját gyakorlásomért magam felelek. Az online órán úgy rendezem be a helyet, hogy biztonságosan tudjak mozogni. Kovacs Oliviát nem terheli felelősség az esetleges sérülésért, kivéve a súlyos gondatlanság esetét.",
+			"waiver_text": "Tudomásul veszem, hogy a jóga testmozgással jár, és ezzel sérülésveszély is együtt jár. Kijelentem, hogy egészséges vagyok, vagy az orvosom jóváhagyta a gyakorlást, és óra előtt szólok Oliviának, ha sérülésem van, várandós vagyok vagy egészségügyi problémám van. Odafigyelek a testemre, pihenek, amikor szükségem van rá, és a saját gyakorlásomért magam felelek. Az online órán úgy rendezem be a helyet, hogy biztonságosan tudjak mozogni. Kovács Olíviát nem terheli felelősség az esetleges sérülésért, kivéve a súlyos gondatlanság esetét.",
 			"cancel_policy": "A csoportos órát 12 órával a kezdés előtt még ingyen lemondhatod: az alkalom visszakerül a bérletedre. Ha alkalmi jeggyel foglaltál, helyette egy órakreditet kapsz. A később lemondott vagy kihagyott óra elhasználódik. A magánórát 24 órával előtte lehet áttenni vagy lemondani.",
 			"private_note": "Az első online magánóránk elején kb. 15 perccel tovább beszélgetünk a céljaidról, ezért számolj egy kicsivel több idővel. Később is szánhatunk erre néhány percet.",
 			"pay_later_note": ""
 		},
 		"products": {
 			"online-5": {
-				"name": "5 alkalmas online bérlet",
+				"name": "5 alkalmas bérlet",
 				"kind": "online_pack",
 				"credits": 5,
-				"validity_days": 60,
-				"price_cents": 1100000,
-				"description": "Öt élő online óra, alkalmanként 2 200 Ft.",
-				"features": "5 élő online óra\nBármelyik csoportos órára\n60 napig érvényes\nAjándékba is adható",
+				"validity_days": 0,
+				"price_cents": 1400000,
+				"description": "Öt élő online óra, alkalmanként 2 800 Ft. Nincs lejárata.",
+				"features": "5 élő online óra\nBármelyik csoportos órára\nNincs lejárata\nAjándékutalványként is megveheted",
 				"featured": 1,
 				"giftable": 1,
 				"active": 1,
 				"duration_min": 0,
 				"sort": 10
-			},
-			"online-10": {
-				"name": "10 alkalmas online bérlet",
-				"kind": "online_pack",
-				"credits": 10,
-				"validity_days": 120,
-				"price_cents": 2000000,
-				"description": "Tíz élő online óra, alkalmanként 2 000 Ft.",
-				"features": "10 élő online óra\nBármelyik csoportos órára\n4 hónapig érvényes\nAjándékba is adható",
-				"featured": 0,
-				"giftable": 1,
-				"active": 1,
-				"duration_min": 0,
-				"sort": 11
-			},
-			"unlimited-monthly": {
-				"name": "Korlátlan havi online",
-				"kind": "membership",
-				"credits": 0,
-				"validity_days": 0,
-				"price_cents": 1290000,
-				"description": "Minden élő online óra, minden héten. Havonta megújul, bármikor lemondható.",
-				"features": "Minden élő online csoportos óra\nHavonta automatikusan megújul\nBármikor lemondható",
-				"featured": 0,
-				"giftable": 0,
-				"active": 1,
-				"duration_min": 0,
-				"sort": 12,
-				"interval": "month",
-				"interval_count": 1,
-				"classes_per_period": 0
-			},
-			"four-a-month": {
-				"name": "Havi 4 online óra",
-				"kind": "membership",
-				"credits": 0,
-				"validity_days": 0,
-				"price_cents": 840000,
-				"description": "Heti egy óra, állandó ritmusban. Havonta megújul, bármikor lemondható.",
-				"features": "Havonta 4 élő online óra\nHavonta automatikusan megújul\nBármikor lemondható",
-				"featured": 0,
-				"giftable": 0,
-				"active": 1,
-				"duration_min": 0,
-				"sort": 13,
-				"interval": "month",
-				"interval_count": 1,
-				"classes_per_period": 4
 			},
 			"private-60": {
 				"name": "Online magánóra, 60 perc",
@@ -171,7 +123,7 @@
 		"gifts": {
 			"title": "Ajándékutalvány",
 			"slug": "ajandekutalvany",
-			"content": "<p>Ajándékozz online bérletet vagy magánórát. Az ajándékutalványt e-mailben kapja meg az, akinek szánod, egy kóddal, amit a fiókjában vált be.</p>\n[oys_gift_cards]"
+			"content": "<p>Ajándékozz 5 alkalmas bérletet vagy magánórát. Az ajándékutalványt e-mailben kapja meg az, akinek szánod, egy kóddal, amit a fiókjában vált be.</p>\n[oys_gift_cards]"
 		}
 	},
 	"pages": {
@@ -180,39 +132,39 @@
 			"excerpt": "",
 			"seo_title": "",
 			"seo_desc": "",
-			"content": "<h2>Dinamikus, mégis gyengéd. Pont elég mindenből.</h2>\n<p>Olivia vagyok, jógaoktató, mozgás- és wellness coach. Budapesten végeztem, és most élőben, online tanítok, magyarul. A jóga előtt évekig személyi edzőként és masszőrként dolgoztam, így ismerem, hogyan mozog a test, és hol tartja a feszültséget. Az óráimon nem kézenállást fogunk gyakorolni. Arra kérlek majd, hogy lélegezz, figyelj, és egy kicsit könnyedebben mozdulj, mint ahogy megérkeztél.</p>\n<p>Minden órában ott van a légzőgyakorlat, az erősítés, a nyújtás, az egyensúlyozás, az igazi flow élmény és a végén egy ráérős relaxáció. Az online óra nem egy videó, amit követsz: együtt gyakorlunk, ugyanabban az időben. Ha bekapcsolod a kamerádat, látlak, menet közben segítek, és kérdezhetsz is.</p>\n<p>A vendégeim többsége nem a tökéletes pózt hajszolja. Munka, gyerek, unoka és minden más mellett jönnek, és azzal zárják be a laptopot, hogy „Ez kellett”, „Végre megérkeztem” vagy „Ma nagyon jól fogok aludni”. Pontosan erről szól az egész.</p>"
+			"content": "<h2>Dinamikus, mégis gyengéd. Pont elég mindenből.</h2>\n<p>Kovács Olívia vagyok, jógaoktató. Budapesten csoportos hatha flow órákat tartottam, most élőben, online folytatjuk, magyarul. Az óráimra kezdőket is szeretettel várok. Viszont szeretem úgy felépíteni, hogy annak is élvezetes legyen, aki régóta gyakorol.</p>\n<p>A gyakorlás alatt részed lesz légzőgyakorlatban, erősítésben, nyújtásban, egyensúlyozásban, flow élményben és relaxációban egyaránt. Alapvetően minden hatha jóga óra elősegíti a méregtelenítést, a mély izmok erősítését, a tartásjavítást, a légzés tudatosabb használatának gyakorlását és a belső csend elérését.</p>\n<p>Egy jóga órán senki nem fog kinézni, mert nem vagy hajlékony, vagy pont akkor nem tartasz még ott bármiben, ahol a szomszédos matracon gyakorló, a jógaoktató, vagy az, akiről egy szép fotót vagy videót láttál. Ha szeretnéd megtapasztalni azt, hogy milyen az elfogadás, várlak szeretettel az online csoportos jóga órákon!</p>"
 		},
 		"about": {
 			"title": "Rólam",
-			"excerpt": "Jógaoktató, mozgás- és wellness coach. Előbb személyi edző és masszőr, 2023 óta jógaoktató; most élőben, online tanít magyarul.",
-			"seo_title": "Kovacs Olivia | Jógaoktató, élő online jógaórák magyarul",
-			"seo_desc": "Ismerd meg Kovacs Oliviát: jógaoktató (Yoga Alliance International, 2023), korábban személyi edző és masszőr, kismama tréner. Élő online jógaórák magyarul.",
+			"excerpt": "Miért lettem jógaoktató? Edzőként és masszőrként kezdtem, 2023 óta vagyok jógaoktató, és most élőben, online tanítok, magyarul.",
+			"seo_title": "Kovács Olívia | Jógaoktató, élő online jógaórák magyarul",
+			"seo_desc": "Ismerd meg Kovács Olíviát: jógaoktató (Yoga Alliance International, 2023), korábban személyi edző és masszőr, kismama tréner. Élő online jógaórák magyarul.",
 			"photo": "olivia-sunset-smile",
-			"content": "<h2>A konditeremtől a jógamatracig</h2>\n<p>Gyerekkorban nem a sportos életvitel volt rám jellemző. Nem volt sikerélményem, ezért nem szerettem mozogni. 19 évesen elkezdtem konditeremben edzeni, és megszerettem. Annyira, hogy később egy szuper inspiráló közösségben, egy női edzőteremben kezdtem dolgozni edzőként, majd mellette masszőrként is.</p>\n<p>A talpreflexológia és a masszázs világában, a saját magamon és a vendégeimen tapasztalt pozitív változások által jöttem rá arra, hogy az emberi test és az emberi idegrendszer mennyire csodálatos és összetett. Elvégeztem egy self myofascial release (SMR) tanfolyamot is, ahol a tudást a sport- és mozgásszervi rehabilitációban, illetve masszázzsal egybekötve tudtam alkalmazni. Mellette jártam különböző csoportos órákra, majd képbe jött a jóga.</p>\n\n<h2>Hogyan talált rám a jóga</h2>\n<p>Ahogy sokan, én is a négy fal között, online kezdtem jógázni. Ezért tudom, mennyit adhat egy jó online óra. Majd egyszer csak azon kaptam magam, hogy nem telik el úgy nap, hogy ne gyakorolnék.</p>\n<p>Amikor megismerkedtem a jógával, elég stresszes voltam. Ebben az is közrejátszott, hogy az egészséges életmóddal átestem a ló túloldalára: a főállásom, a másodállásom és a felnőttképzés mellett is kényszeresen álltam minden nap a konyhában rengeteget, hogy különböző szigorú diétáknak megfeleljek, amire egyébként nem volt különösebben szükségem. Egészségügyi problémáim alakultak ki, miközben azt hittem, jót teszek magammal, de mai fejjel tudom, hogy azokat mind a megfelelési kényszerem produkálta. Ennek a megfelelésnek az elengedésével sikerült kigyógyulnom, és már egyik régen diagnosztizált betegséget sem tudhatom magaménak.</p>\n<p>A jóga gyakorlása viszont mindig könnyed volt. Soha nem kényszerből álltam a matracra, mert imádtam csinálni. Lenyugtatott, kiszakított, feltöltött és növelte az önbizalmam. Csökkent az alvásigényem, elkezdtem a biológiai ébresztőórámra felkelni. Már nem kattogtam azon, hogy tökéletes legyen az étkezésem, minden nap tökéletesen teljesítsek a munkámban, meglegyen a napi lépésszámom. Idővel elkezdtem a testemmel és az elmémmel együttműködni, nem pedig ellenük, és észrevettem, hogy a tökéletes az, ahogy a test jelzi az igényeit.</p>\n\n<h2>Képzések és tanítás</h2>\n<p>Négy és fél évig tartottam napi szinten különböző edzéseket, és már akkor tudtam, hogy a jóga gyakorlás valami teljesen mást nyújt nekem. Egyik sem jobb vagy rosszabb, de számomra összehasonlíthatatlan. Azt a csodás kapcsolódást, amit a jóga által sikerült elérnem saját magammal, szerettem volna átadni másoknak is, ezért lettem jógaoktató.</p>\n<ul>\n<li>Yoga Alliance International által elismert hatha jógaoktatói tanúsítvány (2023), Samadhi Jógastúdió, Budapest, Diószegi Ádám képzésén</li>\n<li>Tibeti hangtál és hangmasszázs operátor, hangrezgéses energetikai kezelő képzés</li>\n<li>Pre- és postnatális tréneri képzés, hogy a kismamáknak ne kelljen lemondaniuk a mozgás öröméről, testileg és lelkileg is felkészülten érkezzenek a szüléshez, és utána minél hatékonyabban regenerálódjanak</li>\n<li>Évek személyi edzőként és masszőrként, talpreflexológiával és SMR-rel</li>\n</ul>\n[oy_fitmummy]\n<p>Budapesten heti csoportos órákat tartottam a Budai Perinatális Központban (Buda Perinatal Center), a Prana Jóga és Életmód Központban és a Korall Sportszigeten, emellett online órákat, szabadtéri jógát, élőzenés flow-kat handpannel és nyelves dobbal, hangjógát vezetett meditációval, valamint hatha flow-t és meditációt a MANAS és a MicrOasis fesztiválon. Tartottam irodai jógát és csapatépítő órákat cégeknek, és mobilitásfejlesztést sportolóknak. Most ugyanezt a gyakorlást adom át élőben, online, magyarul: csoportos órákon és négyszemközt, esténként és hétvégén, hogy otthonról, a nappalidból is gyakorolhass velem.</p>\n\n<h2>Hogyan tanítok</h2>\n<p>Dinamikusan, mégis gyengéden. Úgy építem fel az órákat, hogy egy kezdő is tudja követni, és az is élvezze, aki régóta gyakorol. Imádom a flow élményt, számomra ez a jóga leggyönyörűbb része, és néha az erősítő ászanákat kicsit tovább tartjuk, hogy mindenkinek megérkezzen a figyelme.</p>\n<p>Az órámon szembesülhetsz kihívásokkal, de semmi sem kötelező. Senki nem fog kinézni, mert nem vagy hajlékony, vagy mert még nem tartasz ott, ahol a szomszédos matracon gyakorló, az oktató, vagy az, akiről egy szép fotót láttál.</p>\n<blockquote><p>A jóga nem egy sport, de bárkié és mindenkié.</p></blockquote>\n<p>Az edzések megszerettették velem a mozgást, a jóga pedig a mozgásom miértjét értette és érteti meg velem. Büszke vagyok arra, hogy olyan állandó vendégeim vannak, akikkel tudunk rezonálni, és akik nyitottak a jógára mint egészre, nem csak a pózokra.</p>\n\n<h2>A matracon túl</h2>\n<p>Az új vendégeim gyakran kérdezik, hogy foglalkozom-e mással is, vagy csak a jógával. Igen: marketing managerként is dolgoztam, izgalmas projekteken, ahol emberek az álmaikat valósítják meg a vállalkozásukban. Így nem csak tanultam róla, hogy az ülőmunka milyen nehézségeket okoz a testben, hanem tudom, milyen, amikor tele van a fejed határidőkkel, és nem tudsz kikapcsolni. Pontosan erre valók az óráim.</p>\n<p>És egy kis titok: általános iskolában tesi tagozatos voltam, és gyűlöltem. Mindenben én voltam a legbénább. Soha nem gondoltam volna, hogy a mozgás az életem része lesz. Ma már el sem tudok képzelni egy napot nélküle.</p>\n<p>[oy_booking_link label=\"Gyakorolj velem\"]</p>"
+			"content": "<h2>Miért lettem jógaoktató?</h2>\n<p>Gyerekkorban nem a sportos életvitel volt rám jellemző. Nem volt sikerélményem, ezért nem szerettem mozogni.</p>\n<p>19 évesen elkezdtem konditeremben edzeni, és megszerettem. Annyira, hogy később egy szuper inspiráló közösségben, egy női edzőteremben kezdtem dolgozni edzőként, majd mellette masszőrként is. A talpreflexológia és a masszázs világában, a saját magamon és a vendégeimen tapasztalt pozitív változások által jöttem rá arra, hogy az emberi test és az emberi idegrendszer mennyire csodálatos és összetett. Elvégeztem egy self myofascial release tanfolyamot is, ahol a tudást a sport- és mozgásszervi rehabilitációban, illetve masszázzsal egybekötve tudtam alkalmazni.</p>\n<p>Mellette jártam különböző csoportos órákra, majd képbe jött a jóga. Ahogy sokan, én is a négy fal között, online kezdtem jógázni. Majd egyszer csak azon kaptam magam, hogy nem telik el úgy nap, hogy ne gyakorolnék.</p>\n<p>Amikor megismerkedtem a jógával, elég stresszes voltam, amiben az is közrejátszott, hogy az egészséges életmóddal átestem a ló túloldalára, és a főállásom, másodállásom és felnőttképzés mellett is kényszeresen álltam minden nap a konyhában rengeteget, hogy különböző szigorú diétáknak megfeleljek, amire egyébként nem volt különösebben szükségem.</p>\n<p>Egészségügyi problémáim alakultak ki, miközben azt hittem, jót teszek magammal, de mai fejjel tudom, hogy azokat mind a megfelelési kényszerem produkálta. Ennek a megfelelésnek az elengedésével sikerült kigyógyulnom, és már egyik régen diagnosztizált betegséget sem tudhatom magaménak.</p>\n<p>A jóga gyakorlása viszont mindig könnyed volt. Soha nem kényszerből álltam a matracra, mert imádtam csinálni. Lenyugtatott, kiszakított, feltöltött és növelte az önbizalmam. Vártam minden egyes nap, hogy gyakorolhassak, hogy vajon milyen érzeteket ad az aznapi gyakorlás.</p>\n<p>Ráadásul az alvásigényem is csökkent, elkezdtem a biológiai ébresztőórámra felkelni. Már nem kattogtam azon, hogy tökéletes legyen az étkezésem, minden nap tökéletesen teljesítsek a munkámban, meglegyen a napi lépésszámom és hasonlók.</p>\n<p>Idővel elkezdtem a testemmel és az elmémmel együttműködni, nem pedig ellenük. Észrevettem, hogy a tökéletes az, ahogy a test jelzi az igényeket.</p>\n<p>Ezután kezdett foglalkoztatni, hogy mi is maga a jóga, nem csak az ászanákat, hanem mind a 8 ágát tekintve, hiszen mindig is olyan beállítottságú voltam, aki szeret elmélkedni az összefüggéseken, így nagyon érdekelt, mi is ez.</p>\n<p>4,5 évig tartottam napi szinten különböző edzéseket, és már akkor tudtam, hogy a jóga gyakorlás és az edzés valami teljesen mást nyújt nekem. Egyik sem jobb vagy rosszabb, de számomra a fent leírt tapasztalatok miatt összehasonlíthatatlan.</p>\n<p>Azt a csodás kapcsolódást, amit a jóga által sikerült elérnem saját magammal, szerettem volna átadni másoknak is, és úgy éreztem, ideje másokkal kapcsolódnom jógaoktatóként.</p>\n<p>A jóga megtanított a mostban lenni és odafigyelni arra, mi esik jól éppen most. A jóga tökéletes kiegészítője, vagy előszobája annak, hogy megtanuld helyesen használni a tested és a légzésed, bármilyen mozdulatról, vagy akár egy helyben állásról, ülésről is legyen szó. Arról nem is beszélve, hogy a gondolkodásod is egy sokkal jövedelmezőbb útra tereli.</p>\n<p>Az edzések megszerettették velem a mozgást, a jóga pedig a mozgásom miértjét értette és érteti meg velem.</p>\n<blockquote><p>A jóga nem egy sport, de bárkié és mindenkié.</p></blockquote>\n<h2>Képzések és tanítás</h2>\n<p>2023 óta vagyok jógaoktató. Már azt is tudom, hogy az oktatás sem hasonlítható össze, ha egy kemény edzést vagy egy jóga órát nézünk. Ugyanis az az igazság, hogy egy csoportos edzésen általában nincs arra idő, hogy megtanítsa az edző, hogy hogyan használjuk helyesen az egész testünket, az izmainkat, különben dögunalmas lenne, elvesztené a flow-t, a varázsát.</p>\n<p>A Yoga Alliance International által elismert tanúsítványomat a Samadhi Jógastúdióban, Diószegi Ádám képzésén szereztem meg 2023-ban. Nem sokkal az oktatói képzés után elvégeztem a tibeti hangtál és hangmasszázs operátor, hangrezgéses energetikai kezelő képzést is.</p>\n<p>2026-ban pedig a pre- és postnatális tréneri képzések által is szeretném segíteni a kismamákat, hogy ne kelljen lemondaniuk a mozgás öröméről, és felkészültek legyenek a szülésre mind testileg, mind lelkileg, valamint a minél hatékonyabb regenerációt segíthessük elő együtt a szülés után.</p>\n<ul>\n<li>Yoga Alliance International által elismert hatha jógaoktatói tanúsítvány (2023), Samadhi Jógastúdió, Budapest, Diószegi Ádám képzésén</li>\n<li>Tibeti hangtál és hangmasszázs operátor, hangrezgéses energetikai kezelő képzés</li>\n<li>Pre- és postnatális tréneri képzés, hogy a kismamáknak ne kelljen lemondaniuk a mozgás öröméről, testileg és lelkileg is felkészülten érkezzenek a szüléshez, és utána minél hatékonyabban regenerálódjanak</li>\n<li>Évek személyi edzőként és masszőrként, talpreflexológiával és SMR-rel</li>\n</ul>\n[oy_fitmummy]\n<p>Budapesten heti csoportos órákat tartottam a Budai Perinatális Központban, a pestszentlőrinci Prána Jóga és Életmód Központban és a csepeli Korall Sportszigeten, emellett online órákat, szabadtéri jógát, élőzenés flow-kat handpannel és nyelves dobbal, hangjógát vezetett meditációval, valamint hatha flow-t és meditációt a MANAS és a MicrOasis fesztiválon. Tartottam irodai jógát és csapatépítő órákat cégeknek, és mobilitásfejlesztést sportolóknak. Most ugyanezt a gyakorlást folytatom élőben, online, magyarul, hogy bárhonnan gyakorolhass velem.</p>\n<h2>Hogyan tanítok</h2>\n<p>Az óráimon mindig törekszem a flow élményre, mivel magam is imádom az ilyen típusú órákat, és ezek szerettették meg velem igazán az ászanázást annyira, hogy sokkal mélyebben is beleássam magam a jóga mivoltjába.</p>\n<p>Egy jóga órán senki nem fog kinézni, mert nem vagy hajlékony, vagy pont akkor nem tartasz még ott bármiben, ahol a szomszédos matracon gyakorló, a jógaoktató, vagy az, akiről egy szép fotót vagy videót láttál.</p>\n<p>Büszke vagyok arra, hogy olyan állandó vendégeim vannak, akikkel tudunk rezonálni, és akik nyitottak a jógára, mint egészre.</p>\n<p>A jógát a hozzám hasonlóknak is ajánlom, akit kezd beszippantani, vagy már beszippantott a konditerem, az aerobik vagy más csoportos edzések világa. A jóga egy olyan önismereti eszköz, amely egy olyasféle önbizalmat és szeretetet hoz felszínre, amit én is szeretnék átadni másoknak az óráimon.</p>\n<h2>A matracon túl</h2>\n<p>Az új vendégeim gyakran kérdezik, hogy foglalkozom-e mással is, vagy csak a jógával. Igen: marketing managerként is dolgoztam, izgalmas projekteken, ahol emberek az álmaikat valósítják meg a vállalkozásukban. Így nem csak tanultam róla, hogy az ülőmunka milyen nehézségeket okoz a testben, hanem tudom, milyen, amikor tele van a fejed határidőkkel, és nem tudsz kikapcsolni. Pontosan erre valók az óráim.</p>\n<p>És egy kis titok: általános iskolában tesi tagozatos voltam, és gyűlöltem. Mindenben én voltam a legbénább. Soha nem gondoltam volna, hogy a mozgás az életem része lesz. Ma már el sem tudok képzelni egy napot nélküle.</p>\n<p>[oy_booking_link label=\"Gyakorolj velem\"]</p>"
 		},
 		"classes": {
 			"title": "Online jógaórák",
 			"excerpt": "Hatha flow, slow flow és kismamatorna élőben, online, magyarul: a nappalidból, Zoomon.",
 			"seo_title": "Online jógaórák élőben, magyarul | Hatha flow, slow flow, kismama",
-			"seo_desc": "Élő online jógaórák magyarul Kovacs Oliviával: dinamikus hatha flow, lassabb slow flow és kismamatorna otthonról, Zoomon. Kezdőknek is.",
+			"seo_desc": "Élő online jógaórák magyarul Kovács Olíviával: dinamikus hatha flow, lassabb slow flow és kismamatorna otthonról, Zoomon. Kezdőknek is.",
 			"photo": "online-yoga-living-room",
-			"content": "<p>Minden órámban ott van a légzőgyakorlat, az erősítés, a nyújtás, az egyensúlyozás, a flow élmény és a végén egy igazi relaxáció. Ami változik, az a tempó, és hogy hová kerül a hangsúly. Minden óra élő: ugyanabban az időben gyakorlunk, magyarul, Zoomon.</p>\n[oy_classes]\n<h2>Melyik órát válasszam?</h2>\n<p><strong>Új vagy a jógában, vagy hosszabb kihagyás után térnél vissza?</strong> Kezdd a <a href=\"{{class:slow-flow}}\">Slow Flow</a> órával, ami minden szintnek szól, vagy foglalj egy <a href=\"{{page:private-yoga}}\">online magánórát</a>, hogy négyszemközt tanuld meg az alapokat.</p>\n<p><strong>Már most is aktív vagy: futsz, edzel, túrázol, biciklizel?</strong> A <a href=\"{{class:hatha-flow}}\">Hatha Flow</a> kihívást ad, és közben visszaadja a mozgékonyságot.</p>\n<p><strong>Babát vársz?</strong> A <a href=\"{{class:prenatal-fitness}}\">kismamatorna</a> biztonságosan tart mozgásban, kiscsoportban vagy négyszemközt.</p>\n<h2>Hogyan zajlik egy online óra?</h2>\n<p>Lefoglalod az órát az <a href=\"{{page:schedule-pricing}}\">órarendből</a>, és e-mailben megkapod a Zoom-linket; a fiókodban is megtalálod. Pár perccel a kezdés előtt csatlakozz, hogy köszönhessünk egymásnak, és ha kell, beállítsuk a kamerát. Ha bekapcsolod a kamerádat, látlak, és tudok segíteni a pózokban. A képedet csak én látom.</p>\n[oy_booking_link]"
+			"content": "<p>Alapvetően minden hatha jóga óra elősegíti a méregtelenítést, a mély izmok erősítését, a tartásjavítást, a légzés tudatosabb használatának gyakorlását és a belső csend elérését. A gyakorlás alatt részed lesz légzőgyakorlatban, erősítésben, nyújtásban, egyensúlyozásban, flow élményben és relaxációban egyaránt.</p>\n<p>A hatha flow jóga az erősebb és dinamikusabb vonalat képviseli. A slow flow jógán pedig sokkal inkább a megfigyelésen van a hangsúly, ez egy lassabb óratípus a flow élmény mellett. Minden óra élő: ugyanabban az időben gyakorlunk, magyarul, Zoomon.</p>\n[oy_classes]\n<h2>Melyik órát válasszam?</h2>\n<p><strong>Új vagy a jógában, vagy hosszabb kihagyás után térnél vissza?</strong> Kezdd a <a href=\"{{class:slow-flow}}\">Slow Flow</a> órával, ami minden szintnek szól, vagy foglalj egy <a href=\"{{page:private-yoga}}\">online magánórát</a>, hogy négyszemközt tanuld meg az alapokat.</p>\n<p><strong>Már most is aktív vagy: futsz, edzel, túrázol, biciklizel?</strong> A <a href=\"{{class:hatha-flow}}\">Hatha Flow</a> kihívást ad, és közben visszaadja a mozgékonyságot.</p>\n<p><strong>Babát vársz?</strong> A <a href=\"{{class:prenatal-fitness}}\">kismamatorna</a> biztonságosan tart mozgásban, kiscsoportban vagy négyszemközt.</p>\n<h2>Hogyan zajlik egy online óra?</h2>\n<p>Lefoglalod az órát az <a href=\"{{page:schedule-pricing}}\">órarendből</a>, és e-mailben megkapod a Zoom-linket; a fiókodban is megtalálod. Pár perccel a kezdés előtt csatlakozz, hogy köszönhessünk egymásnak, és ha kell, beállítsuk a kamerát. Ha bekapcsolod a kamerádat, látlak, és tudok segíteni a pózokban. A képedet csak én látom.</p>\n[oy_booking_link]"
 		},
 		"private-yoga": {
 			"title": "Online magánóra",
 			"excerpt": "Négyszemközti jóga és kismamatorna videón, a testedre és a céljaidra tervezve, magyarul.",
 			"seo_title": "Online magánóra | Személyre szabott jóga videón, magyarul",
-			"seo_desc": "Egyéni online jógaóra Kovacs Oliviával: hatha flow, slow flow, mobilitás és kismamatorna videón, a testedre és a céljaidra tervezve. 60, 75 vagy 90 perc.",
+			"seo_desc": "Egyéni online jógaóra Kovács Olíviával: hatha flow, slow flow, mobilitás és kismamatorna videón, a testedre és a céljaidra tervezve. 60, 75 vagy 90 perc.",
 			"photo": "private-side-angle",
 			"content": "<h2>Egy óra, ami pontosan egy emberre szabott</h2>\n<p>Csoportos órán a csoportnak tanítok. Magánórán neked: a válladnak az évekig tartó ülőmunka után, a térdednek, amire vigyázol, a hátadnak, ami esténként jelez, az alvásnak, amit keresel. A te tempódban dolgozunk, és minden alkalom az előzőre épít. Online is működik: videón látlak, és pontosan látom, min dolgozzunk.</p>\n<h2>Amit együtt csinálhatunk</h2>\n<div class=\"offer-grid\">\n<div class=\"offer\">[oy_picto icon=\"lotus\" tone=\"lilac\"]<h3>Személyre szabott jóga</h3><p>Hatha flow, slow flow vagy mobilitás, a testedre és a céljaidra tervezve. 60, 75 vagy 90 perc.</p></div>\n<div class=\"offer\">[oy_picto icon=\"prenatal\" tone=\"pink\"]<h3>Kismamatorna</h3><p>Biztonságos, örömteli mozgás várandósan, a trimeszteredhez igazítva. 30, 45 vagy 60 perc.</p></div>\n<div class=\"offer\">[oy_picto icon=\"mobility\" tone=\"sun\"]<h3>Mobilitás coaching</h3><p>Csípő, váll és gerinc: futóknak, súlyzós edzést végzőknek és mindenkinek, aki sokat ül.</p></div>\n<div class=\"offer\">[oy_picto icon=\"care\" tone=\"sage\"]<h3>Relaxáció és légzés</h3><p>Lassabb óra a túlpörgött idegrendszernek: légzőgyakorlatok, nyújtás, vezetett relaxáció.</p></div>\n</div>\n<h2>Kinek szól az online magánóra</h2>\n<ul>\n<li>Teljesen kezdőknek, akik biztonságban szeretnék megtanulni az alapokat, mielőtt csoportba járnának</li>\n<li>Bárkinek, aki szívesebben gyakorol közönség nélkül</li>\n<li>Akik merevséggel, régi sérüléssel vagy korlátozott mozgással dolgoznak, az orvosuk jóváhagyásával</li>\n<li>Kismamáknak, akik aktívak szeretnének maradni, és friss anyukáknak, akik visszatérnének a mozgáshoz</li>\n<li>Pároknak, barátoknak és családtagoknak, akik együtt gyakorolnának, akár két különböző helyről is</li>\n</ul>\n<h2>Hogyan működik</h2>\n<p>Küldd el lent, mikor érsz rá és mit szeretnél. Egy napon belül válaszolok egy javasolt időponttal és árral, amit egy kattintással elfogadsz és kifizetsz. A videóhívás linkjét e-mailben kapod meg. Csak egy jógamatracnyi hely, egy kamerás telefon vagy laptop és egy kis csend kell hozzá.</p>\n<h2>Kérj időpontot</h2>\n[oys_private_request]"
 		},
 		"schedule-pricing": {
 			"title": "Órarend és árak",
-			"excerpt": "Heti élő online jógaórák magyar idő szerint, alkalmi jegyek, online bérletek, tagságok, magánórák és ajándékutalványok.",
+			"excerpt": "Heti élő online hatha flow órák magyar idő szerint: alkalmi jegy 3 000 Ft, 5 alkalmas bérlet 14 000 Ft, magánóra és ajándékutalvány.",
 			"seo_title": "Online jóga órarend és árak | Élő órák magyarul",
-			"seo_desc": "Heti élő online jógaórák magyar idő szerint: hatha flow, slow flow és kismamatorna. Alkalmi jegy, online bérlet, havi tagság és online magánóra árak forintban.",
+			"seo_desc": "Heti élő online jógaórák magyar idő szerint: hatha flow és slow flow. Alkalmi jegy 3 000 Ft, 5 alkalmas bérlet 14 000 Ft lejárat nélkül, online magánóra és ajándékutalvány.",
 			"photo": "olivia-dancer-home",
-			"content": "<h2>Heti élő online órák</h2>\n<p>Az időpontok magyar idő szerint értendők. Minden óra élő, Zoomon, magyarul.</p>\n[oy_schedule]\n<p>Kérlek, foglalj előre, hogy időben megkapd a linket. Kezdőket minden órára szeretettel várok.</p>\n<h2>Árak</h2>\n[oy_pricing]\n<h2 id=\"gift-cards\">Ajándékutalványok</h2>\n<p>Ajándékozz online bérletet vagy magánórát. Az ajándékutalványt e-mailben kapja meg az, akinek szánod, egy kóddal, amit a fiókjában vált be.</p>\n<p>[oy_gift_link]</p>\n<h2>Jó tudni</h2>\n<h3>Amire szükséged lesz</h3>\n<ul>\n<li>Telefon, tablet vagy laptop kamerával</li>\n<li>Egy jógamatracnyi hely</li>\n<li>Matrac, egy párna és egy pléd a relaxációhoz</li>\n</ul>\n<p><strong>Lemondás:</strong> a csoportos órát 12 órával előtte még ingyen lemondhatod, és az alkalom visszakerül a bérletedre.</p>\n<p><strong>Új vagy a jógában?</strong> Olvasd el a <a href=\"{{page:faq}}\">leggyakoribb kérdéseket</a>, vagy <a href=\"{{page:contact}}\">írj nekem</a> az első órád előtt.</p>"
+			"content": "<h2>Heti élő online órák</h2>\n<p>Az időpontok magyar idő szerint értendők. Minden óra élő, Zoomon, magyarul.</p>\n[oy_schedule]\n<p>Kérlek, foglalj előre, hogy időben megkapd a linket. Az órák legalább 3 fővel indulnak. Kezdőket minden órára szeretettel várok.</p>\n<h2>Árak</h2>\n[oy_pricing]\n<h2 id=\"gift-cards\">Ajándékutalványok</h2>\n<p>Ajándékozz 5 alkalmas bérletet vagy magánórát. Az ajándékutalványt e-mailben kapja meg az, akinek szánod, egy kóddal, amit a fiókjában vált be.</p>\n<p>[oy_gift_link]</p>\n<h2>Jó tudni</h2>\n<h3>Amire szükséged lesz</h3>\n<ul>\n<li>Jógaszőnyeg, egy ülőpárna és egy pléd a relaxációhoz</li>\n<li>Kényelmes öltözet és víz, ha megszomjaznál; a gyakorlást mezítláb ajánlom</li>\n<li>Telefon, tablet vagy laptop kamerával, és egy jógamatracnyi hely</li>\n</ul>\n<p><strong>Bérlet:</strong> az 5 alkalmas bérletnek nincs lejárata, a saját ritmusodban használod fel.</p>\n<p><strong>Lemondás:</strong> a csoportos órát 12 órával előtte még ingyen lemondhatod, és az alkalom visszakerül a bérletedre. Ha 3 főnél kevesebben jelentkeznek, szólok, és visszakapod az alkalmat.</p>\n<p><strong>Új vagy a jógában?</strong> Olvasd el a <a href=\"{{page:faq}}\">leggyakoribb kérdéseket</a>, vagy <a href=\"{{page:contact}}\">írj nekem</a> az első órád előtt.</p>"
 		},
 		"faq": {
 			"title": "Gyakori kérdések",
@@ -234,7 +186,7 @@
 			"title": "Napló",
 			"excerpt": "Írások a gyakorlásról, a légzésről, a jóga nyolc ágáról és az életről a matracon.",
 			"seo_title": "Jóga napló | Olivia Jóga – Online",
-			"seo_desc": "Írások a hatha jóga gyakorlásáról, a légzésről, a meditációról, a jóga nyolc ágáról és az életről a matracon és azon túl, Kovacs Oliviától.",
+			"seo_desc": "Írások a hatha jóga gyakorlásáról, a légzésről, a meditációról, a jóga nyolc ágáról és az életről a matracon és azon túl, Kovács Olíviától.",
 			"photo": "olivia-riverside-profile",
 			"content": ""
 		}
@@ -265,13 +217,13 @@
 		"prenatal-fitness": {
 			"title": "Kismamatorna online",
 			"excerpt": "Biztonságos, örömteli mozgás várandósan, élőben, online: erő, mobilitás, légzés és felkészülés a szülésre.",
-			"duration": "45 perc",
+			"duration": "30, 45 vagy 60 perc",
 			"lang": "magyar",
 			"seo_title": "Kismama torna és kismama jóga online, élőben, magyarul",
 			"photo": "prenatal-ball-training",
 			"aside": "",
 			"link": "",
-			"content": "<p>A várandósság nem ok arra, hogy lemondj a mozgás öröméről. Ezek az órák segítenek erősnek és mozgékonynak maradni, könnyen lélegezni, és testileg-lelkileg felkészülten érkezni a szüléshez. A szülés után pedig együtt dolgozunk a gyengéd, hatékony regeneráción.</p>\n<h2>Amin dolgozunk</h2>\n<ul>\n<li>Erő a hátnak, a csípőnek és a lábnak, amelyek a változó testet hordozzák</li>\n<li>Gátizom-tudatosság és tartás</li>\n<li>Légzés a vajúdáshoz és a nyugalomhoz</li>\n<li>Mobilitás, ami enyhíti a várandósság kellemetlenségeit</li>\n<li>Relaxáció, mert a pihenés is a felkészülés része</li>\n</ul>\n<h2>Hogyan működik</h2>\n<p>Az órák élőben, online zajlanak: heti kiscsoportos órán, vagy négyszemközt 30, 45 vagy 60 percben. Kérlek, kezdés előtt egyeztess a nőgyógyászoddal vagy a védőnőddel, és mondd el, hányadik hétben jársz és hogy érzed magad. Minden óra igazodik a trimeszteredhez és az aznapi állapotodhoz.</p>\n<p>[oy_booking_link]</p>"
+			"content": "<p>A várandósság nem ok arra, hogy lemondj a mozgás öröméről. Ezek az órák segítenek erősnek és mozgékonynak maradni, könnyen lélegezni, és testileg-lelkileg felkészülten érkezni a szüléshez. A szülés után pedig együtt dolgozunk a gyengéd, hatékony regeneráción.</p>\n<h2>Amin dolgozunk</h2>\n<ul>\n<li>Erő a hátnak, a csípőnek és a lábnak, amelyek a változó testet hordozzák</li>\n<li>Gátizom-tudatosság és tartás</li>\n<li>Légzés a vajúdáshoz és a nyugalomhoz</li>\n<li>Mobilitás, ami enyhíti a várandósság kellemetlenségeit</li>\n<li>Relaxáció, mert a pihenés is a felkészülés része</li>\n</ul>\n<h2>Hogyan működik</h2>\n<p>Az órák élőben, online zajlanak, négyszemközt vagy kismamák kiscsoportjában, 30, 45 vagy 60 percben; az időpontot együtt egyeztetjük. Kérlek, kezdés előtt egyeztess a nőgyógyászoddal vagy a védőnőddel, és mondd el, hányadik hétben jársz és hogy érzed magad. Minden óra igazodik a trimeszteredhez és az aznapi állapotodhoz.</p>\n<p>[oy_button url=\"{{contact:prenatal}}\" label=\"Időpontot kérek\"]</p>"
 		},
 		"private-yoga": {
 			"title": "Online magánóra",
@@ -289,20 +241,25 @@
 		{
 			"home": "1",
 			"q": "Tényleg működik a jóga online?",
-			"a": "Igen, ha élő az óra. Nem egy videót követsz: ugyanabban az időben gyakorolunk, én pedig figyelek, vezetlek, és az órát a résztvevőkhöz igazítom. Ha bekapcsolod a kamerádat, látom, hogyan mozogsz, és szólok, ha valamin érdemes változtatni.\n\nSokan azért szeretik, mert nem kell sehová elmenni: a jóga után nem kell hazautazni, csak maradsz a relaxációban egy kicsit tovább."
+			"a": "Igen, ha élő az óra. Nem egy videót követsz: ugyanabban az időben gyakorolunk, én pedig figyelek, vezetlek, és az órát a résztvevőkhöz igazítom. Ha bekapcsolod a kamerádat, látom, hogyan mozogsz, és szólok, ha valamin érdemes változtatni.\n\nAhogy sokan, én is a négy fal között, online kezdtem jógázni. És a jóga után nem kell sehová hazautazni: maradhatsz a relaxációban egy kicsit tovább."
 		},
 		{
 			"home": "1",
-			"q": "Teljesen kezdő vagyok. Melyik órára menjek?",
-			"a": "Kezdőket szeretettel várok, főleg ha a mozgás valamilyen formában már része az életednek. A Slow Flow minden szintnek szól, és ez a legszelídebb kezdés; a Hatha Flow erősebb és dinamikusabb. Ha előbb az alapokat tanulnád meg, egy-két online magánóra remek belépő."
+			"q": "Elég ügyes vagyok a jógához?",
+			"a": "A jóga gyakorlás szépsége az egyszerűségében rejlik, és azoknak való (legalábbis az én órámon), akik munka, háztartás, gyerek, unoka, kertészkedés, más hobbik mellett tökéletesen megelégednek annyival, hogy „Ez jól esett”, „Megérkeztem”, „Felfrissültem”, „Nagyon jól fogok aludni”, „Ez kellett ezután a pörgős nap után” vagy „Ez kellett az egész napos ülés után”, „Már nem fáj a hátam”.\n\nAz órámon nem a kézenállást fogjuk gyakorolni, mégis változatosan állítom össze, úgy, hogy azért mindig van benne kihívás.\n\nDinamikus, mégis gyengéd, pont elég mindenből: ez a célom, semmi több. Hiszen az ászanák, a mozgás a jógában egy eszköz, a jóga 8 ágából csak az egyik."
 		},
 		{
 			"home": "1",
-			"q": "Mire lesz szükségem az online órához?",
-			"a": "Telefonra, tabletre vagy laptopra kamerával, egy jógamatracnyi helyre, és egy matracra, egy párnára meg egy plédre a relaxációhoz. Kényelmes ruhában, mezítláb gyakorlunk. Nagyobb képernyőn könnyebb követni az órát."
+			"q": "Mennyire nehezek a csoportos jóga órák?",
+			"a": "Az óráimra kezdőket is szeretettel várok. Viszont szeretem úgy felépíteni, hogy annak is élvezetes legyen, aki régóta gyakorol.\n\nMindenkinek más a nehéz, más-más erősítő gyakorlatok. Valakinek a nyújtás a legnehezebb része, valakinek az egyensúlyozás, valakinek pedig lehet, hogy az, hogy 1 órára kikapcsolja a gondolatokat.\n\nRengeteg jóga fajta van. A hatha flow jóga az erősebb és dinamikusabb vonalat képviseli. A slow flow jógán pedig sokkal inkább a megfigyelésen van a hangsúly, ez egy lassabb óratípus a flow élmény mellett.\n\nA flow élményre kifejezetten törekszem, számomra a jóga leggyönyörűbb része. Van, amikor erősítő ászanákat is szeretek kitartani, hogy mindenkinek megérkezzen a figyelme.\n\nAz órámon szembesülhetsz kihívásokkal, azonban semmi nem kötelező."
 		},
 		{
 			"home": "1",
+			"q": "Mit kell előkészítenem az online jóga órára?",
+			"a": "Ha van szeretett jógaszőnyeged, azt használd nyugodtan, mellé pedig egy ülőpárnát és egy plédet a relaxációhoz. Ezen felül csak egy kényelmes öltözet kell, víz, ha megszomjaznál, és egy telefon, tablet vagy laptop kamerával. A gyakorlást mezítláb ajánlom."
+		},
+		{
+			"home": "",
 			"q": "Látsz engem az óra alatt?",
 			"a": "Ha bekapcsolod a kamerádat, igen, és így tudok segíteni a pózokban. A képedet csak én látom, a többiek nem. Ha egy nap inkább kamera nélkül gyakorolnál, az is rendben van."
 		},
@@ -318,48 +275,43 @@
 		},
 		{
 			"home": "",
-			"q": "Elég hajlékony vagyok a jógához?",
-			"a": "Nem kell hajlékonynak lenned ahhoz, hogy elkezdd: a hajlékonyságot maga a gyakorlás építi. Az óráim azoknak szólnak, akik munka, család, unokák, kertészkedés és minden más mellett tökéletesen megelégednek annyival, hogy \"Ez jól esett\", \"Megérkeztem\", \"Nagyon jól fogok aludni\" vagy \"Már nem fáj a hátam\".\n\nNem a kézenállást fogjuk gyakorolni. Az órák változatosak, és mindig van bennük egy kis kihívás, de semmi sem kötelező."
-		},
-		{
-			"home": "",
-			"q": "Mennyire nehezek a csoportos órák?",
-			"a": "Mindenkinek más a nehéz. Van, akinek az erősítés, van, akinek a nyújtás vagy az egyensúlyozás, és van, akinek az, hogy egy órára kikapcsolja a gondolatait.\n\nA Hatha Flow az erősebb, dinamikusabb óra. A Slow Flow-n inkább a megfigyelésen van a hangsúly, lassabb tempóban. Mindkettőben ott a flow élmény, ami számomra a jóga leggyönyörűbb része. Néha az erősítő pózokat kicsit tovább tartjuk, hogy mindenkinek megérkezzen a figyelme."
-		},
-		{
-			"home": "",
 			"q": "Mi a hatha jóga?",
-			"a": "A \"ha\" Napot, a \"tha\" Holdat jelent. A hatha jóga az aktív és a passzív energiák kiegyensúlyozására szolgál: erőfeszítés és könnyedség, erő és elengedés. Gondolj a sok ellentétes pólusra, amelyek kiegyensúlyozzák egymást: meleg és hideg, fény és árnyék, befogadás és elengedés. Az egyik nem lenne a másik nélkül.\n\nHa ez az egyensúly kibillen, először rossz érzésként vagy nyugtalanságként érezzük. A hatha jóga a fizikai gyakorlás segítségével találja meg és tartja fenn ezt az egyensúlyt. Az ászanák a meditáció előszobája, annak egy dinamikusabb formája, és a jóga nyolc ágából csak az egyik."
+			"a": "A hatha jóga órán részed lesz légzőgyakorlatokban, erősítésben, nyújtásban, egyensúlyozó gyakorlatokban, flow (áramlás) élményben és relaxációban egyaránt.\n\nHa: Nap ☼\nTha: Hold ☾\n\nA hatha jóga a Nap és a Hold, azaz az aktív és a passzív energiák kiegyensúlyozására szolgál. Jó-rossz, pozitív-negatív, férfi-nő, meleg-hideg, árnyék-fény, befogadás-elengedés, és még sorolhatnám. Ha belegondolunk, számtalan ellentétes pólus van, amik kiegyensúlyozzák egymást. Az egyik nem lenne a másik nélkül.\n\nEz az egyensúly könnyen kibillen, ami először csak rossz érzeteket, majd betegségeket okoz, nem csak az emberben, hanem a Földben, a világban, az univerzumban. A hatha jóga arra szolgál, hogy fizikai segítséggel elérjük, fenntartsuk ezt az egyensúlyt önmagunkban, a világ egy egészséges, kiegyensúlyozott kis sejtjeként működve.\n\nAz ászanák, amiket „pózoknak” nevezünk a gyakorlás alatt, a meditáció előszobája, annak is egy dinamikusabb formája."
+		},
+		{
+			"home": "",
+			"q": "Mik azok a gyakori fizikai gondok, amiken segíthet a rendszeres jóga gyakorlás?",
+			"a": "– gyakori hát- és derékfájás\n– rendszertelen menstruáció\n– emésztési problémák\n– állandó fáradtság\n– gyakori fejfájás\n– magas vérnyomás\n– rossz alvásminőség, álmatlanság\n– „ködös agy”, rossz memória\n– gyenge hátizmok, hasizmok\n– székrekedés\n– hanyag tartás, „telefonnyomkodó nyak”\n– kibillent hormonegyensúly\n\nHa egészségügyi problémád van, kezdés előtt beszéld meg az orvosoddal, és szólj nekem is."
+		},
+		{
+			"home": "",
+			"q": "Mik azok a gyakori mentális, lelki gondok, amiken segíthet a rendszeres jóga gyakorlás?",
+			"a": "A tapasztalataim alapján is:\n– állandó megfelelési kényszer önmagam és mások felé\n– alvászavarok\n– állandó túlgondolás, a gondolatok kontrollálatlansága\n– szorongás, a legrosszabb forgatókönyv lejátszódása fejben\n– stresszfüggőség: „mindig csinálnom kell valamit, különben haszontalannak érzem magam”\n– ha éppen nem csinálok valamit, üresség érzése, nem érzem jól magam a saját társaságomban\n– zárkózottság, érdeklődés hiánya, a világgal való kapcsolódás elvesztése\n– az élet értelmének keresése, kiégés, mókuskerékbe szorulás érzése\n– félelem a saját érzelmek megélésétől\n– félelmek az újtól, az álmok, vágyak megélésétől\n– önbizalomhiány"
 		},
 		{
 			"home": "",
 			"q": "Várandós vagyok. Gyakorolhatok veled?",
-			"a": "Igen, és nagyon szívesen segítek. A kismamatorna élőben, online zajlik, kiscsoportban vagy négyszemközt, és igazodik a trimeszteredhez és az aznapi állapotodhoz. Kérlek, előbb egyeztess a nőgyógyászoddal vagy a védőnőddel, és mondd el, hányadik hétben jársz. A szülés után együtt dolgozhatunk a gyengéd, hatékony regeneráción."
+			"a": "Igen, és nagyon szívesen segítek. A pre- és postnatális tréneri képzések által szeretném segíteni a kismamákat, hogy ne kelljen lemondaniuk a mozgás öröméről, és felkészültek legyenek a szülésre mind testileg, mind lelkileg, valamint a minél hatékonyabb regenerációt segíthessük elő együtt a szülés után.\n\nA kismamatorna élőben, online zajlik, négyszemközt vagy kiscsoportban, és igazodik a trimeszteredhez és az aznapi állapotodhoz. Kérlek, előbb egyeztess a nőgyógyászoddal vagy a védőnőddel, és írd meg, hányadik hétben jársz."
 		},
 		{
 			"home": "",
-			"q": "Hogyan fizethetek?",
-			"a": "Online, foglaláskor: bankkártyával, Apple Pay-jel vagy Google Pay-jel, forintban. Az alkalmi jegyet, a bérleteket és a havi tagságot is így fizeted; a tagság havonta automatikusan megújul, és bármikor lemondható."
+			"q": "Mivel tudom fizetni a jóga órát?",
+			"a": "Online, foglaláskor bankkártyával, Apple Pay-jel vagy Google Pay-jel, forintban. Alkalmi jegyet (3 000 Ft) és 5 alkalmas bérletet (14 000 Ft) is vehetsz; a bérletnek nincs lejárata."
 		},
 		{
 			"home": "",
 			"q": "Mi a lemondási szabály?",
-			"a": "A csoportos órát 12 órával a kezdés előtt még ingyen lemondhatod, és az alkalom visszakerül a bérletedre; ha alkalmi jeggyel foglaltál, egy órakreditet kapsz helyette. A magánórát 24 órával előtte lehet áttenni vagy lemondani."
+			"a": "A csoportos órát 12 órával a kezdés előtt még ingyen lemondhatod, és az alkalom visszakerül a bérletedre; ha alkalmi jeggyel foglaltál, egy órakreditet kapsz helyette. Az órák legalább 3 fővel indulnak: ha kevesebben jelentkeznek, szólok, és visszakapod az alkalmat. A magánórát 24 órával előtte lehet áttenni vagy lemondani."
 		},
 		{
 			"home": "",
 			"q": "Ajándékozhatok jógát?",
-			"a": "Igen. A online bérletre vagy magánórára szóló ajándékutalványt e-mailben kapja meg az, akinek szánod, egy kóddal, amit a fiókjában vált be."
+			"a": "Igen. Az 5 alkalmas bérletet és a magánórát ajándékutalványként is megveheted. Az utalványt e-mailben kapja meg az, akinek szánod, egy kóddal, amit a fiókjában vált be, és onnan már ő maga foglal."
 		},
 		{
 			"home": "",
 			"q": "Sérülésem vagy egészségügyi problémám van. Jöhetek?",
 			"a": "Kérlek, előbb egyeztess az orvosoddal, és óra előtt szólj nekem. Csoportos órán alternatívákat adok; speciális igényekhez gyakran egy online magánóra a legjobb kezdés. A jóga kiegészíti az orvosi ellátást, de nem helyettesíti."
-		},
-		{
-			"home": "",
-			"q": "Miben segíthet a rendszeres jóga?",
-			"a": "Sokan a hát- és derékfájás, a merev \"telefonos nyak\" és a hanyag tartás, a rossz alvás, az állandó fáradtság, a ködös agy, a gyenge hát- és hasizmok vagy a stressz miatt érkeznek a matracra. A rendszeres hatha gyakorlás mély erőt épít, segíti a jobb tartást, és megtanít tudatosabban használni a légzést, és sokan azt tapasztalják, hogy jobban alszanak és jobban tudnak koncentrálni. Ha egészségügyi problémád van, beszéld meg az orvosoddal, mi a jó neked."
 		}
 	],
 	"posts": {
@@ -646,11 +598,11 @@
 			"lang": "hu",
 			"format": "online",
 			"online_capacity": 20,
-			"price": "2500",
+			"price": "3000",
 			"note": "",
-			"day": 1,
-			"start": "18:00",
-			"end": "19:00",
+			"day": 2,
+			"start": "20:00",
+			"end": "21:00",
 			"class": "hatha-flow"
 		},
 		{
@@ -658,35 +610,11 @@
 			"lang": "hu",
 			"format": "online",
 			"online_capacity": 20,
-			"price": "2500",
-			"note": "",
-			"day": 2,
-			"start": "19:00",
-			"end": "20:30",
-			"class": "slow-flow"
-		},
-		{
-			"location": "Online (Zoom)",
-			"lang": "hu",
-			"format": "online",
-			"online_capacity": 20,
-			"price": "2500",
+			"price": "3000",
 			"note": "",
 			"day": 3,
 			"start": "18:30",
-			"end": "19:15",
-			"class": "prenatal-fitness"
-		},
-		{
-			"location": "Online (Zoom)",
-			"lang": "hu",
-			"format": "online",
-			"online_capacity": 20,
-			"price": "2500",
-			"note": "",
-			"day": 4,
-			"start": "18:00",
-			"end": "19:00",
+			"end": "19:30",
 			"class": "hatha-flow"
 		},
 		{
@@ -694,11 +622,23 @@
 			"lang": "hu",
 			"format": "online",
 			"online_capacity": 20,
-			"price": "2500",
+			"price": "3000",
 			"note": "",
-			"day": 6,
-			"start": "16:00",
-			"end": "17:30",
+			"day": 3,
+			"start": "20:00",
+			"end": "21:00",
+			"class": "hatha-flow"
+		},
+		{
+			"location": "Online (Zoom)",
+			"lang": "hu",
+			"format": "online",
+			"online_capacity": 20,
+			"price": "3000",
+			"note": "",
+			"day": 4,
+			"start": "19:00",
+			"end": "20:30",
 			"class": "slow-flow"
 		}
 	],

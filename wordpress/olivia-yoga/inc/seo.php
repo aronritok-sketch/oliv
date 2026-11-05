@@ -96,9 +96,9 @@ add_action( 'wp_head', function () {
 		array(
 			'@type'         => 'Person',
 			'@id'           => $site . '#olivia',
-			'name'          => 'Olivia Kovacs',
+			'name'          => oy_teacher_name(),
 			'jobTitle'      => 'Yoga Teacher | Movement & Wellness Coach',
-			'knowsAbout'    => array( 'Yoga', 'Mobility', 'Prenatal Fitness', 'Meditation', 'Singing Bowl Massage' ),
+			'knowsAbout'    => oy_online_only() ? array( 'Yoga', 'Hatha Yoga', 'Prenatal Fitness', 'Meditation' ) : array( 'Yoga', 'Mobility', 'Prenatal Fitness', 'Meditation', 'Singing Bowl Massage' ),
 			'sameAs'        => array( OY_INSTAGRAM, OY_FACEBOOK ),
 			'hasCredential' => array( '@type' => 'EducationalOccupationalCredential', 'name' => 'Hatha yoga teacher certification (2023)', 'recognizedBy' => array( '@type' => 'Organization', 'name' => 'Yoga Alliance International' ) ),
 		),

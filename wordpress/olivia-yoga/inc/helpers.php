@@ -24,6 +24,18 @@ function oy_images() {
 }
 
 /**
+ * A theme photo's alt text in the visitor's language. The online edition is Hungarian-only, so
+ * Olivia's name follows the Hungarian order there (Kovács Olívia), as on her own Hungarian site.
+ */
+function oy_alt( $alt ) {
+	$alt = oy_t( $alt );
+	if ( oy_online_only() ) {
+		$alt = strtr( $alt, array( 'Olivia Kovacsról' => 'Kovács Olíviáról', 'Olivia Kovacs-szal' => 'Kovács Olíviával', 'Olivia Kovacs' => 'Kovács Olívia' ) );
+	}
+	return $alt;
+}
+
+/**
  * A photo from the theme's bundled set (by key) or the media library (attachment id).
  */
 function oy_photo( $src, $sizes = '100vw', $eager = false, $alt = null ) {
@@ -40,7 +52,7 @@ function oy_photo( $src, $sizes = '100vw', $eager = false, $alt = null ) {
 			$key  = (string) get_post_meta( (int) $src, 'oy_key', true );
 			$imgs = $key ? oy_images() : array();
 			if ( ! empty( $imgs[ $key ]['alt'] ) && get_post_meta( (int) $src, '_wp_attachment_image_alt', true ) === $imgs[ $key ]['alt'] ) {
-				$attrs['alt'] = oy_t( $imgs[ $key ]['alt'] );
+				$attrs['alt'] = oy_alt( $imgs[ $key ]['alt'] );
 			}
 		}
 		$pos = get_post_meta( (int) $src, 'oy_pos', true );
@@ -55,7 +67,7 @@ function oy_photo( $src, $sizes = '100vw', $eager = false, $alt = null ) {
 	}
 	$m    = $imgs[ $src ];
 	$base = get_template_directory_uri() . '/assets/img/' . $src;
-	$alt  = null === $alt ? oy_t( $m['alt'] ) : $alt;
+	$alt  = null === $alt ? oy_alt( $m['alt'] ) : $alt;
 	return sprintf(
 		'<img class="photo" src="%1$s-1200.jpg" srcset="%1$s-600.jpg %8$dw, %1$s-1200.jpg %2$dw" sizes="%3$s" alt="%4$s" width="%2$d" height="%5$d" style="object-position:%6$s" %7$s decoding="async">',
 		esc_url( $base ), (int) $m['w'], esc_attr( $sizes ), esc_attr( $alt ), (int) $m['h'], esc_attr( $m['pos'] ),
@@ -162,7 +174,7 @@ function oy_specialities_line( $cls = 'specialities' ) {
 
 /** Name card: name, title line and specialities. */
 function oy_name_card( $cls = '' ) {
-	return '<div class="namecard ' . esc_attr( $cls ) . '"><p class="namecard__name">' . ( oy_online_only() ? 'Kovacs Olivia' : 'Olivia Kovacs' ) . '</p><p class="namecard__title">' . esc_html( oy_title_line() ) . '</p>' . oy_specialities_line( 'namecard__spec' ) . '</div>';
+	return '<div class="namecard ' . esc_attr( $cls ) . '"><p class="namecard__name">' . esc_html( oy_teacher_name() ) . '</p><p class="namecard__title">' . esc_html( oy_title_line() ) . '</p>' . oy_specialities_line( 'namecard__spec' ) . '</div>';
 }
 
 /* ---------- URLs used across templates ---------- */

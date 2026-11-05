@@ -14,7 +14,7 @@ while ( have_posts() ) :
 	?>
 	<div class="container"><article class="layout">
 		<div class="entry"><?php the_content(); ?></div>
-		<aside class="author"><div class="frame"><?php echo oy_photo( 'olivia-sunset-smile', '84px', false, 'Olivia Kovacs' ); // phpcs:ignore ?></div><div><b>Olivia Kovacs</b><p><?php echo esc_html( oy_title_line() ); ?></p><?php echo oy_specialities_line( 'specialities specialities--small' ); // phpcs:ignore ?></div></aside>
+		<aside class="author"><div class="frame"><?php echo oy_photo( 'olivia-sunset-smile', '84px', false, oy_teacher_name() ); // phpcs:ignore ?></div><div><b><?php echo esc_html( oy_teacher_name() ); ?></b><p><?php echo esc_html( oy_title_line() ); ?></p><?php echo oy_specialities_line( 'specialities specialities--small' ); // phpcs:ignore ?></div></aside>
 		<p class="btn-row"><?php echo oy_btn( oy_book_url(), __( 'Book a class', 'olivia-yoga' ) ); // phpcs:ignore ?></p>
 	</article></div>
 	<?php $more = get_posts( array( 'numberposts' => 3, 'exclude' => array( get_the_ID() ) ) ); ?>

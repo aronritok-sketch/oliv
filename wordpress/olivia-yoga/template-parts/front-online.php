@@ -20,7 +20,7 @@ $needs  = array(
 	array( 'group', __( 'Camera on, if you like', 'olivia-yoga' ), __( 'If I can see you, I can help you with the poses. Only I see your picture.', 'olivia-yoga' ), 'sun' ),
 );
 $steps  = array(
-	array( __( 'Choose a class', 'olivia-yoga' ), __( 'Book from the timetable with a drop-in, a pass or a membership.', 'olivia-yoga' ) ),
+	array( __( 'Choose a class', 'olivia-yoga' ), __( 'Book from the timetable with a drop-in or a class pass.', 'olivia-yoga' ) ),
 	array( __( 'Get the link', 'olivia-yoga' ), __( 'The Zoom link comes by email and is waiting in your account.', 'olivia-yoga' ) ),
 	array( __( 'Roll out your mat', 'olivia-yoga' ), __( 'Join a few minutes early so we can say hello before we start.', 'olivia-yoga' ) ),
 	array( __( 'Practice together, live', 'olivia-yoga' ), __( 'I guide you in real time and adjust the class to the people in it.', 'olivia-yoga' ) ),
@@ -107,7 +107,7 @@ $steps  = array(
 <section class="section section--forest section--breath" aria-label="<?php esc_attr_e( 'Breathing exercise', 'olivia-yoga' ); ?>"><div class="container"><?php echo oy_breath(); // phpcs:ignore ?></div></section>
 
 <section class="section section--tight" id="pricing" aria-labelledby="pricing-title"><div class="container">
-	<?php echo oy_section_head( __( 'Simple pricing', 'olivia-yoga' ), __( 'Pay per class, save with an online pass or membership, or give someone a gift card.', 'olivia-yoga' ), __( 'Prices in forints', 'olivia-yoga' ), 'pricing-title' ); // phpcs:ignore ?>
+	<?php echo oy_section_head( __( 'Simple pricing', 'olivia-yoga' ), __( 'Pay per class, save with a 5-class pass, or give someone a gift card.', 'olivia-yoga' ), __( 'Prices in forints', 'olivia-yoga' ), 'pricing-title' ); // phpcs:ignore ?>
 	<?php echo $studio( 'oys_pricing' ); // phpcs:ignore ?>
 </div></section>
 

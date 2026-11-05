@@ -36,11 +36,19 @@ function oy_edition() {
 	return isset( OY_EDITIONS[ $edition ] ) ? $edition : 'fort-myers';
 }
 
+/**
+ * Olivia's name as the edition writes it.
+ */
+function oy_teacher_name() {
+	return oy_online_only() ? 'Kovács Olívia' : 'Olivia Kovacs'; // Hungarian name order on the Hungarian-only edition.
+}
+
 /** Is this the Hungarian, online-only edition? */
 function oy_online_only() {
 	return 'hu-online' === oy_edition();
 }
 
+/** The site's name in titles, the footer and structured data. */
 function oy_site_name() {
 	return oy_online_only() ? 'Olivia Jóga – Online' : 'Olivia Kovacs Yoga';
 }

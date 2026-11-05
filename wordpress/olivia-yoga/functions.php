@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OY_VERSION', '3.1.0' );
+define( 'OY_VERSION', '3.1.1' );
 define( 'OY_EMAIL', 'olivia.kovacs6@gmail.com' );
 define( 'OY_INSTAGRAM', 'https://www.instagram.com/oliivia_yoga/' );
 define( 'OY_FACEBOOK', 'https://www.facebook.com/oliviajogaoktato' );

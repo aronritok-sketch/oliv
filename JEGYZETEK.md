@@ -98,6 +98,14 @@
 - **MINTA:** heti 5 online óra (H 18:00 Hatha, K 19:00 Slow, Sze 18:30 Kismama, Cs 18:00 Hatha, Szo 16:00 Slow); árak: alkalmi 2 500 Ft, 5 alkalmas 11 000 Ft, 10 alkalmas 20 000 Ft, korlátlan havi 12 900 Ft, havi 4 óra 8 400 Ft, magánóra 60/75/90 perc 12 000 / 14 500 / 17 000 Ft, 5 magánóra 55 000 Ft (a piackutatás szerinti sávban). Olivia véglegesíti.
 - **Teendők:** Olivia nézze át a szövegeket, az órarendet és az árakat; Zoom-fiók; domain (pl. oliviajoga-online); a VPS dev oldal (`dev.helloprovision.com/<slug>`) a `projects.json`-ba felveendő, amikor a VPS él.
 
+## 10. kör: online kiadás Olivia régi oldalának szövegeivel (2026-11-05)
+- **Kérés (Áron):** magyar közönségnek, magyar helyszínhez illő szöveg, a régi oldal (oliviajoga.hu → sites.google.com/view/oliviajoga) szövegeiből.
+- **Szövegek:** a Rólam oldal Olivia saját „Miért lettem jógaoktató?” szövege (csak elírásokat javítottam), a főoldal és az órák bevezetője, a GYIK válaszai (hatha jóga, „Elég ügyes vagyok?”, „Mennyire nehezek?”, fizikai és lelki gondok listája, mit kell előkészíteni) szintén a régi oldalról; az online-specifikus kérdések (link, kamera, késés, lemondás) maradtak.
+- **Név:** a magyar kiadásban mindenhol **Kovács Olívia** (téma: `oy_teacher_name()`; fotók alt szövege, névkártya, szerzői doboz, lábléc, SEO).
+- **Árak (a régi oldal / Motibro szerint):** alkalmi jegy 3 000 Ft, 5 alkalmas bérlet 14 000 Ft, **lejárat nélkül**, ajándékutalványként is; a 10 alkalmas bérlet és a havi tagságok kikerültek. Az órák legalább 3 fővel indulnak.
+- **Órarend:** az ő mostani hatha flow idősávjai, online: K 20:00–21:00, Sze 18:30–19:30, Sze 20:00–21:00. **MINTA maradt:** Cs 19:00 Slow Flow és a magánóra-árak (12 000 / 14 500 / 17 000 Ft, 5 alkalom 55 000 Ft). A kismamatorna egyeztetett időpontban, négyszemközt vagy kiscsoportban (nincs heti fix óra).
+- **Téma 3.1.1.**
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

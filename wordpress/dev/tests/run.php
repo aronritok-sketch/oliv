@@ -1653,6 +1653,7 @@ test( 'online edition: Hungarian addresses and its own copy', function () {
 		eq( 'schedule-pricing', oy_page_key( 'orarend-es-arak' ), 'and back to the theme\'s own slug' );
 		eq( 'Olivia Jóga – Online', oy_site_name(), 'site name' );
 		ok( '' === oy_areas_list(), 'no Fort Myers areas' );
+		ok( str_starts_with( oy_alt( 'Olivia Kovacs in dancer pose in a living room' ), 'Kovács Olívia' ), 'photo alt texts: Hungarian name order' );
 	} finally {
 		update_option( 'oy_edition', 'fort-myers' );
 	}
@@ -1660,6 +1661,7 @@ test( 'online edition: Hungarian addresses and its own copy', function () {
 	$text = wp_json_encode( $data, JSON_UNESCAPED_UNICODE );
 	ok( is_array( $data ) && ! str_contains( $text, '—' ), 'online copy: valid, no em dash' );
 	ok( ! preg_match( '/Fort Myers|Florid|lanai|tenger|strand|homok|pickleball|tenisz|golf|klubház/iu', $text ), 'online copy: written for Hungary (no Fort Myers, sea, beach, tennis, golf …)' );
+	ok( ! str_contains( $text, 'Kovacs' ), 'online copy: her name in Hungarian (Kovács Olívia)' );
 	ok( empty( array_diff( array_keys( $data['pages'] ), array_keys( OY_PAGE_SLUGS ) ) ), 'online pages are theme pages' );
 	foreach ( $data['sessions'] as $s ) {
 		ok( isset( $data['classes'][ $s['class'] ] ) && 'online' === $s['format'], 'timetable: ' . $s['class'] . ' is an online class of this edition' );
