@@ -1659,7 +1659,7 @@ test( 'online edition: Hungarian addresses and its own copy', function () {
 	$data = json_decode( (string) file_get_contents( oy_content_file( 'hu-online' ) ), true );
 	$text = wp_json_encode( $data, JSON_UNESCAPED_UNICODE );
 	ok( is_array( $data ) && ! str_contains( $text, '—' ), 'online copy: valid, no em dash' );
-	ok( ! str_contains( $text, 'Fort Myers' ) && ! str_contains( $text, 'lanai' ), 'online copy: no Fort Myers content' );
+	ok( ! preg_match( '/Fort Myers|Florid|lanai|tenger|strand|homok|pickleball|tenisz|golf|klubház/iu', $text ), 'online copy: written for Hungary (no Fort Myers, sea, beach, tennis, golf …)' );
 	ok( empty( array_diff( array_keys( $data['pages'] ), array_keys( OY_PAGE_SLUGS ) ) ), 'online pages are theme pages' );
 	foreach ( $data['sessions'] as $s ) {
 		ok( isset( $data['classes'][ $s['class'] ] ) && 'online' === $s['format'], 'timetable: ' . $s['class'] . ' is an online class of this edition' );

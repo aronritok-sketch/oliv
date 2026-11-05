@@ -3405,3 +3405,6 @@ msgstr "Gyere alkalmi jeggyel egy élő órára, vagy spórolj online bérlettel
 
 msgid "One-on-one online sessions and packs, planned around you."
 msgstr "Négyszemközti online órák és csomagok, rád szabva."
+
+msgid "e.g. weekday evenings after 6, or Saturday afternoon"
+msgstr "pl. hétköznap este 6 után, vagy szombat délután"
