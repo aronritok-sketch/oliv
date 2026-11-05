@@ -1005,7 +1005,8 @@ test( 'calendar and weekly classes keep donation and pay-at-the-studio settings'
 	wp_set_current_user( 1 );
 	$date = wp_date( 'Y-m-d', time() + 2 * DAY_IN_SECONDS );
 	$req  = new WP_REST_Request( 'POST', '/oys/v1/admin/sessions' );
-	$req->set_body_params( array( 'kind' => 'group', 'class_slug' => 'hatha-flow', 'date' => $date, 'start' => '07:15', 'duration' => 60, 'capacity' => 10, 'price' => 1000, 'pricing' => 'donation', 'pay_later' => 0, 'repeat' => 'weekly' ) );
+	// 05:00: clear of the sample timetable (Thursday and Saturday 07:30), whatever day the tests run on.
+	$req->set_body_params( array( 'kind' => 'group', 'class_slug' => 'hatha-flow', 'date' => $date, 'start' => '05:00', 'duration' => 60, 'capacity' => 10, 'price' => 1000, 'pricing' => 'donation', 'pay_later' => 0, 'repeat' => 'weekly' ) );
 	$res  = rest_do_request( $req )->get_data();
 	eq( 'donation', $res['session']['pricing'], 'donation saved' );
 	eq( false, $res['session']['pay_later'], 'pay at the studio off' );
@@ -1537,6 +1538,18 @@ test( 'languages: addresses, translated texts and the switch back', function () 
 	eq( 'Reservar clase', OYS_I18n::with( 'es', fn() => __( 'Book a class', 'olivia-yoga' ) ), 'theme text in Spanish' );
 	ok( str_contains( OYS_I18n::with( 'hu', fn() => home_url( '/about/' ) ), '/hu/about/' ), 'links inside Hungarian pages stay Hungarian' );
 	ok( ! str_contains( OYS_I18n::with( 'hu', fn() => rest_url( 'oys/v1/' ) ), '/hu/' ), 'the API address has no language' );
+	$parsed = OYS_I18n::with(
+		'hu',
+		function () {
+			OYS_I18n::parsing_starts( true );
+			$during = home_url( '/' );
+			OYS_I18n::parsing_ends();
+			return array( $during, home_url( '/' ) );
+		}
+	);
+	ok( ! str_contains( $parsed[0], '/hu/' ), 'while WordPress parses the request the home address has no language (else /hu/ pages are 404 in a subdirectory install)' );
+	ok( str_contains( $parsed[1], '/hu/' ), 'after parsing, links get the language again' );
+	ok( str_contains( OYS_I18n::with( 'hu', fn() => OYS_I18n::parsing_starts( false ) ?: home_url( '/' ) ), '/hu/' ), 'a request WordPress does not parse leaves links alone' );
 	eq( 'Book a class', __( 'Book a class', 'olivia-studio' ), 'back to English afterwards' );
 	eq( 'en', oys_valid_lang( 'xx' ), 'unknown class language falls back to English' );
 	$s = make_session();

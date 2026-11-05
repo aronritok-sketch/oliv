@@ -28,6 +28,7 @@ class OYS_I18n {
 	private static $uri       = '';
 	private static $home_path = '';
 	private static $active    = false;
+	private static $parsing   = false;
 
 	/** Runs as soon as the plugin file loads: before the theme, before WordPress parses the request. */
 	public static function boot() {
@@ -50,6 +51,16 @@ class OYS_I18n {
 		$rest = substr( $path, strlen( self::$home_path ) );
 		if ( preg_match( '#^/(' . implode( '|', array_keys( self::others() ) ) . ')(/|$)#', $rest, $m ) ) {
 			$_SERVER['REQUEST_URI'] = self::$home_path . '/' . ltrim( substr( self::$uri, strlen( self::$home_path ) + strlen( $m[1] ) + 1 ), '/' );
+			// Some servers (PHP's built-in server, nginx with fastcgi_split_path_info) also pass the path as
+			// PATH_INFO, which WordPress prefers to REQUEST_URI: take the prefix off there too.
+			foreach ( array( 'PATH_INFO', 'ORIG_PATH_INFO' ) as $key ) {
+				if ( isset( $_SERVER[ $key ] ) ) {
+					$_SERVER[ $key ] = (string) preg_replace( '#^(' . preg_quote( self::$home_path, '#' ) . ')?/' . $m[1] . '(?=/|$)#', '$1', (string) $_SERVER[ $key ] );
+				}
+			}
+			if ( isset( $_SERVER['PHP_SELF'] ) ) {
+				$_SERVER['PHP_SELF'] = (string) preg_replace( '#(\.php)/' . $m[1] . '(?=/|$)#', '$1', (string) $_SERVER['PHP_SELF'] );
+			}
 			self::set( $m[1] );
 		} elseif ( 'wp-login.php' === $script ) {
 			self::set( self::lang_from_url( (string) wp_get_raw_referer() ) );
@@ -64,6 +75,11 @@ class OYS_I18n {
 		self::$active = true;
 		add_filter( 'locale', array( __CLASS__, 'locale_filter' ), 1 );
 		add_filter( 'home_url', array( __CLASS__, 'home_url_filter' ), 10, 2 );
+		// WP::parse_request() strips home_url()'s path off the request. The prefix is already gone from the
+		// request, so the home path has to stay plain while WordPress parses it; otherwise, with the site in
+		// a subdirectory (/site/hu vs /site/), nothing matches and every translated page is a 404.
+		add_filter( 'do_parse_request', array( __CLASS__, 'parsing_starts' ), PHP_INT_MAX );
+		add_action( 'parse_request', array( __CLASS__, 'parsing_ends' ), 0 );
 		add_filter( 'redirect_canonical', '__return_false' );
 		add_filter( 'language_attributes', fn() => 'lang="' . esc_attr( self::LANGS[ self::$lang ]['html'] ) . '"' );
 	}
@@ -72,7 +88,19 @@ class OYS_I18n {
 		return self::LANGS[ self::$lang ]['locale'];
 	}
 
+	public static function parsing_starts( $do_parse ) {
+		self::$parsing = (bool) $do_parse;
+		return $do_parse;
+	}
+
+	public static function parsing_ends() {
+		self::$parsing = false;
+	}
+
 	public static function home_url_filter( $url, $path ) {
+		if ( self::$parsing ) {
+			return $url;
+		}
 		// The REST API, feeds and sitemaps stay on the plain address.
 		if ( preg_match( '#^/?(wp-json|feed|wp-sitemap|xmlrpc\.php)(/|$|\?|-|\.)#', (string) $path ) ) {
 			return $url;
