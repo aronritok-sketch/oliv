@@ -5,8 +5,8 @@
 
 defined( 'ABSPATH' ) || exit;
 get_header();
-if ( oy_online_only() ) {
-	get_template_part( 'template-parts/front-online' );
+if ( oy_online_only() || oy_is_demo() ) {
+	get_template_part( oy_is_demo() ? 'template-parts/front-hathaflow' : 'template-parts/front-online' );
 	get_footer();
 	return;
 }

@@ -10,9 +10,10 @@
 <body <?php body_class( 'lang-' . oy_lang() ); ?>>
 <?php wp_body_open(); ?>
 <a class="skip-link" href="#main"><?php esc_html_e( 'Skip to content', 'olivia-yoga' ); ?></a>
+<?php if ( oy_is_demo() ) : ?><p class="demo-bar"><?php esc_html_e( 'Demo site: a sample studio. The classes, times, prices and pictures are examples.', 'olivia-yoga' ); ?></p><?php endif; ?>
 <?php
 $account_label = is_user_logged_in() ? __( 'My account', 'olivia-yoga' ) : __( 'Log in', 'olivia-yoga' );
-$brand         = '<a class="brand" href="' . esc_url( home_url( '/' ) ) . '" rel="home"><svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#2B5036"/><path d="M9 25c4-3.5 8 2.5 12-1s7-2.5 10-.5" fill="none" stroke="#C6A3EE" stroke-width="2.2" stroke-linecap="round"/><circle cx="26.5" cy="13" r="4" fill="#EE3F9A"/></svg><span><span class="brand__name">' . ( oy_online_only() ? 'Olivia Jóga' : 'Olivia Kovacs' ) . '</span><span class="brand__sub">' . esc_html( oy_online_only() ? __( 'Online · live classes in Hungarian', 'olivia-yoga' ) : __( 'Yoga & movement · Fort Myers', 'olivia-yoga' ) ) . '</span></span></a>';
+$brand         = '<a class="brand" href="' . esc_url( home_url( '/' ) ) . '" rel="home"><svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#2B5036"/><path d="M9 25c4-3.5 8 2.5 12-1s7-2.5 10-.5" fill="none" stroke="#C6A3EE" stroke-width="2.2" stroke-linecap="round"/><circle cx="26.5" cy="13" r="4" fill="#EE3F9A"/></svg><span><span class="brand__name">' . esc_html( oy_brand( 'short' ) ) . '</span><span class="brand__sub">' . esc_html( oy_brand( 'sub' ) ) . '</span></span></a>';
 ?>
 <header class="site-header" data-header>
 	<div class="container site-header__inner">

@@ -6,6 +6,9 @@
  *    with studio, beach, private and online classes.
  *  - hu-online: Olivia Jóga – Online, in Hungarian only, for live online classes from Hungary. Hungarian
  *    addresses (/orarend-es-arak/ …), prices in forints, Budapest time, no Fort Myers content.
+ *  - hathaflow: Hathaflow, the booking system as a product demo – a made-up studio in English with sample
+ *    classes, timetable and prices, no Olivia content and none of her photos (the hathaflow child theme
+ *    ships neutral pictures). A bar on every page says it is a demo.
  *
  * The edition is chosen in Appearance → Olivia setup (option `oy_edition`); OY_EDITION in wp-config.php
  * overrides it. Switching sets the booking plugin's languages, currency, prices and the site's time
@@ -18,6 +21,7 @@ defined( 'ABSPATH' ) || exit;
 const OY_EDITIONS = array(
 	'fort-myers' => 'Olivia Kovacs Yoga: Fort Myers (English, Hungarian, Spanish)',
 	'hu-online'  => 'Olivia Jóga – Online (Hungarian, live online classes only)',
+	'hathaflow'  => 'Hathaflow: booking system demo (English, sample studio)',
 );
 
 /** Page addresses of the online edition, by the theme's own page slug. */
@@ -36,11 +40,51 @@ function oy_edition() {
 	return isset( OY_EDITIONS[ $edition ] ) ? $edition : 'fort-myers';
 }
 
+/** Is this the Hathaflow product demo (a made-up studio)? */
+function oy_is_demo() {
+	return 'hathaflow' === oy_edition();
+}
+
 /**
- * Olivia's name as the edition writes it.
+ * The edition's brand: name, short name (logo), logo line, place, teacher, About label, e-mail, social links.
+ * The labels (sub, place, about) are translated; the rest is plain, so the contact constants can be set before the
+ * text domain loads.
+ */
+function oy_brand( $key ) {
+	$plain = array(
+		'fort-myers' => array( 'name' => 'Olivia Kovacs Yoga', 'short' => 'Olivia Kovacs', 'teacher' => 'Olivia Kovacs', 'email' => 'olivia.kovacs6@gmail.com', 'instagram' => 'https://www.instagram.com/oliivia_yoga/', 'facebook' => 'https://www.facebook.com/oliviajogaoktato', 'place' => 'Fort Myers, FL' ),
+		'hu-online'  => array( 'name' => 'Olivia Jóga – Online', 'short' => 'Olivia Jóga', 'teacher' => 'Kovács Olívia', 'email' => 'olivia.kovacs6@gmail.com', 'instagram' => 'https://www.instagram.com/oliivia_yoga/', 'facebook' => 'https://www.facebook.com/oliviajogaoktato' ), // Hungarian name order
+		'hathaflow'  => array( 'name' => 'Hathaflow', 'short' => 'Hathaflow', 'teacher' => 'Hathaflow Studio', 'email' => 'hello@example.com', 'instagram' => '', 'facebook' => '' ),
+	);
+	$edition = oy_edition();
+	if ( isset( $plain[ $edition ][ $key ] ) ) {
+		return $plain[ $edition ][ $key ];
+	}
+	switch ( $edition . '/' . $key ) {
+		case 'fort-myers/sub':
+			return __( 'Yoga & movement · Fort Myers', 'olivia-yoga' );
+		case 'hu-online/sub':
+			return __( 'Online · live classes in Hungarian', 'olivia-yoga' );
+		case 'hu-online/place':
+			return __( 'Online, from anywhere', 'olivia-yoga' );
+		case 'hathaflow/sub':
+			return __( 'Yoga studio · booking demo', 'olivia-yoga' );
+		case 'hathaflow/place':
+			return __( 'Studio & online', 'olivia-yoga' );
+		case 'hathaflow/about':
+			return __( 'About the studio', 'olivia-yoga' );
+		case 'fort-myers/about':
+		case 'hu-online/about':
+			return __( 'About Olivia', 'olivia-yoga' );
+	}
+	return '';
+}
+
+/**
+ * The teacher's name as the edition writes it.
  */
 function oy_teacher_name() {
-	return oy_online_only() ? 'Kovács Olívia' : 'Olivia Kovacs'; // Hungarian name order on the Hungarian-only edition.
+	return oy_brand( 'teacher' );
 }
 
 /** Is this the Hungarian, online-only edition? */
@@ -50,7 +94,7 @@ function oy_online_only() {
 
 /** The site's name in titles, the footer and structured data. */
 function oy_site_name() {
-	return oy_online_only() ? 'Olivia Jóga – Online' : 'Olivia Kovacs Yoga';
+	return oy_brand( 'name' );
 }
 
 /** The address of one of the theme's pages in this edition (about → rolam). */
@@ -71,7 +115,8 @@ function oy_page_key( $slug ) {
 
 /** The approved copy of this edition. */
 function oy_content_file( $edition = null ) {
-	return get_template_directory() . '/demo/' . ( 'hu-online' === ( $edition ?? oy_edition() ) ? 'content-hu-online.json' : 'content.json' );
+	$files = array( 'hu-online' => 'content-hu-online.json', 'hathaflow' => 'content-hathaflow.json' );
+	return get_template_directory() . '/demo/' . ( $files[ $edition ?? oy_edition() ] ?? 'content.json' );
 }
 
 /**

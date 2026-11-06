@@ -54,6 +54,27 @@ Két rész, mindkettő a WordPress adminban tölthető fel ZIP-ként (`dist/`):
 7. **E-mail:** telepíts egy SMTP-bővítményt (pl. *WP Mail SMTP*, *FluentSMTP*) és egy tranzakciós levelezőt (Postmark, Brevo, Amazon SES), különben a levelek spambe mennek.
 8. **Cron:** a tárhelyen állíts be valódi cront 5 percenként: `wget -q -O - https://DOMAIN/wp-cron.php?doing_wp_cron` és a `wp-config.php`-ba `define( 'DISABLE_WP_CRON', true );` – így a helyfoglalások lejárata és az emlékeztetők pontosan futnak.
 
+## HelloProVision-szállítás: négy iu_theme-gyerektéma (2026-11-06)
+
+A HelloProVision-oldalak mind az `iu_theme` gyerektémái (hlprv repó, `deploy/README.md`). Ebből a repóból négy készül:
+
+| Téma | Mi ez | Kiadás (`OY_EDITION`) |
+|---|---|---|
+| `oliviayoga-us` | Olivia Kovacs Yoga, Fort Myers – EN/HU/ES, foglalás | `fort-myers` |
+| `oliviayoga-booking` | Olivia Jóga – Online – magyar, online, forint | `hu-online` |
+| `hathaflow` | Hathaflow – a foglalórendszer eladható demója: kitalált mintastúdió, „Demo site” sáv, semleges képek | `hathaflow` |
+| `oliviayoga` | az oliviajoga.hu új frontendje WordPressen (`oliviajoga-hu/build.py --wp`, Motibro-foglalással) | – |
+
+```
+python3 wordpress/hpv/build-child-themes.py ../hlprv      # → hlprv oliviayoga/wp-theme/*, hathaflow/wp-theme/hathaflow
+```
+
+A generátor az `olivia-yoga` témát másolja (a `get_template_directory` hívásokból `get_stylesheet_directory` lesz, a
+`functions.php` megkapja a kiadást és az `inc/hpv.php`-t: iu_theme-alapstílus ki, REST-előtag `wp-json`,
+`hpv_child_setup` → kiadás-beállítás + tartalomimport). A Hathaflow-tartalom: `wordpress/dev/make-hathaflow-content.py`.
+A bővítmény (`olivia-studio`) mellé a `wordpress/dist/olivia-studio.zip`-ből települ (hlprv `deploy/vps/projects.json`).
+A témákat a hlprv-ben ne szerkeszd: itt javíts, és generáld újra.
+
 ## Stripe beállítása
 
 1. Stripe fiók (Olivia nevére, amerikai cég vagy egyéni vállalkozó adataival), bankszámla a kifizetésekhez.

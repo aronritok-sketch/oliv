@@ -41,7 +41,7 @@ function oy_faq_list( $home_only = false ) {
 }
 
 function oy_areas_list() {
-	if ( oy_online_only() ) {
+	if ( 'fort-myers' !== oy_edition() ) {
 		return '';
 	}
 	$out = '<ul class="areas">';
@@ -114,6 +114,14 @@ function oy_breath() {
 }
 
 function oy_contact_topics() {
+	if ( oy_is_demo() ) {
+		return array(
+			'group'   => __( 'Group class', 'olivia-yoga' ),
+			'private' => __( 'Private session', 'olivia-yoga' ),
+			'gift'    => __( 'Gift card', 'olivia-yoga' ),
+			'other'   => __( 'Something else', 'olivia-yoga' ),
+		);
+	}
 	if ( oy_online_only() ) {
 		return array(
 			'group'    => __( 'Live online class', 'olivia-yoga' ),
@@ -159,7 +167,7 @@ function oy_contact_form() {
 		. '<div class="form__row"><label class="field"><span class="field__label">' . esc_html__( 'Your name', 'olivia-yoga' ) . '</span><input type="text" name="name" id="oy-c-name" required autocomplete="name"><span class="field__error" aria-live="polite"></span></label>'
 		. '<label class="field"><span class="field__label">' . esc_html__( 'Email', 'olivia-yoga' ) . '</span><input type="email" name="email" id="oy-c-email" required autocomplete="email"><span class="field__error" aria-live="polite"></span></label></div>'
 		. '<div class="form__row"><label class="field"><span class="field__label">' . esc_html__( 'Phone (optional)', 'olivia-yoga' ) . '</span><input type="tel" name="phone" id="oy-c-phone" autocomplete="tel"></label>'
-		. ( oy_online_only() ? '</div>' : '<label class="field"><span class="field__label">' . esc_html__( 'Your area (optional)', 'olivia-yoga' ) . '</span><input type="text" name="area" id="oy-c-area" placeholder="' . esc_attr__( 'McGregor, Cape Coral, Fort Myers Beach…', 'olivia-yoga' ) . '"></label></div>' )
+		. ( 'fort-myers' !== oy_edition() ? '</div>' : '<label class="field"><span class="field__label">' . esc_html__( 'Your area (optional)', 'olivia-yoga' ) . '</span><input type="text" name="area" id="oy-c-area" placeholder="' . esc_attr__( 'McGregor, Cape Coral, Fort Myers Beach…', 'olivia-yoga' ) . '"></label></div>' )
 		. '<label class="field"><span class="field__label">' . esc_html__( 'Message', 'olivia-yoga' ) . '</span><textarea name="message" id="oy-c-message" rows="5" required placeholder="' . esc_attr__( 'Tell me a little about your practice, any injuries or a pregnancy I should know about, and when you would like to start.', 'olivia-yoga' ) . '"></textarea><span class="field__error" aria-live="polite"></span></label>'
 		. '<div class="form__foot"><button type="submit" class="btn btn--orchid">' . esc_html__( 'Send message', 'olivia-yoga' ) . oy_icon( 'arrow' ) . '</button>'
 		. '<p class="form__small">' . esc_html__( 'I only use your details to reply to you.', 'olivia-yoga' ) . '</p></div></form>';

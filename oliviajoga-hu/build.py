@@ -9,6 +9,8 @@ WordPress theme (../wordpress/olivia-yoga/assets: site.css, site.js, photos) plu
 
     python3 build.py                                  → dist/ for oliviajoga.hu (canonical, sitemap, .htaccess)
     python3 build.py --preview /demo/<slug>/ --out D  → a noindex preview under a sub-folder (links end in /)
+    python3 build.py --wp <folder>                    → the WordPress theme "oliviayoga" (iu_theme child, wp-theme/ +
+                                                        data/site.json; HelloProVision delivery: hlprv oliviayoga/wp-theme/)
 """
 import html
 import json
@@ -195,7 +197,16 @@ def link(path):
     return BASE + urllib.parse.quote(path) + ('/' if PREVIEW else '')
 
 
+WP = False  # --wp: the WordPress theme (oliviayoga); addresses and files become placeholders the theme fills in
+
+
 def asset(rel):
+    if WP:  # the photos come from the media folder (VPS: media_dir from this repo), the rest from the theme
+        if rel.startswith('img/theme/'):
+            return '%%THEME%%/assets/' + rel
+        if rel.startswith('img/'):
+            return '%%MEDIA%%/' + rel[4:]
+        return '%%THEME%%/assets/' + rel
     return f'{BASE}assets/{rel}'
 
 
@@ -1214,6 +1225,47 @@ def write(path, content):
     open(target, 'w', encoding='utf-8').write(content)
 
 
+def wp_entry(p, body, cls, schema):
+    """One page for the WordPress theme: the editable content (main) and what the theme puts around it."""
+    path = p['path']
+    h1 = re.search(r'<h1[^>]*>(.*?)</h1>', body, re.S)
+    name = dict(NAV).get(path) or (norm(text_of(h1.group(1))) if h1 else p['title'])
+    return {'name': 'Főoldal' if path in ('', 'főoldal') else name, 'title': p['title'], 'desc': description(p), 'cls': cls,
+            'schema': json.dumps(schema, ensure_ascii=False), 'content': body, 'prefooter': prefooter(p)}
+
+
+def wp_theme(pages):
+    """--wp <folder>: the oliviayoga WordPress theme (iu_theme child) – wp-theme/ (PHP) + data/site.json + assets.
+
+    The pages are created by the theme's setup (hpv_child_setup) at the same addresses; the photos are not in the theme
+    (27 MB): the VPS puts oliviajoga-hu/assets/img into uploads/oliviajoga-img (projects.json media_dir)."""
+    src = os.path.join(HERE, 'wp-theme')
+    if os.path.isdir(OUT):
+        shutil.rmtree(OUT)
+    shutil.copytree(src, OUT)
+    css = os.path.join(OUT, 'style.css')
+    head = open(css, encoding='utf-8').read().replace('Version: 0.0.0', 'Version: ' + VERSION)
+    open(css, 'w', encoding='utf-8').write(head)
+    nf = {'path': '404', 'title': f'Az oldal nem található | {SITE_TITLE}', 'sections': []}
+    chrome = {
+        'version': VERSION, 'site_title': SITE_TITLE, 'nav': NAV, 'deleted': sorted(DELETED_PAGES),
+        'header': header(''), 'footer': footer(),
+        '404': page_head({'t': 'h1', 'html': 'Az oldal nem található'}, '404', [('', 'Főoldal')], '', '', 'lilac')
+               + f'<div class="container oj-flow"><p class="btn-row"><a class="btn btn--orchid" href="{esc(link(""))}">Főoldal</a></p></div>',
+        '404_title': nf['title'], 'pages': pages,
+    }
+    os.makedirs(os.path.join(OUT, 'data'), exist_ok=True)
+    json.dump(chrome, open(os.path.join(OUT, 'data', 'site.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
+    os.makedirs(os.path.join(OUT, 'assets', 'img', 'theme'), exist_ok=True)
+    shutil.copy(os.path.join(THEME, 'assets', 'site.css'), os.path.join(OUT, 'assets', 'site.css'))
+    shutil.copy(os.path.join(THEME, 'assets', 'site.js'), os.path.join(OUT, 'assets', 'site.js'))
+    shutil.copy(os.path.join(HERE, 'assets', 'oliviajoga.css'), os.path.join(OUT, 'assets', 'oliviajoga.css'))
+    for key in used:
+        for w in (600, 1200):
+            shutil.copy(os.path.join(THEME, 'assets', 'img', f'{key}-{w}.jpg'), os.path.join(OUT, 'assets', 'img', 'theme', f'{key}-{w}.jpg'))
+    print(f'{len(pages)} pages → WordPress theme {OUT} ({VERSION})')
+
+
 def main():
     global BASE, PREVIEW, OUT
     args = sys.argv[1:]
@@ -1222,6 +1274,11 @@ def main():
         PREVIEW = True
     if '--out' in args:
         OUT = os.path.abspath(args[args.index('--out') + 1])
+    global WP, ORIGIN
+    if '--wp' in args:
+        WP = True
+        OUT = os.path.abspath(args[args.index('--wp') + 1])
+        BASE, ORIGIN = '%%HOME%%/', '%%HOME%%'
     data = json.load(open(os.path.join(HERE, 'content', 'pages.json'), encoding='utf-8'))
     for pg in data['pages']:
         PAGES[pg['path']] = pg
@@ -1257,6 +1314,7 @@ def main():
                'rólam': rolam_page, 'bejelentkezés-jóga-bérlet': booking_page, 'kapcsolat': contact_page}
     tones = {'rólam': 'lilac', 'kapcsolat': 'sage', 'jógaóra-cégeknek': 'sun', 'bejelentkezés-jóga-bérlet': 'pink'}
     posts = {pp for pp, _, _ in journal_cards}
+    wp_pages = {}
     for path, pg in PAGES.items():
         if path in DELETED_PAGES:
             continue
@@ -1274,7 +1332,12 @@ def main():
             t = only_heading(pg['sections'][0])
             extra = {'@type': 'BlogPosting', 'headline': norm(text_of(t['html'])) if t else pg['title'], 'inLanguage': 'hu-HU',
                      'author': {'@id': ORIGIN + '/#olivia'}, 'mainEntityOfPage': ORIGIN + '/' + urllib.parse.quote(path)}
+        if WP:
+            wp_pages[path] = wp_entry(pg, body, cls, schema_base(pg, extra))
+            continue
         write(path, document(pg, body, cls, schema_base(pg, extra)))
+    if WP:
+        return wp_theme(wp_pages)
 
     # assets: the theme's styles, script and the photos used; the old site's photos
     os.makedirs(os.path.join(OUT, 'assets', 'img', 'theme'))

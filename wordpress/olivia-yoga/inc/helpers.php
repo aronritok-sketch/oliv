@@ -158,10 +158,13 @@ function oy_section_head( $title, $text = '', $kicker = '', $id = '' ) {
 
 /** Olivia's title and her specialities, used on the hero name card, the About page and articles. */
 function oy_title_line() {
-	return __( 'Yoga Teacher | Movement & Wellness Coach', 'olivia-yoga' );
+	return oy_is_demo() ? __( 'Yoga studio | Group, private & online classes', 'olivia-yoga' ) : __( 'Yoga Teacher | Movement & Wellness Coach', 'olivia-yoga' );
 }
 
 function oy_specialities() {
+	if ( oy_is_demo() ) {
+		return array( __( 'Hatha flow', 'olivia-yoga' ), __( 'Slow flow', 'olivia-yoga' ), __( 'Private sessions', 'olivia-yoga' ), __( 'Online classes', 'olivia-yoga' ) );
+	}
 	if ( oy_online_only() ) {
 		return array( __( 'Yoga', 'olivia-yoga' ), __( 'Mobility', 'olivia-yoga' ), __( 'Prenatal Fitness', 'olivia-yoga' ), __( 'Meditation', 'olivia-yoga' ) );
 	}

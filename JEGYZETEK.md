@@ -138,6 +138,15 @@
 - **Megjegyzés:** a Barion hivatalos sávjában Diners és Discover van (Maestro/Amex nincs).
 - **Nyitott:** Olivia visszajelzése; a Kapcsolat biztató szövege.
 
+## 16. kör: négy WordPress (iu_theme-gyerektéma) a HelloProVision VPS-devre (2026-11-06)
+- **Kérés (fő chat, Áron jóváhagyásával: „oké, mehet”):** „Az Oliviajógának sok verziója van … a Hathaflow (eladható foglalásrendszer), az amerikai foglalási oldal, a magyar oldal új frontendje és a magyar online foglalás – mindegyikből csinálj WordPresst.”
+- **Kész:** `wordpress/hpv/build-child-themes.py` → hlprv `oliviayoga/wp-theme/{oliviayoga,oliviayoga-booking,oliviayoga-us}` és `hathaflow/wp-theme/hathaflow` (ág: `claude/nifty-ramanujan-3zifiu`), mind iu_theme-gyerek, `hpv_child_setup`-pal (idempotens, kétszer futtatva sem változtat).
+  - `olivia-yoga` téma 3.2.0: új kiadás **hathaflow** (`oy_brand()`, `oy_is_demo()`, saját főoldal `template-parts/front-hathaflow.php`, `demo/content-hathaflow.json`, „Demo site” sáv; fejléc, lábléc, SEO, oldalsávok, kapcsolati űrlap kiadásfüggő). A Fort Myers és a magyar online oldal változatlan.
+  - `oliviajoga-hu/build.py --wp` + `oliviajoga-hu/wp-theme/`: az oliviajoga.hu WordPressen – ugyanazok a címek (ékezettel, perjel nélkül: `/rólam`), címek, leírások, képek; az oldal tartalma HTML-blokk; a képek a VPS `media_dir`-jéből (`uploads/oliviajoga-img`).
+  - Helyben kipróbálva mind a négy (friss WordPress + iu_theme + gyerektéma + bővítmény, `maybe_setup --force` kétszer); hlprv `deploy/vps/projects.json` (a régi `oliviayoga` = most az új frontend; új: `oliviayoga-us`, `oliviayoga-booking`, `hathaflow`), `deploy/sites.json`, dev-címek a tudásbázisban.
+- **Nyitott:** a bővítmény neve az adminban „Olivia Studio” (Hathaflow fehér címke); Hathaflow saját fotók / magyar változat; az US és a booking téma ~21 MB (a képek a témában).
+- **Ügyfélnek** (Olivia) a devről semmi, amíg a fő chat nem szól.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

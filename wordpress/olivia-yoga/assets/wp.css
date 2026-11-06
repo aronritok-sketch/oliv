@@ -80,3 +80,6 @@
 	.header-account span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 	.langs a { padding: .3rem .38rem; }
 }
+
+/* Hathaflow demo: a thin bar on every page that says it is a sample studio */
+.demo-bar { margin: 0; padding: .45rem var(--gutter, 20px); background: var(--ink, #12231A); color: var(--paper, #F3F2EC); font-size: .82rem; font-weight: 600; letter-spacing: .02em; text-align: center; }

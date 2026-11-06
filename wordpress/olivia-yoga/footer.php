@@ -8,22 +8,22 @@ $gift = function_exists( 'oys_page_url' ) ? oys_page_url( 'gifts' ) : oy_contact
 	<div class="container">
 		<div class="footer__grid">
 			<div class="footer__brand">
-				<p class="footer__motto"><?php esc_html_e( 'Dynamic yet gentle. Just enough of everything.', 'olivia-yoga' ); ?></p>
+				<p class="footer__motto"><?php echo esc_html( oy_is_demo() ? __( 'Book, pay and practice in one place.', 'olivia-yoga' ) : __( 'Dynamic yet gentle. Just enough of everything.', 'olivia-yoga' ) ); ?></p>
 				<p><?php echo esc_html( oy_title_line() ); ?></p>
 				<?php echo oy_specialities_line( 'specialities specialities--footer' ); // phpcs:ignore ?>
 				<p class="btn-row"><?php echo oy_btn( oy_book_url(), __( 'Book a class', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore ?></p>
 			</div>
 			<nav aria-label="<?php esc_attr_e( 'Practice', 'olivia-yoga' ); ?>"><h2><?php esc_html_e( 'Practice', 'olivia-yoga' ); ?></h2><ul>
-				<?php echo oy_online_only() ? $link( 'yoga-classes', __( 'Online classes', 'olivia-yoga' ) ) . $link( 'schedule-pricing', __( 'Schedule & pricing', 'olivia-yoga' ) ) . $link( 'private-yoga', __( 'Private online sessions', 'olivia-yoga' ) ) : $link( 'yoga-classes', __( 'Classes', 'olivia-yoga' ) ) . $link( 'private-yoga', __( 'Private yoga', 'olivia-yoga' ) ) . $link( 'schedule-pricing', __( 'Schedule & pricing', 'olivia-yoga' ) ) . $link( 'corporate-yoga', __( 'Teams & athletes', 'olivia-yoga' ) ) . $link( 'events', __( 'Events', 'olivia-yoga' ) ); // phpcs:ignore ?>
+				<?php echo oy_is_demo() ? $link( 'yoga-classes', __( 'Classes', 'olivia-yoga' ) ) . $link( 'schedule-pricing', __( 'Schedule & pricing', 'olivia-yoga' ) ) . $link( 'private-yoga', __( 'Private sessions', 'olivia-yoga' ) ) : ( oy_online_only() ? $link( 'yoga-classes', __( 'Online classes', 'olivia-yoga' ) ) . $link( 'schedule-pricing', __( 'Schedule & pricing', 'olivia-yoga' ) ) . $link( 'private-yoga', __( 'Private online sessions', 'olivia-yoga' ) ) : $link( 'yoga-classes', __( 'Classes', 'olivia-yoga' ) ) . $link( 'private-yoga', __( 'Private yoga', 'olivia-yoga' ) ) . $link( 'schedule-pricing', __( 'Schedule & pricing', 'olivia-yoga' ) ) . $link( 'corporate-yoga', __( 'Teams & athletes', 'olivia-yoga' ) ) . $link( 'events', __( 'Events', 'olivia-yoga' ) ) ); // phpcs:ignore ?>
 			</ul></nav>
 			<nav aria-label="<?php esc_attr_e( 'More', 'olivia-yoga' ); ?>"><h2><?php esc_html_e( 'More', 'olivia-yoga' ); ?></h2><ul>
-				<?php echo $link( 'about', __( 'About Olivia', 'olivia-yoga' ) ) . $link( 'faq', __( 'FAQ', 'olivia-yoga' ) ) . $link( 'journal', __( 'Journal', 'olivia-yoga' ) ) . $link( 'contact', __( 'Contact', 'olivia-yoga' ) ); // phpcs:ignore ?>
+				<?php echo $link( 'about', oy_brand( 'about' ) ) . $link( 'faq', __( 'FAQ', 'olivia-yoga' ) ) . $link( 'journal', __( 'Journal', 'olivia-yoga' ) ) . $link( 'contact', __( 'Contact', 'olivia-yoga' ) ); // phpcs:ignore ?>
 				<li><a href="<?php echo esc_url( $gift ); ?>"><?php esc_html_e( 'Gift cards', 'olivia-yoga' ); ?></a></li>
 				<li><a href="<?php echo esc_url( oy_account_url() ); ?>"><?php esc_html_e( 'My account', 'olivia-yoga' ); ?></a></li>
 			</ul></nav>
 			<div><h2><?php esc_html_e( 'Say hello', 'olivia-yoga' ); ?></h2>
-				<ul class="footer__contact"><li><?php echo oy_icon( 'mail' ); // phpcs:ignore ?><a href="mailto:<?php echo esc_attr( OY_EMAIL ); ?>"><?php echo esc_html( OY_EMAIL ); ?></a></li><li><?php echo oy_icon( oy_online_only() ? 'globe' : 'pin' ); // phpcs:ignore ?><span><?php echo esc_html( oy_online_only() ? __( 'Online, from anywhere', 'olivia-yoga' ) : 'Fort Myers, FL' ); ?></span></li><?php if ( function_exists( 'oys_fb_group_url' ) && oys_fb_group_url() ) : ?><li><?php echo oy_icon( 'facebook' ); // phpcs:ignore ?><a href="<?php echo esc_url( oys_fb_group_url() ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Join our Facebook group', 'olivia-yoga' ); ?></a></li><?php endif; ?></ul>
-				<p class="social"><a href="<?php echo esc_url( OY_INSTAGRAM ); ?>" rel="noopener" target="_blank"><?php echo oy_icon( 'instagram' ); // phpcs:ignore ?><span class="sr-only">Instagram</span></a><a href="<?php echo esc_url( OY_FACEBOOK ); ?>" rel="noopener" target="_blank"><?php echo oy_icon( 'facebook' ); // phpcs:ignore ?><span class="sr-only">Facebook</span></a></p>
+				<ul class="footer__contact"><li><?php echo oy_icon( 'mail' ); // phpcs:ignore ?><a href="mailto:<?php echo esc_attr( OY_EMAIL ); ?>"><?php echo esc_html( OY_EMAIL ); ?></a></li><li><?php echo oy_icon( oy_online_only() ? 'globe' : 'pin' ); // phpcs:ignore ?><span><?php echo esc_html( oy_brand( 'place' ) ); ?></span></li><?php if ( function_exists( 'oys_fb_group_url' ) && oys_fb_group_url() ) : ?><li><?php echo oy_icon( 'facebook' ); // phpcs:ignore ?><a href="<?php echo esc_url( oys_fb_group_url() ); ?>" target="_blank" rel="noopener"><?php esc_html_e( 'Join our Facebook group', 'olivia-yoga' ); ?></a></li><?php endif; ?></ul>
+				<?php if ( OY_INSTAGRAM || OY_FACEBOOK ) : ?><p class="social"><a href="<?php echo esc_url( OY_INSTAGRAM ); ?>" rel="noopener" target="_blank"><?php echo oy_icon( 'instagram' ); // phpcs:ignore ?><span class="sr-only">Instagram</span></a><a href="<?php echo esc_url( OY_FACEBOOK ); ?>" rel="noopener" target="_blank"><?php echo oy_icon( 'facebook' ); // phpcs:ignore ?><span class="sr-only">Facebook</span></a></p><?php endif; ?>
 				<?php echo oy_lang_switcher( 'langs langs--footer' ); // phpcs:ignore ?>
 			</div>
 		</div>

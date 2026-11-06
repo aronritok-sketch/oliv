@@ -11,6 +11,9 @@ function oy_seo_plugin_active() {
 }
 
 function oy_meta_description() {
+	if ( is_front_page() && oy_is_demo() ) {
+		return __( 'Hathaflow is a booking system for yoga studios and teachers: timetable, online booking and payment, class passes, memberships, private sessions, online classes and gift cards. This is a demo studio.', 'olivia-yoga' );
+	}
 	if ( is_front_page() && oy_online_only() ) {
 		return __( 'Live online yoga classes in Hungarian with Olivia Kovacs: hatha flow, slow flow and prenatal fitness from home on Zoom, plus private online sessions. Beginners welcome.', 'olivia-yoga' );
 	}
@@ -28,6 +31,9 @@ function oy_meta_description() {
 add_filter( 'pre_get_document_title', function ( $title ) {
 	if ( oy_seo_plugin_active() ) {
 		return $title;
+	}
+	if ( is_front_page() && oy_is_demo() ) {
+		return __( 'Hathaflow: yoga studio booking demo – timetable, passes, memberships and online classes', 'olivia-yoga' );
 	}
 	if ( is_front_page() ) {
 		return oy_online_only()
@@ -57,7 +63,11 @@ add_action( 'wp_head', function () {
 	if ( is_singular() && has_post_thumbnail() ) {
 		echo '<meta property="og:image" content="' . esc_url( get_the_post_thumbnail_url( null, 'large' ) ) . '">';
 	}
-	echo '<meta name="twitter:card" content="summary_large_image">' . ( oy_online_only() ? '' : '<meta name="geo.region" content="US-FL"><meta name="geo.placename" content="Fort Myers">' ) . "\n";
+	echo '<meta name="twitter:card" content="summary_large_image">' . ( 'fort-myers' === oy_edition() ? '<meta name="geo.region" content="US-FL"><meta name="geo.placename" content="Fort Myers">' : '' ) . "\n";
+	if ( oy_is_demo() ) { // A demo studio: no business or person data for search engines.
+		echo '<script type="application/ld+json">' . wp_json_encode( array( '@context' => 'https://schema.org', '@type' => 'WebSite', 'url' => home_url( '/' ), 'name' => oy_site_name() ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '</script>' . "\n";
+		return;
+	}
 
 	$site     = home_url( '/' );
 	$business = oy_online_only()

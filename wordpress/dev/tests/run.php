@@ -1677,6 +1677,36 @@ test( 'online edition: Hungarian addresses and its own copy', function () {
 	eq( 'hu', $data['setup']['studio']['default_lang'], 'the edition switches the site to Hungarian' );
 } );
 
+test( 'hathaflow edition: a neutral demo studio, none of Olivia\'s content', function () {
+	update_option( 'oy_edition', 'hathaflow' );
+	try {
+		ok( oy_is_demo() && ! oy_online_only(), 'the demo edition' );
+		eq( 'Hathaflow', oy_site_name(), 'site name' );
+		eq( 'hello@example.com', oy_brand( 'email' ), 'a sample address, not Olivia\'s' );
+		eq( '', oy_brand( 'instagram' ), 'no social links' );
+		ok( '' === oy_areas_list(), 'no Fort Myers areas' );
+		ok( ! str_contains( oy_title_line() . oy_brand( 'sub' ) . oy_brand( 'about' ), 'Olivia' ), 'labels: no Olivia' );
+		eq( 'about', oy_page_slug( 'about' ), 'English addresses' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+	$data = json_decode( (string) file_get_contents( oy_content_file( 'hathaflow' ) ), true );
+	$text = wp_json_encode( $data, JSON_UNESCAPED_UNICODE );
+	ok( is_array( $data ) && ! str_contains( $text, '—' ), 'demo copy: valid, no em dash' );
+	ok( ! preg_match( '/Olivia|Olívia|Kovacs|Kovács|Fort Myers|Florid|Samadhi/u', $text ), 'demo copy: no Olivia, no Fort Myers' );
+	ok( str_contains( $text, 'demo' ), 'demo copy: says it is a demo' );
+	ok( empty( array_diff( array_keys( $data['pages'] ), array_keys( OY_PAGE_SLUGS ) ) ), 'demo pages are theme pages' );
+	foreach ( $data['sessions'] as $s ) {
+		ok( isset( $data['classes'][ $s['class'] ] ), 'timetable: ' . $s['class'] . ' is a class of this edition' );
+	}
+	preg_match_all( '/\{\{(page|class):([a-z0-9\-]+)\}\}/', $text, $m, PREG_SET_ORDER );
+	foreach ( $m as $token ) {
+		ok( isset( $data[ 'page' === $token[1] ? 'pages' : 'classes' ][ $token[2] ] ), 'link target exists in this edition: ' . $token[0] );
+	}
+	eq( 'en', $data['setup']['studio']['languages'], 'one language: English' );
+	eq( 'usd', $data['setup']['studio']['currency'], 'dollars' );
+} );
+
 test( 'helpers: money and periods', function () {
 	eq( '$25', oys_money( 2500, 'usd' ), 'whole dollars' );
 	eq( '$25.50', oys_money( 2550, 'usd' ), 'cents' );

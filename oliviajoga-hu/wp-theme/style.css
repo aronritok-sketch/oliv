@@ -1,0 +1,13 @@
+/*
+Theme Name: Olívia jóga (oliviajoga.hu)
+Template: iu_theme
+Author: HelloProVision
+Author URI: https://helloprovision.com/
+Description: Kovács Olívia oldala (oliviajoga.hu) az új dizájnban: ugyanazok a címek, szövegek és képek, mint a régi oldalon. Foglalás: Motibro. iu_theme child; az oliv repó oliviajoga-hu/build.py --wp építi.
+Version: 0.0.0
+Requires at least: 6.4
+Requires PHP: 8.0
+Text Domain: oliviayoga
+License: GPL-2.0-or-later
+*/
+/* The design: assets/site.css + assets/oliviajoga.css. */
