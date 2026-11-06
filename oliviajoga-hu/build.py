@@ -27,7 +27,7 @@ INSTAGRAM = 'https://www.instagram.com/oliivia_yoga/'
 FACEBOOK = 'https://www.facebook.com/oliviajogaoktato'
 SITE_TITLE = 'Jóga 18. és 21. kerület | Kovács Olívia'
 NOTICE = 'Óráimat 2026. november 25-ig tartom!'  # the site's announcement banner
-VERSION = '1.1.0'
+VERSION = '1.1.1'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
