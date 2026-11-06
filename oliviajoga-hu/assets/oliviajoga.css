@@ -313,7 +313,7 @@ h1, h2, .oj-h2, .oj-display, .oj-title__h, .page-head .page-head__title, .oj-loc
 .oj-photos-wrap { padding-top: 0; }
 .oj-photos { display: grid; gap: 1.6rem 1.25rem; grid-template-columns: 1fr 1fr; align-items: end; }
 .oj-photo { margin: 0 14px 14px 0; }
-.oj-photo .frame { border-radius: var(--radius); box-shadow: 14px 14px 0 var(--tone, var(--pink)); }
+.oj-photo .frame { border-radius: var(--radius); }
 .oj-photo--pink { --tone: var(--pink); }
 .oj-photo--lilac { --tone: var(--lilac); }
 .oj-photo--sun { --tone: var(--sun); }
@@ -351,10 +351,6 @@ h1, h2, .oj-h2, .oj-display, .oj-title__h, .page-head .page-head__title, .oj-loc
 /* Home: gift card – the subtitle as a ticket, the two notes as numbered steps */
 .oj-gift__body { display: grid; gap: 1rem; align-content: start; }
 .oj-gift__body .oj-h2 { margin: 0; }
-.oj-ticket { justify-self: start; position: relative; margin: 0; padding: .6rem 1.4rem; background: var(--card); border: 2px dashed var(--orchid); border-radius: 10px; font-weight: 700; color: var(--ink); transform: rotate(-1.5deg); }
-.oj-ticket::before, .oj-ticket::after { content: ""; position: absolute; top: 50%; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; background: var(--sun-soft); border: 2px dashed var(--orchid); }
-.oj-ticket::before { left: -10px; clip-path: inset(0 0 0 50%); }
-.oj-ticket::after { right: -10px; clip-path: inset(0 50% 0 0); }
 .oj-gift__intro { margin: .4rem 0 0; font-weight: 700; color: var(--forest); }
 .oj-steps { list-style: none; margin: 0; padding: 0; counter-reset: s; border-top: 1px solid var(--rule); }
 .oj-steps li { counter-increment: s; position: relative; padding: .95rem 0 .95rem 3.2rem; border-bottom: 1px solid var(--rule); }
@@ -389,7 +385,7 @@ h1, h2, .oj-h2, .oj-display, .oj-title__h, .page-head .page-head__title, .oj-loc
 	.oj-read__aside { position: sticky; top: calc(var(--header-h, 80px) + 32px); align-self: start; }
 	.oj-about > .oj-read__go { padding-left: calc((100% - clamp(3rem, 6vw, 6rem)) * 4 / 11 + clamp(3rem, 6vw, 6rem)); }
 }
-.oj-read__photo { aspect-ratio: 4 / 5; border-radius: var(--radius); box-shadow: 16px 16px 0 var(--lilac); max-width: 420px; }
+.oj-read__photo { aspect-ratio: 4 / 5; border-radius: var(--radius); max-width: 420px; }
 .oj-chapters { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
 .oj-chapter { display: grid; grid-template-columns: 3.4rem minmax(0, 1fr); gap: 1rem; padding: 1.8rem 0 2rem; border-bottom: 1px solid var(--line); }
 .oj-chapter__n { font-family: var(--f-display); font-size: 2.2rem; line-height: 1; color: var(--orchid); padding-top: .15rem; }
@@ -473,3 +469,88 @@ h1, h2, .oj-h2, .oj-display, .oj-title__h, .page-head .page-head__title, .oj-loc
 .oj-logo-opt__foot { background: var(--forest-deep, #1B3324); color: var(--paper); border-radius: var(--radius-sm); padding: 1.6rem 1.4rem; }
 .oj-logo-opt__foot .oj-logo-opt__svg { height: 72px; width: auto; }
 @media (max-width: 700px) { .oj-logo-opt__nav { display: none; } }
+
+/* ==========================================================================
+   Olivia, CRM chat 2026-11-06
+   ========================================================================== */
+/* The logo she chose (B): header and footer */
+.oj-brand { gap: 0; }
+.oj-brand .oj-logo { height: 54px; width: auto; display: block; color: var(--ink); }
+.nav-open .site-header .oj-brand .oj-logo { color: var(--paper); }
+@media (max-width: 600px) { .oj-brand .oj-logo { height: 46px; } }
+.oj-foot-logo { display: inline-block; color: var(--paper); margin-bottom: 1.4rem; }
+.oj-foot-logo .oj-logo { height: 88px; width: auto; display: block; }
+
+/* A wave behind the pictures instead of a colour box (her reference picture: two soft layers) */
+.oj-wave { display: block; max-width: none; }
+.oj-wave path { fill: var(--wa); }
+.oj-wave .oj-wave__b { fill: var(--wb); }
+.oj-wave--pink { --wa: var(--pink); --wb: var(--pink-soft); }
+.oj-wave--lilac { --wa: var(--lilac); --wb: var(--lilac-soft); }
+.oj-wave-wrap--hero { position: absolute; left: -7%; right: -5%; bottom: 0; height: 74%; z-index: 0; }
+.oj-wave-wrap--hero .oj-wave { width: 100%; height: 100%; }
+.oj-hero .hero__photo { position: relative; z-index: 1; }
+.oj-waved { position: relative; }
+.section:has(.oj-wave--ribbon) { overflow-x: clip; }
+.oj-waved > .oj-wave { position: absolute; left: -15%; bottom: -22%; width: 130%; height: 72%; z-index: 0; }
+.oj-waved > .frame { position: relative; z-index: 1; border-radius: var(--radius); box-shadow: none; }
+.intro__visual .oj-waved > .frame, .oj-together__art .oj-waved > .frame { aspect-ratio: 4 / 5; }
+.oj-together__art { max-width: 460px; justify-self: center; width: 100%; }
+
+/* The photo row: in one line, the same height, filling the space, a wave behind */
+.oj-photos { position: relative; grid-template-columns: 1.6fr 1fr 1fr; align-items: stretch; gap: clamp(.6rem, 1.6vw, 1.25rem); padding-bottom: 2.5rem; }
+.oj-photos > .oj-wave { position: absolute; left: -7%; bottom: -3rem; width: 114%; height: 70%; z-index: 0; }
+.oj-photo { position: relative; z-index: 1; margin: 0; }
+.oj-photo--big { grid-column: auto; }
+.oj-photo .frame, .oj-photo--big .frame, .oj-photo--tall .frame { aspect-ratio: auto; height: clamp(220px, 30vw, 440px); }
+.oj-photo--tall:last-child { margin-bottom: 0; }
+@media (max-width: 899px) {
+	.oj-photos { grid-template-columns: 1fr 1fr; }
+	.oj-photo--big { grid-column: 1 / -1; }
+	.oj-photo .frame, .oj-photo--big .frame, .oj-photo--tall .frame { height: clamp(200px, 52vw, 340px); }
+}
+
+/* Pages: the head photo fills the band from top to bottom, with a wave edge */
+@media (min-width: 900px) {
+	.page-head:not(.has-art-photo) { position: relative; overflow: hidden; }
+	.page-head:not(.has-art-photo) .page-head__grid { grid-template-columns: 1fr; min-height: clamp(400px, 34vw, 540px); align-items: center; }
+	.page-head:not(.has-art-photo) .page-head__text { max-width: min(52%, 640px); position: relative; z-index: 2; }
+	.page-head:not(.has-art-photo) .page-head__photo { position: absolute; top: 0; right: 0; bottom: 0; width: 47vw; max-width: 820px; margin: 0; }
+	.page-head:not(.has-art-photo) .page-head__photo::before { content: ""; position: absolute; inset: 0 0 0 -56px; background: rgba(255, 255, 255, .3); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M16 0C5 17 24 33 11 50S3 83 14 100H100V0Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M16 0C5 17 24 33 11 50S3 83 14 100H100V0Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; }
+	.page-head:not(.has-art-photo) .page-head__photo .frame { position: absolute; inset: 0; aspect-ratio: auto; border-radius: 0; box-shadow: none; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M16 0C5 17 24 33 11 50S3 83 14 100H100V0Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M16 0C5 17 24 33 11 50S3 83 14 100H100V0Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; }
+}
+@media (max-width: 899px) {
+	.page-head:not(.has-art-photo) .page-head__photo { width: auto; justify-self: stretch; margin: 1.5rem calc(-1 * var(--gutter, 16px)) calc(-1 * clamp(44px, 6vw, 80px)); position: relative; }
+	.page-head:not(.has-art-photo) .page-head__photo::before { content: ""; position: absolute; inset: -26px 0 0; background: rgba(255, 255, 255, .3); -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M0 16C17 5 33 24 50 11S83 3 100 14V100H0Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M0 16C17 5 33 24 50 11S83 3 100 14V100H0Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; }
+	.page-head:not(.has-art-photo) .page-head__photo .frame { aspect-ratio: 4 / 3; border-radius: 0; box-shadow: none; -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M0 16C17 5 33 24 50 11S83 3 100 14V100H0Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath d='M0 16C17 5 33 24 50 11S83 3 100 14V100H0Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; }
+}
+
+@media (min-width: 600px) and (max-width: 899px) {
+	.page-head:not(.has-art-photo) .page-head__photo .frame { aspect-ratio: 16 / 9; }
+}
+
+/* FAQ and Rólam: a small wave instead of numbers */
+.oj-wavemark { width: 30px; height: auto; display: block; color: var(--orchid); }
+.oj-q__n { min-width: 0; display: inline-flex; }
+.oj-faq .answer { padding-left: 2.9rem; }
+.oj-chapter__n { padding-top: .55rem; }
+.oj-chapter__n .oj-wavemark { width: 40px; }
+
+/* Gift card subtitle: no ticket, the wave under it */
+.oj-gift__sub { margin: 0; font-weight: 700; font-size: var(--step-1); color: var(--ink); display: grid; gap: .35rem; justify-items: start; }
+.oj-gift__sub .oj-wavemark { width: 54px; }
+
+/* Payment logos: Barion's official banner, sharp */
+.oj-badges img.oj-pay { height: 56px; width: auto; max-height: none; max-width: min(400px, 86vw); }
+
+/* Events: the photo fills the card from top to bottom again, in a narrower column so it is not enlarged */
+@media (min-width: 900px) {
+	.oj-event { grid-template-columns: 2fr 3fr; align-items: stretch; }
+	.oj-event__media { align-self: stretch; position: relative; min-height: 260px; }
+	.oj-event__media > a { display: block; height: 100%; }
+	.oj-event__media img { position: absolute; inset: 0; width: 100%; height: 100%; aspect-ratio: auto; object-fit: cover; }
+	.oj-event:nth-child(even) { grid-template-columns: 3fr 2fr; }
+}
+
+/* A jógáról - Tőlem: the white of the pictures melts into the page background */
+.oj-cards--journal .oj-card__media { background: var(--paper); }

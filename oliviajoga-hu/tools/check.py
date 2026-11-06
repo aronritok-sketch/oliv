@@ -43,6 +43,7 @@ def main():
             fails.append(msg)
 
     files = {}
+    data['pages'] = [p for p in data['pages'] if p['path'] not in build.DELETED_PAGES]  # deleted on purpose (Olivia)
     for p in data['pages']:
         for s in p['sections']:  # what Olivia asked to take out (build.dropped_section, REMOVED_*)
             if build.dropped_section(p['path'], s):

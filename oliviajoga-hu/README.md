@@ -39,8 +39,16 @@ megoldás: **`BRIEF.md`** (mesterek: Tschichold / Hey + Headspace / Dumbar; a l�
   `DROPPED_LENGTHS`); a `tools/check.py` ezeket kihagyja, minden más régi szöveg, kép-alt és cím ellenőrzött.
 - Olivia Drive-fotói: `assets/img/new/` (`tools/images.py import`), az írásképek kivágása:
   `tools/images.py cutouts` (`content/cutouts.json`).
-- Logó: három javaslat (`tools/logo.py`, `assets/brand/options/`), csak az előnézetben: `/logo-javaslatok/`; a fejléc
-  Olivia választása után cserélődik.
+- Logó: Olivia a B változatot választotta, levélke nélkül, más hullámmal: `tools/logo.py <fonts>` →
+  `assets/brand/logo.svg` (currentColor + orchidea hullám).
+
+## 4. kör: Olivia üzenetei a CRM-chatben (2026-11-06, 1.2.0)
+
+- `DELETED_PAGES` (`jógaóra-cégeknek`): nincs oldal, menü és sitemap; élesben 301 a főoldalra (`.htaccess`).
+- Hullám a képek mögött (`wave()` a `build.py`-ban): a hősben sáv (`band=True`), máshol a végein elvékonyodó szalag.
+- GYIK, Rólam: számok helyett hullámjel (`WAVE_MARK`); fizetési logók: `assets/img/barion-fizetes.svg` (Barion hivatalos sáv).
+- Menüoldalak fejléce: a kép kitölti a sávot (≥ 900 px jobbra, hullámos széllel; alatta teljes szélességben).
+- Új fotók: `IMG_6232.jpg` → `miert-joga`, `kovacs-olivia-hatha-joga.jpeg` → `gyakoroljunk` (`tools/images.py import`).
 
 ## Fájlok
 

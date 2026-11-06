@@ -12,6 +12,7 @@ WordPress theme (../wordpress/olivia-yoga/assets: site.css, site.js, photos) plu
 """
 import html
 import json
+import math
 import os
 import re
 import shutil
@@ -27,7 +28,7 @@ INSTAGRAM = 'https://www.instagram.com/oliivia_yoga/'
 FACEBOOK = 'https://www.facebook.com/oliviajogaoktato'
 SITE_TITLE = 'Jóga 18. és 21. kerület | Kovács Olívia'
 NOTICE = 'Óráimat 2026. november 25-ig tartom!'  # the site's announcement banner
-VERSION = '1.1.1'
+VERSION = '1.2.0'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -44,7 +45,12 @@ NEW_PHOTOS = {
     'diszito6': 'Jógázó hátulról, fordított namaszte kéztartással, mögötte csoportos óra',
     'olivia3': 'Kovács Olívia guggoló pózban, összetett kézzel egy fesztivál teraszán',
     'private-yoga': 'Fa póz egy világos jógateremben',
+    # 2026-11-06 (Olivia, CRM chat): instead of the old round cut-outs; they keep the old pictures' alt text
+    'miert-joga': 'jóga 21. kerület jóga 18. kerület jóga 11. kerület jóga csepel flow kovács olívia jógaoktató',
+    'gyakoroljunk': 'jóga 11. kerület újbuda mórcz xxi. kerület jóga 18. kerület jóga csepel jóga 21. kerület kovács olívia jógaoktató',
 }
+# Olivia (2026-11-06): „töröljük teljesen a jógaóra cégeknek mindenhonnan” – no page, the old address goes home (301)
+DELETED_PAGES = {'jógaóra-cégeknek'}
 NEW_META = {}
 CUTOUTS = set()  # pictures whose white edge became transparent (tools/images.py cutouts)
 # Taken out on purpose (Olivia's notes): tools/check.py skips these.
@@ -52,6 +58,8 @@ REMOVED_FILES = {
     'old/775328016a39', 'old/085e2f02ccb4', 'old/244f5915632a', 'old/c61fb20665ba', 'old/3c84eb08b35c',
     'old/5214bbe1d570',  # Rólam: the small drawings above the story
     'old/3cf216ddede1',  # Kapcsolat: the picture next to the form
+    'old/d1f4ce0eccf6', 'old/ed90bdb67eca',  # home: the old round cut-outs, Olivia sent new photos for them
+    'old/4242cda89684',  # the payment logos: blurry, replaced by Barion's official acceptance banner (SVG)
 }
 REMOVED_EMBEDS = {'docs.google.com/forms'}  # Kapcsolat: the message form
 DROPPED_LENGTHS = {'90 perc'}  # Árak: there are no 90-minute classes any more
@@ -127,6 +135,40 @@ ICON = {
 def icon(name, cls='icon'):
     return (f'<svg class="{cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" '
             f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">{ICON[name]}</svg>')
+
+
+def _ribbon(cy, amp, phase, th, n=60):
+    """A wave ribbon across a 400×300 box: thin at both ends, thick in the middle (like the wave in her logo)."""
+    top, bot = [], []
+    for i in range(n + 1):
+        t = i / n
+        x = 400 * t
+        y = cy + amp * math.sin(2 * math.pi * (1.15 * t + phase))
+        h = 4 + th * math.sin(math.pi * t) ** .85
+        top.append(f'{x:.1f} {y - h / 2:.1f}')
+        bot.append(f'{x:.1f} {y + h / 2:.1f}')
+    return 'M' + ' L'.join(top) + ' L' + ' L'.join(reversed(bot)) + 'Z'
+
+
+RIBBON_B = _ribbon(132, 30, .32, 190)
+RIBBON_A = _ribbon(160, 36, .08, 150)
+
+
+def wave(tone='pink', band=False):
+    """Olivia (2026-11-06): no colour box behind the pictures – a wave instead, like her reference picture (two soft
+    layers in the tone). band=True: the hero's wide band (wavy top, it runs off the edge); otherwise a ribbon that
+    passes behind the picture and thins out at both ends."""
+    if band:
+        b, a = 'M0 70C70 20 130 120 220 80S350 10 400 40V300H0Z', 'M0 140C60 90 130 190 210 140S340 80 400 120V300H0Z'
+    else:
+        b, a = RIBBON_B, RIBBON_A
+    kind = 'band' if band else 'ribbon'
+    return (f'<svg class="oj-wave oj-wave--{tone} oj-wave--{kind}" viewBox="0 0 400 300" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
+            f'<path class="oj-wave__b" d="{b}"/><path class="oj-wave__a" d="{a}"/></svg>')
+
+
+WAVE_MARK = ('<svg class="oj-wavemark" viewBox="0 0 36 14" aria-hidden="true" focusable="false"><path d="M2 9c4-6 8-6 11 0s7 6 10 0 '
+             '7-6 11 0" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>')
 
 
 def esc(s):
@@ -519,7 +561,10 @@ def prefooter(p):
     badge_html = ''
     if badges:
         imgs = [t for c in badges['columns'] for t in c if t['type'] == 'image']
-        badge_html = '<div class="oj-badges">' + ''.join(f'<figure>{pic(t, "360px")}</figure>' for t in imgs) + '</div>'
+        figs = ''.join(f'<figure>{pic(t, "360px")}</figure>' for t in imgs if t['file'] not in REMOVED_FILES)
+        figs += (f'<figure><img class="oj-pay" src="{asset("img/barion-fizetes.svg")}" width="756" height="108" loading="lazy" '
+                 f'alt="Fizetés Barionnal: bankkártya, Apple Pay, Google Pay"></figure>')
+        badge_html = '<div class="oj-badges">' + figs + '</div>'
     badges_sec = f'<section class="oj-badges-wrap" aria-label="Partnerek"><div class="container">{badge_html}</div></section>' if badge_html else ''
     return (f'<section class="section section--tight section--moss oj-pre" aria-label="Órarend"><div class="container">'
             f'<div class="oj-pre__grid"><div class="oj-pre__lead">{statement}{social}</div><div class="oj-pre__slots">{"".join(slots)}</div></div>'
@@ -532,14 +577,11 @@ def header(path):
         return f'<li{cls}><a href="{esc(link(p))}"{cur}>{esc(n)}</a></li>'
     desk = ''.join(item(p, n) for p, n in NAV[1:])
     mob = ''.join(item(p, n) for p, n in NAV)
-    mark = ('<svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#2B5036"/>'
-            '<path d="M9 25c4-3.5 8 2.5 12-1s7-2.5 10-.5" fill="none" stroke="#C6A3EE" stroke-width="2.2" stroke-linecap="round"/>'
-            '<circle cx="26.5" cy="13" r="4" fill="#EE3F9A"/></svg>')
     return f'''<a class="skip-link" href="#main">Ugrás a tartalomra</a>
 <div class="oj-notice-bar"><div class="container"><p>{esc(NOTICE)}</p></div></div>
 <header class="site-header" data-header>
 	<div class="container site-header__inner">
-		<a class="brand" href="{esc(link(''))}" rel="home">{mark}<span><span class="brand__name">Kovács Olívia</span><span class="brand__sub">Jóga 18. és 21. kerület</span></span></a>
+		<a class="brand oj-brand" href="{esc(link(''))}" rel="home" aria-label="Olívia jóga – Kovács Olívia, főoldal">{logo()}</a>
 		<nav class="nav" aria-label="Fő"><ul class="menu">{desk}</ul></nav>
 		<a class="btn btn--orchid btn--sm header-cta" href="{MOTIBRO}" target="_blank" rel="noopener">Bejelentkezés</a>
 		<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="drawer" data-nav-toggle>
@@ -554,13 +596,21 @@ def header(path):
 </div>'''
 
 
+LOGO_SVG = ''
+
+
+def logo():
+    """Olivia's logo (assets/brand/logo.svg, tools/logo.py): inline, so it takes the text colour."""
+    return LOGO_SVG.replace('<svg ', '<svg class="oj-logo" aria-hidden="true" focusable="false" ', 1).replace(' role="img" aria-label="Olívia jóga"', '')
+
+
 def footer():
     links = ''.join(f'<li><a href="{esc(link(p))}">{esc(n)}</a></li>' for p, n in NAV)
     return f'''<footer class="site-footer">
 	<div class="container">
 		<div class="footer__grid">
 			<div class="footer__brand">
-				<p class="footer__motto">Kovács Olívia</p>
+				<a class="oj-foot-logo" href="{esc(link(''))}" aria-label="Olívia jóga – főoldal">{logo()}</a>
 				<p class="btn-row"><a class="btn btn--orchid" href="{MOTIBRO}" target="_blank" rel="noopener">Bejelentkezés</a></p>
 			</div>
 			<nav aria-label="Oldalak" class="oj-foot-nav"><h2>Oldalak</h2><ul>{links}</ul></nav>
@@ -678,7 +728,7 @@ def home(p):
 			<p class="btn-row oj-twins">{btns}</p>
 		</div>
 		<div class="hero__visual">
-			<div class="hero__block" aria-hidden="true"></div>
+			<div class="oj-wave-wrap oj-wave-wrap--hero">{wave("pink", band=True)}</div>
 			<div class="frame hero__photo oj-hero-photo">{new_pic("hero", "(min-width: 960px) 50vw, 92vw", True, pos="50% 55%")}</div>
 			<div class="namecard hero__card"><p class="namecard__name">Kovács Olívia</p><p class="namecard__spec">Hatha flow<i aria-hidden="true">•</i>Budapest 18. kerület<i aria-hidden="true">•</i>21. kerület</p></div>
 		</div>
@@ -726,9 +776,9 @@ def home(p):
                     f'<div class="oj-locs">{"".join(cards)}</div>{needs}', 'section section--tight'))
     # Olivia's favourite photos ("Főoldal kedvenc képek"), diszito3 the big one, in the theme's frames
     row = [('diszito3', 'big', '50% 40%', 'pink'), ('diszito6', 'tall', '50% 30%', 'lilac'), ('diszito4', 'tall', '50% 35%', 'sun')]
-    photos = ''.join(f'<figure class="oj-photo oj-photo--{k} oj-photo--{tone}" data-reveal style="--i:{n}"><div class="frame">{new_pic(key, "(min-width: 960px) 50vw, 92vw" if k == "big" else "(min-width: 960px) 25vw, 46vw", pos=pos)}</div></figure>'
+    photos = ''.join(f'<figure class="oj-photo oj-photo--{k}" data-reveal style="--i:{n}"><div class="frame">{new_pic(key, "(min-width: 960px) 50vw, 92vw" if k == "big" else "(min-width: 960px) 25vw, 46vw", pos=pos)}</div></figure>'
                      for n, (key, k, pos, tone) in enumerate(row))
-    out.append(wrap(f'<div class="oj-photos">{photos}</div>', 'section section--tight oj-photos-wrap'))
+    out.append(wrap(f'<div class="oj-photos">{wave("lilac")}{photos}</div>', 'section section--tight oj-photos-wrap'))
     # upcoming events
     iU, sU = find(p, lambda s: section_text(s) == 'Közelgő események')
     if sU:
@@ -744,7 +794,7 @@ def home(p):
     iW, sW = by_heading(p, 'Miért jóga?')
     take(iW)
     img = next(t for c in sW['columns'] for t in c if t['type'] == 'image')
-    out.append(wrap(f'<div class="intro__grid"><div class="intro__visual" data-reveal><div class="oj-art">{pic(img, "(min-width: 960px) 36vw, 92vw")}</div></div>'
+    out.append(wrap(f'<div class="intro__grid"><div class="intro__visual" data-reveal><div class="oj-waved">{wave("pink")}<div class="frame">{new_pic("miert-joga", "(min-width: 960px) 36vw, 92vw")}</div></div></div>'
                     f'<div class="oj-prose oj-prose--intro" data-reveal>{blocks_html(tiles_blocks([t for c in sW["columns"] for t in c]))}</div></div>'))
     # Gyakoroljunk együtt! with Tudatosság / Kontroll
     iP, sP = by_heading(p, 'Gyakoroljunk együtt!')
@@ -776,7 +826,7 @@ def home(p):
         words_html += (f'<div class="oj-invite">{"".join(heading(b, "oj-invite__h") for b in invite)}'
                        f'<p class="btn-row">{"".join(button(h, l, "orchid") for h, l in go)}</p></div>')
     out.append(wrap(f'<div class="oj-together"><div class="oj-together__text oj-prose" data-reveal>{heading(title, "oj-h2") if title else ""}{words_html}</div>'
-                    f'<div class="oj-together__art" data-reveal><div class="oj-art">{pic(img, "(min-width: 960px) 36vw, 92vw")}</div></div></div>{fig}', 'section section--pale'))
+                    f'<div class="oj-together__art" data-reveal><div class="oj-waved">{wave("lilac")}<div class="frame">{new_pic("gyakoroljunk", "(min-width: 960px) 36vw, 92vw")}</div></div></div></div>{fig}', 'section section--pale'))
     # questions: each section is one question
     qs = []
     for j, s in enumerate(secs):
@@ -787,7 +837,7 @@ def home(p):
             take(j)
             bs = [b for b in tiles_blocks([t for c in s['columns'] for t in c]) if b['t'] != 'gap']
             q, ans = bs[0], bs[1:]
-            qs.append(f'<details><summary><span class="oj-q__n" aria-hidden="true">{len(qs) + 1:02d}</span><h3 class="oj-q">{fix_links(q["html"])}</h3>{icon("plus")}</summary>'
+            qs.append(f'<details><summary><span class="oj-q__n">{WAVE_MARK}</span><h3 class="oj-q">{fix_links(q["html"])}</h3>{icon("plus")}</summary>'
                       f'<div class="answer oj-prose">{blocks_html(ans)}</div></details>')
     # compact: numbered questions in two columns, all closed (the answers stay in the page for Google)
     out.append(wrap(f'<header class="section__head oj-faq-head" data-reveal><div><p class="kicker">GYIK</p><p class="oj-display">Gyakori kérdések</p></div>'
@@ -806,7 +856,7 @@ def home(p):
     g_ps = [b for b in gb if not only_link(b)]
     sub, intro, steps = (g_ps[0] if g_ps else None), (g_ps[1] if len(g_ps) > 1 else None), g_ps[2:]
     gift = (f'<div class="oj-gift__body">{heading(only_heading(sA), "oj-h2")}'
-            + (f'<p class="oj-ticket">{fix_links(sub["html"])}</p>' if sub else '')
+            + (f'<p class="oj-gift__sub">{fix_links(sub["html"])}{WAVE_MARK}</p>' if sub else '')
             + (f'<p class="oj-gift__intro">{fix_links(intro["html"])}</p>' if intro else '')
             + ('<ol class="oj-steps">' + ''.join(f'<li><p>{fix_links(b["html"])}</p></li>' for b in steps) + '</ol>' if steps else '')
             + f'<p class="btn-row">{"".join(button(h, l, "orchid") for h, l in g_go)}</p></div>')
@@ -983,7 +1033,7 @@ def rolam_page(p):
         if chapters:
             aside = ''
             if not any('oj-read__aside' in x for x in out):
-                aside = f'<aside class="oj-read__aside"><div class="frame oj-read__photo">{theme_pic("olivia-golden-hour-arms", "(min-width: 960px) 28vw, 92vw")}</div></aside>'
+                aside = f'<aside class="oj-read__aside"><div class="oj-waved">{wave("lilac")}<div class="frame oj-read__photo">{theme_pic("olivia-golden-hour-arms", "(min-width: 960px) 28vw, 92vw")}</div></div></aside>'
             out.append(f'<div class="oj-read{" oj-read--first" if aside else ""}">{aside}<ol class="oj-chapters" start="{n - len(chapters) + 1}">{"".join(chapters)}</ol></div>')
             chapters.clear()
         if statements:
@@ -1011,7 +1061,7 @@ def rolam_page(p):
                 body = f'<p class="oj-chapter__lead">{fix_links(first["html"])}</p>' + blocks_html(more)
             else:
                 body = blocks_html(bs)
-            chapters.append(f'<li class="oj-chapter" data-reveal><span class="oj-chapter__n" aria-hidden="true">{n:02d}</span><div class="oj-prose oj-chapter__text">{body}</div></li>')
+            chapters.append(f'<li class="oj-chapter" data-reveal><span class="oj-chapter__n">{WAVE_MARK}</span><div class="oj-prose oj-chapter__text">{body}</div></li>')
     flush()
     btn = ''.join(f'<p class="btn-row oj-read__go">{button(*only_link(b), "orchid", " btn--lg")}</p>' for b in tail)
     return head + f'<div class="container oj-flow oj-about">{"".join(out)}{btn}</div>'
@@ -1157,29 +1207,6 @@ def post_page(p, journal_cards):
 
 # ---------------------------------------------------------------- build
 
-LOGO_OPTIONS = [
-    ('a', 'A – Puha retró', 'A moodboard hullámos, kerek betűi felől: lágy kisbetűk, az í ékezete egy pink levél, alatta ritkított JÓGA és a flow hulláma.'),
-    ('b', 'B – A mostani dizájn betűjével', 'Az oldal címbetűje (Anton) nagybetűvel, ugyanazzal a levél-ékezettel és hullámmal. Ez változtat a legkevesebbet az oldalon.'),
-    ('c', 'C – Telt és játékos', 'A moodboard játékos, kerek logóinak vonala: telt kisbetűk, barátságos és kis méretben is jól olvasható.'),
-]
-
-
-def logo_options_page():
-    """Preview-only page with the three logo options in the real header and footer colours."""
-    cards = ''
-    for key, name, text in LOGO_OPTIONS:
-        svg = open(os.path.join(HERE, 'assets', 'brand', 'options', f'logo-{key}.svg'), encoding='utf-8').read()
-        svg = svg.replace('<svg ', '<svg class="oj-logo-opt__svg" ', 1)
-        cards += (f'<article class="oj-logo-opt" data-reveal><h2 class="oj-logo-opt__name">{esc(name)}</h2><p>{esc(text)}</p>'
-                  f'<div class="oj-logo-opt__bar">{svg}<span class="oj-logo-opt__nav">Rólam · Események · Árak · Jógáról · Kapcsolat</span>'
-                  f'<span class="btn btn--orchid btn--sm">Bejelentkezés</span></div>'
-                  f'<div class="oj-logo-opt__foot">{svg}</div></article>')
-    pg = {'path': 'logo-javaslatok', 'title': f'Logójavaslatok | {SITE_TITLE}', 'sections': []}
-    head = page_head({'t': 'h1', 'html': 'Logójavaslatok'}, 'logo-javaslatok', [('', 'Főoldal')],
-                     '<p class="oj-head__sub">Olivia moodboardja alapján – a választott kerül a fejlécbe és a láblécbe.</p>', '', 'lilac')
-    return document(pg, head + f'<div class="container oj-flow"><div class="oj-logo-opts">{cards}</div></div>', 'is-page', schema_base(pg))
-
-
 def write(path, content):
     rel = path.strip('/')
     target = os.path.join(OUT, rel, 'index.html') if rel else os.path.join(OUT, 'index.html')
@@ -1201,6 +1228,8 @@ def main():
     THEME_META.update(json.load(open(os.path.join(THEME, 'assets', 'img', 'images.json'), encoding='utf-8')))
     NEW_META.update(json.load(open(os.path.join(HERE, 'content', 'new-photos.json'), encoding='utf-8')))
     CUTOUTS.update(json.load(open(os.path.join(HERE, 'content', 'cutouts.json'), encoding='utf-8')))
+    global LOGO_SVG
+    LOGO_SVG = open(os.path.join(HERE, 'assets', 'brand', 'logo.svg'), encoding='utf-8').read().strip()
     # the badge row (Fitmummy, payment logos) ends every page
     for pg in data['pages']:
         if pg['sections']:
@@ -1229,6 +1258,8 @@ def main():
     tones = {'rólam': 'lilac', 'kapcsolat': 'sage', 'jógaóra-cégeknek': 'sun', 'bejelentkezés-jóga-bérlet': 'pink'}
     posts = {pp for pp, _, _ in journal_cards}
     for path, pg in PAGES.items():
+        if path in DELETED_PAGES:
+            continue
         if path in special:
             body = special[path](pg)
             cls = 'is-home' if path in ('', 'főoldal') else 'is-page'
@@ -1255,11 +1286,7 @@ def main():
             shutil.copy(os.path.join(THEME, 'assets', 'img', f'{key}-{w}.jpg'), os.path.join(OUT, 'assets', 'img', 'theme', f'{key}-{w}.jpg'))
     shutil.copytree(os.path.join(HERE, 'assets', 'img', 'old'), os.path.join(OUT, 'assets', 'img', 'old'))
     shutil.copytree(os.path.join(HERE, 'assets', 'img', 'new'), os.path.join(OUT, 'assets', 'img', 'new'))
-
-    # logo options for Olivia: only in the preview (her choice goes into the header afterwards)
-    if PREVIEW:
-        write('logo-javaslatok', logo_options_page())
-        shutil.copytree(os.path.join(HERE, 'assets', 'brand'), os.path.join(OUT, 'assets', 'brand'))
+    shutil.copy(os.path.join(HERE, 'assets', 'img', 'barion-fizetes.svg'), os.path.join(OUT, 'assets', 'img', 'barion-fizetes.svg'))
 
     # 404, robots, sitemap, server rules
     nf = {'path': '404', 'title': f'Az oldal nem található | {SITE_TITLE}', 'sections': []}
@@ -1271,9 +1298,10 @@ def main():
         open(os.path.join(OUT, 'robots.txt'), 'w').write('User-agent: *\nDisallow: /\n')
     else:
         open(os.path.join(OUT, 'robots.txt'), 'w').write(f'User-agent: *\nAllow: /\n\nSitemap: {ORIGIN}/sitemap.xml\n')
-        urls = ''.join(f'<url><loc>{esc(ORIGIN + "/" + urllib.parse.quote(pth))}</loc></url>' for pth in PAGES if pth != 'főoldal')
+        urls = ''.join(f'<url><loc>{esc(ORIGIN + "/" + urllib.parse.quote(pth))}</loc></url>' for pth in PAGES if pth != 'főoldal' and pth not in DELETED_PAGES)
         open(os.path.join(OUT, 'sitemap.xml'), 'w', encoding='utf-8').write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
-        open(os.path.join(OUT, '.htaccess'), 'w').write(HTACCESS)
+        gone = ''.join(f'RedirectMatch 301 ^/{pth}/?$ /\n' for pth in sorted(DELETED_PAGES))
+        open(os.path.join(OUT, '.htaccess'), 'w', encoding='utf-8').write(HTACCESS + gone)
     print(f'{len(PAGES)} pages → {OUT} ({"preview " + BASE if PREVIEW else ORIGIN})')
 
 

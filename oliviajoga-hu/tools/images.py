@@ -25,6 +25,8 @@ NEW = {
     'hero.jpg': 'hero', 'diszito.jpg': 'diszito', 'diszito2.jpg': 'diszito2', 'diszito3.jpg': 'diszito3',
     'diszito4.jpg': 'diszito4', 'diszito5.jpg': 'diszito5', 'diszito6.jpg': 'diszito6',
     'Olivia3.jpg': 'olivia3', 'private-yoga.jpg': 'private-yoga',
+    # 2026-11-06, from Olivia in the CRM chat: the two home photos instead of the old round cut-outs
+    'IMG_6232.jpg': 'miert-joga', 'kovacs-olivia-hatha-joga.jpeg': 'gyakoroljunk',
 }
 
 
@@ -86,15 +88,15 @@ def cutouts():
 
 def import_photos(folder):
     os.makedirs(os.path.join(IMG, 'new'), exist_ok=True)
-    meta = {}
+    mp = os.path.join(HERE, 'content', 'new-photos.json')
+    meta = json.load(open(mp)) if os.path.isfile(mp) else {}  # photos imported earlier stay
     for name, key in NEW.items():
         src = os.path.join(folder, name)
         if not os.path.isfile(src):
-            print('missing', name)
             continue
         im = ImageOps.exif_transpose(Image.open(src)).convert('RGB')
         for w in (800, 1600):
-            if w > im.width and w != 800:
+            if w == 1600 and im.width <= 800:  # a 801–1600 px photo keeps its own width as the large one
                 continue
             x = im if im.width <= w else im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
             if x is not im:

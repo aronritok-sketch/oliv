@@ -132,6 +132,12 @@
 - **Nyitott:** logóválasztás; a Kapcsolat biztató szövege tőlünk van (Olivia átírhatja); a `/jógaóra-cégeknek` oldal sorsa.
 - **Áron (2026-11-06): „csak azok legyenek megváltoztatva, ami le lett írva … az alapdizájn maradjon meg, ez a színkombináció, meg minden”.** Ezért kivéve a saját extrák: címsor-betűköz és kiegyensúlyozott tördelés (csak a kért sorköz maradt), bekezdés-tördelés és elválasztás, a lila kiemelés színváltása (csak a „lélegzés” mozgás maradt, a kért animációként), a beúszások időzítése, a „Miért jóga?” kép átalakítása. Szabály: ügyfél-módosításnál csak a kért pontok; a színek és az alap-komponensek nem változnak.
 
+## 15. kör: oliviajoga.hu – Olivia üzenetei a CRM-chatben (2026-11-06, 1.2.0)
+- **Kérés (Áron):** „közben jönnek üzenetek oliviától. azokat is csináld” – Olivia 12 pontja a chatben (420001-es csatorna).
+- **Kész:** a „jógaóra cégeknek” mindenhonnan törölve (oldal, menü, sitemap; élesben 301 a főoldalra); logó: a B változat, levélke nélkül (az igazi Í), más hullámmal (ecsetvonás a név alatt, a végein vékony) – fejléc és lábléc; a képek mögött színes doboz helyett hullám (két réteg, mint a referenciaképén): a hősben széles hullámsáv, a többi kép mögött hullámszalag, ami a végein elvékonyodik; a főoldali képsor egy sorban, kitöltve, hullámmal; a két új fotó (IMG_6232, kovacs-olivia-hatha-joga) a régi kerek kivágások helyén; GYIK és Rólam számok helyett kis hullámjellel; az ajándékutalvány „jegy”-alcíme ki (sima alcím hullámjellel); fizetési logók: a Barion hivatalos, éles SVG-sávja; a menüoldalak fejlécképe kitölti a sávot fentről lefelé, hullámos széllel; Események: a kép kitölti a keretet, jó minőségben; az írások képeinek fehérje az oldal hátterébe olvad.
+- **Megjegyzés:** a Barion hivatalos sávjában Diners és Discover van (Maestro/Amex nincs).
+- **Nyitott:** Olivia visszajelzése; a Kapcsolat biztató szövege.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

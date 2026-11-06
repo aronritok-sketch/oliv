@@ -26,7 +26,7 @@ design a rendszer**; Olivia jegyzetei meglátások, nem szó szerinti feladatlis
 
 | # | Meglátás | Megoldás |
 |---|---|---|
-| 1 | logócsere a moodboard alapján | 3 logójavaslat külön lapon (`/logo-javaslatok/`, csak az előnézetben); a fejléc Olivia választása után cserélődik |
+| 1 | logócsere a moodboard alapján | 3 javaslatból Olivia a B-t választotta (2026-11-06, chat): levélke nélkül, más hullámmal – fejléc és lábléc |
 | 2 | „hero” kép a főoldalra; a főoldalon minden fotó fekete-fehér, kivéve az ajándékutalványt | a hős fotója az ő képe; a főoldal fotói fekete-fehérek, a színblokkok maradnak |
 | 3 | Csepel és 18. kerület gombja egyenrangú | ugyanaz a gomb mindkettőnek (hős és helyszínkártyák) |
 | 4 | a címsoroknál összelógnak az ékezetek | nagyobb sorköz a többsoros Anton címeken, kiegyensúlyozott tördelés |
@@ -34,13 +34,13 @@ design a rendszer**; Olivia jegyzetei meglátások, nem szó szerinti feladatlis
 | 6 | több kép a kedvencekből, a diszito3 mindenképp | képsor a meglévő keret-komponenssel (diszito3 nagyban + 2 kép), a helyszínek után |
 | 7, 13 | a háttér nélküli képek maradjanak háttér nélküliek | kész (1.0.1): nincs helykitöltő szín az átlátszó képek mögött |
 | 8 | furán váltakozó betűméret, vastagság a folyószövegben | egy bekezdés-stílus, egy bevezető, a meghívó-mondat a meglévő idézet-dobozban |
-| 9 | GYIK: kreatívabb, kisebb, ne legyen unalmas | számozott, csukott kérdések két hasábban (a válaszok a lapon maradnak a Google-nek) |
-| 10 | ajándékutalvány: alcím és szöveg kreatívabban | az alcím „jegy”-címke, a két teendő számozott lépés |
-| 11 | csapatépítő rész ki a főoldalról és a menüből | kész; a `/jógaóra-cégeknek` oldal a címén megmarad |
+| 9 | GYIK: kreatívabb, kisebb, ne legyen unalmas | csukott kérdések két hasábban, számok helyett hullámjellel (chat, 2026-11-06); a válaszok a lapon maradnak a Google-nek |
+| 10 | ajándékutalvány: alcím és szöveg kreatívabban | a „jegy”-címke Oliviának nem tetszett (chat) → sima alcím hullámjellel; a két teendő számozott lépés |
+| 11 | csapatépítő rész ki a főoldalról és a menüből | chat (2026-11-06): teljesen törölve, élesben 301 a főoldalra |
 | 12 | a hosszú vélemény legyen esztétikus | Gergely véleménye kiemelt, széles idézet-kártya; a rövidek kiegyensúlyozott rácsban |
 | 14, 18 | a neve túl sokszor a láblécben | a nagy név és a „Jóga 18. és 21. kerület \| Kovács Olívia” sor kikerül |
-| 15, 16 | Rólam: a rajzok ki, a design újragondolva, szöveg-elrendezés jobban | könyv-mód: olvasóhasáb számozott fejezetekkel, mellette tapadó portré; a nagy mondatok színblokkban, teljes szélességben |
-| 17, 19 | széteső képminőség (események) | a képek eredeti arányban, nem nagyítva; a fejléckép fekvő keretben |
+| 15, 16 | Rólam: a rajzok ki, a design újragondolva, szöveg-elrendezés jobban | könyv-mód: olvasóhasáb fejezetekkel (számok helyett hullámjel – chat), mellette tapadó portré hullámmal; a nagy mondatok színblokkban |
+| 17, 19 | széteső képminőség (események) | chat: a kép újra kitölti a keretet fentről lefelé, jó minőségű forrásból; a fejléckép kitölti a sávot |
 | 20 | az alcím (helyszínek) szebben | címke-sor: „csoportos hatha flow jóga órák” + helyszín-címkék (gombostűvel) |
 | 21 | 90 perces óra ki | kész |
 | 22 | az alsó Bejelentkezés gomb nem kell | kész |
