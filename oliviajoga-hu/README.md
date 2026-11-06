@@ -29,6 +29,19 @@ legyen, csak egy új UX-et kapjon”.
 - SEO-plusz: meta description (az oldal első bekezdéséből), canonical, Open Graph, JSON-LD (WebSite, Person,
   BlogPosting), `sitemap.xml`, `robots.txt`, 404 oldal, gyors statikus oldal.
 
+## 3. kör: Olivia jegyzetei a meglévő dizájnon belül (2026-11-06)
+
+A 2. kör (szó szerinti megvalósítás új logóval, új betűvel, sok új elemmel) Áron szerint rosszabb lett, visszavonva.
+A 3. kör az 1. kör dizájnját tartja meg, és azon belül oldja meg Olivia meglátásait – a brief és a pontonkénti
+megoldás: **`BRIEF.md`** (mesterek: Tschichold / Hey + Headspace / Dumbar; a lélegző „JÓGA” kiemelés).
+
+- A szándékos törléseket a `build.py` sorolja fel (`dropped_section`, `REMOVED_FILES`, `REMOVED_EMBEDS`,
+  `DROPPED_LENGTHS`); a `tools/check.py` ezeket kihagyja, minden más régi szöveg, kép-alt és cím ellenőrzött.
+- Olivia Drive-fotói: `assets/img/new/` (`tools/images.py import`), az írásképek kivágása:
+  `tools/images.py cutouts` (`content/cutouts.json`).
+- Logó: három javaslat (`tools/logo.py`, `assets/brand/options/`), csak az előnézetben: `/logo-javaslatok/`; a fejléc
+  Olivia választása után cserélődik.
+
 ## Fájlok
 
 | | |

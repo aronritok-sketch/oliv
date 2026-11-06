@@ -272,3 +272,207 @@
 /* Transparent pictures (Fitmummy and payment logos, the drawings, the cut-out photos) without the theme's pale
    placeholder colour behind them (Áron, 2026-11-06: this stays from round 2) */
 img.photo[src$=".webp"] { background: transparent; }
+
+/* ==========================================================================
+   Round 3 (BRIEF.md): Olivia's notes inside the existing design.
+   Gerinc – Tschichold (book mode for long text) · Hang – Hey (black-and-white photos, colour from the blocks)
+   · Mozgás – Dumbar (one motion rule: the breath). No new typeface, no new ornament family.
+   ========================================================================== */
+:root { --breath-in: 4s; --breath-out: 6s; --ease-breath: cubic-bezier(.45, .05, .35, 1); }
+
+/* Headings: room for the accents (Á, É, Ő, Ű on Anton capitals), balanced lines */
+h1, h2, .oj-h2, .oj-display, .oj-title__h, .page-head .page-head__title, .oj-loc .oj-loc__seo, .oj-needs h3,
+.oj-pre .oj-pre__statement, .oj-event .oj-event__title, .oj-map .oj-map__title, .oj-quotes h1, .oj-quotes h2,
+.oj-quotes .is-long, .namecard__name, .oj-alert h2, .price-group__head h3, .contrast__word, .drawer li a {
+	line-height: 1.18; letter-spacing: .012em; text-wrap: balance;
+}
+.page-head .page-head__title { line-height: 1.04; padding-top: .06em; }
+.page-head--long .page-head__title { line-height: 1.1; }
+.hero__title { line-height: 1; }
+.hero__title mark { line-height: 1.1; padding-top: .05em; }
+.contrast__word { line-height: 1; }
+.oj-h2.is-long, .oj-title .is-long, .oj-prose .is-long { line-height: 1.45; }
+p, li { text-wrap: pretty; }
+@media (max-width: 600px) { .oj-prose p, .oj-prose li { hyphens: auto; } }
+
+/* The breath (aláírás): the lilac block behind "JÓGA" breathes in 4 s and out 6 s */
+.hero__title mark.oj-breath { position: relative; background: none; z-index: 0; }
+.hero__title mark.oj-breath::before { content: ""; position: absolute; inset: 0; background: var(--lilac); border-radius: 4px; z-index: -1; transform-origin: 0 60%; }
+@media (prefers-reduced-motion: no-preference) {
+	.hero__title mark.oj-breath::before { animation: oj-breath calc(var(--breath-in) + var(--breath-out)) var(--ease-breath) infinite; }
+	@keyframes oj-breath { 0%, 100% { transform: scale(1, 1); } 40% { transform: scale(1.07, 1.12); background: color-mix(in oklab, var(--lilac) 82%, var(--pink)); } }
+	.js [data-reveal] { transition-duration: 1.2s; transition-timing-function: var(--ease-breath); transition-delay: calc(var(--i, 0) * .12s); }
+}
+
+/* Home: every photo black and white, except the gift card (Olivia); the colour stays in the blocks */
+.is-home main .photo { filter: grayscale(1) contrast(1.05); }
+.is-home main .keep-color .photo, .is-home main .oj-art .photo { filter: none; } /* the gift card; Olivia's own black-and-white art keeps its pink line */
+.oj-hero .oj-hero-photo { aspect-ratio: 800 / 618; }
+.oj-twins { display: flex; flex-wrap: wrap; gap: .75rem; max-width: 600px; }
+.oj-twins .btn { flex: 1 1 16rem; justify-content: center; text-align: center; }
+@media (max-width: 600px) { .oj-twins .btn { font-size: .8rem; letter-spacing: .08em; padding-inline: 1rem; white-space: nowrap; } }
+
+/* Home: Olivia's favourite photos in the theme's frames */
+.oj-photos-wrap { padding-top: 0; }
+.oj-photos { display: grid; gap: 1.6rem 1.25rem; grid-template-columns: 1fr 1fr; align-items: end; }
+.oj-photo { margin: 0 14px 14px 0; }
+.oj-photo .frame { border-radius: var(--radius); box-shadow: 14px 14px 0 var(--tone, var(--pink)); }
+.oj-photo--pink { --tone: var(--pink); }
+.oj-photo--lilac { --tone: var(--lilac); }
+.oj-photo--sun { --tone: var(--sun); }
+.oj-photo--big { grid-column: 1 / -1; }
+.oj-photo--big .frame { aspect-ratio: 4 / 3; }
+.oj-photo--tall .frame { aspect-ratio: 3 / 4; }
+@media (min-width: 900px) {
+	.oj-photos { grid-template-columns: 1.75fr 1fr 1fr; gap: 2rem; }
+	.oj-photo--big { grid-column: auto; }
+	.oj-photo--tall:last-child { margin-bottom: 3.5rem; }
+}
+@media (prefers-reduced-motion: no-preference) {
+	.oj-photo .frame img { transition: transform 1.2s var(--ease-breath); }
+	.oj-photo:hover .frame img { transform: scale(1.04); }
+}
+
+/* Home: "Gyakoroljunk együtt!" – one paragraph style, a lead, the invitation in the quote box */
+.oj-together__text .oj-lead { font-size: var(--step-1); font-weight: 600; line-height: 1.6; color: var(--ink); }
+.oj-invite { margin-top: 1.6rem; background: var(--lilac-soft); border-left: 3px solid var(--orchid); border-radius: 0 var(--radius) var(--radius) 0; padding: 1.4rem 1.6rem; }
+.oj-invite .oj-invite__h, .oj-invite .is-long { font: 600 1.06rem/1.6 var(--f-text); text-transform: none; letter-spacing: 0; color: var(--ink); margin: 0; max-width: none; }
+.oj-invite .btn-row { margin-top: 1rem; }
+
+/* Home: questions – numbered, closed, two columns */
+.oj-faq-head { max-width: none; display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 1rem 2rem; }
+.oj-faq-head .oj-display { margin: 0; }
+.oj-faq-head p { margin: 0; }
+.oj-faq { margin-top: 2rem; }
+@media (min-width: 900px) { .oj-faq { display: grid; grid-template-columns: 1fr 1fr; column-gap: 3.5rem; border-top: 0; } .oj-faq details:nth-child(-n+2) { border-top: 1px solid var(--rule); } }
+.oj-faq summary { justify-content: flex-start; font-size: 1.05rem; padding: 1.15rem 0; }
+.oj-faq summary .oj-q { flex: 1; }
+.oj-faq summary svg { width: 30px; height: 30px; padding: 6px; }
+.oj-q__n { font-family: var(--f-display); font-weight: 400; font-size: 1.5rem; line-height: 1; color: var(--orchid); min-width: 2.2ch; }
+.oj-faq .answer { padding-left: 2.6rem; font-size: .96rem; }
+
+/* Home: gift card – the subtitle as a ticket, the two notes as numbered steps */
+.oj-gift__body { display: grid; gap: 1rem; align-content: start; }
+.oj-gift__body .oj-h2 { margin: 0; }
+.oj-ticket { justify-self: start; position: relative; margin: 0; padding: .6rem 1.4rem; background: var(--card); border: 2px dashed var(--orchid); border-radius: 10px; font-weight: 700; color: var(--ink); transform: rotate(-1.5deg); }
+.oj-ticket::before, .oj-ticket::after { content: ""; position: absolute; top: 50%; width: 16px; height: 16px; margin-top: -8px; border-radius: 50%; background: var(--sun-soft); border: 2px dashed var(--orchid); }
+.oj-ticket::before { left: -10px; clip-path: inset(0 0 0 50%); }
+.oj-ticket::after { right: -10px; clip-path: inset(0 50% 0 0); }
+.oj-gift__intro { margin: .4rem 0 0; font-weight: 700; color: var(--forest); }
+.oj-steps { list-style: none; margin: 0; padding: 0; counter-reset: s; border-top: 1px solid var(--rule); }
+.oj-steps li { counter-increment: s; position: relative; padding: .95rem 0 .95rem 3.2rem; border-bottom: 1px solid var(--rule); }
+.oj-steps li::before { content: "0" counter(s); position: absolute; left: 0; top: .85rem; font-family: var(--f-display); font-size: 1.7rem; line-height: 1; color: var(--orchid); }
+.oj-steps p { margin: 0; font-size: .97rem; line-height: 1.65; }
+.oj-gift__body .btn-row { margin: .6rem 0 0; }
+
+/* Home: reviews – the long one as a wide feature, the short ones balanced */
+.oj-review-feature { margin: 2.5rem auto 0; max-width: 980px; background: var(--card); border-radius: var(--radius); border-top: 4px solid var(--orchid); padding: clamp(1.8rem, 4vw, 3rem) clamp(1.6rem, 5vw, 3.6rem); box-shadow: 0 1px 0 var(--line); display: grid; gap: 1rem; }
+.oj-review-feature__mark { width: 46px; height: 46px; color: var(--pink); fill: currentColor; stroke: none; }
+.oj-review-feature blockquote { margin: 0; }
+.oj-review-feature blockquote p { margin: 0; font-size: clamp(1.05rem, 1rem + .35vw, 1.25rem); font-weight: 600; line-height: 1.7; color: var(--ink); columns: 1; }
+@media (min-width: 900px) { .oj-review-feature blockquote p { columns: 2; column-gap: 3rem; } }
+.oj-review-feature figcaption { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .14em; color: var(--muted); }
+.oj-review-feature + .oj-reviews { margin-top: 1.25rem; }
+
+/* Keyword headings with places (Árak, Bejelentkezés, Kapcsolat): a lead line and place chips */
+.seo-h { display: flex; flex-wrap: wrap; gap: .5rem .55rem; align-items: center; }
+.seo-h .seo-h__lead { flex-basis: 100%; font-family: var(--f-text); font-weight: 700; text-transform: none; letter-spacing: 0; color: var(--ink); line-height: 1.3; }
+.seo-h .seo-h__place { display: inline-flex; align-items: center; gap: .45rem; background: var(--card); color: var(--ink); border-radius: 999px; padding: .45rem 1rem .45rem .75rem; font: 600 1rem/1.2 var(--f-text); text-transform: none; letter-spacing: 0; box-shadow: 0 1px 0 var(--line); }
+.seo-h .seo-h__place svg { width: 18px; height: 18px; color: var(--orchid); flex: none; }
+.seo-h .seo-h__place strong { font-weight: 700; }
+.page-head .seo-h.oj-head__sub { max-width: 36rem; margin-top: .4rem; }
+.page-head .seo-h .seo-h__lead { font-size: var(--step-2); margin-bottom: .3rem; }
+
+/* Rólam – book mode: a calm reading column, numbered chapters, a portrait beside the first ones */
+.oj-about { gap: clamp(3rem, 6vw, 5rem); }
+.oj-read { display: grid; gap: 2rem; }
+@media (min-width: 960px) {
+	.oj-read { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: clamp(3rem, 6vw, 6rem); }
+	.oj-read:not(.oj-read--first) .oj-chapters { grid-column: 2; }
+	.oj-read__aside { position: sticky; top: calc(var(--header-h, 80px) + 32px); align-self: start; }
+	.oj-about > .oj-read__go { padding-left: calc((100% - clamp(3rem, 6vw, 6rem)) * 4 / 11 + clamp(3rem, 6vw, 6rem)); }
+}
+.oj-read__photo { aspect-ratio: 4 / 5; border-radius: var(--radius); box-shadow: 16px 16px 0 var(--lilac); max-width: 420px; }
+.oj-chapters { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--rule); }
+.oj-chapter { display: grid; grid-template-columns: 3.4rem minmax(0, 1fr); gap: 1rem; padding: 1.8rem 0 2rem; border-bottom: 1px solid var(--line); }
+.oj-chapter__n { font-family: var(--f-display); font-size: 2.2rem; line-height: 1; color: var(--orchid); padding-top: .15rem; }
+.oj-chapter__text { max-width: 64ch; }
+.oj-chapter__text p { line-height: 1.75; }
+.oj-chapter__text .oj-chapter__lead { font-size: var(--step-1); font-weight: 600; line-height: 1.6; color: var(--ink); }
+.oj-statements .oj-col { padding: clamp(1.8rem, 4vw, 3rem); }
+.oj-statements h1, .oj-statements h2, .oj-statements .is-long { font-family: var(--f-display); font-weight: 400; text-transform: uppercase; font-size: clamp(1.7rem, 1.25rem + 1.7vw, 2.6rem); line-height: 1.14; color: var(--ink); letter-spacing: .012em; max-width: 24ch; }
+.oj-statements p { font-weight: 600; max-width: 56ch; }
+.oj-read__go { margin: 0; }
+
+/* Árak: one length (60 perc) */
+.oj-pricing .price-group:only-child { margin-top: 0; }
+
+/* Események: photos in their own shape, never zoomed */
+.oj-head--landscape .page-head__photo .frame { aspect-ratio: 800 / 429; }
+@media (min-width: 900px) {
+	.oj-event { align-items: center; }
+	.oj-event__media { align-self: center; background: transparent; }
+	.oj-event__media img { aspect-ratio: auto; min-height: 0; height: auto; }
+}
+
+/* A jógáról - Tőlem: the white of the pictures is see-through now */
+.oj-cards--journal .oj-card__media { background: transparent; }
+.oj-cards--journal .oj-card__media img[src$=".webp"] { object-fit: cover; }
+
+/* Posts: a real title, a lead, tight lists, a button that fits */
+.is-post .entry > h2:first-child + h3, .is-post .entry > h3:first-child { font-family: var(--f-display); font-weight: 400; text-transform: uppercase; font-size: var(--step-3); line-height: 1.12; letter-spacing: .012em; color: var(--ink); margin: .4rem 0 1.2rem; max-width: 22ch; text-wrap: balance; }
+.is-post .entry > h3 strong { font-weight: inherit; }
+.is-post .entry > h2:first-child + h3 + p { font-size: var(--step-1); font-weight: 600; color: var(--forest); }
+.is-post .entry { max-width: 68ch; }
+.is-post .entry p, .is-post .entry li { line-height: 1.75; }
+.is-post .entry ul li { margin: .25rem 0; }
+.oj-more .btn-row .btn { white-space: nowrap; width: 100%; justify-content: center; font-size: .76rem; letter-spacing: .06em; padding-inline: .9rem; }
+
+/* Bejelentkezés: the booking widget in the middle, as tall as its content */
+.oj-booking { display: flex; justify-content: center; }
+.oj-embed--motibro { width: 100%; max-width: 780px; box-shadow: var(--shadow); }
+.oj-embed--motibro iframe { height: 1080px; }
+.oj-places-card { justify-self: center; width: 100%; max-width: 980px; background: var(--pink-soft); border-radius: var(--radius); padding: clamp(1.6rem, 4vw, 2.6rem); display: grid; gap: 1.4rem; position: relative; overflow: hidden; }
+.oj-places-card::after { content: ""; position: absolute; right: -60px; top: -60px; width: 180px; height: 180px; background: var(--pink); opacity: .45; border-radius: 58% 42% 55% 45% / 47% 58% 42% 53%; }
+.oj-places-card .seo-h { position: relative; z-index: 1; margin: 0; font-size: 1rem; }
+.oj-places-card .seo-h__lead { font-family: var(--f-display); font-weight: 400; text-transform: uppercase; font-size: var(--step-3); line-height: 1.1; letter-spacing: .012em; }
+.oj-places-card .seo-h__place { font-size: clamp(1rem, .95rem + .3vw, 1.15rem); padding: .6rem 1.15rem .6rem .85rem; }
+.oj-places-card .btn-row { margin: 0; position: relative; z-index: 1; }
+
+/* Kapcsolat: the two places as on the home page, with times and map; a few warm words instead of the form */
+.oj-locs--contact { margin-top: 0; }
+.oj-loc .seo-h.oj-loc__kw { position: relative; z-index: 1; margin: 0 0 .9rem; font-size: 1rem; }
+.oj-loc .seo-h.oj-loc__kw .seo-h__lead { font-size: .78rem; text-transform: uppercase; letter-spacing: .18em; }
+.oj-loc .oj-loc__place { position: relative; z-index: 1; font-family: var(--f-display); font-weight: 400; text-transform: uppercase; font-size: clamp(2rem, 1.5rem + 2vw, 3.1rem); line-height: 1.1; margin: 0 0 1.4rem; max-width: 14ch; }
+.oj-loc .oj-loc__place strong { font-weight: inherit; }
+.oj-slot--2 { grid-template-columns: 5.5rem 1fr; }
+.oj-slot--2 span:nth-child(2) { font-family: var(--f-display); font-size: 1.6rem; line-height: 1; color: var(--ink); }
+.oj-loc__note { position: relative; z-index: 1; margin: .7rem 0 0; font-size: .92rem; font-weight: 600; color: var(--ink); }
+.oj-loc--contact .btn-row { margin-top: 1.2rem; padding-top: 0; }
+.oj-loc--contact .oj-embed { margin-top: 1.4rem; position: relative; z-index: 1; }
+.oj-reach { background: var(--sun-soft); border-radius: var(--radius); padding: clamp(1.8rem, 5vw, 3.4rem); position: relative; overflow: hidden; }
+.oj-reach::after { content: ""; position: absolute; right: -70px; bottom: -80px; width: 240px; height: 240px; background: var(--sun); opacity: .4; border-radius: 58% 42% 55% 45% / 47% 58% 42% 53%; }
+.oj-reach__text { position: relative; z-index: 1; max-width: 46rem; }
+.oj-reach .oj-reach__h { font-family: var(--f-display); font-weight: 400; text-transform: uppercase; font-size: var(--step-3); line-height: 1.1; margin: 0 0 1rem; }
+.oj-reach .oj-reach__h strong { font-weight: inherit; }
+.oj-reach__invite { font-size: var(--step-1); font-weight: 600; line-height: 1.6; color: var(--ink); margin: 0 0 1.5rem; }
+@media (max-width: 959px) {
+	.oj-read__aside { display: none; } /* the head photo is right above on a phone */
+}
+@media (max-width: 600px) {
+	.oj-chapter { grid-template-columns: 1fr; gap: .4rem; padding: 1.4rem 0 1.6rem; }
+	.oj-chapter__n { font-size: 1.8rem; }
+}
+.oj-art img[src$=".webp"] { mix-blend-mode: normal; } /* already transparent: no blending needed */
+
+/* Logo options (preview only: /logo-javaslatok/) */
+.oj-logo-opts { display: grid; gap: 1.5rem; }
+.oj-logo-opt { background: var(--card); border-radius: var(--radius); padding: clamp(1.4rem, 3vw, 2.2rem); box-shadow: 0 1px 0 var(--line); display: grid; gap: 1rem; }
+.oj-logo-opt .oj-logo-opt__name { font-family: var(--f-display); font-weight: 400; text-transform: uppercase; font-size: var(--step-2); margin: 0; }
+.oj-logo-opt p { margin: 0; max-width: 62ch; }
+.oj-logo-opt__bar { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: .9rem 1.2rem; color: var(--ink); }
+.oj-logo-opt__bar .oj-logo-opt__svg { height: 52px; width: auto; }
+.oj-logo-opt__nav { margin-left: auto; font-size: .88rem; font-weight: 600; }
+.oj-logo-opt__foot { background: var(--forest-deep, #1B3324); color: var(--paper); border-radius: var(--radius-sm); padding: 1.6rem 1.4rem; }
+.oj-logo-opt__foot .oj-logo-opt__svg { height: 72px; width: auto; }
+@media (max-width: 700px) { .oj-logo-opt__nav { display: none; } }

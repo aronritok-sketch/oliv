@@ -124,6 +124,13 @@
 - **Tanulság (Áron):** az ügyfél jegyzetei meglátások, nem szó szerinti feladatlista. Előbb prompt/terv belőlük, azt Áronnal megbeszéljük, csak utána építünk.
 - A 2. kör kódja és Olivia letöltött képei a d791581 commitban visszakereshetők (`tools/images.py`, `tools/logo.py`, `assets/img/new`).
 
+## 14. kör: oliviajoga.hu – Olivia jegyzetei a meglévő dizájnon belül (2026-11-06)
+- **Kérés (Áron):** Olivia szerkesztette a doksit; „vedd komolyan … használd a mesterek eszközeit … maradjon meg a dizájn … de erősíts”.
+- **Módszer:** webdesign skill (hlprv): brief a mesterek módszerével (`oliviajoga-hu/BRIEF.md` – Tschichold / Hey + Headspace / Dumbar, metafora: a hatha flow légzése, aláírás: a lélegző „JÓGA” kiemelés), tiltólista (új betű, futó szósáv – Olivia korábban: „ez szar” –, forgó felirat, új díszcsalád), önkritika 390 / 768 / 1440 px képernyőképekkel.
+- **Kész (1.1.0):** Olivia „hero” képe; fekete-fehér főoldali fotók (kivéve az ajándékutalványt és Olivia saját fekete-fehér/pink rajzait); egyforma bejelentkezés-gombok; képsor a kedvencekből (diszito3) a téma kereteivel; sorköz az ékezetekhez; egy bekezdés-stílus a „Gyakoroljunk együtt”-ben; GYIK számozva, csukva, két hasábban; ajándékutalvány jegy-alcímmel és lépésekkel; csapatépítő rész ki (főoldal + menü, az oldal a címén marad); Gergely hosszú véleménye kiemelt, kéthasábos idézet; lábléc név nélkül; Rólam könyv-módban (olvasóhasáb, számozott fejezetek, tapadó portré, nagy mondatok színblokkban); Árak (90 perc és alsó gomb ki, private yoga kép, helyszín-címkék); Jógáról (diszito2, átlátszó fehér); cikkek (rendes cím, gomb); Események (képek nem nagyítva); Bejelentkezés (Motibro középen, görgetés nélkül, helyszínek formázva); Kapcsolat (Olivia3, két színes helyszíndoboz térképpel, űrlap helyett biztató szöveg).
+- **Logó:** három javaslat az előnézetben (`/logo-javaslatok/`): A puha retró, B a mostani dizájn betűjével (Anton), C telt és játékos – Olivia választ, utána kerül a fejlécbe.
+- **Nyitott:** logóválasztás; a Kapcsolat biztató szövege tőlünk van (Olivia átírhatja); a `/jógaóra-cégeknek` oldal sorsa.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
