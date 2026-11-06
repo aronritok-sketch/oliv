@@ -29,38 +29,12 @@ legyen, csak egy új UX-et kapjon”.
 - SEO-plusz: meta description (az oldal első bekezdéséből), canonical, Open Graph, JSON-LD (WebSite, Person,
   BlogPosting), `sitemap.xml`, `robots.txt`, 404 oldal, gyors statikus oldal.
 
-## 2. kör: Olivia módosításai (2026-11-05, Google Doc „Módosítások oliviajoga.hu”)
-
-- **Új logó** a moodboard alapján (`assets/brand`, `tools/logo.py`): „olívia” puha retró betűkkel (Fraunces), pink
-  levél-ékezet, ritkított „JÓGA” és hullám; favicon is. A láblécből kikerült a nagy név és a „Jóga 18. és 21. kerület |
-  Kovács Olívia” sor.
-- **Főoldal:** Olivia „hero” képe; minden fotó fekete-fehér, kivéve az ajándékutalványt; a csepeli és a 18. kerületi
-  bejelentkezés egyforma gomb; képsáv a „Főoldal kedvenc képek” mappából (diszito3 nagyban), lassan futó szósáv;
-  animációk (beúszó cím, forgó felirat, rajzolódó hullám, finom parallax; `prefers-reduced-motion` esetén nincs mozgás);
-  „Gyakoroljunk együtt” ritmusos szövegblokkokkal; GYIK számozott, zárt kártyákban két oszlopban; ajándékutalvány
-  „jegy” alcímmel és lépésekkel; a csapatépítő rész kikerült (a főoldalról és a menüből, a `/jógaóra-cégeknek` oldal
-  a címén megmaradt); a véleményeknél középen csak Gergely.
-- **Címsorok:** nagyobb sortáv, hogy az ékezetek ne érjenek össze.
-- **Rólam:** a kis rajzok helyett számozott fejezetek (idővonal) és kiemelt mondatok.
-- **Árak:** a 90 perces órák és az alsó gomb kikerült, új kép (private yoga), a kulcsszavas alcím helyszín-címkékkel.
-- **A jógáról - Tőlem:** új fejléckép (diszito2), az írások képeinek fehér széle átlátszó (`tools/images.py cutouts`).
-- **Írások:** rendes cím, szorosabb listák, a „A jógáról - Tőlem” gomb nem lóg ki.
-- **Események:** a képek nem nagyítódnak (fekvő keret, eredeti arány).
-- **Bejelentkezés:** a Motibro-ablak középen, belső görgetés nélkül; alatta a két helyszín formázva.
-- **Kapcsolat:** új kép (Olivia3), a két helyszín két színes dobozban órarenddel és térképpel, az űrlap és a kép
-  helyett biztató szöveg (`CONTACT_INVITE` a `build.py`-ban, Olivia átírhatja).
-- A szándékos törléseket a `build.py` sorolja fel (`dropped_section`, `REMOVED_FILES`, `REMOVED_EMBEDS`,
-  `DROPPED_LENGTHS`); a `tools/check.py` ezeket kihagyja, minden más régi szöveg, kép-alt és cím továbbra is ellenőrzött.
-
 ## Fájlok
 
 | | |
 |---|---|
 | `content/pages.json` | a régi oldal tartalma oldalanként → szekció → oszlop → elem (szöveg, kép, gomb, beágyazás) |
-| `assets/img/old/` | a régi fotók, 800 és 1600 px (webp, ahol átlátszó vagy kivágott) |
-| `assets/img/new/` | Olivia Drive-fotói (2. kör), 800 és 1600 px; `content/new-photos.json` |
-| `assets/brand/` | logó és favicon (`tools/logo.py`) |
-| `assets/oliviajoga.js` | GYIK (egyszerre egy nyitva), parallax |
+| `assets/img/old/` | a régi fotók, 800 és 1600 px (webp, ahol átlátszó) |
 | `assets/oliviajoga.css` | az új komponensek; a téma `site.css`-e és `site.js`-e mellé |
 | `build.py` | a statikus oldal (`dist/`) |
 | `tools/extract.py`, `tools/grab-old-site.js` | a régi oldal kinyerése |
@@ -70,7 +44,7 @@ legyen, csak egy új UX-et kapjon”.
 
 ```bash
 python3 build.py                                    # dist/ az oliviajoga.hu-ra (canonical, sitemap, .htaccess)
-python3 tools/check.py dist                         # 2266 ellenőrzés
+python3 tools/check.py dist                         # 2355 ellenőrzés
 python3 build.py --preview /demo/<slug>/ --out D    # noindex előnézet alkönyvtárba (a linkek /-re végződnek)
 ```
 

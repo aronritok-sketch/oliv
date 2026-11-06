@@ -118,11 +118,11 @@
 - **Dokumentumok a projektben:** 47 – novemberi piackutatás (2026-11-03); 48 – „Versenytársak – online jóga Magyarországon” (5 oldal: élő online órák árai, videótárak, ki van elöl a Google-ben, mit jelent ez Oliviának, fő keresési témák). Olivia a 48-as linkjét CRM-csetben kapta (Áron nevében).
 - **DataForSEO:** a 2026-11-05-i SERP-lekérés hibás adatot adott (csak google.com), és 30 napig gyorsítótárban marad; a versenytárs-adatok a 11-03-i SERP-ből vannak.
 
-## 13. kör: oliviajoga.hu – Olivia módosításai (2026-11-05)
-- **Forrás:** Olivia CRM-üzenete, Google Doc „Módosítások oliviajoga.hu” (30 pont, képernyőképekkel); képek a Drive-járól („Főoldal kedvenc képek”, Moodboard).
-- **Kész:** új logó (moodboard: retró, puha betűk; `oliviajoga-hu/assets/brand`), fekete-fehér főoldal a hero képpel, egyforma bejelentkezés-gombok, képsáv (diszito3), animációk, GYIK és ajándékutalvány új formában, csapatépítő rész ki (főoldal + menü), vélemények átrendezve, láblécből a név ki, Rólam új dizájn (ikonok nélkül), Árak (90 perc és alsó gomb ki, új kép, szebb alcím), Jógáról (új kép, átlátszó fehér), írások (cím, gomb), Események (képminőség), Bejelentkezés (Motibro középen, görgetés nélkül), Kapcsolat (új kép, két színes helyszíndoboz térképpel, űrlap helyett biztató szöveg). Részletek: `oliviajoga-hu/README.md`, „2. kör”.
-- **Előnézet:** https://helloprovision.com/demo/oliviajoga-hu-6083/ (ugyanaz a cím). Ellenőrzés: 2266/2266.
-- **Nyitott:** a logó első javaslat – Olivia jóváhagyása kell; a Kapcsolat oldal biztató szövege tőlünk van, Olivia átírhatja; a `/jógaóra-cégeknek` oldal a címén megmaradt (menüben nincs) – döntés: maradjon-e.
+## 13. kör: oliviajoga.hu – Olivia módosításai (2026-11-05) – VISSZAVONVA
+- **Forrás:** Olivia Google Doc-ja („Módosítások oliviajoga.hu”, 30 pont, képernyőképekkel); képek a Drive-járól („Főoldal kedvenc képek”, Moodboard).
+- **Mi történt:** a 30 pontot szó szerint megcsináltuk (d791581: új logó, fekete-fehér főoldal, animációk, új Rólam/Kapcsolat …). Áron (2026-11-06): „szarabb lett” → visszaállítva az 1. körre; **csak a háttér-javítás maradt** (az átlátszó képek – Fitmummy-logó, rajzok, kivágott fotók – mögött nincs halványzöld helykitöltő szín). Oldal: 1.0.1, előnézet ugyanott, 2355/2355 ellenőrzés.
+- **Tanulság (Áron):** az ügyfél jegyzetei meglátások, nem szó szerinti feladatlista. Előbb prompt/terv belőlük, azt Áronnal megbeszéljük, csak utána építünk.
+- A 2. kör kódja és Olivia letöltött képei a d791581 commitban visszakereshetők (`tools/images.py`, `tools/logo.py`, `assets/img/new`).
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).

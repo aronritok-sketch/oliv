@@ -44,9 +44,6 @@ def main():
 
     files = {}
     for p in data['pages']:
-        for s in p['sections']:  # what Olivia asked to take out (build.dropped_section, REMOVED_*)
-            if build.dropped_section(p['path'], s):
-                s['columns'] = []
         f = os.path.join(out, p['path'], 'index.html') if p['path'] else os.path.join(out, 'index.html')
         ok(os.path.isfile(f), f'missing page: /{p["path"]}')
         if not os.path.isfile(f):
@@ -68,13 +65,13 @@ def main():
                                     ok(n in text, f'/{p["path"]}: text missing: {n[:80]}')
                     elif t['type'] == 'button':
                         ok(norm(t['label']) in text, f'/{p["path"]}: button missing: {t["label"]}')
-                    elif t['type'] == 'image' and not build.is_divider(t) and t['file'] not in build.PRICES and t['file'] not in build.DROPPED and t['file'] not in build.REMOVED_FILES:
+                    elif t['type'] == 'image' and not build.is_divider(t) and t['file'] not in build.PRICES and t['file'] not in build.DROPPED:
                         if t['w'] == 1000 and t['h'] == 400 or t['file'] == 'old/49fd21489bf3':
                             continue  # the reviews and "Ami nem szükséges": rebuilt as text
                         alt = html.escape(t.get('alt', ''), quote=True)
                         found = re.search(r'<img[^>]*' + re.escape(t['file']) + r'-[^>]*alt="' + re.escape(alt) + '"', doc)
                         ok(found, f'/{p["path"]}: photo missing or alt changed: {t["file"]} "{t.get("alt", "")[:40]}"')
-                    elif t['type'] == 'embed' and not any(r in t['src'] for r in build.REMOVED_EMBEDS):
+                    elif t['type'] == 'embed':
                         ok(html.escape(t['src'], quote=True) in doc, f'/{p["path"]}: embed missing: {t["src"][:60]}')
         ok('href="page:' not in doc, f'/{p["path"]}: unresolved old link')
     # internal links
