@@ -71,7 +71,6 @@ def cutouts():
             if imgs:
                 files.add(imgs[0]['file'])
                 break
-    files |= {'old/d1f4ce0eccf6'}  # home: "Miért jóga?" photo on white
     done = []
     for f in sorted(files - KEEP_WHITE):
         ok = False

@@ -284,7 +284,7 @@ img.photo[src$=".webp"] { background: transparent; }
 h1, h2, .oj-h2, .oj-display, .oj-title__h, .page-head .page-head__title, .oj-loc .oj-loc__seo, .oj-needs h3,
 .oj-pre .oj-pre__statement, .oj-event .oj-event__title, .oj-map .oj-map__title, .oj-quotes h1, .oj-quotes h2,
 .oj-quotes .is-long, .namecard__name, .oj-alert h2, .price-group__head h3, .contrast__word, .drawer li a {
-	line-height: 1.18; letter-spacing: .012em; text-wrap: balance;
+	line-height: 1.18;
 }
 .page-head .page-head__title { line-height: 1.04; padding-top: .06em; }
 .page-head--long .page-head__title { line-height: 1.1; }
@@ -292,16 +292,13 @@ h1, h2, .oj-h2, .oj-display, .oj-title__h, .page-head .page-head__title, .oj-loc
 .hero__title mark { line-height: 1.1; padding-top: .05em; }
 .contrast__word { line-height: 1; }
 .oj-h2.is-long, .oj-title .is-long, .oj-prose .is-long { line-height: 1.45; }
-p, li { text-wrap: pretty; }
-@media (max-width: 600px) { .oj-prose p, .oj-prose li { hyphens: auto; } }
 
 /* The breath (aláírás): the lilac block behind "JÓGA" breathes in 4 s and out 6 s */
 .hero__title mark.oj-breath { position: relative; background: none; z-index: 0; }
 .hero__title mark.oj-breath::before { content: ""; position: absolute; inset: 0; background: var(--lilac); border-radius: 4px; z-index: -1; transform-origin: 0 60%; }
 @media (prefers-reduced-motion: no-preference) {
 	.hero__title mark.oj-breath::before { animation: oj-breath calc(var(--breath-in) + var(--breath-out)) var(--ease-breath) infinite; }
-	@keyframes oj-breath { 0%, 100% { transform: scale(1, 1); } 40% { transform: scale(1.07, 1.12); background: color-mix(in oklab, var(--lilac) 82%, var(--pink)); } }
-	.js [data-reveal] { transition-duration: 1.2s; transition-timing-function: var(--ease-breath); transition-delay: calc(var(--i, 0) * .12s); }
+	@keyframes oj-breath { 0%, 100% { transform: scale(1, 1); } 40% { transform: scale(1.07, 1.12); } }
 }
 
 /* Home: every photo black and white, except the gift card (Olivia); the colour stays in the blocks */
@@ -400,7 +397,7 @@ p, li { text-wrap: pretty; }
 .oj-chapter__text p { line-height: 1.75; }
 .oj-chapter__text .oj-chapter__lead { font-size: var(--step-1); font-weight: 600; line-height: 1.6; color: var(--ink); }
 .oj-statements .oj-col { padding: clamp(1.8rem, 4vw, 3rem); }
-.oj-statements h1, .oj-statements h2, .oj-statements .is-long { font-family: var(--f-display); font-weight: 400; text-transform: uppercase; font-size: clamp(1.7rem, 1.25rem + 1.7vw, 2.6rem); line-height: 1.14; color: var(--ink); letter-spacing: .012em; max-width: 24ch; }
+.oj-statements h1, .oj-statements h2, .oj-statements .is-long { font-family: var(--f-display); font-weight: 400; text-transform: uppercase; font-size: clamp(1.7rem, 1.25rem + 1.7vw, 2.6rem); line-height: 1.18; color: var(--ink); max-width: 24ch; }
 .oj-statements p { font-weight: 600; max-width: 56ch; }
 .oj-read__go { margin: 0; }
 
@@ -420,7 +417,7 @@ p, li { text-wrap: pretty; }
 .oj-cards--journal .oj-card__media img[src$=".webp"] { object-fit: cover; }
 
 /* Posts: a real title, a lead, tight lists, a button that fits */
-.is-post .entry > h2:first-child + h3, .is-post .entry > h3:first-child { font-family: var(--f-display); font-weight: 400; text-transform: uppercase; font-size: var(--step-3); line-height: 1.12; letter-spacing: .012em; color: var(--ink); margin: .4rem 0 1.2rem; max-width: 22ch; text-wrap: balance; }
+.is-post .entry > h2:first-child + h3, .is-post .entry > h3:first-child { font-family: var(--f-display); font-weight: 400; text-transform: uppercase; font-size: var(--step-3); line-height: 1.18; color: var(--ink); margin: .4rem 0 1.2rem; max-width: 22ch; }
 .is-post .entry > h3 strong { font-weight: inherit; }
 .is-post .entry > h2:first-child + h3 + p { font-size: var(--step-1); font-weight: 600; color: var(--forest); }
 .is-post .entry { max-width: 68ch; }
@@ -435,7 +432,7 @@ p, li { text-wrap: pretty; }
 .oj-places-card { justify-self: center; width: 100%; max-width: 980px; background: var(--pink-soft); border-radius: var(--radius); padding: clamp(1.6rem, 4vw, 2.6rem); display: grid; gap: 1.4rem; position: relative; overflow: hidden; }
 .oj-places-card::after { content: ""; position: absolute; right: -60px; top: -60px; width: 180px; height: 180px; background: var(--pink); opacity: .45; border-radius: 58% 42% 55% 45% / 47% 58% 42% 53%; }
 .oj-places-card .seo-h { position: relative; z-index: 1; margin: 0; font-size: 1rem; }
-.oj-places-card .seo-h__lead { font-family: var(--f-display); font-weight: 400; text-transform: uppercase; font-size: var(--step-3); line-height: 1.1; letter-spacing: .012em; }
+.oj-places-card .seo-h__lead { font-family: var(--f-display); font-weight: 400; text-transform: uppercase; font-size: var(--step-3); line-height: 1.18; }
 .oj-places-card .seo-h__place { font-size: clamp(1rem, .95rem + .3vw, 1.15rem); padding: .6rem 1.15rem .6rem .85rem; }
 .oj-places-card .btn-row { margin: 0; position: relative; z-index: 1; }
 
