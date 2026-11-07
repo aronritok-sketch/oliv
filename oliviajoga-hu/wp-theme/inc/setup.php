@@ -93,9 +93,46 @@ function oj_setup() {
 			$log[] = 'removed: ' . $gone;
 		}
 	}
+	$log[] = oj_sync_media();
 	flush_rewrite_rules( false );
 	update_option( 'oj_setup_log', array( 'version' => $data['version'] ?? '', 'log' => $log, 'time' => time() ), false );
 	return $log;
+}
+
+/**
+ * The photos a new version uses that the media folder does not have yet (the VPS copies the folder only when the
+ * site is created): fetched from the oliv repo on GitHub. At most ~40 seconds a run; the rest on the next run.
+ */
+function oj_sync_media() {
+	$up  = wp_upload_dir( null, false );
+	$dir = defined( 'OJ_MEDIA_DIR' ) ? OJ_MEDIA_DIR : $up['basedir'] . '/oliviajoga-img';
+	if ( ! is_dir( $dir ) ) {
+		return 'photos: from GitHub (no media folder)';
+	}
+	preg_match_all( '#%%MEDIA%%/([^"\'\s?\\\\]+)#', (string) file_get_contents( __DIR__ . '/../data/site.json' ), $m );
+	$need = array_unique( array_map( 'rawurldecode', $m[1] ) );
+	$base = 'https://raw.githubusercontent.com/aronritok-sketch/oliv/claude/nifty-ramanujan-3zifiu/oliviajoga-hu/assets/img/';
+	$got  = 0;
+	$left = 0;
+	$t0   = microtime( true );
+	foreach ( $need as $rel ) {
+		if ( str_contains( $rel, '..' ) || is_file( $dir . '/' . $rel ) ) {
+			continue;
+		}
+		if ( microtime( true ) - $t0 > 40 ) {
+			$left++;
+			continue;
+		}
+		$r = wp_remote_get( $base . implode( '/', array_map( 'rawurlencode', explode( '/', $rel ) ) ), array( 'timeout' => 20 ) );
+		if ( 200 !== wp_remote_retrieve_response_code( $r ) ) {
+			$left++;
+			continue;
+		}
+		wp_mkdir_p( dirname( $dir . '/' . $rel ) );
+		file_put_contents( $dir . '/' . $rel, wp_remote_retrieve_body( $r ) );
+		$got++;
+	}
+	return sprintf( 'photos: %d fetched, %d left', $got, $left );
 }
 
 // Pages Olivia removed (Jógaóra cégeknek): the old address goes to the home page (301), as on the static site.

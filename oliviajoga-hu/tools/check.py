@@ -16,6 +16,8 @@ HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, HERE)
 import build  # noqa: E402  (the same rules for decorative images and the picture-only price cards)
 
+NEW_PHOTOS = json.load(open(os.path.join(HERE, 'content', 'new-photos.json'), encoding='utf-8'))
+
 
 def norm(s):
     s = html.unescape(re.sub(r'<[^>]+>', ' ', s)).replace('\xa0', ' ')
@@ -73,7 +75,10 @@ def main():
                         if t['w'] == 1000 and t['h'] == 400 or t['file'] == 'old/49fd21489bf3':
                             continue  # the reviews and "Ami nem szükséges": rebuilt as text
                         alt = html.escape(t.get('alt', ''), quote=True)
-                        found = re.search(r'<img[^>]*' + re.escape(t['file']) + r'-[^>]*alt="' + re.escape(alt) + '"', doc)
+                        src = t['file']  # a journal card's new photo (tools/images.py cards) keeps the old picture's alt text
+                        if t.get('href', '').startswith('page:') and build.card_key(t['href'][5:]) in NEW_PHOTOS:
+                            src = build.card_key(t['href'][5:])
+                        found = re.search(r'<img[^>]*' + re.escape(src) + r'-[^>]*alt="' + re.escape(alt) + '"', doc)
                         ok(found, f'/{p["path"]}: photo missing or alt changed: {t["file"]} "{t.get("alt", "")[:40]}"')
                     elif t['type'] == 'embed' and not any(r in t['src'] for r in build.REMOVED_EMBEDS):
                         ok(html.escape(t['src'], quote=True) in doc, f'/{p["path"]}: embed missing: {t["src"][:60]}')

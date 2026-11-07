@@ -42,5 +42,101 @@
  "gyakoroljunk": {
   "w": 1000,
   "h": 1193
+ },
+ "cikk-milyen-elemekbol-all-1": {
+  "w": 1365,
+  "h": 2048
+ },
+ "cikk-milyen-elemekbol-all-2": {
+  "w": 1600,
+  "h": 1200
+ },
+ "cikk-milyen-elemekbol-all-3": {
+  "w": 1600,
+  "h": 1200
+ },
+ "cikk-milyen-elemekbol-all-4": {
+  "w": 1365,
+  "h": 2048
+ },
+ "cikk-milyen-elemekbol-all-5": {
+  "w": 1600,
+  "h": 2133
+ },
+ "cikk-a-nyujtas-hatasa": {
+  "w": 1600,
+  "h": 1067
+ },
+ "cikk-joga-pozitiv-gondolkodas": {
+  "w": 1600,
+  "h": 1200
+ },
+ "cikk-a-lelki-egeszseg-vilagnapja-osszel": {
+  "w": 1440,
+  "h": 1440
+ },
+ "cikk-binge": {
+  "w": 1600,
+  "h": 2000
+ },
+ "cikk-legzes": {
+  "w": 1600,
+  "h": 1759
+ },
+ "cikk-zene": {
+  "w": 1600,
+  "h": 1200
+ },
+ "cikk-allj-meg": {
+  "w": 1600,
+  "h": 1064
+ },
+ "cikk-pajzsmirigy-harmonizalas": {
+  "w": 1452,
+  "h": 961
+ },
+ "cikk-mit-ad-a-joga": {
+  "w": 1600,
+  "h": 1063
+ },
+ "cikk-munka": {
+  "w": 1600,
+  "h": 1063
+ },
+ "cikk-meditacio": {
+  "w": 1600,
+  "h": 2133
+ },
+ "cikk-yama": {
+  "w": 1365,
+  "h": 1024
+ },
+ "cikk-niyama": {
+  "w": 1365,
+  "h": 1708
+ },
+ "cikk-aszana": {
+  "w": 1365,
+  "h": 1822
+ },
+ "cikk-pranajama": {
+  "w": 1365,
+  "h": 1708
+ },
+ "cikk-pratyahara": {
+  "w": 1600,
+  "h": 2000
+ },
+ "cikk-dharana": {
+  "w": 1365,
+  "h": 2013
+ },
+ "cikk-dhjana": {
+  "w": 1365,
+  "h": 1092
+ },
+ "cikk-szamadhi": {
+  "w": 1365,
+  "h": 1761
  }
 }

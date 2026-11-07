@@ -49,6 +49,9 @@ megoldás: **`BRIEF.md`** (mesterek: Tschichold / Hey + Headspace / Dumbar; a l�
 - GYIK, Rólam: számok helyett hullámjel (`WAVE_MARK`); fizetési logók: `assets/img/barion-fizetes.svg` (Barion hivatalos sáv).
 - Menüoldalak fejléce: a kép kitölti a sávot (≥ 900 px jobbra, hullámos széllel; alatta teljes szélességben).
 - Új fotók: `IMG_6232.jpg` → `miert-joga`, `kovacs-olivia-hatha-joga.jpeg` → `gyakoroljunk` (`tools/images.py import`).
+- 1.3.0: cikk-kártyák Olivia teljes fotóival (`tools/images.py cards <mappa>` → `assets/img/new/cikk-*`, a régi alt marad –
+  `tools/check.py` ezt nézi); egységes kártyacím (`card_titles`); Kapcsolat-dobozok alja egy vonalban (`.oj-loc__foot`);
+  hullámok: `blob()` (a kép oldalán kifut a képernyő szélére) és `band()` (teljes szélességű sáv a képsor mögött).
 
 ## Fájlok
 

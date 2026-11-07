@@ -14,11 +14,11 @@ WordPress theme (../wordpress/olivia-yoga/assets: site.css, site.js, photos) plu
 """
 import html
 import json
-import math
 import os
 import re
 import shutil
 import sys
+import unicodedata
 import urllib.parse
 
 HERE = os.path.dirname(os.path.abspath(__file__))
@@ -30,7 +30,7 @@ INSTAGRAM = 'https://www.instagram.com/oliivia_yoga/'
 FACEBOOK = 'https://www.facebook.com/oliviajogaoktato'
 SITE_TITLE = 'Jóga 18. és 21. kerület | Kovács Olívia'
 NOTICE = 'Óráimat 2026. november 25-ig tartom!'  # the site's announcement banner
-VERSION = '1.2.0'
+VERSION = '1.3.0'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -139,34 +139,26 @@ def icon(name, cls='icon'):
             f'stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">{ICON[name]}</svg>')
 
 
-def _ribbon(cy, amp, phase, th, n=60):
-    """A wave ribbon across a 400×300 box: thin at both ends, thick in the middle (like the wave in her logo)."""
-    top, bot = [], []
-    for i in range(n + 1):
-        t = i / n
-        x = 400 * t
-        y = cy + amp * math.sin(2 * math.pi * (1.15 * t + phase))
-        h = 4 + th * math.sin(math.pi * t) ** .85
-        top.append(f'{x:.1f} {y - h / 2:.1f}')
-        bot.append(f'{x:.1f} {y + h / 2:.1f}')
-    return 'M' + ' L'.join(top) + ' L' + ' L'.join(reversed(bot)) + 'Z'
+# Olivia (2026-11-06, CRM chat): a wave behind the pictures instead of a colour box, like her reference picture – big,
+# soft, layered curves in the tone that run off the edge of the screen. (The first try – a ribbon with pointed ends and a
+# band with straight sides – was „béna”.) Two layers: the light tone behind, a mid tone in front; smooth cubic curves only.
+BLOB_BACK = 'M0 6C14 0 34 2 50 8C70 15 92 22 96 40C100 56 86 66 90 80C94 94 76 100 56 98C38 96 18 90 0 94Z'
+BLOB_FRONT = 'M0 30C18 22 40 28 56 38C74 49 80 64 72 76C64 88 42 90 24 86C14 84 6 84 0 86Z'
+BAND_BACK = 'M0 12C12 4 26 3 40 9C56 16 70 20 84 13C92 9 97 8 100 9V30C88 37 72 36 56 30C40 24 22 26 0 34Z'
+BAND_FRONT = 'M0 22C14 15 30 17 46 23C62 29 80 31 100 20V27C82 35 62 34 46 28C30 23 14 26 0 30Z'
 
 
-RIBBON_B = _ribbon(132, 30, .32, 190)
-RIBBON_A = _ribbon(160, 36, .08, 150)
+def blob(tone='pink', side='left'):
+    """A soft wave shape behind a picture that runs off the screen on the picture's side (left or right)."""
+    flip = ' transform="matrix(-1 0 0 1 100 0)"' if side == 'right' else ''
+    return (f'<svg class="oj-blob oj-blob--{side} oj-tone--{tone}" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" '
+            f'focusable="false"><g{flip}><path class="oj-blob__back" d="{BLOB_BACK}"/><path class="oj-blob__front" d="{BLOB_FRONT}"/></g></svg>')
 
 
-def wave(tone='pink', band=False):
-    """Olivia (2026-11-06): no colour box behind the pictures – a wave instead, like her reference picture (two soft
-    layers in the tone). band=True: the hero's wide band (wavy top, it runs off the edge); otherwise a ribbon that
-    passes behind the picture and thins out at both ends."""
-    if band:
-        b, a = 'M0 70C70 20 130 120 220 80S350 10 400 40V300H0Z', 'M0 140C60 90 130 190 210 140S340 80 400 120V300H0Z'
-    else:
-        b, a = RIBBON_B, RIBBON_A
-    kind = 'band' if band else 'ribbon'
-    return (f'<svg class="oj-wave oj-wave--{tone} oj-wave--{kind}" viewBox="0 0 400 300" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
-            f'<path class="oj-wave__b" d="{b}"/><path class="oj-wave__a" d="{a}"/></svg>')
+def band(tone='lilac'):
+    """A soft wave band across the whole screen, behind a row of pictures."""
+    return (f'<svg class="oj-band oj-tone--{tone}" viewBox="0 0 100 40" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
+            f'<path class="oj-blob__back" d="{BAND_BACK}"/><path class="oj-blob__front" d="{BAND_FRONT}"/></svg>')
 
 
 WAVE_MARK = ('<svg class="oj-wavemark" viewBox="0 0 36 14" aria-hidden="true" focusable="false"><path d="M2 9c4-6 8-6 11 0s7 6 10 0 '
@@ -258,6 +250,38 @@ def new_pic(key, sizes='(min-width: 960px) 36vw, 90vw', eager=False, cls='photo'
     load = ' fetchpriority="high"' if eager else ' loading="lazy"'
     return (f'<img class="{cls}" src="{big if m["w"] > 800 else small}"{srcset} alt="{esc(NEW_PHOTOS[key])}" width="{m["w"]}" '
             f'height="{m["h"]}" style="object-position:{pos}"{load} decoding="async">')
+
+
+def card_key(path):
+    return 'cikk-' + unicodedata.normalize('NFKD', path).encode('ascii', 'ignore').decode()
+
+
+# Olivia (2026-11-06, CRM chat): the journal cards show her full photos (tools/images.py cards) instead of the old
+# graphics; the old picture's alt text stays (tools/check.py: REPLACED_FILES).
+REPLACED_FILES = {}
+
+
+def card_pic(path, t, sizes='(min-width: 960px) 30vw, 92vw'):
+    """The card picture of a journal post: the new photo if there is one, with the old picture's alt text."""
+    key = card_key(path)
+    if key not in NEW_META:
+        return pic(t, sizes)
+    REPLACED_FILES[t['file']] = key
+    m = NEW_META[key]
+    small, big = asset(f'img/new/{key}-800.jpg'), asset(f'img/new/{key}-1600.jpg')
+    srcset = f' srcset="{small} 800w, {big} {m["w"]}w" sizes="{sizes}"' if m['w'] > 800 else ''
+    return (f'<img class="photo" src="{big if m["w"] > 800 else small}"{srcset} alt="{esc(t.get("alt", ""))}" width="{m["w"]}" '
+            f'height="{m["h"]}" loading="lazy" decoding="async">')
+
+
+def card_titles(body):
+    """One title style on every journal card (Olivia: „egységesítsük a cikkek címeinek formázását”): the first block is
+    the title, a heading right after it the subtitle – whatever tag the old page used (the levels stay for Google)."""
+    m = re.match(r'\s*<(h[1-6]|p)>', body)
+    if not m:
+        return body
+    body = body[:m.start(1) - 1] + f'<{m.group(1)} class="oj-card__title">' + body[m.end():]
+    return re.sub(r'(</(?:h[1-6]|p)>\s*)<(h[1-6])>', r'\1<\2 class="oj-card__sub">', body, count=1)
 
 
 def theme_pic(key, sizes='(min-width: 960px) 36vw, 90vw', eager=False):
@@ -739,7 +763,7 @@ def home(p):
 			<p class="btn-row oj-twins">{btns}</p>
 		</div>
 		<div class="hero__visual">
-			<div class="oj-wave-wrap oj-wave-wrap--hero">{wave("pink", band=True)}</div>
+			{blob("pink", "right")}
 			<div class="frame hero__photo oj-hero-photo">{new_pic("hero", "(min-width: 960px) 50vw, 92vw", True, pos="50% 55%")}</div>
 			<div class="namecard hero__card"><p class="namecard__name">Kovács Olívia</p><p class="namecard__spec">Hatha flow<i aria-hidden="true">•</i>Budapest 18. kerület<i aria-hidden="true">•</i>21. kerület</p></div>
 		</div>
@@ -789,7 +813,7 @@ def home(p):
     row = [('diszito3', 'big', '50% 40%', 'pink'), ('diszito6', 'tall', '50% 30%', 'lilac'), ('diszito4', 'tall', '50% 35%', 'sun')]
     photos = ''.join(f'<figure class="oj-photo oj-photo--{k}" data-reveal style="--i:{n}"><div class="frame">{new_pic(key, "(min-width: 960px) 50vw, 92vw" if k == "big" else "(min-width: 960px) 25vw, 46vw", pos=pos)}</div></figure>'
                      for n, (key, k, pos, tone) in enumerate(row))
-    out.append(wrap(f'<div class="oj-photos">{wave("lilac")}{photos}</div>', 'section section--tight oj-photos-wrap'))
+    out.append(wrap(f'<div class="oj-photos">{band("lilac")}{photos}</div>', 'section section--tight oj-photos-wrap'))
     # upcoming events
     iU, sU = find(p, lambda s: section_text(s) == 'Közelgő események')
     if sU:
@@ -805,7 +829,7 @@ def home(p):
     iW, sW = by_heading(p, 'Miért jóga?')
     take(iW)
     img = next(t for c in sW['columns'] for t in c if t['type'] == 'image')
-    out.append(wrap(f'<div class="intro__grid"><div class="intro__visual" data-reveal><div class="oj-waved">{wave("pink")}<div class="frame">{new_pic("miert-joga", "(min-width: 960px) 36vw, 92vw")}</div></div></div>'
+    out.append(wrap(f'<div class="intro__grid"><div class="intro__visual" data-reveal><div class="oj-waved">{blob("pink", "left")}<div class="frame">{new_pic("miert-joga", "(min-width: 960px) 36vw, 92vw")}</div></div></div>'
                     f'<div class="oj-prose oj-prose--intro" data-reveal>{blocks_html(tiles_blocks([t for c in sW["columns"] for t in c]))}</div></div>'))
     # Gyakoroljunk együtt! with Tudatosság / Kontroll
     iP, sP = by_heading(p, 'Gyakoroljunk együtt!')
@@ -837,7 +861,7 @@ def home(p):
         words_html += (f'<div class="oj-invite">{"".join(heading(b, "oj-invite__h") for b in invite)}'
                        f'<p class="btn-row">{"".join(button(h, l, "orchid") for h, l in go)}</p></div>')
     out.append(wrap(f'<div class="oj-together"><div class="oj-together__text oj-prose" data-reveal>{heading(title, "oj-h2") if title else ""}{words_html}</div>'
-                    f'<div class="oj-together__art" data-reveal><div class="oj-waved">{wave("lilac")}<div class="frame">{new_pic("gyakoroljunk", "(min-width: 960px) 36vw, 92vw")}</div></div></div></div>{fig}', 'section section--pale'))
+                    f'<div class="oj-together__art" data-reveal><div class="oj-waved">{blob("lilac", "right")}<div class="frame">{new_pic("gyakoroljunk", "(min-width: 960px) 36vw, 92vw")}</div></div></div></div>{fig}', 'section section--pale'))
     # questions: each section is one question
     qs = []
     for j, s in enumerate(secs):
@@ -995,9 +1019,11 @@ def contact_page(p):
             tone = ['pink', 'lilac'][len(boxes) % 2]
             notes_html = ''.join('<p class="oj-loc__note">' + fix_links(b['html']) + '</p>' for b in notes)
             boxes.append(f'<article class="oj-loc oj-loc--{tone} oj-loc--contact" data-reveal>{seo_heading(h, "oj-loc__kw")}'
-                         f'{heading(place, "oj-loc__place") if place else ""}{slot_rows(times)}{notes_html}'
+                         f'{heading(place, "oj-loc__place") if place else ""}{slot_rows(times)}'
+                         # Olivia (2026-11-06): the buttons and maps of the two boxes in one line → this block sits at the bottom
+                         f'<div class="oj-loc__foot">{notes_html}'
                          f'<p class="btn-row">{"".join(button(hh, ll, "dark" if n == 0 else "ghost") for n, (hh, ll) in enumerate(links))}</p>'
-                         f'{embed_html(emb["src"], norm(text_of(place["html"])) if place else "Térkép")}</article>')
+                         f'{embed_html(emb["src"], norm(text_of(place["html"])) if place else "Térkép")}</div></article>')
             i += 2
             continue
         if boxes:
@@ -1044,7 +1070,7 @@ def rolam_page(p):
         if chapters:
             aside = ''
             if not any('oj-read__aside' in x for x in out):
-                aside = f'<aside class="oj-read__aside"><div class="oj-waved">{wave("lilac")}<div class="frame oj-read__photo">{theme_pic("olivia-golden-hour-arms", "(min-width: 960px) 28vw, 92vw")}</div></div></aside>'
+                aside = f'<aside class="oj-read__aside"><div class="oj-waved">{blob("lilac", "left")}<div class="frame oj-read__photo">{theme_pic("olivia-golden-hour-arms", "(min-width: 960px) 28vw, 92vw")}</div></div></aside>'
             out.append(f'<div class="oj-read{" oj-read--first" if aside else ""}">{aside}<ol class="oj-chapters" start="{n - len(chapters) + 1}">{"".join(chapters)}</ol></div>')
             chapters.clear()
         if statements:
@@ -1140,9 +1166,10 @@ def journal_page(p):
             if not bs:
                 continue
             more = next((only_link(b) for b in bs if only_link(b)), None)
-            body = blocks_html([b for b in bs if not only_link(b)], buttons=False)
+            body = card_titles(blocks_html([b for b in bs if not only_link(b)], buttons=False))
             target = href_of(im['href']) if im and im.get('href') else (href_of(more[0]) if more else '#')
-            media = f'<a class="oj-card__media" href="{esc(target)}" tabindex="-1">{pic(im, "(min-width: 960px) 30vw, 92vw")}</a>' if im else ''
+            photo = card_pic(im['href'][5:], im) if im and im.get('href', '').startswith('page:') else (pic(im, "(min-width: 960px) 30vw, 92vw") if im else '')
+            media = f'<a class="oj-card__media" href="{esc(target)}" tabindex="-1">{photo}</a>' if im else ''
             go = f'<a class="card__more" href="{esc(href_of(more[0]))}">{more[1]} {icon("arrow")}</a>' if more else ''
             cards.append(f'<article class="oj-card oj-card--{TONES[n % 4]}" data-reveal>{media}<div class="oj-card__body oj-prose">{body}{go}</div></article>')
             n += 1
@@ -1308,7 +1335,7 @@ def main():
             im = next((t for t in c if t['type'] == 'image' and t.get('href', '').startswith('page:')), None)
             if im:
                 h = next((b for b in tiles_blocks(c) if b['t'].startswith('h') or b['t'] == 'p'), None)
-                journal_cards.append((im['href'][5:], norm(text_of(h['html'])) if h else '', pic(im, '120px')))
+                journal_cards.append((im['href'][5:], norm(text_of(h['html'])) if h else '', card_pic(im['href'][5:], im, '120px')))
 
     special = {'': home, 'főoldal': home, 'árak': prices_page, 'jógáról': journal_page, 'események': events_page,
                'rólam': rolam_page, 'bejelentkezés-jóga-bérlet': booking_page, 'kapcsolat': contact_page}

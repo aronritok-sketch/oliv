@@ -481,25 +481,29 @@ h1, h2, .oj-h2, .oj-display, .oj-title__h, .page-head .page-head__title, .oj-loc
 .oj-foot-logo { display: inline-block; color: var(--paper); margin-bottom: 1.4rem; }
 .oj-foot-logo .oj-logo { height: 88px; width: auto; display: block; }
 
-/* A wave behind the pictures instead of a colour box (her reference picture: two soft layers) */
-.oj-wave { display: block; max-width: none; }
-.oj-wave path { fill: var(--wa); }
-.oj-wave .oj-wave__b { fill: var(--wb); }
-.oj-wave--pink { --wa: var(--pink); --wb: var(--pink-soft); }
-.oj-wave--lilac { --wa: var(--lilac); --wb: var(--lilac-soft); }
-.oj-wave-wrap--hero { position: absolute; left: -7%; right: -5%; bottom: 0; height: 74%; z-index: 0; }
-.oj-wave-wrap--hero .oj-wave { width: 100%; height: 100%; }
-.oj-hero .hero__photo { position: relative; z-index: 1; }
+/* A wave behind the pictures instead of a colour box (her reference picture): big, soft, two-layer curves that run off
+   the screen on the picture's side, so no edge or end of a shape shows. --oj-bleed = the distance from the content
+   column to the edge of the screen. */
+:root { --oj-bleed: max(var(--gutter, 20px), (100vw - var(--max, 1240px)) / 2); }
+.oj-tone--pink { --wa: var(--pink-soft); --wb: color-mix(in srgb, var(--pink) 42%, var(--pink-soft)); }
+.oj-tone--lilac { --wa: var(--lilac-soft); --wb: color-mix(in srgb, var(--lilac) 55%, var(--lilac-soft)); }
+.oj-blob, .oj-band { position: absolute; z-index: 0; display: block; max-width: none; pointer-events: none; }
+.oj-blob__back { fill: var(--wa); }
+.oj-blob__front { fill: var(--wb); }
+.section:has(.oj-blob, .oj-band), .hero:has(.oj-blob) { overflow-x: clip; }
 .oj-waved { position: relative; }
-.section:has(.oj-wave--ribbon) { overflow-x: clip; }
-.oj-waved > .oj-wave { position: absolute; left: -15%; bottom: -22%; width: 130%; height: 72%; z-index: 0; }
 .oj-waved > .frame { position: relative; z-index: 1; border-radius: var(--radius); box-shadow: none; }
+.oj-waved > .oj-blob--left { left: calc(-1 * var(--oj-bleed)); width: calc(118% + var(--oj-bleed)); top: 16%; height: 98%; }
+.oj-waved > .oj-blob--right { right: calc(-1 * var(--oj-bleed)); width: calc(118% + var(--oj-bleed)); top: 16%; height: 98%; }
+.oj-hero .hero__visual > .oj-blob--right { right: calc(-1 * var(--oj-bleed)); width: calc(114% + var(--oj-bleed)); top: 8%; height: 92%; }
+.oj-hero .hero__photo, .oj-hero .hero__card { position: relative; z-index: 1; }
 .intro__visual .oj-waved > .frame, .oj-together__art .oj-waved > .frame { aspect-ratio: 4 / 5; }
-.oj-together__art { max-width: 460px; justify-self: center; width: 100%; }
+.oj-together__art { max-width: 460px; justify-self: end; width: 100%; }
+@media (max-width: 959px) { .oj-together__art { justify-self: stretch; max-width: none; } }
 
-/* The photo row: in one line, the same height, filling the space, a wave behind */
+/* The photo row: in one line, the same height, filling the space, a wave band across the screen behind */
 .oj-photos { position: relative; grid-template-columns: 1.6fr 1fr 1fr; align-items: stretch; gap: clamp(.6rem, 1.6vw, 1.25rem); padding-bottom: 2.5rem; }
-.oj-photos > .oj-wave { position: absolute; left: -7%; bottom: -3rem; width: 114%; height: 70%; z-index: 0; }
+.oj-photos > .oj-band { left: calc(-1 * var(--oj-bleed)); width: calc(100% + 2 * var(--oj-bleed)); bottom: -1rem; height: 66%; }
 .oj-photo { position: relative; z-index: 1; margin: 0; }
 .oj-photo--big { grid-column: auto; }
 .oj-photo .frame, .oj-photo--big .frame, .oj-photo--tall .frame { aspect-ratio: auto; height: clamp(220px, 30vw, 440px); }
@@ -554,3 +558,14 @@ h1, h2, .oj-h2, .oj-display, .oj-title__h, .page-head .page-head__title, .oj-loc
 
 /* A jógáról - Tőlem: the white of the pictures melts into the page background */
 .oj-cards--journal .oj-card__media { background: var(--paper); }
+
+/* Olivia, CRM chat 2026-11-06 (2): journal cards – her full photos, one title style on every card */
+.oj-cards--journal .oj-card__media { aspect-ratio: 4 / 3; background: var(--soft); }
+.oj-cards--journal .oj-card__media img { object-fit: cover; object-position: 50% 35%; }
+.oj-card__body .oj-card__title { font-family: var(--f-text); text-transform: none; font-weight: 700; font-size: 1.18rem; line-height: 1.3; letter-spacing: 0; color: var(--ink); margin: 0 0 .5rem; }
+.oj-card__body .oj-card__sub { font-family: var(--f-text); text-transform: none; font-weight: 600; font-size: .95rem; line-height: 1.4; letter-spacing: 0; color: var(--forest); margin: 0 0 .7rem; }
+.oj-card__title strong, .oj-card__sub strong { font-weight: inherit; }
+
+/* Kapcsolat: the notes, buttons and map at the bottom of both boxes, so they line up */
+.oj-loc--contact .oj-loc__foot { margin-top: auto; position: relative; z-index: 1; }
+.oj-loc--contact .oj-loc__foot .btn-row { margin-top: 1.2rem; }
