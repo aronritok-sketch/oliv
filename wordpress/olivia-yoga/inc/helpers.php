@@ -158,10 +158,16 @@ function oy_section_head( $title, $text = '', $kicker = '', $id = '' ) {
 
 /** Olivia's title and her specialities, used on the hero name card, the About page and articles. */
 function oy_title_line() {
-	return oy_is_demo() ? __( 'Yoga studio | Group, private & online classes', 'olivia-yoga' ) : __( 'Yoga Teacher | Movement & Wellness Coach', 'olivia-yoga' );
+	$line = oy_is_demo() ? __( 'Yoga studio | Group, private & online classes', 'olivia-yoga' ) : __( 'Yoga Teacher | Movement & Wellness Coach', 'olivia-yoga' );
+	return (string) apply_filters( 'oy_title_line', $line );
 }
 
 function oy_specialities() {
+	// On the HathaFlow platform every teacher's site lists what that teacher teaches (filter `oy_specialities`).
+	$custom = apply_filters( 'oy_specialities', null );
+	if ( is_array( $custom ) && $custom ) {
+		return array_map( 'strval', $custom );
+	}
 	if ( oy_is_demo() ) {
 		return array( __( 'Hatha flow', 'olivia-yoga' ), __( 'Slow flow', 'olivia-yoga' ), __( 'Private sessions', 'olivia-yoga' ), __( 'Online classes', 'olivia-yoga' ) );
 	}

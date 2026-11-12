@@ -46,11 +46,27 @@ function oy_is_demo() {
 }
 
 /**
+ * Should the "Demo site" bar show? On the HathaFlow platform every teacher's site runs this edition, and the
+ * platform decides per site (filter `oy_demo_bar`; text: `oy_demo_bar_text`).
+ */
+function oy_demo_bar() {
+	return (bool) apply_filters( 'oy_demo_bar', oy_is_demo() );
+}
+
+/**
  * The edition's brand: name, short name (logo), logo line, place, teacher, About label, e-mail, social links.
  * The labels (sub, place, about) are translated; the rest is plain, so the contact constants can be set before the
  * text domain loads.
  */
 function oy_brand( $key ) {
+	/**
+	 * The HathaFlow platform gives every teacher's site its own brand (name, logo text, teacher, e-mail, place …):
+	 * return a string from `oy_brand` to replace the edition's value, null to keep it.
+	 */
+	$custom = apply_filters( 'oy_brand', null, $key, oy_edition() );
+	if ( is_string( $custom ) ) {
+		return $custom;
+	}
 	$plain = array(
 		'fort-myers' => array( 'name' => 'Olivia Kovacs Yoga', 'short' => 'Olivia Kovacs', 'teacher' => 'Olivia Kovacs', 'email' => 'olivia.kovacs6@gmail.com', 'instagram' => 'https://www.instagram.com/oliivia_yoga/', 'facebook' => 'https://www.facebook.com/oliviajogaoktato', 'place' => 'Fort Myers, FL' ),
 		'hu-online'  => array( 'name' => 'Olivia Jóga – Online', 'short' => 'Olivia Jóga', 'teacher' => 'Kovács Olívia', 'email' => 'olivia.kovacs6@gmail.com', 'instagram' => 'https://www.instagram.com/oliivia_yoga/', 'facebook' => 'https://www.facebook.com/oliviajogaoktato' ), // Hungarian name order
@@ -116,7 +132,10 @@ function oy_page_key( $slug ) {
 /** The approved copy of this edition. */
 function oy_content_file( $edition = null ) {
 	$files = array( 'hu-online' => 'content-hu-online.json', 'hathaflow' => 'content-hathaflow.json' );
-	return get_template_directory() . '/demo/' . ( $files[ $edition ?? oy_edition() ] ?? 'content.json' );
+	$file  = get_template_directory() . '/demo/' . ( $files[ $edition ?? oy_edition() ] ?? 'content.json' );
+	/** A site's own starter content (the HathaFlow platform writes one per teacher from the sign-up answers). */
+	$custom = (string) apply_filters( 'oy_content_file', $file, $edition ?? oy_edition() );
+	return '' !== $custom && is_readable( $custom ) ? $custom : $file;
 }
 
 /**
