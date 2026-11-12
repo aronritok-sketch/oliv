@@ -1995,6 +1995,16 @@ test( 'settings page: secrets (LiveKit, Stripe, Zoom) are never printed back int
 	ok( in_array( 'livekit_api_secret', OYS_Admin::SECRETS, true ) && in_array( 'stripe_live_secret', OYS_Admin::SECRETS, true ), 'an empty secret field keeps the saved one' );
 } );
 
+test( 'signed links are bound to the site (on a network one teacher\'s link must not open another\'s class)', function () {
+	$a = array( OYS_Live::sign( 7, 3 ), OYS_Stripe::order_key( 5 ), OYS_Newsletter::unsubscribe_url( 9 ) );
+	$keep = $GLOBALS['blog_id'];
+	$GLOBALS['blog_id'] = 2;
+	$b = array( OYS_Live::sign( 7, 3 ), OYS_Stripe::order_key( 5 ), OYS_Newsletter::unsubscribe_url( 9 ) );
+	$GLOBALS['blog_id'] = $keep;
+	ok( $a[0] !== $b[0] && $a[1] !== $b[1] && $a[2] !== $b[2], 'the same ids on another site give another signature' );
+	eq( $a[0], OYS_Live::sign( 7, 3 ), 'stable on the same site' );
+} );
+
 test( 'live: raise hand – the teacher sees it in her chat poll and lowers it', function () {
 	live_on();
 	try {

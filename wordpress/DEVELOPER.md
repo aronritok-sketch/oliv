@@ -610,6 +610,8 @@ Olivia oldala és a HathaFlow ugyanazt használja: fizetés (Stripe) → hozzáf
   vagy ha az óra már nem online: `DeleteRoom` (bent lévők kiesnek).
 - **Link:** `oys_join_link` filter (prioritás 5, a Zoom előtt): a fiókoldal `?live=<óra>&b=<foglalás>&k=<HMAC>` – a
   résztvevő saját, aláírt linkje (belépés nélkül is működik). Oktató / stúdió: `?live=<óra>` belépve → owner.
+  Minden aláírt link (élő óra, rendelés `oys_key`, leiratkozás) `oys_sig()`-gel készül, az oldalhoz kötve
+  (`get_current_blog_id()`): hálózaton egy tanár linkje nem nyitja egy másik tanár azonos számú óráját (1.7.2).
 - **Belépés:** `POST oys/v1/live/<id>/join` → LiveKit access token (JWT HS256, `video` grant, lejárat = óra vége + 30 perc).
   A terem `live_open_minutes` (10) perccel előtte nyit, az oktató egy órával előtte már indíthat („Élő adás indítása”).
   Identitás `teacher-<uid>` / `b<foglalás>`, metadata `{"role":…}`. Kis órán (online helyek ≤ `live_grid_max`, magánóra

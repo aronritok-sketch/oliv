@@ -6,6 +6,15 @@
 
 defined( 'ABSPATH' ) || exit;
 
+/**
+ * A short signature for links (join, order, unsubscribe), bound to this site: on a WordPress network the salts are the
+ * same on every site and the ids start at 1 on each, so without the site a link from one teacher's site would open the
+ * same id on another (hlprv KB 2026-11-12, HathaFlow).
+ */
+function oys_sig( $data, $len = 20 ) {
+	return substr( hash_hmac( 'sha256', $data . '|site-' . get_current_blog_id(), wp_salt( 'auth' ) ), 0, $len );
+}
+
 function oys_now() {
 	return gmdate( 'Y-m-d H:i:s' );
 }

@@ -195,7 +195,7 @@ class OYS_Live {
 
 	/** The signature of a participant's own link (their booking). */
 	public static function sign( $session_id, $booking_id ) {
-		return substr( hash_hmac( 'sha256', 'live|' . (int) $session_id . '|' . (int) $booking_id, wp_salt( 'auth' ) ), 0, 24 );
+		return oys_sig( 'live|' . (int) $session_id . '|' . (int) $booking_id, 24 );
 	}
 
 	/** The live page of a class: for a participant their own link, for the teacher the plain one. */

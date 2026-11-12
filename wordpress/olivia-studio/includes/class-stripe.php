@@ -303,7 +303,7 @@ class OYS_Stripe {
 
 	/** Signed key for return URLs, so an order page can't be opened by guessing ids. */
 	public static function order_key( $order_id ) {
-		return substr( hash_hmac( 'sha256', 'order-' . $order_id, wp_salt( 'auth' ) ), 0, 20 );
+		return oys_sig( 'order-' . $order_id );
 	}
 
 	/* ---------- Webhook ---------- */

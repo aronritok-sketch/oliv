@@ -31,7 +31,7 @@ class OYS_Newsletter {
 	}
 
 	private static function sig( $user_id ) {
-		return substr( hash_hmac( 'sha256', 'unsub|' . (int) $user_id, wp_salt( 'auth' ) ), 0, 20 );
+		return oys_sig( 'unsub|' . (int) $user_id );
 	}
 
 	/** One click from the email: no login needed, the link is signed. */
