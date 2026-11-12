@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OY_VERSION', '3.3.0' );
+define( 'OY_VERSION', '3.3.1' );
 
 require_once get_template_directory() . '/inc/edition.php';
 
@@ -21,6 +21,7 @@ require_once get_template_directory() . '/inc/seo.php';
 if ( is_admin() ) {
 	require_once get_template_directory() . '/inc/demo-import.php';
 	require_once get_template_directory() . '/inc/translations-admin.php';
+	require_once get_template_directory() . '/inc/image-position.php';
 }
 
 add_action( 'after_setup_theme', function () {

@@ -1251,3 +1251,12 @@ msgstr "Hatha flow szerdánként 18:30-tól 20:00-ig, élőben, Zoomon."
 
 msgid "One-to-one or with a friend, planned for your trimester and how you feel that day."
 msgstr "Egyénileg vagy a barátnőddel, a trimeszteredhez és az aznapi állapotodhoz igazítva."
+
+msgid "Photo position"
+msgstr "Kép helye"
+
+msgid "Centre"
+msgstr "Középre"
+
+msgid "Click the part of the photo that must always stay in view (a face, for example). The frames and crops stay the same."
+msgstr "Kattints a fotón arra a részre, aminek mindig látszania kell (például az arcra). A keretek és a vágás nem változnak."

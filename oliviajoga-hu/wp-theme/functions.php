@@ -11,6 +11,7 @@
 defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/inc/setup.php';
+require_once __DIR__ . '/inc/image-position.php';
 
 /** The theme's data: pages (title, description, schema, prefooter, content), header, footer, menu. */
 function oj_data() {
@@ -100,7 +101,7 @@ function oj_fill( $html ) {
 			'%%ONLINE%%' => oj_online_url(),
 		);
 	}
-	return strtr( (string) $html, $map );
+	return strtr( oj_apply_positions( (string) $html ), $map ); // a képek helye az adminból (inc/image-position.php)
 }
 
 /** The old address of the current page ('' = home, '404'). */

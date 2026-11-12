@@ -76,6 +76,11 @@ Olivia doksija két részből áll: amit most kért, és amit **november 26-tól
   foglaló dev-másolata, `OJ_ONLINE_URL` felülírja.
 - **Ellenőrzés:** `tools/check.py <mappa> --after` (címek, régi címsorok, helyszín-szavak, nincs Motibro, térkép,
   Barion és „tartom”).
+- **1.4.1 (a doksi kiegészítése):** az előlábléc őszibarack (`oj-pre--peach`, `--sun-soft`); az Árak alcíme „élő online,
+  csoportos hatha flow jóga órák / és egyéni, privát online kismamatorna” (`PRICES_SUB`; a helyszín-chipek november
+  26-án tűnnek el); telefonon a nyitott menü alatt az értesítősáv rejtve (a „Főoldal” nem csúszik a fejléc alá).
+- **Képek helye (Áron):** WordPress → Megjelenés → Képek helye (`wp-theme/inc/image-position.php`): fotónként egy pont,
+  aminek látszania kell; a vágás a dizájné marad. `oj_img_pos` opció, kulcs: a fájl útja méret nélkül (`new/hero`).
 - **Facebook-képek:** a „Facebookra” mappa 18 fotója 1080 × 1350-ben, az oldal stílusában (`tools/facebook/`:
   `make_html.py` + `shoot.js`, Playwright); a demón: `/demo/oliviajoga-hu-6083/facebook/`.
 

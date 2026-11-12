@@ -1094,3 +1094,12 @@ msgstr "Hatha flow cada miércoles, de 18:30 a 20:00, en directo por Zoom."
 
 msgid "One-to-one or with a friend, planned for your trimester and how you feel that day."
 msgstr "Individual o con una amiga, según tu trimestre y cómo te sientas ese día."
+
+msgid "Photo position"
+msgstr "Posición de la foto"
+
+msgid "Centre"
+msgstr "Centrar"
+
+msgid "Click the part of the photo that must always stay in view (a face, for example). The frames and crops stay the same."
+msgstr "Haz clic en la parte de la foto que siempre debe verse (una cara, por ejemplo). Los marcos y recortes no cambian."

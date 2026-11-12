@@ -39,7 +39,7 @@ ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.4.0'
+VERSION = '1.4.1'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -75,7 +75,8 @@ REMOVED_FILES = {
 REMOVED_EMBEDS = {'docs.google.com/forms'}
 # Olivia (11.12): the gift card is an online one now, bought on the online site – the old steps (write to me, Motibro
 # invitation) are replaced; tools/check.py skips these.
-REPLACED_TEXT = {'1 órás vagy 5 alkalmas jóga ajándékutalvány', 'Ezekre az információkra lesz szükségem az ajándékutalvány kiállításához:'}
+PRICES_SUB = ('élő online, csoportos hatha flow jóga órák', 'és egyéni, privát online kismamatorna')
+REPLACED_TEXT = {'csoportos hatha flow jóga órák Budapest 18. kerület Budapest 21. kerület', '1 órás vagy 5 alkalmas jóga ajándékutalvány', 'Ezekre az információkra lesz szükségem az ajándékutalvány kiállításához:'}
 REPLACED_TEXT_START = ('Vásárlás után kérlek, vedd fel velem a kapcsolatot', 'Ahhoz, hogy az ajándékozott tudjon online foglalni')  # Kapcsolat: the message form
 DROPPED_LENGTHS = {'90 perc'}  # Árak: there are no 90-minute classes any more
 # Photos from the theme (Olivia's own, round 8) for the page heads; Hungarian alt text.
@@ -645,16 +646,16 @@ def prefooter(p):
         for b in bs[1:]:
             ol = only_link(b)
             if ol:
-                rows.append(f'<p class="oj-pre__go">{button(ol[0], ol[1], "light", " btn--sm")}</p>')
+                rows.append(f'<p class="oj-pre__go">{button(ol[0], ol[1], "dark", " btn--sm")}</p>')
             else:
                 rows.append(f'<p class="oj-pre__time">{icon("clock")}<span>{fix_links(b["html"])}</span></p>')
         slots.append(f'<div class="oj-pre__slot">{heading(h)}{"".join(rows)}</div>')
     if AFTER:  # the weekly classes are online now; the old places stay in words
         was = ' · '.join(norm(text_of(re.search(r'<h\d[^>]*>(.*?)</h\d>', x).group(1))) for x in slots if re.search(r'<h\d', x))
         slots = [f'<div class="oj-pre__slot"><h3>Élő online hatha flow jóga</h3><p class="oj-pre__time">{icon("clock")}<span>szerda 18:30 – 20:00 (90 perc)</span></p>'
-                 f'<p class="oj-pre__go">{button(online("yoga"), "Online jóga bejelentkezés", "light", " btn--sm")}</p></div>',
+                 f'<p class="oj-pre__go">{button(online("yoga"), "Online jóga bejelentkezés", "dark", " btn--sm")}</p></div>',
                  f'<div class="oj-pre__slot"><h3>Online kismamatorna</h3><p class="oj-pre__time">{icon("clock")}<span>egyéni időpontban (60 perc)</span></p>'
-                 f'<p class="oj-pre__go">{button(online("prenatal"), "Online kismamatorna", "light", " btn--sm")}</p></div>']
+                 f'<p class="oj-pre__go">{button(online("prenatal"), "Online kismamatorna", "dark", " btn--sm")}</p></div>']
         if was:
             slots.append(f'<p class="oj-pre__was">2026. november 25-ig: {esc(was)}</p>')
     social = (f'<p class="social"><a href="{INSTAGRAM}" target="_blank" rel="noopener">{icon("ig")}<span class="sr-only">Instagram</span></a>'
@@ -673,7 +674,7 @@ def prefooter(p):
                      f'alt="Fizetés Barionnal: bankkártya, Apple Pay, Google Pay"></figure>')
         badge_html = '<div class="oj-badges">' + figs + '</div>'
     badges_sec = f'<section class="oj-badges-wrap" aria-label="Partnerek"><div class="container">{badge_html}</div></section>' if badge_html else ''
-    return (f'<section class="section section--tight section--moss oj-pre" aria-label="Órarend"><div class="container">'
+    return (f'<section class="section section--tight oj-pre oj-pre--peach" aria-label="Órarend"><div class="container">'
             f'<div class="oj-pre__grid"><div class="oj-pre__lead">{statement}{social}</div><div class="oj-pre__slots">{"".join(slots)}</div></div>'
             f'</div></section>{badges_sec}')
 
@@ -1358,7 +1359,13 @@ def prices_page(p):
     secs = [s for s in p['sections'] if not is_prefooter(s) and not is_badges(s)]
     title = title_of(secs[0])
     sub = only_heading(secs[1])
-    head = page_head(title, p['path'], [('', 'Főoldal')], seo_heading(sub, 'oj-head__sub') if sub else '', theme_pic(PAGE_PHOTO['árak'], eager=True), 'sun')
+    if sub:  # Olivia (11.12): „élő online, csoportos hatha flow jóga órák és egyéni, privát online kismamatorna”
+        lines = heading_lines(sub)
+        places = '' if AFTER else ''.join(f'<span class="seo-h__place">{icon("pin")}<span>{esc(m.group(1))}<strong>{esc(m.group(2))}</strong></span></span>'
+                                          for ln in lines[1:] for m in [re.match(r'(.*?)(\d+\.\s*kerület.*)$', ln)] if m)
+        sub_html = (f'<{sub["t"]} class="seo-h oj-head__sub"><span class="seo-h__lead">{esc(PRICES_SUB[0])}</span>'
+                    f'<span class="seo-h__lead seo-h__lead--2">{esc(PRICES_SUB[1])}</span> {places}</{sub["t"]}>')
+    head = page_head(title, p['path'], [('', 'Főoldal')], sub_html if sub else '', theme_pic(PAGE_PHOTO['árak'], eager=True), 'sun')
     if AFTER:
         return prices_after(head)
     groups, note, book = [], None, None

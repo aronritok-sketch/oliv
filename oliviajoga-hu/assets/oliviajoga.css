@@ -682,3 +682,20 @@ h1, h2, .oj-h2, .oj-display, .oj-title__h, .page-head .page-head__title, .oj-loc
 .price-group--text .price-group__head { position: static; }
 .price-group--text .price-group__text { max-width: 52ch; }
 .price-group--text .price-group__when { max-width: none; }
+
+/* Olivia (11.12, later note): the closing block in peach („ez a rész legyen ez a szín”) */
+.oj-pre.oj-pre--peach { background: var(--sun-soft); color: var(--ink); }
+.oj-pre--peach .oj-pre__statement { color: var(--ink); }
+.oj-pre--peach .oj-pre__more { color: var(--ink); }
+.oj-pre--peach .oj-pre__slot { background: rgba(255, 255, 255, .55); border-color: rgba(18, 35, 26, .14); }
+.oj-pre--peach .oj-pre__slot h3 { color: var(--ink); }
+.oj-pre--peach .oj-pre__time { color: var(--ink); }
+.oj-pre--peach .oj-pre__time svg { color: var(--orchid); }
+.oj-pre--peach .oj-pre__was { color: var(--muted); }
+.oj-pre--peach .social a { background: #fff; }
+
+/* Árak: the two lines under the title */
+.page-head .oj-head__sub .seo-h__lead--2 { display: block; }
+
+/* Phone menu: the notice bar would push the header down over the first menu item (Olivia: „Főoldal” cut off) */
+.nav-open .oj-notice-bar { display: none; }
