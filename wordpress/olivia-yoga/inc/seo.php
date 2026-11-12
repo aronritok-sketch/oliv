@@ -131,6 +131,15 @@ add_action( 'wp_head', function () {
 	echo '<script type="application/ld+json">' . wp_json_encode( array( '@context' => 'https://schema.org', '@graph' => $graph ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG ) . '</script>' . "\n";
 }, 1 );
 
+// No author archives and no users in the sitemap: they would show the admin's login name (and there is one author).
+add_filter( 'wp_sitemaps_add_provider', fn( $provider, $name ) => 'users' === $name ? false : $provider, 10, 2 );
+add_action( 'template_redirect', function () {
+	if ( is_author() ) {
+		wp_safe_redirect( home_url( '/' ), 301 );
+		exit;
+	}
+} );
+
 // Account, booking and checkout-return pages don't belong in search results.
 add_filter( 'wp_robots', function ( $robots ) {
 	if ( function_exists( 'oy_is_studio_page' ) && in_array( oy_is_studio_page(), array( 'book', 'account' ), true ) ) {

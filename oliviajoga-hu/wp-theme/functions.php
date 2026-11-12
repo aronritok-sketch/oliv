@@ -150,6 +150,7 @@ add_action( 'wp_enqueue_scripts', function () {
 	wp_enqueue_style( 'oj-site', get_stylesheet_directory_uri() . '/assets/site.css', array(), $v );
 	wp_enqueue_style( 'oj-oliviajoga', get_stylesheet_directory_uri() . '/assets/oliviajoga.css', array( 'oj-site' ), $v );
 	wp_enqueue_script( 'oj-site', get_stylesheet_directory_uri() . '/assets/site.js', array(), $v, array( 'strategy' => 'defer', 'in_footer' => true ) );
+	wp_enqueue_script( 'oj-oliviajoga', get_stylesheet_directory_uri() . '/assets/oliviajoga.js', array( 'oj-site' ), $v, array( 'strategy' => 'defer', 'in_footer' => true ) );
 }, 20 );
 
 // The page's own title and head (description, canonical, Open Graph, structured data) from the old site.

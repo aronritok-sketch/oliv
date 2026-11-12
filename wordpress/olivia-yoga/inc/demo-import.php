@@ -283,7 +283,8 @@ function oy_import_all( $refresh = false ) {
 		$log[] = sprintf( '%d FAQs', count( $data['faqs'] ) );
 	}
 
-	// Journal posts.
+	// Journal posts (the online edition's first English addresses become Hungarian first, so nothing is doubled).
+	$log   = array_merge( $log, oy_online_post_slugs() );
 	$posts = 0;
 	foreach ( $data['posts'] as $slug => $p ) {
 		$id = oy_import_target( $slug, 'post' );
@@ -315,10 +316,7 @@ function oy_import_all( $refresh = false ) {
 		$posts++;
 	}
 	$log[] = sprintf( '%d journal posts', $posts );
-	$hello = get_post( 1 );
-	if ( $hello && 'hello-world' === $hello->post_name ) {
-		wp_delete_post( 1, true );
-	}
+	$log   = array_merge( $log, oy_remove_wp_samples(), oy_import_privacy( $data, $refresh ) );
 
 	// Past events (with photos).
 	$moments = 0;
@@ -458,6 +456,82 @@ function oy_import_all( $refresh = false ) {
  * The class texts, pages, FAQs and menu come from the content file. Runs once (option oy_online_rev); on a fresh site
  * the normal import does all this.
  */
+/** The online edition's journal posts: the first, English addresses get their Hungarian ones (the old ones redirect). */
+function oy_online_post_slugs() {
+	if ( ! oy_online_only() ) {
+		return array();
+	}
+	$n = 0;
+	foreach ( OY_ONLINE_POST_SLUGS as $en => $hu ) {
+		$post = get_page_by_path( $en, OBJECT, 'post' );
+		if ( $post && ! get_page_by_path( $hu, OBJECT, 'post' ) ) {
+			wp_update_post( array( 'ID' => $post->ID, 'post_name' => $hu ) );
+			$n++;
+		}
+	}
+	return $n ? array( sprintf( '%d journal posts: Hungarian addresses', $n ) ) : array();
+}
+
+/** WordPress's own sample content ("Hello world!", "Sample Page"), in any language – never on a client site. */
+function oy_remove_wp_samples() {
+	$log   = array();
+	$hello = get_post( 1 );
+	if ( $hello && 'post' === $hello->post_type && in_array( $hello->post_name, array( 'hello-world', 'hello-vilag', 'hola-mundo' ), true ) ) {
+		wp_delete_post( 1, true );
+		$log[] = 'removed: the sample post';
+	}
+	foreach ( array( 'sample-page', 'minta-oldal', 'ez-egy-minta-oldal', 'pagina-ejemplo' ) as $slug ) {
+		$page = get_page_by_path( $slug );
+		if ( $page && in_array( $page->post_title, array( 'Sample Page', 'Minta oldal', 'Ez egy minta oldal', 'Página de ejemplo' ), true ) ) {
+			wp_delete_post( $page->ID, true );
+			$log[] = 'removed: the sample page';
+		}
+	}
+	return $log;
+}
+
+/**
+ * The privacy notice (the content file's "privacy"): a published page, set as the site's privacy policy (the footer
+ * links to it). A policy page someone wrote and published themselves is kept; ours is rewritten only on refresh.
+ */
+function oy_import_privacy( array $data, $refresh = false ) {
+	if ( empty( $data['privacy']['content'] ) ) {
+		return array();
+	}
+	$pv   = $data['privacy'];
+	$page = get_post( (int) get_option( 'wp_page_for_privacy_policy' ) );
+	$ours = $page && get_post_meta( $page->ID, 'oy_privacy', true );
+	if ( $page && 'publish' === $page->post_status && ! $ours ) {
+		return array();
+	}
+	if ( ! $page || 'trash' === $page->post_status ) {
+		$page = get_page_by_path( $pv['slug'] );
+		$ours = $page && get_post_meta( $page->ID, 'oy_privacy', true );
+	}
+	if ( $ours && 'publish' === $page->post_status && ! $refresh ) {
+		update_option( 'wp_page_for_privacy_policy', $page->ID );
+		return array();
+	}
+	$args = array(
+		'post_type'    => 'page',
+		'post_status'  => 'publish',
+		'post_title'   => $pv['title'],
+		'post_name'    => $pv['slug'],
+		'post_content' => strtr( $pv['content'], array( '{email}' => OY_EMAIL, '{teacher}' => oy_teacher_name(), '{site}' => oy_site_name() ) ),
+	);
+	if ( $page ) {
+		$args['ID'] = $page->ID;
+		wp_update_post( wp_slash( $args ) );
+		$id = $page->ID;
+	} else {
+		$id = wp_insert_post( wp_slash( $args ) );
+	}
+	update_post_meta( $id, 'oy_privacy', 1 );
+	update_post_meta( $id, 'oy_seo_desc', $pv['seo_desc'] ?? '' );
+	update_option( 'wp_page_for_privacy_policy', $id );
+	return array( 'privacy notice: /' . $pv['slug'] . '/' );
+}
+
 function oy_migrate_online() {
 	$rev = '2026-11-12b';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_online_rev' ) === $rev ) {

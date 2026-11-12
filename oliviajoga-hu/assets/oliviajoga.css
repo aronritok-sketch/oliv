@@ -699,3 +699,27 @@ h1, h2, .oj-h2, .oj-display, .oj-title__h, .page-head .page-head__title, .oj-loc
 
 /* Phone menu: the notice bar would push the header down over the first menu item (Olivia: „Főoldal” cut off) */
 .nav-open .oj-notice-bar { display: none; }
+
+/* „Egy korszak lezárult” in motion (Áron, 2026-11-12: „mozogjon és legyen menő”; assets/oliviajoga.js):
+   the photos come in one after the other and float gently, the brush stroke draws itself in and flows across them,
+   one photo at a time lights up in colour (and the one under the pointer). Nothing moves with reduced motion. */
+.oj-korszak__cell { position: relative; isolation: isolate; }
+.oj-korszak__cell .photo { transition: filter 1.2s ease, transform 1.6s cubic-bezier(.2, .8, .2, 1); }
+.is-home main .oj-korszak__cell.is-lit .photo,
+.is-home main .oj-korszak__cell:hover .photo { filter: none; transform: scale(1.09); }
+.oj-korszak__cell::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+	box-shadow: inset 0 0 0 0 var(--orchid); transition: box-shadow .7s ease; }
+.oj-korszak__cell.is-lit::after, .oj-korszak__cell:hover::after { box-shadow: inset 0 0 0 3px var(--orchid); }
+.oj-korszak__cell--0, .oj-korszak__cell--3 { --r: -3deg; }
+.oj-korszak__cell--1, .oj-korszak__cell--5 { --r: 2deg; }
+.oj-korszak__cell--2, .oj-korszak__cell--6 { --r: -1.5deg; }
+.oj-korszak__cell--4 { --r: 3deg; }
+@media (prefers-reduced-motion: no-preference) {
+	.js .oj-korszak .oj-korszak__cell { opacity: 0; transform: translateY(30px) scale(.88) rotate(var(--r, 0deg));
+		transition: opacity .8s ease, transform 1s cubic-bezier(.2, .8, .2, 1); transition-delay: calc(var(--i, 0) * 55ms); }
+	.js .oj-korszak.is-in .oj-korszak__cell { opacity: 1; transform: none;
+		animation: oj-float 7s ease-in-out infinite; animation-delay: calc(var(--i, 0) * -.45s); }
+	.js .oj-korszak__grid > .oj-band--flow { clip-path: inset(-20% 100% -20% 0); transition: clip-path 2s cubic-bezier(.6, .05, .2, 1) .5s; }
+	.js .oj-korszak.is-in .oj-korszak__grid > .oj-band--flow { clip-path: inset(-20% -2% -20% 0); }
+}
+@keyframes oj-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }

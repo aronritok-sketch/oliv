@@ -39,7 +39,7 @@ ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.4.2'
+VERSION = '1.4.3'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -179,9 +179,23 @@ def blob(tone='pink', side='left'):
             f'focusable="false"><path class="oj-blob__back" d="{BRUSH_BACK}"/><path class="oj-blob__front" d="{BRUSH_FRONT}"/></svg>')
 
 
-def band(tone='lilac'):
-    """A long brush stroke behind a row of pictures."""
-    return (f'<svg class="oj-band oj-brush oj-tone--{tone}" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
+# The hero keeps its first, soft wave behind the photo (Olivia, 2026-11-12: „nem a gomb, hanem a háttér” – the brush
+# stroke of 1.4.0 is everywhere else, not there).
+SOFT_BACK = 'M0 6C14 0 34 2 50 8C70 15 92 22 96 40C100 56 86 66 90 80C94 94 76 100 56 98C38 96 18 90 0 94Z'
+SOFT_FRONT = 'M0 30C18 22 40 28 56 38C74 49 80 64 72 76C64 88 42 90 24 86C14 84 6 84 0 86Z'
+
+
+def blob_soft(tone='pink', side='left'):
+    """The soft wave shape of 1.3.0 behind a picture, running off the screen on the picture's side."""
+    flip = ' transform="matrix(-1 0 0 1 100 0)"' if side == 'right' else ''
+    return (f'<svg class="oj-blob oj-blob--{side} oj-tone--{tone}" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" '
+            f'focusable="false"><g{flip}><path class="oj-blob__back" d="{SOFT_BACK}"/><path class="oj-blob__front" d="{SOFT_FRONT}"/></g></svg>')
+
+
+def band(tone='lilac', flow=False):
+    """A long brush stroke behind a row of pictures; flow: it moves (assets/oliviajoga.js)."""
+    cls = ' oj-band--flow' if flow else ''
+    return (f'<svg class="oj-band oj-brush{cls} oj-tone--{tone}" viewBox="0 0 1000 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
             f'<path class="oj-blob__back" d="{BRUSH_LONG_BACK}"/><path class="oj-blob__front" d="{BRUSH_LONG_FRONT}"/></svg>')
 
 
@@ -809,6 +823,7 @@ def document(p, body, cls, schema, image=None):
 {prefooter(p)}
 {footer()}
 <script src="{asset("site.js")}?v={v}" defer></script>
+<script src="{asset("oliviajoga.js")}?v={v}" defer></script>
 </body>
 </html>
 '''
@@ -901,13 +916,13 @@ def was_strip(heads_html):
 def korszak_section():
     """Olivia (11.12): „egy korszak lezárult” – her photos of three years of classes, the wave over them, and the way on."""
     keys = sorted(k for k in NEW_META if k.startswith('korszak-'))
-    cells = ''.join(f'<figure class="oj-korszak__cell oj-korszak__cell--{n % 7}">{new_pic(k, "(min-width: 960px) 20vw, 33vw")}</figure>'
+    cells = ''.join(f'<figure class="oj-korszak__cell oj-korszak__cell--{n % 7}" style="--i:{n}">{new_pic(k, "(min-width: 960px) 20vw, 33vw")}</figure>'
                     for n, k in enumerate(keys))
     return wrap(f'<div class="oj-korszak" data-reveal><div class="oj-korszak__text"><p class="kicker">3 év közös gyakorlás</p>'
                 f'<h2 class="oj-h2">Egy korszak lezárult</h2><p class="oj-lead">{esc(KORSZAK_TEXT)}</p>'
                 f'<p class="btn-row">{button(online(), "Jóga online", "orchid", " btn--lg")}</p>'
                 f'</div>'
-                f'<div class="oj-korszak__grid">{cells}{band("pink")}</div></div>', 'section oj-korszak-wrap')
+                f'<div class="oj-korszak__grid">{cells}{band("pink", True)}</div></div>', 'section oj-korszak-wrap')
 
 
 def home(p):
@@ -937,7 +952,7 @@ def home(p):
 			<p class="btn-row oj-twins">{btns}</p>
 		</div>
 		<div class="hero__visual">
-			{blob("pink", "right")}
+			{blob_soft("pink", "right")}
 			<div class="frame hero__photo oj-hero-photo">{new_pic("hero", "(min-width: 960px) 50vw, 92vw", True, pos="50% 55%")}</div>
 			<div class="namecard hero__card"><p class="namecard__name">Kovács Olívia</p><p class="namecard__spec">Hatha flow<i aria-hidden="true">•</i>Budapest 18. kerület<i aria-hidden="true">•</i>21. kerület</p></div>
 		</div>
@@ -1551,6 +1566,7 @@ def wp_theme(pages, versions):
     shutil.copy(os.path.join(THEME, 'assets', 'site.css'), os.path.join(OUT, 'assets', 'site.css'))
     shutil.copy(os.path.join(THEME, 'assets', 'site.js'), os.path.join(OUT, 'assets', 'site.js'))
     shutil.copy(os.path.join(HERE, 'assets', 'oliviajoga.css'), os.path.join(OUT, 'assets', 'oliviajoga.css'))
+    shutil.copy(os.path.join(HERE, 'assets', 'oliviajoga.js'), os.path.join(OUT, 'assets', 'oliviajoga.js'))
     for key in used:
         for w in (600, 1200):
             shutil.copy(os.path.join(THEME, 'assets', 'img', f'{key}-{w}.jpg'), os.path.join(OUT, 'assets', 'img', 'theme', f'{key}-{w}.jpg'))
@@ -1652,6 +1668,7 @@ def main():
     shutil.copy(os.path.join(THEME, 'assets', 'site.css'), os.path.join(OUT, 'assets', 'site.css'))
     shutil.copy(os.path.join(THEME, 'assets', 'site.js'), os.path.join(OUT, 'assets', 'site.js'))
     shutil.copy(os.path.join(HERE, 'assets', 'oliviajoga.css'), os.path.join(OUT, 'assets', 'oliviajoga.css'))
+    shutil.copy(os.path.join(HERE, 'assets', 'oliviajoga.js'), os.path.join(OUT, 'assets', 'oliviajoga.js'))
     for key in used:
         for w in (600, 1200):
             shutil.copy(os.path.join(THEME, 'assets', 'img', f'{key}-{w}.jpg'), os.path.join(OUT, 'assets', 'img', 'theme', f'{key}-{w}.jpg'))

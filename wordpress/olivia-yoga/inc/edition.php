@@ -47,6 +47,35 @@ const OY_ONLINE_MOVED = array(
 	'hatha-flow-vs-slow-flow'       => array( 'page', 'journal' ),
 );
 
+// The journal posts of the online edition first had their English addresses (2026-11-12, first day live): the
+// Hungarian ones are better for search, the old ones redirect.
+const OY_ONLINE_POST_SLUGS = array(
+	'hatha-class-elements-stretching' => 'hatha-jogaora-elemei-nyujtas',
+	'hatha-class-elements-strengthening' => 'hatha-jogaora-elemei-erosites',
+	'hatha-class-elements-vinyasas' => 'hatha-jogaora-elemei-vinyasza',
+	'hatha-class-elements-balance' => 'hatha-jogaora-elemei-egyensuly',
+	'hatha-class-elements-relaxation' => 'hatha-jogaora-elemei-relaxacio',
+	'the-effects-of-stretching' => 'a-nyujtas-hatasa',
+	'yoga-and-positive-thinking' => 'joga-es-pozitiv-gondolkodas',
+	'world-mental-health-day' => 'lelki-egeszseg-vilagnapja',
+	'which-way-of-thinking-is-healthy' => 'melyik-gondolkodas-egeszseges',
+	'you-can-achieve-anything-with-your-breath' => 'legzessel-barmit-elerhetsz',
+	'music-in-a-yoga-class' => 'zene-a-jogaoran',
+	'stop-for-a-moment' => 'allj-meg-egy-pillanatra',
+	'yoga-for-thyroid-balance' => 'pajzsmirigy-harmonizalas-jogaval',
+	'what-yoga-gives' => 'mit-ad-a-joga',
+	'do-you-do-anything-besides-yoga' => 'foglalkozol-massal-is',
+	'meditation' => 'meditacio',
+	'eight-limbs-yama' => 'a-joga-8-aga-yama',
+	'eight-limbs-niyama' => 'a-joga-8-aga-niyama',
+	'eight-limbs-asana' => 'a-joga-8-aga-aszana',
+	'eight-limbs-pranayama' => 'a-joga-8-aga-pranajama',
+	'eight-limbs-pratyahara' => 'a-joga-8-aga-pratyahara',
+	'eight-limbs-dharana' => 'a-joga-8-aga-dharana',
+	'eight-limbs-dhyana' => 'a-joga-8-aga-dhjana',
+	'eight-limbs-samadhi' => 'a-joga-8-aga-szamadhi',
+);
+
 add_action( 'template_redirect', function () {
 	if ( ! is_404() || ! oy_online_only() ) {
 		return;
@@ -54,6 +83,9 @@ add_action( 'template_redirect', function () {
 	$home = (string) wp_parse_url( home_url( '/' ), PHP_URL_PATH );
 	$path = trim( substr( (string) wp_parse_url( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_PATH ), strlen( rtrim( $home, '/' ) ) ), '/' );
 	$to   = OY_ONLINE_MOVED[ $path ] ?? null;
+	if ( ! $to && isset( OY_ONLINE_POST_SLUGS[ $path ] ) ) {
+		$to = array( 'path', OY_ONLINE_POST_SLUGS[ $path ] );
+	}
 	if ( ! $to && str_starts_with( $path, 'naplo/' ) ) {
 		$to = array( 'path', 'jogarol/' . substr( $path, 6 ) );
 	}

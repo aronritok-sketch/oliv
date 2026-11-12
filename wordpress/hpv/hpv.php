@@ -36,13 +36,7 @@ add_action( 'hpv_child_setup', function ( $from, $to, $slug ) {
 	if ( '' === (string) $from || get_option( 'oy_edition' ) !== oy_edition() ) {
 		$log = array_merge( $log, oy_switch_edition( oy_edition() ) );
 	}
-	if ( in_array( get_the_title( 1 ), array( 'Hello world!', 'Helló világ!' ), true ) ) {
-		wp_delete_post( 1, true );
-	}
-	$sample = get_page_by_path( 'sample-page' ) ?: get_page_by_path( 'minta-oldal' );
-	if ( $sample ) {
-		wp_delete_post( $sample->ID, true );
-	}
+	$log = array_merge( $log, oy_remove_wp_samples() ); // "Hello world!", "Sample Page" – in any language
 	if ( get_option( 'permalink_structure' ) === '' ) {
 		update_option( 'permalink_structure', '/%postname%/' );
 	}

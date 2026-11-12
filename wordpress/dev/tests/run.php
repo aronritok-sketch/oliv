@@ -1761,6 +1761,13 @@ test( 'online edition: Hungarian addresses and its own copy', function () {
 	}
 	ok( ! preg_match( '/slow flow|slow-flow|zoom/iu', wp_json_encode( array_diff_key( $data, array( '_note' => 1 ) ), JSON_UNESCAPED_UNICODE ) ), 'online copy: no slow flow, no Zoom' );
 	eq( 'Jógáról', $data['menu']['journal'], 'the journal is „Jógáról”' );
+	// first day live (2026-11-12): Hungarian post addresses, the old ones redirect; a privacy notice
+	foreach ( array_keys( $data['posts'] ) as $slug ) {
+		ok( ! preg_match( '/^(eight-limbs|hatha-class-elements|the-|what-|which-|yoga-|you-|music-|stop-|world-|do-you|meditation$)/', $slug ), "post address in Hungarian: $slug" );
+	}
+	eq( array_values( OY_ONLINE_POST_SLUGS ), array_keys( $data['posts'] ), 'every old post address has its new one, in order' );
+	ok( ! empty( $data['privacy']['content'] ) && str_contains( $data['privacy']['content'], '{email}' ) && 'adatvedelem' === $data['privacy']['slug'], 'a privacy notice, with the contact address' );
+	ok( ! preg_match( '/\b(Kft|Bt|adószám|cégjegyzék)\b/u', $data['privacy']['content'] ), 'the notice invents no company data' );
 	eq( '2026-12-16', $data['sessions'][0]['valid_from'], 'the Wednesday class starts on 16 December' );
 	eq( array( '2026-12-23' ), $data['sessions'][0]['skip'], 'no class on 23 December' );
 	preg_match_all( '/\{\{private:([a-z0-9\-]+)\}\}/', $text, $m );
@@ -1768,6 +1775,45 @@ test( 'online edition: Hungarian addresses and its own copy', function () {
 		ok( isset( $data['setup']['services'][ $topic ] ), "request link for an existing service: $topic" );
 	}
 	ok( str_contains( oy_resolve_tokens( '{{private:egyeni-joga}}' ), 'topic=egyeni-joga' ), 'service keys with a hyphen resolve' );
+} );
+
+test( 'online edition, first day live: English post addresses become Hungarian, WordPress samples go, a privacy page', function () {
+	require_once get_template_directory() . '/inc/demo-import.php';
+	update_option( 'oy_edition', 'hu-online' );
+	$made = array();
+	try {
+		$old = get_page_by_path( 'meditation', OBJECT, 'post' ); // the imported journal of the test site: the old addresses
+		$old = $old ? $old->ID : ( $made[] = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'Meditáció', 'post_name' => 'meditation' ) ) );
+		$made[] = $sample = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Ez egy minta oldal', 'post_name' => 'ez-egy-minta-oldal' ) );
+		$made[] = $draft = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'draft', 'post_title' => 'Adatvédelmi irányelvek', 'post_name' => 'adatvedelmi-iranyelvek' ) );
+		update_option( 'wp_page_for_privacy_policy', $draft );
+		$log = oy_online_post_slugs();
+		eq( 'meditacio', get_post( $old )->post_name, 'the old post keeps its id, gets the Hungarian address' );
+		ok( $log && false === get_page_by_path( 'meditation', OBJECT, 'post' ) instanceof WP_Post, 'and not twice' );
+		oy_remove_wp_samples();
+		ok( null === get_post( $sample ), 'the Hungarian sample page is gone' );
+		$data = json_decode( (string) file_get_contents( oy_content_file( 'hu-online' ) ), true );
+		oy_import_privacy( $data );
+		$pp = get_post( $draft );
+		ok( 'publish' === $pp->post_status && 'adatvedelem' === $pp->post_name && (int) get_option( 'wp_page_for_privacy_policy' ) === $draft, "WordPress's draft policy page becomes ours, published" );
+		ok( str_contains( $pp->post_content, 'mailto:' . OY_EMAIL ) && ! str_contains( $pp->post_content, '{' ), 'with the real contact address, no placeholders' );
+		ok( str_contains( get_privacy_policy_url(), '/adatvedelem/' ), 'the footer link works' );
+		wp_update_post( array( 'ID' => $draft, 'post_content' => 'Olivia edited it' ) );
+		oy_import_privacy( $data );
+		eq( 'Olivia edited it', get_post( $draft )->post_content, 'an edited notice is kept on the next setup' );
+	} finally {
+		foreach ( OY_ONLINE_POST_SLUGS as $en => $hu ) { // the test site's own (Fort Myers) posts get their addresses back
+			$p = get_page_by_path( $hu, OBJECT, 'post' );
+			if ( $p ) {
+				wp_update_post( array( 'ID' => $p->ID, 'post_name' => $en ) );
+			}
+		}
+		foreach ( $made as $id ) {
+			wp_delete_post( $id, true );
+		}
+		delete_option( 'wp_page_for_privacy_policy' );
+		update_option( 'oy_edition', 'fort-myers' );
+	}
 } );
 
 test( 'online edition: a weekly class leaves out a date (23 December)', function () {
