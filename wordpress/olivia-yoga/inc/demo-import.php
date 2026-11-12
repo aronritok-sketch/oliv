@@ -138,6 +138,27 @@ function oy_import_next_weekday( $weekday, $days ) {
 	return wp_date( 'Y-m-d', $ts );
 }
 
+/**
+ * Dates a weekly class leaves out (Olivia: no class on 23 December): cancelled, so the timetable doesn't make them again.
+ * Dates far ahead are made first.
+ */
+function oy_import_skip_dates( $template_id, array $dates ) {
+	$dates = array_filter( $dates, fn( $d ) => preg_match( '/^\d{4}-\d{2}-\d{2}$/', (string) $d ) && strtotime( $d ) > time() - DAY_IN_SECONDS );
+	if ( ! $dates || ! class_exists( 'OYS_Schedule' ) ) {
+		return 0;
+	}
+	$weeks = (int) ceil( ( strtotime( max( $dates ) ) - time() ) / WEEK_IN_SECONDS ) + 1;
+	OYS_Schedule::generate( max( (int) OYS_Settings::get( 'weeks_ahead' ), $weeks ) );
+	$n = 0;
+	foreach ( OYS_Schedule::query( array( 'from' => oys_now(), 'status' => 'scheduled' ) ) as $row ) {
+		if ( (int) $row->template_id === (int) $template_id && in_array( wp_date( 'Y-m-d', oys_ts( $row->starts_at ) ), $dates, true ) ) {
+			OYS_Schedule::cancel_session( $row->id, 'Ezen a napon nincs óra.' );
+			$n++;
+		}
+	}
+	return $n;
+}
+
 function oy_import_all( $refresh = false ) {
 	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
 	$data += array( 'moments' => array(), 'events' => array(), 'posts' => array(), 'faqs' => array(), 'sessions' => array() );
@@ -390,9 +411,17 @@ function oy_import_all( $refresh = false ) {
 				'lang'            => $s['lang'] ?? 'en',
 				'note'            => $s['note'],
 				'active'          => 1,
+				'valid_from'      => $s['valid_from'] ?? null,
 			) );
 		}
 		$made = OYS_Schedule::generate();
+		foreach ( OYS_Schedule::templates() as $t ) {
+			foreach ( $data['sessions'] as $s ) {
+				if ( ! empty( $s['skip'] ) && $t->class_slug === $s['class'] && (int) $t->weekday === (int) $s['day'] ) {
+					oy_import_skip_dates( (int) $t->id, (array) $s['skip'] );
+				}
+			}
+		}
 		foreach ( $data['events'] as $ev ) {
 			$utc         = oys_local_to_utc( oy_import_next_weekday( (int) $ev['weekday'], 30 ) . ' ' . $ev['start'] );
 			[ $sh, $sm ] = array_map( 'intval', explode( ':', $ev['start'] ) );
@@ -420,13 +449,17 @@ function oy_import_all( $refresh = false ) {
 }
 
 /**
- * The online site (hu-online) after Olivia's notes of 12 November 2026, on a site set up before: her new prices
- * (5 classes 13 000 Ft for 8 weeks, a 1-class gift, the prenatal sessions), Wednesday 18:30–20:00 as the only weekly
- * class, the prenatal class at /online-jogaorak/kismamatorna/, and the class texts and pages from the content file.
- * Runs once (option oy_online_rev); on a fresh site the normal import does all this.
+ * The online site (hu-online) after Olivia's notes of 12 November 2026, on a site set up before:
+ *  - rev 1 (her oliviajoga.hu doc): the new prices, Wednesday 18:30–20:00 as the only weekly class, the prenatal class
+ *    at /online-jogaorak/kismamatorna/;
+ *  - rev 2 (her doc „Módosítások online jóga”): the one-to-one services (individual online yoga, prenatal, stretching,
+ *    relaxation and breathing) with their passes, no slow flow, no private sessions page (in the classes page now),
+ *    „Jógáról” instead of „Napló” (/jogarol/), the Wednesday class from 16 December without 23 December, own streaming.
+ * The class texts, pages, FAQs and menu come from the content file. Runs once (option oy_online_rev); on a fresh site
+ * the normal import does all this.
  */
 function oy_migrate_online() {
-	$rev = '2026-11-12';
+	$rev = '2026-11-12b';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_online_rev' ) === $rev ) {
 		return array();
 	}
@@ -435,27 +468,42 @@ function oy_migrate_online() {
 	if ( class_exists( 'OYS_Products' ) ) {
 		$all = get_option( OYS_Products::OPTION, array() );
 		$all = is_array( $all ) ? $all : array();
-		foreach ( (array) ( $data['setup']['products'] ?? array() ) as $id => $p ) {
-			if ( 'online-5' === $id || 'online-1' === $id || str_starts_with( $id, 'kismama-' ) ) {
-				$all[ $id ] = $p;
-			}
-		}
-		// the plugin's dollar-priced default passes, if an upgrade added them: not on this site
-		foreach ( OYS_Products::defaults() as $id => $p ) {
-			if ( isset( $all[ $id ] ) && ! isset( $data['setup']['products'][ $id ] ) && (int) $all[ $id ]['price_cents'] === (int) $p['price_cents'] ) {
+		// the edition's passes; anything else (the old private sessions, the plugin's dollar-priced defaults) goes off sale
+		foreach ( $all as $id => $p ) {
+			if ( ! isset( $data['setup']['products'][ $id ] ) ) {
 				$all[ $id ]['active'] = 0;
 			}
 		}
+		foreach ( (array) ( $data['setup']['products'] ?? array() ) as $id => $p ) {
+			$all[ $id ] = $p;
+		}
 		update_option( OYS_Products::OPTION, $all );
-		$log[] = 'prices: 12 November';
+		$log[] = 'prices and passes: 12 November';
 	}
-	if ( class_exists( 'OYS_Settings' ) && isset( $data['setup']['studio']['cancel_extend_days'] ) ) {
-		OYS_Settings::update( array( 'cancel_extend_days' => (int) $data['setup']['studio']['cancel_extend_days'] ) );
+	if ( class_exists( 'OYS_Services' ) ) {
+		update_option( OYS_Services::OPTION, (array) ( $data['setup']['services'] ?? array() ) );
+		$log[] = sprintf( '%d one-to-one services', count( (array) ( $data['setup']['services'] ?? array() ) ) );
+	}
+	if ( class_exists( 'OYS_Settings' ) ) {
+		OYS_Settings::update( array_intersect_key( (array) $data['setup']['studio'], array_flip( array( 'cancel_extend_days', 'cancel_policy', 'private_note' ) ) ) );
 	}
 	$old = get_page_by_path( 'prenatal-fitness', OBJECT, 'oy_class' );
 	if ( $old && ! get_page_by_path( 'kismamatorna', OBJECT, 'oy_class' ) ) {
 		wp_update_post( array( 'ID' => $old->ID, 'post_name' => 'kismamatorna' ) );
 		$log[] = 'prenatal class: /kismamatorna/';
+	}
+	// gone: the slow flow class, the private sessions class and page, the „hatha flow or slow flow” article (old addresses redirect)
+	foreach ( array( array( 'slow-flow', 'oy_class' ), array( 'private-yoga', 'oy_class' ), array( 'online-maganora', 'page' ), array( 'hatha-flow-vs-slow-flow', 'post' ) ) as $gone ) {
+		$post = get_page_by_path( $gone[0], OBJECT, $gone[1] );
+		if ( $post ) {
+			wp_trash_post( $post->ID );
+			$log[] = 'removed: ' . $gone[0];
+		}
+	}
+	$journal = get_page_by_path( 'naplo' );
+	if ( $journal && ! get_page_by_path( 'jogarol' ) ) {
+		wp_update_post( array( 'ID' => $journal->ID, 'post_name' => 'jogarol', 'post_title' => $data['pages']['journal']['title'] ?? 'Jógáról' ) );
+		$log[] = 'journal: /jogarol/';
 	}
 	if ( class_exists( 'OYS_Schedule' ) ) {
 		global $wpdb;
@@ -466,7 +514,7 @@ function oy_migrate_online() {
 			if ( $is && ! $keep ) {
 				[ $sh, $sm ] = array_map( 'intval', explode( ':', $want['start'] ) );
 				[ $eh, $em ] = array_map( 'intval', explode( ':', $want['end'] ) );
-				OYS_Schedule::save_template( array_merge( (array) $t, array( 'duration_min' => ( $eh * 60 + $em ) - ( $sh * 60 + $sm ), 'active' => 1 ) ), $t->id );
+				OYS_Schedule::save_template( array_merge( (array) $t, array( 'duration_min' => ( $eh * 60 + $em ) - ( $sh * 60 + $sm ), 'location' => $want['location'], 'valid_from' => $want['valid_from'] ?? null, 'active' => 1 ) ), $t->id );
 				$keep = (int) $t->id;
 				continue;
 			}
@@ -474,22 +522,26 @@ function oy_migrate_online() {
 				OYS_Schedule::save_template( array_merge( (array) $t, array( 'active' => 0 ) ), $t->id );
 			}
 		}
-		// the future dates of the other weekly classes go (cancelled with a refund where someone booked), the kept
-		// class's future dates get the new end
-		$s   = OYS_Install::table( 'sessions' );
-		$now = gmdate( 'Y-m-d H:i:s' );
+		// future dates of the other weekly classes, and of the kept one before it starts, go (cancelled with a refund where
+		// someone booked); the kept class's other future dates get the new end and place
+		$s     = OYS_Install::table( 'sessions' );
+		$now   = gmdate( 'Y-m-d H:i:s' );
+		$from  = $want['valid_from'] ?? '';
+		$moved = 'Az órarend változott: az élő online óra szerdánként 18:30-tól 20:00-ig lesz, az első 2026. december 16-án.';
 		foreach ( $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $s WHERE kind = 'group' AND status = 'scheduled' AND starts_at > %s AND template_id > 0", $now ) ) as $row ) { // phpcs:ignore
-			if ( (int) $row->template_id === $keep ) {
+			$early = $from && wp_date( 'Y-m-d', oys_ts( $row->starts_at ) ) < $from;
+			if ( (int) $row->template_id === $keep && ! $early ) {
 				$tpl = OYS_Schedule::template( $keep );
-				$wpdb->update( $s, array( 'ends_at' => gmdate( 'Y-m-d H:i:s', oys_ts( $row->starts_at ) + (int) $tpl->duration_min * 60 ) ), array( 'id' => $row->id ) );
+				$wpdb->update( $s, array( 'ends_at' => gmdate( 'Y-m-d H:i:s', oys_ts( $row->starts_at ) + (int) $tpl->duration_min * 60 ), 'location' => $tpl->location ), array( 'id' => $row->id ) );
 			} elseif ( (int) $row->booked + (int) $row->online_booked > 0 ) {
-				OYS_Schedule::cancel_session( $row->id, 'Az órarend változott: szerdánként 18:30-tól 20:00-ig tartom az élő online órát.' );
+				OYS_Schedule::cancel_session( $row->id, $moved );
 			} else {
 				$wpdb->delete( $s, array( 'id' => $row->id ) );
 			}
 		}
 		$made  = OYS_Schedule::generate();
-		$log[] = sprintf( 'timetable: Wednesday 18:30–20:00 (%d new dates)', $made );
+		$skip  = $keep && ! empty( $want['skip'] ) ? oy_import_skip_dates( $keep, (array) $want['skip'] ) : 0;
+		$log[] = sprintf( 'timetable: Wednesday 18:30–20:00 from %s (%d new dates, %d left out)', $from ?: 'now', $made, $skip );
 	}
 	kses_remove_filters();
 	$log = array_merge( $log, oy_import_all( true ) );

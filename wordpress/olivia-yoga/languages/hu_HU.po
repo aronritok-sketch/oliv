@@ -1260,3 +1260,98 @@ msgstr "Középre"
 
 msgid "Click the part of the photo that must always stay in view (a face, for example). The frames and crops stay the same."
 msgstr "Kattints a fotón arra a részre, aminek mindig látszania kell (például az arcra). A keretek és a vágás nem változnak."
+
+# Online edition after Olivia's notes of 12 November 2026
+
+msgid "Individual online sessions"
+msgstr "Egyéni online órák"
+
+msgid "About yoga"
+msgstr "Jógáról"
+
+msgid "Individual"
+msgstr "Egyéni"
+
+msgid "Live online yoga classes in Hungarian with Olivia Kovacs: group flow yoga on Wednesdays, individual online yoga, prenatal fitness, stretching, relaxation and breathing from home. Beginners welcome."
+msgstr "Élő online jógaórák magyarul Kovács Olíviával: csoportos flow jóga szerdánként, egyéni online jóga, kismamatorna, stretching, relaxáció és légzés otthonról. Kezdőknek is."
+
+msgid "Live online yoga classes in Hungarian with Olivia Kovacs: group flow yoga, individual online yoga, prenatal fitness, stretching, relaxation and breathing."
+msgstr "Élő online jógaórák magyarul Kovács Olíviával: csoportos flow jóga, egyéni online jóga, kismamatorna, stretching, relaxáció és légzés."
+
+msgid "Live online, in the browser"
+msgstr "Élőben, online, a böngészőben"
+
+msgid "Group online flow yoga"
+msgstr "Csoportos online flow jóga"
+
+msgid "Every Wednesday, 18:30 to 20:00, live and in Hungarian. Beginners welcome."
+msgstr "Szerdánként 18:30-tól 20:00-ig, élőben, magyarul. Kezdőket is szeretettel várok."
+
+msgid "Individual online yoga"
+msgstr "Egyéni online jóga"
+
+msgid "One-to-one on video: for a sore back, for stress, or to learn yoga from the basics."
+msgstr "Négyszemközt, videón: ha fáj a hátad, ha stresszes vagy, vagy ha az alapoktól tanulnád a jógát."
+
+msgid "Stretching, relaxation, breathing"
+msgstr "Stretching, relaxáció, légzés"
+
+msgid "One-to-one stretching and mobility, or half an hour of breathing and relaxation."
+msgstr "Egyéni nyújtás és mobilizáció, vagy fél óra légzés és relaxáció."
+
+msgid "No courage needed for the first class"
+msgstr "Nem kell bátorság az első órához"
+
+msgid "Nervous about your first yoga class? Try it at home, on your own mat. Nobody is watching, and your camera can stay off if you like."
+msgstr "Ha izgulsz, milyen lesz egy jógaóra, otthonról, a saját szőnyegeden kipróbálhatod. Senki nem néz, és ha szeretnéd, a kamerád is kikapcsolva maradhat."
+
+msgid "No travel"
+msgstr "Nem kell utaznod"
+
+msgid "No traffic, no parking, no queue in the changing room. Five minutes before class you can still be cooking dinner, and afterwards you can go straight to bed."
+msgstr "Nincs dugó, parkolás, öltözőben sorban állás. Az óra előtt öt perccel még a vacsorát kevered, utána rögtön lefekhetsz."
+
+msgid "The power of the group"
+msgstr "A közösség ereje"
+
+msgid "You are at home, but the motivation stays: the class is live, you need to be there on time, and the others are waiting for you."
+msgstr "Bár otthon vagy, megmarad a motiváció: az óra élő, ott kell lenned időben, és a többiek is várnak."
+
+msgid "The yoga you like"
+msgstr "Azt a jógát, ami tetszik"
+
+msgid "Haven't found the yoga or the teacher you like near you? Join from anywhere, even from abroad."
+msgstr "Ha a közeledben nem találtad meg azt a jógát vagy oktatót, akihez szívesen járnál, online bárhonnan csatlakozhatsz, akár külföldről is."
+
+msgid "Why practise online?"
+msgstr "Miért jó online jógázni?"
+
+msgid "Four reasons people choose live online yoga, and stay."
+msgstr "Négy ok, amiért az élő online jógát választják, és maradnak is."
+
+msgid "Why online"
+msgstr "Miért online"
+
+msgid "Any device with a camera and a browser, no app to install. A bigger screen is easier to follow."
+msgstr "Bármilyen eszköz kamerával és böngészővel, alkalmazást nem kell telepíteni. Nagyobb képernyőn könnyebb követni."
+
+msgid "Your own link comes by email and is waiting in your account. It opens in the browser."
+msgstr "A saját linkedet e-mailben kapod, és a fiókodban is ott vár. A böngésződben nyílik meg."
+
+msgid "I guide you in real time. Afterwards the class chat stays open, and you can watch the class again for a week."
+msgstr "Valós időben vezetlek. Az óra után a chat nyitva marad, és egy hétig visszanézheted az órát."
+
+msgid "Live online yoga in Hungarian with Olivia Kovacs: group flow yoga every Wednesday, and individual online yoga, prenatal fitness, stretching, relaxation and breathing from your living room. Beginners very welcome."
+msgstr "Élő online jóga magyarul Kovács Olíviával: csoportos flow jóga minden szerdán, valamint egyéni online jóga, kismamatorna, stretching, relaxáció és légzés a nappalidból. Kezdőket is szeretettel várok."
+
+msgid "Breathwork, strength, stretching, balance, a real flow state and a long relaxation, live and in Hungarian. Join the group on Wednesdays, or ask for a one-to-one session."
+msgstr "Légzés, erősítés, nyújtás, egyensúly, igazi flow élmény és hosszú relaxáció, élőben, magyarul. Gyere a szerdai csoportba, vagy kérj egyéni órát."
+
+msgid "Read more about yoga"
+msgstr "Olvass a jógáról"
+
+msgid "Join a live online class, ask for a one-to-one session, or just send a question. Beginners very welcome."
+msgstr "Gyere el egy élő online órára, kérj egyéni órát, vagy csak küldd el a kérdésed. Kezdőket is szeretettel várok."
+
+msgid "Online Yoga, Live in Hungarian: Flow Yoga, Prenatal & One-to-One Classes | Olivia Jóga"
+msgstr "Online jóga élőben, magyarul: flow jóga, kismamatorna, egyéni órák | Olivia Jóga"

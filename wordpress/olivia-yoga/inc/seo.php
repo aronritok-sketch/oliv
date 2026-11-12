@@ -15,7 +15,7 @@ function oy_meta_description() {
 		return __( 'Hathaflow is a booking system for yoga studios and teachers: timetable, online booking and payment, class passes, memberships, private sessions, online classes and gift cards. This is a demo studio.', 'olivia-yoga' );
 	}
 	if ( is_front_page() && oy_online_only() ) {
-		return __( 'Live online yoga classes in Hungarian with Olivia Kovacs: hatha flow, slow flow and prenatal fitness from home on Zoom, plus private online sessions. Beginners welcome.', 'olivia-yoga' );
+		return __( 'Live online yoga classes in Hungarian with Olivia Kovacs: group flow yoga on Wednesdays, individual online yoga, prenatal fitness, stretching, relaxation and breathing from home. Beginners welcome.', 'olivia-yoga' );
 	}
 	if ( is_front_page() ) {
 		return __( 'Yoga, mobility and prenatal fitness in Fort Myers, FL: hatha flow and slow flow classes, private yoga at your home, lanai or on the beach, meditation and singing bowl massage with Olivia Kovacs.', 'olivia-yoga' );
@@ -37,7 +37,7 @@ add_filter( 'pre_get_document_title', function ( $title ) {
 	}
 	if ( is_front_page() ) {
 		return oy_online_only()
-			? __( 'Online Yoga Classes, Live in Hungarian: Hatha Flow, Slow Flow & Prenatal | Olivia Jóga', 'olivia-yoga' )
+			? __( 'Online Yoga, Live in Hungarian: Flow Yoga, Prenatal & One-to-One Classes | Olivia Jóga', 'olivia-yoga' )
 			: __( 'Yoga in Fort Myers, FL: Hatha Flow, Private Yoga & Prenatal Fitness | Olivia Kovacs', 'olivia-yoga' );
 	}
 	if ( is_singular() ) {
@@ -78,13 +78,13 @@ add_action( 'wp_head', function () {
 			'url'         => $site,
 			'email'       => OY_EMAIL,
 			'sameAs'      => array( OY_INSTAGRAM, OY_FACEBOOK ),
-			'description' => __( 'Live online yoga classes in Hungarian: hatha flow, slow flow, prenatal fitness and private online sessions with Olivia Kovacs.', 'olivia-yoga' ),
+			'description' => __( 'Live online yoga classes in Hungarian with Olivia Kovacs: group flow yoga, individual online yoga, prenatal fitness, stretching, relaxation and breathing.', 'olivia-yoga' ),
 			'areaServed'  => array( '@type' => 'Country', 'name' => 'Hungary' ),
 			'knowsLanguage' => 'hu',
 			'founder'     => array( '@id' => $site . '#olivia' ),
 			'makesOffer'  => array(
 				'@type'       => 'Offer',
-				'itemOffered' => array( '@type' => 'Service', 'name' => __( 'Live online yoga classes', 'olivia-yoga' ), 'serviceType' => 'Online yoga class', 'areaServed' => array( '@type' => 'Country', 'name' => 'Hungary' ), 'availableChannel' => array( '@type' => 'ServiceChannel', 'name' => 'Zoom', 'serviceUrl' => oy_page_link( 'schedule-pricing' ) ) ),
+				'itemOffered' => array( '@type' => 'Service', 'name' => __( 'Live online yoga classes', 'olivia-yoga' ), 'serviceType' => 'Online yoga class', 'areaServed' => array( '@type' => 'Country', 'name' => 'Hungary' ), 'availableChannel' => array( '@type' => 'ServiceChannel', 'name' => __( 'Live online, in the browser', 'olivia-yoga' ), 'serviceUrl' => oy_page_link( 'schedule-pricing' ) ) ),
 			),
 		)
 		: null;

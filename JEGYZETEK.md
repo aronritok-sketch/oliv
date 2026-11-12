@@ -156,6 +156,8 @@
 - **Kiegészítés (doksi + Áron, 2026-11-12):** oliviajoga.hu 1.4.1 – őszibarack előlábléc, új Árak-alcím, telefonos menü javítva; **Képek helye** az adminban: az oliviajoga.hu-témában Megjelenés → Képek helye (fotónként a látható pont), a foglaló-/US-témában (3.3.1) Média → kép → „Kép helye” (`oy_pos` meta, `inc/image-position.php`).
 - **Nyitott:** a dev foglalóoldalán a bővítményt a VPS-en újra kell telepíteni (a `hpv-site update` nem teszi fel a `plugin_zips`-et); az oliviajoga.online domain élesítése (most parkolt oldal); a magánóra-árak továbbra is MINTA.
 
+- **18. kör (Olivia „Módosítások online jóga” doksija + Áron, 2026-11-12):** nincs Zoom: **saját élő közvetítés Daily-vel** (olivia-studio 1.6.0, `OYS_Live`): élő oldal a fiókban, saját link minden résztvevőnek, a chat az óra után is megmarad, felvétel csak Oliviáról (a résztvevők soha), 7 napig visszanézhető, az óra eleji szavak AI-összefoglalója. Az online oldal (olivia-yoga 3.4.0): csoportos online flow jóga szerdánként (első dec. 16., dec. 23. kimarad), egyéni online jóga, online kismamatorna (hosszabb oldal, eszközlista), online stretching és mobilizáció, relaxáció és légzés (saját árak, bérletek), „miért online” horgok (SEO-kutatás: „egyéni” > „privát”, „kismama torna” 720/hó, „stretching” 1600/hó, „légzőgyakorlatok” 590/hó), slow flow és Zoom ki, Napló → Jógáról, az oliviajoga.hu arculata és logója kisbetűs „online”-nal. Teendő az élesítéshez: Daily API-kulcs (`OYS_DAILY_API_KEY`) a szerveren.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

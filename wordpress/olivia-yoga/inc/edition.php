@@ -28,12 +28,41 @@ const OY_EDITIONS = array(
 const OY_ONLINE_SLUGS = array(
 	'about'            => 'rolam',
 	'yoga-classes'     => 'online-jogaorak',
-	'private-yoga'     => 'online-maganora',
+	'private-yoga'     => 'online-jogaorak', // Olivia, 11.12: the private sessions page went into the classes page
 	'schedule-pricing' => 'orarend-es-arak',
 	'faq'              => 'gyik',
 	'contact'          => 'kapcsolat',
-	'journal'          => 'naplo',
+	'journal'          => 'jogarol', // „Jógáról” (Olivia, 11.12; was „Napló”)
 );
+
+/**
+ * Addresses of the online site that moved (Olivia's notes of 12 November 2026): the old ones lead to the new.
+ * Keys: the path (without slashes); values: [ kind, target ] – page key, class slug, or the classes page with an anchor.
+ */
+const OY_ONLINE_MOVED = array(
+	'naplo'                         => array( 'page', 'journal' ),
+	'online-maganora'               => array( 'anchor', 'egyeni-orak' ),
+	'online-jogaorak/slow-flow'     => array( 'page', 'yoga-classes' ),
+	'online-jogaorak/private-yoga'  => array( 'class', 'egyeni-online-joga' ),
+	'hatha-flow-vs-slow-flow'       => array( 'page', 'journal' ),
+);
+
+add_action( 'template_redirect', function () {
+	if ( ! is_404() || ! oy_online_only() ) {
+		return;
+	}
+	$home = (string) wp_parse_url( home_url( '/' ), PHP_URL_PATH );
+	$path = trim( substr( (string) wp_parse_url( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_PATH ), strlen( rtrim( $home, '/' ) ) ), '/' );
+	$to   = OY_ONLINE_MOVED[ $path ] ?? null;
+	if ( ! $to && str_starts_with( $path, 'naplo/' ) ) {
+		$to = array( 'path', 'jogarol/' . substr( $path, 6 ) );
+	}
+	if ( $to ) {
+		$url = 'class' === $to[0] ? oy_class_url( $to[1] ) : ( 'anchor' === $to[0] ? oy_page_link( 'yoga-classes', $to[1] ) : ( 'path' === $to[0] ? home_url( '/' . $to[1] . '/' ) : oy_page_link( $to[1] ) ) );
+		wp_safe_redirect( $url, 301 );
+		exit;
+	}
+} );
 
 function oy_edition() {
 	$edition = defined( 'OY_EDITION' ) ? (string) OY_EDITION : (string) get_option( 'oy_edition', 'fort-myers' );
@@ -157,6 +186,9 @@ function oy_switch_edition( $edition ) {
 	}
 	if ( class_exists( 'OYS_Products' ) && ! empty( $setup['products'] ) ) {
 		update_option( OYS_Products::OPTION, (array) $setup['products'] );
+	}
+	if ( class_exists( 'OYS_Services' ) ) {
+		update_option( OYS_Services::OPTION, (array) ( $setup['services'] ?? array() ) );
 	}
 	if ( class_exists( 'OYS_Locations' ) && isset( $setup['locations'] ) ) {
 		update_option( OYS_Locations::OPTION, (array) $setup['locations'], false );

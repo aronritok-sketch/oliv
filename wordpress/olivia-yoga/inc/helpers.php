@@ -230,7 +230,7 @@ function oy_resolve_tokens( $text ) {
 		return oy_contact_url( $m[2] );
 	}, $text );
 	// {{private}}: the private session request; {{private:prenatal}}: the same, for a prenatal session
-	return preg_replace_callback( '/\{\{private(?::([a-z]+))?\}\}/', fn( $m ) => empty( $m[1] ) ? oy_private_url() : add_query_arg( 'topic', $m[1], oy_private_url() ), $text );
+	return preg_replace_callback( '/\{\{private(?::([a-z0-9\-]+))?\}\}/', fn( $m ) => empty( $m[1] ) ? oy_private_url() : add_query_arg( 'topic', $m[1], oy_private_url() ), $text );
 }
 
 /* ---------- Breadcrumbs and page head ---------- */
@@ -274,4 +274,36 @@ function oy_class_facts( $post_id, $cls = 'chips' ) {
 function oy_class_meta( $post_id, $key ) {
 	$own = oy_tr( $post_id, str_replace( 'oy_', '', $key ) );
 	return $own ?: oy_t( (string) get_post_meta( $post_id, $key, true ) );
+}
+
+/* ---------- The look of oliviajoga.hu on the online site (Olivia, 11.12: „a teljes design legyen az, mint az oliviajoga.hu-n”) ---------- */
+
+/** Her logo (OLÍVIA, the pink brush stroke, JÓGA) with „online” in small letters, inline so it takes the text colour. */
+function oy_online_logo( $cls = 'oj-logo' ) {
+	static $svg = null;
+	if ( null === $svg ) {
+		$svg = (string) file_get_contents( get_template_directory() . '/assets/img/logo-online.svg' );
+	}
+	return str_replace( '<svg ', '<svg class="' . esc_attr( $cls ) . '" aria-hidden="true" focusable="false" ', $svg );
+}
+
+/** The wave of her logo as a path: a brush stroke along a sine, thin at both ends, thick in the middle. */
+function oy_brush_d( $w, $h, $amp, $th, $periods = 1.5, $phase = 0.0, $n = 96 ) {
+	$top = array();
+	$bot = array();
+	for ( $i = 0; $i <= $n; $i++ ) {
+		$t     = $i / $n;
+		$x     = $w * $t;
+		$y     = $h / 2 + $amp * sin( 2 * M_PI * $periods * $t + $phase );
+		$d     = ( .1 + .9 * pow( sin( M_PI * $t ), 1.15 ) ) * $th / 2;
+		$top[] = sprintf( '%.1f %.1f', $x, $y - $d );
+		$bot[] = sprintf( '%.1f %.1f', $x, $y + $d );
+	}
+	return 'M' . implode( ' L', $top ) . ' L' . implode( ' L', array_reverse( $bot ) ) . 'Z';
+}
+
+/** Two brush strokes behind a picture, like the wave in her logo: a broad one in the tone, a thin orchid one. */
+function oy_brush_blob( $tone = 'pink', $side = 'right' ) {
+	return '<svg class="oj-blob oj-brush oj-blob--' . esc_attr( $side ) . ' oj-tone--' . esc_attr( $tone ) . '" viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
+		. '<path class="oj-blob__back" d="' . oy_brush_d( 400, 100, 22, 30 ) . '"/><path class="oj-blob__front" d="' . oy_brush_d( 400, 100, 18, 12, 1.5, .7 ) . '"/></svg>';
 }

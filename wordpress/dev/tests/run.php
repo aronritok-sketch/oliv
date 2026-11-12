@@ -1749,6 +1749,38 @@ test( 'online edition: Hungarian addresses and its own copy', function () {
 		ok( in_array( $p['kind'], $kinds, true ) && 0 === $p['price_cents'] % 100, "product $id: online kind, whole forints" );
 	}
 	eq( 'hu', $data['setup']['studio']['default_lang'], 'the edition switches the site to Hungarian' );
+	// Olivia's doc of 12 November: one-to-one services, no slow flow, no Zoom, „Jógáról”
+	foreach ( $data['setup']['services'] as $key => $svc ) {
+		ok( isset( $data['classes'][ $svc['class'] ] ), "service $key has its class page" );
+		ok( str_contains( $data['classes'][ $svc['class'] ]['content'], '{{private:' . $key . '}}' ), "service $key: the class page asks for a time for it" );
+	}
+	foreach ( $data['setup']['products'] as $id => $p ) {
+		ok( empty( $p['service'] ) || isset( $data['setup']['services'][ $p['service'] ] ), "product $id: its service exists" );
+	}
+	ok( ! preg_match( '/slow flow|slow-flow|zoom/iu', wp_json_encode( array_diff_key( $data, array( '_note' => 1 ) ), JSON_UNESCAPED_UNICODE ) ), 'online copy: no slow flow, no Zoom' );
+	eq( 'Jógáról', $data['menu']['journal'], 'the journal is „Jógáról”' );
+	eq( '2026-12-16', $data['sessions'][0]['valid_from'], 'the Wednesday class starts on 16 December' );
+	eq( array( '2026-12-23' ), $data['sessions'][0]['skip'], 'no class on 23 December' );
+	preg_match_all( '/\{\{private:([a-z0-9\-]+)\}\}/', $text, $m );
+	foreach ( array_unique( $m[1] ) as $topic ) {
+		ok( isset( $data['setup']['services'][ $topic ] ), "request link for an existing service: $topic" );
+	}
+	ok( str_contains( oy_resolve_tokens( '{{private:egyeni-joga}}' ), 'topic=egyeni-joga' ), 'service keys with a hyphen resolve' );
+} );
+
+test( 'online edition: a weekly class leaves out a date (23 December)', function () {
+	require_once get_template_directory() . '/inc/demo-import.php';
+	$day  = wp_date( 'N', time() + 9 * DAY_IN_SECONDS );
+	$tpl  = OYS_Schedule::save_template( array( 'class_slug' => 'hatha-flow', 'weekday' => (int) $day, 'start_time' => '18:30', 'duration_min' => 90, 'format' => 'online', 'online_capacity' => 20, 'active' => 1, 'valid_from' => wp_date( 'Y-m-d', time() + 8 * DAY_IN_SECONDS ) ) );
+	OYS_Schedule::generate( 3 );
+	$dates = fn( $status ) => array_map( fn( $r ) => wp_date( 'Y-m-d', oys_ts( $r->starts_at ) ), array_filter( OYS_Schedule::query( array( 'from' => oys_now(), 'status' => $status ) ), fn( $r ) => (int) $r->template_id === $tpl ) );
+	eq( array( wp_date( 'Y-m-d', time() + 9 * DAY_IN_SECONDS ), wp_date( 'Y-m-d', time() + 16 * DAY_IN_SECONDS ) ), array_values( $dates( 'scheduled' ) ), 'nothing before the first date' );
+	$skip = wp_date( 'Y-m-d', time() + 16 * DAY_IN_SECONDS );
+	eq( 1, oy_import_skip_dates( $tpl, array( $skip ) ), 'the date is left out' );
+	ok( ! in_array( $skip, $dates( 'scheduled' ), true ) && in_array( $skip, $dates( 'cancelled' ), true ), 'cancelled, not deleted' );
+	OYS_Schedule::generate( 4 );
+	ok( ! in_array( $skip, $dates( 'scheduled' ), true ), 'and not made again' );
+	ok( in_array( wp_date( 'Y-m-d', time() + 23 * DAY_IN_SECONDS ), $dates( 'scheduled' ), true ), 'the week after goes on' );
 } );
 
 test( 'hathaflow edition: a neutral demo studio, none of Olivia\'s content', function () {

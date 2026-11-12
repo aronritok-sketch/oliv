@@ -1103,3 +1103,98 @@ msgstr "Centrar"
 
 msgid "Click the part of the photo that must always stay in view (a face, for example). The frames and crops stay the same."
 msgstr "Haz clic en la parte de la foto que siempre debe verse (una cara, por ejemplo). Los marcos y recortes no cambian."
+
+# Online edition after Olivia's notes of 12 November 2026
+
+msgid "Individual online sessions"
+msgstr "Clases individuales en línea"
+
+msgid "About yoga"
+msgstr "Sobre el yoga"
+
+msgid "Individual"
+msgstr "Individual"
+
+msgid "Live online yoga classes in Hungarian with Olivia Kovacs: group flow yoga on Wednesdays, individual online yoga, prenatal fitness, stretching, relaxation and breathing from home. Beginners welcome."
+msgstr "Clases de yoga en vivo en línea en húngaro con Olivia Kovacs: flow yoga en grupo los miércoles, yoga individual en línea, ejercicio prenatal, estiramientos, relajación y respiración desde casa. Principiantes bienvenidos."
+
+msgid "Live online yoga classes in Hungarian with Olivia Kovacs: group flow yoga, individual online yoga, prenatal fitness, stretching, relaxation and breathing."
+msgstr "Clases de yoga en vivo en línea en húngaro con Olivia Kovacs: flow yoga en grupo, yoga individual, ejercicio prenatal, estiramientos, relajación y respiración."
+
+msgid "Live online, in the browser"
+msgstr "En vivo, en línea, en el navegador"
+
+msgid "Group online flow yoga"
+msgstr "Flow yoga en grupo en línea"
+
+msgid "Every Wednesday, 18:30 to 20:00, live and in Hungarian. Beginners welcome."
+msgstr "Cada miércoles de 18:30 a 20:00, en vivo y en húngaro. Principiantes bienvenidos."
+
+msgid "Individual online yoga"
+msgstr "Yoga individual en línea"
+
+msgid "One-to-one on video: for a sore back, for stress, or to learn yoga from the basics."
+msgstr "A solas por video: para la espalda dolorida, para el estrés o para aprender yoga desde lo básico."
+
+msgid "Stretching, relaxation, breathing"
+msgstr "Estiramientos, relajación, respiración"
+
+msgid "One-to-one stretching and mobility, or half an hour of breathing and relaxation."
+msgstr "Estiramientos y movilidad individuales, o media hora de respiración y relajación."
+
+msgid "No courage needed for the first class"
+msgstr "No hace falta valor para la primera clase"
+
+msgid "Nervous about your first yoga class? Try it at home, on your own mat. Nobody is watching, and your camera can stay off if you like."
+msgstr "¿Te pone nerviosa tu primera clase de yoga? Pruébala en casa, en tu propia esterilla. Nadie te mira, y tu cámara puede quedarse apagada si quieres."
+
+msgid "No travel"
+msgstr "Sin desplazamientos"
+
+msgid "No traffic, no parking, no queue in the changing room. Five minutes before class you can still be cooking dinner, and afterwards you can go straight to bed."
+msgstr "Sin tráfico, sin aparcar, sin colas en el vestuario. Cinco minutos antes de clase aún puedes estar cocinando, y después irte directo a la cama."
+
+msgid "The power of the group"
+msgstr "La fuerza del grupo"
+
+msgid "You are at home, but the motivation stays: the class is live, you need to be there on time, and the others are waiting for you."
+msgstr "Estás en casa, pero la motivación se mantiene: la clase es en vivo, tienes que estar a tiempo y los demás te esperan."
+
+msgid "The yoga you like"
+msgstr "El yoga que te gusta"
+
+msgid "Haven't found the yoga or the teacher you like near you? Join from anywhere, even from abroad."
+msgstr "¿No has encontrado cerca el yoga o la profesora que te gusta? Únete desde cualquier lugar, incluso desde el extranjero."
+
+msgid "Why practise online?"
+msgstr "¿Por qué practicar en línea?"
+
+msgid "Four reasons people choose live online yoga, and stay."
+msgstr "Cuatro razones por las que se elige el yoga en vivo en línea, y se queda."
+
+msgid "Why online"
+msgstr "Por qué en línea"
+
+msgid "Any device with a camera and a browser, no app to install. A bigger screen is easier to follow."
+msgstr "Cualquier dispositivo con cámara y navegador, sin instalar ninguna aplicación. En una pantalla más grande es más fácil seguir la clase."
+
+msgid "Your own link comes by email and is waiting in your account. It opens in the browser."
+msgstr "Tu propio enlace llega por correo y te espera en tu cuenta. Se abre en el navegador."
+
+msgid "I guide you in real time. Afterwards the class chat stays open, and you can watch the class again for a week."
+msgstr "Te guío en tiempo real. Después, el chat de la clase sigue abierto y puedes volver a ver la clase durante una semana."
+
+msgid "Live online yoga in Hungarian with Olivia Kovacs: group flow yoga every Wednesday, and individual online yoga, prenatal fitness, stretching, relaxation and breathing from your living room. Beginners very welcome."
+msgstr "Yoga en vivo en línea en húngaro con Olivia Kovacs: flow yoga en grupo cada miércoles, y yoga individual, ejercicio prenatal, estiramientos, relajación y respiración desde tu salón. Principiantes muy bienvenidos."
+
+msgid "Breathwork, strength, stretching, balance, a real flow state and a long relaxation, live and in Hungarian. Join the group on Wednesdays, or ask for a one-to-one session."
+msgstr "Respiración, fuerza, estiramientos, equilibrio, un verdadero estado de flow y una larga relajación, en vivo y en húngaro. Únete al grupo de los miércoles o pide una sesión individual."
+
+msgid "Read more about yoga"
+msgstr "Lee más sobre el yoga"
+
+msgid "Join a live online class, ask for a one-to-one session, or just send a question. Beginners very welcome."
+msgstr "Únete a una clase en vivo en línea, pide una sesión individual o simplemente envía una pregunta. Principiantes muy bienvenidos."
+
+msgid "Online Yoga, Live in Hungarian: Flow Yoga, Prenatal & One-to-One Classes | Olivia Jóga"
+msgstr "Yoga en línea, en vivo y en húngaro: flow yoga, prenatal y clases individuales | Olivia Jóga"

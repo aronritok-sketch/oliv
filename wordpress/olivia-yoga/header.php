@@ -14,6 +14,9 @@
 <?php
 $account_label = is_user_logged_in() ? __( 'My account', 'olivia-yoga' ) : __( 'Log in', 'olivia-yoga' );
 $brand         = '<a class="brand" href="' . esc_url( home_url( '/' ) ) . '" rel="home"><svg class="brand__mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="19" fill="#2B5036"/><path d="M9 25c4-3.5 8 2.5 12-1s7-2.5 10-.5" fill="none" stroke="#C6A3EE" stroke-width="2.2" stroke-linecap="round"/><circle cx="26.5" cy="13" r="4" fill="#EE3F9A"/></svg><span><span class="brand__name">' . esc_html( oy_brand( 'short' ) ) . '</span><span class="brand__sub">' . esc_html( oy_brand( 'sub' ) ) . '</span></span></a>';
+if ( oy_online_only() ) { // the oliviajoga.hu logo with „online” (Olivia, 11.12)
+	$brand = '<a class="brand oj-brand" href="' . esc_url( home_url( '/' ) ) . '" rel="home" aria-label="' . esc_attr( oy_site_name() ) . '">' . oy_online_logo() . '</a>';
+}
 ?>
 <header class="site-header" data-header>
 	<div class="container site-header__inner">

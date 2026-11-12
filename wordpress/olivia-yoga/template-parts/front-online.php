@@ -8,34 +8,40 @@ defined( 'ABSPATH' ) || exit;
 
 $studio = fn( $sc ) => shortcode_exists( $sc ) ? do_shortcode( '[' . $sc . ']' ) : '';
 $ways   = array(
-	array( __( 'Live group classes', 'olivia-yoga' ), __( 'Hatha flow every Wednesday, 18:30 to 20:00, live on Zoom.', 'olivia-yoga' ), oy_page_link( 'schedule-pricing' ), 'group', 'lilac' ),
-	array( __( 'Private online sessions', 'olivia-yoga' ), __( 'One-on-one on video, planned around your body, your goals and your week.', 'olivia-yoga' ), oy_page_link( 'private-yoga' ), 'home', 'pink' ),
+	array( __( 'Group online flow yoga', 'olivia-yoga' ), __( 'Every Wednesday, 18:30 to 20:00, live and in Hungarian. Beginners welcome.', 'olivia-yoga' ), oy_class_url( 'hatha-flow' ), 'group', 'lilac' ),
+	array( __( 'Individual online yoga', 'olivia-yoga' ), __( 'One-to-one on video: for a sore back, for stress, or to learn yoga from the basics.', 'olivia-yoga' ), oy_class_url( 'egyeni-online-joga' ), 'home', 'pink' ),
 	array( __( 'Prenatal fitness online', 'olivia-yoga' ), __( 'One-to-one or with a friend, planned for your trimester and how you feel that day.', 'olivia-yoga' ), oy_class_url( oy_prenatal_slug() ), 'prenatal', 'sage' ),
-	array( __( 'Journal', 'olivia-yoga' ), __( 'Breathing, the eight limbs of yoga and practice notes to read between classes.', 'olivia-yoga' ), oy_page_link( 'journal' ), 'lotus', 'sun' ),
+	array( __( 'Stretching, relaxation, breathing', 'olivia-yoga' ), __( 'One-to-one stretching and mobility, or half an hour of breathing and relaxation.', 'olivia-yoga' ), oy_page_link( 'yoga-classes', 'egyeni-orak' ), 'mobility', 'sun' ),
+);
+$why    = array(
+	array( 'home', __( 'No courage needed for the first class', 'olivia-yoga' ), __( 'Nervous about your first yoga class? Try it at home, on your own mat. Nobody is watching, and your camera can stay off if you like.', 'olivia-yoga' ), 'lilac' ),
+	array( 'clock', __( 'No travel', 'olivia-yoga' ), __( 'No traffic, no parking, no queue in the changing room. Five minutes before class you can still be cooking dinner, and afterwards you can go straight to bed.', 'olivia-yoga' ), 'pink' ),
+	array( 'group', __( 'The power of the group', 'olivia-yoga' ), __( 'You are at home, but the motivation stays: the class is live, you need to be there on time, and the others are waiting for you.', 'olivia-yoga' ), 'sage' ),
+	array( 'lotus', __( 'The yoga you like', 'olivia-yoga' ), __( 'Haven\'t found the yoga or the teacher you like near you? Join from anywhere, even from abroad.', 'olivia-yoga' ), 'sun' ),
 );
 $needs  = array(
 	array( 'home', __( 'A quiet corner', 'olivia-yoga' ), __( 'Room for a mat, and a door you can close for an hour.', 'olivia-yoga' ), 'lilac' ),
 	array( 'lotus', __( 'A mat, a cushion and a blanket', 'olivia-yoga' ), __( 'The cushion and blanket are for the long relaxation at the end.', 'olivia-yoga' ), 'pink' ),
-	array( 'online', __( 'A phone, tablet or laptop', 'olivia-yoga' ), __( 'Any device with a camera that runs Zoom. A bigger screen is easier to follow.', 'olivia-yoga' ), 'sage' ),
+	array( 'online', __( 'A phone, tablet or laptop', 'olivia-yoga' ), __( 'Any device with a camera and a browser, no app to install. A bigger screen is easier to follow.', 'olivia-yoga' ), 'sage' ),
 	array( 'group', __( 'Camera on, if you like', 'olivia-yoga' ), __( 'If I can see you, I can help you with the poses. Only I see your picture.', 'olivia-yoga' ), 'sun' ),
 );
 $steps  = array(
 	array( __( 'Choose a class', 'olivia-yoga' ), __( 'Book from the timetable with a drop-in or a class pass.', 'olivia-yoga' ) ),
-	array( __( 'Get the link', 'olivia-yoga' ), __( 'The Zoom link comes by email and is waiting in your account.', 'olivia-yoga' ) ),
+	array( __( 'Get the link', 'olivia-yoga' ), __( 'Your own link comes by email and is waiting in your account. It opens in the browser.', 'olivia-yoga' ) ),
 	array( __( 'Roll out your mat', 'olivia-yoga' ), __( 'Join a few minutes early so we can say hello before we start.', 'olivia-yoga' ) ),
-	array( __( 'Practice together, live', 'olivia-yoga' ), __( 'I guide you in real time and adjust the class to the people in it.', 'olivia-yoga' ) ),
+	array( __( 'Practice together, live', 'olivia-yoga' ), __( 'I guide you in real time. Afterwards the class chat stays open, and you can watch the class again for a week.', 'olivia-yoga' ) ),
 );
 ?>
-<section class="hero" aria-labelledby="hero-title">
+<section class="hero oj-hero" aria-labelledby="hero-title">
 	<div class="container hero__grid">
 		<div class="hero__text">
 			<?php echo oy_kicker( __( 'Live online yoga · in Hungarian', 'olivia-yoga' ) ); // phpcs:ignore ?>
 			<h1 class="hero__title" id="hero-title"><span class="hero__l1"><?php echo esc_html_x( 'Online', 'online hero title, line 1', 'olivia-yoga' ); ?></span> <span class="hero__l2"><mark><?php echo esc_html_x( 'yoga', 'online hero title, line 2', 'olivia-yoga' ); ?></mark></span> <span class="hero__l3"><?php echo esc_html_x( 'live, from home', 'online hero title, line 3', 'olivia-yoga' ); ?></span></h1>
-			<p class="hero__lead"><?php esc_html_e( 'Live online yoga classes in Hungarian with Olivia Kovacs: dynamic yet gentle hatha flow, slow flow and prenatal fitness from your living room, on Zoom. Beginners very welcome.', 'olivia-yoga' ); ?></p>
+			<p class="hero__lead"><?php esc_html_e( 'Live online yoga in Hungarian with Olivia Kovacs: group flow yoga every Wednesday, and individual online yoga, prenatal fitness, stretching, relaxation and breathing from your living room. Beginners very welcome.', 'olivia-yoga' ); ?></p>
 			<p class="btn-row"><?php echo oy_btn( oy_book_url(), __( 'Book a class', 'olivia-yoga' ), 'orchid', 'btn--lg' ) . oy_btn( oy_page_link( 'schedule-pricing' ), __( 'Schedule & pricing', 'olivia-yoga' ), 'ghost' ); // phpcs:ignore ?></p>
 		</div>
 		<div class="hero__visual">
-			<div class="hero__block" aria-hidden="true"></div>
+			<?php echo oy_brush_blob( 'pink', 'right' ); // phpcs:ignore ?>
 			<div class="frame hero__photo"><?php echo oy_photo( 'online-yoga-living-room', '(min-width: 960px) 52vw, 92vw', true ); // phpcs:ignore ?></div>
 			<?php echo oy_name_card( 'hero__card' ); // phpcs:ignore ?>
 		</div>
@@ -48,9 +54,14 @@ $steps  = array(
 	<?php endforeach; ?>
 </div></div></section>
 
+<section class="section section--pale" id="why-online" aria-labelledby="why-title"><div class="container">
+	<?php echo oy_section_head( __( 'Why practise online?', 'olivia-yoga' ), __( 'Four reasons people choose live online yoga, and stay.', 'olivia-yoga' ), __( 'Why online', 'olivia-yoga' ), 'why-title' ); // phpcs:ignore ?>
+	<ul class="places places--why" data-reveal><?php foreach ( $why as $n ) : ?><li><?php echo oy_pictogram( $n[0], $n[3] ); // phpcs:ignore ?><div><h3><?php echo esc_html( $n[1] ); ?></h3><p><?php echo esc_html( $n[2] ); ?></p></div></li><?php endforeach; ?></ul>
+</div></section>
+
 <section class="section" id="intro" aria-labelledby="intro-title"><div class="container">
 	<div class="intro__grid">
-		<div class="intro__visual" data-reveal><div class="frame"><?php echo oy_photo( 'olivia-golden-hour-arms', '(min-width: 960px) 36vw, 92vw' ); // phpcs:ignore ?></div></div>
+		<div class="intro__visual" data-reveal><div class="oj-waved"><?php echo oy_brush_blob( 'lilac', 'left' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'olivia-golden-hour-arms', '(min-width: 960px) 36vw, 92vw' ); // phpcs:ignore ?></div></div></div>
 		<div class="prose" data-reveal>
 			<?php echo oy_kicker( __( 'Meet your teacher', 'olivia-yoga' ) ); // phpcs:ignore ?>
 			<?php
@@ -70,7 +81,7 @@ $steps  = array(
 </div></section>
 
 <section class="section section--tight" id="classes" aria-labelledby="classes-title"><div class="container">
-	<?php echo oy_section_head( __( 'Online classes', 'olivia-yoga' ), __( 'Breathwork, strength, stretching, balance, a real flow state and a long relaxation in every class, live on Zoom. Choose the pace that suits you today.', 'olivia-yoga' ), __( 'Classes', 'olivia-yoga' ), 'classes-title' ); // phpcs:ignore ?>
+	<?php echo oy_section_head( __( 'Online classes', 'olivia-yoga' ), __( 'Breathwork, strength, stretching, balance, a real flow state and a long relaxation, live and in Hungarian. Join the group on Wednesdays, or ask for a one-to-one session.', 'olivia-yoga' ), __( 'Classes', 'olivia-yoga' ), 'classes-title' ); // phpcs:ignore ?>
 	<?php echo oy_classes_list(); // phpcs:ignore ?>
 </div></section>
 
@@ -119,13 +130,13 @@ $steps  = array(
 <?php $journal = get_posts( array( 'numberposts' => 3 ) ); ?>
 <?php if ( $journal ) : ?>
 <section class="section section--pale" aria-labelledby="journal-title"><div class="container">
-	<header class="section__head section__head--row" data-reveal><div><?php echo oy_kicker( __( 'Journal', 'olivia-yoga' ) ); // phpcs:ignore ?><h2 id="journal-title"><?php esc_html_e( 'From the journal', 'olivia-yoga' ); ?></h2></div><?php echo oy_btn( oy_page_link( 'journal' ), __( 'All articles', 'olivia-yoga' ), 'ghost' ); // phpcs:ignore ?></header>
+	<header class="section__head section__head--row" data-reveal><div><?php echo oy_kicker( __( 'About yoga', 'olivia-yoga' ) ); // phpcs:ignore ?><h2 id="journal-title"><?php esc_html_e( 'Read more about yoga', 'olivia-yoga' ); ?></h2></div><?php echo oy_btn( oy_page_link( 'journal' ), __( 'All articles', 'olivia-yoga' ), 'ghost' ); // phpcs:ignore ?></header>
 	<?php get_template_part( 'template-parts/cards', null, array( 'posts' => $journal ) ); ?>
 </div></section>
 <?php endif; ?>
 
-<section class="section cta" aria-labelledby="cta-title"><div class="container"><div class="cta__inner" data-reveal>
+<section class="section cta oj-cta--peach" aria-labelledby="cta-title"><div class="container"><div class="cta__inner" data-reveal>
 	<h2 id="cta-title"><?php esc_html_e( 'Your mat is waiting', 'olivia-yoga' ); ?></h2>
-	<p class="lead"><?php esc_html_e( 'Join a live online class, request a private session, or just send a question. Beginners very welcome.', 'olivia-yoga' ); ?></p>
+	<p class="lead"><?php esc_html_e( 'Join a live online class, ask for a one-to-one session, or just send a question. Beginners very welcome.', 'olivia-yoga' ); ?></p>
 	<p class="btn-row"><?php echo oy_btn( oy_book_url(), __( 'Book a class', 'olivia-yoga' ), 'orchid', 'btn--lg' ) . oy_btn( oy_contact_url(), __( 'Send a message', 'olivia-yoga' ), 'ghost' ); // phpcs:ignore ?></p>
 </div></div></section>
