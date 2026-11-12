@@ -1976,6 +1976,25 @@ test( 'live: the teacher mutes everyone (not herself)', function () {
 	}
 } );
 
+test( 'settings page: secrets (LiveKit, Stripe, Zoom) are never printed back into the page', function () {
+	if ( ! class_exists( 'OYS_Admin' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/admin.php';
+		require_once OYS_DIR . 'includes/admin/class-admin.php';
+	}
+	$before = OYS_Settings::all();
+	OYS_Settings::update( array( 'livekit_url' => 'wss://test-proj.livekit.cloud', 'livekit_api_key' => 'APIabc123', 'livekit_api_secret' => 'lk-secret-should-not-show', 'stripe_live_secret' => 'sk_live_should_not_show' ) );
+	wp_set_current_user( get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0] );
+	ob_start();
+	OYS_Admin::page_settings();
+	$html = ob_get_clean();
+	wp_set_current_user( 0 );
+	update_option( OYS_Settings::OPTION, $before );
+	ok( str_contains( $html, 'name="s[livekit_api_secret]"' ) && str_contains( $html, 'name="s[livekit_url]"' ) && str_contains( $html, 'name="s[livekit_api_key]"' ), 'the LiveKit fields are on the settings page' );
+	ok( ! str_contains( $html, 'lk-secret-should-not-show' ) && ! str_contains( $html, 'sk_live_should_not_show' ), 'the saved secrets are not in the page' );
+	ok( str_contains( $html, 'wss://test-proj.livekit.cloud' ), 'the URL (not a secret) is shown' );
+	ok( in_array( 'livekit_api_secret', OYS_Admin::SECRETS, true ) && in_array( 'stripe_live_secret', OYS_Admin::SECRETS, true ), 'an empty secret field keeps the saved one' );
+} );
+
 test( 'live: raise hand – the teacher sees it in her chat poll and lowers it', function () {
 	live_on();
 	try {

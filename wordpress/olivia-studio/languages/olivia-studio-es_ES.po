@@ -3877,3 +3877,6 @@ msgstr "El resumen está visible para los participantes."
 
 msgid "Summary waiting for you."
 msgstr "El resumen te está esperando."
+
+msgid "A key is saved. Leave empty to keep it."
+msgstr "Hay una clave guardada. Si lo dejas vacío, se conserva."

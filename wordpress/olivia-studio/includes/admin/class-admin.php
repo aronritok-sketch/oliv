@@ -10,6 +10,9 @@ class OYS_Admin {
 
 	const CAP = 'oys_manage';
 
+	/** Settings that are secrets: shown as empty password fields, an empty field keeps the saved value. */
+	const SECRETS = array( 'stripe_test_secret', 'stripe_test_webhook', 'stripe_live_secret', 'stripe_live_webhook', 'zoom_client_secret', 'livekit_api_secret' );
+
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ) );
 		add_action( 'admin_enqueue_scripts', function ( $hook ) {
@@ -914,7 +917,10 @@ class OYS_Admin {
 	public static function page_settings() {
 		self::header( __( 'Studio settings', 'olivia-studio' ) );
 		$s   = OYS_Settings::all();
-		$f   = fn( $k, $type = 'text', $cls = 'regular-text', $extra = '' ) => '<input type="' . $type . '" name="s[' . $k . ']" value="' . esc_attr( $s[ $k ] ) . '" class="' . $cls . '" ' . $extra . '>';
+		// A secret is never printed back into the page: the field stays empty, and empty keeps the saved one.
+		$f   = fn( $k, $type = 'text', $cls = 'regular-text', $extra = '' ) => 'password' === $type
+			? '<input type="password" name="s[' . $k . ']" value="" class="' . $cls . '" ' . ( '' !== (string) $s[ $k ] ? 'autocomplete="new-password" placeholder="••••••••••"' : $extra ) . '>' . ( '' !== (string) $s[ $k ] ? '<p class="description">' . esc_html__( 'A key is saved. Leave empty to keep it.', 'olivia-studio' ) . '</p>' : '' )
+			: '<input type="' . $type . '" name="s[' . $k . ']" value="' . esc_attr( $s[ $k ] ) . '" class="' . $cls . '" ' . $extra . '>';
 		$hook = rest_url( 'oys/v1/stripe-webhook' );
 		echo self::form( 'save_settings' ) . '<h2>' . esc_html__( 'Payments (Stripe)', 'olivia-studio' ) . '</h2><table class="form-table">'; // phpcs:ignore
 		echo '<tr><th>' . esc_html__( 'Mode', 'olivia-studio' ) . '</th><td><select name="s[stripe_mode]"><option value="test"' . selected( $s['stripe_mode'], 'test', false ) . '>' . esc_html__( 'Test (no real charges)', 'olivia-studio' ) . '</option><option value="live"' . selected( $s['stripe_mode'], 'live', false ) . '>' . esc_html__( 'Live', 'olivia-studio' ) . '</option></select></td></tr>';
@@ -1475,8 +1481,8 @@ class OYS_Admin {
 		$in    = wp_unslash( $_POST['s'] ?? array() );
 		$clean = array();
 		foreach ( OYS_Settings::defaults() as $k => $default ) {
-			if ( ! isset( $in[ $k ] ) ) {
-				continue;
+			if ( ! isset( $in[ $k ] ) || ( in_array( $k, self::SECRETS, true ) && '' === trim( (string) $in[ $k ] ) ) ) {
+				continue; // a secret left empty keeps the saved one
 			}
 			if ( is_int( $default ) ) {
 				$clean[ $k ] = max( 0, (int) $in[ $k ] );

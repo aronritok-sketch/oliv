@@ -600,7 +600,9 @@ HathaFlow-platform** (HathaFlow Platform Plan, CRM 5080001 / 16846006, 11–13. 
 Olivia oldala és a HathaFlow ugyanazt használja: fizetés (Stripe) → hozzáférés → élő óra → visszanézés.
 
 - **Kulcsok:** `OYS_LIVEKIT_URL` (`wss://<projekt>.livekit.cloud`), `OYS_LIVEKIT_API_KEY`, `OYS_LIVEKIT_API_SECRET` a
-  wp-configban (vagy Studio → Settings → *Live online classes (HathaFlow Live)*; a konstans nyer). Ha `live_on` + kulcsok,
+  wp-configban (vagy Studio → Settings → *Live online classes (HathaFlow Live)*; a konstans nyer). A titokmezők
+  (`OYS_Admin::SECRETS`: Stripe, Zoom, LiveKit) jelszómezők, a mentett értéket a lap nem írja vissza, üresen hagyva megmarad
+  (1.7.1 – Áron SSH nélkül, az adminban adja meg a kulcsokat). Ha `live_on` + kulcsok,
   `OYS_Zoom::enabled()` hamis. Szerver-API: Twirp (`POST <https>/twirp/livekit.RoomService/{ListRooms,DeleteRoom,
   ListParticipants,MutePublishedTrack}`, Bearer szervertoken); fejlesztéshez `OYS_LIVEKIT_API_BASE`.
 - **Terem:** óránként egy (`oys-<md5(home_url) 8>-<óra id>`), a LiveKit az első belépéskor hozza létre. Tábla: `oys_live`

@@ -3899,3 +3899,6 @@ msgstr "Az összefoglaló látszik a résztvevőknek."
 
 msgid "Summary waiting for you."
 msgstr "Az összefoglaló rád vár."
+
+msgid "A key is saved. Leave empty to keep it."
+msgstr "Van mentett kulcs. Ha üresen hagyod, megmarad."
