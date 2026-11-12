@@ -40,7 +40,7 @@ class OYS_Zoom {
 
 	/** Zoom is set up and meetings should be created automatically. */
 	public static function enabled() {
-		return self::configured() && (int) OYS_Settings::get( 'zoom_auto' );
+		return self::configured() && (int) OYS_Settings::get( 'zoom_auto' ) && ! OYS_Live::enabled(); // our own streaming comes first
 	}
 
 	/** Everyone joining online gets their own registration link. */

@@ -3473,3 +3473,178 @@ msgstr "dos personas (con una amiga)"
 
 msgid "Private session products only: their credits pay only for this service."
 msgstr "Solo sesiones privadas: sus créditos sirven solo para este servicio."
+
+# Live online classes (OYS_Live, 2026-11-12)
+
+msgid "Could not reach Daily: %s"
+msgstr "No se pudo conectar con Daily: %s"
+
+msgid "Daily answered with an error (%1$d). %2$s"
+msgstr "Daily respondió con un error (%1$d). %2$s"
+
+msgid "This class has no live room."
+msgstr "Esta clase no tiene sala en vivo."
+
+msgid "Daily did not return a room."
+msgstr "Daily no devolvió una sala."
+
+msgid "This class is over."
+msgstr "Esta clase ya terminó."
+
+msgid "The room opens shortly before the class."
+msgstr "La sala se abre poco antes de la clase."
+
+msgid "Daily did not return an entry token."
+msgstr "Daily no devolvió un acceso."
+
+msgid "Write a message first."
+msgstr "Escribe un mensaje primero."
+
+msgid "The chat of this class is closed."
+msgstr "El chat de esta clase está cerrado."
+
+msgid "One moment, then send it again."
+msgstr "Un momento y vuelve a enviarlo."
+
+msgid "Recording not found."
+msgstr "No se encontró la grabación."
+
+msgid "Daily did not return a link."
+msgstr "Daily no devolvió un enlace."
+
+msgid "The transcript could not be downloaded."
+msgstr "No se pudo descargar la transcripción."
+
+msgid "No AI key: the summary is not written."
+msgstr "Sin clave de IA: no se escribe el resumen."
+
+msgid "This live class is not in your bookings."
+msgstr "Esta clase en vivo no está entre tus reservas."
+
+msgid "You can't remove this message."
+msgstr "No puedes borrar este mensaje."
+
+msgid "The recording is no longer available."
+msgstr "La grabación ya no está disponible."
+
+msgid "Only the teacher can change this."
+msgstr "Solo la profesora puede cambiar esto."
+
+msgid "This live class can't be found."
+msgstr "No se encuentra esta clase en vivo."
+
+msgid "Log in with the account you booked with, or open the link from your booking email."
+msgstr "Entra con la cuenta con la que reservaste o abre el enlace de tu correo de reserva."
+
+msgid "Book this class"
+msgstr "Reservar esta clase"
+
+msgid "Join the class"
+msgstr "Entrar a la clase"
+
+msgid "Joining…"
+msgstr "Entrando…"
+
+msgid "You left the class. You can join again."
+msgstr "Saliste de la clase. Puedes volver a entrar."
+
+msgid "Send"
+msgstr "Enviar"
+
+msgid "teacher"
+msgstr "profesora"
+
+msgid "No messages yet. Say hello!"
+msgstr "Aún no hay mensajes. ¡Saluda!"
+
+msgid "Something went wrong. Try again in a moment."
+msgstr "Algo salió mal. Inténtalo de nuevo en un momento."
+
+msgid "Recording (only you are on it)"
+msgstr "Grabando (solo apareces tú)"
+
+msgid "Not recording"
+msgstr "Sin grabar"
+
+msgid "Start recording"
+msgstr "Empezar a grabar"
+
+msgid "Stop recording"
+msgstr "Detener la grabación"
+
+msgid "The recording starts with the class."
+msgstr "La grabación empieza con la clase."
+
+msgid "Saved."
+msgstr "Guardado."
+
+msgid "The room opens in %s."
+msgstr "La sala se abre en %s."
+
+msgid "The room is open."
+msgstr "La sala está abierta."
+
+msgid "The room opens %d minutes before the class."
+msgstr "La sala se abre %d minutos antes de la clase."
+
+msgid "In your browser, no app needed. On a phone or tablet, open this page in Chrome or Safari."
+msgstr "En tu navegador, sin aplicación. En el móvil o la tableta, abre esta página en Chrome o Safari."
+
+msgid "Allow the camera and the microphone when your browser asks. You can turn both off in the room."
+msgstr "Permite la cámara y el micrófono cuando el navegador lo pida. Puedes apagar ambos en la sala."
+
+msgid "The class is recorded, but only %s is on the recording: you are not."
+msgstr "La clase se graba, pero en la grabación solo aparece %s: tú no."
+
+msgid "Class chat"
+msgstr "Chat de la clase"
+
+msgid "Message"
+msgstr "Mensaje"
+
+msgid "Write to the class…"
+msgstr "Escribe al grupo…"
+
+msgid "Your opening words"
+msgstr "Tus palabras de apertura"
+
+msgid "No summary: the opening words were not transcribed, or there was nothing to keep."
+msgstr "Sin resumen: no se transcribieron las palabras de apertura o no había nada que guardar."
+
+msgid "The summary is written a few minutes after the class."
+msgstr "El resumen se escribe unos minutos después de la clase."
+
+msgid "Show it to the participants"
+msgstr "Mostrarlo a los participantes"
+
+msgid "From the opening words"
+msgstr "De las palabras de apertura"
+
+msgid "A short summary written with the help of AI, not word for word."
+msgstr "Un breve resumen escrito con ayuda de IA, no palabra por palabra."
+
+msgid "Watch the class again"
+msgstr "Vuelve a ver la clase"
+
+msgid "Part %1$d (%2$d min)"
+msgstr "Parte %1$d (%2$d min)"
+
+msgid "Play the recording (%d min)"
+msgstr "Ver la grabación (%d min)"
+
+msgid "Available until %s."
+msgstr "Disponible hasta el %s."
+
+msgid "The recording will be here shortly after the class."
+msgstr "La grabación estará aquí poco después de la clase."
+
+msgid "The class is over. Thank you for practising together!"
+msgstr "La clase terminó. ¡Gracias por practicar juntos!"
+
+msgid "Join from home in your browser, no app needed"
+msgstr "Desde casa, en tu navegador, sin aplicación"
+
+msgid "Stays here after the class: you can keep talking for %d day."
+msgid_plural "Stays here after the class: you can keep talking for %d days."
+msgstr[0] "Se queda aquí después de la clase: podéis seguir hablando %d día."
+msgstr[1] "Se queda aquí después de la clase: podéis seguir hablando %d días."

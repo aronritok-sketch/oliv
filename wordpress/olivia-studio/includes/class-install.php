@@ -362,6 +362,39 @@ class OYS_Install {
 			PRIMARY KEY  (id),
 			KEY session_id (session_id)
 		) $c;" );
+
+		// Our live room of an online class (Daily): the room, its recordings and the summary of the opening words.
+		dbDelta( 'CREATE TABLE ' . self::table( 'live' ) . " (
+			session_id bigint(20) unsigned NOT NULL,
+			room_name varchar(128) NOT NULL DEFAULT '',
+			room_url varchar(255) NOT NULL DEFAULT '',
+			room_id varchar(64) NOT NULL DEFAULT '',
+			state varchar(20) NOT NULL DEFAULT 'room',
+			tries smallint(5) unsigned NOT NULL DEFAULT 0,
+			recordings text NULL,
+			transcript mediumtext NULL,
+			summary text NULL,
+			summary_status varchar(10) NOT NULL DEFAULT '',
+			created_at datetime NOT NULL,
+			processed_at datetime NULL,
+			PRIMARY KEY  (session_id),
+			KEY state (state)
+		) $c;" );
+
+		// The class chat of a live class: stays after class (OYS_Live).
+		dbDelta( 'CREATE TABLE ' . self::table( 'live_chat' ) . " (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			session_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			user_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			booking_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			name varchar(100) NOT NULL DEFAULT '',
+			body text NULL,
+			is_teacher tinyint(1) unsigned NOT NULL DEFAULT 0,
+			deleted tinyint(1) unsigned NOT NULL DEFAULT 0,
+			created_at datetime NOT NULL,
+			PRIMARY KEY  (id),
+			KEY session_id (session_id,id)
+		) $c;" );
 	}
 
 	public static function add_roles() {

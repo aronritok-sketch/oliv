@@ -21,7 +21,7 @@ class OYS_Admin {
 			}
 		} );
 		$actions = array( 'save_session', 'cancel_session', 'roster', 'save_template', 'delete_template', 'generate', 'private_offer', 'private_decline',
-			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'message', 'pay_later_reset', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_delete', 'save_ai' );
+			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'live_test', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'message', 'pay_later_reset', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_delete', 'save_ai' );
 		foreach ( $actions as $a ) {
 			add_action( 'admin_post_oys_admin_' . $a, array( __CLASS__, 'guard' ) );
 		}
@@ -439,6 +439,10 @@ class OYS_Admin {
 		$out = '<div class="oys-box oys-live"><h3>' . esc_html__( 'Live online', 'olivia-studio' ) . '</h3>';
 		if ( $s->online_url ) {
 			return $out . '<p>' . esc_html__( 'Link set on the class:', 'olivia-studio' ) . ' <a href="' . esc_url( $s->online_url ) . '" target="_blank" rel="noopener">' . esc_html( $s->online_url ) . '</a></p></div>';
+		}
+		if ( OYS_Live::uses_live( $s ) ) {
+			return $out . '<p><a class="button button-primary" href="' . esc_url( OYS_Live::url( $s->id ) ) . '" target="_blank" rel="noopener">' . esc_html__( 'Open the live room (teacher)', 'olivia-studio' ) . '</a></p>'
+				. '<p class="description">' . esc_html( OYS_Live::admin_status( $s ) ) . ' ' . esc_html__( 'People joining online get their own link by email and in their account.', 'olivia-studio' ) . '</p></div>';
 		}
 		if ( ! OYS_Zoom::enabled() ) {
 			return $out . '<p>' . wp_kses_post( sprintf( __( 'Add a link to the class in the calendar, or connect Zoom in <a href="%s">Settings</a> to create meetings automatically.', 'olivia-studio' ), esc_url( admin_url( 'admin.php?page=oys-settings#zoom' ) ) ) ) . '</p></div>';
@@ -966,13 +970,36 @@ class OYS_Admin {
 		echo '<tr><th>' . esc_html__( 'Online only', 'olivia-studio' ) . '</th><td><label><input type="hidden" name="s[online_only]" value="0"><input type="checkbox" name="s[online_only]" value="1"' . checked( 1, (int) $s['online_only'], false ) . '> ' . esc_html__( 'Only live online classes (no studio): the price list shows the online drop-in and online passes', 'olivia-studio' ) . '</label></td></tr>';
 		echo '<tr><th>' . esc_html__( 'Drop-in price for an online class', 'olivia-studio' ) . '</th><td><input name="online_price" class="small-text" value="' . esc_attr( $s['online_price_cents'] / 100 ) . '"> ' . esc_html( strtoupper( $s['currency'] ) ) . '<p class="description">' . esc_html__( 'Used for new online classes in the calendar; each class can still have its own price.', 'olivia-studio' ) . '</p></td></tr>';
 		echo '<tr><th>' . esc_html__( 'One class on a studio pass covers', 'olivia-studio' ) . '</th><td>' . $f( 'online_per_credit', 'number', 'small-text', 'min="1"' ) . ' ' . esc_html__( 'online classes', 'olivia-studio' ) . '<p class="description">' . esc_html__( 'When someone books an online class with a studio pass, one class from the pass turns into this many online classes (same expiry date); one is used and the rest stay in their account. Online passes are used first. Memberships include online classes, and they don\'t count towards a monthly class limit.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
+		$check = fn( $k, $label ) => '<label><input type="hidden" name="s[' . $k . ']" value="0"><input type="checkbox" name="s[' . $k . ']" value="1"' . checked( 1, (int) $s[ $k ], false ) . '> ' . esc_html( $label ) . '</label>';
+		echo '</table><h2 id="live">' . esc_html__( 'Live online classes (our own streaming)', 'olivia-studio' ) . '</h2>';
+		echo '<p class="description" style="max-width:760px">' . esc_html__( 'Online classes run on the site itself: people join from their account or the link in their emails, in the browser, no app and no Zoom. The class chat stays after the class. The video runs on Daily (daily.co): create an account there and copy its API key here, or put it in wp-config.php as OYS_DAILY_API_KEY.', 'olivia-studio' ) . '</p><table class="form-table">';
+		echo '<tr><th>' . esc_html__( 'Daily API key', 'olivia-studio' ) . '</th><td>' . ( defined( 'OYS_DAILY_API_KEY' ) ? '<code>OYS_DAILY_API_KEY</code> ' . esc_html__( '(set in wp-config.php)', 'olivia-studio' ) : $f( 'daily_api_key', 'password', 'regular-text', 'autocomplete="off"' ) ) . '</td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'Live streaming', 'olivia-studio' ) . '</th><td>' . $check( 'live_on', __( 'Online classes use our own live room (not Zoom)', 'olivia-studio' ) ) . '</td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'The room opens (minutes before the class)', 'olivia-studio' ) . '</th><td>' . $f( 'live_open_minutes', 'number', 'small-text', 'min="5"' ) . '</td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'Recording', 'olivia-studio' ) . '</th><td><select name="s[live_record]">'
+			. '<option value="group"' . selected( $s['live_record'], 'group', false ) . '>' . esc_html__( 'Group classes and events', 'olivia-studio' ) . '</option>'
+			. '<option value="all"' . selected( $s['live_record'], 'all', false ) . '>' . esc_html__( 'Every online class, private sessions too', 'olivia-studio' ) . '</option>'
+			. '<option value="none"' . selected( $s['live_record'], 'none', false ) . '>' . esc_html__( 'No recording', 'olivia-studio' ) . '</option></select>'
+			. '<p class="description">' . esc_html__( 'Only the teacher is on the recording, never the participants. It starts by itself when the class starts (the teacher can stop it in the room).', 'olivia-studio' ) . '</p></td></tr>';
+		echo '<tr><th>' . esc_html__( 'Participants can watch the recording for (days)', 'olivia-studio' ) . '</th><td>' . $f( 'live_replay_days', 'number', 'small-text', 'min="0"' ) . '</td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'Summary of the opening words', 'olivia-studio' ) . '</th><td><select name="s[live_summary]">'
+			. '<option value="auto"' . selected( $s['live_summary'], 'auto', false ) . '>' . esc_html__( 'Shown to the participants right away', 'olivia-studio' ) . '</option>'
+			. '<option value="review"' . selected( $s['live_summary'], 'review', false ) . '>' . esc_html__( 'The teacher reads it first and shows it', 'olivia-studio' ) . '</option>'
+			. '<option value="off"' . selected( $s['live_summary'], 'off', false ) . '>' . esc_html__( 'No summary', 'olivia-studio' ) . '</option></select> '
+			. $f( 'live_intro_minutes', 'number', 'small-text', 'min="0"' ) . ' ' . esc_html__( 'minutes from the start', 'olivia-studio' )
+			. '<p class="description">' . esc_html__( 'The teacher\'s first minutes are transcribed (only the teacher) and the AI writes a short summary, not word for word, in the class\'s language. It needs the Anthropic API key (Newsletter → AI settings). The teacher can edit or hide it on the live page.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'People can keep writing in the class chat for (days)', 'olivia-studio' ) . '</th><td>' . $f( 'live_chat_days', 'number', 'small-text', 'min="0"' ) . '</td></tr>'; // phpcs:ignore
+		$live = OYS_Live::enabled() ? __( 'On: online classes run in our live room.', 'olivia-studio' ) : ( '' === trim( OYS_Live::key() ) ? __( 'No Daily API key yet.', 'olivia-studio' ) : __( 'Switched off.', 'olivia-studio' ) );
+		echo '<tr><th>' . esc_html__( 'Status', 'olivia-studio' ) . '</th><td>' . esc_html( $live ) . ( '' !== trim( OYS_Live::key() ) ? ' <button class="button" form="oys-live-test">' . esc_html__( 'Test the connection', 'olivia-studio' ) . '</button>' : '' ) . '</td></tr>';
 		echo '</table><h2 id="zoom">' . esc_html__( 'Zoom (live online classes)', 'olivia-studio' ) . '</h2>';
+		if ( OYS_Live::enabled() ) {
+			echo '<p class="description">' . esc_html__( 'Not used while our own live streaming is on.', 'olivia-studio' ) . '</p>';
+		}
 		echo '<p class="description" style="max-width:760px">' . esc_html__( 'With Zoom connected, online and hybrid classes get their Zoom meeting automatically; people joining online get the link in their emails and account, and you start the class from the calendar or the roster. In the Zoom App Marketplace create a "Server-to-Server OAuth" app, add the scopes to create, update and delete meetings and to manage registrants, activate it and copy its Account ID, Client ID and Client Secret here. A class with an online link typed in by hand keeps that link.', 'olivia-studio' ) . '</p><table class="form-table">';
 		echo '<tr><th>' . esc_html__( 'Account ID', 'olivia-studio' ) . '</th><td>' . $f( 'zoom_account_id', 'text', 'regular-text', 'autocomplete="off"' ) . '</td></tr>'; // phpcs:ignore
 		echo '<tr><th>' . esc_html__( 'Client ID', 'olivia-studio' ) . '</th><td>' . $f( 'zoom_client_id', 'text', 'regular-text', 'autocomplete="off"' ) . '</td></tr>'; // phpcs:ignore
 		echo '<tr><th>' . esc_html__( 'Client Secret', 'olivia-studio' ) . '</th><td>' . $f( 'zoom_client_secret', 'password', 'regular-text', 'autocomplete="off"' ) . '</td></tr>'; // phpcs:ignore
 		echo '<tr><th>' . esc_html__( 'Meetings belong to', 'olivia-studio' ) . '</th><td>' . $f( 'zoom_host', 'text', 'regular-text', 'placeholder="me"' ) . '<p class="description">' . esc_html__( '"me" = the account owner, or the email of the Zoom user who teaches.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
-		$check = fn( $k, $label ) => '<label><input type="hidden" name="s[' . $k . ']" value="0"><input type="checkbox" name="s[' . $k . ']" value="1"' . checked( 1, (int) $s[ $k ], false ) . '> ' . esc_html( $label ) . '</label>';
 		echo '<tr><th>' . esc_html__( 'Options', 'olivia-studio' ) . '</th><td>' . $check( 'zoom_auto', __( 'Create Zoom meetings automatically for online and hybrid classes', 'olivia-studio' ) ) . '<br>'
 			. $check( 'zoom_personal', __( 'Personal link for everyone who joins online (Zoom registration; online guests need an email)', 'olivia-studio' ) ) . '<br>'
 			. $check( 'zoom_waiting_room', __( 'Waiting room (you let people in)', 'olivia-studio' ) ) . '</td></tr>'; // phpcs:ignore
@@ -985,7 +1012,7 @@ class OYS_Admin {
 		echo '<tr><th>' . esc_html__( 'Version', 'olivia-studio' ) . '</th><td>' . $f( 'waiver_version', 'text', 'small-text' ) . '<p class="description">' . esc_html__( 'Change the version after editing the text: everyone is asked to accept the new version at their next booking.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
 		echo '</table><h2>' . esc_html__( 'Emails', 'olivia-studio' ) . '</h2><p>' . wp_kses_post( sprintf( __( 'Sender, reminders and the text of every automatic email are in <a href="%s">Studio → Emails &amp; reminders</a>.', 'olivia-studio' ), esc_url( admin_url( 'admin.php?page=oys-emails' ) ) ) ) . '</p>';
 		submit_button();
-		echo '</form>' . self::form( 'zoom_test', 'id="oys-zoom-test"' ) . '</form></div>'; // phpcs:ignore
+		echo '</form>' . self::form( 'zoom_test', 'id="oys-zoom-test"' ) . '</form>' . self::form( 'live_test', 'id="oys-live-test"' ) . '</form></div>'; // phpcs:ignore
 	}
 
 	/* ======================================================================
@@ -1414,6 +1441,11 @@ class OYS_Admin {
 		self::back( 'oys-emails', array( 'edit' => $key, 'lang' => $lang ), $ok ? sprintf( __( 'Test sent to %s.', 'olivia-studio' ), $to ) : __( 'The test could not be sent. Check the email set-up (SMTP plugin).', 'olivia-studio' ) );
 	}
 
+	private static function do_live_test() {
+		$res = OYS_Live::test_connection();
+		self::back( 'oys-settings', array(), is_wp_error( $res ) ? $res->get_error_message() : __( 'Daily is connected.', 'olivia-studio' ) );
+	}
+
 	private static function do_zoom_test() {
 		$res = OYS_Zoom::test_connection();
 		self::back( 'oys-settings', array(), is_wp_error( $res ) ? sprintf( __( 'Zoom: %s', 'olivia-studio' ), $res->get_error_message() ) : sprintf( __( 'Zoom is connected (%s).', 'olivia-studio' ), $res ) );
@@ -1457,6 +1489,15 @@ class OYS_Admin {
 		$clean['currency']    = strtolower( substr( preg_replace( '/[^a-z]/i', '', $clean['currency'] ?? 'usd' ), 0, 3 ) ) ?: 'usd';
 		$clean['hold_minutes'] = max( 30, (int) ( $clean['hold_minutes'] ?? 30 ) );
 		$clean['online_per_credit'] = max( 1, (int) ( $clean['online_per_credit'] ?? 4 ) );
+		if ( isset( $clean['live_record'] ) && ! in_array( $clean['live_record'], array( 'group', 'all', 'none' ), true ) ) {
+			$clean['live_record'] = 'group';
+		}
+		if ( isset( $clean['live_summary'] ) && ! in_array( $clean['live_summary'], array( 'auto', 'review', 'off' ), true ) ) {
+			$clean['live_summary'] = 'auto';
+		}
+		if ( isset( $clean['live_open_minutes'] ) ) {
+			$clean['live_open_minutes'] = max( 5, $clean['live_open_minutes'] );
+		}
 		foreach ( array( 'zoom_account_id', 'zoom_client_id', 'zoom_client_secret' ) as $k ) {
 			if ( isset( $clean[ $k ] ) && OYS_Settings::get( $k ) !== $clean[ $k ] ) {
 				delete_transient( OYS_Zoom::TOKEN );

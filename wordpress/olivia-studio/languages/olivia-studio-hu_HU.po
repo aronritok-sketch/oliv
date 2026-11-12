@@ -3495,3 +3495,178 @@ msgstr "két fő (barátnővel)"
 
 msgid "Private session products only: their credits pay only for this service."
 msgstr "Csak egyéni óráknál: az alkalmai csak erre a szolgáltatásra használhatók."
+
+# Live online classes (OYS_Live, 2026-11-12)
+
+msgid "Could not reach Daily: %s"
+msgstr "Nem érem el a videószolgáltatást (Daily): %s"
+
+msgid "Daily answered with an error (%1$d). %2$s"
+msgstr "A videószolgáltatás (Daily) hibát jelzett (%1$d). %2$s"
+
+msgid "This class has no live room."
+msgstr "Ehhez az órához nincs élő terem."
+
+msgid "Daily did not return a room."
+msgstr "A videószolgáltatás nem adott termet."
+
+msgid "This class is over."
+msgstr "Ez az óra már véget ért."
+
+msgid "The room opens shortly before the class."
+msgstr "A terem nem sokkal az óra előtt nyílik."
+
+msgid "Daily did not return an entry token."
+msgstr "A videószolgáltatás nem adott belépőt."
+
+msgid "Write a message first."
+msgstr "Előbb írj egy üzenetet."
+
+msgid "The chat of this class is closed."
+msgstr "Ennek az órának a chatje lezárult."
+
+msgid "One moment, then send it again."
+msgstr "Egy pillanat, aztán küldd újra."
+
+msgid "Recording not found."
+msgstr "A felvétel nem található."
+
+msgid "Daily did not return a link."
+msgstr "A videószolgáltatás nem adott linket."
+
+msgid "The transcript could not be downloaded."
+msgstr "A leiratot nem sikerült letölteni."
+
+msgid "No AI key: the summary is not written."
+msgstr "Nincs AI-kulcs: az összefoglaló nem készül el."
+
+msgid "This live class is not in your bookings."
+msgstr "Ez az élő óra nincs a foglalásaid között."
+
+msgid "You can't remove this message."
+msgstr "Ezt az üzenetet nem törölheted."
+
+msgid "The recording is no longer available."
+msgstr "A felvétel már nem érhető el."
+
+msgid "Only the teacher can change this."
+msgstr "Ezt csak az oktató módosíthatja."
+
+msgid "This live class can't be found."
+msgstr "Ez az élő óra nem található."
+
+msgid "Log in with the account you booked with, or open the link from your booking email."
+msgstr "Lépj be azzal a fiókkal, amellyel foglaltál, vagy nyisd meg a foglalási e-mailedben kapott linket."
+
+msgid "Book this class"
+msgstr "Óra foglalása"
+
+msgid "Join the class"
+msgstr "Belépek az órára"
+
+msgid "Joining…"
+msgstr "Belépés…"
+
+msgid "You left the class. You can join again."
+msgstr "Kiléptél az óráról. Bármikor visszaléphetsz."
+
+msgid "Send"
+msgstr "Küldés"
+
+msgid "teacher"
+msgstr "oktató"
+
+msgid "No messages yet. Say hello!"
+msgstr "Még nincs üzenet. Köszönj be!"
+
+msgid "Something went wrong. Try again in a moment."
+msgstr "Valami nem sikerült. Próbáld újra egy pillanat múlva."
+
+msgid "Recording (only you are on it)"
+msgstr "Felvétel megy (csak te vagy rajta)"
+
+msgid "Not recording"
+msgstr "Nincs felvétel"
+
+msgid "Start recording"
+msgstr "Felvétel indítása"
+
+msgid "Stop recording"
+msgstr "Felvétel leállítása"
+
+msgid "The recording starts with the class."
+msgstr "A felvétel az óra kezdetével indul."
+
+msgid "Saved."
+msgstr "Elmentve."
+
+msgid "The room opens in %s."
+msgstr "A terem %s múlva nyílik."
+
+msgid "The room is open."
+msgstr "A terem nyitva van."
+
+msgid "The room opens %d minutes before the class."
+msgstr "A terem az óra előtt %d perccel nyílik."
+
+msgid "In your browser, no app needed. On a phone or tablet, open this page in Chrome or Safari."
+msgstr "A böngésződben, alkalmazás nélkül. Telefonon vagy tableten Chrome-ban vagy Safariban nyisd meg ezt az oldalt."
+
+msgid "Allow the camera and the microphone when your browser asks. You can turn both off in the room."
+msgstr "Engedélyezd a kamerát és a mikrofont, amikor a böngésző kéri. A teremben mindkettőt kikapcsolhatod."
+
+msgid "The class is recorded, but only %s is on the recording: you are not."
+msgstr "Az óráról felvétel készül, de azon csak %s látszik és hallatszik, te nem."
+
+msgid "Class chat"
+msgstr "Az óra chatje"
+
+msgid "Message"
+msgstr "Üzenet"
+
+msgid "Write to the class…"
+msgstr "Írj a csoportnak…"
+
+msgid "Your opening words"
+msgstr "A bevezetőd"
+
+msgid "No summary: the opening words were not transcribed, or there was nothing to keep."
+msgstr "Nincs összefoglaló: a bevezető nem lett leírva, vagy nem volt benne megtartandó gondolat."
+
+msgid "The summary is written a few minutes after the class."
+msgstr "Az összefoglaló pár perccel az óra után készül el."
+
+msgid "Show it to the participants"
+msgstr "Mutasd meg a résztvevőknek"
+
+msgid "From the opening words"
+msgstr "A bevezetőből"
+
+msgid "A short summary written with the help of AI, not word for word."
+msgstr "Rövid összefoglaló, mesterséges intelligencia segítségével – nem szó szerinti."
+
+msgid "Watch the class again"
+msgstr "Nézd vissza az órát"
+
+msgid "Part %1$d (%2$d min)"
+msgstr "%1$d. rész (%2$d perc)"
+
+msgid "Play the recording (%d min)"
+msgstr "Felvétel lejátszása (%d perc)"
+
+msgid "Available until %s."
+msgstr "Visszanézhető eddig: %s"
+
+msgid "The recording will be here shortly after the class."
+msgstr "A felvétel nem sokkal az óra után itt lesz."
+
+msgid "The class is over. Thank you for practising together!"
+msgstr "Az óra véget ért. Köszönöm, hogy együtt gyakoroltunk!"
+
+msgid "Join from home in your browser, no app needed"
+msgstr "Otthonról, a böngésződben, alkalmazás nélkül"
+
+msgid "Stays here after the class: you can keep talking for %d day."
+msgid_plural "Stays here after the class: you can keep talking for %d days."
+msgstr[0] "Az óra után is itt marad: még %d napig beszélgethettek."
+msgstr[1] "Az óra után is itt marad: még %d napig beszélgethettek."

@@ -222,3 +222,46 @@
 .oys-teacher__name { margin: 0 0 .2rem; }
 .oys-teacher__headline { font-weight: 700; color: var(--oys-forest); margin: 0 0 .8rem; }
 .oys-teacher__next { grid-column: 1 / -1; margin: -1rem 0 0; padding-left: 1.2rem; }
+
+/* ---------- Live online class (OYS_Live): video + class chat ---------- */
+.oys-live__head { margin-bottom: 1.2rem; }
+.oys-live__kicker { margin: 0 0 .3rem; font-size: .76rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--oys-orchid); }
+.oys-live__head h2 { margin: 0; }
+.oys-live__when { margin: .35rem 0 0; color: var(--oys-muted); font-weight: 600; }
+.oys-live__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); gap: 1.2rem; align-items: start; }
+.oys-live__stage { display: grid; gap: 1rem; min-width: 0; }
+.oys-live__video { aspect-ratio: 16 / 10; min-height: 320px; max-height: 78vh; width: 100%; border: 2px solid var(--oys-ink); border-radius: 6px; overflow: hidden; background: #12231A; }
+.oys-live__video[hidden] { display: none; }
+.oys-live__lobby { display: grid; gap: 1rem; justify-items: start; padding: clamp(1.2rem, 3vw, 2rem); border: 2px solid var(--oys-ink); border-radius: 6px; background: var(--oys-paper); }
+.oys-live__lobby[hidden] { display: none; }
+.oys-live__status { margin: 0; font-weight: 700; color: var(--oys-ink); }
+.oys-live__tips { margin: 0; padding-left: 1.1rem; color: var(--oys-muted); font-size: .92rem; display: grid; gap: .3rem; }
+.oys-live__owner { display: flex; flex-wrap: wrap; gap: .6rem; align-items: center; font-size: .9rem; font-weight: 600; }
+.oys-live__owner[hidden] { display: none; }
+.oys-live__rec::before { content: ""; display: inline-block; width: .65rem; height: .65rem; margin-right: .4rem; border-radius: 50%; background: var(--oys-muted); vertical-align: middle; }
+.oys-live__rec.is-on::before { background: #D3302F; }
+.oys-live__after { display: grid; gap: 1rem; }
+.oys-live__summary h3, .oys-live__replay h3 { margin-top: 0; }
+.oys-live__summary-text { width: 100%; font: inherit; }
+.oys-live__player { width: 100%; max-height: 70vh; border-radius: 6px; background: #12231A; }
+.oys-live__chat { position: sticky; top: 1rem; display: grid; grid-template-rows: auto auto minmax(0, 1fr) auto; gap: .6rem; max-height: min(78vh, 720px); padding: 1rem; border: 2px solid var(--oys-ink); border-radius: 6px; background: var(--oys-card); }
+.oys-live__chat h3 { margin: 0; }
+.oys-live__chat .oys-small { margin: 0; }
+.oys-live__messages { list-style: none; margin: 0; padding: 0 .2rem 0 0; overflow-y: auto; display: grid; align-content: start; gap: .55rem; min-height: 180px; }
+.oys-live__empty { color: var(--oys-muted); font-size: .92rem; }
+.oys-live__msg { padding: .55rem .7rem; border-radius: 6px; background: var(--oys-paper); }
+.oys-live__msg.is-teacher { background: color-mix(in srgb, var(--oys-lilac) 45%, var(--oys-paper)); }
+.oys-live__msg-head { display: flex; flex-wrap: wrap; gap: .4rem; align-items: baseline; margin: 0 0 .15rem; font-size: .82rem; }
+.oys-live__msg-head time { color: var(--oys-muted); }
+.oys-live__badge { font-size: .68rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--oys-forest); }
+.oys-live__del { margin-left: auto; padding: 0; border: 0; background: none; font: inherit; font-size: .76rem; color: var(--oys-muted); text-decoration: underline; cursor: pointer; }
+.oys-live__msg-body { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.oys-live__form { display: grid; gap: .45rem; }
+.oys-live__form textarea { width: 100%; resize: vertical; min-height: 2.8rem; font: inherit; padding: .5rem .6rem; border: 2px solid var(--oys-ink); border-radius: 6px; background: #fff; }
+.oys-live__form .btn { justify-self: end; }
+@media (max-width: 860px) {
+	.oys-live__grid { grid-template-columns: minmax(0, 1fr); }
+	.oys-live__video { aspect-ratio: 3 / 4; min-height: 0; max-height: 72vh; }
+	.oys-live__chat { position: static; max-height: 560px; }
+}
+.oys-live .screen-reader-text { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }

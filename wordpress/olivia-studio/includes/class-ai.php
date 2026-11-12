@@ -66,29 +66,45 @@ class OYS_AI {
 			? "Improve this newsletter draft following Olivia's note. Keep what she wrote unless the note says otherwise.\n\nOlivia's note: " . ( $brief ?: 'Polish it.' ) . "\n\nCurrent draft:\n" . $draft
 			: "Olivia's brief for this newsletter:\n" . $brief;
 
+		$out = self::json( $system, $context . "\n\n" . $ask, array(
+			'type'                 => 'object',
+			'properties'           => array(
+				'subject'      => array( 'type' => 'string' ),
+				'preheader'    => array( 'type' => 'string' ),
+				'body'         => array( 'type' => 'string' ),
+				'button_label' => array( 'type' => 'string', 'description' => 'Short call to action for a button to the booking page, or an empty string for none.' ),
+			),
+			'required'             => array( 'subject', 'preheader', 'body', 'button_label' ),
+			'additionalProperties' => false,
+		), 16000 );
+		if ( is_wp_error( $out ) ) {
+			return $out;
+		}
+		if ( empty( $out['subject'] ) || empty( $out['body'] ) ) {
+			return new WP_Error( 'oys_ai', __( 'The AI answer could not be read. Please try again.', 'olivia-studio' ) );
+		}
+		return array(
+			'subject'      => sanitize_text_field( $out['subject'] ),
+			'preheader'    => sanitize_text_field( $out['preheader'] ?? '' ),
+			'body'         => sanitize_textarea_field( $out['body'] ),
+			'button_label' => sanitize_text_field( $out['button_label'] ?? '' ),
+		);
+	}
+
+	/**
+	 * One request with a structured (JSON schema) answer. @return array|WP_Error the decoded answer
+	 */
+	public static function json( $system, $content, array $schema, $max_tokens = 4000, $effort = 'medium' ) {
 		$body = array(
 			'model'         => OYS_Settings::get( 'ai_model' ) ?: self::DEFAULT_MODEL,
-			'max_tokens'    => 16000,
+			'max_tokens'    => (int) $max_tokens,
 			'fallbacks'     => 'default',
 			'system'        => $system,
 			'output_config' => array(
-				'effort' => 'medium',
-				'format' => array(
-					'type'   => 'json_schema',
-					'schema' => array(
-						'type'                 => 'object',
-						'properties'           => array(
-							'subject'      => array( 'type' => 'string' ),
-							'preheader'    => array( 'type' => 'string' ),
-							'body'         => array( 'type' => 'string' ),
-							'button_label' => array( 'type' => 'string', 'description' => 'Short call to action for a button to the booking page, or an empty string for none.' ),
-						),
-						'required'             => array( 'subject', 'preheader', 'body', 'button_label' ),
-						'additionalProperties' => false,
-					),
-				),
+				'effort' => $effort,
+				'format' => array( 'type' => 'json_schema', 'schema' => $schema ),
 			),
-			'messages'      => array( array( 'role' => 'user', 'content' => $context . "\n\n" . $ask ) ),
+			'messages'      => array( array( 'role' => 'user', 'content' => $content ) ),
 		);
 		$res = wp_remote_post( self::api_url(), array(
 			'timeout' => 180,
@@ -107,7 +123,7 @@ class OYS_AI {
 		$json = json_decode( wp_remote_retrieve_body( $res ), true );
 		if ( 200 !== $code || ! is_array( $json ) ) {
 			$msg = is_array( $json ) ? ( $json['error']['message'] ?? '' ) : '';
-			oys_log( 'AI draft failed', array( 'status' => $code, 'error' => $msg ) );
+			oys_log( 'AI request failed', array( 'status' => $code, 'error' => $msg ) );
 			return new WP_Error( 'oys_ai', 401 === $code ? __( 'The AI service did not accept the API key. Check it in the AI settings.', 'olivia-studio' ) : sprintf( __( 'The AI service answered with an error (%1$d). %2$s', 'olivia-studio' ), $code, $msg ) );
 		}
 		if ( 'refusal' === ( $json['stop_reason'] ?? '' ) ) {
@@ -123,14 +139,6 @@ class OYS_AI {
 			}
 		}
 		$out = json_decode( $text, true );
-		if ( ! is_array( $out ) || empty( $out['subject'] ) || empty( $out['body'] ) ) {
-			return new WP_Error( 'oys_ai', __( 'The AI answer could not be read. Please try again.', 'olivia-studio' ) );
-		}
-		return array(
-			'subject'      => sanitize_text_field( $out['subject'] ),
-			'preheader'    => sanitize_text_field( $out['preheader'] ?? '' ),
-			'body'         => sanitize_textarea_field( $out['body'] ),
-			'button_label' => sanitize_text_field( $out['button_label'] ?? '' ),
-		);
+		return is_array( $out ) ? $out : new WP_Error( 'oys_ai', __( 'The AI answer could not be read. Please try again.', 'olivia-studio' ) );
 	}
 }

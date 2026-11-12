@@ -2,7 +2,7 @@
 /**
  * Plugin settings (one option array). Secrets can also come from wp-config.php constants,
  * which take precedence: OYS_STRIPE_SECRET_KEY, OYS_STRIPE_WEBHOOK_SECRET, OYS_STRIPE_CONNECT_WEBHOOK_SECRET, OYS_ZOOM_ACCOUNT_ID,
- * OYS_ZOOM_CLIENT_ID, OYS_ZOOM_CLIENT_SECRET.
+ * OYS_ZOOM_CLIENT_ID, OYS_ZOOM_CLIENT_SECRET, OYS_DAILY_API_KEY (our live streaming), OYS_ANTHROPIC_API_KEY.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -70,6 +70,14 @@ class OYS_Settings {
 			'zoom_auto'               => 1,
 			'zoom_personal'           => 0,
 			'zoom_waiting_room'       => 0,
+			'daily_api_key'           => '',
+			'live_on'                 => 1,
+			'live_open_minutes'       => 15,
+			'live_record'             => 'group',
+			'live_replay_days'        => 7,
+			'live_intro_minutes'      => 10,
+			'live_summary'            => 'auto',
+			'live_chat_days'          => 7,
 			'email_from_name'         => 'Olivia Kovacs Yoga',
 			'email_from'              => get_option( 'admin_email' ),
 			'notify_email'            => get_option( 'admin_email' ),

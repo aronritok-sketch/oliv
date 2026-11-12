@@ -98,7 +98,8 @@ oliv/
     │       ├── class-gifts.php        Ajándékkártyák
     │       ├── class-memberships.php  Tagság (Stripe előfizetés): csatlakozás, szinkron, keret, lemondás, portál
     │       ├── class-security.php     Belépés- és regisztráció-korlátozás
-    │       ├── class-zoom.php         Zoom meetingek automatikusan (Server-to-Server OAuth)
+    │       ├── class-zoom.php         Zoom meetingek automatikusan (Server-to-Server OAuth) – ha nincs saját közvetítés
+│       ├── class-live.php         saját élő közvetítés (Daily): terem, élő oldal, chat, felvétel, összefoglaló
     │       ├── class-email-templates.php  Az automatikus levelek szerkeszthető szövegei, ki/be kapcsolói
     │       ├── class-app-api.php      Mobilapp REST API (oys/v1/app/*), tokenes belépés
     │       ├── admin/class-calendar.php   Admin naptár (REST + oldal)
@@ -575,7 +576,7 @@ Sorozat-módosításnál minden további dátum ugyanannyi nappal tolódik, mint
 - `oys_mode_for( $session, $mode )` dönti el a tényleges módot (online-only órán mindig online). Minden helyfoglaló függvény kap `$mode`-ot: `take_seats()`, `release_seats()`, `force_seats()`, `spots_left()`, `price_for()`; a `book_party()` / `hold()` / `book_with_*()` / `book_manual()` `mode` argumentummal. A vendég a foglaló módját örökli.
 - Foglalóoldal: két fül (`?mode=online`); ha a stúdió tele van és online van hely, alapból az online nyílik. A várólista csak a stúdióhelyekre vonatkozik.
 - Kredit: `credit_kind( $session, $mode )`, `available_for( $user, $session, $mode )`, `consume_for(…, $mode)`; tagság: `covers( $m, $session, $mode )`, és `used_in_period()` a `mode = online` sorokat nem számolja.
-- Link: `OYS_Bookings::join_link( $booking )` – csak online résztvevőnek; a `oys_join_link` filteren át a Zoom adja, különben az órán megadott `online_url`. Stúdiós résztvevő soha nem kapja meg.
+- Link: `OYS_Bookings::join_link( $booking )` – csak online résztvevőnek; a `oys_join_link` filteren át a saját élő oldal (6.13b) vagy a Zoom adja, különben az órán megadott `online_url`. Stúdiós résztvevő soha nem kapja meg.
 
 ### 6.13 Zoom (automatikus meetingek)
 
@@ -590,6 +591,18 @@ Sorozat-módosításnál minden további dátum ugyanannyi nappal tolódik, mint
 - **Személyes linkek** (`zoom_personal`): minden online résztvevő regisztrálva lesz (`POST /meetings/{id}/registrants`, `approval_type = 0`), a saját linkje a `bookings.join_url`-ba kerül; lemondáskor `PUT …/registrants/status` `cancel`. Online vendégnek ilyenkor kötelező az e-mail. Fizetős Zoom (Pro) kell hozzá.
 - **Óra indítása:** névsor / naptár „Start the Zoom class” → `admin-post.php?action=oys_admin_zoom_start` → friss `start_url` (`GET /meetings/{id}`) → átirányítás.
 - Fejlesztéshez: `OYS_ZOOM_API_BASE`, `OYS_ZOOM_OAUTH_URL` konstansok a szimulátorra (16.4).
+
+### 6.13b Saját élő közvetítés (Daily) – Zoom helyett (1.6.0)
+
+Olivia és Áron, 2026-11-12: **nincs Zoom**, az online órák a saját oldalon futnak. `OYS_Live` (`includes/class-live.php`), kulcs: `OYS_DAILY_API_KEY` (wp-config) vagy Studio → Settings → *Live online classes*. Ha be van kapcsolva (`live_on` + kulcs), `OYS_Zoom::enabled()` hamis.
+
+- **Terem:** minden online / hibrid óra (és online egyéni óra) privát Daily-terme (`POST /rooms`, `privacy: private`, `nbf` = nyitás − 1 óra, `exp` = vége + 30 perc, `enable_chat: false`, `enable_transcription_storage`). Lustán jön létre (élő oldal, óránkénti `prepare_upcoming()` a 24 órán belüli órákra); óra áthelyezésekor `nbf`/`exp` frissül, lemondáskor a terem törlődik. Tábla: `oys_live` (session_id, room_*, state room|done|closed, recordings JSON, transcript, summary, summary_status).
+- **Link:** `oys_join_link` filter (prioritás 5, a Zoom előtt): a fiókoldal `?live=<óra>&b=<foglalás>&k=<HMAC>` – a résztvevő saját, aláírt linkje (belépés nélkül is működik). Oktató / stúdió: `?live=<óra>` belépve → owner.
+- **Élő oldal:** `[oys_account]` `?live=` esetén `OYS_Live::page()`: videó (Daily Prebuilt, `assets/vendor/daily.js` 0.92.2, `assets/live.js`) + az óra chatje. Belépés: `POST oys/v1/live/<id>/join` → meeting token (résztvevő: `is_owner false`, felvételi jog nélkül; oktató: `is_owner true`, `enable_recording: cloud`).
+- **Felvétel csak Oliviáról:** az oktató böngészője az óra kezdetekor `startRecording({layout:{preset:'single-participant', session_id:<saját>}})` – a résztvevők sosem kerülnek a felvételre. `live_record`: group (csoportos óra, esemény) | all | none. Visszanézés a foglalóknak `live_replay_days` napig (`GET …/recording?rec=` → rövid lejáratú Daily link).
+- **Bevezető összefoglalója:** az oktató böngészője az első `live_intro_minutes` percben csak az oktatót íratja le (`startTranscription({participants:[saját]})`, Deepgram nova-3 a tanóra nyelvén, hiba esetén nova-2). Óra után a cron (`oys_frequent`, 15 perccel a vége után) letölti a leiratot (VTT → szöveg) és a felvételeket, majd `OYS_AI::json()` rövid, nem szó szerinti összefoglalót ír a tanóra nyelvén. `live_summary`: auto (rögtön látszik) | review (az oktató teszi közzé) | off. Az oktató az élő oldalon szerkesztheti / elrejtheti.
+- **Chat:** saját (`oys_live_chat`), REST pollinggal (4 mp óra alatt, 15 mp egyébként); az óra után is megmarad, `live_chat_days` napig lehet írni, utána olvasható. 2 mp-es küldési korlát; a résztvevő a sajátját, az oktató bármit törölhet.
+- Tesztek: `live:` kezdetű tesztek a `dev/tests/run.php`-ban (Daily és AI helyben szimulálva, `OYS_DAILY_API_BASE`).
 
 ### 6.14 Mobil API és iOS app
 

@@ -159,7 +159,7 @@ class OYS_Frontend {
 		$ratio        = OYS_Passes::online_per_credit();
 		$online_only  = (bool) OYS_Settings::get( 'online_only' );
 		if ( $online_only ) {
-			$cards[] = array( 'tone' => 'paper', 'title' => __( 'Live online class', 'olivia-studio' ), 'price' => oys_money( $online_price ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array( __( 'Any live online group class', 'olivia-studio' ), __( 'Join from home on Zoom', 'olivia-studio' ), __( 'The link comes by email and is in your account', 'olivia-studio' ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
+			$cards[] = array( 'tone' => 'paper', 'title' => __( 'Live online class', 'olivia-studio' ), 'price' => oys_money( $online_price ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array( __( 'Any live online group class', 'olivia-studio' ), ( OYS_Live::enabled() ? __( 'Join from home in your browser, no app needed', 'olivia-studio' ) : __( 'Join from home on Zoom', 'olivia-studio' ) ), __( 'The link comes by email and is in your account', 'olivia-studio' ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
 		} else {
 			$cards[] = array( 'tone' => 'paper', 'title' => __( 'Drop-in class', 'olivia-studio' ), 'price' => oys_money( $dropin ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array_filter( array( __( 'Any group class in person', 'olivia-studio' ), $online_price ? sprintf( __( 'Online classes: %s', 'olivia-studio' ), oys_money( $online_price ) ) : '', __( 'Bring friends: add guests when you book', 'olivia-studio' ), 'off' !== OYS_Settings::get( 'pay_later' ) ? __( 'Pay online or at the studio', 'olivia-studio' ) : '' ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
 		}
@@ -1033,6 +1033,9 @@ class OYS_Frontend {
 
 	public static function sc_account() {
 		$flash = oys_render_flash();
+		if ( isset( $_GET['live'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification -- the live page of a class (OYS_Live)
+			return $flash . OYS_Live::page();
+		}
 		if ( ! is_user_logged_in() ) {
 			return $flash . '<div class="oys-card oys-auth oys-auth--page"><p class="lead">' . esc_html__( 'Book and cancel classes, bring guests, see your passes, membership and receipts, and request private sessions.', 'olivia-studio' ) . '</p>' . self::auth_forms( oys_account_url() ) . '</div>';
 		}
