@@ -3670,3 +3670,232 @@ msgid "Stays here after the class: you can keep talking for %d day."
 msgid_plural "Stays here after the class: you can keep talking for %d days."
 msgstr[0] "Az óra után is itt marad: még %d napig beszélgethettek."
 msgstr[1] "Az óra után is itt marad: még %d napig beszélgethettek."
+
+# HathaFlow Live (LiveKit), 2026-11-12
+msgid "Live online classes (HathaFlow Live)"
+msgstr "Élő online órák (HathaFlow Live)"
+
+msgid "Online classes run on the site itself: only the people who booked get in, from their account or the link in their emails, in the browser, nothing to download, no Zoom. The class chat stays after the class. The video goes through LiveKit (livekit.io, LiveKit Cloud): create a project there and copy its URL (wss://…), API key and secret here, or put them in wp-config.php as OYS_LIVEKIT_URL, OYS_LIVEKIT_API_KEY and OYS_LIVEKIT_API_SECRET."
+msgstr "Az online órák magán az oldalon futnak: csak az jut be, aki foglalt, a fiókjából vagy a levelében kapott linkkel, a böngészőben, letöltés és Zoom nélkül. Az óra chatje az óra után is megmarad. A videó a LiveKiten megy (livekit.io, LiveKit Cloud): hozz létre ott egy projektet, és másold ide az URL-jét (wss://…), az API-kulcsát és a titkát, vagy tedd őket a wp-config.php-ba OYS_LIVEKIT_URL, OYS_LIVEKIT_API_KEY és OYS_LIVEKIT_API_SECRET néven."
+
+msgid "LiveKit URL"
+msgstr "LiveKit URL"
+
+msgid "LiveKit API key"
+msgstr "LiveKit API-kulcs"
+
+msgid "LiveKit API secret"
+msgstr "LiveKit API-titok"
+
+msgid "(set in wp-config.php)"
+msgstr "(a wp-config.php-ban van megadva)"
+
+msgid "Live classes"
+msgstr "Élő órák"
+
+msgid "Online classes run in our own live room (not Zoom)"
+msgstr "Az online órák a saját élő termünkben futnak (nem Zoomon)"
+
+msgid "The room opens (minutes before the class)"
+msgstr "A terem nyitása (perccel az óra előtt)"
+
+msgid "The teacher can go live an hour before."
+msgstr "Az oktató már egy órával előtte élőben indíthat."
+
+msgid "Students can turn their camera on up to"
+msgstr "A tanulók bekapcsolhatják a kamerájukat legfeljebb"
+
+msgid "online places"
+msgstr "online helyig"
+
+msgid "In smaller classes the teacher sees the students in a grid; in bigger ones only the teacher is on screen. Private sessions are always two-way."
+msgstr "Kisebb órán az oktató rácsban látja a tanulókat; nagyobbon csak az oktató van a képen. A magánóra mindig kétirányú."
+
+msgid "Recording"
+msgstr "Felvétel"
+
+msgid "Group classes and events"
+msgstr "Csoportos órák és események"
+
+msgid "Every online class, private sessions too"
+msgstr "Minden online óra, a magánórák is"
+
+msgid "No recording"
+msgstr "Nincs felvétel"
+
+msgid "Only the teacher is on the recording, never the participants: it is made in the teacher's browser from her own camera and microphone, starts by itself when the class starts and is saved on this server while she teaches."
+msgstr "A felvételen csak az oktató van, a résztvevők soha: az oktató böngészője készíti az ő saját kamerájából és mikrofonjából, az óra kezdetekor magától indul, és óra közben erre a szerverre mentődik."
+
+msgid "Participants can watch the recording for (days)"
+msgstr "A résztvevők ennyi napig nézhetik vissza"
+
+msgid "Recordings are deleted after (days)"
+msgstr "A felvételek törlése (nap múlva)"
+
+msgid "Until then the teacher can download them from the live page."
+msgstr "Addig az oktató letöltheti őket az élő óra oldaláról."
+
+msgid "Summary of the opening words"
+msgstr "Összefoglaló az óra eleji szavakról"
+
+msgid "Shown to the participants right away"
+msgstr "Rögtön megjelenik a résztvevőknek"
+
+msgid "The teacher reads it first and shows it"
+msgstr "Az oktató előbb elolvassa, aztán megjeleníti"
+
+msgid "No summary"
+msgstr "Nincs összefoglaló"
+
+msgid "minutes from the start"
+msgstr "perc az elejéből"
+
+msgid "The teacher's first minutes are written down in her browser (speech recognition, best in Chrome) and the AI writes a short summary, not word for word, in the class's language. It needs the Anthropic API key (Newsletter → AI settings). The teacher can edit or hide it on the live page."
+msgstr "Az oktató első perceit a böngészője leírja (beszédfelismerés, Chrome-ban a legjobb), és az MI rövid összefoglalót ír belőle, nem szó szerint, az óra nyelvén. Ehhez kell az Anthropic API-kulcs (Hírlevél → MI-beállítások). Az oktató az élő óra oldalán szerkesztheti vagy elrejtheti."
+
+msgid "People can keep writing in the class chat for (days)"
+msgstr "Az óra chatjébe ennyi napig lehet még írni"
+
+msgid "On: online classes run in our live room."
+msgstr "Bekapcsolva: az online órák a saját élő termünkben futnak."
+
+msgid "Switched off."
+msgstr "Kikapcsolva."
+
+msgid "No LiveKit project connected yet."
+msgstr "Még nincs LiveKit-projekt csatlakoztatva."
+
+msgid "Zoom (live online classes)"
+msgstr "Zoom (élő online órák)"
+
+msgid "Not used while our own live streaming is on."
+msgstr "Nem használjuk, amíg a saját élő közvetítésünk be van kapcsolva."
+
+msgid "LiveKit is connected."
+msgstr "A LiveKit csatlakoztatva van."
+
+msgid "Open the live room (teacher)"
+msgstr "Az élő terem megnyitása (oktató)"
+
+msgid "People joining online get their own link by email and in their account."
+msgstr "Aki online jön, e-mailben és a fiókjában kapja meg a saját linkjét."
+
+msgid "Link set on the class:"
+msgstr "Az órához megadott link:"
+
+msgid "This class doesn't use Zoom."
+msgstr "Ez az óra nem Zoomon megy."
+
+msgid "Online only"
+msgstr "Csak online"
+
+msgid "Only live online classes (no studio): the price list shows the online drop-in and online passes"
+msgstr "Csak élő online órák (nincs stúdió): az árlistán az online alkalmi jegy és az online bérletek látszanak"
+
+msgid "Drop-in price for an online class"
+msgstr "Egy online óra alkalmi ára"
+
+msgid "Used for new online classes in the calendar; each class can still have its own price."
+msgstr "Az új online órák kapják meg a naptárban; minden órának lehet saját ára is."
+
+msgid "One class on a studio pass covers"
+msgstr "A stúdióbérlet egy alkalma ennyit ér"
+
+msgid "online classes"
+msgstr "online órát"
+
+msgid "When someone books an online class with a studio pass, one class from the pass turns into this many online classes (same expiry date); one is used and the rest stay in their account. Online passes are used first. Memberships include online classes, and they don't count towards a monthly class limit."
+msgstr "Ha valaki stúdióbérlettel foglal online órát, a bérlet egy alkalma ennyi online órává válik (ugyanazzal a lejárattal); egyet felhasznál, a többi a fiókjában marad. Előbb az online bérlet fogy. A tagság az online órákat is tartalmazza, és ezek nem számítanak bele a havi alkalomkeretbe."
+
+msgid "You"
+msgstr "Te"
+
+msgid "Could not reach the live video service: %s"
+msgstr "Nem érem el az élő videó szolgáltatást: %s"
+
+msgid "The live video service answered with an error (%1$d). %2$s"
+msgstr "Az élő videó szolgáltatás hibával válaszolt (%1$d). %2$s"
+
+msgid "This class is not recorded."
+msgstr "Erről az óráról nem készül felvétel."
+
+msgid "This recording is closed."
+msgstr "Ez a felvétel már lezárult."
+
+msgid "A piece of the recording is missing."
+msgstr "Hiányzik egy darab a felvételből."
+
+msgid "This piece of the recording is empty or too big."
+msgstr "A felvételnek ez a darabja üres vagy túl nagy."
+
+msgid "The recording could not be saved on the server."
+msgstr "A felvételt nem sikerült a szerverre menteni."
+
+msgid "Go live"
+msgstr "Élő adás indítása"
+
+msgid "Saving the recording…"
+msgstr "A felvétel mentése…"
+
+msgid "Mute"
+msgstr "Mikrofon ki"
+
+msgid "Unmute"
+msgstr "Mikrofon be"
+
+msgid "Camera off"
+msgstr "Kamera ki"
+
+msgid "Camera on"
+msgstr "Kamera be"
+
+msgid "Raise hand"
+msgstr "Kézfeltartás"
+
+msgid "Lower hand"
+msgstr "Kéz le"
+
+msgid "Lower the hand"
+msgstr "Kéz leengedése"
+
+msgid "%s raised a hand"
+msgstr "%s feltette a kezét"
+
+msgid "Mute everyone"
+msgstr "Mindenki némítása"
+
+msgid "Everyone is muted."
+msgstr "Mindenki némítva."
+
+msgid "The teacher will be here in a moment."
+msgstr "Az oktató mindjárt itt lesz."
+
+msgid "In the class: %d"
+msgstr "Az órán: %d"
+
+msgid "Connection lost, reconnecting…"
+msgstr "Megszakadt a kapcsolat, újracsatlakozás…"
+
+msgid "Your camera or microphone could not be started. Check that the browser may use them."
+msgstr "Nem sikerült elindítani a kamerádat vagy a mikrofonodat. Nézd meg, hogy a böngésző használhatja-e őket."
+
+msgid "Your opening words are being written down."
+msgstr "Az óra eleji szavaidat most leírja a rendszer."
+
+msgid "You see and hear %s; your camera and microphone stay off. Questions go in the chat."
+msgstr "Látod és hallod: %s; a kamerád és a mikrofonod kikapcsolva marad. Kérdezni a chatben tudsz."
+
+msgid "Download"
+msgstr "Letöltés"
+
+msgid "Participants can watch it for %1$d days; it is deleted from the server after %2$d days."
+msgstr "A résztvevők %1$d napig nézhetik vissza; %2$d nap után törlődik a szerverről."
+
+msgid "Open the live room a few minutes before the class and press „Go live”."
+msgstr "Nyisd meg az élő termet pár perccel az óra előtt, és nyomd meg: „Élő adás indítása”."
+
+msgid "Summary shown to the participants."
+msgstr "Az összefoglaló látszik a résztvevőknek."
+
+msgid "Summary waiting for you."
+msgstr "Az összefoglaló rád vár."

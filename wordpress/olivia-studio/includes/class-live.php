@@ -1,22 +1,23 @@
 <?php
 /**
- * Our own live streaming for online classes, on Daily (https://www.daily.co) – no Zoom (Olivia and Áron, 2026-11-12).
+ * HathaFlow Live – live online classes on the site itself, tied to the booking (HathaFlow Platform Plan, Oct 2026,
+ * „HathaFlow Live”, pp. 11–13; Áron, 2026-11-12: „nincs Zoom … a Hathaflow-nak a rendszerére hagyatkozz”).
+ * The engine (this plugin) carries it, so Olivia's site and every HathaFlow teacher get the same thing.
  *
- *  - Room: every online / hybrid class (and online private session) gets a private Daily room when it's first needed
- *    (someone opens the live page, or the hourly job a day before). A class with a link typed in by hand keeps it.
- *  - Live page: the account page with ?live=<class>. The video (Daily Prebuilt, in the browser, no app) and the class
- *    chat side by side. Booked participants get their own link (also works without logging in: it's signed with
- *    their booking); the teacher of the class and the studio join as owner.
- *  - Chat: ours (table oys_live_chat), not Daily's, so it stays after class and people can keep talking
- *    (`live_chat_days` after the class; readable as long as the page is).
- *  - Recording (`live_record`: group = group classes and events, all, none): the teacher's browser starts the cloud
- *    recording of the teacher only (layout single-participant) when the class starts, so the participants are never
- *    on it. Booked participants can watch it for `live_replay_days`.
- *  - Opening words: the teacher's first `live_intro_minutes` minutes are transcribed (only the teacher), and after
- *    class the AI writes a short summary – not word for word – in the class's language. `live_summary`: auto (shown
- *    on the live page right away), review (the teacher publishes it), off.
- *
- * Key: OYS_DAILY_API_KEY in wp-config.php (or Settings → Live online). OYS_DAILY_API_BASE for tests.
+ *  - Video: LiveKit (WebRTC, two-way; the picture reaches viewers over the provider's network, quality adapts to each
+ *    viewer). Rooms are made by LiveKit when the first person joins; the server only signs entry tokens (JWT).
+ *    Keys: OYS_LIVEKIT_URL (wss://…), OYS_LIVEKIT_API_KEY, OYS_LIVEKIT_API_SECRET (or Settings → Live online).
+ *  - Only those who booked get in: their own signed link (account or email), nothing to download, the room opens
+ *    `live_open_minutes` (10) before the class. The teacher (or the studio) presses one button: „Go live”.
+ *  - Small classes (online seats up to `live_grid_max`) and private sessions: students may turn their camera on and the
+ *    teacher sees them in a grid. Bigger classes: only the teacher is on screen. Chat, raise hand, one-tap mute; the
+ *    teacher can mute everyone.
+ *  - Chat: ours (table oys_live_chat), it stays after class (`live_chat_days`).
+ *  - Recording: the teacher only, recorded in her own browser from her own camera and microphone (nobody else is on
+ *    it), uploaded in pieces while she teaches, kept on this server. The participants can watch it for
+ *    `live_replay_days`; the files are deleted after `live_keep_days`. `live_record`: group | all | none.
+ *  - Opening words: the teacher's first `live_intro_minutes` are written down in her browser (speech recognition in
+ *    the class's language); after class the AI writes a short summary, not word for word (`live_summary`).
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -29,26 +30,39 @@ class OYS_Live {
 		add_filter( 'oys_join_link', array( __CLASS__, 'join_link' ), 5, 3 );
 		add_action( 'rest_api_init', array( __CLASS__, 'routes' ) );
 		add_action( 'oys_session_saved', array( __CLASS__, 'on_session_saved' ), 10, 2 );
-		add_action( 'oys_hourly', array( __CLASS__, 'prepare_upcoming' ) );
+		add_action( 'oys_hourly', array( __CLASS__, 'clean_up' ) );
 		add_action( 'oys_frequent', array( __CLASS__, 'process' ) );
+		add_action( 'init', array( __CLASS__, 'maybe_stream_replay' ), 20 );
 	}
 
 	/* ---------- Configuration ---------- */
 
-	public static function key() {
-		return defined( 'OYS_DAILY_API_KEY' ) ? (string) OYS_DAILY_API_KEY : (string) OYS_Settings::get( 'daily_api_key' );
+	private static function conf( $key ) {
+		$const = 'OYS_LIVEKIT_' . strtoupper( $key );
+		return trim( defined( $const ) ? (string) constant( $const ) : (string) OYS_Settings::get( 'livekit_' . $key ) );
 	}
 
+	/** wss://<project>.livekit.cloud – where the browsers connect. */
+	public static function ws_url() {
+		$url = self::conf( 'url' );
+		return '' === $url ? '' : preg_replace( '#^http(s?)://#', 'ws$1://', $url );
+	}
+
+	/** https://… – the same server's API (Twirp). */
 	public static function api_base() {
-		return defined( 'OYS_DAILY_API_BASE' ) ? OYS_DAILY_API_BASE : 'https://api.daily.co/v1';
+		return defined( 'OYS_LIVEKIT_API_BASE' ) ? OYS_LIVEKIT_API_BASE : preg_replace( '#^ws(s?)://#', 'http$1://', self::ws_url() );
 	}
 
-	/** Our streaming is set up and on: online classes run on it (and Zoom stays out). */
+	public static function configured() {
+		return '' !== self::ws_url() && '' !== self::conf( 'api_key' ) && '' !== self::conf( 'api_secret' );
+	}
+
+	/** Our live classes are set up and on: online classes run in them (and Zoom stays out). */
 	public static function enabled() {
-		return '' !== trim( self::key() ) && (int) OYS_Settings::get( 'live_on' );
+		return self::configured() && (int) OYS_Settings::get( 'live_on' );
 	}
 
-	/** Does this class run in our live room? (Online or hybrid, scheduled or over, no link typed in by hand.) */
+	/** Does this class run in our live room? (Online or hybrid, scheduled, no link typed in by hand.) */
 	public static function uses_live( $session ) {
 		return self::enabled() && $session && oys_has_online( $session ) && in_array( $session->status, array( 'scheduled', 'completed' ), true ) && '' === (string) $session->online_url;
 	}
@@ -64,39 +78,67 @@ class OYS_Live {
 		return 'off' !== (string) OYS_Settings::get( 'live_summary' ) && 'private' !== $session->kind && (int) OYS_Settings::get( 'live_intro_minutes' ) > 0;
 	}
 
-	/** Language of the class (transcription, summary): the class's own, else the site's. */
+	/** Students may send video and sound: private sessions, and group classes up to `live_grid_max` online seats. */
+	public static function two_way( $session ) {
+		if ( 'private' === $session->kind ) {
+			return true;
+		}
+		$seats = oys_is_online( $session ) ? (int) $session->capacity : (int) $session->online_capacity;
+		return $seats > 0 && $seats <= (int) OYS_Settings::get( 'live_grid_max' );
+	}
+
+	/** Language of the class (speech recognition, summary): the class's own, else the site's. */
 	public static function lang( $session ) {
 		$langs = array_keys( OYS_I18n::languages() );
 		return count( $langs ) > 1 ? oys_valid_lang( $session->lang ?? 'en' ) : oys_valid_lang( $langs[0] ?? 'en' );
 	}
 
-	/* ---------- Daily API ---------- */
+	/* ---------- LiveKit: tokens and the server API ---------- */
 
-	public static function api( $method, $path, $body = null ) {
-		$args = array(
-			'method'  => $method,
-			'timeout' => 20,
-			'headers' => array( 'Authorization' => 'Bearer ' . self::key(), 'Content-Type' => 'application/json' ),
-		);
-		if ( null !== $body ) {
-			$args['body'] = wp_json_encode( $body );
-		}
-		$res = wp_remote_request( self::api_base() . $path, $args );
+	private static function b64( $data ) {
+		return rtrim( strtr( base64_encode( $data ), '+/', '-_' ), '=' );
+	}
+
+	/** A LiveKit access token (JWT, HS256). $grant: the „video” grant (room, roomJoin, canPublish …). */
+	public static function token( $identity, $name, array $grant, $ttl = 600, $metadata = '' ) {
+		$now    = time();
+		$claims = array_filter( array(
+			'iss'      => self::conf( 'api_key' ),
+			'sub'      => (string) $identity,
+			'name'     => (string) $name,
+			'nbf'      => $now - 10,
+			'exp'      => $now + max( 60, (int) $ttl ),
+			'jti'      => (string) $identity . '-' . $now,
+			'video'    => $grant,
+			'metadata' => (string) $metadata,
+		), fn( $v ) => '' !== $v && array() !== $v );
+		$seg = self::b64( wp_json_encode( array( 'alg' => 'HS256', 'typ' => 'JWT' ) ) ) . '.' . self::b64( wp_json_encode( $claims ) );
+		return $seg . '.' . self::b64( hash_hmac( 'sha256', $seg, self::conf( 'api_secret' ), true ) );
+	}
+
+	/** RoomService call (Twirp, JSON). @return array|WP_Error */
+	public static function api( $method, array $body, array $grant = array() ) {
+		$auth = self::token( 'oys-server', '', $grant ?: array( 'roomCreate' => true, 'roomList' => true, 'roomAdmin' => true, 'room' => (string) ( $body['room'] ?? '' ) ), 300 );
+		$res  = wp_remote_post( rtrim( self::api_base(), '/' ) . '/twirp/livekit.RoomService/' . $method, array(
+			'timeout' => 15,
+			'headers' => array( 'Authorization' => 'Bearer ' . $auth, 'Content-Type' => 'application/json' ),
+			'body'    => wp_json_encode( (object) $body ),
+		) );
 		if ( is_wp_error( $res ) ) {
-			return new WP_Error( 'oys_live', sprintf( __( 'Could not reach Daily: %s', 'olivia-studio' ), $res->get_error_message() ) );
+			return new WP_Error( 'oys_live', sprintf( __( 'Could not reach the live video service: %s', 'olivia-studio' ), $res->get_error_message() ) );
 		}
 		$code = (int) wp_remote_retrieve_response_code( $res );
 		$data = json_decode( (string) wp_remote_retrieve_body( $res ), true );
 		if ( $code < 200 || $code >= 300 ) {
-			$info = is_array( $data ) ? (string) ( $data['info'] ?? ( $data['error'] ?? '' ) ) : '';
-			oys_log( 'Daily request failed', array( 'path' => strtok( $path, '?' ), 'status' => $code, 'info' => $info ) );
-			return new WP_Error( 'oys_live', sprintf( __( 'Daily answered with an error (%1$d). %2$s', 'olivia-studio' ), $code, $info ) );
+			$info = is_array( $data ) ? (string) ( $data['msg'] ?? ( $data['code'] ?? '' ) ) : '';
+			oys_log( 'LiveKit request failed', array( 'method' => $method, 'status' => $code, 'info' => $info ) );
+			return new WP_Error( 'oys_live', sprintf( __( 'The live video service answered with an error (%1$d). %2$s', 'olivia-studio' ), $code, $info ) );
 		}
 		return is_array( $data ) ? $data : array();
 	}
 
 	public static function test_connection() {
-		$res = self::api( 'GET', '/rooms?limit=1' );
+		$res = self::api( 'ListRooms', array(), array( 'roomList' => true ) );
 		return is_wp_error( $res ) ? $res : true;
 	}
 
@@ -111,6 +153,10 @@ class OYS_Live {
 		return $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . self::table() . ' WHERE session_id = %d', (int) $session_id ) );
 	}
 
+	public static function room_name( $session_id ) {
+		return 'oys-' . substr( md5( home_url() ), 0, 8 ) . '-' . (int) $session_id;
+	}
+
 	/** When the room opens (minutes before the start) and closes (after the end). */
 	private static function window( $session ) {
 		return array(
@@ -119,79 +165,29 @@ class OYS_Live {
 		);
 	}
 
-	/** The class's Daily room, created the first time it's needed. @return object|WP_Error the oys_live row */
-	public static function ensure_room( $session ) {
-		$session = is_object( $session ) ? $session : OYS_Schedule::get( (int) $session );
-		if ( ! self::uses_live( $session ) ) {
-			return new WP_Error( 'oys_live', __( 'This class has no live room.', 'olivia-studio' ) );
-		}
+	/** The class's row (room, recordings, opening words), made the first time someone joins. */
+	public static function ensure_row( $session ) {
 		$row = self::row( $session->id );
 		if ( $row && $row->room_name ) {
 			return $row;
 		}
-		list( $opens, $closes ) = self::window( $session );
-		$props = array(
-			'nbf'                          => $opens - HOUR_IN_SECONDS, // the teacher can come in an hour early
-			'exp'                          => $closes,
-			'eject_at_room_exp'            => true,
-			'enable_chat'                  => false, // the class chat is ours: it stays after class
-			'enable_prejoin_ui'            => true,
-			'enable_knocking'              => false,
-			'enable_transcription_storage' => true,
-			'lang'                         => 'es' === self::lang( $session ) ? 'es' : 'en',
-		);
-		$room = self::api( 'POST', '/rooms', array(
-			'name'       => 'oys-' . substr( md5( home_url() ), 0, 6 ) . '-' . (int) $session->id . '-' . strtolower( wp_generate_password( 6, false, false ) ),
-			'privacy'    => 'private',
-			'properties' => $props,
-		) );
-		if ( is_wp_error( $room ) ) {
-			return $room;
-		}
-		if ( empty( $room['name'] ) || empty( $room['url'] ) ) {
-			return new WP_Error( 'oys_live', __( 'Daily did not return a room.', 'olivia-studio' ) );
-		}
 		global $wpdb;
-		$data = array(
-			'session_id' => (int) $session->id,
-			'room_name'  => sanitize_text_field( $room['name'] ),
-			'room_url'   => esc_url_raw( $room['url'] ),
-			'room_id'    => sanitize_text_field( (string) ( $room['id'] ?? '' ) ),
-			'state'      => 'room',
-			'created_at' => oys_now(),
-		);
+		$data = array( 'session_id' => (int) $session->id, 'room_name' => self::room_name( $session->id ), 'room_url' => self::ws_url(), 'room_id' => '', 'state' => 'room', 'created_at' => oys_now() );
 		$row ? $wpdb->update( self::table(), $data, array( 'session_id' => (int) $session->id ) ) : $wpdb->insert( self::table(), $data );
 		return self::row( $session->id );
 	}
 
-	/** Moved: the room opens and closes with the class. Cancelled or no longer online: the room goes. */
+	/** Cancelled or no longer online: the room closes (anyone still in it leaves). */
 	public static function on_session_saved( $session_id, $before = null ) {
 		$row = self::row( $session_id );
-		if ( ! $row || ! $row->room_name || ! self::enabled() ) {
+		if ( ! $row || ! $row->room_name || ! self::configured() ) {
 			return;
 		}
 		$s = OYS_Schedule::get( $session_id );
 		if ( ! $s || 'cancelled' === $s->status || ! oys_has_online( $s ) || '' !== (string) $s->online_url ) {
-			self::api( 'DELETE', '/rooms/' . rawurlencode( $row->room_name ) );
+			self::api( 'DeleteRoom', array( 'room' => $row->room_name ) );
 			global $wpdb;
-			$wpdb->update( self::table(), array( 'room_name' => '', 'room_url' => '', 'state' => 'closed' ), array( 'session_id' => (int) $session_id ) );
-			return;
-		}
-		if ( $before && ( $before->starts_at !== $s->starts_at || $before->ends_at !== $s->ends_at ) ) {
-			list( $opens, $closes ) = self::window( $s );
-			self::api( 'POST', '/rooms/' . rawurlencode( $row->room_name ), array( 'properties' => array( 'nbf' => $opens - HOUR_IN_SECONDS, 'exp' => $closes ) ) );
-		}
-	}
-
-	/** Hourly: rooms for the classes of the next day that people booked online. */
-	public static function prepare_upcoming() {
-		if ( ! self::enabled() ) {
-			return;
-		}
-		foreach ( OYS_Schedule::query( array( 'from' => oys_now(), 'to' => oys_utc_plus( DAY_IN_SECONDS ), 'kind' => array( 'group', 'event', 'private' ) ) ) as $s ) {
-			if ( self::uses_live( $s ) && ! self::row( $s->id ) && ( (int) $s->online_booked || 'private' === $s->kind || oys_is_online( $s ) && (int) $s->booked ) ) {
-				self::ensure_room( $s );
-			}
+			$wpdb->update( self::table(), array( 'state' => 'closed' ), array( 'session_id' => (int) $session_id ) );
 		}
 	}
 
@@ -220,7 +216,7 @@ class OYS_Live {
 		return self::url( $session->id, $booking->id );
 	}
 
-	/** Teacher of the class, or the studio: joins as owner (records, can remove chat messages). */
+	/** Teacher of the class, or the studio: joins as the teacher (goes live, records, mutes everyone). */
 	public static function is_owner( $session, $user_id ) {
 		if ( ! $user_id ) {
 			return false;
@@ -232,9 +228,7 @@ class OYS_Live {
 		return $t && (int) $t->user_id === (int) $user_id;
 	}
 
-	/**
-	 * Who is asking: [ owner, booking, user_id, name ] or null. $b / $k = the signed booking of a participant's own link.
-	 */
+	/** Who is asking: [ owner, booking, user_id, name ] or null. $b / $k = the signed booking of a participant's own link. */
 	public static function who( $session, $b = 0, $k = '' ) {
 		if ( ! $session ) {
 			return null;
@@ -262,7 +256,7 @@ class OYS_Live {
 		return array( 'owner' => false, 'booking' => $booking, 'user_id' => (int) $booking->user_id, 'name' => $name ?: __( 'Guest', 'olivia-studio' ) );
 	}
 
-	/** before | open | over, for joining the video. */
+	/** before | open | over, for joining the video. The teacher can come in an hour early. */
 	public static function phase( $session, $owner = false ) {
 		list( $opens, $closes ) = self::window( $session );
 		$now = time();
@@ -283,48 +277,271 @@ class OYS_Live {
 
 	/* ---------- Joining ---------- */
 
-	/** @return array|WP_Error what the live page needs to join the video */
+	/** @return array|WP_Error what the live page needs to connect: the server, a token, and the teacher's tasks */
 	public static function join( $session, array $who ) {
 		if ( 'open' !== self::phase( $session, $who['owner'] ) ) {
 			return new WP_Error( 'oys_live', 'over' === self::phase( $session ) ? __( 'This class is over.', 'olivia-studio' ) : __( 'The room opens shortly before the class.', 'olivia-studio' ) );
 		}
-		$row = self::ensure_room( $session );
-		if ( is_wp_error( $row ) ) {
-			return $row;
-		}
+		$row = self::ensure_row( $session );
 		list( , $closes ) = self::window( $session );
-		$props = array(
-			'room_name'          => $row->room_name,
-			'user_name'          => mb_substr( $who['name'], 0, 60 ),
-			'user_id'            => $who['owner'] ? 'teacher-' . (int) $who['user_id'] : 'booking-' . (int) $who['booking']->id,
-			'is_owner'           => (bool) $who['owner'],
-			'exp'                => $closes,
-			'eject_at_token_exp' => true,
-		);
-		if ( $who['owner'] && self::records( $session ) ) {
-			$props['enable_recording'] = 'cloud'; // only the teacher can record
-		}
-		$token = self::api( 'POST', '/meeting-tokens', array( 'properties' => $props ) );
-		if ( is_wp_error( $token ) ) {
-			return $token;
-		}
-		if ( empty( $token['token'] ) ) {
-			return new WP_Error( 'oys_live', __( 'Daily did not return an entry token.', 'olivia-studio' ) );
+		$two      = self::two_way( $session );
+		$identity = $who['owner'] ? 'teacher-' . (int) $who['user_id'] : 'b' . (int) $who['booking']->id;
+		$grant    = array( 'room' => $row->room_name, 'roomJoin' => true, 'canSubscribe' => true, 'canPublishData' => true );
+		if ( $who['owner'] ) {
+			$grant['canPublish'] = true;
+		} else {
+			$grant['canPublish'] = $two;
+			if ( $two ) {
+				$grant['canPublishSources'] = array( 'camera', 'microphone' );
+			}
 		}
 		$lang = self::lang( $session );
 		return array(
-			'url'    => $row->room_url,
-			'token'  => (string) $token['token'],
+			'url'    => self::ws_url(),
+			'token'  => self::token( $identity, mb_substr( $who['name'], 0, 60 ), $grant, $closes - time(), wp_json_encode( array( 'role' => $who['owner'] ? 'teacher' : 'student' ) ) ),
+			'me'     => $identity,
 			'owner'  => (bool) $who['owner'],
+			'twoWay' => $two,
 			'record' => $who['owner'] && self::records( $session ),
 			'intro'  => $who['owner'] && self::summarises( $session ) ? array(
-				'start'    => oys_ts( $session->starts_at ) * 1000,
-				'minutes'  => (int) OYS_Settings::get( 'live_intro_minutes' ),
-				'language' => $lang,
-				'model'    => 'nova-3',
+				'start'   => oys_ts( $session->starts_at ) * 1000,
+				'minutes' => (int) OYS_Settings::get( 'live_intro_minutes' ),
+				'lang'    => OYS_I18n::LANGS[ $lang ]['html'] ?? 'en-US',
 			) : null,
 			'start'  => oys_ts( $session->starts_at ) * 1000,
 		);
+	}
+
+	/** The teacher mutes everyone's microphone. @return int|WP_Error how many were muted */
+	public static function mute_all( $session ) {
+		$row = self::row( $session->id );
+		if ( ! $row ) {
+			return 0;
+		}
+		$list = self::api( 'ListParticipants', array( 'room' => $row->room_name ) );
+		if ( is_wp_error( $list ) ) {
+			return $list;
+		}
+		$n = 0;
+		foreach ( (array) ( $list['participants'] ?? array() ) as $p ) {
+			if ( str_starts_with( (string) ( $p['identity'] ?? '' ), 'teacher-' ) ) {
+				continue;
+			}
+			foreach ( (array) ( $p['tracks'] ?? array() ) as $t ) {
+				$audio = 'AUDIO' === ( $t['type'] ?? '' ) || 1 === ( $t['type'] ?? null ) || 'MICROPHONE' === ( $t['source'] ?? '' );
+				if ( $audio && empty( $t['muted'] ) ) {
+					$res = self::api( 'MutePublishedTrack', array( 'room' => $row->room_name, 'identity' => $p['identity'], 'track_sid' => $t['sid'], 'muted' => true ) );
+					$n  += is_wp_error( $res ) ? 0 : 1;
+				}
+			}
+		}
+		return $n;
+	}
+
+	/* ---------- Raised hands (through this server, like the chat: works on every network) ---------- */
+
+	private static function hands_key( $session_id ) {
+		return 'oys_live_hands_' . (int) $session_id;
+	}
+
+	/** Raised hands of a class: [ identity => name ]. */
+	public static function hands( $session_id ) {
+		$h = get_transient( self::hands_key( $session_id ) );
+		return is_array( $h ) ? $h : array();
+	}
+
+	/** A participant raises or lowers their hand; the teacher lowers anyone's ($identity). */
+	public static function set_hand( $session, array $who, $up, $identity = '' ) {
+		$h  = self::hands( $session->id );
+		$id = $who['owner'] ? sanitize_key( $identity ) : 'b' . (int) $who['booking']->id;
+		if ( '' === $id ) {
+			return $h;
+		}
+		if ( $up && ! $who['owner'] ) {
+			$h[ $id ] = $who['name'];
+		} else {
+			unset( $h[ $id ] );
+		}
+		set_transient( self::hands_key( $session->id ), $h, 3 * HOUR_IN_SECONDS );
+		return $h;
+	}
+
+	/* ---------- Recording: the teacher's own camera, uploaded in pieces ---------- */
+
+	/** The folder of the recordings (inside uploads, with a name nobody can guess; served only through replay()). */
+	public static function rec_dir() {
+		$dir = wp_upload_dir( null, false )['basedir'] . '/oys-live-' . substr( hash_hmac( 'sha256', 'oys-live-recordings', wp_salt( 'auth' ) ), 0, 20 );
+		if ( ! is_dir( $dir ) ) {
+			wp_mkdir_p( $dir );
+			file_put_contents( $dir . '/index.php', "<?php\n// Silence." );
+			file_put_contents( $dir . '/.htaccess', "Require all denied\nDeny from all\n" );
+		}
+		return $dir;
+	}
+
+	public static function recordings( $row ) {
+		return $row ? array_values( array_filter( (array) json_decode( (string) $row->recordings, true ), 'is_array' ) ) : array();
+	}
+
+	private static function save_recordings( $session_id, array $recs ) {
+		global $wpdb;
+		$wpdb->update( self::table(), array( 'recordings' => wp_json_encode( array_values( $recs ) ) ), array( 'session_id' => (int) $session_id ) );
+	}
+
+	/** A new recording (the teacher's browser starts one when the class starts). @return array|WP_Error */
+	public static function rec_start( $session, $mime ) {
+		if ( ! self::records( $session ) ) {
+			return new WP_Error( 'oys_live', __( 'This class is not recorded.', 'olivia-studio' ) );
+		}
+		$mime = preg_match( '#^video/(webm|mp4)\b#', (string) $mime, $m ) ? $m[0] : 'video/webm';
+		$row  = self::ensure_row( $session );
+		$recs = self::recordings( $row );
+		$id   = strtolower( wp_generate_password( 12, false, false ) );
+		$recs[] = array( 'id' => $id, 'file' => $id . '-' . strtolower( wp_generate_password( 16, false, false ) ) . ( 'video/mp4' === $mime ? '.mp4' : '.webm' ), 'mime' => $mime, 'status' => 'recording', 'seq' => 0, 'bytes' => 0, 'started' => time(), 'last' => time(), 'minutes' => 0 );
+		self::save_recordings( $session->id, $recs );
+		return array( 'id' => $id );
+	}
+
+	/** One piece of a recording, in order. @return array|WP_Error [ seq => the next one expected ] */
+	public static function rec_chunk( $session, $rec_id, $seq, $data ) {
+		$row  = self::row( $session->id );
+		$recs = self::recordings( $row );
+		foreach ( $recs as $i => $r ) {
+			if ( $r['id'] !== $rec_id ) {
+				continue;
+			}
+			if ( 'recording' !== $r['status'] ) {
+				return new WP_Error( 'oys_live', __( 'This recording is closed.', 'olivia-studio' ) );
+			}
+			if ( (int) $seq < (int) $r['seq'] ) {
+				return array( 'seq' => (int) $r['seq'] ); // sent twice (a retry): already here
+			}
+			if ( (int) $seq > (int) $r['seq'] ) {
+				return new WP_Error( 'oys_live_seq', __( 'A piece of the recording is missing.', 'olivia-studio' ), array( 'status' => 409, 'seq' => (int) $r['seq'] ) );
+			}
+			$len = strlen( (string) $data );
+			if ( ! $len || $len > 16 * MB_IN_BYTES ) {
+				return new WP_Error( 'oys_live', __( 'This piece of the recording is empty or too big.', 'olivia-studio' ) );
+			}
+			if ( false === file_put_contents( self::rec_dir() . '/' . $r['file'], $data, FILE_APPEND | LOCK_EX ) ) {
+				return new WP_Error( 'oys_live', __( 'The recording could not be saved on the server.', 'olivia-studio' ), array( 'status' => 500 ) );
+			}
+			$recs[ $i ]['seq']     = (int) $r['seq'] + 1;
+			$recs[ $i ]['bytes']   = (int) $r['bytes'] + $len;
+			$recs[ $i ]['last']    = time();
+			$recs[ $i ]['minutes'] = max( 1, (int) round( ( time() - (int) $r['started'] ) / 60 ) );
+			self::save_recordings( $session->id, $recs );
+			return array( 'seq' => $recs[ $i ]['seq'] );
+		}
+		return new WP_Error( 'oys_live', __( 'Recording not found.', 'olivia-studio' ), array( 'status' => 404 ) );
+	}
+
+	/** The teacher stops a recording (or the class is over): it can be watched. */
+	public static function rec_stop( $session, $rec_id, $seconds = 0 ) {
+		$recs = self::recordings( self::row( $session->id ) );
+		foreach ( $recs as $i => $r ) {
+			if ( $r['id'] === $rec_id && 'recording' === $r['status'] ) {
+				$recs[ $i ]['status']  = (int) $r['bytes'] > 0 ? 'finished' : 'empty';
+				$recs[ $i ]['minutes'] = max( 1, (int) round( ( (int) $seconds ?: (int) $r['last'] - (int) $r['started'] ) / 60 ) );
+			}
+		}
+		self::save_recordings( $session->id, $recs );
+		return true;
+	}
+
+	/** Recordings people can watch. */
+	public static function watchable( $row ) {
+		return array_values( array_filter( self::recordings( $row ), fn( $r ) => 'finished' === $r['status'] && is_file( self::rec_dir() . '/' . $r['file'] ) ) );
+	}
+
+	/**
+	 * ?oys_replay=<class>&rec=<id> (+ b, k of the participant's own link): the recording, for the people who booked
+	 * (for `live_replay_days`) and the teacher (also as a download: &dl=1). Seeking works (HTTP ranges).
+	 */
+	public static function maybe_stream_replay() {
+		if ( empty( $_GET['oys_replay'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			return;
+		}
+		$session = OYS_Schedule::get( absint( $_GET['oys_replay'] ) );
+		$who     = $session && self::uses_live( $session ) ? self::who( $session, absint( $_GET['b'] ?? 0 ), sanitize_text_field( wp_unslash( $_GET['k'] ?? '' ) ) ) : null;
+		$rec     = null;
+		foreach ( $who ? self::watchable( self::row( $session->id ) ) : array() as $r ) {
+			if ( $r['id'] === sanitize_key( $_GET['rec'] ?? '' ) ) {
+				$rec = $r;
+			}
+		}
+		if ( ! $rec || ! self::replay_open( $session, $who['owner'] ) ) {
+			status_header( 404 );
+			exit;
+		}
+		self::send_file( self::rec_dir() . '/' . $rec['file'], $rec['mime'], $who['owner'] && ! empty( $_GET['dl'] ) ? sanitize_title( oys_session_title( $session ) ) . '-' . wp_date( 'Y-m-d', oys_ts( $session->starts_at ) ) . ( 'video/mp4' === $rec['mime'] ? '.mp4' : '.webm' ) : '' );
+		exit;
+	}
+
+	private static function send_file( $path, $mime, $download = '' ) {
+		$size  = filesize( $path );
+		$start = 0;
+		$end   = $size - 1;
+		nocache_headers();
+		header( 'Content-Type: ' . $mime );
+		header( 'Accept-Ranges: bytes' );
+		header( 'X-Content-Type-Options: nosniff' );
+		if ( $download ) {
+			header( 'Content-Disposition: attachment; filename="' . $download . '"' );
+		}
+		if ( isset( $_SERVER['HTTP_RANGE'] ) && preg_match( '/bytes=(\d*)-(\d*)/', (string) $_SERVER['HTTP_RANGE'], $m ) ) {
+			$start = '' === $m[1] ? max( 0, $size - (int) $m[2] ) : (int) $m[1];
+			$end   = '' === $m[1] || '' === $m[2] ? $size - 1 : min( (int) $m[2], $size - 1 );
+			if ( $start > $end || $start >= $size ) {
+				status_header( 416 );
+				header( 'Content-Range: bytes */' . $size );
+				return;
+			}
+			status_header( 206 );
+			header( 'Content-Range: bytes ' . $start . '-' . $end . '/' . $size );
+		}
+		header( 'Content-Length: ' . ( $end - $start + 1 ) );
+		while ( ob_get_level() ) {
+			ob_end_clean();
+		}
+		$fh = fopen( $path, 'rb' );
+		fseek( $fh, $start );
+		$left = $end - $start + 1;
+		while ( $left > 0 && ! feof( $fh ) ) {
+			$buf   = fread( $fh, (int) min( 1048576, $left ) );
+			$left -= strlen( $buf );
+			echo $buf; // phpcs:ignore WordPress.Security.EscapeOutput -- video bytes
+			flush();
+		}
+		fclose( $fh );
+	}
+
+	/** The address a recording is watched from. */
+	public static function replay_url( $session_id, $rec_id, array $who, $download = false ) {
+		$args = array( 'oys_replay' => (int) $session_id, 'rec' => $rec_id );
+		if ( $who['booking'] ) {
+			$args['b'] = (int) $who['booking']->id;
+			$args['k'] = self::sign( $session_id, $who['booking']->id );
+		}
+		if ( $download ) {
+			$args['dl'] = 1;
+		}
+		return add_query_arg( $args, home_url( '/' ) );
+	}
+
+	/* ---------- Opening words ---------- */
+
+	/** A piece of the teacher's opening words, written down in her browser. */
+	public static function add_transcript( $session, $text ) {
+		$text = trim( sanitize_textarea_field( (string) $text ) );
+		if ( '' === $text || time() > oys_ts( $session->starts_at ) + ( (int) OYS_Settings::get( 'live_intro_minutes' ) + 10 ) * MINUTE_IN_SECONDS ) {
+			return false;
+		}
+		$row  = self::ensure_row( $session );
+		$full = trim( (string) $row->transcript . ' ' . $text );
+		global $wpdb;
+		$wpdb->update( self::table(), array( 'transcript' => mb_substr( $full, 0, 20000 ) ), array( 'session_id' => (int) $session->id ) );
+		return true;
 	}
 
 	/* ---------- Chat ---------- */
@@ -384,16 +601,16 @@ class OYS_Live {
 		);
 	}
 
-	/* ---------- After class: recording, opening words ---------- */
+	/* ---------- After class ---------- */
 
-	/** Every 5 minutes: rooms of classes that ended at least 15 minutes ago get their recording and summary. */
+	/** Every 5 minutes: classes that ended 15 minutes ago get their recordings closed and the summary written. */
 	public static function process() {
 		if ( ! self::enabled() ) {
 			return;
 		}
 		global $wpdb;
 		$rows = $wpdb->get_results( $wpdb->prepare(
-			'SELECT l.* FROM ' . self::table() . ' l JOIN ' . OYS_Install::table( 'sessions' ) . " s ON s.id = l.session_id WHERE l.state = 'room' AND l.room_name <> '' AND s.ends_at < %s ORDER BY s.ends_at ASC LIMIT 5",
+			'SELECT l.* FROM ' . self::table() . ' l JOIN ' . OYS_Install::table( 'sessions' ) . " s ON s.id = l.session_id WHERE l.state = 'room' AND s.ends_at < %s ORDER BY s.ends_at ASC LIMIT 5",
 			oys_utc_plus( -15 * MINUTE_IN_SECONDS )
 		) );
 		foreach ( $rows as $row ) {
@@ -406,141 +623,43 @@ class OYS_Live {
 		if ( ! $session ) {
 			return;
 		}
-		$update = array( 'tries' => (int) $row->tries + 1, 'processed_at' => oys_now() );
-		$wait   = false;
-
-		$recs = self::recordings( $row );
-		if ( is_wp_error( $recs ) ) {
-			$wait = true;
-		} else {
-			$wait = $wait || in_array( 'in-progress', array_column( $recs, 'status' ), true );
-			$done = array_values( array_filter( $recs, fn( $r ) => 'finished' === $r['status'] ) );
-			$update['recordings'] = wp_json_encode( $done );
-		}
-
-		if ( self::summarises( $session ) && '' === (string) $row->summary ) {
-			$t = self::fetch_transcript( $row );
-			if ( is_wp_error( $t ) || 'pending' === $t['state'] ) {
-				$wait = true;
-			} elseif ( 'ready' === $t['state'] ) {
-				$update['transcript'] = $t['text'];
-				$sum                  = self::summarize( $session, $t['text'] );
-				if ( is_wp_error( $sum ) ) {
-					$wait = $wait || OYS_AI::ready();
-				} elseif ( '' !== $sum ) {
-					$update['summary']        = $sum;
-					$update['summary_status'] = 'review' === OYS_Settings::get( 'live_summary' ) ? 'draft' : 'published';
-				}
+		foreach ( self::recordings( $row ) as $r ) {
+			if ( 'recording' === $r['status'] ) {
+				self::rec_stop( $session, $r['id'] ); // the teacher closed the page without stopping
 			}
 		}
-		// Daily needs a few minutes for the recording and the transcript; after about two hours we stop asking.
+		$update = array( 'tries' => (int) $row->tries + 1, 'processed_at' => oys_now() );
+		$wait   = false;
+		if ( self::summarises( $session ) && '' === (string) $row->summary && '' !== trim( (string) $row->transcript ) ) {
+			$sum = self::summarize( $session, (string) $row->transcript );
+			if ( is_wp_error( $sum ) ) {
+				$wait = OYS_AI::ready();
+			} elseif ( '' !== $sum ) {
+				$update['summary']        = $sum;
+				$update['summary_status'] = 'review' === OYS_Settings::get( 'live_summary' ) ? 'draft' : 'published';
+			}
+		}
 		$update['state'] = $wait && $update['tries'] < 24 ? 'room' : 'done';
 		global $wpdb;
 		$wpdb->update( self::table(), $update, array( 'session_id' => (int) $row->session_id ) );
 	}
 
-	/** Recordings of the room on Daily: [ id, status, minutes, start ]. */
-	public static function recordings( $row ) {
-		$list = self::api( 'GET', '/recordings?room_name=' . rawurlencode( $row->room_name ) );
-		if ( is_wp_error( $list ) ) {
-			return $list;
-		}
-		$out = array();
-		foreach ( (array) ( $list['data'] ?? array() ) as $r ) {
-			if ( empty( $r['id'] ) || ( $r['room_name'] ?? $row->room_name ) !== $row->room_name ) {
-				continue;
+	/** Hourly: recordings older than `live_keep_days` are deleted from the server. */
+	public static function clean_up() {
+		global $wpdb;
+		$days = max( 1, (int) OYS_Settings::get( 'live_keep_days' ) );
+		$rows = $wpdb->get_results( $wpdb->prepare(
+			'SELECT l.* FROM ' . self::table() . ' l JOIN ' . OYS_Install::table( 'sessions' ) . " s ON s.id = l.session_id WHERE l.recordings LIKE %s AND s.ends_at < %s LIMIT 50",
+			'%"file"%', oys_utc_plus( -$days * DAY_IN_SECONDS )
+		) );
+		foreach ( $rows as $row ) {
+			foreach ( self::recordings( $row ) as $r ) {
+				if ( ! empty( $r['file'] ) && is_file( self::rec_dir() . '/' . $r['file'] ) ) {
+					wp_delete_file( self::rec_dir() . '/' . $r['file'] );
+				}
 			}
-			$out[] = array(
-				'id'      => sanitize_text_field( $r['id'] ),
-				'status'  => sanitize_key( $r['status'] ?? 'finished' ),
-				'minutes' => max( 1, (int) round( (int) ( $r['duration'] ?? 0 ) / 60 ) ),
-				'start'   => (int) ( $r['start_ts'] ?? 0 ),
-			);
+			self::save_recordings( $row->session_id, array() );
 		}
-		usort( $out, fn( $a, $b ) => $a['start'] <=> $b['start'] );
-		return $out;
-	}
-
-	/** A short-lived link to watch a recording (Daily keeps the file). */
-	public static function recording_link( $row, $recording_id ) {
-		$known = array_column( (array) json_decode( (string) $row->recordings, true ), 'id' );
-		if ( ! in_array( $recording_id, $known, true ) ) {
-			return new WP_Error( 'oys_live', __( 'Recording not found.', 'olivia-studio' ) );
-		}
-		$link = self::api( 'GET', '/recordings/' . rawurlencode( $recording_id ) . '/access-link' );
-		if ( is_wp_error( $link ) ) {
-			return $link;
-		}
-		return empty( $link['download_link'] ) ? new WP_Error( 'oys_live', __( 'Daily did not return a link.', 'olivia-studio' ) ) : esc_url_raw( $link['download_link'] );
-	}
-
-	/** The transcript of the opening words: [ state => none|pending|ready, text ]. */
-	public static function fetch_transcript( $row ) {
-		if ( '' === (string) $row->room_id ) {
-			return array( 'state' => 'none' );
-		}
-		$list = self::api( 'GET', '/transcript?roomId=' . rawurlencode( $row->room_id ) );
-		if ( is_wp_error( $list ) ) {
-			return $list;
-		}
-		$items = array_values( array_filter( (array) ( $list['data'] ?? array() ), fn( $t ) => is_array( $t ) && (string) ( $t['roomId'] ?? $row->room_id ) === (string) $row->room_id ) );
-		if ( ! $items ) {
-			return array( 'state' => 'none' );
-		}
-		foreach ( $items as $t ) {
-			if ( in_array( (string) ( $t['status'] ?? '' ), array( 't_in_progress', 'in_progress', 'started' ), true ) ) {
-				return array( 'state' => 'pending' );
-			}
-		}
-		usort( $items, fn( $a, $b ) => (int) ( $a['created'] ?? 0 ) <=> (int) ( $b['created'] ?? 0 ) );
-		$parts = array();
-		foreach ( $items as $t ) {
-			if ( ! in_array( (string) ( $t['status'] ?? '' ), array( 't_finished', 'finished' ), true ) || ( isset( $t['isVttAvailable'] ) && ! $t['isVttAvailable'] ) ) {
-				continue;
-			}
-			$link = self::api( 'GET', '/transcript/' . rawurlencode( (string) ( $t['transcriptId'] ?? ( $t['id'] ?? '' ) ) ) . '/access-link' );
-			if ( is_wp_error( $link ) ) {
-				return $link;
-			}
-			$url = (string) ( $link['link'] ?? ( $link['download_link'] ?? '' ) );
-			$res = $url ? wp_remote_get( $url, array( 'timeout' => 20 ) ) : null;
-			if ( ! $res || is_wp_error( $res ) || 200 !== (int) wp_remote_retrieve_response_code( $res ) ) {
-				return new WP_Error( 'oys_live', __( 'The transcript could not be downloaded.', 'olivia-studio' ) );
-			}
-			$parts[] = self::parse_vtt( (string) wp_remote_retrieve_body( $res ) );
-		}
-		$text = trim( implode( "\n", array_filter( $parts ) ) );
-		return '' === $text ? array( 'state' => 'none' ) : array( 'state' => 'ready', 'text' => mb_substr( $text, 0, 20000 ) );
-	}
-
-	/** WebVTT → plain text, one line per cue (speaker names dropped: only the teacher is transcribed). */
-	public static function parse_vtt( $vtt ) {
-		$lines = array();
-		$skip  = false;
-		foreach ( preg_split( '/\r\n|\r|\n/', (string) $vtt ) as $raw ) {
-			$line = trim( $raw );
-			if ( '' === $line ) {
-				$skip = false;
-				continue;
-			}
-			if ( $skip || str_starts_with( $line, 'WEBVTT' ) || preg_match( '/^(NOTE|STYLE|REGION)\b/', $line ) ) {
-				$skip = $skip || ! str_starts_with( $line, 'WEBVTT' );
-				continue;
-			}
-			if ( str_contains( $line, '-->' ) || ctype_digit( $line ) || preg_match( '/^[a-z_-]+:\d+$/i', $line ) ) {
-				continue;
-			}
-			if ( preg_match( '/^<v(?:\.[^\s>]*)?\s+[^>]+>(.*)$/u', $line, $m ) ) {
-				$line = $m[1];
-			} elseif ( preg_match( '/^(\p{L}[^:<>\[\]]{0,58}):(\S.*)$/u', $line, $m ) && ! preg_match( '#(^|\s)https?$#i', $m[1] ) ) {
-				$line = $m[2]; // Daily writes "Name:text"
-			}
-			$text = trim( html_entity_decode( wp_strip_all_tags( $line ), ENT_QUOTES, 'UTF-8' ) );
-			if ( '' !== $text ) {
-				$lines[] = $text;
-			}
-		}
-		return implode( ' ', $lines );
 	}
 
 	/** The AI's short summary of the opening words ('' when there was nothing to summarise). @return string|WP_Error */
@@ -572,19 +691,31 @@ class OYS_Live {
 		$r( '/chat', 'GET', 'rest_chat' );
 		$r( '/chat', 'POST', 'rest_post' );
 		$r( '/chat/(?P<mid>\d+)', 'DELETE', 'rest_delete' );
-		$r( '/recording', 'GET', 'rest_recording' );
 		$r( '/summary', 'POST', 'rest_summary' );
+		$r( '/mute-all', 'POST', 'rest_mute_all' );
+		$r( '/rec', 'POST', 'rest_rec_start' );
+		$r( '/rec/(?P<rec>[a-z0-9]+)/chunk', 'POST', 'rest_rec_chunk' );
+		$r( '/rec/(?P<rec>[a-z0-9]+)/stop', 'POST', 'rest_rec_stop' );
+		$r( '/transcript', 'POST', 'rest_transcript' );
+		$r( '/hand', 'POST', 'rest_hand' );
 	}
 
-	/** [ session, who ] of a request, or a WP_Error. */
-	private static function req( WP_REST_Request $req ) {
+	/** [ session, who ] of a request, or a WP_Error. $owner: only the teacher. */
+	private static function req( WP_REST_Request $req, $owner = false ) {
 		$session = OYS_Schedule::get( (int) $req['id'] );
 		$who     = $session && self::uses_live( $session ) ? self::who( $session, (int) $req->get_param( 'b' ), (string) $req->get_param( 'k' ) ) : null;
-		return $who ? array( $session, $who ) : new WP_Error( 'oys_live', __( 'This live class is not in your bookings.', 'olivia-studio' ), array( 'status' => 403 ) );
+		if ( ! $who ) {
+			return new WP_Error( 'oys_live', __( 'This live class is not in your bookings.', 'olivia-studio' ), array( 'status' => 403 ) );
+		}
+		if ( $owner && ! $who['owner'] ) {
+			return new WP_Error( 'oys_live', __( 'Only the teacher can change this.', 'olivia-studio' ), array( 'status' => 403 ) );
+		}
+		return array( $session, $who );
 	}
 
 	private static function fail( WP_Error $e, $status = 400 ) {
-		return new WP_Error( $e->get_error_code(), $e->get_error_message(), array( 'status' => $e->get_error_data()['status'] ?? $status ) );
+		$data = (array) $e->get_error_data();
+		return new WP_Error( $e->get_error_code(), $e->get_error_message(), array_merge( $data, array( 'status' => $data['status'] ?? $status ) ) );
 	}
 
 	public static function rest_join( WP_REST_Request $req ) {
@@ -594,6 +725,71 @@ class OYS_Live {
 		}
 		$out = self::join( $r[0], $r[1] );
 		return is_wp_error( $out ) ? self::fail( $out, 409 ) : rest_ensure_response( $out );
+	}
+
+	public static function rest_mute_all( WP_REST_Request $req ) {
+		$r = self::req( $req, true );
+		if ( is_wp_error( $r ) ) {
+			return $r;
+		}
+		$n = self::mute_all( $r[0] );
+		return is_wp_error( $n ) ? self::fail( $n, 502 ) : rest_ensure_response( array( 'muted' => $n ) );
+	}
+
+	public static function rest_rec_start( WP_REST_Request $req ) {
+		$r = self::req( $req, true );
+		if ( is_wp_error( $r ) ) {
+			return $r;
+		}
+		$out = self::rec_start( $r[0], (string) $req->get_param( 'mime' ) );
+		return is_wp_error( $out ) ? self::fail( $out ) : rest_ensure_response( $out );
+	}
+
+	public static function rest_rec_chunk( WP_REST_Request $req ) {
+		$r = self::req( $req, true );
+		if ( is_wp_error( $r ) ) {
+			return $r;
+		}
+		$out = self::rec_chunk( $r[0], (string) $req['rec'], (int) $req->get_param( 'seq' ), $req->get_body() );
+		return is_wp_error( $out ) ? self::fail( $out ) : rest_ensure_response( $out );
+	}
+
+	public static function rest_rec_stop( WP_REST_Request $req ) {
+		$r = self::req( $req, true );
+		if ( is_wp_error( $r ) ) {
+			return $r;
+		}
+		self::rec_stop( $r[0], (string) $req['rec'], (int) $req->get_param( 'seconds' ) );
+		return rest_ensure_response( array( 'ok' => true ) );
+	}
+
+	public static function rest_hand( WP_REST_Request $req ) {
+		$r = self::req( $req );
+		if ( is_wp_error( $r ) ) {
+			return $r;
+		}
+		return rest_ensure_response( array( 'hands' => array_keys( self::set_hand( $r[0], $r[1], (bool) $req->get_param( 'up' ), (string) $req->get_param( 'identity' ) ) ) ) );
+	}
+
+	public static function rest_transcript( WP_REST_Request $req ) {
+		$r = self::req( $req, true );
+		if ( is_wp_error( $r ) ) {
+			return $r;
+		}
+		return rest_ensure_response( array( 'ok' => self::add_transcript( $r[0], (string) $req->get_param( 'text' ) ) ) );
+	}
+
+	/** The teacher edits, publishes or hides the summary of the opening words. */
+	public static function rest_summary( WP_REST_Request $req ) {
+		$r = self::req( $req, true );
+		if ( is_wp_error( $r ) ) {
+			return $r;
+		}
+		$status = in_array( $req->get_param( 'status' ), array( 'published', 'hidden', 'draft' ), true ) ? $req->get_param( 'status' ) : 'published';
+		self::ensure_row( $r[0] );
+		global $wpdb;
+		$wpdb->update( self::table(), array( 'summary' => sanitize_textarea_field( (string) $req->get_param( 'summary' ) ), 'summary_status' => $status ), array( 'session_id' => (int) $r[0]->id ) );
+		return rest_ensure_response( array( 'ok' => true ) );
 	}
 
 	public static function rest_chat( WP_REST_Request $req ) {
@@ -609,6 +805,8 @@ class OYS_Live {
 			'gone'     => array_map( 'intval', $gone ),
 			'open'     => $who['owner'] || self::chat_open( $session ),
 			'phase'    => self::phase( $session, $who['owner'] ),
+			'hands'    => $who['owner'] ? (object) self::hands( $session->id ) : null,
+			'hand'     => $who['owner'] ? null : isset( self::hands( $session->id )[ 'b' . (int) $who['booking']->id ] ),
 		) );
 	}
 
@@ -627,35 +825,6 @@ class OYS_Live {
 			return $r;
 		}
 		return self::delete_message( $r[0], $r[1], (int) $req['mid'] ) ? rest_ensure_response( array( 'ok' => true ) ) : new WP_Error( 'oys_live', __( 'You can\'t remove this message.', 'olivia-studio' ), array( 'status' => 403 ) );
-	}
-
-	public static function rest_recording( WP_REST_Request $req ) {
-		$r = self::req( $req );
-		if ( is_wp_error( $r ) ) {
-			return $r;
-		}
-		list( $session, $who ) = $r;
-		$row = self::row( $session->id );
-		if ( ! $row || ! self::replay_open( $session, $who['owner'] ) ) {
-			return new WP_Error( 'oys_live', __( 'The recording is no longer available.', 'olivia-studio' ), array( 'status' => 410 ) );
-		}
-		$url = self::recording_link( $row, sanitize_text_field( (string) $req->get_param( 'rec' ) ) );
-		return is_wp_error( $url ) ? self::fail( $url, 404 ) : rest_ensure_response( array( 'url' => $url ) );
-	}
-
-	/** The teacher edits, publishes or hides the summary of the opening words. */
-	public static function rest_summary( WP_REST_Request $req ) {
-		$r = self::req( $req );
-		if ( is_wp_error( $r ) ) {
-			return $r;
-		}
-		if ( ! $r[1]['owner'] ) {
-			return new WP_Error( 'oys_live', __( 'Only the teacher can change this.', 'olivia-studio' ), array( 'status' => 403 ) );
-		}
-		$status = in_array( $req->get_param( 'status' ), array( 'published', 'hidden', 'draft' ), true ) ? $req->get_param( 'status' ) : 'published';
-		global $wpdb;
-		$wpdb->update( self::table(), array( 'summary' => sanitize_textarea_field( (string) $req->get_param( 'summary' ) ), 'summary_status' => $status ), array( 'session_id' => (int) $r[0]->id ) );
-		return rest_ensure_response( array( 'ok' => true ) );
 	}
 
 	/* ---------- The live page ---------- */
@@ -689,13 +858,13 @@ class OYS_Live {
 			'nonce'    => is_user_logged_in() ? wp_create_nonce( 'wp_rest' ) : '',
 			'b'        => $b,
 			'k'        => $k,
-			'daily'    => OYS_URL . 'assets/vendor/daily.js?ver=0.92.2',
+			'lk'       => OYS_URL . 'assets/vendor/livekit-client.umd.js?ver=2.23.0',
 			'phase'    => $phase,
 			'owner'    => $who['owner'],
 			'opens'    => self::window( $session )[0] * 1000,
 			'chatOpen' => $who['owner'] || self::chat_open( $session ),
 			'i18n'     => array(
-				'join'      => __( 'Join the class', 'olivia-studio' ),
+				'join'      => $who['owner'] ? __( 'Go live', 'olivia-studio' ) : __( 'Join the class', 'olivia-studio' ),
 				'joining'   => __( 'Joining…', 'olivia-studio' ),
 				'left'      => __( 'You left the class. You can join again.', 'olivia-studio' ),
 				'send'      => __( 'Send', 'olivia-studio' ),
@@ -704,6 +873,24 @@ class OYS_Live {
 				'empty'     => __( 'No messages yet. Say hello!', 'olivia-studio' ),
 				'error'     => __( 'Something went wrong. Try again in a moment.', 'olivia-studio' ),
 				'recOn'     => __( 'Recording (only you are on it)', 'olivia-studio' ),
+				'recUp'     => __( 'Saving the recording…', 'olivia-studio' ),
+				'micOn'     => __( 'Mute', 'olivia-studio' ),
+				'micOff'    => __( 'Unmute', 'olivia-studio' ),
+				'camOn'     => __( 'Camera off', 'olivia-studio' ),
+				'camOff'    => __( 'Camera on', 'olivia-studio' ),
+				'hand'      => __( 'Raise hand', 'olivia-studio' ),
+				'handDown'  => __( 'Lower hand', 'olivia-studio' ),
+				'handLower' => __( 'Lower the hand', 'olivia-studio' ),
+				'handUp'    => __( '%s raised a hand', 'olivia-studio' ),
+				'muteAll'   => __( 'Mute everyone', 'olivia-studio' ),
+				'mutedAll'  => __( 'Everyone is muted.', 'olivia-studio' ),
+				'leave'     => __( 'Leave', 'olivia-studio' ),
+				'waiting'   => __( 'The teacher will be here in a moment.', 'olivia-studio' ),
+				'you'       => __( 'You', 'olivia-studio' ),
+				'people'    => __( 'In the class: %d', 'olivia-studio' ),
+				'reconnect' => __( 'Connection lost, reconnecting…', 'olivia-studio' ),
+				'noDevice'  => __( 'Your camera or microphone could not be started. Check that the browser may use them.', 'olivia-studio' ),
+				'listening' => __( 'Your opening words are being written down.', 'olivia-studio' ),
 				'recOff'    => __( 'Not recording', 'olivia-studio' ),
 				'recStart'  => __( 'Start recording', 'olivia-studio' ),
 				'recStop'   => __( 'Stop recording', 'olivia-studio' ),
@@ -724,15 +911,16 @@ class OYS_Live {
 		if ( 'over' === $phase ) {
 			$out .= self::after_html( $session, $row, $who );
 		} else {
-			$out .= '<div class="oys-live__video" data-live-video hidden></div>'
+			$out .= '<div class="oys-live__video" data-live-video hidden><div class="oys-live__main" data-live-main></div><div class="oys-live__tiles" data-live-tiles></div>'
+				. '<p class="oys-live__note" data-live-note hidden></p><div class="oys-live__bar" data-live-bar></div></div>'
 				. '<div class="oys-live__lobby" data-live-lobby><p class="oys-live__status" data-live-status>'
 				. ( 'open' === $phase ? esc_html__( 'The room is open.', 'olivia-studio' ) : esc_html( sprintf( __( 'The room opens %d minutes before the class.', 'olivia-studio' ), max( 5, (int) OYS_Settings::get( 'live_open_minutes' ) ) ) ) ) . '</p>'
-				. '<button type="button" class="btn btn--primary" data-live-join' . ( 'open' === $phase ? '' : ' disabled' ) . '>' . esc_html__( 'Join the class', 'olivia-studio' ) . '</button>'
+				. '<button type="button" class="btn btn--primary" data-live-join' . ( 'open' === $phase ? '' : ' disabled' ) . '>' . esc_html( $who['owner'] ? __( 'Go live', 'olivia-studio' ) : __( 'Join the class', 'olivia-studio' ) ) . '</button>'
 				. '<ul class="oys-live__tips"><li>' . esc_html__( 'In your browser, no app needed. On a phone or tablet, open this page in Chrome or Safari.', 'olivia-studio' ) . '</li>'
-				. '<li>' . esc_html__( 'Allow the camera and the microphone when your browser asks. You can turn both off in the room.', 'olivia-studio' ) . '</li>'
+				. '<li>' . esc_html( $who['owner'] || self::two_way( $session ) ? __( 'Allow the camera and the microphone when your browser asks. You can turn both off in the room.', 'olivia-studio' ) : sprintf( __( 'You see and hear %s; your camera and microphone stay off. Questions go in the chat.', 'olivia-studio' ), $teacher ) ) . '</li>'
 				. ( self::records( $session ) ? '<li>' . esc_html( sprintf( __( 'The class is recorded, but only %s is on the recording: you are not.', 'olivia-studio' ), $teacher ) ) . '</li>' : '' )
 				. '</ul></div>'
-				. ( $who['owner'] ? '<div class="oys-live__owner" data-live-owner hidden><span data-live-rec-state></span> <button type="button" class="btn btn--ghost btn--sm" data-live-rec hidden></button></div>' : '' );
+				. ( $who['owner'] ? '<div class="oys-live__owner" data-live-owner hidden><span data-live-rec-state></span> <button type="button" class="btn btn--ghost btn--sm" data-live-rec hidden></button> <span class="oys-small" data-live-intro></span></div>' : '' );
 		}
 		$out .= '</section>' . self::chat_html( $session, $who ) . '</div></div>';
 		return $out;
@@ -763,32 +951,32 @@ class OYS_Live {
 			$out .= '<div class="oys-live__summary oys-card"><h3>' . esc_html__( 'From the opening words', 'olivia-studio' ) . '</h3><p>' . nl2br( esc_html( $sum ) ) . '</p>'
 				. '<p class="oys-small">' . esc_html__( 'A short summary written with the help of AI, not word for word.', 'olivia-studio' ) . '</p></div>';
 		}
-		$recs = $row ? array_values( (array) json_decode( (string) $row->recordings, true ) ) : array();
+		$recs = self::watchable( $row );
 		if ( $recs && self::replay_open( $session, $who['owner'] ) ) {
 			$out .= '<div class="oys-live__replay oys-card"><h3>' . esc_html__( 'Watch the class again', 'olivia-studio' ) . '</h3><div data-live-player></div><p>';
 			foreach ( $recs as $i => $r ) {
-				$out .= '<button type="button" class="btn btn--primary btn--sm" data-live-replay="' . esc_attr( $r['id'] ) . '">' . esc_html( count( $recs ) > 1 ? sprintf( __( 'Part %1$d (%2$d min)', 'olivia-studio' ), $i + 1, $r['minutes'] ) : sprintf( __( 'Play the recording (%d min)', 'olivia-studio' ), $r['minutes'] ) ) . '</button> ';
+				$out .= '<button type="button" class="btn btn--primary btn--sm" data-live-replay="' . esc_url( self::replay_url( $session->id, $r['id'], $who ) ) . '" data-mime="' . esc_attr( $r['mime'] ) . '">' . esc_html( count( $recs ) > 1 ? sprintf( __( 'Part %1$d (%2$d min)', 'olivia-studio' ), $i + 1, $r['minutes'] ) : sprintf( __( 'Play the recording (%d min)', 'olivia-studio' ), $r['minutes'] ) ) . '</button> ';
+				if ( $who['owner'] ) {
+					$out .= '<a class="btn btn--ghost btn--sm" href="' . esc_url( self::replay_url( $session->id, $r['id'], $who, true ) ) . '">' . esc_html__( 'Download', 'olivia-studio' ) . '</a> ';
+				}
 			}
 			$days = (int) OYS_Settings::get( 'live_replay_days' );
-			$out .= '</p>' . ( $who['owner'] ? '' : '<p class="oys-small">' . esc_html( sprintf( __( 'Available until %s.', 'olivia-studio' ), oys_date( gmdate( 'Y-m-d H:i:s', oys_ts( $session->ends_at ) + $days * DAY_IN_SECONDS ), 'M j' ) ) ) . '</p>' ) . '</div>';
-		} elseif ( $row && 'room' === $row->state && self::records( $session ) ) {
-			$out .= '<div class="oys-card"><p>' . esc_html__( 'The recording will be here shortly after the class.', 'olivia-studio' ) . '</p></div>';
+			$out .= '</p>' . ( $who['owner']
+				? '<p class="oys-small">' . esc_html( sprintf( __( 'Participants can watch it for %1$d days; it is deleted from the server after %2$d days.', 'olivia-studio' ), $days, (int) OYS_Settings::get( 'live_keep_days' ) ) ) . '</p>'
+				: '<p class="oys-small">' . esc_html( sprintf( __( 'Available until %s.', 'olivia-studio' ), oys_date( gmdate( 'Y-m-d H:i:s', oys_ts( $session->ends_at ) + $days * DAY_IN_SECONDS ), 'M j' ) ) ) . '</p>' ) . '</div>';
 		}
 		return '<div class="oys-live__after"><p class="oys-live__status">' . esc_html__( 'The class is over. Thank you for practising together!', 'olivia-studio' ) . '</p>' . $out . '</div>';
 	}
 
-	/** For the admin's class box: state of the room, recording and summary. */
+	/** For the admin's class box: recordings and summary. */
 	public static function admin_status( $session ) {
 		$row = self::row( $session->id );
-		if ( ! $row || ! $row->room_name ) {
-			return __( 'The live room is created when the first person books online, or a day before the class.', 'olivia-studio' );
+		if ( ! $row ) {
+			return __( 'Open the live room a few minutes before the class and press „Go live”.', 'olivia-studio' );
 		}
-		$recs = (array) json_decode( (string) $row->recordings, true );
-		$bits = array( __( 'Live room ready.', 'olivia-studio' ) );
-		if ( 'done' === $row->state || $recs ) {
-			$bits[] = $recs ? sprintf( _n( '%d recording.', '%d recordings.', count( $recs ), 'olivia-studio' ), count( $recs ) ) : __( 'No recording.', 'olivia-studio' );
-			$bits[] = '' !== (string) $row->summary ? ( 'published' === $row->summary_status ? __( 'Summary shown to the participants.', 'olivia-studio' ) : __( 'Summary waiting for you.', 'olivia-studio' ) ) : '';
-		}
+		$recs   = self::watchable( $row );
+		$bits   = array( $recs ? sprintf( _n( '%d recording.', '%d recordings.', count( $recs ), 'olivia-studio' ), count( $recs ) ) : '' );
+		$bits[] = '' !== (string) $row->summary ? ( 'published' === $row->summary_status ? __( 'Summary shown to the participants.', 'olivia-studio' ) : __( 'Summary waiting for you.', 'olivia-studio' ) ) : '';
 		return implode( ' ', array_filter( $bits ) );
 	}
 }

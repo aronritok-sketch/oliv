@@ -3648,3 +3648,232 @@ msgid "Stays here after the class: you can keep talking for %d day."
 msgid_plural "Stays here after the class: you can keep talking for %d days."
 msgstr[0] "Se queda aquí después de la clase: podéis seguir hablando %d día."
 msgstr[1] "Se queda aquí después de la clase: podéis seguir hablando %d días."
+
+# HathaFlow Live (LiveKit), 2026-11-12
+msgid "Live online classes (HathaFlow Live)"
+msgstr "Clases en directo online (HathaFlow Live)"
+
+msgid "Online classes run on the site itself: only the people who booked get in, from their account or the link in their emails, in the browser, nothing to download, no Zoom. The class chat stays after the class. The video goes through LiveKit (livekit.io, LiveKit Cloud): create a project there and copy its URL (wss://…), API key and secret here, or put them in wp-config.php as OYS_LIVEKIT_URL, OYS_LIVEKIT_API_KEY and OYS_LIVEKIT_API_SECRET."
+msgstr "Las clases online se dan en la propia web: solo entra quien ha reservado, desde su cuenta o el enlace de sus correos, en el navegador, sin descargar nada y sin Zoom. El chat de la clase se queda después de la clase. El vídeo va por LiveKit (livekit.io, LiveKit Cloud): crea allí un proyecto y copia aquí su URL (wss://…), la clave de API y el secreto, o ponlos en wp-config.php como OYS_LIVEKIT_URL, OYS_LIVEKIT_API_KEY y OYS_LIVEKIT_API_SECRET."
+
+msgid "LiveKit URL"
+msgstr "URL de LiveKit"
+
+msgid "LiveKit API key"
+msgstr "Clave de API de LiveKit"
+
+msgid "LiveKit API secret"
+msgstr "Secreto de API de LiveKit"
+
+msgid "(set in wp-config.php)"
+msgstr "(definido en wp-config.php)"
+
+msgid "Live classes"
+msgstr "Clases en directo"
+
+msgid "Online classes run in our own live room (not Zoom)"
+msgstr "Las clases online se dan en nuestra propia sala en directo (no en Zoom)"
+
+msgid "The room opens (minutes before the class)"
+msgstr "La sala se abre (minutos antes de la clase)"
+
+msgid "The teacher can go live an hour before."
+msgstr "La profesora puede empezar en directo una hora antes."
+
+msgid "Students can turn their camera on up to"
+msgstr "Los alumnos pueden encender la cámara hasta"
+
+msgid "online places"
+msgstr "plazas online"
+
+msgid "In smaller classes the teacher sees the students in a grid; in bigger ones only the teacher is on screen. Private sessions are always two-way."
+msgstr "En las clases pequeñas la profesora ve a los alumnos en una cuadrícula; en las grandes solo se ve a la profesora. Las sesiones privadas son siempre en ambos sentidos."
+
+msgid "Recording"
+msgstr "Grabación"
+
+msgid "Group classes and events"
+msgstr "Clases en grupo y eventos"
+
+msgid "Every online class, private sessions too"
+msgstr "Todas las clases online, también las privadas"
+
+msgid "No recording"
+msgstr "Sin grabación"
+
+msgid "Only the teacher is on the recording, never the participants: it is made in the teacher's browser from her own camera and microphone, starts by itself when the class starts and is saved on this server while she teaches."
+msgstr "En la grabación solo aparece la profesora, nunca los participantes: la hace su navegador con su propia cámara y micrófono, empieza sola al comenzar la clase y se guarda en este servidor mientras enseña."
+
+msgid "Participants can watch the recording for (days)"
+msgstr "Los participantes pueden ver la grabación durante (días)"
+
+msgid "Recordings are deleted after (days)"
+msgstr "Las grabaciones se borran a los (días)"
+
+msgid "Until then the teacher can download them from the live page."
+msgstr "Hasta entonces la profesora puede descargarlas desde la página de la clase en directo."
+
+msgid "Summary of the opening words"
+msgstr "Resumen de las palabras del inicio"
+
+msgid "Shown to the participants right away"
+msgstr "Se muestra enseguida a los participantes"
+
+msgid "The teacher reads it first and shows it"
+msgstr "La profesora lo lee primero y lo publica"
+
+msgid "No summary"
+msgstr "Sin resumen"
+
+msgid "minutes from the start"
+msgstr "minutos desde el inicio"
+
+msgid "The teacher's first minutes are written down in her browser (speech recognition, best in Chrome) and the AI writes a short summary, not word for word, in the class's language. It needs the Anthropic API key (Newsletter → AI settings). The teacher can edit or hide it on the live page."
+msgstr "Los primeros minutos de la profesora se transcriben en su navegador (reconocimiento de voz, mejor en Chrome) y la IA escribe un resumen breve, no literal, en el idioma de la clase. Necesita la clave de API de Anthropic (Newsletter → Ajustes de IA). La profesora puede editarlo u ocultarlo en la página de la clase en directo."
+
+msgid "People can keep writing in the class chat for (days)"
+msgstr "Se puede seguir escribiendo en el chat de la clase durante (días)"
+
+msgid "On: online classes run in our live room."
+msgstr "Activado: las clases online se dan en nuestra sala en directo."
+
+msgid "Switched off."
+msgstr "Desactivado."
+
+msgid "No LiveKit project connected yet."
+msgstr "Todavía no hay ningún proyecto de LiveKit conectado."
+
+msgid "Zoom (live online classes)"
+msgstr "Zoom (clases online en directo)"
+
+msgid "Not used while our own live streaming is on."
+msgstr "No se usa mientras nuestra propia emisión en directo esté activada."
+
+msgid "LiveKit is connected."
+msgstr "LiveKit está conectado."
+
+msgid "Open the live room (teacher)"
+msgstr "Abrir la sala en directo (profesora)"
+
+msgid "People joining online get their own link by email and in their account."
+msgstr "Quien se une online recibe su propio enlace por correo y en su cuenta."
+
+msgid "Link set on the class:"
+msgstr "Enlace de la clase:"
+
+msgid "This class doesn't use Zoom."
+msgstr "Esta clase no usa Zoom."
+
+msgid "Online only"
+msgstr "Solo online"
+
+msgid "Only live online classes (no studio): the price list shows the online drop-in and online passes"
+msgstr "Solo clases online en directo (sin estudio): la lista de precios muestra la clase suelta online y los bonos online"
+
+msgid "Drop-in price for an online class"
+msgstr "Precio de una clase online suelta"
+
+msgid "Used for new online classes in the calendar; each class can still have its own price."
+msgstr "Se usa para las nuevas clases online del calendario; cada clase puede tener su propio precio."
+
+msgid "One class on a studio pass covers"
+msgstr "Una clase del bono de estudio equivale a"
+
+msgid "online classes"
+msgstr "clases online"
+
+msgid "When someone books an online class with a studio pass, one class from the pass turns into this many online classes (same expiry date); one is used and the rest stay in their account. Online passes are used first. Memberships include online classes, and they don't count towards a monthly class limit."
+msgstr "Cuando alguien reserva una clase online con un bono de estudio, una clase del bono se convierte en este número de clases online (con la misma caducidad); se usa una y el resto queda en su cuenta. Primero se usan los bonos online. Las membresías incluyen las clases online, que no cuentan para el límite mensual."
+
+msgid "You"
+msgstr "Tú"
+
+msgid "Could not reach the live video service: %s"
+msgstr "No se pudo contactar con el servicio de vídeo en directo: %s"
+
+msgid "The live video service answered with an error (%1$d). %2$s"
+msgstr "El servicio de vídeo en directo respondió con un error (%1$d). %2$s"
+
+msgid "This class is not recorded."
+msgstr "Esta clase no se graba."
+
+msgid "This recording is closed."
+msgstr "Esta grabación ya está cerrada."
+
+msgid "A piece of the recording is missing."
+msgstr "Falta un fragmento de la grabación."
+
+msgid "This piece of the recording is empty or too big."
+msgstr "Este fragmento de la grabación está vacío o es demasiado grande."
+
+msgid "The recording could not be saved on the server."
+msgstr "No se pudo guardar la grabación en el servidor."
+
+msgid "Go live"
+msgstr "Empezar en directo"
+
+msgid "Saving the recording…"
+msgstr "Guardando la grabación…"
+
+msgid "Mute"
+msgstr "Silenciar"
+
+msgid "Unmute"
+msgstr "Activar micrófono"
+
+msgid "Camera off"
+msgstr "Apagar cámara"
+
+msgid "Camera on"
+msgstr "Encender cámara"
+
+msgid "Raise hand"
+msgstr "Levantar la mano"
+
+msgid "Lower hand"
+msgstr "Bajar la mano"
+
+msgid "Lower the hand"
+msgstr "Bajar la mano"
+
+msgid "%s raised a hand"
+msgstr "%s ha levantado la mano"
+
+msgid "Mute everyone"
+msgstr "Silenciar a todos"
+
+msgid "Everyone is muted."
+msgstr "Todos están silenciados."
+
+msgid "The teacher will be here in a moment."
+msgstr "La profesora llegará en un momento."
+
+msgid "In the class: %d"
+msgstr "En la clase: %d"
+
+msgid "Connection lost, reconnecting…"
+msgstr "Se ha perdido la conexión, reconectando…"
+
+msgid "Your camera or microphone could not be started. Check that the browser may use them."
+msgstr "No se pudo iniciar tu cámara o micrófono. Comprueba que el navegador tenga permiso para usarlos."
+
+msgid "Your opening words are being written down."
+msgstr "Se están transcribiendo tus palabras del inicio."
+
+msgid "You see and hear %s; your camera and microphone stay off. Questions go in the chat."
+msgstr "Ves y oyes a %s; tu cámara y tu micrófono siguen apagados. Las preguntas, en el chat."
+
+msgid "Download"
+msgstr "Descargar"
+
+msgid "Participants can watch it for %1$d days; it is deleted from the server after %2$d days."
+msgstr "Los participantes pueden verla durante %1$d días; se borra del servidor a los %2$d días."
+
+msgid "Open the live room a few minutes before the class and press „Go live”."
+msgstr "Abre la sala en directo unos minutos antes de la clase y pulsa «Empezar en directo»."
+
+msgid "Summary shown to the participants."
+msgstr "El resumen está visible para los participantes."
+
+msgid "Summary waiting for you."
+msgstr "El resumen te está esperando."

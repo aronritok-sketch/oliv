@@ -363,7 +363,7 @@ class OYS_Install {
 			KEY session_id (session_id)
 		) $c;" );
 
-		// Our live room of an online class (Daily): the room, its recordings and the summary of the opening words.
+		// The live room of an online class (HathaFlow Live): the room, its recordings and the opening words with their summary.
 		dbDelta( 'CREATE TABLE ' . self::table( 'live' ) . " (
 			session_id bigint(20) unsigned NOT NULL,
 			room_name varchar(128) NOT NULL DEFAULT '',

@@ -1815,54 +1815,58 @@ test( 'hathaflow edition: a neutral demo studio, none of Olivia\'s content', fun
 	eq( 'usd', $data['setup']['studio']['currency'], 'dollars' );
 } );
 
-/* ---------- Our own live streaming (Daily) ---------- */
+/* ---------- HathaFlow Live (LiveKit) ---------- */
 
-// In-process Daily: rooms, tokens, recordings, transcripts. $GLOBALS['daily_*'] steer the answers.
-$GLOBALS['daily_calls'] = array();
+// In-process LiveKit server API (Twirp): remembers what was asked, answers like the server.
+$GLOBALS['lk_calls'] = array();
 add_filter( 'pre_http_request', function ( $pre, $args, $url ) {
-	if ( false !== $pre || ( ! str_starts_with( $url, OYS_Live::api_base() ) && ! str_starts_with( $url, 'https://daily.test/' ) ) ) {
+	if ( false !== $pre || ! OYS_Live::configured() || ! str_starts_with( $url, OYS_Live::api_base() . '/twirp/' ) ) {
 		return $pre;
 	}
-	$method = $args['method'] ?? 'GET';
-	$path   = str_starts_with( $url, 'https://daily.test/' ) ? '/file' : substr( $url, strlen( OYS_Live::api_base() ) );
-	$body   = json_decode( $args['body'] ?? 'null', true ) ?: array();
-	$GLOBALS['daily_calls'][] = array( $method, strtok( $path, '?' ), $body, $args['headers']['Authorization'] ?? '' );
+	$method = substr( $url, strrpos( $url, '/' ) + 1 );
+	$body   = json_decode( $args['body'] ?? '{}', true ) ?: array();
+	$GLOBALS['lk_calls'][] = array( $method, $body, $args['headers']['Authorization'] ?? '' );
 	$json = array();
-	$raw  = null;
-	if ( 'POST' === $method && '/rooms' === $path ) {
-		$json = array( 'id' => 'room-uuid-' . count( $GLOBALS['daily_calls'] ), 'name' => $body['name'], 'url' => 'https://olivia.daily.test/' . $body['name'], 'config' => $body['properties'] );
-	} elseif ( '/meeting-tokens' === $path ) {
-		$json = array( 'token' => 'tok_' . md5( wp_json_encode( $body ) ) );
-	} elseif ( str_starts_with( $path, '/recordings?' ) ) {
-		$json = array( 'data' => $GLOBALS['daily_recordings'] ?? array() );
-	} elseif ( preg_match( '#^/recordings/([^/]+)/access-link$#', $path, $m ) ) {
-		$json = array( 'download_link' => 'https://daily.test/rec/' . $m[1] . '.mp4' );
-	} elseif ( str_starts_with( $path, '/transcript?' ) ) {
-		$json = array( 'data' => $GLOBALS['daily_transcripts'] ?? array() );
-	} elseif ( preg_match( '#^/transcript/([^/]+)/access-link$#', $path, $m ) ) {
-		$json = array( 'link' => 'https://daily.test/vtt/' . $m[1] . '.vtt' );
-	} elseif ( '/file' === $path ) {
-		$raw = $GLOBALS['daily_vtt'] ?? '';
+	if ( 'ListParticipants' === $method ) {
+		$json = array( 'participants' => $GLOBALS['lk_participants'] ?? array() );
 	}
-	return array( 'headers' => array(), 'body' => null !== $raw ? $raw : wp_json_encode( $json ), 'response' => array( 'code' => 200, 'message' => 'OK' ), 'cookies' => array(), 'filename' => null );
+	return array( 'headers' => array(), 'body' => wp_json_encode( (object) $json ), 'response' => array( 'code' => 200, 'message' => 'OK' ), 'cookies' => array(), 'filename' => null );
 }, 8, 3 );
-function daily_calls( $method, $pattern ) {
-	return array_values( array_filter( $GLOBALS['daily_calls'], fn( $c ) => $c[0] === $method && preg_match( $pattern, $c[1] ) ) );
+function lk_calls( $method ) {
+	return array_values( array_filter( $GLOBALS['lk_calls'], fn( $c ) => $c[0] === $method ) );
 }
 function live_on( array $more = array() ) {
-	OYS_Settings::update( array_merge( array( 'daily_api_key' => 'daily-test-key', 'live_on' => 1, 'live_record' => 'group', 'live_summary' => 'auto', 'live_intro_minutes' => 10, 'live_chat_days' => 7, 'live_replay_days' => 7, 'live_open_minutes' => 15 ), $more ) );
-	$GLOBALS['daily_calls'] = array();
+	OYS_Settings::update( array_merge( array( 'livekit_url' => 'wss://olivia.livekit.test', 'livekit_api_key' => 'APItest', 'livekit_api_secret' => 'secret-for-tests', 'live_on' => 1, 'live_record' => 'group', 'live_summary' => 'auto', 'live_intro_minutes' => 10, 'live_chat_days' => 7, 'live_replay_days' => 7, 'live_keep_days' => 30, 'live_open_minutes' => 10, 'live_grid_max' => 25 ), $more ) );
+	$GLOBALS['lk_calls'] = array();
 }
 function live_off() {
-	OYS_Settings::update( array( 'daily_api_key' => '', 'ai_api_key' => '' ) );
-	unset( $GLOBALS['daily_recordings'], $GLOBALS['daily_transcripts'], $GLOBALS['daily_vtt'] );
+	OYS_Settings::update( array( 'livekit_url' => '', 'livekit_api_key' => '', 'livekit_api_secret' => '', 'ai_api_key' => '' ) );
+	unset( $GLOBALS['lk_participants'] );
+}
+/** The claims of a LiveKit token, after checking its signature. */
+function lk_claims( $jwt ) {
+	[ $h, $p, $s ] = explode( '.', $jwt );
+	$sig = rtrim( strtr( base64_encode( hash_hmac( 'sha256', "$h.$p", 'secret-for-tests', true ) ), '+/', '-_' ), '=' );
+	return hash_equals( $sig, $s ) ? json_decode( base64_decode( strtr( $p, '-_', '+/' ) ), true ) : null;
+}
+/** A REST request as the logged-in teacher (the studio). */
+function live_owner_req( $method, $path, $params = array(), $body = null ) {
+	$req = new WP_REST_Request( $method, '/oys/v1' . $path );
+	$req->set_query_params( $params );
+	if ( null !== $body ) {
+		$req->set_body( $body );
+	}
+	wp_set_current_user( get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0] );
+	$res = rest_do_request( $req );
+	wp_set_current_user( 0 );
+	return array( $res->get_status(), $res->get_data() );
 }
 
 test( 'live: online people get their own live page, never Zoom; studio people none', function () {
 	live_on();
 	OYS_Settings::update( array( 'zoom_account_id' => 'acc', 'zoom_client_id' => 'id', 'zoom_client_secret' => 'secret', 'zoom_auto' => 1 ) );
 	try {
-		ok( OYS_Live::enabled() && ! OYS_Zoom::enabled(), 'our streaming on, Zoom stays out' );
+		ok( OYS_Live::enabled() && ! OYS_Zoom::enabled(), 'our live classes on, Zoom stays out' );
 		$s    = make_session( array( 'format' => 'hybrid', 'online_price' => 600 ) );
 		$st   = OYS_Bookings::get( OYS_Bookings::book_manual( make_user(), $s, 'comp', false ) );
 		$on   = OYS_Bookings::get( OYS_Bookings::book_manual( make_user(), $s, 'comp', false, false, 'online' ) );
@@ -1873,7 +1877,7 @@ test( 'live: online people get their own live page, never Zoom; studio people no
 		eq( (int) $on->id, (int) $q['b'], 'link: the booking' );
 		eq( OYS_Live::sign( $s->id, $on->id ), $q['k'], 'link: signed' );
 		ok( str_starts_with( $link, oys_page_url( 'account' ) ), 'on the account page' );
-		eq( 0, count( $GLOBALS['daily_calls'] ), 'no room yet: made when needed' );
+		eq( 0, count( $GLOBALS['lk_calls'] ), 'booking calls nobody: the room is made when people join' );
 		$typed = make_session( array( 'format' => 'online', 'online_url' => 'https://meet.example.test/x' ) );
 		$tb    = OYS_Bookings::get( OYS_Bookings::book_manual( make_user(), $typed, 'comp', false ) );
 		eq( 'https://meet.example.test/x', OYS_Bookings::join_link( $tb, $typed ), 'a link typed in by hand is kept' );
@@ -1891,53 +1895,159 @@ test( 'live: online people get their own live page, never Zoom; studio people no
 	}
 } );
 
-test( 'live: joining – room once, the teacher records only herself, participants never', function () {
+test( 'live: joining – only the people who booked, ten minutes before; the teacher goes live; tokens signed', function () {
 	live_on();
 	try {
-		$s  = make_session( array( 'format' => 'online', 'in_hours' => 3 ) );
-		$b  = OYS_Bookings::get( OYS_Bookings::book_manual( make_user( 'Anna' ), $s, 'comp', false ) );
+		$s   = make_session( array( 'format' => 'online', 'in_hours' => 3 ) );
+		$b   = OYS_Bookings::get( OYS_Bookings::book_manual( make_user( 'Anna' ), $s, 'comp', false ) );
 		$who = OYS_Live::who( $s, $b->id, OYS_Live::sign( $s->id, $b->id ) );
 		eq( 'before', OYS_Live::phase( $s ), 'three hours before: not open yet' );
 		ok( is_wp_error( OYS_Live::join( $s, $who ) ), 'participants wait until the room opens' );
-		$s = OYS_Schedule::get( OYS_Schedule::save( array( 'starts_at' => oys_utc_plus( 10 * MINUTE_IN_SECONDS ), 'ends_at' => oys_utc_plus( 70 * MINUTE_IN_SECONDS ) ), $s->id ) );
+		$s = OYS_Schedule::get( OYS_Schedule::save( array( 'starts_at' => oys_utc_plus( 12 * MINUTE_IN_SECONDS ), 'ends_at' => oys_utc_plus( 72 * MINUTE_IN_SECONDS ) ), $s->id ) );
+		eq( 'before', OYS_Live::phase( $s ), 'twelve minutes before: still closed (it opens ten minutes before)' );
+		eq( 'open', OYS_Live::phase( $s, true ), 'the teacher can go live an hour before' );
+		$s = OYS_Schedule::get( OYS_Schedule::save( array( 'starts_at' => oys_utc_plus( 8 * MINUTE_IN_SECONDS ), 'ends_at' => oys_utc_plus( 68 * MINUTE_IN_SECONDS ) ), $s->id ) );
 		$j = OYS_Live::join( $s, $who );
-		ok( ! is_wp_error( $j ) && str_starts_with( $j['url'], 'https://olivia.daily.test/' ), 'ten minutes before: in' );
+		ok( ! is_wp_error( $j ) && 'wss://olivia.livekit.test' === $j['url'], 'eight minutes before: in, on the LiveKit server' );
+		$c = lk_claims( $j['token'] );
+		ok( is_array( $c ), 'the entry token is signed with the secret' );
+		eq( 'APItest', $c['iss'], 'token: issued with the API key' );
+		eq( 'b' . $b->id, $c['sub'], 'token: the booking is the identity' );
+		eq( 'Anna', $c['name'], 'token: her name' );
+		eq( OYS_Live::room_name( $s->id ), $c['video']['room'], 'token: only this class\'s room' );
+		ok( true === $c['video']['roomJoin'] && empty( $c['video']['roomAdmin'] ), 'token: joins, no admin rights' );
+		ok( $c['exp'] >= oys_ts( $s->ends_at ) && $c['exp'] <= oys_ts( $s->ends_at ) + 31 * MINUTE_IN_SECONDS, 'token: valid until half an hour after the class' );
+		ok( true === $c['video']['canPublish'] && array( 'camera', 'microphone' ) === $c['video']['canPublishSources'], 'small class: students may turn their camera on' );
 		ok( ! $j['owner'] && ! $j['record'] && null === $j['intro'], 'a participant does not record or transcribe' );
-		$rooms = daily_calls( 'POST', '#^/rooms$#' );
-		eq( 1, count( $rooms ), 'room created' );
-		eq( 'private', $rooms[0][2]['privacy'], 'private room: a token is needed' );
-		ok( false === $rooms[0][2]['properties']['enable_chat'], 'Daily chat off: the class chat is ours' );
-		ok( ! isset( $rooms[0][2]['properties']['enable_recording'] ), 'the room itself does not let anyone record' );
-		eq( 'Bearer daily-test-key', $rooms[0][3], 'API key sent' );
-		$tok = daily_calls( 'POST', '#^/meeting-tokens$#' )[0][2]['properties'];
-		ok( false === $tok['is_owner'] && ! isset( $tok['enable_recording'] ), 'participant token: no owner, no recording' );
-		eq( 'Anna', $tok['user_name'], 'participant name' );
-		OYS_Live::join( $s, $who );
-		eq( 1, count( daily_calls( 'POST', '#^/rooms$#' ) ), 'room created only once' );
+		eq( 'student', json_decode( $c['metadata'], true )['role'], 'token: a student' );
 
 		$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0];
 		wp_set_current_user( $admin );
 		$owner = OYS_Live::who( $s );
-		ok( $owner && $owner['owner'], 'the studio joins as owner' );
-		$j   = OYS_Live::join( $s, $owner );
-		$tok = end( $GLOBALS['daily_calls'] )[2]['properties'];
-		ok( true === $tok['is_owner'] && 'cloud' === $tok['enable_recording'], 'only the teacher can record' );
-		ok( $j['record'] && 10 === $j['intro']['minutes'], 'the teacher records and transcribes the opening' );
-		eq( oys_ts( $s->starts_at ) * 1000, $j['intro']['start'], 'the transcript starts with the class' );
+		ok( $owner && $owner['owner'], 'the studio joins as the teacher' );
+		$j = OYS_Live::join( $s, $owner );
+		$c = lk_claims( $j['token'] );
+		ok( str_starts_with( $c['sub'], 'teacher-' ) && true === $c['video']['canPublish'] && empty( $c['video']['canPublishSources'] ), 'the teacher sends picture, sound (and music) freely' );
+		ok( $j['record'] && 10 === $j['intro']['minutes'] && 'en-US' === $j['intro']['lang'], 'the teacher records and writes down the opening words, in the class\'s language' );
+		eq( oys_ts( $s->starts_at ) * 1000, $j['intro']['start'], 'from the start of the class' );
 
+		$big = make_session( array( 'format' => 'online', 'capacity' => 40, 'in_hours' => 0.1 ) );
+		$bb  = OYS_Bookings::get( OYS_Bookings::book_manual( make_user(), $big, 'comp', false, true ) );
+		wp_set_current_user( 0 );
+		$c = lk_claims( OYS_Live::join( $big, OYS_Live::who( $big, $bb->id, OYS_Live::sign( $big->id, $bb->id ) ) )['token'] );
+		ok( false === $c['video']['canPublish'] && true === $c['video']['canSubscribe'], 'big class: only the teacher is on screen' );
+		wp_set_current_user( $admin );
 		$p  = make_session( array( 'kind' => 'private', 'format' => 'online', 'in_hours' => 0.1 ) );
 		$jp = OYS_Live::join( $p, OYS_Live::who( $p ) );
-		ok( ! $jp['record'] && null === $jp['intro'], 'private sessions: no recording, no summary (by default)' );
-		$tok = end( $GLOBALS['daily_calls'] )[2]['properties'];
-		ok( ! isset( $tok['enable_recording'] ), 'private session token: no recording' );
+		ok( ! $jp['record'] && null === $jp['intro'] && $jp['twoWay'], 'private session: two-way, not recorded, no summary (by default)' );
 		live_on( array( 'live_record' => 'none' ) );
 		ok( ! OYS_Live::join( $s, $owner )['record'], 'recording can be switched off' );
 		wp_set_current_user( 0 );
 
 		OYS_Schedule::cancel_session( $s->id );
-		eq( 1, count( daily_calls( 'DELETE', '#^/rooms/oys-#' ) ), 'cancelled class: the room goes' );
+		ok( 1 === count( lk_calls( 'DeleteRoom' ) ) && OYS_Live::room_name( $s->id ) === lk_calls( 'DeleteRoom' )[0][1]['room'], 'cancelled class: the room closes' );
+		$auth = lk_claims( substr( lk_calls( 'DeleteRoom' )[0][2], 7 ) );
+		ok( ! empty( $auth['video']['roomCreate'] ), 'the server API is called with a signed server token' );
 	} finally {
 		wp_set_current_user( 0 );
+		live_off();
+	}
+} );
+
+test( 'live: the teacher mutes everyone (not herself)', function () {
+	live_on();
+	try {
+		$s = make_session( array( 'format' => 'online', 'in_hours' => 0.1 ) );
+		$b = OYS_Bookings::get( OYS_Bookings::book_manual( make_user(), $s, 'comp', false, true ) );
+		OYS_Live::ensure_row( $s );
+		$GLOBALS['lk_participants'] = array(
+			array( 'identity' => 'teacher-1', 'tracks' => array( array( 'sid' => 'TR_t', 'type' => 'AUDIO', 'muted' => false ) ) ),
+			array( 'identity' => 'b1', 'tracks' => array( array( 'sid' => 'TR_a', 'type' => 'AUDIO', 'muted' => false ), array( 'sid' => 'TR_v', 'type' => 'VIDEO', 'muted' => false ) ) ),
+			array( 'identity' => 'b2', 'tracks' => array( array( 'sid' => 'TR_b', 'type' => 'AUDIO', 'muted' => true ) ) ),
+		);
+		list( $code ) = api( 'POST', '/live/' . $s->id . '/mute-all?b=' . $b->id . '&k=' . OYS_Live::sign( $s->id, $b->id ) );
+		eq( 403, $code, 'a participant cannot mute the others' );
+		list( $code, $data ) = live_owner_req( 'POST', '/live/' . $s->id . '/mute-all' );
+		ok( 200 === $code && 1 === $data['muted'], 'one microphone muted' );
+		$m = lk_calls( 'MutePublishedTrack' );
+		ok( 1 === count( $m ) && 'b1' === $m[0][1]['identity'] && 'TR_a' === $m[0][1]['track_sid'] && true === $m[0][1]['muted'], 'the open student microphone, not the teacher, not the video' );
+	} finally {
+		live_off();
+	}
+} );
+
+test( 'live: raise hand – the teacher sees it in her chat poll and lowers it', function () {
+	live_on();
+	try {
+		$s  = make_session( array( 'format' => 'online', 'in_hours' => 0.1 ) );
+		$b  = OYS_Bookings::get( OYS_Bookings::book_manual( make_user( 'Anna' ), $s, 'comp', false, true ) );
+		$q  = '?b=' . $b->id . '&k=' . OYS_Live::sign( $s->id, $b->id );
+		list( $code, $data ) = api( 'POST', '/live/' . $s->id . '/hand' . $q, array( 'up' => true ) );
+		ok( 200 === $code && array( 'b' . $b->id ) === $data['hands'], 'the student raises a hand' );
+		list( , $data ) = api( 'GET', '/live/' . $s->id . '/chat' . $q );
+		ok( true === $data['hand'] && null === $data['hands'], 'the student sees only her own hand, not the others' );
+		list( , $data ) = live_owner_req( 'GET', '/live/' . $s->id . '/chat' );
+		$h = (array) $data['hands'];
+		ok( isset( $h[ 'b' . $b->id ] ) && '' !== $h[ 'b' . $b->id ], 'the teacher gets the raised hand with the name' );
+		list( $code ) = api( 'POST', '/live/' . $s->id . '/hand?b=' . $b->id . '&k=wrong', array( 'up' => true ) );
+		eq( 403, $code, 'not with a wrong link' );
+		live_owner_req( 'POST', '/live/' . $s->id . '/hand', array( 'up' => false, 'identity' => 'b' . $b->id ) );
+		list( , $data ) = api( 'GET', '/live/' . $s->id . '/chat' . $q );
+		ok( false === $data['hand'], 'the teacher lowered it' );
+	} finally {
+		live_off();
+	}
+} );
+
+test( 'live: the recording – only the teacher records, pieces in order, the participants watch it, deleted later', function () {
+	live_on();
+	try {
+		$s = make_session( array( 'format' => 'online', 'in_hours' => 0.1 ) );
+		$b = OYS_Bookings::get( OYS_Bookings::book_manual( make_user(), $s, 'comp', false, true ) );
+		$k = OYS_Live::sign( $s->id, $b->id );
+		list( $code ) = api( 'POST', '/live/' . $s->id . '/rec?b=' . $b->id . '&k=' . $k, array( 'mime' => 'video/webm' ) );
+		eq( 403, $code, 'a participant cannot record' );
+		list( $code, $data ) = live_owner_req( 'POST', '/live/' . $s->id . '/rec', array( 'mime' => 'video/webm;codecs=vp8,opus' ) );
+		ok( 200 === $code && preg_match( '/^[a-z0-9]{12}$/', $data['id'] ), 'the teacher starts a recording' );
+		$rid = $data['id'];
+		list( $code, $data ) = live_owner_req( 'POST', '/live/' . $s->id . '/rec/' . $rid . '/chunk', array( 'seq' => 0 ), 'AAAA' );
+		ok( 200 === $code && 1 === $data['seq'], 'first piece saved' );
+		list( $code, $data ) = live_owner_req( 'POST', '/live/' . $s->id . '/rec/' . $rid . '/chunk', array( 'seq' => 0 ), 'AAAA' );
+		ok( 200 === $code && 1 === $data['seq'], 'the same piece again (a retry) is not saved twice' );
+		list( $code, $data ) = live_owner_req( 'POST', '/live/' . $s->id . '/rec/' . $rid . '/chunk', array( 'seq' => 2 ), 'CCCC' );
+		ok( 409 === $code && 1 === $data['data']['seq'], 'a gap is refused, with the piece expected' );
+		live_owner_req( 'POST', '/live/' . $s->id . '/rec/' . $rid . '/chunk', array( 'seq' => 1 ), 'BBBB' );
+		$row  = OYS_Live::row( $s->id );
+		$recs = OYS_Live::recordings( $row );
+		eq( 'AAAABBBB', file_get_contents( OYS_Live::rec_dir() . '/' . $recs[0]['file'] ), 'the file is the pieces in order' );
+		ok( str_contains( OYS_Live::rec_dir(), '/oys-live-' ) && is_file( OYS_Live::rec_dir() . '/index.php' ), 'kept in a folder nobody can guess, not listed' );
+		eq( array(), OYS_Live::watchable( $row ), 'not watchable while recording' );
+		live_owner_req( 'POST', '/live/' . $s->id . '/rec/' . $rid . '/stop', array( 'seconds' => 3600 ) );
+		$rec = OYS_Live::watchable( OYS_Live::row( $s->id ) );
+		ok( 1 === count( $rec ) && 60 === $rec[0]['minutes'] && 'video/webm' === $rec[0]['mime'], 'stopped: watchable, 60 minutes' );
+		list( $code ) = live_owner_req( 'POST', '/live/' . $s->id . '/rec/' . $rid . '/chunk', array( 'seq' => 2 ), 'DDDD' );
+		eq( 400, $code, 'a closed recording takes no more pieces' );
+		$url = OYS_Live::replay_url( $s->id, $rid, OYS_Live::who( $s, $b->id, $k ) );
+		parse_str( (string) parse_url( $url, PHP_URL_QUERY ), $q );
+		ok( (int) $q['oys_replay'] === (int) $s->id && $q['rec'] === $rid && $q['k'] === $k, 'the participant\'s replay address carries their own signed link' );
+
+		// A recording left open (the teacher closed the page) is closed after the class.
+		$s2 = make_session( array( 'format' => 'online', 'in_hours' => 0.1 ) );
+		list( , $d2 ) = live_owner_req( 'POST', '/live/' . $s2->id . '/rec', array( 'mime' => 'video/mp4' ) );
+		live_owner_req( 'POST', '/live/' . $s2->id . '/rec/' . $d2['id'] . '/chunk', array( 'seq' => 0 ), 'MP4' );
+		OYS_Schedule::save( array( 'starts_at' => oys_utc_plus( -2 * HOUR_IN_SECONDS ), 'ends_at' => oys_utc_plus( -HOUR_IN_SECONDS ) ), $s2->id );
+		OYS_Live::process();
+		$r2 = OYS_Live::watchable( OYS_Live::row( $s2->id ) );
+		ok( 1 === count( $r2 ) && 'video/mp4' === $r2[0]['mime'], 'closed and watchable after the class' );
+		eq( 'done', OYS_Live::row( $s2->id )->state, 'processed' );
+
+		// After `live_keep_days` the files go.
+		$file = OYS_Live::rec_dir() . '/' . OYS_Live::recordings( OYS_Live::row( $s2->id ) )[0]['file'];
+		OYS_Schedule::save( array( 'starts_at' => oys_utc_plus( -40 * DAY_IN_SECONDS ), 'ends_at' => oys_utc_plus( -40 * DAY_IN_SECONDS + HOUR_IN_SECONDS ) ), $s2->id );
+		OYS_Live::clean_up();
+		ok( ! is_file( $file ) && array() === OYS_Live::recordings( OYS_Live::row( $s2->id ) ), 'deleted after 30 days' );
+		wp_delete_file( OYS_Live::rec_dir() . '/' . $recs[0]['file'] );
+	} finally {
 		live_off();
 	}
 } );
@@ -1987,7 +2097,8 @@ test( 'live: the class chat stays after class, people remove their own messages'
 	}
 } );
 
-test( 'live: after class – recording for the participants, AI summary of the opening words', function () {
+
+test( 'live: after class – the opening words, written down in the teacher\'s browser, summarised by the AI', function () {
 	live_on();
 	OYS_Settings::update( array( 'ai_api_key' => 'sk-ant-test', 'ai_model' => 'claude-opus-5', 'languages' => 'hu', 'default_lang' => 'hu' ) );
 	$sent = null;
@@ -2003,57 +2114,34 @@ test( 'live: after class – recording for the participants, AI summary of the o
 	try {
 		$s = make_session( array( 'format' => 'online', 'in_hours' => 0.1 ) );
 		$b = OYS_Bookings::get( OYS_Bookings::book_manual( make_user(), $s, 'comp', false, true ) );
-		OYS_Live::ensure_room( $s );
-		$row = OYS_Live::row( $s->id );
-		$s   = OYS_Schedule::get( OYS_Schedule::save( array( 'starts_at' => oys_utc_plus( -2 * HOUR_IN_SECONDS ), 'ends_at' => oys_utc_plus( -HOUR_IN_SECONDS ) ), $s->id ) );
-
-		$GLOBALS['daily_recordings']  = array( array( 'id' => 'rec-1', 'room_name' => $row->room_name, 'status' => 'in-progress', 'duration' => 0, 'start_ts' => time() - 7000 ) );
-		$GLOBALS['daily_transcripts'] = array( array( 'transcriptId' => 'tr-1', 'roomId' => $row->room_id, 'status' => 't_in_progress' ) );
-		OYS_Live::process();
-		eq( 'room', OYS_Live::row( $s->id )->state, 'still being made at Daily: asked again later' );
-		eq( null, $sent, 'no summary before the transcript is ready' );
-
-		$GLOBALS['daily_recordings'][0]['status']   = 'finished';
-		$GLOBALS['daily_recordings'][0]['duration'] = 3540;
-		$GLOBALS['daily_transcripts'][0]['status']  = 't_finished';
-		$GLOBALS['daily_vtt'] = "WEBVTT\n\n1\n00:00:01.000 --> 00:00:04.000\n<v Olivia>Sziasztok, ma a légzésre figyelünk.\n\n2\n00:00:05.000 --> 00:00:09.000\nOlivia:A légzés vezeti a mozdulatot.\n";
+		$k = OYS_Live::sign( $s->id, $b->id );
+		list( $code ) = api( 'POST', '/live/' . $s->id . '/transcript?b=' . $b->id . '&k=' . $k, array( 'text' => 'hello' ) );
+		eq( 403, $code, 'only the teacher\'s words are written down' );
+		live_owner_req( 'POST', '/live/' . $s->id . '/transcript', array( 'text' => 'Sziasztok, ma a légzésre figyelünk.' ) );
+		live_owner_req( 'POST', '/live/' . $s->id . '/transcript', array( 'text' => 'A légzés vezeti a mozdulatot.' ) );
+		eq( 'Sziasztok, ma a légzésre figyelünk. A légzés vezeti a mozdulatot.', OYS_Live::row( $s->id )->transcript, 'the pieces add up' );
+		$s = OYS_Schedule::get( OYS_Schedule::save( array( 'starts_at' => oys_utc_plus( -2 * HOUR_IN_SECONDS ), 'ends_at' => oys_utc_plus( -HOUR_IN_SECONDS ) ), $s->id ) );
+		ok( ! OYS_Live::add_transcript( $s, 'late words' ), 'nothing is added after the opening minutes' );
 		OYS_Live::process();
 		$row = OYS_Live::row( $s->id );
 		eq( 'done', $row->state, 'processed' );
-		eq( 'Sziasztok, ma a légzésre figyelünk. A légzés vezeti a mozdulatot.', $row->transcript, 'transcript read from the VTT' );
 		eq( 'Olivia arról beszélt, hogy a légzés vezeti a mozdulatot.', $row->summary, 'summary stored' );
 		eq( 'published', $row->summary_status, 'shown right away (auto)' );
 		ok( str_contains( $sent['system'], 'Hungarian' ) && str_contains( $sent['system'], 'not quote her word for word' ), 'Hungarian, not word for word' );
 		ok( str_contains( $sent['messages'][0]['content'], 'A légzés vezeti a mozdulatot.' ), 'the transcript is sent' );
-		eq( 'json_schema', $sent['body']['output_config']['format']['type'] ?? $sent['output_config']['format']['type'], 'structured answer' );
-		eq( array( array( 'id' => 'rec-1', 'status' => 'finished', 'minutes' => 59, 'start' => $GLOBALS['daily_recordings'][0]['start_ts'] ) ), json_decode( $row->recordings, true ), 'recording stored' );
-
-		$k = OYS_Live::sign( $s->id, $b->id );
-		list( $code, $data ) = api( 'GET', '/live/' . $s->id . '/recording?b=' . $b->id . '&k=' . $k . '&rec=rec-1' );
-		ok( 200 === $code && 'https://daily.test/rec/rec-1.mp4' === $data['url'], 'the participant watches the recording' );
-		list( $code ) = api( 'GET', '/live/' . $s->id . '/recording?b=' . $b->id . '&k=' . $k . '&rec=someone-elses' );
-		eq( 404, $code, 'only this class\'s recordings' );
-		list( $code ) = api( 'POST', '/live/' . $s->id . '/summary?b=' . $b->id . '&k=' . $k, array( 'summary' => 'x' ) );
-		eq( 403, $code, 'only the teacher edits the summary' );
+		eq( 'json_schema', $sent['output_config']['format']['type'], 'structured answer' );
 
 		$_GET = array( 'live' => $s->id, 'b' => $b->id, 'k' => $k );
 		$page = OYS_Live::page();
-		ok( str_contains( $page, 'a légzés vezeti a mozdulatot' ) && str_contains( $page, 'data-live-replay="rec-1"' ), 'live page after class: summary and recording' );
-		ok( str_contains( $page, 'data-live-messages' ) && ! str_contains( $page, 'data-live-join' ), 'chat stays, the video is gone' );
+		ok( str_contains( $page, 'a légzés vezeti a mozdulatot' ) && str_contains( $page, 'data-live-messages' ) && ! str_contains( $page, 'data-live-join' ), 'live page after class: summary and chat, the video is gone' );
 		$_GET = array( 'live' => $s->id );
-		ok( str_contains( OYS_Live::page(), 'name="log"' ) || str_contains( OYS_Live::page(), 'oys-auth' ), 'without the link: log in' );
-
-		live_on( array( 'live_replay_days' => 0 ) );
-		list( $code ) = api( 'GET', '/live/' . $s->id . '/recording?b=' . $b->id . '&k=' . $k . '&rec=rec-1' );
-		eq( 410, $code, 'after `live_replay_days` the recording is gone for participants' );
+		ok( str_contains( OYS_Live::page(), 'oys-auth' ), 'without the link: log in' );
 
 		// Review mode: the teacher reads it first.
-		$s2 = make_session( array( 'format' => 'online', 'in_hours' => 0.1 ) );
 		live_on( array( 'live_summary' => 'review' ) );
-		OYS_Live::ensure_room( $s2 );
+		$s2 = make_session( array( 'format' => 'online', 'in_hours' => 0.1 ) );
+		live_owner_req( 'POST', '/live/' . $s2->id . '/transcript', array( 'text' => 'A légzés vezeti a mozdulatot.' ) );
 		OYS_Schedule::save( array( 'starts_at' => oys_utc_plus( -2 * HOUR_IN_SECONDS ), 'ends_at' => oys_utc_plus( -HOUR_IN_SECONDS ) ), $s2->id );
-		$GLOBALS['daily_transcripts'] = array( array( 'transcriptId' => 'tr-2', 'roomId' => OYS_Live::row( $s2->id )->room_id, 'status' => 't_finished' ) );
-		$GLOBALS['daily_recordings']  = array();
 		OYS_Live::process();
 		eq( 'draft', OYS_Live::row( $s2->id )->summary_status, 'review: waits for the teacher' );
 		$_GET = array( 'live' => $s2->id );
@@ -2064,11 +2152,6 @@ test( 'live: after class – recording for the participants, AI summary of the o
 		OYS_Settings::update( array( 'languages' => 'en,hu,es', 'default_lang' => 'en' ) );
 		live_off();
 	}
-} );
-
-test( 'live: WebVTT to plain text', function () {
-	eq( 'Hello there. Breathe in.', OYS_Live::parse_vtt( "WEBVTT\n\nNOTE a note\nmore note\n\ntranscript:1\n00:00:00.500 --> 00:00:02.000\nOlivia:Hello there.\n\n00:01:00.000 --> 00:01:02.000\n<v.x Olivia>Breathe in.\n" ), 'cues, speakers and notes dropped' );
-	eq( 'See https://example.com', OYS_Live::parse_vtt( "WEBVTT\n\n1\n00:00:00.000 --> 00:00:01.000\nSee https://example.com\n" ), 'a link is not a speaker' );
 } );
 
 test( 'helpers: money and periods', function () {

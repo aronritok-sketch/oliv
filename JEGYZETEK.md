@@ -156,7 +156,16 @@
 - **Kiegészítés (doksi + Áron, 2026-11-12):** oliviajoga.hu 1.4.1 – őszibarack előlábléc, új Árak-alcím, telefonos menü javítva; **Képek helye** az adminban: az oliviajoga.hu-témában Megjelenés → Képek helye (fotónként a látható pont), a foglaló-/US-témában (3.3.1) Média → kép → „Kép helye” (`oy_pos` meta, `inc/image-position.php`).
 - **Nyitott:** a dev foglalóoldalán a bővítményt a VPS-en újra kell telepíteni (a `hpv-site update` nem teszi fel a `plugin_zips`-et); az oliviajoga.online domain élesítése (most parkolt oldal); a magánóra-árak továbbra is MINTA.
 
-- **18. kör (Olivia „Módosítások online jóga” doksija + Áron, 2026-11-12):** nincs Zoom: **saját élő közvetítés Daily-vel** (olivia-studio 1.6.0, `OYS_Live`): élő oldal a fiókban, saját link minden résztvevőnek, a chat az óra után is megmarad, felvétel csak Oliviáról (a résztvevők soha), 7 napig visszanézhető, az óra eleji szavak AI-összefoglalója. Az online oldal (olivia-yoga 3.4.0): csoportos online flow jóga szerdánként (első dec. 16., dec. 23. kimarad), egyéni online jóga, online kismamatorna (hosszabb oldal, eszközlista), online stretching és mobilizáció, relaxáció és légzés (saját árak, bérletek), „miért online” horgok (SEO-kutatás: „egyéni” > „privát”, „kismama torna” 720/hó, „stretching” 1600/hó, „légzőgyakorlatok” 590/hó), slow flow és Zoom ki, Napló → Jógáról, az oliviajoga.hu arculata és logója kisbetűs „online”-nal. Teendő az élesítéshez: Daily API-kulcs (`OYS_DAILY_API_KEY`) a szerveren.
+- **18. kör (Olivia „Módosítások online jóga” doksija + Áron, 2026-11-12):** nincs Zoom: **saját élő közvetítés** (olivia-studio 1.6.0, `OYS_Live`; első változat Daily-vel): élő oldal a fiókban, saját link minden résztvevőnek, a chat az óra után is megmarad, felvétel csak Oliviáról (a résztvevők soha), 7 napig visszanézhető, az óra eleji szavak AI-összefoglalója. Az online oldal (olivia-yoga 3.4.0): csoportos online flow jóga szerdánként (első dec. 16., dec. 23. kimarad), egyéni online jóga, online kismamatorna (hosszabb oldal, eszközlista), online stretching és mobilizáció, relaxáció és légzés (saját árak, bérletek), „miért online” horgok (SEO-kutatás: „egyéni” > „privát”, „kismama torna” 720/hó, „stretching” 1600/hó, „légzőgyakorlatok” 590/hó), slow flow és Zoom ki, Napló → Jógáról, az oliviajoga.hu arculata és logója kisbetűs „online”-nal. (A Daily-t ugyanazon a napon kivettük, lásd lent.)
+
+- **18b. kör (Áron, 2026-11-12 este):** „ne a dailyt … ami a Hathaflow-nak a tervében van, azt a fajta streaminget
+  használjuk … Stripe-os fizetéstől kezdve minden ugyanaz … a hathaflós doksiból dolgozz.” → **HathaFlow Live LiveKittel**
+  (olivia-studio 1.7.0, DEVELOPER 6.13b), a HathaFlow Platform Plan 11–13. oldala szerint: csak a foglalók, saját link, a
+  terem 10 perccel előtte nyit, „Élő adás indítása”, kis órán a tanulók kamerája rácsban, nagyon csak az oktató; chat,
+  kézfeltartás, mindenki némítása; felvétel csak az oktatóról (a böngészőjéből, darabokban a saját szerverre), 7 napig
+  visszanézhető, 30 nap után törlődik; az óra eleji szavak AI-összefoglalója. Helyben kétböngészős próbával (LiveKit dev
+  szerver) végigment. **Teendő az élesítéshez:** LiveKit Cloud projekt (Áron) → `OYS_LIVEKIT_URL`, `OYS_LIVEKIT_API_KEY`,
+  `OYS_LIVEKIT_API_SECRET` a szerveren. Feltételezés: Olivia oldalán nincs HathaFlow-platformdíj.
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).

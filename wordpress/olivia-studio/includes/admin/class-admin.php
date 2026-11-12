@@ -971,26 +971,31 @@ class OYS_Admin {
 		echo '<tr><th>' . esc_html__( 'Drop-in price for an online class', 'olivia-studio' ) . '</th><td><input name="online_price" class="small-text" value="' . esc_attr( $s['online_price_cents'] / 100 ) . '"> ' . esc_html( strtoupper( $s['currency'] ) ) . '<p class="description">' . esc_html__( 'Used for new online classes in the calendar; each class can still have its own price.', 'olivia-studio' ) . '</p></td></tr>';
 		echo '<tr><th>' . esc_html__( 'One class on a studio pass covers', 'olivia-studio' ) . '</th><td>' . $f( 'online_per_credit', 'number', 'small-text', 'min="1"' ) . ' ' . esc_html__( 'online classes', 'olivia-studio' ) . '<p class="description">' . esc_html__( 'When someone books an online class with a studio pass, one class from the pass turns into this many online classes (same expiry date); one is used and the rest stay in their account. Online passes are used first. Memberships include online classes, and they don\'t count towards a monthly class limit.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
 		$check = fn( $k, $label ) => '<label><input type="hidden" name="s[' . $k . ']" value="0"><input type="checkbox" name="s[' . $k . ']" value="1"' . checked( 1, (int) $s[ $k ], false ) . '> ' . esc_html( $label ) . '</label>';
-		echo '</table><h2 id="live">' . esc_html__( 'Live online classes (our own streaming)', 'olivia-studio' ) . '</h2>';
-		echo '<p class="description" style="max-width:760px">' . esc_html__( 'Online classes run on the site itself: people join from their account or the link in their emails, in the browser, no app and no Zoom. The class chat stays after the class. The video runs on Daily (daily.co): create an account there and copy its API key here, or put it in wp-config.php as OYS_DAILY_API_KEY.', 'olivia-studio' ) . '</p><table class="form-table">';
-		echo '<tr><th>' . esc_html__( 'Daily API key', 'olivia-studio' ) . '</th><td>' . ( defined( 'OYS_DAILY_API_KEY' ) ? '<code>OYS_DAILY_API_KEY</code> ' . esc_html__( '(set in wp-config.php)', 'olivia-studio' ) : $f( 'daily_api_key', 'password', 'regular-text', 'autocomplete="off"' ) ) . '</td></tr>'; // phpcs:ignore
-		echo '<tr><th>' . esc_html__( 'Live streaming', 'olivia-studio' ) . '</th><td>' . $check( 'live_on', __( 'Online classes use our own live room (not Zoom)', 'olivia-studio' ) ) . '</td></tr>'; // phpcs:ignore
-		echo '<tr><th>' . esc_html__( 'The room opens (minutes before the class)', 'olivia-studio' ) . '</th><td>' . $f( 'live_open_minutes', 'number', 'small-text', 'min="5"' ) . '</td></tr>'; // phpcs:ignore
+		echo '</table><h2 id="live">' . esc_html__( 'Live online classes (HathaFlow Live)', 'olivia-studio' ) . '</h2>';
+		echo '<p class="description" style="max-width:760px">' . esc_html__( 'Online classes run on the site itself: only the people who booked get in, from their account or the link in their emails, in the browser, nothing to download, no Zoom. The class chat stays after the class. The video goes through LiveKit (livekit.io, LiveKit Cloud): create a project there and copy its URL (wss://…), API key and secret here, or put them in wp-config.php as OYS_LIVEKIT_URL, OYS_LIVEKIT_API_KEY and OYS_LIVEKIT_API_SECRET.', 'olivia-studio' ) . '</p><table class="form-table">';
+		foreach ( array( 'url' => array( __( 'LiveKit URL', 'olivia-studio' ), 'text', 'placeholder="wss://….livekit.cloud"' ), 'api_key' => array( __( 'LiveKit API key', 'olivia-studio' ), 'text', 'autocomplete="off"' ), 'api_secret' => array( __( 'LiveKit API secret', 'olivia-studio' ), 'password', 'autocomplete="off"' ) ) as $k => $l ) {
+			$const = 'OYS_LIVEKIT_' . strtoupper( $k );
+			echo '<tr><th>' . esc_html( $l[0] ) . '</th><td>' . ( defined( $const ) ? '<code>' . esc_html( $const ) . '</code> ' . esc_html__( '(set in wp-config.php)', 'olivia-studio' ) : $f( 'livekit_' . $k, $l[1], 'regular-text', $l[2] ) ) . '</td></tr>'; // phpcs:ignore
+		}
+		echo '<tr><th>' . esc_html__( 'Live classes', 'olivia-studio' ) . '</th><td>' . $check( 'live_on', __( 'Online classes run in our own live room (not Zoom)', 'olivia-studio' ) ) . '</td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'The room opens (minutes before the class)', 'olivia-studio' ) . '</th><td>' . $f( 'live_open_minutes', 'number', 'small-text', 'min="5"' ) . '<p class="description">' . esc_html__( 'The teacher can go live an hour before.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'Students can turn their camera on up to', 'olivia-studio' ) . '</th><td>' . $f( 'live_grid_max', 'number', 'small-text', 'min="0"' ) . ' ' . esc_html__( 'online places', 'olivia-studio' ) . '<p class="description">' . esc_html__( 'In smaller classes the teacher sees the students in a grid; in bigger ones only the teacher is on screen. Private sessions are always two-way.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
 		echo '<tr><th>' . esc_html__( 'Recording', 'olivia-studio' ) . '</th><td><select name="s[live_record]">'
 			. '<option value="group"' . selected( $s['live_record'], 'group', false ) . '>' . esc_html__( 'Group classes and events', 'olivia-studio' ) . '</option>'
 			. '<option value="all"' . selected( $s['live_record'], 'all', false ) . '>' . esc_html__( 'Every online class, private sessions too', 'olivia-studio' ) . '</option>'
 			. '<option value="none"' . selected( $s['live_record'], 'none', false ) . '>' . esc_html__( 'No recording', 'olivia-studio' ) . '</option></select>'
-			. '<p class="description">' . esc_html__( 'Only the teacher is on the recording, never the participants. It starts by itself when the class starts (the teacher can stop it in the room).', 'olivia-studio' ) . '</p></td></tr>';
+			. '<p class="description">' . esc_html__( 'Only the teacher is on the recording, never the participants: it is made in the teacher\'s browser from her own camera and microphone, starts by itself when the class starts and is saved on this server while she teaches.', 'olivia-studio' ) . '</p></td></tr>';
 		echo '<tr><th>' . esc_html__( 'Participants can watch the recording for (days)', 'olivia-studio' ) . '</th><td>' . $f( 'live_replay_days', 'number', 'small-text', 'min="0"' ) . '</td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'Recordings are deleted after (days)', 'olivia-studio' ) . '</th><td>' . $f( 'live_keep_days', 'number', 'small-text', 'min="1"' ) . '<p class="description">' . esc_html__( 'Until then the teacher can download them from the live page.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
 		echo '<tr><th>' . esc_html__( 'Summary of the opening words', 'olivia-studio' ) . '</th><td><select name="s[live_summary]">'
 			. '<option value="auto"' . selected( $s['live_summary'], 'auto', false ) . '>' . esc_html__( 'Shown to the participants right away', 'olivia-studio' ) . '</option>'
 			. '<option value="review"' . selected( $s['live_summary'], 'review', false ) . '>' . esc_html__( 'The teacher reads it first and shows it', 'olivia-studio' ) . '</option>'
 			. '<option value="off"' . selected( $s['live_summary'], 'off', false ) . '>' . esc_html__( 'No summary', 'olivia-studio' ) . '</option></select> '
 			. $f( 'live_intro_minutes', 'number', 'small-text', 'min="0"' ) . ' ' . esc_html__( 'minutes from the start', 'olivia-studio' )
-			. '<p class="description">' . esc_html__( 'The teacher\'s first minutes are transcribed (only the teacher) and the AI writes a short summary, not word for word, in the class\'s language. It needs the Anthropic API key (Newsletter → AI settings). The teacher can edit or hide it on the live page.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
+			. '<p class="description">' . esc_html__( 'The teacher\'s first minutes are written down in her browser (speech recognition, best in Chrome) and the AI writes a short summary, not word for word, in the class\'s language. It needs the Anthropic API key (Newsletter → AI settings). The teacher can edit or hide it on the live page.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
 		echo '<tr><th>' . esc_html__( 'People can keep writing in the class chat for (days)', 'olivia-studio' ) . '</th><td>' . $f( 'live_chat_days', 'number', 'small-text', 'min="0"' ) . '</td></tr>'; // phpcs:ignore
-		$live = OYS_Live::enabled() ? __( 'On: online classes run in our live room.', 'olivia-studio' ) : ( '' === trim( OYS_Live::key() ) ? __( 'No Daily API key yet.', 'olivia-studio' ) : __( 'Switched off.', 'olivia-studio' ) );
-		echo '<tr><th>' . esc_html__( 'Status', 'olivia-studio' ) . '</th><td>' . esc_html( $live ) . ( '' !== trim( OYS_Live::key() ) ? ' <button class="button" form="oys-live-test">' . esc_html__( 'Test the connection', 'olivia-studio' ) . '</button>' : '' ) . '</td></tr>';
+		$live = OYS_Live::enabled() ? __( 'On: online classes run in our live room.', 'olivia-studio' ) : ( OYS_Live::configured() ? __( 'Switched off.', 'olivia-studio' ) : __( 'No LiveKit project connected yet.', 'olivia-studio' ) );
+		echo '<tr><th>' . esc_html__( 'Status', 'olivia-studio' ) . '</th><td>' . esc_html( $live ) . ( OYS_Live::configured() ? ' <button class="button" form="oys-live-test">' . esc_html__( 'Test the connection', 'olivia-studio' ) . '</button>' : '' ) . '</td></tr>';
 		echo '</table><h2 id="zoom">' . esc_html__( 'Zoom (live online classes)', 'olivia-studio' ) . '</h2>';
 		if ( OYS_Live::enabled() ) {
 			echo '<p class="description">' . esc_html__( 'Not used while our own live streaming is on.', 'olivia-studio' ) . '</p>';
@@ -1443,7 +1448,7 @@ class OYS_Admin {
 
 	private static function do_live_test() {
 		$res = OYS_Live::test_connection();
-		self::back( 'oys-settings', array(), is_wp_error( $res ) ? $res->get_error_message() : __( 'Daily is connected.', 'olivia-studio' ) );
+		self::back( 'oys-settings', array(), is_wp_error( $res ) ? $res->get_error_message() : __( 'LiveKit is connected.', 'olivia-studio' ) );
 	}
 
 	private static function do_zoom_test() {
@@ -1494,6 +1499,11 @@ class OYS_Admin {
 		}
 		if ( isset( $clean['live_summary'] ) && ! in_array( $clean['live_summary'], array( 'auto', 'review', 'off' ), true ) ) {
 			$clean['live_summary'] = 'auto';
+		}
+		foreach ( array( 'livekit_url', 'livekit_api_key', 'livekit_api_secret' ) as $k ) {
+			if ( isset( $clean[ $k ] ) ) {
+				$clean[ $k ] = trim( $clean[ $k ] );
+			}
 		}
 		if ( isset( $clean['live_open_minutes'] ) ) {
 			$clean['live_open_minutes'] = max( 5, $clean['live_open_minutes'] );

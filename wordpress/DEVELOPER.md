@@ -99,7 +99,7 @@ oliv/
     │       ├── class-memberships.php  Tagság (Stripe előfizetés): csatlakozás, szinkron, keret, lemondás, portál
     │       ├── class-security.php     Belépés- és regisztráció-korlátozás
     │       ├── class-zoom.php         Zoom meetingek automatikusan (Server-to-Server OAuth) – ha nincs saját közvetítés
-│       ├── class-live.php         saját élő közvetítés (Daily): terem, élő oldal, chat, felvétel, összefoglaló
+│       ├── class-live.php         HathaFlow Live (LiveKit): terem, élő oldal, chat, kéz, felvétel, összefoglaló
     │       ├── class-email-templates.php  Az automatikus levelek szerkeszthető szövegei, ki/be kapcsolói
     │       ├── class-app-api.php      Mobilapp REST API (oys/v1/app/*), tokenes belépés
     │       ├── admin/class-calendar.php   Admin naptár (REST + oldal)
@@ -592,17 +592,50 @@ Sorozat-módosításnál minden további dátum ugyanannyi nappal tolódik, mint
 - **Óra indítása:** névsor / naptár „Start the Zoom class” → `admin-post.php?action=oys_admin_zoom_start` → friss `start_url` (`GET /meetings/{id}`) → átirányítás.
 - Fejlesztéshez: `OYS_ZOOM_API_BASE`, `OYS_ZOOM_OAUTH_URL` konstansok a szimulátorra (16.4).
 
-### 6.13b Saját élő közvetítés (Daily) – Zoom helyett (1.6.0)
+### 6.13b HathaFlow Live – saját élő közvetítés LiveKittel, Zoom helyett (1.7.0)
 
-Olivia és Áron, 2026-11-12: **nincs Zoom**, az online órák a saját oldalon futnak. `OYS_Live` (`includes/class-live.php`), kulcs: `OYS_DAILY_API_KEY` (wp-config) vagy Studio → Settings → *Live online classes*. Ha be van kapcsolva (`live_on` + kulcs), `OYS_Zoom::enabled()` hamis.
+Olivia és Áron, 2026-11-12: **nincs Zoom**, az online órák a saját oldalon futnak, **ugyanazzal a megoldással, mint a
+HathaFlow-platform** (HathaFlow Platform Plan, CRM 5080001 / 16846006, 11–13. o.: „HathaFlow Live”, LiveKit WebRTC). Áron:
+„ne a dailyt … a hathaflós doksiból dolgozz” – a Daily-s 1.6.0-s változat kikerült. Mivel a motor közös (`olivia-studio`),
+Olivia oldala és a HathaFlow ugyanazt használja: fizetés (Stripe) → hozzáférés → élő óra → visszanézés.
 
-- **Terem:** minden online / hibrid óra (és online egyéni óra) privát Daily-terme (`POST /rooms`, `privacy: private`, `nbf` = nyitás − 1 óra, `exp` = vége + 30 perc, `enable_chat: false`, `enable_transcription_storage`). Lustán jön létre (élő oldal, óránkénti `prepare_upcoming()` a 24 órán belüli órákra); óra áthelyezésekor `nbf`/`exp` frissül, lemondáskor a terem törlődik. Tábla: `oys_live` (session_id, room_*, state room|done|closed, recordings JSON, transcript, summary, summary_status).
-- **Link:** `oys_join_link` filter (prioritás 5, a Zoom előtt): a fiókoldal `?live=<óra>&b=<foglalás>&k=<HMAC>` – a résztvevő saját, aláírt linkje (belépés nélkül is működik). Oktató / stúdió: `?live=<óra>` belépve → owner.
-- **Élő oldal:** `[oys_account]` `?live=` esetén `OYS_Live::page()`: videó (Daily Prebuilt, `assets/vendor/daily.js` 0.92.2, `assets/live.js`) + az óra chatje. Belépés: `POST oys/v1/live/<id>/join` → meeting token (résztvevő: `is_owner false`, felvételi jog nélkül; oktató: `is_owner true`, `enable_recording: cloud`).
-- **Felvétel csak Oliviáról:** az oktató böngészője az óra kezdetekor `startRecording({layout:{preset:'single-participant', session_id:<saját>}})` – a résztvevők sosem kerülnek a felvételre. `live_record`: group (csoportos óra, esemény) | all | none. Visszanézés a foglalóknak `live_replay_days` napig (`GET …/recording?rec=` → rövid lejáratú Daily link).
-- **Bevezető összefoglalója:** az oktató böngészője az első `live_intro_minutes` percben csak az oktatót íratja le (`startTranscription({participants:[saját]})`, Deepgram nova-3 a tanóra nyelvén, hiba esetén nova-2). Óra után a cron (`oys_frequent`, 15 perccel a vége után) letölti a leiratot (VTT → szöveg) és a felvételeket, majd `OYS_AI::json()` rövid, nem szó szerinti összefoglalót ír a tanóra nyelvén. `live_summary`: auto (rögtön látszik) | review (az oktató teszi közzé) | off. Az oktató az élő oldalon szerkesztheti / elrejtheti.
-- **Chat:** saját (`oys_live_chat`), REST pollinggal (4 mp óra alatt, 15 mp egyébként); az óra után is megmarad, `live_chat_days` napig lehet írni, utána olvasható. 2 mp-es küldési korlát; a résztvevő a sajátját, az oktató bármit törölhet.
-- Tesztek: `live:` kezdetű tesztek a `dev/tests/run.php`-ban (Daily és AI helyben szimulálva, `OYS_DAILY_API_BASE`).
+- **Kulcsok:** `OYS_LIVEKIT_URL` (`wss://<projekt>.livekit.cloud`), `OYS_LIVEKIT_API_KEY`, `OYS_LIVEKIT_API_SECRET` a
+  wp-configban (vagy Studio → Settings → *Live online classes (HathaFlow Live)*; a konstans nyer). Ha `live_on` + kulcsok,
+  `OYS_Zoom::enabled()` hamis. Szerver-API: Twirp (`POST <https>/twirp/livekit.RoomService/{ListRooms,DeleteRoom,
+  ListParticipants,MutePublishedTrack}`, Bearer szervertoken); fejlesztéshez `OYS_LIVEKIT_API_BASE`.
+- **Terem:** óránként egy (`oys-<md5(home_url) 8>-<óra id>`), a LiveKit az első belépéskor hozza létre. Tábla: `oys_live`
+  (DB 12: session_id, room_name, state room|done|closed, recordings JSON, transcript, summary, summary_status). Lemondáskor
+  vagy ha az óra már nem online: `DeleteRoom` (bent lévők kiesnek).
+- **Link:** `oys_join_link` filter (prioritás 5, a Zoom előtt): a fiókoldal `?live=<óra>&b=<foglalás>&k=<HMAC>` – a
+  résztvevő saját, aláírt linkje (belépés nélkül is működik). Oktató / stúdió: `?live=<óra>` belépve → owner.
+- **Belépés:** `POST oys/v1/live/<id>/join` → LiveKit access token (JWT HS256, `video` grant, lejárat = óra vége + 30 perc).
+  A terem `live_open_minutes` (10) perccel előtte nyit, az oktató egy órával előtte már indíthat („Élő adás indítása”).
+  Identitás `teacher-<uid>` / `b<foglalás>`, metadata `{"role":…}`. Kis órán (online helyek ≤ `live_grid_max`, magánóra
+  mindig) a tanuló is küldhet kamerát + mikrofont (az oktató rácsban látja), nagyon csak az oktató van a képen; a tanuló
+  csak az oktatót iratkozza fel (`autoSubscribe: false`).
+- **Élő oldal:** `[oys_account]` `?live=` esetén `OYS_Live::page()`: `assets/vendor/livekit-client.umd.js` 2.23.0
+  (Apache 2.0) + `assets/live.js` (csempék, mikrofon / kamera, kilépés, létszám, újracsatlakozás) + az óra chatje.
+- **Kézfeltartás, némítás:** a kéz a saját szerveren megy (`POST …/hand`, transient), az oktató a chat-lekérdezéssel kapja
+  (`hands`), egy koppintással leengedi; a tanuló a saját állapotát (`hand`) látja. Mindenki némítása: `POST …/mute-all`
+  (`MutePublishedTrack` minden nyitott tanulói mikrofonra, az oktatóé marad).
+- **Felvétel csak az oktatóról:** az oktató böngészője az óra kezdetekor `MediaRecorder`-rel veszi a **saját** kamera- és
+  mikrofonsávját, 10 mp-es darabokban, sorszámmal tölti fel (`POST …/rec`, `…/rec/<id>/chunk?seq=`, `…/rec/<id>/stop`;
+  hiányzó darab → 409 a várt sorszámmal, ismétlés nem duplikál). Fájl: `uploads/oys-live-<hmac>/` véletlen névvel,
+  kiszolgálás `?oys_replay=` aláírt linken, Range-támogatással. A résztvevők sosem kerülnek a felvételre.
+  `live_record`: group | all | none; visszanézés a foglalóknak `live_replay_days` (7) napig, törlés `live_keep_days`
+  (30) nap után (`oys_hourly`); addig az oktató letöltheti.
+- **Bevezető összefoglalója:** az első `live_intro_minutes` percben az oktató böngészője leírja az oktató szavait (Web
+  Speech API, a tanóra nyelvén), és `POST …/transcript`-tel küldi. Óra után (`oys_frequent`, 15 perccel a vége után)
+  `OYS_AI::json()` rövid, nem szó szerinti összefoglalót ír. `live_summary`: auto | review | off; az oktató az élő oldalon
+  szerkesztheti / elrejtheti.
+- **Chat:** saját (`oys_live_chat`), REST pollinggal (4 mp óra alatt, 15 mp egyébként); az óra után is megmarad,
+  `live_chat_days` napig lehet írni, utána olvasható. 2 mp-es küldési korlát; a résztvevő a sajátját, az oktató bármit
+  törölhet.
+- **Stripe:** változatlan – a foglalás / bérlet / fizetés ugyanaz, mint eddig (Olivia saját Stripe-fiókja); az élő óra
+  csak a foglalóknak nyílik. Olivia oldalán nincs HathaFlow-platformdíj (feltételezés, Áron jóváhagyására vár).
+- Tesztek: `live:` kezdetű tesztek a `dev/tests/run.php`-ban (LiveKit és AI szimulálva). Kétböngészős próba helyben:
+  `livekit-server --dev` (devkey / secret) + Playwright `--use-fake-device-for-media-stream`: oktató indít, tanuló belép,
+  lát és hall, kamera-csempe, kéz, chat, felvétel, mindenki némítása.
 
 ### 6.14 Mobil API és iOS app
 
