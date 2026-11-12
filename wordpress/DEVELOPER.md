@@ -634,7 +634,7 @@ Olivia oldala és a HathaFlow ugyanazt használja: fizetés (Stripe) → hozzáf
   `live_chat_days` napig lehet írni, utána olvasható. 2 mp-es küldési korlát; a résztvevő a sajátját, az oktató bármit
   törölhet.
 - **Stripe:** változatlan – a foglalás / bérlet / fizetés ugyanaz, mint eddig (Olivia saját Stripe-fiókja); az élő óra
-  csak a foglalóknak nyílik. Olivia oldalán nincs HathaFlow-platformdíj (feltételezés, Áron jóváhagyására vár).
+  csak a foglalóknak nyílik. Olivia oldalán nincs HathaFlow-platformdíj (Áron jóváhagyta, 2026-11-12).
 - Tesztek: `live:` kezdetű tesztek a `dev/tests/run.php`-ban (LiveKit és AI szimulálva). Kétböngészős próba helyben:
   `livekit-server --dev` (devkey / secret) + Playwright `--use-fake-device-for-media-stream`: oktató indít, tanuló belép,
   lát és hall, kamera-csempe, kéz, chat, felvétel, mindenki némítása.

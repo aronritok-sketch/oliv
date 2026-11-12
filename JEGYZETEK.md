@@ -165,7 +165,7 @@
   kézfeltartás, mindenki némítása; felvétel csak az oktatóról (a böngészőjéből, darabokban a saját szerverre), 7 napig
   visszanézhető, 30 nap után törlődik; az óra eleji szavak AI-összefoglalója. Helyben kétböngészős próbával (LiveKit dev
   szerver) végigment. **Teendő az élesítéshez:** LiveKit Cloud projekt (Áron) → `OYS_LIVEKIT_URL`, `OYS_LIVEKIT_API_KEY`,
-  `OYS_LIVEKIT_API_SECRET` a szerveren. Feltételezés: Olivia oldalán nincs HathaFlow-platformdíj.
+  `OYS_LIVEKIT_API_SECRET` (Áron az adminban adja meg). Olivia oldalán nincs HathaFlow-platformdíj (Áron jóváhagyta).
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
