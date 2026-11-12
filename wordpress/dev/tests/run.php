@@ -1023,6 +1023,8 @@ test( 'one-to-one services: their own credits, alone or with a friend; a single 
 		$legacy = OYS_Products::get( 'pn-d5' );
 		ok( 'private_pack' === $legacy['kind'] && 'prenatal' === $legacy['service'] && 2 === $legacy['people'], '1.5.0 prenatal_duo_pack is read as a prenatal pack for two' );
 		ok( isset( OYS_Products::purchasable()['pn-5'] ) && ! isset( OYS_Products::purchasable()['pn-1'] ), 'packs are bought, singles are booked by request' );
+		$prices = OYS_Frontend::sc_pricing( array() );
+		ok( str_contains( $prices, 'Relax 1' ) && str_contains( $prices, 'topic=relax' ), 'a 30-minute session of a service has its own card on the price list' );
 		$u = make_user( 'Mia' );
 		foreach ( array( array( 'prenatal', 1, 60, 'kismamatorna', 'prenatal' ), array( 'relax', 1, 30, 'relaxacio', 'relax' ), array( 'prenatal', 2, 60, 'kismamatorna-duo', 'prenatal_duo' ) ) as $n => [ $topic, $people, $dur, $slug, $kind ] ) {
 			$wpdb->insert( OYS_Install::table( 'private_requests' ), array( 'user_id' => $u, 'topic' => $topic, 'duration_min' => $dur, 'people' => $people, 'location_type' => 'online', 'preferred' => 'mornings', 'status' => 'new', 'created_at' => oys_now() ) );

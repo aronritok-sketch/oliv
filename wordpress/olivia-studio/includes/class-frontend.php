@@ -159,14 +159,15 @@ class OYS_Frontend {
 		$ratio        = OYS_Passes::online_per_credit();
 		$online_only  = (bool) OYS_Settings::get( 'online_only' );
 		if ( $online_only ) {
-			$cards[] = array( 'tone' => 'paper', 'title' => __( 'Live online class', 'olivia-studio' ), 'price' => oys_money( $online_price ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array( __( 'Any live online group class', 'olivia-studio' ), ( OYS_Live::enabled() ? __( 'Join from home in your browser, no app needed', 'olivia-studio' ) : __( 'Join from home on Zoom', 'olivia-studio' ) ), __( 'The link comes by email and is in your account', 'olivia-studio' ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
+			$cards[] = array( 'tone' => 'paper', 'title' => __( 'Live online class', 'olivia-studio' ), 'price' => oys_money( $online_price ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array( __( 'Any live online group class', 'olivia-studio' ), ( OYS_Zoom::enabled() ? __( 'Join from home on Zoom', 'olivia-studio' ) : __( 'Join from home in your browser, no app needed', 'olivia-studio' ) ), __( 'The link comes by email and is in your account', 'olivia-studio' ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
 		} else {
 			$cards[] = array( 'tone' => 'paper', 'title' => __( 'Drop-in class', 'olivia-studio' ), 'price' => oys_money( $dropin ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array_filter( array( __( 'Any group class in person', 'olivia-studio' ), $online_price ? sprintf( __( 'Online classes: %s', 'olivia-studio' ), oys_money( $online_price ) ) : '', __( 'Bring friends: add guests when you book', 'olivia-studio' ), 'off' !== OYS_Settings::get( 'pay_later' ) ? __( 'Pay online or at the studio', 'olivia-studio' ) : '' ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
 		}
 		$tones = array( 'lilac', 'sun', 'pink' );
 		$i     = 0;
 		foreach ( OYS_Products::all( true ) as $p ) {
-			if ( 'private_single' === $p['kind'] && 60 !== (int) $p['duration_min'] ) {
+			// private yoga's 75 and 90 minutes are lines on the 60-minute card; a service's single session has its own card
+			if ( 'private_single' === $p['kind'] && '' === $p['service'] && 60 !== (int) $p['duration_min'] ) {
 				continue;
 			}
 			// A one-class online pass at the drop-in price is there to be given as a gift: the drop-in card covers it.
@@ -182,7 +183,7 @@ class OYS_Frontend {
 				$cta  = array( __( 'Request a private session', 'olivia-studio' ), oys_account_url( 'private' ) );
 				$unit = sprintf( __( '%d minutes', 'olivia-studio' ), (int) $p['duration_min'] );
 				foreach ( OYS_Products::all( true ) as $q ) {
-					if ( 'private_single' === $q['kind'] && 60 !== (int) $q['duration_min'] ) {
+					if ( 'private_single' === $q['kind'] && '' === $q['service'] && 60 !== (int) $q['duration_min'] ) {
 						$features[] = sprintf( __( '%1$d minutes: %2$s', 'olivia-studio' ), (int) $q['duration_min'], oys_money( $q['price_cents'] ) );
 					}
 				}

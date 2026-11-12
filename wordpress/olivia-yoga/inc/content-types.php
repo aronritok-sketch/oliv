@@ -53,11 +53,11 @@ function oy_register_content_types() {
 		'supports'     => array( 'title', 'editor', 'excerpt', 'thumbnail' ),
 	) );
 	foreach ( array( 'oy_duration', 'oy_lang', 'oy_link', 'oy_aside_photo', 'oy_seo_title' ) as $key ) {
-		register_post_meta( 'oy_class', $key, array( 'type' => 'string', 'single' => true, 'show_in_rest' => true ) );
+		register_post_meta( 'oy_class', $key, array( 'type' => 'string', 'single' => true, 'show_in_rest' => true, 'sanitize_callback' => 'sanitize_text_field' ) );
 	}
-	register_post_meta( 'oy_faq', 'oy_home', array( 'type' => 'string', 'single' => true, 'show_in_rest' => true ) );
+	register_post_meta( 'oy_faq', 'oy_home', array( 'type' => 'string', 'single' => true, 'show_in_rest' => true, 'sanitize_callback' => 'sanitize_text_field' ) );
 	foreach ( array( 'oy_date', 'oy_place' ) as $key ) {
-		register_post_meta( 'oy_moment', $key, array( 'type' => 'string', 'single' => true, 'show_in_rest' => true ) );
+		register_post_meta( 'oy_moment', $key, array( 'type' => 'string', 'single' => true, 'show_in_rest' => true, 'sanitize_callback' => 'sanitize_text_field' ) );
 	}
 }
 

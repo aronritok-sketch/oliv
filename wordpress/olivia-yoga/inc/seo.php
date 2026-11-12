@@ -28,6 +28,14 @@ function oy_meta_description() {
 	return get_bloginfo( 'description' );
 }
 
+// A title returned here is printed as it is (WordPress escapes only its own): every one goes through esc_html (hlprv
+// KB 2026-11-12: on a multi-teacher site an editor's class title must not become markup).
+add_filter( 'pre_get_document_title', function ( $title ) {
+	if ( oy_seo_plugin_active() || '' === (string) $title ) {
+		return $title;
+	}
+	return esc_html( $title );
+}, 99 );
 add_filter( 'pre_get_document_title', function ( $title ) {
 	if ( oy_seo_plugin_active() ) {
 		return $title;
@@ -65,7 +73,7 @@ add_action( 'wp_head', function () {
 	}
 	echo '<meta name="twitter:card" content="summary_large_image">' . ( 'fort-myers' === oy_edition() ? '<meta name="geo.region" content="US-FL"><meta name="geo.placename" content="Fort Myers">' : '' ) . "\n";
 	if ( oy_is_demo() ) { // A demo studio: no business or person data for search engines.
-		echo '<script type="application/ld+json">' . wp_json_encode( array( '@context' => 'https://schema.org', '@type' => 'WebSite', 'url' => home_url( '/' ), 'name' => oy_site_name() ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '</script>' . "\n";
+		echo '<script type="application/ld+json">' . wp_json_encode( array( '@context' => 'https://schema.org', '@type' => 'WebSite', 'url' => home_url( '/' ), 'name' => oy_site_name() ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG ) . '</script>' . "\n";
 		return;
 	}
 
@@ -120,7 +128,7 @@ add_action( 'wp_head', function () {
 	if ( is_singular( 'post' ) ) {
 		$graph[] = array( '@type' => 'BlogPosting', 'headline' => get_the_title(), 'datePublished' => get_the_date( 'c' ), 'author' => array( '@id' => $site . '#olivia' ), 'mainEntityOfPage' => get_permalink() );
 	}
-	echo '<script type="application/ld+json">' . wp_json_encode( array( '@context' => 'https://schema.org', '@graph' => $graph ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE ) . '</script>' . "\n";
+	echo '<script type="application/ld+json">' . wp_json_encode( array( '@context' => 'https://schema.org', '@graph' => $graph ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG ) . '</script>' . "\n";
 }, 1 );
 
 // Account, booking and checkout-return pages don't belong in search results.
