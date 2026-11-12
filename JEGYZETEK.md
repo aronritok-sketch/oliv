@@ -167,6 +167,13 @@
   szerver) végigment. **Teendő az élesítéshez:** LiveKit Cloud projekt (Áron) → `OYS_LIVEKIT_URL`, `OYS_LIVEKIT_API_KEY`,
   `OYS_LIVEKIT_API_SECRET` (Áron az adminban adja meg). Olivia oldalán nincs HathaFlow-platformdíj (Áron jóváhagyta).
 
+- **18c. kör (2026-11-12 este, élesítés):** az oliviajoga.online ÉLES a VPS-en (a fő chat, `from_dev`); olivia-studio
+  1.7.1 (titokmezők nem íródnak vissza, Áron az adminban adja a kulcsokat), 1.7.2 (aláírt linkek az oldalhoz kötve –
+  HathaFlow-jelzés). olivia-yoga 3.4.2: WP-mintatartalom törlése, adatvédelmi tájékoztató (`/adatvedelem/`), magyar
+  bejegyzéscímek (a régiek átirányítanak), nincs users-sitemap / szerzői oldal. oliviajoga.hu 1.4.3: a fejléc hulláma
+  vissza, a korszak-rács animált. Nyitott: admin-fiók Áronnak és Oliviának az élesen (a távirányító élesen nem futtat
+  WP-CLI-t), a bővítmény frissítése élesen (GitHub-kiadás alapú frissítő kell), SMTP / küldő cím.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -79,6 +79,11 @@ Olivia doksija két részből áll: amit most kért, és amit **november 26-tól
 - **1.4.1 (a doksi kiegészítése):** az előlábléc őszibarack (`oj-pre--peach`, `--sun-soft`); az Árak alcíme „élő online,
   csoportos hatha flow jóga órák / és egyéni, privát online kismamatorna” (`PRICES_SUB`; a helyszín-chipek november
   26-án tűnnek el); telefonon a nyitott menü alatt az értesítősáv rejtve (a „Főoldal” nem csúszik a fejléc alá).
+- **1.4.3 (Olivia Áronon át, 2026-11-12):** a fejléc fotója mögött újra az 1.3.0-s puha rózsaszín hullám („nem a gomb,
+  hanem a háttér”; a gombok zöldek maradnak; `blob_soft`). Az „Egy korszak lezárult” rács mozog („mozogjon és legyen
+  menő”, `assets/oliviajoga.js`): a fotók egymás után beúsznak és lassan lebegnek, az ecsetvonás kirajzolódik és
+  folyamatosan hullámzik rajtuk, egyszerre egy fotó kiszíneződik orchidea kerettel (és amelyik fölött az egér van);
+  csak amíg látszik, csökkentett mozgásnál semmi.
 - **Képek helye (Áron):** WordPress → Megjelenés → Képek helye (`wp-theme/inc/image-position.php`): fotónként egy pont,
   aminek látszania kell; a vágás a dizájné marad. `oj_img_pos` opció, kulcs: a fájl útja méret nélkül (`new/hero`).
 - **Facebook-képek:** a „Facebookra” mappa 18 fotója 1080 × 1350-ben, az oldal stílusában (`tools/facebook/`:
