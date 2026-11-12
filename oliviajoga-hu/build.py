@@ -32,7 +32,7 @@ FACEBOOK = 'https://www.facebook.com/oliviajogaoktato'
 SITE_TITLE = 'Jóga 18. és 21. kerület | Kovács Olívia'
 NOTICE = 'Óráimat 2026. november 25-ig tartom!'  # the site's announcement banner
 # Olivia, „oliviajoga.hu módosítások 11.12.”: after 25 November she teaches live online yoga on oliviajoga.online (ours).
-ONLINE = 'https://www.oliviajoga.online'
+ONLINE = 'https://oliviajoga.online'  # Olivia: the final domain, without www
 ONLINE_PATHS = {'home': '/', 'yoga': '/online-jogaorak/', 'prenatal': '/online-jogaorak/kismamatorna/', 'account': '/fiokom/',
                 'gift': '/ajandekutalvany/'}
 ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
@@ -906,7 +906,7 @@ def korszak_section():
     return wrap(f'<div class="oj-korszak" data-reveal><div class="oj-korszak__text"><p class="kicker">3 év közös gyakorlás</p>'
                 f'<h2 class="oj-h2">Egy korszak lezárult</h2><p class="oj-lead">{esc(KORSZAK_TEXT)}</p>'
                 f'<p class="btn-row">{button(online(), "Jóga online", "orchid", " btn--lg")}</p>'
-                f'<p class="oj-korszak__url">www.oliviajoga.online</p></div>'
+                f'</div>'
                 f'<div class="oj-korszak__grid">{cells}{band("pink")}</div></div>', 'section oj-korszak-wrap')
 
 
@@ -1169,7 +1169,7 @@ def booking_page(p):
     head = page_head(title, p['path'], [('', 'Főoldal')], '', theme_pic(PAGE_PHOTO['bejelentkezés-jóga-bérlet'], eager=True), 'pink')
     if AFTER:  # the WordPress theme sends this address straight to her account there (Olivia); a fallback page
         return head + (f'<div class="container oj-flow"><div class="oj-alert oj-alert--online" data-reveal><div class="oj-alert__text">'
-                       f'<p>A bejelentkezés, a bérleted és a foglalásaid a www.oliviajoga.online oldalon vannak.</p>{online_words()}</div>'
+                       f'<p>A bejelentkezés, a bérleted és a foglalásaid az oliviajoga.online oldalon vannak.</p>{online_words()}</div>'
                        f'<p class="btn-row oj-online__go">{button(online("account"), "Fiókom", "orchid", " btn--lg")}'
                        f'{button(online(), "oliviajoga.online " + icon("arrow"), "ghost", " btn--lg")}</p></div></div>')
     out, i = [], 1
@@ -1398,7 +1398,7 @@ def prices_page(p):
             top = ''
             if note:
                 top += (f'<div class="oj-alert oj-alert--slim">{blocks_html([note])}{online_words()}'
-                        f'<p><a class="text-link" href="{esc(online())}" target="_blank" rel="noopener">www.oliviajoga.online {icon("arrow")}</a></p></div>')
+                        f'<p><a class="text-link" href="{esc(online())}" target="_blank" rel="noopener">oliviajoga.online {icon("arrow")}</a></p></div>')
             groups.append(f'<section class="price-group" data-reveal><header class="price-group__head"><h3>{esc(length)}</h3>{top}</header>'
                           f'<div class="price-group__cards" style="--n:{len(cards)}">{"".join(cards)}</div></section>')  # no extra button below (Olivia)
             note, book = None, None

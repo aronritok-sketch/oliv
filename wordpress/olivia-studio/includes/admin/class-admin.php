@@ -562,17 +562,19 @@ class OYS_Admin {
 				$u = get_userdata( $r->user_id );
 				self::header( sprintf( __( 'Private request from %s', 'olivia-studio' ), $u ? $u->display_name : '' ) );
 				echo '<div class="oys-box"><p><b>' . self::user_label( $r->user_id ) . '</b> · ' . esc_html( $u ? $u->user_email : '' ) . ' · ' . esc_html( get_user_meta( $r->user_id, 'oys_phone', true ) ) . '</p>' // phpcs:ignore
-					. '<p><b>' . esc_html( OYS_Privates::topics()[ $r->topic ?? 'yoga' ] ?? '' ) . '</b> · ' . (int) $r->duration_min . ' min · ' . (int) $r->people . ' ' . esc_html__( 'people', 'olivia-studio' ) . ' · ' . esc_html( $types[ $r->location_type ] ?? '' ) . ' · ' . esc_html( $r->address ) . '</p>'
+					. '<p><b>' . esc_html( OYS_Privates::topic_label( $r->topic ?? '', (int) $r->people ) ) . '</b> · ' . (int) $r->duration_min . ' min · ' . (int) $r->people . ' ' . esc_html__( 'people', 'olivia-studio' ) . ' · ' . esc_html( $types[ $r->location_type ] ?? '' ) . ' · ' . esc_html( $r->address ) . '</p>'
 					. '<p><b>' . esc_html__( 'Preferred times', 'olivia-studio' ) . '</b><br>' . nl2br( esc_html( $r->preferred ) ) . '</p>'
 					. '<p><b>' . esc_html__( 'Notes', 'olivia-studio' ) . '</b><br>' . nl2br( esc_html( $r->notes ) ) . '</p>'
 					. '<p><b>' . esc_html__( 'Health notes on profile', 'olivia-studio' ) . '</b><br>' . nl2br( esc_html( get_user_meta( $r->user_id, 'oys_health_notes', true ) ) ) . '</p>'
 					. '<p>' . esc_html__( 'Status', 'olivia-studio' ) . ': <b>' . esc_html( $st[ $r->status ] ?? $r->status ) . '</b></p></div>';
 				if ( in_array( $r->status, array( 'new', 'offered' ), true ) ) {
 					$s     = $r->session_id ? OYS_Schedule::get( $r->session_id ) : null;
-					$price = $r->price_cents ?: ( 'prenatal' === ( $r->topic ?? '' ) ? OYS_Products::prenatal_price_for( (int) $r->people ) : OYS_Products::private_price_for( $r->duration_min, 'online' === $r->location_type ) );
+					$svc   = OYS_Services::get( (string) ( $r->topic ?? '' ) );
+					$price = $r->price_cents ?: ( $svc ? OYS_Services::price( $svc['key'], (int) $r->people ) : OYS_Products::private_price_for( $r->duration_min, 'online' === $r->location_type ) );
+					$durs  = array_unique( array_merge( $svc ? array( (int) $svc['duration'] ) : array(), array( 60, 75, 90 ) ) );
 					echo '<h2>' . ( $s ? esc_html__( 'Change the offer', 'olivia-studio' ) : esc_html__( 'Send an offer', 'olivia-studio' ) ) . '</h2>' . self::form( 'private_offer' ) . '<input type="hidden" name="id" value="' . (int) $r->id . '"><table class="form-table">' // phpcs:ignore
 						. '<tr><th>' . esc_html__( 'Date and time', 'olivia-studio' ) . '</th><td><input type="datetime-local" name="starts" required value="' . esc_attr( $s ? oys_utc_to_local_input( $s->starts_at ) : '' ) . '"></td></tr>'
-						. '<tr><th>' . esc_html__( 'Length (min)', 'olivia-studio' ) . '</th><td><select name="duration">' . implode( '', array_map( fn( $d ) => '<option value="' . $d . '"' . selected( (int) $r->duration_min, $d, false ) . '>' . $d . '</option>', array( 60, 75, 90 ) ) ) . '</select></td></tr>'
+						. '<tr><th>' . esc_html__( 'Length (min)', 'olivia-studio' ) . '</th><td><select name="duration">' . implode( '', array_map( fn( $d ) => '<option value="' . $d . '"' . selected( (int) $r->duration_min, $d, false ) . '>' . $d . '</option>', $durs ) ) . '</select></td></tr>'
 						. '<tr><th>' . esc_html__( 'Time to talk through goals', 'olivia-studio' ) . '</th><td><label><input type="checkbox" name="extra" value="1"' . checked( $s ? oys_ts( $s->ends_at ) - oys_ts( $s->starts_at ) > (int) $r->duration_min * 60 : OYS_Privates::is_first( $r->user_id, $r->id ), true, false ) . '> ' . sprintf( esc_html__( 'Block %s extra minutes (not charged)', 'olivia-studio' ), '<input type="number" name="extra_min" min="5" step="5" class="small-text" value="' . esc_attr( max( 5, (int) OYS_Settings::get( 'private_first_extra_min' ) ) ) . '">' ) . '</label><p class="description">' . esc_html( OYS_Privates::is_first( $r->user_id, $r->id ) ? __( 'First private session with this person.', 'olivia-studio' ) : __( 'They have had a private session before.', 'olivia-studio' ) ) . '</p></td></tr>'
 						. '<tr><th>' . esc_html__( 'Price', 'olivia-studio' ) . '</th><td><input name="price" class="small-text" value="' . esc_attr( $price / 100 ) . '"> ' . esc_html( strtoupper( OYS_Settings::get( 'currency' ) ) ) . '<p class="description">' . esc_html__( 'Small groups: set the total for the group.', 'olivia-studio' ) . '</p></td></tr>'
 						. '<tr><th>' . esc_html__( 'Location', 'olivia-studio' ) . '</th><td><input class="regular-text" name="location" value="' . esc_attr( $s ? $s->location : $r->address ) . '"></td></tr>'
@@ -845,6 +847,11 @@ class OYS_Admin {
 			echo '</select></td></tr>';
 			echo '<tr><th>' . esc_html__( 'Price', 'olivia-studio' ) . '</th><td><input name="price" class="small-text" value="' . esc_attr( $p['price_cents'] / 100 ) . '"> ' . esc_html( strtoupper( OYS_Settings::get( 'currency' ) ) ) . '</td></tr>';
 			echo '<tr><th>' . esc_html__( 'Classes / sessions', 'olivia-studio' ) . '</th><td><input type="number" name="credits" min="1" class="small-text" value="' . (int) $p['credits'] . '"> ' . esc_html__( 'valid for', 'olivia-studio' ) . ' <input type="number" name="validity_days" min="0" class="small-text" value="' . (int) $p['validity_days'] . '"> ' . esc_html__( 'days (0 = no expiry)', 'olivia-studio' ) . '</td></tr>';
+			$svcs = '<option value="">' . esc_html__( '(none: private yoga)', 'olivia-studio' ) . '</option>';
+			foreach ( OYS_Services::all() as $sk => $sv ) {
+				$svcs .= '<option value="' . esc_attr( $sk ) . '"' . selected( $p['service'] ?? '', $sk, false ) . '>' . esc_html( OYS_Services::label( $sk ) ) . '</option>';
+			}
+			echo '<tr><th>' . esc_html__( 'One-to-one service', 'olivia-studio' ) . '</th><td><select name="service">' . $svcs . '</select> <select name="people"><option value="1">' . esc_html__( 'one person', 'olivia-studio' ) . '</option><option value="2"' . selected( (int) ( $p['people'] ?? 1 ), 2, false ) . '>' . esc_html__( 'two people (with a friend)', 'olivia-studio' ) . '</option></select> <span class="description">' . esc_html__( 'Private session products only: their credits pay only for this service.', 'olivia-studio' ) . '</span></td></tr>'; // phpcs:ignore
 			echo '<tr><th>' . esc_html__( 'Session length (private)', 'olivia-studio' ) . '</th><td><input type="number" name="duration_min" min="0" class="small-text" value="' . (int) $p['duration_min'] . '"> min · ' . esc_html__( 'online price', 'olivia-studio' ) . ' <input name="online_price" class="small-text" value="' . esc_attr( (int) $p['online_price_cents'] ? $p['online_price_cents'] / 100 : '' ) . '"> <span class="description">' . esc_html__( 'Single private sessions only: price when the session is online (empty = same as in person).', 'olivia-studio' ) . '</span></td></tr>';
 			echo '<tr><th>' . esc_html__( 'Membership billing', 'olivia-studio' ) . '</th><td>' . esc_html__( 'every', 'olivia-studio' ) . ' <input type="number" name="interval_count" min="1" class="small-text" value="' . (int) $p['interval_count'] . '"> <select name="interval"><option value="month"' . selected( $p['interval'], 'month', false ) . '>' . esc_html__( 'month(s)', 'olivia-studio' ) . '</option><option value="year"' . selected( $p['interval'], 'year', false ) . '>' . esc_html__( 'year(s)', 'olivia-studio' ) . '</option></select> · ' . esc_html__( 'classes per period', 'olivia-studio' ) . ' <input type="number" name="classes_per_period" min="0" class="small-text" value="' . (int) $p['classes_per_period'] . '"> <span class="description">' . esc_html__( '0 = unlimited. Only used for memberships; a price change applies to new members (existing members keep their price in Stripe).', 'olivia-studio' ) . '</span></td></tr>';
 			echo '<tr><th>' . esc_html__( 'Short description', 'olivia-studio' ) . '</th><td><input class="large-text" name="description" value="' . esc_attr( $p['description'] ) . '"></td></tr>';
@@ -880,6 +887,8 @@ class OYS_Admin {
 			'giftable'      => empty( $_POST['giftable'] ) ? 0 : 1,
 			'active'        => empty( $_POST['active'] ) ? 0 : 1,
 			'duration_min'  => max( 0, (int) ( $_POST['duration_min'] ?? 0 ) ),
+			'service'       => isset( OYS_Services::all()[ sanitize_key( $_POST['service'] ?? '' ) ] ) ? sanitize_key( $_POST['service'] ) : '',
+			'people'        => 2 === (int) ( $_POST['people'] ?? 1 ) ? 2 : 1,
 			'sort'          => (int) ( $_POST['sort'] ?? 50 ),
 			'interval'           => 'year' === ( $_POST['interval'] ?? '' ) ? 'year' : 'month',
 			'interval_count'     => max( 1, (int) ( $_POST['interval_count'] ?? 1 ) ),

@@ -1,5 +1,5 @@
 """Facebook images, step 2: one page per photo in the site's design (1080 x 1350): the photo in a rounded frame,
-the brush wave of her logo over it, the logo and www.oliviajoga.online (Olivia, 11.12).
+the brush wave of her logo over it and the logo (Olivia, 11.12; no web address: „a www-t ki tudjuk szedni? a teljes feliratot”).
 
     python3 -I make_html.py <prepared folder> <html folder> ../../assets/brand/logo.svg
     node shoot.js <html folder> <jpg folder>
@@ -58,7 +58,7 @@ body{{background:{soft};font-family:Quicksand,sans-serif;color:#12231A;position:
 <div class="frame"><img src="file://{os.path.join(prep, f)}" alt=""></div>
 <svg class="over" viewBox="0 0 1160 220" preserveAspectRatio="none"><path class="b" d="{back}"/><path class="f" d="{front}"/></svg>
 {head}
-<div class="foot">{logo}<div class="go">{'' if land else '<p class="k">Élő online jóga</p>'}<p class="u">www.oliviajoga.online</p></div></div>
+<div class="foot">{logo}<div class="go">{'' if land else '<p class="k">Élő online jóga</p>'}</div></div>
 </body></html>'''
     name = f'olivia-joga-facebook-{n + 1:02d}'
     open(os.path.join(out, name + '.html'), 'w', encoding='utf-8').write(html)

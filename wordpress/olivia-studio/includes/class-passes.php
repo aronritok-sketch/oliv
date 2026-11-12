@@ -38,7 +38,7 @@ class OYS_Passes {
 			'product_id'    => $product['id'],
 			'name'          => $product['name'],
 			'kind'          => OYS_Products::credit_kind( $product ),
-			'credits'       => 'prenatal_single' === $product['kind'] ? 1 : max( 1, (int) $product['credits'] ), // a prenatal single: credits = people
+			'credits'       => 'private_single' === $product['kind'] ? 1 : max( 1, (int) $product['credits'] ), // a single session is one credit
 			'validity_days' => (int) $product['validity_days'],
 			'order_id'      => $order_id,
 			'source'        => $source,
@@ -152,9 +152,19 @@ class OYS_Passes {
 			'class'   => __( 'Group classes', 'olivia-studio' ),
 			'online'  => __( 'Online classes', 'olivia-studio' ),
 			'private' => __( 'Private sessions', 'olivia-studio' ),
-			'prenatal'     => __( 'Prenatal sessions', 'olivia-studio' ),
-			'prenatal_duo' => __( 'Prenatal sessions with a friend', 'olivia-studio' ),
-		);
+		) + self::service_kinds();
+	}
+
+	/** Credit kinds of the one-to-one services (OYS_Services): the service, and the service with a friend. */
+	public static function service_kinds() {
+		$out = array();
+		foreach ( OYS_Services::all() as $key => $s ) {
+			$out[ OYS_Services::credit_kind( $key ) ] = OYS_Services::label( $key );
+			if ( $s['duo'] ) {
+				$out[ OYS_Services::credit_kind( $key, 2 ) ] = OYS_Services::label( $key, 2 );
+			}
+		}
+		return $out;
 	}
 
 	/**

@@ -46,7 +46,7 @@ function oj_online_url() {
 	if ( 'dev.helloprovision.com' === wp_parse_url( home_url(), PHP_URL_HOST ) ) {
 		return 'https://dev.helloprovision.com/oliviayoga-booking';
 	}
-	return 'https://www.oliviajoga.online';
+	return 'https://oliviajoga.online';
 }
 
 /**

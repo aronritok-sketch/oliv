@@ -1,7 +1,7 @@
 <?php
 /**
  * Things people can buy besides a single drop-in: class passes, private-session packs,
- * single private sessions (used for gifts and as offer defaults), prenatal sessions and an optional intro offer.
+ * single private sessions (used for gifts and as offer defaults), one-to-one services and an optional intro offer.
  *
  * kind:
  *   pack           class credits (group classes and events that allow credits; one also covers
@@ -13,11 +13,10 @@
  *                  online); giftable as one private credit
  *   membership     recurring Stripe subscription; `classes_per_period` group classes per billing
  *                  period (0 = unlimited), billed every `interval_count` × `interval` (month|year)
- *   prenatal_pack      prenatal-session credits (one credit = one 60-minute one-to-one prenatal session);
- *                      they pay only for prenatal sessions, not for private yoga
- *   prenatal_duo_pack  the same for a mum and her friend together (one credit = one session for the two)
- *   prenatal_single    price of one prenatal session (`credits` = people: 1 alone, 2 with a friend);
- *                      price list, offer default and gift
+ *
+ * private_single and private_pack can belong to a one-to-one service (`service`, OYS_Services: the prenatal class,
+ * stretching …; `people` 2 = for two): their credits pay only for that service. 1.5.0's prenatal_pack,
+ * prenatal_duo_pack and prenatal_single are read as private_* products of the `prenatal` service.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -52,8 +51,21 @@ class OYS_Products {
 			$all = array();
 		}
 		foreach ( $all as $id => &$p ) {
-			$p       = wp_parse_args( $p, array( 'name' => $id, 'kind' => 'pack', 'credits' => 1, 'validity_days' => 90, 'price_cents' => 0, 'description' => '', 'features' => '', 'featured' => 0, 'giftable' => 0, 'active' => 1, 'duration_min' => 0, 'sort' => 50, 'interval' => 'month', 'interval_count' => 1, 'classes_per_period' => 0, 'online_price_cents' => 0 ) );
+			$p       = wp_parse_args( $p, array( 'name' => $id, 'kind' => 'pack', 'credits' => 1, 'validity_days' => 90, 'price_cents' => 0, 'description' => '', 'features' => '', 'featured' => 0, 'giftable' => 0, 'active' => 1, 'duration_min' => 0, 'sort' => 50, 'interval' => 'month', 'interval_count' => 1, 'classes_per_period' => 0, 'online_price_cents' => 0, 'service' => '', 'people' => 1 ) );
 			$p['id'] = $id;
+			if ( str_starts_with( (string) $p['kind'], 'prenatal_' ) ) { // 1.5.0
+				$p['service'] = 'prenatal';
+				if ( 'prenatal_single' === $p['kind'] ) {
+					$p['people']  = max( 1, min( 2, (int) $p['credits'] ) );
+					$p['credits'] = 1;
+					$p['kind']    = 'private_single';
+				} else {
+					$p['people'] = 'prenatal_duo_pack' === $p['kind'] ? 2 : 1;
+					$p['kind']   = 'private_pack';
+				}
+			}
+			$p['service'] = in_array( $p['kind'], array( 'private_single', 'private_pack' ), true ) ? sanitize_key( (string) $p['service'] ) : '';
+			$p['people']  = (int) $p['people'] > 1 ? 2 : 1;
 		}
 		unset( $p );
 		if ( $only_active ) {
@@ -82,7 +94,7 @@ class OYS_Products {
 
 	/** Products a customer can buy on their own (not private singles, which are booked through a request). */
 	public static function purchasable() {
-		return array_filter( self::all( true ), fn( $p ) => in_array( $p['kind'], array( 'pack', 'intro', 'online_pack', 'private_pack', 'prenatal_pack', 'prenatal_duo_pack' ), true ) );
+		return array_filter( self::all( true ), fn( $p ) => in_array( $p['kind'], array( 'pack', 'intro', 'online_pack', 'private_pack' ), true ) );
 	}
 
 	public static function memberships( $only_active = true ) {
@@ -128,32 +140,21 @@ class OYS_Products {
 		if ( 'online_pack' === $product['kind'] ) {
 			return 'online';
 		}
-		if ( in_array( $product['kind'], array( 'prenatal_pack', 'prenatal_duo_pack', 'prenatal_single' ), true ) ) {
-			return 'prenatal_duo_pack' === $product['kind'] || ( 'prenatal_single' === $product['kind'] && (int) $product['credits'] > 1 ) ? 'prenatal_duo' : 'prenatal';
+		if ( in_array( $product['kind'], array( 'private_pack', 'private_single' ), true ) && ! empty( $product['service'] ) ) {
+			return OYS_Services::credit_kind( $product['service'], (int) ( $product['people'] ?? 1 ) );
 		}
 		return in_array( $product['kind'], array( 'private_pack', 'private_single' ), true ) ? 'private' : 'class';
 	}
 
-	/** Does the studio offer prenatal sessions (an active prenatal product)? */
-	public static function has_prenatal() {
-		return (bool) array_filter( self::all( true ), fn( $p ) => str_starts_with( (string) $p['kind'], 'prenatal_' ) );
-	}
-
-	/** Price of one prenatal session: alone, or with a friend (2 people). */
-	public static function prenatal_price_for( $people = 1 ) {
-		$people = $people > 1 ? 2 : 1;
-		foreach ( self::all( true ) as $p ) {
-			if ( 'prenatal_single' === $p['kind'] && max( 1, min( 2, (int) $p['credits'] ) ) === $people ) {
-				return (int) $p['price_cents'];
-			}
-		}
-		return 0;
+	/** Private yoga as before (private products without a one-to-one service)? */
+	public static function has_plain_private() {
+		return (bool) array_filter( self::all( true ), fn( $p ) => in_array( $p['kind'], array( 'private_single', 'private_pack' ), true ) && '' === $p['service'] );
 	}
 
 	/** Price of one private session of this length, in person or online (online falls back to the in-person price). */
 	public static function private_price_for( $duration, $online = false ) {
 		foreach ( self::all( true ) as $p ) {
-			if ( 'private_single' === $p['kind'] && (int) $p['duration_min'] === (int) $duration ) {
+			if ( 'private_single' === $p['kind'] && '' === $p['service'] && (int) $p['duration_min'] === (int) $duration ) {
 				return $online && (int) $p['online_price_cents'] ? (int) $p['online_price_cents'] : (int) $p['price_cents'];
 			}
 		}
@@ -167,9 +168,6 @@ class OYS_Products {
 			'online_pack'    => __( 'Online class pass', 'olivia-studio' ),
 			'private_pack'   => __( 'Private session pack', 'olivia-studio' ),
 			'private_single' => __( 'Single private session (price list and gifts)', 'olivia-studio' ),
-			'prenatal_pack'     => __( 'Prenatal session pack', 'olivia-studio' ),
-			'prenatal_duo_pack' => __( 'Prenatal session pack, with a friend', 'olivia-studio' ),
-			'prenatal_single'   => __( 'Single prenatal session (price list and gifts; credits = people)', 'olivia-studio' ),
 			'membership'     => __( 'Membership (monthly or yearly subscription)', 'olivia-studio' ),
 		);
 	}

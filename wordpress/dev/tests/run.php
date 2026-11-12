@@ -1001,35 +1001,46 @@ test( 'private: first session gets extra time, note in the offer', function () {
 	ok( ! OYS_Privates::is_first( $u ), 'not first any more' );
 } );
 
-test( 'prenatal sessions: their own credits, alone or with a friend; a single as a gift is one credit', function () {
+test( 'one-to-one services: their own credits, alone or with a friend; a single as a gift is one credit', function () {
 	global $wpdb;
 	$products = get_option( OYS_Products::OPTION );
+	$services = get_option( OYS_Services::OPTION );
 	try {
+		update_option( OYS_Services::OPTION, array(
+			'prenatal'   => array( 'label' => 'Prenatal', 'class' => 'kismamatorna', 'duration' => 60, 'duo' => 1, 'sort' => 1 ),
+			'relax'      => array( 'label' => 'Relaxation', 'class' => 'relaxacio', 'duration' => 30, 'duo' => 0, 'sort' => 2 ),
+		) );
 		update_option( OYS_Products::OPTION, array_merge( (array) $products, array(
-			'pn-1'   => array( 'name' => 'Prenatal 1', 'kind' => 'prenatal_single', 'credits' => 1, 'validity_days' => 0, 'price_cents' => 5000, 'giftable' => 1, 'active' => 1, 'duration_min' => 60 ),
-			'pn-2'   => array( 'name' => 'Prenatal 1, two', 'kind' => 'prenatal_single', 'credits' => 2, 'validity_days' => 0, 'price_cents' => 8000, 'giftable' => 1, 'active' => 1, 'duration_min' => 60 ),
-			'pn-5'   => array( 'name' => 'Prenatal 5', 'kind' => 'prenatal_pack', 'credits' => 5, 'validity_days' => 0, 'price_cents' => 22000, 'active' => 1, 'duration_min' => 60 ),
-			'pn-d5'  => array( 'name' => 'Prenatal 5, two', 'kind' => 'prenatal_duo_pack', 'credits' => 5, 'validity_days' => 0, 'price_cents' => 36000, 'active' => 1, 'duration_min' => 60 ),
+			'pn-1'  => array( 'name' => 'Prenatal 1', 'kind' => 'private_single', 'service' => 'prenatal', 'people' => 1, 'credits' => 1, 'validity_days' => 0, 'price_cents' => 5000, 'giftable' => 1, 'active' => 1, 'duration_min' => 60 ),
+			'pn-2'  => array( 'name' => 'Prenatal 1, two', 'kind' => 'private_single', 'service' => 'prenatal', 'people' => 2, 'credits' => 1, 'validity_days' => 0, 'price_cents' => 8000, 'giftable' => 1, 'active' => 1, 'duration_min' => 60 ),
+			'pn-5'  => array( 'name' => 'Prenatal 5', 'kind' => 'private_pack', 'service' => 'prenatal', 'credits' => 5, 'validity_days' => 0, 'price_cents' => 22000, 'active' => 1, 'duration_min' => 60 ),
+			'pn-d5' => array( 'name' => 'Prenatal 5, two', 'kind' => 'prenatal_duo_pack', 'credits' => 5, 'validity_days' => 0, 'price_cents' => 36000, 'active' => 1, 'duration_min' => 60 ),
+			'rx-1'  => array( 'name' => 'Relax 1', 'kind' => 'private_single', 'service' => 'relax', 'credits' => 1, 'validity_days' => 0, 'price_cents' => 2000, 'active' => 1, 'duration_min' => 30 ),
 		) ) );
-		ok( OYS_Products::has_prenatal(), 'the studio offers prenatal sessions' );
-		eq( 5000, OYS_Products::prenatal_price_for( 1 ), 'price alone' );
-		eq( 8000, OYS_Products::prenatal_price_for( 2 ), 'price with a friend' );
+		eq( array( 'prenatal', 'relax' ), array_keys( OYS_Services::offered() ), 'the services on offer' );
+		eq( 5000, OYS_Services::price( 'prenatal' ), 'price alone' );
+		eq( 8000, OYS_Services::price( 'prenatal', 2 ), 'price with a friend' );
+		$legacy = OYS_Products::get( 'pn-d5' );
+		ok( 'private_pack' === $legacy['kind'] && 'prenatal' === $legacy['service'] && 2 === $legacy['people'], '1.5.0 prenatal_duo_pack is read as a prenatal pack for two' );
 		ok( isset( OYS_Products::purchasable()['pn-5'] ) && ! isset( OYS_Products::purchasable()['pn-1'] ), 'packs are bought, singles are booked by request' );
 		$u = make_user( 'Mia' );
-		foreach ( array( array( 1, 'kismamatorna', 'prenatal' ), array( 2, 'kismamatorna-duo', 'prenatal_duo' ) ) as [ $people, $slug, $kind ] ) {
-			$wpdb->insert( OYS_Install::table( 'private_requests' ), array( 'user_id' => $u, 'topic' => 'prenatal', 'duration_min' => 60, 'people' => $people, 'location_type' => 'online', 'preferred' => 'mornings', 'status' => 'new', 'created_at' => oys_now() ) );
-			$s = OYS_Schedule::get( OYS_Privates::offer( (int) $wpdb->insert_id, wp_date( 'Y-m-d', time() + ( 3 + $people ) * DAY_IN_SECONDS ) . 'T10:00', 60, 5000, '', 'https://zoom.example/x' ) );
-			eq( $slug, $s->class_slug, "prenatal session for $people: its class" );
-			eq( $kind, OYS_Bookings::credit_kind( $s ), "prenatal session for $people: paid with $kind credits" );
+		foreach ( array( array( 'prenatal', 1, 60, 'kismamatorna', 'prenatal' ), array( 'relax', 1, 30, 'relaxacio', 'relax' ), array( 'prenatal', 2, 60, 'kismamatorna-duo', 'prenatal_duo' ) ) as $n => [ $topic, $people, $dur, $slug, $kind ] ) {
+			$wpdb->insert( OYS_Install::table( 'private_requests' ), array( 'user_id' => $u, 'topic' => $topic, 'duration_min' => $dur, 'people' => $people, 'location_type' => 'online', 'preferred' => 'mornings', 'status' => 'new', 'created_at' => oys_now() ) );
+			$s = OYS_Schedule::get( OYS_Privates::offer( (int) $wpdb->insert_id, wp_date( 'Y-m-d', time() + ( 3 + $n ) * DAY_IN_SECONDS ) . 'T10:00', $dur, 5000, '', 'https://meet.example/x' ) );
+			eq( $slug, $s->class_slug, "$topic for $people: its class" );
+			eq( $kind, OYS_Bookings::credit_kind( $s ), "$topic for $people: paid with $kind credits" );
+			eq( 1, (int) $s->credits_allowed, "$topic: a credit covers the service's own length" );
 		}
-		OYS_Passes::grant_product( $u, OYS_Products::get( 'private-5' ) ?: array( 'id' => 'p5', 'name' => 'P5', 'kind' => 'private_pack', 'credits' => 5, 'validity_days' => 0 ) );
+		OYS_Passes::grant( $u, array( 'product_id' => 'p5', 'name' => 'P5', 'kind' => 'private', 'credits' => 5, 'validity_days' => 0 ) );
 		eq( 0, OYS_Passes::available_for( $u, $s ), 'private yoga credits do not pay for a prenatal session' );
 		OYS_Passes::grant_product( $u, OYS_Products::get( 'pn-d5' ) );
 		eq( 5, OYS_Passes::available_for( $u, $s ), 'the friend pack pays for the session for two' );
 		$g = OYS_Passes::get( OYS_Passes::grant_product( $u, OYS_Products::get( 'pn-2' ), 0, 'gift' ) );
 		ok( 'prenatal_duo' === $g->kind && 1 === (int) $g->credits_total, 'a single for two, as a gift: one session for the two' );
+		ok( isset( OYS_Passes::kinds()['relax'] ) && isset( OYS_Passes::kinds()['prenatal_duo'] ), 'the services have their own credit kinds' );
 	} finally {
 		update_option( OYS_Products::OPTION, $products );
+		false === $services ? delete_option( OYS_Services::OPTION ) : update_option( OYS_Services::OPTION, $services );
 	}
 } );
 
@@ -1733,7 +1744,7 @@ test( 'online edition: Hungarian addresses and its own copy', function () {
 	foreach ( $m as $token ) {
 		ok( isset( $data[ 'page' === $token[1] ? 'pages' : 'classes' ][ $token[2] ] ), 'link target exists in this edition: ' . $token[0] );
 	}
-	$kinds = array( 'online_pack', 'membership', 'private_single', 'private_pack', 'prenatal_single', 'prenatal_pack', 'prenatal_duo_pack' );
+	$kinds = array( 'online_pack', 'membership', 'private_single', 'private_pack', 'prenatal_single', 'prenatal_pack', 'prenatal_duo_pack' ); // prenatal_*: 1.5.0, read as private_* of the prenatal service
 	foreach ( $data['setup']['products'] as $id => $p ) {
 		ok( in_array( $p['kind'], $kinds, true ) && 0 === $p['price_cents'] % 100, "product $id: online kind, whole forints" );
 	}

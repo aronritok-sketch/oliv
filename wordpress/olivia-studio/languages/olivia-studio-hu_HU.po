@@ -291,7 +291,7 @@ msgstr "Csoportos órák"
 #: includes/admin/class-admin.php:693
 #: includes/admin/class-admin.php:939
 msgid "Private sessions"
-msgstr "Privát órák"
+msgstr "Egyéni órák"
 
 #: includes/admin/class-admin.php:664
 #: includes/class-privacy.php:40
@@ -656,7 +656,7 @@ msgstr "Ez az óra már elkezdődött."
 
 #: includes/class-bookings.php:631
 msgid "Private session credit"
-msgstr "Privát alkalom"
+msgstr "Egyéni alkalom"
 
 #: includes/class-bookings.php:631
 msgid "Online class credit"
@@ -1017,7 +1017,7 @@ msgstr "Ajándékutalvány"
 #: includes/class-orders.php:203
 #: includes/class-schedule.php:373
 msgid "Private session"
-msgstr "Privát óra"
+msgstr "Egyéni óra"
 
 #: includes/class-app-api.php:322
 #: includes/class-frontend.php:537
@@ -1125,7 +1125,7 @@ msgstr "Visszakapott alkalom"
 
 #: includes/class-frontend.php:82
 msgid "No group classes today. Private sessions are available on request."
-msgstr "Ma nincs csoportos óra. Privát óra kérésre elérhető."
+msgstr "Ma nincs csoportos óra. Egyéni óra kérésre elérhető."
 
 #: includes/class-frontend.php:98
 #: includes/class-frontend.php:447
@@ -1210,7 +1210,7 @@ msgstr "Fizess online vagy a helyszínen"
 #: includes/class-frontend.php:169
 #: includes/class-frontend.php:1253
 msgid "Request a private session"
-msgstr "Privát óra kérése"
+msgstr "Egyéni óra kérése"
 
 #: includes/class-frontend.php:170
 #: includes/class-frontend.php:1272
@@ -1288,7 +1288,7 @@ msgstr "Havi ritmus, automatikus számlázással. Bármikor lemondható."
 
 #: includes/class-frontend.php:200
 msgid "Private & teams"
-msgstr "Privát és csapat"
+msgstr "Egyéni és csapat"
 
 #: includes/class-frontend.php:200
 msgid "One-on-one sessions, packs, and classes for your team."
@@ -1395,7 +1395,7 @@ msgstr "Kód (kártyás fizetéshez)"
 
 #: includes/class-frontend.php:410
 msgid "Log in to see and confirm your private session."
-msgstr "Lépj be, hogy lásd és jóváhagyd a privát órádat."
+msgstr "Lépj be, hogy lásd és jóváhagyd a egyéni órádat."
 
 #: includes/class-frontend.php:413
 msgid "This class could not be found. Please pick another from the timetable."
@@ -1841,7 +1841,7 @@ msgstr "Van fiókom"
 
 #: includes/class-frontend.php:1016
 msgid "Book and cancel classes, bring guests, see your passes, membership and receipts, and request private sessions."
-msgstr "Foglalj és mondj le órákat, hozz vendéget, nézd meg a bérleteidet, a tagságodat és a nyugtáidat, és kérj privát órát."
+msgstr "Foglalj és mondj le órákat, hozz vendéget, nézd meg a bérleteidet, a tagságodat és a nyugtáidat, és kérj egyéni órát."
 
 #: includes/class-frontend.php:1025
 msgid "History"
@@ -2085,7 +2085,7 @@ msgstr "Jóváhagyás és fizetés"
 
 #: includes/class-frontend.php:1247
 msgid "Private session, %d min"
-msgstr "Privát óra, %d perc"
+msgstr "Egyéni óra, %d perc"
 
 #: includes/class-frontend.php:1272
 msgid "online %s"
@@ -2209,7 +2209,7 @@ msgstr "Az ajándékutalványt fizetés után azonnal e-mailben kapja meg a mega
 
 #: includes/class-frontend.php:1365
 msgid "Create a free account to request a private session. You'll get a suggested time and price, and confirm with one click."
-msgstr "Privát óra kéréséhez hozz létre egy ingyenes fiókot. Kapsz egy javasolt időpontot és árat, és egy kattintással jóváhagyhatod."
+msgstr "Egyéni óra kéréséhez hozz létre egy ingyenes fiókot. Kapsz egy javasolt időpontot és árat, és egy kattintással jóváhagyhatod."
 
 #: includes/class-locations.php:153
 #: includes/class-locations.php:157
@@ -2631,7 +2631,7 @@ msgstr ""
 
 #: includes/class-privates.php:105
 msgid "Private session (%d min)"
-msgstr "Privát óra (%d perc)"
+msgstr "Egyéni óra (%d perc)"
 
 #: includes/class-privates.php:109
 msgid "Includes about %d extra minutes to talk through your goals."
@@ -2935,7 +2935,7 @@ msgstr "Szia {first_name}, üdv! Elkészült a fiókod."
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "From your account you can book and cancel classes, see your passes and receipts, and request private sessions."
-msgstr "A fiókodban órákat foglalhatsz és mondhatsz le, láthatod a bérleteidet és nyugtáidat, és privát órát kérhetsz."
+msgstr "A fiókodban órákat foglalhatsz és mondhatsz le, láthatod a bérleteidet és nyugtáidat, és egyéni órát kérhetsz."
 
 #: data
 #. Default text stored as data (email template, product or timetable).
@@ -3065,7 +3065,7 @@ msgstr "Találkozunk a matracon!"
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "Your private session request"
-msgstr "Privát óra kérésed"
+msgstr "Egyéni óra kérésed"
 
 #: data
 #. Default text stored as data (email template, product or timetable).
@@ -3085,22 +3085,22 @@ msgstr "Kéréseim"
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "Your private session: please confirm"
-msgstr "Privát órád: kérlek, hagyd jóvá"
+msgstr "Egyéni órád: kérlek, hagyd jóvá"
 
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "Your private session"
-msgstr "A privát órád"
+msgstr "A egyéni órád"
 
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "Here is your private session. Confirm it by paying below (or with a private session credit if you have one)."
-msgstr "Itt a privát órád. Hagyd jóvá a lenti fizetéssel (vagy egy privát alkalommal, ha van)."
+msgstr "Itt a egyéni órád. Hagyd jóvá a lenti fizetéssel (vagy egy egyéni alkalommal, ha van)."
 
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "About your private session request"
-msgstr "A privát óra kérésedről"
+msgstr "A egyéni óra kérésedről"
 
 #: data
 #. Default text stored as data (email template, product or timetable).
@@ -3265,7 +3265,7 @@ msgstr "6 hónapig érvényes"
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "Private session, 60 minutes"
-msgstr "Privát óra, 60 perc"
+msgstr "Egyéni óra, 60 perc"
 
 #: data
 #. Default text stored as data (email template, product or timetable).
@@ -3285,12 +3285,12 @@ msgstr "A céljaidra tervezve"
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "Private session, 75 minutes"
-msgstr "Privát óra, 75 perc"
+msgstr "Egyéni óra, 75 perc"
 
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "Private session, 90 minutes"
-msgstr "Privát óra, 90 perc"
+msgstr "Egyéni óra, 90 perc"
 
 #: data
 #. Default text stored as data (email template, product or timetable).
@@ -3330,12 +3330,12 @@ msgstr "Havonta 4 csoportos óra"
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "5 private sessions"
-msgstr "5 privát óra"
+msgstr "5 egyéni óra"
 
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "Five 60-minute private sessions. Save $50."
-msgstr "Öt 60 perces privát óra. 50 dollár megtakarítás."
+msgstr "Öt 60 perces egyéni óra. 50 dollár megtakarítás."
 
 #: data
 #. Default text stored as data (email template, product or timetable).
@@ -3428,7 +3428,7 @@ msgid "When the studio cancels a class, passes are valid longer by (days, 0 = of
 msgstr "Ha a stúdió lemond egy órát, a bérletek ennyivel tovább érvényesek (nap, 0 = ki)"
 
 msgid "Private yoga"
-msgstr "Jóga magánóra"
+msgstr "Egyéni jóga"
 
 msgid "Prenatal session"
 msgstr "Kismamatorna"
@@ -3459,3 +3459,39 @@ msgstr "Mire jelentkezel?"
 
 msgid "Prenatal session: always 60 minutes, alone (%1$s) or with a friend (%2$s for the two of you). Tell me which trimester or week you are in."
 msgstr "Kismamatorna: mindig 60 perc, egyedül (%1$s) vagy a barátnőddel (%2$s kettőtöknek). Írd meg, hányadik trimeszterben vagy hétben jársz."
+
+msgid "%s, with a friend"
+msgstr "%s, barátnővel"
+
+msgid "Ask for a time"
+msgstr "Időpontot kérek"
+
+msgid "%d minutes, for the two of you"
+msgstr "%d perc, kettőtöknek"
+
+msgid "%d minutes, one-to-one"
+msgstr "%d perc, egyénileg"
+
+msgid "min"
+msgstr "perc"
+
+msgid "with a friend: %s for the two of you"
+msgstr "barátnővel: %s kettőtöknek"
+
+msgid "private yoga"
+msgstr "egyéni jóga"
+
+msgid "(none: private yoga)"
+msgstr "(nincs: egyéni jóga)"
+
+msgid "One-to-one service"
+msgstr "Egyéni szolgáltatás"
+
+msgid "one person"
+msgstr "egy fő"
+
+msgid "two people (with a friend)"
+msgstr "két fő (barátnővel)"
+
+msgid "Private session products only: their credits pay only for this service."
+msgstr "Csak egyéni óráknál: az alkalmai csak erre a szolgáltatásra használhatók."
