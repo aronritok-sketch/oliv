@@ -54,6 +54,28 @@ class OYS_Privates {
 		);
 	}
 
+	/** The prenatal class (its page slug): one-to-one prenatal sessions are private sessions of this class. */
+	const PRENATAL = 'kismamatorna';
+
+	/** What a private request is for: private yoga, or a prenatal session (when the studio offers them). */
+	public static function topics() {
+		return array(
+			'yoga'     => __( 'Private yoga', 'olivia-studio' ),
+			'prenatal' => __( 'Prenatal session', 'olivia-studio' ),
+		);
+	}
+
+	/** Prenatal sessions are paid with prenatal credits (alone, or with a friend), private yoga with private credits. */
+	public static function credit_kind_for( $session ) {
+		if ( self::PRENATAL === $session->class_slug ) {
+			return 'prenatal';
+		}
+		if ( self::PRENATAL . '-duo' === $session->class_slug ) {
+			return 'prenatal_duo';
+		}
+		return 'private';
+	}
+
 	public static function handle_request() {
 		check_admin_referer( 'oys_private_request' );
 		$user_id = get_current_user_id();
@@ -63,10 +85,13 @@ class OYS_Privates {
 		$types    = self::location_types();
 		$type     = sanitize_key( $_POST['location_type'] ?? 'home' );
 		$duration = (int) ( $_POST['duration_min'] ?? 60 );
+		$prenatal = 'prenatal' === sanitize_key( $_POST['topic'] ?? '' ) && OYS_Products::has_prenatal();
 		$row      = array(
 			'user_id'       => $user_id,
-			'duration_min'  => in_array( $duration, array( 60, 75, 90 ), true ) ? $duration : 60,
-			'people'        => min( 10, max( 1, (int) ( $_POST['people'] ?? 1 ) ) ),
+			'topic'         => $prenatal ? 'prenatal' : 'yoga',
+			// a prenatal session is 60 minutes, alone or with a friend
+			'duration_min'  => $prenatal ? 60 : ( in_array( $duration, array( 60, 75, 90 ), true ) ? $duration : 60 ),
+			'people'        => min( $prenatal ? 2 : 10, max( 1, (int) ( $_POST['people'] ?? 1 ) ) ),
 			'location_type' => isset( $types[ $type ] ) ? $type : 'home',
 			'address'       => sanitize_text_field( wp_unslash( $_POST['address'] ?? '' ) ),
 			'preferred'     => sanitize_textarea_field( wp_unslash( $_POST['preferred'] ?? '' ) ),
@@ -99,10 +124,14 @@ class OYS_Privates {
 		if ( ! $start ) {
 			return new WP_Error( 'oys_time', __( 'Choose a date and time.', 'olivia-studio' ) );
 		}
+		$prenatal = 'prenatal' === ( $request->topic ?? '' );
+		$duo      = $prenatal && (int) $request->people > 1;
 		$data = array(
 			'kind'            => 'private',
-			'class_slug'      => 'private-yoga',
-			'title'           => sprintf( __( 'Private session (%d min)', 'olivia-studio' ), $duration_min ),
+			'class_slug'      => $prenatal ? self::PRENATAL . ( $duo ? '-duo' : '' ) : 'private-yoga',
+			'title'           => $prenatal
+				? sprintf( $duo ? __( 'Prenatal session with a friend (%d min)', 'olivia-studio' ) : __( 'Prenatal session (%d min)', 'olivia-studio' ), $duration_min )
+				: sprintf( __( 'Private session (%d min)', 'olivia-studio' ), $duration_min ),
 			'starts_at'       => $start,
 			// Extra minutes (first session: talking through goals) are blocked in the calendar, not charged.
 			'ends_at'         => gmdate( 'Y-m-d H:i:s', oys_ts( $start ) + ( $duration_min + max( 0, (int) $extra_min ) ) * MINUTE_IN_SECONDS ),

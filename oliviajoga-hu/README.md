@@ -53,6 +53,32 @@ megoldás: **`BRIEF.md`** (mesterek: Tschichold / Hey + Headspace / Dumbar; a l�
   `tools/check.py` ezt nézi); egységes kártyacím (`card_titles`); Kapcsolat-dobozok alja egy vonalban (`.oj-loc__foot`);
   hullámok: `blob()` (a kép oldalán kifut a képernyő szélére) és `band()` (teljes szélességű sáv a képsor mögött).
 
+## 5. kör: az oliviajoga.hu redesign doksi (2026-11-12, 1.4.0)
+
+Olivia doksija két részből áll: amit most kért, és amit **november 26-tól** (az utolsó helyszíni óra után).
+
+- **Most:** zöld hős-gombok (`btn--forest`); ahol „november 25-ig tartom”, ott az élő online jóga is (szerdánként
+  18:30–20:00) gombokkal a www.oliviajoga.online-ra (`online_words()`, `online_buttons()`, értesítősáv); minden hullám a
+  logó ecsetvonása (`brush_d()` → `blob()`, `band()`, `WAVE_MARK`, a fejlécfotó széle); ONLINE ajándékutalvány az online
+  oldal ajándék-checkoutjára (`online('gift')`); „Egy korszak lezárult” szekció a 18 fotóból (`korszak_section()`,
+  `tools/images.py korszak <mappa>` → `assets/img/new/korszak-*`, alt: `content/korszak-alts.json`); az előlábléc
+  mondata kiegészítve (`YOGIC_LIFE`); Rólam: még egy fotó az utolsó fejezetek mellett; a cikkek fejléce Olivia nyers
+  fotója, a színes sávot alul-felül kitöltve.
+- **November 26-tól** (`AFTER`, `build.py --after`; a WordPress-téma magától vált a dátumon, Budapest ideje szerint;
+  előnézet: `?nov26=1`, vissza: `?nov26=0`): „tartottam”; órarend és térképek helyett a két online doboz (online jóga,
+  online kismamatorna – idő, ár, gomb; `online_boxes()`), a helyszínek szavai megmaradnak (`was_strip()`); Árak:
+  90 perces élő online jóga (3 000 / 13 000 Ft, 8 hét, lemondáskor kitolódik) és külön a kismamatorna (`prices_after()`);
+  menü: „Bejelentkezés & jóga bérlet” → az online fiók, új „Online kismamatorna”; minden foglaló gomb az online oldalra,
+  a kerületes gombfelirat „Online jóga bejelentkezés” (`after_href()`, `after_label()`); GYIK két válasza
+  (`FAQ_AFTER`); a Barion-sáv helyett a Stripe fizetési módjainak logói (`assets/img/pay/`, MIT, Shopify
+  payment_icons).
+- **Online oldal címe:** `ONLINE` (élesben www.oliviajoga.online); a WordPress-témában `%%ONLINE%%`, a dev szerveren a
+  foglaló dev-másolata, `OJ_ONLINE_URL` felülírja.
+- **Ellenőrzés:** `tools/check.py <mappa> --after` (címek, régi címsorok, helyszín-szavak, nincs Motibro, térkép,
+  Barion és „tartom”).
+- **Facebook-képek:** a „Facebookra” mappa 18 fotója 1080 × 1350-ben, az oldal stílusában (`tools/facebook/`:
+  `make_html.py` + `shoot.js`, Playwright); a demón: `/demo/oliviajoga-hu-6083/facebook/`.
+
 ## Fájlok
 
 | | |
@@ -70,6 +96,8 @@ megoldás: **`BRIEF.md`** (mesterek: Tschichold / Hey + Headspace / Dumbar; a l�
 python3 build.py                                    # dist/ az oliviajoga.hu-ra (canonical, sitemap, .htaccess)
 python3 tools/check.py dist                         # 2355 ellenőrzés
 python3 build.py --preview /demo/<slug>/ --out D    # noindex előnézet alkönyvtárba (a linkek /-re végződnek)
+python3 build.py --after --preview /demo/<slug>/nov26/ --online <online oldal> --out D/nov26   # a november 26-i állapot
+python3 tools/check.py D/nov26 --base /demo/<slug>/nov26/ --after
 ```
 
 A régi oldal újraolvasása (ha Olivia ott módosít): a Google a képek címét látogatásonként aláírja, ezért az oldalakat és

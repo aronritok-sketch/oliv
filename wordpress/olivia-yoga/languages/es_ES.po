@@ -1088,3 +1088,9 @@ msgstr "Cuencos tibetanos alineados en un estudio de yoga"
 #: inc/content-types.php
 msgid "Most popular"
 msgstr "Más popular"
+
+msgid "Hatha flow every Wednesday, 18:30 to 20:00, live on Zoom."
+msgstr "Hatha flow cada miércoles, de 18:30 a 20:00, en directo por Zoom."
+
+msgid "One-to-one or with a friend, planned for your trimester and how you feel that day."
+msgstr "Individual o con una amiga, según tu trimestre y cómo te sientas ese día."

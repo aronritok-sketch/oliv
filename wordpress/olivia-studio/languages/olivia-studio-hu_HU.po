@@ -3408,3 +3408,54 @@ msgstr "Négyszemközti online órák és csomagok, rád szabva."
 
 msgid "e.g. weekday evenings after 6, or Saturday afternoon"
 msgstr "pl. hétköznap este 6 után, vagy szombat délután"
+
+msgid "Prenatal session pack"
+msgstr "Kismamatorna-bérlet"
+
+msgid "Prenatal session pack, with a friend"
+msgstr "Kismamatorna-bérlet barátnővel"
+
+msgid "Single prenatal session (price list and gifts; credits = people)"
+msgstr "Egy kismamatorna (árlista és ajándék; alkalmak = létszám)"
+
+msgid "Prenatal sessions"
+msgstr "Kismamatorna"
+
+msgid "Prenatal sessions with a friend"
+msgstr "Kismamatorna barátnővel"
+
+msgid "When the studio cancels a class, passes are valid longer by (days, 0 = off)"
+msgstr "Ha a stúdió lemond egy órát, a bérletek ennyivel tovább érvényesek (nap, 0 = ki)"
+
+msgid "Private yoga"
+msgstr "Jóga magánóra"
+
+msgid "Prenatal session"
+msgstr "Kismamatorna"
+
+msgid "Prenatal session with a friend (%d min)"
+msgstr "Kismamatorna barátnővel (%d perc)"
+
+msgid "Prenatal session (%d min)"
+msgstr "Kismamatorna (%d perc)"
+
+msgid "Request a prenatal session"
+msgstr "Kismamatorna-időpontot kérek"
+
+msgid "60 minutes, for the two of you"
+msgstr "60 perc, kettőtöknek"
+
+msgid "60 minutes, one-to-one"
+msgstr "60 perc, egyénileg"
+
+msgid "One-to-one, or with a friend: planned for your trimester and how you feel that day."
+msgstr "Egyénileg vagy a barátnőddel: a trimeszteredhez és az aznapi állapotodhoz igazítva."
+
+msgid "Prenatal session, %d min"
+msgstr "Kismamatorna, %d perc"
+
+msgid "What would you like?"
+msgstr "Mire jelentkezel?"
+
+msgid "Prenatal session: always 60 minutes, alone (%1$s) or with a friend (%2$s for the two of you). Tell me which trimester or week you are in."
+msgstr "Kismamatorna: mindig 60 perc, egyedül (%1$s) vagy a barátnőddel (%2$s kettőtöknek). Írd meg, hányadik trimeszterben vagy hétben jársz."

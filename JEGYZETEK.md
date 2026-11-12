@@ -148,6 +148,13 @@
 - **Nyitott:** a bővítmény neve az adminban „Olivia Studio” (Hathaflow fehér címke); Hathaflow saját fotók / magyar változat; az US és a booking téma ~21 MB (a képek a témában).
 - **Ügyfélnek** (Olivia) a devről semmi, amíg a fő chat nem szól.
 
+## 17. kör: oliviajoga.hu redesign doksi + oliviajoga.online (2026-11-12)
+- **Kérés (Áron):** „ez az oliviajoga.hu redesign. csináld meg a deven a módosításokat”, „ha kész írj Olivianak”; az oliviajoga.online „a mi domainünk”.
+- **oliviajoga.hu 1.4.0** (`oliviajoga-hu/README.md`, 5. kör): a doksi első része most él, a második (november 26-tól) a WordPress-témában a dátumon magától vált; előnézet `?nov26=1`. Demó: `/demo/oliviajoga-hu-6083/` és `/nov26/`, Facebook-képek: `/facebook/`.
+- **olivia-studio 1.5.0:** kismamatorna saját bérlettípusokkal (`prenatal_pack`, `prenatal_duo_pack`, `prenatal_single`; a kredit csak kismamatornára jó, magánjógára nem), a magánóra-kérésben „Mire jelentkezel?” (`topic`, DB 11), ha a stúdió lemond egy csoportos órát, a lejáró bérletek `cancel_extend_days` (7) nappal tovább érvényesek, a dolláros alaptermékek nem kerülnek forintos oldalra.
+- **olivia-yoga 3.3.0** (online kiadás): 5 alkalmas 13 000 Ft / 8 hét, 1 alkalmas ajándék, kismamatorna-árak, szerda 18:30–20:00 (90 perc) az egyetlen heti óra, `/online-jogaorak/kismamatorna/` (a régi `prenatal-fitness` 301), egyszeri frissítés a meglévő oldalon (`oy_migrate_online()`, `oy_online_rev`).
+- **Nyitott:** a dev foglalóoldalán a bővítményt a VPS-en újra kell telepíteni (a `hpv-site update` nem teszi fel a `plugin_zips`-et); az oliviajoga.online domain élesítése (most parkolt oldal); a magánóra-árak továbbra is MINTA.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

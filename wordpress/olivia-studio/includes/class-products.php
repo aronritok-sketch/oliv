@@ -1,7 +1,7 @@
 <?php
 /**
  * Things people can buy besides a single drop-in: class passes, private-session packs,
- * single private sessions (used for gifts and as offer defaults) and an optional intro offer.
+ * single private sessions (used for gifts and as offer defaults), prenatal sessions and an optional intro offer.
  *
  * kind:
  *   pack           class credits (group classes and events that allow credits; one also covers
@@ -13,6 +13,11 @@
  *                  online); giftable as one private credit
  *   membership     recurring Stripe subscription; `classes_per_period` group classes per billing
  *                  period (0 = unlimited), billed every `interval_count` × `interval` (month|year)
+ *   prenatal_pack      prenatal-session credits (one credit = one 60-minute one-to-one prenatal session);
+ *                      they pay only for prenatal sessions, not for private yoga
+ *   prenatal_duo_pack  the same for a mum and her friend together (one credit = one session for the two)
+ *   prenatal_single    price of one prenatal session (`credits` = people: 1 alone, 2 with a friend);
+ *                      price list, offer default and gift
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -77,7 +82,7 @@ class OYS_Products {
 
 	/** Products a customer can buy on their own (not private singles, which are booked through a request). */
 	public static function purchasable() {
-		return array_filter( self::all( true ), fn( $p ) => in_array( $p['kind'], array( 'pack', 'intro', 'online_pack', 'private_pack' ), true ) );
+		return array_filter( self::all( true ), fn( $p ) => in_array( $p['kind'], array( 'pack', 'intro', 'online_pack', 'private_pack', 'prenatal_pack', 'prenatal_duo_pack' ), true ) );
 	}
 
 	public static function memberships( $only_active = true ) {
@@ -86,6 +91,10 @@ class OYS_Products {
 
 	/** After an upgrade: add default products of kinds the site doesn't have yet (e.g. memberships, online passes). */
 	public static function add_missing_kinds() {
+		// The defaults are priced in dollars: a site in another currency (the Hungarian online site) has its own list.
+		if ( 'usd' !== strtolower( (string) OYS_Settings::get( 'currency' ) ) ) {
+			return;
+		}
 		$all   = get_option( self::OPTION, array() );
 		$all   = is_array( $all ) ? $all : array();
 		$kinds = array_map( fn( $p ) => $p['kind'] ?? '', $all );
@@ -119,7 +128,26 @@ class OYS_Products {
 		if ( 'online_pack' === $product['kind'] ) {
 			return 'online';
 		}
+		if ( in_array( $product['kind'], array( 'prenatal_pack', 'prenatal_duo_pack', 'prenatal_single' ), true ) ) {
+			return 'prenatal_duo_pack' === $product['kind'] || ( 'prenatal_single' === $product['kind'] && (int) $product['credits'] > 1 ) ? 'prenatal_duo' : 'prenatal';
+		}
 		return in_array( $product['kind'], array( 'private_pack', 'private_single' ), true ) ? 'private' : 'class';
+	}
+
+	/** Does the studio offer prenatal sessions (an active prenatal product)? */
+	public static function has_prenatal() {
+		return (bool) array_filter( self::all( true ), fn( $p ) => str_starts_with( (string) $p['kind'], 'prenatal_' ) );
+	}
+
+	/** Price of one prenatal session: alone, or with a friend (2 people). */
+	public static function prenatal_price_for( $people = 1 ) {
+		$people = $people > 1 ? 2 : 1;
+		foreach ( self::all( true ) as $p ) {
+			if ( 'prenatal_single' === $p['kind'] && max( 1, min( 2, (int) $p['credits'] ) ) === $people ) {
+				return (int) $p['price_cents'];
+			}
+		}
+		return 0;
 	}
 
 	/** Price of one private session of this length, in person or online (online falls back to the in-person price). */
@@ -139,6 +167,9 @@ class OYS_Products {
 			'online_pack'    => __( 'Online class pass', 'olivia-studio' ),
 			'private_pack'   => __( 'Private session pack', 'olivia-studio' ),
 			'private_single' => __( 'Single private session (price list and gifts)', 'olivia-studio' ),
+			'prenatal_pack'     => __( 'Prenatal session pack', 'olivia-studio' ),
+			'prenatal_duo_pack' => __( 'Prenatal session pack, with a friend', 'olivia-studio' ),
+			'prenatal_single'   => __( 'Single prenatal session (price list and gifts; credits = people)', 'olivia-studio' ),
 			'membership'     => __( 'Membership (monthly or yearly subscription)', 'olivia-studio' ),
 		);
 	}

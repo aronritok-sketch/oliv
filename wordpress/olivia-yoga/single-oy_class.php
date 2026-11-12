@@ -11,7 +11,8 @@ while ( have_posts() ) :
 	$slug = get_post_field( 'post_name' );
 	echo oy_page_head( get_the_title(), get_the_excerpt(), array( array( __( 'Classes', 'olivia-yoga' ), oy_page_link( 'yoga-classes' ) ), array( get_the_title(), get_permalink() ) ), 'c' . $slug, oy_class_facts( $id, 'chips page-head__chips' ), oy_post_photo( $id, '', '(min-width: 960px) 36vw, 90vw', true ) ); // phpcs:ignore
 	$aside_photo = (int) get_post_meta( $id, 'oy_aside_photo', true );
-	$private     = in_array( $slug, array( 'prenatal-fitness', 'singing-bowl-massage' ), true );
+	$prenatal    = oy_prenatal_slug() === $slug;
+	$private     = $prenatal || 'singing-bowl-massage' === $slug;
 	?>
 	<div class="container">
 		<div class="layout layout--aside">
@@ -26,8 +27,12 @@ while ( have_posts() ) :
 				<?php if ( $aside_photo ) : ?><div class="frame"><?php echo oy_photo( $aside_photo, '340px' ); // phpcs:ignore ?></div><?php endif; ?>
 				<h2><?php the_title(); ?></h2>
 				<?php echo oy_class_facts( $id, 'aside-facts' ); // phpcs:ignore ?>
-				<?php if ( 'prenatal-fitness' === $slug ) : ?><?php echo oy_fitmummy( 'credential--aside' ); // phpcs:ignore ?><?php endif; ?>
-				<?php echo $private ? oy_btn( oy_contact_url( 'prenatal-fitness' === $slug ? 'prenatal' : 'massage' ), __( 'Ask for a session', 'olivia-yoga' ), 'orchid' ) : oy_btn( oy_book_url(), __( 'Book this class', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore ?>
+				<?php if ( $prenatal ) : ?><?php echo oy_fitmummy( 'credential--aside' ); // phpcs:ignore ?><?php endif; ?>
+				<?php
+				// the online site books a prenatal session through the request form (the booking plugin), the others ask by message
+				$ask = $prenatal && oy_online_only() && function_exists( 'oys_account_url' ) ? add_query_arg( 'topic', 'prenatal', oy_private_url() ) : oy_contact_url( $prenatal ? 'prenatal' : 'massage' );
+				echo $private ? oy_btn( $ask, __( 'Ask for a session', 'olivia-yoga' ), 'orchid' ) : oy_btn( oy_book_url(), __( 'Book this class', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore
+				?>
 			</div></aside>
 		</div>
 	</div>

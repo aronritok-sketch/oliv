@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 $oj_path = oj_path();
-$oj_page = '404' === $oj_path ? array( 'cls' => 'is-page', 'prefooter' => oj_data()['pages']['']['prefooter'] ?? '' ) : oj_page( $oj_path );
+$oj_page = '404' === $oj_path ? array( 'cls' => 'is-page', 'prefooter' => oj_page( '' )['prefooter'] ?? '' ) : oj_page( $oj_path );
 if ( '404' === $oj_path ) {
 	status_header( 404 );
 }
@@ -24,7 +24,7 @@ if ( '404' === $oj_path ) {
 <?php echo oj_main(); // phpcs:ignore -- built HTML ?>
 </main>
 <?php echo oj_fill( $oj_page['prefooter'] ?? '' ); // phpcs:ignore -- built HTML ?>
-<?php echo oj_fill( oj_data()['footer'] ?? '' ); // phpcs:ignore -- built HTML ?>
+<?php echo oj_fill( oj_chrome( 'footer' ) ); // phpcs:ignore -- built HTML ?>
 <?php wp_footer(); ?>
 </body>
 </html>

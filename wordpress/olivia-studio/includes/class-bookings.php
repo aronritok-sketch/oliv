@@ -140,7 +140,7 @@ class OYS_Bookings {
 	/** Which pass credits pay for a session: private, online (joining online) or class. */
 	public static function credit_kind( $session, $mode = 'studio' ) {
 		if ( 'private' === $session->kind ) {
-			return 'private';
+			return OYS_Privates::credit_kind_for( $session );
 		}
 		return 'online' === oys_mode_for( $session, $mode ) ? 'online' : 'class';
 	}

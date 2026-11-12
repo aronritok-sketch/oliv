@@ -38,7 +38,7 @@ class OYS_Passes {
 			'product_id'    => $product['id'],
 			'name'          => $product['name'],
 			'kind'          => OYS_Products::credit_kind( $product ),
-			'credits'       => max( 1, (int) $product['credits'] ),
+			'credits'       => 'prenatal_single' === $product['kind'] ? 1 : max( 1, (int) $product['credits'] ), // a prenatal single: credits = people
 			'validity_days' => (int) $product['validity_days'],
 			'order_id'      => $order_id,
 			'source'        => $source,
@@ -152,7 +152,30 @@ class OYS_Passes {
 			'class'   => __( 'Group classes', 'olivia-studio' ),
 			'online'  => __( 'Online classes', 'olivia-studio' ),
 			'private' => __( 'Private sessions', 'olivia-studio' ),
+			'prenatal'     => __( 'Prenatal sessions', 'olivia-studio' ),
+			'prenatal_duo' => __( 'Prenatal sessions with a friend', 'olivia-studio' ),
 		);
+	}
+
+	/**
+	 * The studio cancelled a group class: every pass that could have paid for it and runs out by a date is valid
+	 * that many days longer (setting `cancel_extend_days`, 7 = the next week's class). Olivia: „amennyiben én mondom
+	 * le, az érvényesség kitolódik”. Returns how many passes were extended.
+	 */
+	public static function extend_for_cancelled( $session ) {
+		$days = (int) OYS_Settings::get( 'cancel_extend_days' );
+		if ( $days <= 0 || ! $session || ! in_array( $session->kind, array( 'group', 'event' ), true ) || ! $session->credits_allowed ) {
+			return 0;
+		}
+		$kinds = 'online' === $session->format ? array( 'online', 'class' ) : ( 'hybrid' === $session->format ? array( 'class', 'online' ) : array( 'class' ) );
+		global $wpdb;
+		$t   = OYS_Install::table( 'passes' );
+		$in  = implode( ',', array_fill( 0, count( $kinds ), '%s' ) );
+		$sql = $wpdb->prepare(
+			"UPDATE $t SET expires_at = DATE_ADD(expires_at, INTERVAL %d DAY) WHERE kind IN ($in) AND credits_left > 0 AND expires_at IS NOT NULL AND expires_at > %s AND created_at < %s", // phpcs:ignore
+			array_merge( array( $days ), $kinds, array( oys_now(), $session->starts_at ) )
+		);
+		return (int) $wpdb->query( $sql ); // phpcs:ignore
 	}
 
 	/** Give a credit back. If the original pass has expired, the credit comes back as a fresh 30-day credit. */

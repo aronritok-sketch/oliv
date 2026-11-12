@@ -8,9 +8,9 @@ defined( 'ABSPATH' ) || exit;
 
 $studio = fn( $sc ) => shortcode_exists( $sc ) ? do_shortcode( '[' . $sc . ']' ) : '';
 $ways   = array(
-	array( __( 'Live group classes', 'olivia-yoga' ), __( 'Hatha flow and slow flow every week, live on Zoom, in Hungarian time.', 'olivia-yoga' ), oy_page_link( 'schedule-pricing' ), 'group', 'lilac' ),
+	array( __( 'Live group classes', 'olivia-yoga' ), __( 'Hatha flow every Wednesday, 18:30 to 20:00, live on Zoom.', 'olivia-yoga' ), oy_page_link( 'schedule-pricing' ), 'group', 'lilac' ),
 	array( __( 'Private online sessions', 'olivia-yoga' ), __( 'One-on-one on video, planned around your body, your goals and your week.', 'olivia-yoga' ), oy_page_link( 'private-yoga' ), 'home', 'pink' ),
-	array( __( 'Prenatal fitness online', 'olivia-yoga' ), __( 'Safe, joyful movement for moms-to-be, privately or in a small group.', 'olivia-yoga' ), oy_class_url( 'prenatal-fitness' ), 'prenatal', 'sage' ),
+	array( __( 'Prenatal fitness online', 'olivia-yoga' ), __( 'One-to-one or with a friend, planned for your trimester and how you feel that day.', 'olivia-yoga' ), oy_class_url( oy_prenatal_slug() ), 'prenatal', 'sage' ),
 	array( __( 'Journal', 'olivia-yoga' ), __( 'Breathing, the eight limbs of yoga and practice notes to read between classes.', 'olivia-yoga' ), oy_page_link( 'journal' ), 'lotus', 'sun' ),
 );
 $needs  = array(

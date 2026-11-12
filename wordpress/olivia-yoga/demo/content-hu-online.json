@@ -1,5 +1,5 @@
 {
-	"_note": "Olivia Jóga – Online: a magyar, csak online kiadás tartalma (oy_edition = hu-online). Szövegek Olivia régi oldaláról (oliviajoga.hu); a csoportos árak és a hatha flow időpontok az ő mostani adatai, a csütörtöki slow flow és a magánóra-árak MINTA.",
+	"_note": "Olivia Jóga – Online: a magyar, csak online kiadás tartalma (oy_edition = hu-online). Szövegek Olivia régi oldaláról (oliviajoga.hu); a csoportos és a kismamatorna-árak, a szerdai 90 perces hatha flow Olivia 2026. 11. 12-i adatai; a magánóra-árak MINTA.",
 	"setup": {
 		"options": {
 			"timezone_string": "Europe/Budapest",
@@ -23,17 +23,32 @@
 			"waiver_text": "Tudomásul veszem, hogy a jóga testmozgással jár, és ezzel sérülésveszély is együtt jár. Kijelentem, hogy egészséges vagyok, vagy az orvosom jóváhagyta a gyakorlást, és óra előtt szólok Oliviának, ha sérülésem van, várandós vagyok vagy egészségügyi problémám van. Odafigyelek a testemre, pihenek, amikor szükségem van rá, és a saját gyakorlásomért magam felelek. Az online órán úgy rendezem be a helyet, hogy biztonságosan tudjak mozogni. Kovács Olíviát nem terheli felelősség az esetleges sérülésért, kivéve a súlyos gondatlanság esetét.",
 			"cancel_policy": "A csoportos órát 12 órával a kezdés előtt még ingyen lemondhatod: az alkalom visszakerül a bérletedre. Ha alkalmi jeggyel foglaltál, helyette egy órakreditet kapsz. A később lemondott vagy kihagyott óra elhasználódik. A magánórát 24 órával előtte lehet áttenni vagy lemondani.",
 			"private_note": "Az első online magánóránk elején kb. 15 perccel tovább beszélgetünk a céljaidról, ezért számolj egy kicsivel több idővel. Később is szánhatunk erre néhány percet.",
-			"pay_later_note": ""
+			"pay_later_note": "",
+			"cancel_extend_days": 7
 		},
 		"products": {
+			"online-1": {
+				"name": "1 alkalmas online jóga jegy",
+				"kind": "online_pack",
+				"credits": 1,
+				"validity_days": 56,
+				"price_cents": 300000,
+				"description": "Egy élő online óra (90 perc). Ajándékutalványként is megveheted.",
+				"features": "1 élő online óra, 90 perc\n8 hétig érvényes",
+				"featured": 0,
+				"giftable": 1,
+				"active": 1,
+				"duration_min": 0,
+				"sort": 9
+			},
 			"online-5": {
 				"name": "5 alkalmas bérlet",
 				"kind": "online_pack",
 				"credits": 5,
-				"validity_days": 0,
-				"price_cents": 1400000,
-				"description": "Öt élő online óra, alkalmanként 2 800 Ft. Nincs lejárata.",
-				"features": "5 élő online óra\nBármelyik csoportos órára\nNincs lejárata\nAjándékutalványként is megveheted",
+				"validity_days": 56,
+				"price_cents": 1300000,
+				"description": "Öt élő online óra (90 perc), alkalmanként 2 600 Ft. 8 hétig érvényes; ha én mondok le egy órát, az érvényessége egy héttel kitolódik.",
+				"features": "5 élő online óra, 90 perc\nBármelyik csoportos órára\n8 hétig érvényes\nHa én mondok le órát, egy héttel tovább érvényes\nAjándékutalványként is megveheted",
 				"featured": 1,
 				"giftable": 1,
 				"active": 1,
@@ -98,6 +113,62 @@
 				"active": 1,
 				"duration_min": 60,
 				"sort": 30
+			},
+			"kismama-1": {
+				"name": "Online kismamatorna, 1 alkalom",
+				"kind": "prenatal_single",
+				"credits": 1,
+				"validity_days": 0,
+				"price_cents": 500000,
+				"description": "60 perc, egyénileg: a trimeszteredhez és az aznapi állapotodhoz igazítva.",
+				"features": "60 perc, négyszemközt\nEgy pár perces beszélgetéssel kezdünk\nAjándékutalványként is megveheted",
+				"featured": 0,
+				"giftable": 1,
+				"active": 1,
+				"duration_min": 60,
+				"sort": 40
+			},
+			"kismama-duo-1": {
+				"name": "Online kismamatorna barátnővel, 1 alkalom",
+				"kind": "prenatal_single",
+				"credits": 2,
+				"validity_days": 0,
+				"price_cents": 800000,
+				"description": "60 perc kettőtöknek: neked és a barátnődnek.",
+				"features": "60 perc, kettőtöknek\nMindkettőtökhöz igazítva",
+				"featured": 0,
+				"giftable": 1,
+				"active": 1,
+				"duration_min": 60,
+				"sort": 41
+			},
+			"kismama-5": {
+				"name": "5 alkalmas online kismamatorna-bérlet",
+				"kind": "prenatal_pack",
+				"credits": 5,
+				"validity_days": 0,
+				"price_cents": 2200000,
+				"description": "Öt 60 perces online kismamatorna, lejárat nélkül.",
+				"features": "5 × 60 perc, egyénileg\nNincs lejárata\nAjándékutalványként is megveheted",
+				"featured": 0,
+				"giftable": 1,
+				"active": 1,
+				"duration_min": 60,
+				"sort": 42
+			},
+			"kismama-duo-5": {
+				"name": "5 alkalmas online kismamatorna-bérlet barátnővel",
+				"kind": "prenatal_duo_pack",
+				"credits": 5,
+				"validity_days": 0,
+				"price_cents": 3600000,
+				"description": "Öt 60 perces online kismamatorna kettőtöknek, lejárat nélkül.",
+				"features": "5 × 60 perc, kettőtöknek\nNincs lejárata",
+				"featured": 0,
+				"giftable": 1,
+				"active": 1,
+				"duration_min": 60,
+				"sort": 43
 			}
 		},
 		"locations": []
@@ -123,7 +194,7 @@
 		"gifts": {
 			"title": "Ajándékutalvány",
 			"slug": "ajandekutalvany",
-			"content": "<p>Ajándékozz 5 alkalmas bérletet vagy magánórát. Az ajándékutalványt e-mailben kapja meg az, akinek szánod, egy kóddal, amit a fiókjában vált be.</p>\n[oys_gift_cards]"
+			"content": "<p>Ajándékozz 1 vagy 5 alkalmas online jóga bérletet, vagy online kismamatornát. Az ajándékutalványt e-mailben kapja meg az, akinek szánod, egy kóddal, amit a fiókjában vált be.</p>\n[oys_gift_cards]"
 		}
 	},
 	"pages": {
@@ -148,7 +219,7 @@
 			"seo_title": "Online jógaórák élőben, magyarul | Hatha flow, slow flow, kismama",
 			"seo_desc": "Élő online jógaórák magyarul Kovács Olíviával: dinamikus hatha flow, lassabb slow flow és kismamatorna otthonról, Zoomon. Kezdőknek is.",
 			"photo": "online-yoga-living-room",
-			"content": "<p>Alapvetően minden hatha jóga óra elősegíti a méregtelenítést, a mély izmok erősítését, a tartásjavítást, a légzés tudatosabb használatának gyakorlását és a belső csend elérését. A gyakorlás alatt részed lesz légzőgyakorlatban, erősítésben, nyújtásban, egyensúlyozásban, flow élményben és relaxációban egyaránt.</p>\n<p>A hatha flow jóga az erősebb és dinamikusabb vonalat képviseli. A slow flow jógán pedig sokkal inkább a megfigyelésen van a hangsúly, ez egy lassabb óratípus a flow élmény mellett. Minden óra élő: ugyanabban az időben gyakorlunk, magyarul, Zoomon.</p>\n[oy_classes]\n<h2>Melyik órát válasszam?</h2>\n<p><strong>Új vagy a jógában, vagy hosszabb kihagyás után térnél vissza?</strong> Kezdd a <a href=\"{{class:slow-flow}}\">Slow Flow</a> órával, ami minden szintnek szól, vagy foglalj egy <a href=\"{{page:private-yoga}}\">online magánórát</a>, hogy négyszemközt tanuld meg az alapokat.</p>\n<p><strong>Már most is aktív vagy: futsz, edzel, túrázol, biciklizel?</strong> A <a href=\"{{class:hatha-flow}}\">Hatha Flow</a> kihívást ad, és közben visszaadja a mozgékonyságot.</p>\n<p><strong>Babát vársz?</strong> A <a href=\"{{class:prenatal-fitness}}\">kismamatorna</a> biztonságosan tart mozgásban, kiscsoportban vagy négyszemközt.</p>\n<h2>Hogyan zajlik egy online óra?</h2>\n<p>Lefoglalod az órát az <a href=\"{{page:schedule-pricing}}\">órarendből</a>, és e-mailben megkapod a Zoom-linket; a fiókodban is megtalálod. Pár perccel a kezdés előtt csatlakozz, hogy köszönhessünk egymásnak, és ha kell, beállítsuk a kamerát. Ha bekapcsolod a kamerádat, látlak, és tudok segíteni a pózokban. A képedet csak én látom.</p>\n[oy_booking_link]"
+			"content": "<p>Alapvetően minden hatha jóga óra elősegíti a méregtelenítést, a mély izmok erősítését, a tartásjavítást, a légzés tudatosabb használatának gyakorlását és a belső csend elérését. A gyakorlás alatt részed lesz légzőgyakorlatban, erősítésben, nyújtásban, egyensúlyozásban, flow élményben és relaxációban egyaránt.</p>\n<p>A hatha flow jóga az erősebb és dinamikusabb vonalat képviseli. A slow flow jógán pedig sokkal inkább a megfigyelésen van a hangsúly, ez egy lassabb óratípus a flow élmény mellett. Minden óra élő: ugyanabban az időben gyakorlunk, magyarul, Zoomon.</p>\n[oy_classes]\n<h2>Melyik órát válasszam?</h2>\n<p><strong>Új vagy a jógában, vagy hosszabb kihagyás után térnél vissza?</strong> Kezdd a <a href=\"{{class:slow-flow}}\">Slow Flow</a> órával, ami minden szintnek szól, vagy foglalj egy <a href=\"{{page:private-yoga}}\">online magánórát</a>, hogy négyszemközt tanuld meg az alapokat.</p>\n<p><strong>Már most is aktív vagy: futsz, edzel, túrázol, biciklizel?</strong> A <a href=\"{{class:hatha-flow}}\">Hatha Flow</a> kihívást ad, és közben visszaadja a mozgékonyságot.</p>\n<p><strong>Babát vársz?</strong> A <a href=\"{{class:kismamatorna}}\">kismamatorna</a> biztonságosan tart mozgásban, kiscsoportban vagy négyszemközt.</p>\n<h2>Hogyan zajlik egy online óra?</h2>\n<p>Lefoglalod az órát az <a href=\"{{page:schedule-pricing}}\">órarendből</a>, és e-mailben megkapod a Zoom-linket; a fiókodban is megtalálod. Pár perccel a kezdés előtt csatlakozz, hogy köszönhessünk egymásnak, és ha kell, beállítsuk a kamerát. Ha bekapcsolod a kamerádat, látlak, és tudok segíteni a pózokban. A képedet csak én látom.</p>\n[oy_booking_link]"
 		},
 		"private-yoga": {
 			"title": "Online magánóra",
@@ -160,11 +231,11 @@
 		},
 		"schedule-pricing": {
 			"title": "Órarend és árak",
-			"excerpt": "Heti élő online hatha flow órák magyar idő szerint: alkalmi jegy 3 000 Ft, 5 alkalmas bérlet 14 000 Ft, magánóra és ajándékutalvány.",
+			"excerpt": "Élő online hatha flow óra szerdánként 18:30-tól 20:00-ig magyar idő szerint: alkalmi jegy 3 000 Ft, 5 alkalmas bérlet 13 000 Ft, magánóra és ajándékutalvány.",
 			"seo_title": "Online jóga órarend és árak | Élő órák magyarul",
-			"seo_desc": "Heti élő online jógaórák magyar idő szerint: hatha flow és slow flow. Alkalmi jegy 3 000 Ft, 5 alkalmas bérlet 14 000 Ft lejárat nélkül, online magánóra és ajándékutalvány.",
+			"seo_desc": "Élő online jóga szerdánként 18:30-tól 20:00-ig, magyar idő szerint. Alkalmi jegy 3 000 Ft, 5 alkalmas bérlet 13 000 Ft (8 hétig érvényes), online kismamatorna és ajándékutalvány.",
 			"photo": "olivia-dancer-home",
-			"content": "<h2>Heti élő online órák</h2>\n<p>Az időpontok magyar idő szerint értendők. Minden óra élő, Zoomon, magyarul.</p>\n[oy_schedule]\n<p>Kérlek, foglalj előre, hogy időben megkapd a linket. Az órák legalább 3 fővel indulnak. Kezdőket minden órára szeretettel várok.</p>\n<h2>Árak</h2>\n[oy_pricing]\n<h2 id=\"gift-cards\">Ajándékutalványok</h2>\n<p>Ajándékozz 5 alkalmas bérletet vagy magánórát. Az ajándékutalványt e-mailben kapja meg az, akinek szánod, egy kóddal, amit a fiókjában vált be.</p>\n<p>[oy_gift_link]</p>\n<h2>Jó tudni</h2>\n<h3>Amire szükséged lesz</h3>\n<ul>\n<li>Jógaszőnyeg, egy ülőpárna és egy pléd a relaxációhoz</li>\n<li>Kényelmes öltözet és víz, ha megszomjaznál; a gyakorlást mezítláb ajánlom</li>\n<li>Telefon, tablet vagy laptop kamerával, és egy jógamatracnyi hely</li>\n</ul>\n<p><strong>Bérlet:</strong> az 5 alkalmas bérletnek nincs lejárata, a saját ritmusodban használod fel.</p>\n<p><strong>Lemondás:</strong> a csoportos órát 12 órával előtte még ingyen lemondhatod, és az alkalom visszakerül a bérletedre. Ha 3 főnél kevesebben jelentkeznek, szólok, és visszakapod az alkalmat.</p>\n<p><strong>Új vagy a jógában?</strong> Olvasd el a <a href=\"{{page:faq}}\">leggyakoribb kérdéseket</a>, vagy <a href=\"{{page:contact}}\">írj nekem</a> az első órád előtt.</p>"
+			"content": "<h2>Élő online jóga szerdánként</h2>\n<p>Szerdánként 18:30-tól 20:00-ig, 90 percben. A gyakorlás alatt részed lesz légzőgyakorlatban, erősítésben, nyújtásban, egyensúlyozásban, flow élményben és relaxációban egyaránt, közben pedig hétköznapi példákon keresztül, elméleti és gyakorlati síkon is jobban megismerkedhetsz a jógikus életvitellel. Az órák csoportosak, de senkinek nem kell „szerepelnie”: ha szeretnéd, beszélgethetünk és kapcsolódhatunk is.</p>\n<p>Az időpontok magyar idő szerint értendők. Minden óra élő, Zoomon, magyarul.</p>\n[oy_schedule]\n<p>Kérlek, foglalj előre, hogy időben megkapd a linket. Az órák legalább 3 fővel indulnak. Kezdőket minden órára szeretettel várok.</p>\n<h2>Árak</h2>\n[oy_pricing]\n<h2 id=\"gift-cards\">Ajándékutalványok</h2>\n<p>Ajándékozz 1 vagy 5 alkalmas online jóga bérletet, vagy online kismamatornát. Az ajándékutalványt e-mailben kapja meg az, akinek szánod, egy kóddal, amit a fiókjában vált be.</p>\n<p>[oy_gift_link]</p>\n<h2>Jó tudni</h2>\n<h3>Amire szükséged lesz</h3>\n<ul>\n<li>Jógaszőnyeg, egy ülőpárna és egy pléd a relaxációhoz</li>\n<li>Kényelmes öltözet és víz, ha megszomjaznál; a gyakorlást mezítláb ajánlom</li>\n<li>Telefon, tablet vagy laptop kamerával, és egy jógamatracnyi hely</li>\n</ul>\n<p><strong>Bérlet:</strong> az 5 alkalmas bérlet 8 hétig érvényes. Ha én mondok le egy órát, az érvényessége egy héttel kitolódik.</p>\n<p><strong>Lemondás:</strong> a csoportos órát 12 órával előtte még ingyen lemondhatod, és az alkalom visszakerül a bérletedre. Ha 3 főnél kevesebben jelentkeznek, szólok, és visszakapod az alkalmat.</p>\n<p><strong>Új vagy a jógában?</strong> Olvasd el a <a href=\"{{page:faq}}\">leggyakoribb kérdéseket</a>, vagy <a href=\"{{page:contact}}\">írj nekem</a> az első órád előtt.</p>"
 		},
 		"faq": {
 			"title": "Gyakori kérdések",
@@ -195,13 +266,13 @@
 		"hatha-flow": {
 			"title": "Hatha Flow online",
 			"excerpt": "A tanításom erősebb, dinamikusabb oldala: légzés vezette sorozatok, kitartott erősítő pózok, egyensúlyozás és egy áramlás, amiben elmerülhetsz.",
-			"duration": "60 perc",
+			"duration": "90 perc",
 			"lang": "magyar",
 			"seo_title": "Hatha flow online jógaóra élőben, magyarul",
 			"photo": "olivia-mandala-lunge",
 			"aside": "deck-down-dog",
 			"link": "",
-			"content": "<h2>Mi történik egy Hatha Flow órán</h2>\n<p>Megérkezéssel kezdünk: néhány perc légzés, hogy a napot a nappali ajtaján kívül hagyd. Aztán felmelegítünk napüdvözletekkel, álló sorozatokkal, a has, a hát és a láb mély izmait erősítő gyakorlatokkal, és fókuszt kívánó egyensúlyozó pózokkal. Van, ami a légzéssel áramlik, és van, amit kicsit tovább tartunk, hogy mindenkinek megérkezzen a figyelme.</p>\n<p>Az óra utolsó része lelassul: nyújtás, néhány pillanat csend és egy hosszú relaxáció.</p>\n<h2>Kinek szól</h2>\n<p>A Hatha Flow az erősebb, dinamikusabb óra. Neked való, ha a mozgás már valamilyen formában része az életednek, legyen az séta, edzőterem, futás, túra vagy bicikli, és könnyen lejutsz a földre és fel. Nem kell hajlékonynak lenned.</p>\n<h2>Amit hazaviszel</h2>\n<ul>\n<li>Erő a has és a hát mély izmaiban, ami a jó tartást támogatja</li>\n<li>Szabadabb csípő, váll és gerinc</li>\n<li>Stabilabb egyensúly és fókusz</li>\n<li>Egy légzés, amit akkor is használhatsz, amikor hangos a nap</li>\n</ul>\n<h2>Online, élőben</h2>\n<p>Az óra élő, Zoomon, magyarul. Kell hozzá egy jógamatracnyi hely, és egy kamerás telefon vagy laptop. Ha bekapcsolod a kamerádat, látlak, és tudok segíteni a pózokban.</p>\n[oy_booking_link]"
+			"content": "<h2>Mi történik egy Hatha Flow órán</h2>\n<p>Megérkezéssel kezdünk: néhány perc légzés, hogy a napot a nappali ajtaján kívül hagyd. Aztán felmelegítünk napüdvözletekkel, álló sorozatokkal, a has, a hát és a láb mély izmait erősítő gyakorlatokkal, és fókuszt kívánó egyensúlyozó pózokkal. Van, ami a légzéssel áramlik, és van, amit kicsit tovább tartunk, hogy mindenkinek megérkezzen a figyelme.</p>\n<p>Az óra utolsó része lelassul: nyújtás, néhány pillanat csend és egy hosszú relaxáció.</p>\n<h2>Kinek szól</h2>\n<p>A Hatha Flow az erősebb, dinamikusabb óra. Neked való, ha a mozgás már valamilyen formában része az életednek, legyen az séta, edzőterem, futás, túra vagy bicikli, és könnyen lejutsz a földre és fel. Nem kell hajlékonynak lenned.</p>\n<h2>Amit hazaviszel</h2>\n<ul>\n<li>Erő a has és a hát mély izmaiban, ami a jó tartást támogatja</li>\n<li>Szabadabb csípő, váll és gerinc</li>\n<li>Stabilabb egyensúly és fókusz</li>\n<li>Egy légzés, amit akkor is használhatsz, amikor hangos a nap</li>\n</ul>\n<h2>Szerdánként 18:30-tól 20:00-ig</h2>\n<p>A gyakorlás alatt részed lesz légzőgyakorlatban, erősítésben, nyújtásban, egyensúlyozásban, flow élményben és relaxációban egyaránt, közben pedig hétköznapi példákon keresztül, elméleti és gyakorlati síkon is jobban megismerkedhetsz a jógikus életvitellel. Az órák csoportosak, de senkinek nem kell „szerepelnie”: ha szeretnéd, beszélgethetünk és kapcsolódhatunk is.</p>\n<h2>Online, élőben</h2>\n<p>Az óra élő, Zoomon, magyarul. Kell hozzá egy jógamatracnyi hely, és egy kamerás telefon vagy laptop. Ha bekapcsolod a kamerádat, látlak, és tudok segíteni a pózokban.</p>\n[oy_booking_link]"
 		},
 		"slow-flow": {
 			"title": "Slow Flow online",
@@ -214,16 +285,16 @@
 			"link": "",
 			"content": "<h2>Lassabb óra, több térrel a megfigyelésre</h2>\n<p>A Slow Flow is mozog, mert a flow élmény minden órámon fontos, de a tempó teret hagy arra, hogy megérezd az egyes formákat, észrevedd, hol kapaszkodsz, és egy kicsit elengedj. Több idő jut a földre, több a nyújtás, és hosszabb a relaxáció.</p>\n<h2>Kinek szól</h2>\n<p>A Slow Flow minden szintnek szól: teljesen kezdőknek, kihagyás után visszatérőknek, sokat ülőknek, és mindenkinek, aki a nap végén egyszerre pörög és fáradt. A tapasztalt gyakorlók is szeretik, az erősebb edzések ellensúlyaként.</p>\n<h2>Mire számíthatsz</h2>\n<ul>\n<li>Gyengéd légzés a megérkezéshez</li>\n<li>Mobilitás a gerincnek, a csípőnek és a vállnak</li>\n<li>Lassú, tudatos álló és egyensúlyozó gyakorlatok</li>\n<li>Hosszabban kitartott nyújtások a földön</li>\n<li>Vezetett relaxáció vagy meditáció a végén</li>\n</ul>\n<h2>Online, élőben</h2>\n<p>Az óra élő, Zoomon, magyarul. A relaxációhoz készíts magad mellé egy párnát és egy plédet, és ha teheted, halkítsd le a telefonod. Az esti időpont jó lezárása lehet egy hosszú napnak.</p>\n[oy_booking_link]"
 		},
-		"prenatal-fitness": {
-			"title": "Kismamatorna online",
-			"excerpt": "Biztonságos, örömteli mozgás várandósan, élőben, online: erő, mobilitás, légzés és felkészülés a szülésre.",
-			"duration": "30, 45 vagy 60 perc",
+		"kismamatorna": {
+			"title": "Online kismamatorna",
+			"excerpt": "Egyénre szabott, 60 perces online kismamatorna, egyedül vagy a barátnőddel: a trimeszteredhez, a hetedhez és az aznapi állapotodhoz igazítva.",
+			"duration": "60 perc",
 			"lang": "magyar",
-			"seo_title": "Kismama torna és kismama jóga online, élőben, magyarul",
+			"seo_title": "Online kismamatorna élőben, egyénileg vagy barátnővel",
 			"photo": "prenatal-ball-training",
 			"aside": "",
 			"link": "",
-			"content": "<p>A várandósság nem ok arra, hogy lemondj a mozgás öröméről. Ezek az órák segítenek erősnek és mozgékonynak maradni, könnyen lélegezni, és testileg-lelkileg felkészülten érkezni a szüléshez. A szülés után pedig együtt dolgozunk a gyengéd, hatékony regeneráción.</p>\n<h2>Amin dolgozunk</h2>\n<ul>\n<li>Erő a hátnak, a csípőnek és a lábnak, amelyek a változó testet hordozzák</li>\n<li>Gátizom-tudatosság és tartás</li>\n<li>Légzés a vajúdáshoz és a nyugalomhoz</li>\n<li>Mobilitás, ami enyhíti a várandósság kellemetlenségeit</li>\n<li>Relaxáció, mert a pihenés is a felkészülés része</li>\n</ul>\n<h2>Hogyan működik</h2>\n<p>Az órák élőben, online zajlanak, négyszemközt vagy kismamák kiscsoportjában, 30, 45 vagy 60 percben; az időpontot együtt egyeztetjük. Kérlek, kezdés előtt egyeztess a nőgyógyászoddal vagy a védőnőddel, és mondd el, hányadik hétben jársz és hogy érzed magad. Minden óra igazodik a trimeszteredhez és az aznapi állapotodhoz.</p>\n<p>[oy_button url=\"{{contact:prenatal}}\" label=\"Időpontot kérek\"]</p>"
+			"content": "<p>Az online kismamatorna egyéni óra, de jöhetsz akár a barátnőddel is. Ez a 60 perc minden kismamánál és minden alkalommal egyénre szabott: a jelenlegi állapotodtól és hangulatodtól is függ, és a gyakorlatokat az is meghatározza, éppen hányadik trimeszterben, akár hányadik hétben jársz. Minden órát egy pár perces felmérés, beszélgetés előz meg arról, hogyan érzed magad, milyen az állapotod.</p>\n<p>A várandósság nem ok arra, hogy lemondj a mozgás öröméről. Ezek az órák segítenek erősnek és mozgékonynak maradni, könnyen lélegezni, és testileg-lelkileg felkészülten érkezni a szüléshez.</p>\n<h2>Amin dolgozunk</h2>\n<ul>\n<li>Erő a hátnak, a csípőnek és a lábnak, amelyek a változó testet hordozzák</li>\n<li>Gátizom-tudatosság és tartás</li>\n<li>Légzés a vajúdáshoz és a nyugalomhoz</li>\n<li>Mobilitás, ami enyhíti a várandósság kellemetlenségeit</li>\n<li>Relaxáció, mert a pihenés is a felkészülés része</li>\n</ul>\n<h2>Árak</h2>\n<ul>\n<li><strong>1 alkalom:</strong> 5 000 Ft (60 perc)</li>\n<li><strong>5 alkalmas bérlet:</strong> 22 000 Ft, lejárat nélkül</li>\n<li><strong>Barátnővel, 1 alkalom:</strong> 8 000 Ft kettőtöknek</li>\n<li><strong>Barátnővel, 5 alkalmas bérlet:</strong> 36 000 Ft kettőtöknek, lejárat nélkül</li>\n</ul>\n<h2>Hogyan működik</h2>\n<p>Az órák élőben, online zajlanak; az időpontot együtt egyeztetjük. Kérlek, kezdés előtt egyeztess a nőgyógyászoddal vagy a védőnőddel, és írd meg, hányadik hétben jársz és hogy érzed magad.</p>\n<p>[oy_button url=\"{{private:prenatal}}\" label=\"Időpontot kérek\"]</p>"
 		},
 		"private-yoga": {
 			"title": "Online magánóra",
@@ -296,7 +367,7 @@
 		{
 			"home": "",
 			"q": "Mivel tudom fizetni a jóga órát?",
-			"a": "Online, foglaláskor bankkártyával, Apple Pay-jel vagy Google Pay-jel, forintban. Alkalmi jegyet (3 000 Ft) és 5 alkalmas bérletet (14 000 Ft) is vehetsz; a bérletnek nincs lejárata."
+			"a": "Online, foglaláskor bankkártyával, Apple Pay-jel vagy Google Pay-jel, forintban. Alkalmi jegyet (3 000 Ft) és 5 alkalmas bérletet (13 000 Ft) is vehetsz; a bérlet 8 hétig érvényes, és ha én mondok le egy órát, egy héttel kitolódik."
 		},
 		{
 			"home": "",
@@ -600,46 +671,10 @@
 			"online_capacity": 20,
 			"price": "3000",
 			"note": "",
-			"day": 2,
-			"start": "20:00",
-			"end": "21:00",
-			"class": "hatha-flow"
-		},
-		{
-			"location": "Online (Zoom)",
-			"lang": "hu",
-			"format": "online",
-			"online_capacity": 20,
-			"price": "3000",
-			"note": "",
 			"day": 3,
 			"start": "18:30",
-			"end": "19:30",
+			"end": "20:00",
 			"class": "hatha-flow"
-		},
-		{
-			"location": "Online (Zoom)",
-			"lang": "hu",
-			"format": "online",
-			"online_capacity": 20,
-			"price": "3000",
-			"note": "",
-			"day": 3,
-			"start": "20:00",
-			"end": "21:00",
-			"class": "hatha-flow"
-		},
-		{
-			"location": "Online (Zoom)",
-			"lang": "hu",
-			"format": "online",
-			"online_capacity": 20,
-			"price": "3000",
-			"note": "",
-			"day": 4,
-			"start": "19:00",
-			"end": "20:30",
-			"class": "slow-flow"
 		}
 	],
 	"events": []

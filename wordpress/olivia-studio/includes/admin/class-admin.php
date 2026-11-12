@@ -562,14 +562,14 @@ class OYS_Admin {
 				$u = get_userdata( $r->user_id );
 				self::header( sprintf( __( 'Private request from %s', 'olivia-studio' ), $u ? $u->display_name : '' ) );
 				echo '<div class="oys-box"><p><b>' . self::user_label( $r->user_id ) . '</b> · ' . esc_html( $u ? $u->user_email : '' ) . ' · ' . esc_html( get_user_meta( $r->user_id, 'oys_phone', true ) ) . '</p>' // phpcs:ignore
-					. '<p>' . (int) $r->duration_min . ' min · ' . (int) $r->people . ' ' . esc_html__( 'people', 'olivia-studio' ) . ' · ' . esc_html( $types[ $r->location_type ] ?? '' ) . ' · ' . esc_html( $r->address ) . '</p>'
+					. '<p><b>' . esc_html( OYS_Privates::topics()[ $r->topic ?? 'yoga' ] ?? '' ) . '</b> · ' . (int) $r->duration_min . ' min · ' . (int) $r->people . ' ' . esc_html__( 'people', 'olivia-studio' ) . ' · ' . esc_html( $types[ $r->location_type ] ?? '' ) . ' · ' . esc_html( $r->address ) . '</p>'
 					. '<p><b>' . esc_html__( 'Preferred times', 'olivia-studio' ) . '</b><br>' . nl2br( esc_html( $r->preferred ) ) . '</p>'
 					. '<p><b>' . esc_html__( 'Notes', 'olivia-studio' ) . '</b><br>' . nl2br( esc_html( $r->notes ) ) . '</p>'
 					. '<p><b>' . esc_html__( 'Health notes on profile', 'olivia-studio' ) . '</b><br>' . nl2br( esc_html( get_user_meta( $r->user_id, 'oys_health_notes', true ) ) ) . '</p>'
 					. '<p>' . esc_html__( 'Status', 'olivia-studio' ) . ': <b>' . esc_html( $st[ $r->status ] ?? $r->status ) . '</b></p></div>';
 				if ( in_array( $r->status, array( 'new', 'offered' ), true ) ) {
 					$s     = $r->session_id ? OYS_Schedule::get( $r->session_id ) : null;
-					$price = $r->price_cents ?: OYS_Products::private_price_for( $r->duration_min, 'online' === $r->location_type );
+					$price = $r->price_cents ?: ( 'prenatal' === ( $r->topic ?? '' ) ? OYS_Products::prenatal_price_for( (int) $r->people ) : OYS_Products::private_price_for( $r->duration_min, 'online' === $r->location_type ) );
 					echo '<h2>' . ( $s ? esc_html__( 'Change the offer', 'olivia-studio' ) : esc_html__( 'Send an offer', 'olivia-studio' ) ) . '</h2>' . self::form( 'private_offer' ) . '<input type="hidden" name="id" value="' . (int) $r->id . '"><table class="form-table">' // phpcs:ignore
 						. '<tr><th>' . esc_html__( 'Date and time', 'olivia-studio' ) . '</th><td><input type="datetime-local" name="starts" required value="' . esc_attr( $s ? oys_utc_to_local_input( $s->starts_at ) : '' ) . '"></td></tr>'
 						. '<tr><th>' . esc_html__( 'Length (min)', 'olivia-studio' ) . '</th><td><select name="duration">' . implode( '', array_map( fn( $d ) => '<option value="' . $d . '"' . selected( (int) $r->duration_min, $d, false ) . '>' . $d . '</option>', array( 60, 75, 90 ) ) ) . '</select></td></tr>'
@@ -927,6 +927,7 @@ class OYS_Admin {
 			'cancel_hours'          => __( 'Free cancellation until (hours before a group class)', 'olivia-studio' ),
 			'private_cancel_hours'  => __( 'Free cancellation until (hours before a private session)', 'olivia-studio' ),
 			'dropin_credit_days'    => __( 'Credit for a cancelled drop-in is valid for (days)', 'olivia-studio' ),
+			'cancel_extend_days'    => __( 'When the studio cancels a class, passes are valid longer by (days, 0 = off)', 'olivia-studio' ),
 			'booking_window_days'   => __( 'Show classes this many days ahead', 'olivia-studio' ),
 			'booking_close_minutes' => __( 'Online booking closes (minutes before start)', 'olivia-studio' ),
 			'waitlist_cutoff_hours' => __( 'Waitlist stops moving people in (hours before start)', 'olivia-studio' ),

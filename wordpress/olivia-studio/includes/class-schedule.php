@@ -363,6 +363,7 @@ class OYS_Schedule {
 			$n++;
 		}
 		OYS_Bookings::clear_waitlist( $session_id );
+		OYS_Passes::extend_for_cancelled( $session );
 		return $n;
 	}
 

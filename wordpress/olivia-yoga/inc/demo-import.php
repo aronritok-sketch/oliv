@@ -418,3 +418,82 @@ function oy_import_all( $refresh = false ) {
 	flush_rewrite_rules();
 	return $log;
 }
+
+/**
+ * The online site (hu-online) after Olivia's notes of 12 November 2026, on a site set up before: her new prices
+ * (5 classes 13 000 Ft for 8 weeks, a 1-class gift, the prenatal sessions), Wednesday 18:30–20:00 as the only weekly
+ * class, the prenatal class at /online-jogaorak/kismamatorna/, and the class texts and pages from the content file.
+ * Runs once (option oy_online_rev); on a fresh site the normal import does all this.
+ */
+function oy_migrate_online() {
+	$rev = '2026-11-12';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_online_rev' ) === $rev ) {
+		return array();
+	}
+	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+	$log  = array();
+	if ( class_exists( 'OYS_Products' ) ) {
+		$all = get_option( OYS_Products::OPTION, array() );
+		$all = is_array( $all ) ? $all : array();
+		foreach ( (array) ( $data['setup']['products'] ?? array() ) as $id => $p ) {
+			if ( 'online-5' === $id || 'online-1' === $id || str_starts_with( $id, 'kismama-' ) ) {
+				$all[ $id ] = $p;
+			}
+		}
+		// the plugin's dollar-priced default passes, if an upgrade added them: not on this site
+		foreach ( OYS_Products::defaults() as $id => $p ) {
+			if ( isset( $all[ $id ] ) && ! isset( $data['setup']['products'][ $id ] ) && (int) $all[ $id ]['price_cents'] === (int) $p['price_cents'] ) {
+				$all[ $id ]['active'] = 0;
+			}
+		}
+		update_option( OYS_Products::OPTION, $all );
+		$log[] = 'prices: 12 November';
+	}
+	if ( class_exists( 'OYS_Settings' ) && isset( $data['setup']['studio']['cancel_extend_days'] ) ) {
+		OYS_Settings::update( array( 'cancel_extend_days' => (int) $data['setup']['studio']['cancel_extend_days'] ) );
+	}
+	$old = get_page_by_path( 'prenatal-fitness', OBJECT, 'oy_class' );
+	if ( $old && ! get_page_by_path( 'kismamatorna', OBJECT, 'oy_class' ) ) {
+		wp_update_post( array( 'ID' => $old->ID, 'post_name' => 'kismamatorna' ) );
+		$log[] = 'prenatal class: /kismamatorna/';
+	}
+	if ( class_exists( 'OYS_Schedule' ) ) {
+		global $wpdb;
+		$want = $data['sessions'][0] ?? null;
+		$keep = 0;
+		foreach ( OYS_Schedule::templates() as $t ) {
+			$is = $want && (int) $t->weekday === (int) $want['day'] && $t->start_time === $want['start'] && $t->class_slug === $want['class'];
+			if ( $is && ! $keep ) {
+				[ $sh, $sm ] = array_map( 'intval', explode( ':', $want['start'] ) );
+				[ $eh, $em ] = array_map( 'intval', explode( ':', $want['end'] ) );
+				OYS_Schedule::save_template( array_merge( (array) $t, array( 'duration_min' => ( $eh * 60 + $em ) - ( $sh * 60 + $sm ), 'active' => 1 ) ), $t->id );
+				$keep = (int) $t->id;
+				continue;
+			}
+			if ( (int) $t->active ) {
+				OYS_Schedule::save_template( array_merge( (array) $t, array( 'active' => 0 ) ), $t->id );
+			}
+		}
+		// the future dates of the other weekly classes go (cancelled with a refund where someone booked), the kept
+		// class's future dates get the new end
+		$s   = OYS_Install::table( 'sessions' );
+		$now = gmdate( 'Y-m-d H:i:s' );
+		foreach ( $wpdb->get_results( $wpdb->prepare( "SELECT * FROM $s WHERE kind = 'group' AND status = 'scheduled' AND starts_at > %s AND template_id > 0", $now ) ) as $row ) { // phpcs:ignore
+			if ( (int) $row->template_id === $keep ) {
+				$tpl = OYS_Schedule::template( $keep );
+				$wpdb->update( $s, array( 'ends_at' => gmdate( 'Y-m-d H:i:s', oys_ts( $row->starts_at ) + (int) $tpl->duration_min * 60 ) ), array( 'id' => $row->id ) );
+			} elseif ( (int) $row->booked + (int) $row->online_booked > 0 ) {
+				OYS_Schedule::cancel_session( $row->id, 'Az órarend változott: szerdánként 18:30-tól 20:00-ig tartom az élő online órát.' );
+			} else {
+				$wpdb->delete( $s, array( 'id' => $row->id ) );
+			}
+		}
+		$made  = OYS_Schedule::generate();
+		$log[] = sprintf( 'timetable: Wednesday 18:30–20:00 (%d new dates)', $made );
+	}
+	kses_remove_filters();
+	$log = array_merge( $log, oy_import_all( true ) );
+	kses_init_filters();
+	update_option( 'oy_online_rev', $rev );
+	return $log;
+}

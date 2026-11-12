@@ -3386,3 +3386,54 @@ msgstr "Amanecer en la arena, si el tiempo lo permite"
 #. Default text stored as data (email template, product or timetable).
 msgid "Live-Music Slow Flow with Handpan"
 msgstr "Slow flow con música en vivo y handpan"
+
+msgid "Prenatal session pack"
+msgstr "Bono de sesiones prenatales"
+
+msgid "Prenatal session pack, with a friend"
+msgstr "Bono de sesiones prenatales, con una amiga"
+
+msgid "Single prenatal session (price list and gifts; credits = people)"
+msgstr "Sesión prenatal suelta (precios y regalos; créditos = personas)"
+
+msgid "Prenatal sessions"
+msgstr "Sesiones prenatales"
+
+msgid "Prenatal sessions with a friend"
+msgstr "Sesiones prenatales con una amiga"
+
+msgid "When the studio cancels a class, passes are valid longer by (days, 0 = off)"
+msgstr "Si el estudio cancela una clase, los bonos valen más tiempo (días, 0 = no)"
+
+msgid "Private yoga"
+msgstr "Yoga privado"
+
+msgid "Prenatal session"
+msgstr "Sesión prenatal"
+
+msgid "Prenatal session with a friend (%d min)"
+msgstr "Sesión prenatal con una amiga (%d min)"
+
+msgid "Prenatal session (%d min)"
+msgstr "Sesión prenatal (%d min)"
+
+msgid "Request a prenatal session"
+msgstr "Pedir una sesión prenatal"
+
+msgid "60 minutes, for the two of you"
+msgstr "60 minutos, para las dos"
+
+msgid "60 minutes, one-to-one"
+msgstr "60 minutos, individual"
+
+msgid "One-to-one, or with a friend: planned for your trimester and how you feel that day."
+msgstr "Individual o con una amiga: según tu trimestre y cómo te sientas ese día."
+
+msgid "Prenatal session, %d min"
+msgstr "Sesión prenatal, %d min"
+
+msgid "What would you like?"
+msgstr "¿Qué te gustaría?"
+
+msgid "Prenatal session: always 60 minutes, alone (%1$s) or with a friend (%2$s for the two of you). Tell me which trimester or week you are in."
+msgstr "Sesión prenatal: siempre 60 minutos, sola (%1$s) o con una amiga (%2$s para las dos). Cuéntame en qué trimestre o semana estás."

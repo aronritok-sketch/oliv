@@ -4,6 +4,7 @@
     python3 tools/images.py cutouts                 the "A jógáról - Tőlem" pictures and the post covers: the white
                                                     around them (made to blend into the old site's white page)
                                                     becomes transparent → old/<id>-800.webp (+ -1600.webp)
+    python3 -I tools/images.py korszak <folder>     the "egy korszak lezárult" photos (Drive, 2026-11-12) → new/korszak-*
     python3 -I tools/images.py cards <folder>       the journal cards: Olivia's full photos (white edges cut) → new/cikk-*
     python3 -I tools/images.py import <folder>      Olivia's photos from her Drive ("Főoldal kedvenc képek"):
                                                     <folder>/<name>.jpg → assets/img/new/<key>-800.jpg, -1600.jpg
@@ -46,6 +47,51 @@ CARDS = {
     'yama': '3.png', 'niyama': '4.png', 'ászana': '5.png', 'pránajáma': '6.png', 'pratyahara': 'Olívia (18).jpg',
     'dhárana': '8.png', 'dhjána': '9.png', 'szamádhi': '10.png',
 }
+
+
+# 2026-11-12 (Olivia, „oliviajoga.hu módosítások 11.12.”): 3 years of group classes – the photos for the "egy korszak
+# lezárult" section (Drive folder 10yw9EXv5U60-_X1461bsTLTQDKAvDGnc). File name → key, Hungarian alt text.
+KORSZAK = {
+    'joga-18-kerulet-pestszentlorinc.jpg': ('korszak-01', 'Csoportos jógaóra a 18. kerületben, Pestszentlőrincen, a Prána jógaközpontban'),
+    'joga-csepel-korall.jpg': ('korszak-02', 'Szabadtéri jógaóra Csepelen, a Korall sportsziget udvarán, 21. kerület'),
+    'IMG_0024.jpg': ('korszak-03', 'Kovács Olívia oldalnyújtás közben egy szabadtéri csoportos jógaórán'),
+    'joga-11-kerulet-ujbuda.jpg': ('korszak-04', 'Esti jógaóra egy nyitott pavilonban, a résztvevők gyermekpózban'),
+    'IMG_4910.jpg': ('korszak-05', 'Mosolygó csoport egy jógaóra után'),
+    'IMG_0904.jpg': ('korszak-06', 'Csoportos jógaóra egy fesztivál pavilonjában'),
+    'joga-csepel-kovacs-olivia.jpg': ('korszak-07', 'Jóga Csepelen naplementében, a résztvevők az udvaron gyakorolnak'),
+    'IMG_4405.jpg': ('korszak-08', 'Közös fotó egy jógaóra után'),
+    '20260612_170044.jpg': ('korszak-09', 'A jógacsoport közös fotója a szabadban'),
+    'IMG_5438.jpg': ('korszak-10', 'Szabadtéri jógaóra Csepelen, a Korall sportsziget udvarán'),
+    'Photoroom_20250613_191127.jpeg': ('korszak-11', 'Szabadtéri csoportos jógaóra a Korall sportszigeten'),
+    'IMG_0346.jpg': ('korszak-12', 'Esti szabadtéri jógaóra a fűben'),
+    'joga-pesterzsebet-csili.jpg': ('korszak-13', 'Csoportos jógaóra egy tükrös teremben'),
+    '23565.jpg': ('korszak-14', 'Jógaóra a Prána jógaközpontban, 18. kerület'),
+    'att-cUOp976a.jpg': ('korszak-15', 'Jógaóra egy virágos ajtókeretű teremben'),
+    'polish_save.png': ('korszak-16', 'A jógacsoport közös fotója a Prána jógaközpontban'),
+    'csapatepito-otlet.jpg': ('korszak-17', 'Csapatépítő jóga egy tornateremben, fapózban'),
+    'IMG_4867.jpg': ('korszak-18', 'Kovács Olívia vezeti az órát egy világos teremben'),
+}
+
+
+def import_korszak(folder):
+    mp = os.path.join(HERE, 'content', 'new-photos.json')
+    meta = json.load(open(mp))
+    alts = {}
+    for name, (key, alt) in KORSZAK.items():
+        im = ImageOps.exif_transpose(Image.open(os.path.join(folder, name))).convert('RGB')
+        for w in (800, 1600):
+            if w == 1600 and im.width <= 800:
+                continue
+            x = im if im.width <= w else im.resize((w, round(im.height * w / im.width)), Image.LANCZOS)
+            if x is not im:
+                x = x.filter(ImageFilter.UnsharpMask(radius=1.2, percent=40, threshold=2))
+            x.save(os.path.join(IMG, 'new', f'{key}-{w}.jpg'), 'JPEG', quality=80, optimize=True, progressive=True)
+        big = min(im.width, 1600)
+        meta[key] = {'w': big, 'h': round(im.height * big / im.width)}
+        alts[key] = alt
+        print(key, im.size)
+    json.dump(meta, open(mp, 'w'), indent=1)
+    json.dump(alts, open(os.path.join(HERE, 'content', 'korszak-alts.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 
 
 def card_key(path):
@@ -166,5 +212,7 @@ if __name__ == '__main__':
         import_photos(sys.argv[2])
     elif sys.argv[1:2] == ['cards']:
         import_cards(sys.argv[2])
+    elif sys.argv[1:2] == ['korszak']:
+        import_korszak(sys.argv[2])
     else:
         print(__doc__)

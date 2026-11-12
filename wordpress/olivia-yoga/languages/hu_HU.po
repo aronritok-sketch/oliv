@@ -1245,3 +1245,9 @@ msgstr "jóga"
 msgctxt "online hero title, line 3"
 msgid "live, from home"
 msgstr "élőben, otthonról"
+
+msgid "Hatha flow every Wednesday, 18:30 to 20:00, live on Zoom."
+msgstr "Hatha flow szerdánként 18:30-tól 20:00-ig, élőben, Zoomon."
+
+msgid "One-to-one or with a friend, planned for your trimester and how you feel that day."
+msgstr "Egyénileg vagy a barátnőddel, a trimeszteredhez és az aznapi állapotodhoz igazítva."

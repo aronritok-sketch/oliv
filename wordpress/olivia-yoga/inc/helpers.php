@@ -193,6 +193,11 @@ function oy_book_url() {
 	return function_exists( 'oys_page_url' ) ? oys_page_url( 'book' ) : oy_page_link( 'contact', 'book' );
 }
 
+/** The prenatal class's address (slug): /online-jogaorak/kismamatorna/ on the Hungarian online site (Olivia, 11.12). */
+function oy_prenatal_slug() {
+	return 'hu-online' === oy_edition() ? 'kismamatorna' : 'prenatal-fitness';
+}
+
 function oy_private_url() {
 	return function_exists( 'oys_account_url' ) ? oys_account_url( 'private' ) : add_query_arg( 'topic', 'private', oy_page_link( 'contact' ) ) . '#book';
 }
@@ -206,7 +211,7 @@ function oy_contact_url( $topic = '' ) {
 	return ( $topic ? add_query_arg( 'topic', $topic, $url ) : $url ) . '#book';
 }
 
-/** Resolve {{page:slug}}, {{class:slug}}, {{contact:topic}} and {{private}} tokens in imported copy. */
+/** Resolve {{page:slug}}, {{class:slug}}, {{contact:topic}}, {{private}} and {{private:topic}} tokens in imported copy. */
 function oy_resolve_tokens( $text ) {
 	$text = preg_replace_callback( '/\{\{(page|class|contact):([a-z0-9\-]+)\}\}(#[a-z0-9\-]+)?/', function ( $m ) {
 		$anchor = isset( $m[3] ) ? substr( $m[3], 1 ) : '';
@@ -218,7 +223,8 @@ function oy_resolve_tokens( $text ) {
 		}
 		return oy_contact_url( $m[2] );
 	}, $text );
-	return str_replace( '{{private}}', oy_private_url(), $text );
+	// {{private}}: the private session request; {{private:prenatal}}: the same, for a prenatal session
+	return preg_replace_callback( '/\{\{private(?::([a-z]+))?\}\}/', fn( $m ) => empty( $m[1] ) ? oy_private_url() : add_query_arg( 'topic', $m[1], oy_private_url() ), $text );
 }
 
 /* ---------- Breadcrumbs and page head ---------- */

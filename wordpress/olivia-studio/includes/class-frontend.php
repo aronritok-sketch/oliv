@@ -169,8 +169,15 @@ class OYS_Frontend {
 			if ( 'private_single' === $p['kind'] && 60 !== (int) $p['duration_min'] ) {
 				continue;
 			}
+			// A one-class online pass at the drop-in price is there to be given as a gift: the drop-in card covers it.
+			if ( $online_only && 'online_pack' === $p['kind'] && 1 === (int) $p['credits'] && (int) $p['price_cents'] === $online_price ) {
+				continue;
+			}
 			$features = array_filter( array_map( 'trim', explode( "\n", $p['features'] ) ) );
-			if ( 'private_single' === $p['kind'] ) {
+			if ( 'prenatal_single' === $p['kind'] ) {
+				$cta  = array( __( 'Request a prenatal session', 'olivia-studio' ), add_query_arg( 'topic', 'prenatal', oys_account_url( 'private' ) ) );
+				$unit = (int) $p['credits'] > 1 ? __( '60 minutes, for the two of you', 'olivia-studio' ) : __( '60 minutes, one-to-one', 'olivia-studio' );
+			} elseif ( 'private_single' === $p['kind'] ) {
 				$cta  = array( __( 'Request a private session', 'olivia-studio' ), oys_account_url( 'private' ) );
 				$unit = sprintf( __( '%d minutes', 'olivia-studio' ), (int) $p['duration_min'] );
 				foreach ( OYS_Products::all( true ) as $q ) {
@@ -189,12 +196,12 @@ class OYS_Frontend {
 				$unit = OYS_Products::period_label( $p );
 			} else {
 				$cta  = array( 'intro' === $p['kind'] ? __( 'Claim the intro offer', 'olivia-studio' ) : __( 'Buy now', 'olivia-studio' ), oys_page_url( 'book', array( 'product' => $p['id'] ) ) );
-				$unit = 'private_pack' === $p['kind'] ? __( 'per pack', 'olivia-studio' ) : sprintf( 'online_pack' === $p['kind'] ? _n( '%d online class', '%d online classes', (int) $p['credits'], 'olivia-studio' ) : _n( '%d class', '%d classes', (int) $p['credits'], 'olivia-studio' ), (int) $p['credits'] );
+				$unit = in_array( $p['kind'], array( 'private_pack', 'prenatal_pack', 'prenatal_duo_pack' ), true ) ? __( 'per pack', 'olivia-studio' ) : sprintf( 'online_pack' === $p['kind'] ? _n( '%d online class', '%d online classes', (int) $p['credits'], 'olivia-studio' ) : _n( '%d class', '%d classes', (int) $p['credits'], 'olivia-studio' ), (int) $p['credits'] );
 				if ( in_array( $p['kind'], array( 'pack', 'intro' ), true ) && $ratio > 1 ) {
 					$features[] = sprintf( __( 'Online classes: 1 class = %d online', 'olivia-studio' ), $ratio );
 				}
 			}
-			$group   = 'membership' === $p['kind'] ? 'members' : ( in_array( $p['kind'], array( 'private_single', 'private_pack' ), true ) ? 'private' : 'classes' );
+			$group   = 'membership' === $p['kind'] ? 'members' : ( in_array( $p['kind'], array( 'private_single', 'private_pack' ), true ) ? 'private' : ( str_starts_with( $p['kind'], 'prenatal_' ) ? 'prenatal' : 'classes' ) );
 			$cards[] = array( 'tone' => $p['featured'] ? 'forest' : $tones[ $i++ % 3 ], 'title' => oys_product_name( $p ), 'price' => oys_money( $p['price_cents'] ), 'unit' => $unit, 'features' => array_map( 'oys_product_text', $features ), 'cta' => $cta, 'featured' => (bool) $p['featured'], 'group' => $group );
 		}
 		$teams = $online_only ? null : array( 'tone' => 'pink', 'title' => __( 'Teams & companies', 'olivia-studio' ), 'price' => __( 'Custom', 'olivia-studio' ), 'unit' => __( 'quote', 'olivia-studio' ), 'features' => array( __( 'On-site, outdoors or online', 'olivia-studio' ), __( 'One-off or weekly', 'olivia-studio' ), __( 'Sports teams and clubs too', 'olivia-studio' ) ), 'cta' => array( __( 'Request a proposal', 'olivia-studio' ), apply_filters( 'oys_corporate_contact_url', home_url( '/contact/?topic=corporate#book' ) ) ), 'featured' => false, 'group' => 'private' );
@@ -205,6 +212,7 @@ class OYS_Frontend {
 		$groups = array(
 			'classes' => array( __( 'Group classes', 'olivia-studio' ), $online_only ? __( 'Drop in to a live class, or save with an online pass.', 'olivia-studio' ) : __( 'Drop in, or save with a pass. Use passes in the studio or online.', 'olivia-studio' ), array() ),
 			'members' => array( __( 'Memberships', 'olivia-studio' ), __( 'A monthly rhythm, billed automatically. Cancel any time.', 'olivia-studio' ), array() ),
+			'prenatal' => array( __( 'Prenatal sessions', 'olivia-studio' ), __( 'One-to-one, or with a friend: planned for your trimester and how you feel that day.', 'olivia-studio' ), array() ),
 			'private' => array( $online_only ? __( 'Private sessions', 'olivia-studio' ) : __( 'Private & teams', 'olivia-studio' ), $online_only ? __( 'One-on-one online sessions and packs, planned around you.', 'olivia-studio' ) : __( 'One-on-one sessions, packs, and classes for your team.', 'olivia-studio' ), array() ),
 		);
 		foreach ( $cards as $c ) {
@@ -604,7 +612,7 @@ class OYS_Frontend {
 
 	private static function render_product_checkout( $product_id ) {
 		$p = OYS_Products::get( $product_id );
-		if ( ! $p || empty( $p['active'] ) || ! in_array( $p['kind'], array( 'pack', 'intro', 'online_pack', 'private_pack', 'membership' ), true ) ) {
+		if ( ! $p || empty( $p['active'] ) || ! in_array( $p['kind'], array( 'pack', 'intro', 'online_pack', 'private_pack', 'prenatal_pack', 'prenatal_duo_pack', 'membership' ), true ) ) {
 			return '<p class="oys-notice oys-notice--error">' . esc_html__( 'This pass is not available.', 'olivia-studio' ) . '</p>';
 		}
 		$is_member = 'membership' === $p['kind'];
@@ -899,7 +907,7 @@ class OYS_Frontend {
 		$user_id = get_current_user_id();
 		$p       = OYS_Products::get( sanitize_key( $_POST['product'] ?? '' ) );
 		$back    = $p ? oys_page_url( 'book', array( 'product' => $p['id'] ) ) : oys_page_url( 'book' );
-		if ( ! $p || empty( $p['active'] ) || ! in_array( $p['kind'], array( 'pack', 'intro', 'online_pack', 'private_pack' ), true ) ) {
+		if ( ! $p || empty( $p['active'] ) || ! in_array( $p['kind'], array( 'pack', 'intro', 'online_pack', 'private_pack', 'prenatal_pack', 'prenatal_duo_pack' ), true ) ) {
 			oys_redirect( $back );
 		}
 		if ( 'intro' === $p['kind'] && ! OYS_Orders::is_new_customer( $user_id ) ) {
@@ -1042,6 +1050,7 @@ class OYS_Frontend {
 
 		$credits = OYS_Passes::balance( $user_id, 'class' );
 		$private = OYS_Passes::balance( $user_id, 'private' );
+		$prenatal = OYS_Passes::balance( $user_id, 'prenatal' ) + OYS_Passes::balance( $user_id, 'prenatal_duo' );
 		$online  = OYS_Passes::balance( $user_id, 'online' );
 		$member  = OYS_Memberships::current_for( $user_id );
 		$next    = OYS_Bookings::for_user( $user_id, 'upcoming', array( 'confirmed' ) );
@@ -1053,6 +1062,7 @@ class OYS_Frontend {
 		$out .= '<div class="oys-stat oys-stat--lilac"><dt>' . esc_html__( 'Classes on passes', 'olivia-studio' ) . '</dt><dd>' . (int) $credits . '</dd></div>'
 			. ( $online ? '<div class="oys-stat oys-stat--lilac"><dt>' . esc_html__( 'Online classes', 'olivia-studio' ) . '</dt><dd>' . (int) $online . '</dd></div>' : '' )
 			. ( $private ? '<div class="oys-stat oys-stat--sun"><dt>' . esc_html__( 'Private sessions', 'olivia-studio' ) . '</dt><dd>' . (int) $private . '</dd></div>' : '' )
+			. ( $prenatal ? '<div class="oys-stat oys-stat--sun"><dt>' . esc_html__( 'Prenatal sessions', 'olivia-studio' ) . '</dt><dd>' . (int) $prenatal . '</dd></div>' : '' )
 			. '<div class="oys-stat oys-stat--pink"><dt>' . esc_html__( 'Upcoming', 'olivia-studio' ) . '</dt><dd>' . count( $next ) . '</dd></div></dl></header>';
 		$out .= '<nav class="oys-account__nav" aria-label="' . esc_attr__( 'Account', 'olivia-studio' ) . '">';
 		foreach ( $tabs as $k => $label ) {
@@ -1252,7 +1262,8 @@ class OYS_Frontend {
 				if ( 'offered' === $r->status && $s && 'scheduled' === $s->status ) {
 					$action = '<a class="btn btn--primary btn--sm" href="' . esc_url( oys_book_url( $s->id ) ) . '">' . esc_html__( 'Confirm and pay', 'olivia-studio' ) . '</a>';
 				}
-				$out .= '<li class="oys-item"><div class="oys-item__main"><h4>' . sprintf( esc_html__( 'Private session, %d min', 'olivia-studio' ), (int) $r->duration_min ) . ' <span class="badge">' . esc_html( $st[ $r->status ] ?? $r->status ) . '</span></h4>'
+				$what  = 'prenatal' === ( $r->topic ?? '' ) ? sprintf( esc_html__( 'Prenatal session, %d min', 'olivia-studio' ), (int) $r->duration_min ) : sprintf( esc_html__( 'Private session, %d min', 'olivia-studio' ), (int) $r->duration_min );
+				$out .= '<li class="oys-item"><div class="oys-item__main"><h4>' . $what . ' <span class="badge">' . esc_html( $st[ $r->status ] ?? $r->status ) . '</span></h4>'
 					. '<p>' . esc_html( ( $types[ $r->location_type ] ?? '' ) . ' · ' . $detail ) . '</p>'
 					. ( $r->admin_message ? '<p class="oys-small">' . esc_html( $r->admin_message ) . '</p>' : '' ) . '</div><div class="oys-item__actions">' . $action . '</div></li>';
 			}
@@ -1280,8 +1291,20 @@ class OYS_Frontend {
 			$oprice = OYS_Products::private_price_for( $d, true );
 			$dur   .= '<option value="' . $d . '">' . sprintf( esc_html__( '%d minutes', 'olivia-studio' ), $d ) . ( $price ? ' · ' . esc_html( oys_money( $price ) ) : '' ) . ( $oprice && $oprice !== $price ? ' · ' . esc_html( sprintf( __( 'online %s', 'olivia-studio' ), oys_money( $oprice ) ) ) : '' ) . '</option>';
 		}
+		$topic = '';
+		if ( OYS_Products::has_prenatal() ) {
+			$want = 'prenatal' === sanitize_key( $_GET['topic'] ?? '' ) ? 'prenatal' : 'yoga'; // phpcs:ignore WordPress.Security.NonceVerification
+			$pre  = OYS_Products::prenatal_price_for( 1 );
+			$duo  = OYS_Products::prenatal_price_for( 2 );
+			$opt  = '';
+			foreach ( OYS_Privates::topics() as $k => $v ) {
+				$opt .= '<option value="' . esc_attr( $k ) . '"' . selected( $want, $k, false ) . '>' . esc_html( $v ) . '</option>';
+			}
+			$topic = '<label class="field"><span>' . esc_html__( 'What would you like?', 'olivia-studio' ) . '</span><select name="topic" id="oys-pr-topic">' . $opt . '</select></label>'
+				. '<p class="oys-small">' . esc_html( sprintf( __( 'Prenatal session: always 60 minutes, alone (%1$s) or with a friend (%2$s for the two of you). Tell me which trimester or week you are in.', 'olivia-studio' ), oys_money( $pre ), oys_money( $duo ) ) ) . '</p>';
+		}
 		return self::form_open( 'oys_private_request', 'class="oys-form oys-card"' )
-			. self::private_note()
+			. self::private_note() . $topic
 			. '<div class="form__row"><label class="field"><span>' . esc_html__( 'Length', 'olivia-studio' ) . '</span><select name="duration_min" id="oys-pr-duration">' . $dur . '</select></label>'
 			. '<label class="field"><span>' . esc_html__( 'How many people', 'olivia-studio' ) . '</span><input type="number" name="people" id="oys-pr-people" min="1" max="10" value="1"></label></div>'
 			. ( $online_only ? '<input type="hidden" name="location_type" value="online"><input type="hidden" name="address" value="">' : '<div class="form__row"><label class="field"><span>' . esc_html__( 'Where', 'olivia-studio' ) . '</span><select name="location_type" id="oys-pr-type">' . $opts . '</select></label>'

@@ -34,14 +34,70 @@ function oj_media_url() {
 	return 'https://raw.githubusercontent.com/aronritok-sketch/oliv/claude/nifty-ramanujan-3zifiu/oliviajoga-hu/assets/img';
 }
 
+/**
+ * Olivia's online site (live online yoga, online prenatal class, her account, the online gift card): www.oliviajoga.online;
+ * on the dev server its dev copy. OJ_ONLINE_URL (wp-config.php) overrides both.
+ */
+function oj_online_url() {
+	if ( defined( 'OJ_ONLINE_URL' ) ) {
+		return untrailingslashit( OJ_ONLINE_URL );
+	}
+	if ( 'dev.helloprovision.com' === wp_parse_url( home_url(), PHP_URL_HOST ) ) {
+		return 'https://dev.helloprovision.com/oliviayoga-booking';
+	}
+	return 'https://www.oliviajoga.online';
+}
+
+/**
+ * The site from 26 November (Olivia, 11.12 doc): her classes ended on 25 November, the online yoga goes on – the theme
+ * switches by itself on that day (Budapest time). Preview before: ?nov26=1 (a cookie keeps it; ?nov26=0 ends it).
+ */
+function oj_after() {
+	static $after = null;
+	if ( null !== $after ) {
+		return $after;
+	}
+	$from = oj_data()['after']['from'] ?? '';
+	if ( '' === $from ) {
+		return $after = false;
+	}
+	$today = wp_date( 'Y-m-d', null, new DateTimeZone( 'Europe/Budapest' ) );
+	if ( $today >= $from ) {
+		return $after = true;
+	}
+	$ask = isset( $_GET['nov26'] ) ? sanitize_key( wp_unslash( $_GET['nov26'] ) ) : null; // phpcs:ignore WordPress.Security.NonceVerification
+	if ( null !== $ask ) {
+		return $after = '1' === $ask;
+	}
+	return $after = isset( $_COOKIE['oj_nov26'] ) && '1' === $_COOKIE['oj_nov26'];
+}
+
+add_action( 'init', function () {
+	if ( ! isset( $_GET['nov26'] ) || headers_sent() ) { // phpcs:ignore WordPress.Security.NonceVerification
+		return;
+	}
+	$on = '1' === sanitize_key( wp_unslash( $_GET['nov26'] ) ); // phpcs:ignore WordPress.Security.NonceVerification
+	setcookie( 'oj_nov26', $on ? '1' : '', $on ? time() + 30 * DAY_IN_SECONDS : time() - 3600, COOKIEPATH ?: '/', COOKIE_DOMAIN, is_ssl(), true );
+} );
+
+/** Header, footer and the pages' built HTML for today: the version from 26 November once that day has come. */
+function oj_chrome( $key ) {
+	$d = oj_data();
+	if ( oj_after() && isset( $d['after'][ $key ] ) ) {
+		return $d['after'][ $key ];
+	}
+	return $d[ $key ] ?? '';
+}
+
 /** Placeholders in the built HTML → this site's addresses. */
 function oj_fill( $html ) {
 	static $map = null;
 	if ( null === $map ) {
 		$map = array(
-			'%%HOME%%'  => untrailingslashit( home_url() ),
-			'%%THEME%%' => get_stylesheet_directory_uri(),
-			'%%MEDIA%%' => oj_media_url(),
+			'%%HOME%%'   => untrailingslashit( home_url() ),
+			'%%THEME%%'  => get_stylesheet_directory_uri(),
+			'%%MEDIA%%'  => oj_media_url(),
+			'%%ONLINE%%' => oj_online_url(),
 		);
 	}
 	return strtr( (string) $html, $map );
@@ -63,7 +119,12 @@ function oj_path() {
 function oj_page( $path ) {
 	$pages = oj_data()['pages'] ?? array();
 	if ( isset( $pages[ $path ] ) ) {
-		return $pages[ $path ];
+		$p = $pages[ $path ];
+		if ( oj_after() && isset( oj_data()['after']['pages'][ $path ] ) ) {
+			$p['prefooter'] = oj_data()['after']['pages'][ $path ]['prefooter'];
+			$p['desc']      = oj_data()['after']['pages'][ $path ]['desc'] ?? $p['desc'];
+		}
+		return $p;
 	}
 	$home = $pages[''] ?? array();
 	return array(
@@ -71,7 +132,7 @@ function oj_page( $path ) {
 		'desc'      => is_singular() ? wp_strip_all_tags( get_the_excerpt() ) : '',
 		'cls'       => 'is-page',
 		'schema'    => '',
-		'prefooter' => $home['prefooter'] ?? '',
+		'prefooter' => oj_after() ? ( oj_data()['after']['pages']['']['prefooter'] ?? '' ) : ( $home['prefooter'] ?? '' ),
 	);
 }
 
@@ -120,7 +181,7 @@ add_action( 'wp_head', function () {
 
 /** The header with the current page marked in the menu. */
 function oj_header( $path ) {
-	$html = preg_replace( '/ aria-current="page"/', '', oj_fill( oj_data()['header'] ?? '' ) );
+	$html = preg_replace( '/ aria-current="page"/', '', oj_fill( oj_chrome( 'header' ) ) );
 	$here = '' === $path ? home_url( '/' ) : untrailingslashit( home_url() ) . '/' . rawurlencode( $path );
 	return str_replace( '<a href="' . esc_attr( $here ) . '">', '<a href="' . esc_attr( $here ) . '" aria-current="page">', $html );
 }
@@ -132,9 +193,29 @@ function oj_main() {
 	}
 	$post = get_queried_object();
 	$html = $post instanceof WP_Post ? $post->post_content : '';
+	// from 26 November the new version of the page – unless someone has edited the page in WordPress since the setup
+	$path  = oj_path();
+	$after = oj_data()['after']['pages'][ $path ] ?? null;
+	$md5   = (array) get_option( 'oj_setup_md5', array() );
+	$key   = '' === $path ? 'főoldal' : $path;
+	if ( oj_after() && $after && $post instanceof WP_Post && ( ! isset( $md5[ $key ] ) || md5( $post->post_content ) === $md5[ $key ] ) ) {
+		$html = $after['content'];
+	}
 	$html = preg_replace( '/<!-- \/?wp:html -->\s*/', '', $html );
 	return oj_fill( do_shortcode( $html ) );
 }
+
+// From 26 November „Bejelentkezés & jóga bérlet” is her account on the online site (Olivia): straight there.
+add_action( 'template_redirect', function () {
+	if ( ! oj_after() || is_404() ) {
+		return;
+	}
+	$to = oj_data()['after']['redirect'][ oj_path() ] ?? '';
+	if ( '' !== $to ) {
+		wp_redirect( oj_fill( $to ), 302 ); // phpcs:ignore WordPress.Security.SafeRedirect -- her own online site
+		exit;
+	}
+} );
 
 // The old addresses have no trailing slash (/rólam): WordPress keeps them as they are.
 add_filter( 'user_trailingslashit', function ( $url, $type ) {

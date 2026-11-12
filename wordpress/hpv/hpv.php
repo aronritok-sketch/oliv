@@ -36,16 +36,17 @@ add_action( 'hpv_child_setup', function ( $from, $to, $slug ) {
 	if ( '' === (string) $from || get_option( 'oy_edition' ) !== oy_edition() ) {
 		$log = array_merge( $log, oy_switch_edition( oy_edition() ) );
 	}
-	if ( 'Hello world!' === get_the_title( 1 ) ) {
+	if ( in_array( get_the_title( 1 ), array( 'Hello world!', 'Helló világ!' ), true ) ) {
 		wp_delete_post( 1, true );
 	}
-	$sample = get_page_by_path( 'sample-page' );
+	$sample = get_page_by_path( 'sample-page' ) ?: get_page_by_path( 'minta-oldal' );
 	if ( $sample ) {
 		wp_delete_post( $sample->ID, true );
 	}
 	if ( get_option( 'permalink_structure' ) === '' ) {
 		update_option( 'permalink_structure', '/%postname%/' );
 	}
+	$log = array_merge( $log, oy_migrate_online() ); // the online site after Olivia's notes of 12 November (once)
 	kses_remove_filters();
 	$log = array_merge( $log, oy_import_all( false ) );
 	kses_init_filters();

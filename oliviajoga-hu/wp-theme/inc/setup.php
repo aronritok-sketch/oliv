@@ -38,7 +38,7 @@ function oj_setup() {
 	if ( '/%postname%' !== get_option( 'permalink_structure' ) ) {
 		update_option( 'permalink_structure', '/%postname%' );
 	}
-	if ( 'Hello world!' === get_the_title( 1 ) ) {
+	if ( in_array( get_the_title( 1 ), array( 'Hello world!', 'Helló világ!' ), true ) ) {
 		wp_delete_post( 1, true );
 	}
 	$sample = get_page_by_path( 'sample-page' ) ?: get_page_by_path( 'minta-oldal' );

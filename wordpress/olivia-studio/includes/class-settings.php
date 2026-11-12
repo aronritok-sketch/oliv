@@ -26,6 +26,7 @@ class OYS_Settings {
 			'hold_minutes'            => 30,
 			'cancel_hours'            => 12,
 			'private_cancel_hours'    => 24,
+			'cancel_extend_days'      => 7,
 			'dropin_credit_days'      => 90,
 			'waitlist_cutoff_hours'   => 2,
 			'booking_window_days'     => 28,
