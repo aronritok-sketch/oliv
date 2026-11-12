@@ -84,6 +84,12 @@ Olivia doksija két részből áll: amit most kért, és amit **november 26-tól
   menő”, `assets/oliviajoga.js`): a fotók egymás után beúsznak és lassan lebegnek, az ecsetvonás kirajzolódik és
   folyamatosan hullámzik rajtuk, egyszerre egy fotó kiszíneződik orchidea kerettel (és amelyik fölött az egér van);
   csak amíg látszik, csökkentett mozgásnál semmi.
+- **1.4.4 – SEO (Áron, 2026-11-12: „minden SEO követelménynek feleljen meg … ne veszítsen semmit”):** minden régi
+  képnek valódi leírás az alt-ban, utána a régi alt kulcsszavai rendezve (`content/alt-descriptions.json`,
+  `better_alt`; a check.py ellenőrzi, hogy egyetlen régi kulcsszó sem veszett el); oldalanként pontosan egy H1 (a régi
+  tartalom további h1-jei `h2.oj-was-h1`, ugyanakkora); og:image minden oldalon (statikus és WordPress); a két rövid
+  meta-leírás (Kapcsolat, Mit ad a jóga?) megírva; WordPressben nincs users-sitemap és szerzői oldal, a magyar
+  „Helló Világ!” / „Ez egy minta oldal” is törlődik. A címek (title) a régi oldaléi maradnak (pozíció).
 - **Képek helye (Áron):** WordPress → Megjelenés → Képek helye (`wp-theme/inc/image-position.php`): fotónként egy pont,
   aminek látszania kell; a vágás a dizájné marad. `oj_img_pos` opció, kulcs: a fájl útja méret nélkül (`new/hero`).
 - **Facebook-képek:** a „Facebookra” mappa 18 fotója 1080 × 1350-ben, az oldal stílusában (`tools/facebook/`:

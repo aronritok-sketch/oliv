@@ -153,6 +153,15 @@ add_action( 'wp_enqueue_scripts', function () {
 	wp_enqueue_script( 'oj-oliviajoga', get_stylesheet_directory_uri() . '/assets/oliviajoga.js', array( 'oj-site' ), $v, array( 'strategy' => 'defer', 'in_footer' => true ) );
 }, 20 );
 
+// No author archives and no users in the sitemap: they would show the admin's login name.
+add_filter( 'wp_sitemaps_add_provider', fn( $provider, $name ) => 'users' === $name ? false : $provider, 10, 2 );
+add_action( 'template_redirect', function () {
+	if ( is_author() ) {
+		wp_safe_redirect( home_url( '/' ), 301 );
+		exit;
+	}
+} );
+
 // The page's own title and head (description, canonical, Open Graph, structured data) from the old site.
 add_filter( 'pre_get_document_title', function ( $title ) {
 	$path = oj_path();
@@ -176,6 +185,9 @@ add_action( 'wp_head', function () {
 	echo '<meta name="theme-color" content="#2B5036">' . "\n";
 	echo '<meta property="og:site_name" content="' . esc_attr( oj_data()['site_title'] ?? '' ) . '"><meta property="og:locale" content="hu_HU"><meta property="og:type" content="' . ( 'is-post' === $p['cls'] ? 'article' : 'website' ) . '">' . "\n";
 	echo '<meta property="og:title" content="' . esc_attr( $title ) . '"><meta property="og:description" content="' . esc_attr( $p['desc'] ) . '"><meta property="og:url" content="' . esc_url( $canon ) . '">' . "\n";
+	if ( ! empty( $p['image'] ) ) { // the page's first photo (sharing on Facebook, Messenger …)
+		echo '<meta property="og:image" content="' . esc_url( oj_fill( $p['image'] ) ) . '"><meta name="twitter:card" content="summary_large_image">' . "\n";
+	}
 	if ( ! empty( $p['schema'] ) ) {
 		echo '<script type="application/ld+json">' . oj_fill( $p['schema'] ) . '</script>' . "\n"; // phpcs:ignore -- built JSON
 	}

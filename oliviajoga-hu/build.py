@@ -39,7 +39,7 @@ ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.4.3'
+VERSION = '1.4.4'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -299,11 +299,48 @@ def ext_attr(h):
 
 # ---------------------------------------------------------------- pictures
 
+# Alt texts (Áron, 2026-11-12: „alt-textek, képleírások, minden legyen kurva jó … ne veszítsen semmit”): what the picture
+# shows (content/alt-descriptions.json), then the old site's keywords, tidied up – every old keyword stays.
+ALT_DESC = {k: v for k, v in json.load(open(os.path.join(HERE, 'content', 'alt-descriptions.json'), encoding='utf-8')).items()
+            if not k.startswith('_')}
+ALT_NAMES = [(r'\bkovács[- ]olívia\b', 'Kovács Olívia'), (r'\bkovacs olivia\b', 'Kovács Olívia'), (r'\bjogaoktato\b', 'jógaoktató'),
+             (r'\bcsepel\b', 'Csepel'), (r'\bújbud(a)?\b', 'Újbuda'), (r'\bpestszentlőrinc\b', 'Pestszentlőrinc'),
+             (r'\bpesterzsébet\b', 'Pesterzsébet'), (r'\bkorall\b', 'Korall'), (r'\bmóri?cz\b', 'Móricz'), (r'\bgellért\b', 'Gellért'),
+             (r'\bbartók\b', 'Bartók'), (r'\bmányoki\b', 'Mányoki'), (r'\bprána\b', 'Prána'), (r'\bcsili\b', 'Csili'),
+             (r'\bmanas\b', 'Manas'), (r'\bmicroasis\b', 'Microasis'), (r'\bösszetartozás háza\b', 'Összetartozás Háza'),
+             (r'\bfitness expo\b', 'Fitness Expo'), (r'\bbudapest\b', 'Budapest'), (r'\bxxi\.', 'XXI.'), (r'\bxx\.', 'XX.'),
+             (r'\bjóga-(?=\s)', 'jóga')]
+
+
+def alt_keywords(old):
+    """The old alt's keywords, readable: names capitalised, the „jóga …” phrases once each, comma-separated."""
+    s = ' '.join(old.split())
+    for a, b in ALT_NAMES:
+        s = re.sub(a, b, s, flags=re.I)
+    seen = []
+    for part in re.split(r'\s+(?=jóga\b)', s):
+        part = part.strip(' ,')
+        if part and part.lower() != 'jóga' and part.lower() not in (x.lower() for x in seen):
+            seen.append(part)
+    return ', '.join(seen)
+
+
+def better_alt(key, old):
+    """The alt text of an old-site picture (key: its file name, or a journal card's photo key)."""
+    desc = ALT_DESC.get(key.split('/')[-1], '')
+    kw = alt_keywords(old or '')
+    if not desc:
+        return old
+    if 'Kovács Olívia' in desc:
+        kw = re.sub(r'\s*Kovács Olívia,?', '', kw).strip(' ,')
+    return f'{desc} – {kw}' if kw else desc
+
+
 def pic(t, sizes='(min-width: 960px) 40vw, 92vw', eager=False, alt=None, cls='photo'):
     f, ext, w, h = t['file'], t['ext'], t['w'], t['h']
     if f in CUTOUTS:
         ext = '.webp'
-    a = t.get('alt', '') if alt is None else alt
+    a = better_alt(f, t.get('alt', '')) if alt is None else alt
     W = min(w, 1600)
     H = round(h * W / w)
     small, big = asset(f'img/{f}-800{ext}'), asset(f'img/{f}-1600{ext}')
@@ -343,7 +380,7 @@ def card_pic(path, t, sizes='(min-width: 960px) 30vw, 92vw', eager=False):
     m = NEW_META[key]
     small, big = asset(f'img/new/{key}-800.jpg'), asset(f'img/new/{key}-1600.jpg')
     srcset = f' srcset="{small} 800w, {big} {m["w"]}w" sizes="{sizes}"' if m['w'] > 800 else ''
-    return (f'<img class="photo" src="{big if m["w"] > 800 else small}"{srcset} alt="{esc(t.get("alt", ""))}" width="{m["w"]}" '
+    return (f'<img class="photo" src="{big if m["w"] > 800 else small}"{srcset} alt="{esc(better_alt(key, t.get("alt", "")))}" width="{m["w"]}" '
             f'height="{m["h"]}"{" fetchpriority=high" if eager else " loading=lazy"} decoding="async">')
 
 
@@ -770,7 +807,24 @@ def footer():
 <a class="book-fab" href="{esc(book_url())}" target="_blank" rel="noopener" data-book-fab>{icon("cal")}Bejelentkezés</a>'''
 
 
+# Pages whose old text has no sentence long enough for a search snippet (the old site had no meta descriptions).
+DESC = {
+    'kapcsolat': ('Írj nekem, ha kérdésed van a jógaórákról, a bérletekről, az egyéni óráról vagy az ajándékutalványról: '
+                  'Kovács Olívia jógaoktató, Budapest 18. és 21. kerület.'),
+    'mit-ad-a-jóga': ('Mit ad a jóga? Ráhangolódás, flow, erő, nyújtás, légzőgyakorlatok, relaxáció és meditáció – amit egy '
+                      'átlagos jógagyakorlás tanít nekem.'),
+}
+DESC_AFTER = {
+    'kapcsolat': ('Írj nekem, ha kérdésed van az élő online jógaórákról, az online kismamatornáról, az egyéni óráról vagy az '
+                  'ajándékutalványról: Kovács Olívia jógaoktató.'),
+}
+
+
 def description(p):
+    if AFTER and p['path'] in DESC_AFTER:
+        return DESC_AFTER[p['path']]
+    if p['path'] in DESC:
+        return DESC[p['path']]
     for s in p['sections']:
         for c in s['columns']:
             for t in c:
@@ -795,6 +849,9 @@ def document(p, body, cls, schema, image=None):
     canon = ORIGIN + '/' + urllib.parse.quote(path if path != 'főoldal' else '')
     desc = description(p)
     robots = '<meta name="robots" content="noindex, nofollow">\n' if PREVIEW else ''
+    image = image or first_image(body)
+    if image.startswith('/'):
+        image = ORIGIN + image
     og_img = f'<meta property="og:image" content="{esc(image)}">\n' if image else ''
     v = VERSION
     return f'''<!doctype html>
@@ -1537,7 +1594,7 @@ def wp_entry(p, body, cls, schema):
     h1 = re.search(r'<h1[^>]*>(.*?)</h1>', body, re.S)
     name = dict(NAV).get(path) or (norm(text_of(h1.group(1))) if h1 else p['title'])
     return {'name': 'Főoldal' if path in ('', 'főoldal') else name, 'title': p['title'], 'desc': description(p), 'cls': cls,
-            'schema': json.dumps(schema, ensure_ascii=False), 'content': body, 'prefooter': prefooter(p)}
+            'schema': json.dumps(schema, ensure_ascii=False), 'content': body, 'prefooter': prefooter(p), 'image': first_image(body)}
 
 
 def wp_theme(pages, versions):
@@ -1573,6 +1630,29 @@ def wp_theme(pages, versions):
     print(f'{len(pages)} pages → WordPress theme {OUT} ({VERSION})')
 
 
+def fix_headings(body):
+    """Exactly one h1 per page (the old site's own h1s inside the content become h2s that look the same, class
+    oj-was-h1); a page head without an h1 gets one."""
+    if '<h1' not in body:
+        body = re.sub(r'<(h[2-6]|p) class="page-head__title">(.*?)</\1>', r'<h1 class="page-head__title">\2</h1>', body, count=1, flags=re.S)
+    seen = [0]
+
+    def one(m):
+        seen[0] += 1
+        if seen[0] == 1:
+            return m.group(0)
+        attrs = m.group(1) or ''
+        attrs = attrs.replace('class="', 'class="oj-was-h1 ', 1) if 'class="' in attrs else ' class="oj-was-h1"' + attrs
+        return f'<h2{attrs}>{m.group(2)}</h2>'
+    return re.sub(r'<h1(\s[^>]*)?>(.*?)</h1>', one, body, flags=re.S)
+
+
+def first_image(body):
+    """The page's first photo, big (for og:image)."""
+    m = re.search(r'<img[^>]*\bsrc="([^"]+)"', body)
+    return m.group(1) if m else ''
+
+
 def render_all(journal_cards):
     """Every page: (path, page, body, class, structured data)."""
     special = {'': home, 'főoldal': home, 'árak': prices_page, 'jógáról': journal_page, 'események': events_page,
@@ -1597,7 +1677,7 @@ def render_all(journal_cards):
             t = only_heading(pg['sections'][0])
             extra = {'@type': 'BlogPosting', 'headline': norm(text_of(t['html'])) if t else pg['title'], 'inLanguage': 'hu-HU',
                      'author': {'@id': ORIGIN + '/#olivia'}, 'mainEntityOfPage': ORIGIN + '/' + urllib.parse.quote(path)}
-        out.append((path, pg, body, cls, schema_base(pg, extra)))
+        out.append((path, pg, fix_headings(body), cls, schema_base(pg, extra)))
     return out
 
 

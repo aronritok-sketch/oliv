@@ -14,6 +14,7 @@ import json
 import os
 import re
 import sys
+import unicodedata
 import urllib.parse
 
 HERE = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -82,13 +83,19 @@ def main():
                     elif t['type'] == 'image' and not build.is_divider(t) and t['file'] not in build.PRICES and t['file'] not in build.DROPPED and t['file'] not in build.REMOVED_FILES:
                         if t['w'] == 1000 and t['h'] == 400 or t['file'] == 'old/49fd21489bf3':
                             continue  # the reviews and "Ami nem szükséges": rebuilt as text
-                        alt = html.escape(t.get('alt', ''), quote=True)
+                        old_alt = t.get('alt', '')
                         src = t['file']  # a journal card's new photo (tools/images.py cards) keeps the old picture's alt text
                         if t.get('href', '').startswith('page:') and build.card_key(t['href'][5:]) in NEW_PHOTOS:
                             src = build.card_key(t['href'][5:])
+                        # the alt: the picture described, then every keyword of the old alt (build.better_alt, 2026-11-12)
+                        alt = html.escape(build.better_alt(src, old_alt), quote=True)
                         found = re.search(r'<img[^>]*' + re.escape(src) + r'-[^>]*alt="' + re.escape(alt) + '"', doc)
                         if not found and build.card_key(p['path']) in NEW_PHOTOS:  # a post's head: her raw photo (11.12)
-                            found = re.search(r'<img[^>]*' + re.escape(build.card_key(p['path'])) + r'-[^>]*alt="' + re.escape(alt) + '"', doc)
+                            ck = build.card_key(p['path'])
+                            found = re.search(r'<img[^>]*' + re.escape(ck) + r'-[^>]*alt="' + re.escape(html.escape(build.better_alt(ck, old_alt), quote=True)) + '"', doc)
+                        bare = lambda x: unicodedata.normalize('NFKD', x.lower()).encode('ascii', 'ignore').decode()  # noqa: E731 (kovacs = Kovács)
+                        words = [w for w in re.findall(r'\w+', bare(old_alt)) if len(w) > 2]
+                        ok(all(w in bare(build.better_alt(src, old_alt)) for w in words), f'/{p["path"]}: an old alt keyword lost: {old_alt[:60]}')
                         ok(found, f'/{p["path"]}: photo missing or alt changed: {t["file"]} "{t.get("alt", "")[:40]}"')
                     elif t['type'] == 'embed' and not any(r in t['src'] for r in build.REMOVED_EMBEDS):
                         ok(html.escape(t['src'], quote=True) in doc, f'/{p["path"]}: embed missing: {t["src"][:60]}')

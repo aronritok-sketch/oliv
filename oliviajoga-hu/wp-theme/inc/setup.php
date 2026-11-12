@@ -38,12 +38,16 @@ function oj_setup() {
 	if ( '/%postname%' !== get_option( 'permalink_structure' ) ) {
 		update_option( 'permalink_structure', '/%postname%' );
 	}
-	if ( in_array( get_the_title( 1 ), array( 'Hello world!', 'Helló világ!' ), true ) ) {
+	// WordPress's own sample post and page, in any language (the Hungarian ones: „Helló Világ!”, „Ez egy minta oldal”)
+	$hello = get_post( 1 );
+	if ( $hello && 'post' === $hello->post_type && in_array( $hello->post_name, array( 'hello-world', 'hello-vilag' ), true ) ) {
 		wp_delete_post( 1, true );
 	}
-	$sample = get_page_by_path( 'sample-page' ) ?: get_page_by_path( 'minta-oldal' );
-	if ( $sample ) {
-		wp_delete_post( $sample->ID, true );
+	foreach ( array( 'sample-page', 'minta-oldal', 'ez-egy-minta-oldal' ) as $s ) {
+		$sample = get_page_by_path( $s );
+		if ( $sample && in_array( $sample->post_title, array( 'Sample Page', 'Minta oldal', 'Ez egy minta oldal' ), true ) ) {
+			wp_delete_post( $sample->ID, true );
+		}
 	}
 
 	kses_remove_filters();

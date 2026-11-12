@@ -723,3 +723,6 @@ h1, h2, .oj-h2, .oj-display, .oj-title__h, .page-head .page-head__title, .oj-loc
 	.js .oj-korszak.is-in .oj-korszak__grid > .oj-band--flow { clip-path: inset(-20% -2% -20% 0); }
 }
 @keyframes oj-float { 0%, 100% { translate: 0 0; } 50% { translate: 0 -8px; } }
+
+/* One h1 per page (SEO, 2026-11-12): the old site's own h1s in the content are h2s now – they keep their size */
+.oj-was-h1 { font-size: var(--step-4); }
