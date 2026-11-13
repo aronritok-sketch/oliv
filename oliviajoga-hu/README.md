@@ -93,7 +93,11 @@ Olivia doksija két részből áll: amit most kért, és amit **november 26-tól
 - **Képek helye (Áron):** WordPress → Megjelenés → Képek helye (`wp-theme/inc/image-position.php`): fotónként egy pont,
   aminek látszania kell; a vágás a dizájné marad. `oj_img_pos` opció, kulcs: a fájl útja méret nélkül (`new/hero`).
 - **Facebook-képek:** a „Facebookra” mappa 18 fotója 1080 × 1350-ben, az oldal stílusában (`tools/facebook/`:
-  `make_html.py` + `shoot.js`, Playwright); a demón: `/demo/oliviajoga-hu-6083/facebook/`.
+  `make_html.py` + `shoot.js`, Playwright); a demón: `/demo/oliviajoga-hu-6083/facebook/`. 2026-11-13: újragyártva
+  web-cím nélkül (Olivia kérése), a kétszer szereplő IMG_5438 nélkül 17 kép.
+- **Facebook-borító „online jóga”** (Áron, 2026-11-13): `tools/facebook/cover.py` + `cover.js` – oldal 1640 × 624
+  (a telefon a középső 16:9-et mutatja, a szöveg és a fotó ott van), csoport 1640 × 856; az oliviajoga.online
+  stílusában. A képek + borítók + posztszöveg zipben Olivia portálján (CRM-chat, 2026-11-13).
 
 ## Fájlok
 
