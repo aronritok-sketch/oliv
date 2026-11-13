@@ -1,67 +1,69 @@
-"""Online timetable story (Olivia, portal chat 2026-11-13): „egy nagyon hasonló órarendet szeretnék” – her ORAREND.png
-(1151 x 2048: blurred class photo, a pink veil with wavy edges, white ÓRAREND with a pink script word, places in dark
-capitals, times in white with an italic „hatha flow”, a pink pill at the bottom) for the online classes: „online jóga
-órarend”, Wednesday 18.30–20.00, no places, private yoga and private prenatal by appointment, oliviajoga.online.
-Readable, not too much on it. 1080 x 1920 (Instagram / Facebook story).
+"""Online timetable story (Olivia, portal chat 2026-11-13).
 
-    python3 -I orarend.py <photo> <html folder>
+First wish: „egy nagyon hasonló órarendet szeretnék” – her ORAREND.png, for the online classes: „online jóga órarend”,
+Wednesday 18.30–20.00, no places, private yoga and private prenatal by appointment, oliviajoga.online, readable.
+Second wish (on the first version): „ugyanaz a kép legyen a háttér … inkább csinálj te hasonlót, finomítsunk rajta”.
+
+So this is her own picture: the background is her ORAREND.png with the old text taken out (orarend_bg.py), at her
+size (1151 x 2048, 9:16), and the new text sits where hers did, in her type: white Montserrat ÓRAREND with a pink
+italic script over it, the lines in dark capitals with a thin divider, the times in white with an italic class name,
+the pink button at the bottom. Measured on her original (pixels): title x 57–1090, baseline 346; the script 118–276;
+first block 740 / 805 / 892; second block 1151 / 1215 / 1299 / 1383; the button 1814–1877.
+
+    python3 -I orarend_bg.py ORAREND.png <png folder>/orarend-hatter.png
+    python3 -I orarend.py <png folder>/orarend-hatter.png <html folder>
     node cover.js <html folder> <png folder>
 """
-import math
 import os
 import sys
 
-W, H = 1080, 1920
-
-
-def wave_band(w, top, bottom, amp, periods=1.3, phase=0.0, n=120):
-    """A band from `top` to `bottom` whose upper and lower edges are soft waves (the veil of her design)."""
-    up = [(w * i / n, top + amp * math.sin(2 * math.pi * periods * i / n + phase)) for i in range(n + 1)]
-    lo = [(w * i / n, bottom + amp * math.sin(2 * math.pi * (periods * .8) * i / n + phase + 1.7)) for i in range(n, -1, -1)]
-    return 'M' + ' L'.join(f'{x:.1f} {y:.1f}' for x, y in up + lo) + 'Z'
+W, H = 1151, 2048
+PINK = '#E539A3'
+INK = '#1D1D1D'
 
 
 def main():
-    photo, out = sys.argv[1], sys.argv[2]
+    bg, out = sys.argv[1], sys.argv[2]
     os.makedirs(out, exist_ok=True)
-    veil = wave_band(W, 420, 1560, 34, phase=.6)
     html = f'''<!doctype html><html lang="hu" data-w="{W}" data-h="{H}"><head><meta charset="utf-8">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Cormorant+Garamond:ital,wght@1,600;1,700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Cormorant+Garamond:ital,wght@1,500;1,600&display=swap">
 <style>
 *{{margin:0;box-sizing:border-box}} html,body{{width:{W}px;height:{H}px;overflow:hidden}}
-body{{position:relative;font-family:Montserrat,sans-serif;background:#c9a7ae}}
-.bg{{position:absolute;inset:-40px;background:url("file://{photo}") 50% 55%/cover;filter:blur(7px) saturate(.95) brightness(.92)}}
-.tint{{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,236,242,.10),rgba(255,214,228,.18))}}
-svg{{position:absolute;inset:0;width:{W}px;height:{H}px}}
-.veil{{fill:rgba(236,150,190,.50)}}
-.title{{position:absolute;left:0;right:0;top:118px;text-align:center}}
-.title b{{display:block;font:800 178px/1 Montserrat;letter-spacing:-.01em;color:#fff;text-shadow:0 6px 26px rgba(70,20,40,.35)}}
-.title i{{position:absolute;right:92px;top:-70px;font:italic 700 118px/1 "Cormorant Garamond",serif;color:#E2368F;text-shadow:0 3px 14px rgba(255,255,255,.55)}}
-.block{{position:absolute;left:70px;right:70px;text-align:center;color:#1F1A1C}}
-.h{{text-shadow:0 1px 12px rgba(255,255,255,.35);font:800 62px/1.08 Montserrat;letter-spacing:.005em;text-transform:uppercase}}
-.h span{{display:inline-block;width:3px;height:56px;margin:0 22px;background:#1F1A1C;vertical-align:-6px;opacity:.75}}
-.s{{margin-top:12px;font:600 36px/1.25 Montserrat;color:#2A1E24}}
-.t{{margin-top:34px;font:700 70px/1.12 Montserrat;color:#fff;text-shadow:0 2px 4px rgba(50,10,30,.6),0 4px 22px rgba(50,10,30,.45)}}
-.t em{{font:italic 700 74px/1 "Cormorant Garamond",serif;color:#fff}}
-.li{{margin-top:22px;font:700 64px/1.15 Montserrat;color:#fff;text-shadow:0 2px 4px rgba(50,10,30,.6),0 4px 22px rgba(50,10,30,.45)}}
-.pill{{position:absolute;left:50%;bottom:150px;transform:translateX(-50%);white-space:nowrap;padding:22px 44px;border-radius:26px;background:#E2368F;color:#fff;font:700 44px/1 Montserrat;letter-spacing:.02em;box-shadow:0 10px 28px rgba(120,20,70,.28)}}
+body{{position:relative;font-family:Montserrat,sans-serif;background:url("file://{bg}") 0 0/{W}px {H}px no-repeat}}
+.line{{position:absolute;left:0;right:0;text-align:center;white-space:nowrap}}
+.title{{top:150px;height:200px}}
+.title b{{position:absolute;left:57px;bottom:0;font:800 200px/1 Montserrat;letter-spacing:-.012em;color:#fff;
+  text-shadow:3px 6px 14px rgba(40,15,25,.32)}}
+.title i{{position:absolute;right:120px;top:-48px;font:italic 600 142px/1 "Cormorant Garamond",serif;color:{PINK};
+  text-shadow:2px 4px 10px rgba(40,15,25,.22)}}
+.h{{font:800 64px/1 Montserrat;color:{INK};letter-spacing:-.005em;text-shadow:0 3px 8px rgba(255,235,242,.55)}}
+.h span{{display:inline-block;width:3px;height:60px;margin:0 30px;background:{INK};vertical-align:-6px}}
+.s{{font:600 40px/1 Montserrat;color:{INK};letter-spacing:-.02em;text-transform:uppercase;text-shadow:0 2px 8px rgba(255,235,242,.55)}}
+.t{{font:700 64px/1 Montserrat;color:#fff;text-shadow:0 2px 3px rgba(60,20,40,.45),0 4px 14px rgba(60,20,40,.4)}}
+.t em{{font:italic 500 74px/1 "Cormorant Garamond",serif;margin-left:14px}}
+.pill{{position:absolute;left:50%;top:1814px;transform:translateX(-50%);height:63px;padding:0 26px;border-radius:14px;
+  background:{PINK};color:#fff;font:500 40px/63px Montserrat;letter-spacing:-.005em;white-space:nowrap;
+  box-shadow:0 6px 18px rgba(90,20,60,.22)}}
 </style></head><body>
-<div class="bg"></div><div class="tint"></div>
-<svg viewBox="0 0 {W} {H}"><path class="veil" d="{veil}"/></svg>
-<div class="title"><i>online jóga</i><b>ÓRAREND</b></div>
-<div class="block" style="top:620px">
-  <p class="h">Csoportos<span></span>élő online</p>
-  <p class="s">(első óra: december 16.)</p>
-  <p class="t">• szerda 18.30–20.00</p>
-  <p class="t" style="margin-top:6px"><em>hatha flow</em></p>
-</div>
-<div class="block" style="top:1100px">
-  <p class="h">Privát órák<span></span>online</p>
-  <p class="s">(egyénileg egyeztetett időpontban)</p>
-  <p class="li">• privát jóga</p>
-  <p class="li">• privát kismamatorna</p>
-</div>
-<div class="pill">BEJELENTKEZÉS: OLIVIAJOGA.ONLINE</div>
+<div class="line title"><b id="t">ÓRAREND</b><i>online jóga</i></div>
+
+<p class="line h" style="top:740px">CSOPORTOS<span></span>ÉLŐ ONLINE</p>
+<p class="line s" style="top:808px">(első óra: december 16.)</p>
+<p class="line t" style="top:892px">• szerda 18.30–20.00<em>hatha flow</em></p>
+
+<p class="line h" style="top:1151px">PRIVÁT ÓRÁK<span></span>ONLINE</p>
+<p class="line s" style="top:1219px">(egyénileg egyeztetett időpontban)</p>
+<p class="line t" style="top:1299px">• privát<em>jóga</em></p>
+<p class="line t" style="top:1383px">• privát<em>kismamatorna</em></p>
+
+<p class="pill">BEJELENTKEZÉS: OLIVIAJOGA.ONLINE</p>
+<script>
+// ÓRAREND as wide as hers (x 57–1090)
+document.fonts.ready.then(() => {{
+  const t = document.getElementById('t'); const want = 1090 - 57;
+  t.style.fontSize = (200 * want / t.getBoundingClientRect().width) + 'px';
+}});
+</script>
 </body></html>'''
     open(os.path.join(out, 'online-joga-orarend.html'), 'w', encoding='utf-8').write(html)
     print('online-joga-orarend')

@@ -102,6 +102,11 @@ Olivia doksija két részből áll: amit most kért, és amit **november 26-tól
   felirat nélkül (`tools/facebook/wave_only.py`, a fotó saját arányában, 2048 px), és **online órarend** a régi
   ORAREND.png mintájára (`tools/facebook/orarend.py`, 1080 × 1920: „online jóga ÓRAREND”, szerda 18.30–20.00 hatha flow,
   privát jóga és privát kismamatorna egyeztetett időpontban, „Bejelentkezés: oliviajoga.online”). Zipben a portálon.
+- **Órarend, 2. kör (Olivia, 19:07):** „ugyanaz a kép legyen a háttér … inkább csinálj te hasonlót”. A nyers fotó
+  nincs meg (Drive, portál, doksi), ezért a háttér az ő ORAREND.png-je a régi feliratok nélkül
+  (`tools/facebook/orarend_bg.py`: betű-maszk + árnyék, kitöltés a környezetből; numpy + opencv-python-headless), a
+  rózsaszín hullámos fátyol marad. Az új szöveg az ő méreteire, az ő betűivel (`orarend.py`, 1151 × 2048 → JPG
+  1080 × 1920). Ha Olivia átküldi a nyers fotót, a háttér abból is készülhet.
 
 ## Fájlok
 
