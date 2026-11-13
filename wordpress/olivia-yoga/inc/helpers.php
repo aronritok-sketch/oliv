@@ -59,6 +59,7 @@ function oy_photo( $src, $sizes = '100vw', $eager = false, $alt = null ) {
 		if ( $pos ) {
 			$attrs['style'] = 'object-position:' . esc_attr( $pos );
 		}
+		$attrs['data-oyp'] = (string) get_post_meta( (int) $src, 'oy_key', true ) ?: 'a' . (int) $src; // the page editor's key
 		return wp_get_attachment_image( (int) $src, 'large', false, $attrs );
 	}
 	$imgs = oy_images();
@@ -69,10 +70,11 @@ function oy_photo( $src, $sizes = '100vw', $eager = false, $alt = null ) {
 	$base = get_template_directory_uri() . '/assets/img/' . $src;
 	$alt  = null === $alt ? oy_alt( $m['alt'] ) : $alt;
 	return sprintf(
-		'<img class="photo" src="%1$s-1200.jpg" srcset="%1$s-600.jpg %8$dw, %1$s-1200.jpg %2$dw" sizes="%3$s" alt="%4$s" width="%2$d" height="%5$d" style="object-position:%6$s" %7$s decoding="async">',
+		'<img class="photo" src="%1$s-1200.jpg" srcset="%1$s-600.jpg %8$dw, %1$s-1200.jpg %2$dw" sizes="%3$s" alt="%4$s" width="%2$d" height="%5$d" style="object-position:%6$s" %7$s decoding="async" data-oyp="%9$s">',
 		esc_url( $base ), (int) $m['w'], esc_attr( $sizes ), esc_attr( $alt ), (int) $m['h'], esc_attr( $m['pos'] ),
 		$eager ? 'fetchpriority="high"' : 'loading="lazy"',
-		min( 600, (int) $m['w'] )
+		min( 600, (int) $m['w'] ),
+		esc_attr( $src )
 	);
 }
 

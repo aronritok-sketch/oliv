@@ -12,6 +12,7 @@ defined( 'ABSPATH' ) || exit;
 
 require_once __DIR__ . '/inc/setup.php';
 require_once __DIR__ . '/inc/image-position.php';
+require_once __DIR__ . '/inc/page-editor.php'; // Szerkesztés a weboldalon (Olivia, 11.13) – from wordpress/olivia-yoga, copied by build.py --wp
 
 /** The theme's data: pages (title, description, schema, prefooter, content), header, footer, menu. */
 function oj_data() {

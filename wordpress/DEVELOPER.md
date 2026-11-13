@@ -677,6 +677,26 @@ Olivia oldala és a HathaFlow ugyanazt használja: fizetés (Stripe) → hozzáf
   eszköz, vagy más program használja. A felvétel is kiírja, ha nincs mit felvenni.
 - A VPS-en a fejléc `camera=(self), microphone=(self)` (hlprv `deploy/vps/nginx/hpv-headers.conf`, 2026-11-13).
 
+### 6.13e Szerkesztés a weboldalon (olivia-yoga 3.5.0, oliviayoga 1.5.0)
+
+Olivia (Áron, 11.13) a saját oldalain szerkeszt, a Védőburok 0.13.0 / Kassai-témák szerkesztőjének mintájára
+(`olivia-yoga/inc/page-editor.php`, `assets/edit.js`, `assets/edit.css`; az oliviajoga.hu témájába a
+`oliviajoga-hu/build.py --wp` másolja). Belépve (szerkesztő vagy admin, `edit_others_pages`) „✎ Oldal szerkesztése”
+(admin sáv, bal alsó gomb, `?szerkesztes=1`): kattintás → írás (félkövér, dőlt, sortörés), kép → Médiatár + kivágási
+pont, alul Mentés / Elvetés / Képek a lapon / Lista és súgó / Kilépés, Ctrl+S. Admin: Megjelenés → Szövegek és képek
+(az átírt elemek, egyenként „eredeti”, előző mentés vissza, súgó).
+
+- Csak a kész oldal `<main>` része megy át egy DOM-lépésen (kimeneti puffer, `template_redirect` 1000), és csak ha van
+  mentett eltérés vagy szerkesztés mód van. Fejléc, lábléc, szkriptek érintetlenek.
+- Kulcs: szövegnél az eredeti szöveg md5-ének eleje (`t` + 10 jegy) – **ugyanaz a mondat mindenhol egyszerre változik**
+  (GYIK-válasz a főoldalon és a GYIK-oldalon). Kép: `data-oyp` (az `oy_photo()` kiírja) vagy a fájlnév méret nélkül.
+- Nem szerkeszthető: link- és gombfelirat (a linkkártyán belüli cím és bekezdés igen), menü, űrlap, a foglaló bővítmény
+  (`oys…` osztály), árak, órarend, légzőgyakorlat. Ezek adatok a Stúdió menüben.
+- Tárolás: `oye_edits` (`t` → HTML, `i` → `{id, fx, fy}`), `oye_edits_prev`, `oye_edits_meta` (hol, ki, mikor, eredeti).
+- **Tartalom-migrációnál vigyázz:** ha egy szöveg eredetije megváltozik, a rá mentett átírás már nem talál (csendben az
+  új eredeti látszik). Olivia átírásait az admin lista mutatja.
+- Online kiadáson és a magyar oldalon él; az amerikai kiadáson és a Hathaflow demón ki van kapcsolva (`oye_enabled`).
+
 ### 6.14 Mobil API és iOS app
 
 **API** – `OYS_App_API` (`includes/class-app-api.php`), útvonalak a `oys/v1/app/` alatt:

@@ -39,7 +39,7 @@ ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.4.4'
+VERSION = '1.5.0'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -1624,6 +1624,10 @@ def wp_theme(pages, versions):
     shutil.copy(os.path.join(THEME, 'assets', 'site.js'), os.path.join(OUT, 'assets', 'site.js'))
     shutil.copy(os.path.join(HERE, 'assets', 'oliviajoga.css'), os.path.join(OUT, 'assets', 'oliviajoga.css'))
     shutil.copy(os.path.join(HERE, 'assets', 'oliviajoga.js'), os.path.join(OUT, 'assets', 'oliviajoga.js'))
+    # Szerkesztés a weboldalon (Olivia, 11.13): the same editor as the online site (wordpress/olivia-yoga)
+    shutil.copy(os.path.join(THEME, 'inc', 'page-editor.php'), os.path.join(OUT, 'inc', 'page-editor.php'))
+    shutil.copy(os.path.join(THEME, 'assets', 'edit.js'), os.path.join(OUT, 'assets', 'edit.js'))
+    shutil.copy(os.path.join(THEME, 'assets', 'edit.css'), os.path.join(OUT, 'assets', 'edit.css'))
     for key in used:
         for w in (600, 1200):
             shutil.copy(os.path.join(THEME, 'assets', 'img', f'{key}-{w}.jpg'), os.path.join(OUT, 'assets', 'img', 'theme', f'{key}-{w}.jpg'))

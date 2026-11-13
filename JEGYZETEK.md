@@ -183,6 +183,15 @@
   15 perc). olivia-yoga **3.4.4:** az online kiadás feladója `info@oliviajoga.online`, a válasz és a stúdió-értesítés
   Olivia címére (élesen egyszer, csak ha még az alapérték áll ott). Tesztek 846/0.
 
+- **18e. kör (Olivia doksija 11.13 + Áron: „vizuális szerkesztő”):** olivia-yoga **3.5.0** – a hős az oliviajoga.hu
+  stílusában (lélegző lila blokk, lágy rózsaszín hullám, zöld gombok, a JÓGA ékezete a blokkban), névkártya: „Jógaoktató |
+  Pre- és postnatális tréner | Mozgás- és wellness coach”, „Jóga • Kismamatorna • Mobilizáció • Relaxáció és légzés”; új
+  hős-szöveg; öt külön szolgáltatás-doboz eltolva; „Nem kell utaznod” gyertyás mondattal; „magyarul” sehol; „Bejelentkezés
+  és árak”; kismamatorna: a kilenc mozgásmodul, óránként kettő. Élesen egyszeri tartalomfrissítés (`oy_migrate_1113`).
+  **Szerkesztés a weboldalon** mindkét oldalon (DEVELOPER 6.13e); oliviayoga (oliviajoga.hu) **1.5.0**. Tesztek 867/0.
+- **Fizetés (Áron, 11.13 este):** az Arovia Group LLC számláz → Stripe (Arovia) + QuickBooks. A kulcsok a CRM-ben vannak,
+  és onnan nem jönnek ki (a CRM így készült; a QuickBooks-token is csak egy helyen élhet) → az oldal a CRM-en át fizettet.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

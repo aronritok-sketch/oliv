@@ -2409,6 +2409,57 @@ test( 'admin in Hungarian: the emails page has no English left', function () {
 	ok( str_contains( $html, 'Mikor megy ki' ) && str_contains( $html, 'Szöveg szerkesztése' ), 'Hungarian column and button' );
 } );
 
+/** A small real JPEG in the media library (for the page editor test). */
+function self_test_image() {
+	$up   = wp_upload_dir();
+	$file = $up['path'] . '/oye-test.jpg';
+	$im   = imagecreatetruecolor( 40, 30 );
+	imagejpeg( $im, $file );
+	imagedestroy( $im );
+	$id = wp_insert_attachment( array( 'post_mime_type' => 'image/jpeg', 'post_title' => 'oye-test', 'post_status' => 'inherit' ), $file );
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+	wp_update_attachment_metadata( $id, wp_generate_attachment_metadata( $id, $file ) );
+	return $id;
+}
+
+test( 'page editor: saved text and photo show to everyone, links, booking and prices stay as they are', function () {
+	if ( ! function_exists( 'oye_pass' ) ) {
+		require_once dirname( __DIR__, 2 ) . '/olivia-yoga/inc/page-editor.php';
+	}
+	delete_option( 'oye_edits' );
+	$html = '<section><p class="hero__lead">Élő online jóga <b>minden</b> szerdán.</p><a class="way" href="/x"><h3>Csoportos jóga</h3><p>Szerdánként.</p></a>'
+		. '<p><a class="btn" href="/book">Óra foglalása</a></p><div class="oys-schedule"><p>Szerda 18:30</p></div><h1><span class="hero__l1">Online</span> <mark>jóga</mark></h1>'
+		. '<div class="frame"><img class="photo" src="/wp-content/themes/x/assets/img/online-yoga-living-room-1200.jpg" srcset="/a-600.jpg 600w" data-oyp="online-yoga-living-room" alt=""></div></section>';
+	eq( $html, oye_pass( $html ), 'nothing saved: the page is untouched' );
+	$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0];
+	wp_set_current_user( $admin );
+	$img = self_test_image();
+	$res = oye_apply(
+		array(
+			oye_text_key( 'Élő online jóga <b>minden</b> szerdán.' ) => array( 'v' => 'Új szöveg <script>x</script><em>itt</em>', 'def' => 'Élő online jóga <b>minden</b> szerdán.' ),
+			oye_text_key( 'Csoportos jóga' ) => array( 'v' => 'Csoportos online jóga' ),
+			oye_text_key( 'jóga' ) => array( 'v' => 'JÓGA!' ),
+			oye_text_key( 'Óra foglalása' ) => array( 'v' => 'nem írható' ),
+			oye_text_key( 'Szerda 18:30' ) => array( 'v' => 'nem írható' ),
+		),
+		array( 'i:online-yoga-living-room' => array( 'id' => $img, 'fx' => 30, 'fy' => 20 ) )
+	);
+	wp_set_current_user( 0 );
+	ok( $res['ok'], 'saved' );
+	$out = oye_pass( $html );
+	ok( str_contains( $out, '<p class="hero__lead">Új szöveg x<em>itt</em></p>' ), 'the text, only with simple formatting (no script)' );
+	ok( str_contains( $out, '<h3>Csoportos online jóga</h3>' ), 'a title inside a card link is text' );
+	ok( str_contains( $out, '<mark>JÓGA!</mark>' ), 'a part of the big title' );
+	ok( str_contains( $out, '>Óra foglalása</a>' ) && str_contains( $out, '<p>Szerda 18:30</p>' ), 'button labels and the booking plugin are not edited' );
+	ok( str_contains( $out, wp_get_attachment_image_url( $img, 'large' ) ) && ! str_contains( $out, 'srcset' ) && str_contains( $out, 'object-position:30% 20%' ), 'the photo: the new one, with its crop point' );
+	$page = '<html><body><header><p>Fejléc</p></header><main id="main">' . $html . '</main><footer>x</footer></body></html>';
+	$full = oye_filter_page( $page );
+	ok( str_contains( $full, '<header><p>Fejléc</p></header>' ) && str_contains( $full, 'Csoportos online jóga' ), 'only <main> goes through the editor' );
+	delete_option( 'oye_edits' );
+	delete_option( 'oye_edits_meta' );
+	delete_option( 'oye_edits_prev' );
+} );
+
 test( 'helpers: money and periods', function () {
 	eq( '$25', oys_money( 2500, 'usd' ), 'whole dollars' );
 	eq( '$25.50', oys_money( 2550, 'usd' ), 'cents' );
