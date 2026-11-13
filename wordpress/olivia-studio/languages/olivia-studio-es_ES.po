@@ -4008,3 +4008,28 @@ msgstr "Lo siento, estoy enferma."
 
 msgid "a free class"
 msgstr "una clase gratis"
+
+# 1.8.2: the live room – full window, full screen, why the camera did not start
+msgid "Full screen"
+msgstr "Pantalla completa"
+
+msgid "Exit full screen"
+msgstr "Salir de pantalla completa"
+
+msgid "This website does not allow the camera and microphone (the server sends a Permissions-Policy header that turns them off). The browser can't even ask. The site's host has to allow them: camera=(self), microphone=(self)."
+msgstr "Este sitio web no permite la cámara ni el micrófono (el servidor envía una cabecera Permissions-Policy que los desactiva), así que el navegador ni siquiera pregunta. El alojamiento debe permitirlos: camera=(self), microphone=(self)."
+
+msgid "The browser does not allow the camera or microphone. Click the icon left of the address bar, set Camera and Microphone to Allow, then reload the page."
+msgstr "El navegador no permite la cámara o el micrófono. Haz clic en el icono a la izquierda de la barra de direcciones, pon Cámara y Micrófono en Permitir y recarga la página."
+
+msgid "No camera or microphone was found. Plug one in, or check that it is switched on."
+msgstr "No se encontró cámara ni micrófono. Conecta uno o comprueba que esté encendido."
+
+msgid "Another program is using the camera (e.g. Zoom, Teams, FaceTime). Close it, then try again."
+msgstr "Otro programa está usando la cámara (p. ej. Zoom, Teams, FaceTime). Ciérralo y vuelve a intentarlo."
+
+msgid "Nothing to record yet: turn on your camera or microphone."
+msgstr "Aún no hay nada que grabar: enciende la cámara o el micrófono."
+
+msgid "This browser can't record. Use Chrome, Edge or Safari on a computer."
+msgstr "Este navegador no puede grabar. Usa Chrome, Edge o Safari en un ordenador."

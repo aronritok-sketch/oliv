@@ -224,6 +224,12 @@
 	var recState = q('[data-live-rec-state]');
 	var introEl = q('[data-live-intro]');
 	var LK = null;
+	if (cfg.owner && lobby && policyBlocks()) { // say it before she tries: the browser will not even ask
+		var warn = document.createElement('p');
+		warn.className = 'oys-live__warn';
+		warn.textContent = t.blocked;
+		lobby.insertBefore(warn, lobby.firstChild);
+	}
 	var lkP = null;
 	var room = null;
 	var join = null;
@@ -479,8 +485,41 @@
 		});
 	}
 
+	/* Why the camera or microphone did not start: the site's server forbids them (Permissions-Policy), the browser
+	   was told no, there is none, or another program holds the camera. */
+	function policyBlocks() {
+		var pp = document.permissionsPolicy || document.featurePolicy;
+		try {
+			return !!(pp && pp.allowsFeature && (!pp.allowsFeature('camera') || !pp.allowsFeature('microphone')));
+		} catch (e) {
+			return false;
+		}
+	}
+
+	function deviceError(err) {
+		if (policyBlocks()) {
+			return t.blocked;
+		}
+		var kind = LK && LK.MediaDeviceFailure && LK.MediaDeviceFailure.getFailure ? LK.MediaDeviceFailure.getFailure(err) : '';
+		var name = (err && err.name) || '';
+		if (kind === 'PermissionDenied' || name === 'NotAllowedError' || name === 'SecurityError') {
+			return t.denied;
+		}
+		if (kind === 'NotFound' || name === 'NotFoundError' || name === 'OverconstrainedError') {
+			return t.notFound;
+		}
+		if (kind === 'DeviceInUse' || name === 'NotReadableError' || name === 'AbortError') {
+			return t.inUse;
+		}
+		return t.noDevice;
+	}
+
 	function startRec() {
-		if (rec.on || !room || !window.MediaRecorder) {
+		if (rec.on || !room) {
+			return;
+		}
+		if (!window.MediaRecorder) {
+			setRec(false, t.recNoSup);
 			return;
 		}
 		var lp = room.localParticipant;
@@ -494,6 +533,7 @@
 			tracks.push(mic.track.mediaStreamTrack);
 		}
 		if (!tracks.length) {
+			setRec(false, policyBlocks() ? t.blocked : t.recNoAv);
 			return;
 		}
 		var mime = recMime();
@@ -501,6 +541,7 @@
 		try {
 			recorder = new MediaRecorder(new MediaStream(tracks), mime ? { mimeType: mime, videoBitsPerSecond: 1200000, audioBitsPerSecond: 96000 } : {});
 		} catch (e) {
+			setRec(false, t.recNoSup);
 			return;
 		}
 		rec.on = true;
@@ -608,7 +649,52 @@
 
 	/* Joining and leaving */
 
+	/* While in the class the room fills the browser window (small laptops: everything on one screen, no scrolling),
+	   and the full screen button hides the browser too. */
+	var head = q('.oys-live__head');
+	var fsBtn = null;
+	function fsOn() {
+		return !!(document.fullscreenElement || document.webkitFullscreenElement);
+	}
+	function fsLabel() {
+		if (fsBtn) {
+			fsBtn.textContent = fsOn() ? t.fullExit : t.full;
+		}
+	}
+	if (head && (root.requestFullscreen || root.webkitRequestFullscreen)) {
+		fsBtn = document.createElement('button');
+		fsBtn.type = 'button';
+		fsBtn.className = 'oys-live__fs';
+		fsBtn.hidden = true;
+		fsBtn.addEventListener('click', function () {
+			if (fsOn()) {
+				(document.exitFullscreen || document.webkitExitFullscreen).call(document);
+			} else {
+				var go = root.requestFullscreen || root.webkitRequestFullscreen;
+				var r = go.call(root);
+				if (r && r.catch) {
+					r.catch(function () {});
+				}
+			}
+		});
+		document.addEventListener('fullscreenchange', fsLabel);
+		document.addEventListener('webkitfullscreenchange', fsLabel);
+		fsLabel();
+		head.appendChild(fsBtn);
+	}
+	function stageMode(on) {
+		root.classList.toggle('is-live', on);
+		document.documentElement.classList.toggle('oys-live-open', on);
+		if (fsBtn) {
+			fsBtn.hidden = !on;
+		}
+		if (!on && fsOn()) {
+			(document.exitFullscreen || document.webkitExitFullscreen).call(document);
+		}
+	}
+
 	function showLobby(msg) {
+		stageMode(false);
 		stage.hidden = true;
 		lobby.hidden = false;
 		if (ownerBar) {
@@ -641,10 +727,10 @@
 		var canSend = cfg.owner || join.twoWay;
 		if (canSend) {
 			var mic = button(t.micOn, 'is-mic', function () {
-				lp.setMicrophoneEnabled(!lp.isMicrophoneEnabled).then(sync, function () { note(t.noDevice, 6000); });
+				lp.setMicrophoneEnabled(!lp.isMicrophoneEnabled).then(sync, function (e) { note(deviceError(e), 12000); });
 			});
 			var cam = button(t.camOn, 'is-cam', function () {
-				lp.setCameraEnabled(!lp.isCameraEnabled).then(sync, function () { note(t.noDevice, 6000); });
+				lp.setCameraEnabled(!lp.isCameraEnabled).then(sync, function (e) { note(deviceError(e), 12000); });
 			});
 			var sync = function () {
 				mic.textContent = lp.isMicrophoneEnabled ? t.micOn : t.micOff;
@@ -764,6 +850,7 @@
 			return room.connect(join.url, join.token, { autoSubscribe: !!cfg.owner }).then(function () {
 				lobby.hidden = true;
 				stage.hidden = false;
+				stageMode(true);
 				room.startAudio().catch(function () {});
 				room.remoteParticipants.forEach(function (p) {
 					if (cfg.owner || isTeacher(p)) {
@@ -777,7 +864,7 @@
 				controls();
 				refresh();
 				var publish = cfg.owner ? room.localParticipant.enableCameraAndMicrophone() : Promise.resolve();
-				return publish.catch(function () { note(t.noDevice); }).then(function () {
+				return publish.catch(function (e) { note(deviceError(e)); }).then(function () {
 					if (cfg.owner) {
 						ownerBar.hidden = false;
 						if (join.record) {

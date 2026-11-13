@@ -970,6 +970,14 @@ class OYS_Live {
 				'opensIn'   => __( 'The room opens in %s.', 'olivia-studio' ),
 				'min'       => __( 'min', 'olivia-studio' ),
 				'openNow'   => __( 'The room is open.', 'olivia-studio' ),
+				'full'      => __( 'Full screen', 'olivia-studio' ),
+				'fullExit'  => __( 'Exit full screen', 'olivia-studio' ),
+				'blocked'   => __( 'This website does not allow the camera and microphone (the server sends a Permissions-Policy header that turns them off). The browser can\'t even ask. The site\'s host has to allow them: camera=(self), microphone=(self).', 'olivia-studio' ),
+				'denied'    => __( 'The browser does not allow the camera or microphone. Click the icon left of the address bar, set Camera and Microphone to Allow, then reload the page.', 'olivia-studio' ),
+				'notFound'  => __( 'No camera or microphone was found. Plug one in, or check that it is switched on.', 'olivia-studio' ),
+				'inUse'     => __( 'Another program is using the camera (e.g. Zoom, Teams, FaceTime). Close it, then try again.', 'olivia-studio' ),
+				'recNoAv'   => __( 'Nothing to record yet: turn on your camera or microphone.', 'olivia-studio' ),
+				'recNoSup'  => __( 'This browser can\'t record. Use Chrome, Edge or Safari on a computer.', 'olivia-studio' ),
 			),
 		);
 

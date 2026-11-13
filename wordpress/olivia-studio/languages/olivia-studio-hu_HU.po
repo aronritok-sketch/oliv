@@ -5919,3 +5919,28 @@ msgstr "A helyszínen fizetve"
 
 msgid "Not collected yet"
 msgstr "Még nincs beszedve"
+
+# 1.8.2: the live room – full window, full screen, why the camera did not start
+msgid "Full screen"
+msgstr "Teljes képernyő"
+
+msgid "Exit full screen"
+msgstr "Kilépés a teljes képernyőből"
+
+msgid "This website does not allow the camera and microphone (the server sends a Permissions-Policy header that turns them off). The browser can't even ask. The site's host has to allow them: camera=(self), microphone=(self)."
+msgstr "Ez a weboldal nem engedi a kamerát és a mikrofont (a szerver egy Permissions-Policy fejléccel letiltja őket), ezért a böngésző meg sem kérdezi. A tárhelyen kell engedélyezni: camera=(self), microphone=(self)."
+
+msgid "The browser does not allow the camera or microphone. Click the icon left of the address bar, set Camera and Microphone to Allow, then reload the page."
+msgstr "A böngésző nem engedi a kamerát vagy a mikrofont. Kattints a címsor bal oldalán lévő ikonra, a Kamerát és a Mikrofont állítsd Engedélyezésre, majd töltsd újra az oldalt."
+
+msgid "No camera or microphone was found. Plug one in, or check that it is switched on."
+msgstr "Nem található kamera vagy mikrofon. Csatlakoztass egyet, vagy nézd meg, hogy be van-e kapcsolva."
+
+msgid "Another program is using the camera (e.g. Zoom, Teams, FaceTime). Close it, then try again."
+msgstr "A kamerát most egy másik program használja (pl. Zoom, Teams, FaceTime). Zárd be, és próbáld újra."
+
+msgid "Nothing to record yet: turn on your camera or microphone."
+msgstr "Még nincs mit felvenni: kapcsold be a kamerát vagy a mikrofont."
+
+msgid "This browser can't record. Use Chrome, Edge or Safari on a computer."
+msgstr "Ez a böngésző nem tud felvenni. Használj számítógépen Chrome-ot, Edge-et vagy Safarit."

@@ -668,6 +668,15 @@ Olivia oldala és a HathaFlow ugyanazt használja: fizetés (Stripe) → hozzáf
   (DKIM, DMARC, brevo-code) a Brevóban kell hitelesíteni, a feladó cím ezen a domainen legyen.
 - A regisztrációs levél (`welcome`) a következő 3 nyilvános órát is listázza foglalás-linkkel (`OYS_Emails::upcoming_html()`).
 
+### 6.13d Az élő óra a teljes ablakban, kamerahibák (1.8.2)
+
+- Csatlakozás után a `.oys-live` megkapja az `is-live` osztályt: a teljes böngészőablakot kitölti (videó, résztvevők, gombok,
+  felvétel, chat egy képernyőn, kis laptopon is), a fejlécben „Teljes képernyő” gomb (Fullscreen API). Kilépéskor vissza.
+- Ha a kamera vagy a mikrofon nem indul, a pontos ok látszik: a szerver `Permissions-Policy` fejléce tiltja
+  (`camera=()` – a böngésző meg sem kérdez; az oktató már a belépés előtt figyelmeztetést kap), a böngésző tiltja, nincs
+  eszköz, vagy más program használja. A felvétel is kiírja, ha nincs mit felvenni.
+- A VPS-en a fejléc `camera=(self), microphone=(self)` (hlprv `deploy/vps/nginx/hpv-headers.conf`, 2026-11-13).
+
 ### 6.14 Mobil API és iOS app
 
 **API** – `OYS_App_API` (`includes/class-app-api.php`), útvonalak a `oys/v1/app/` alatt:
