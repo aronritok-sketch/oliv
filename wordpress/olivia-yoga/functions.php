@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OY_VERSION', '3.5.1' );
+define( 'OY_VERSION', '3.5.2' );
 
 require_once get_template_directory() . '/inc/edition.php';
 
@@ -21,6 +21,11 @@ require_once get_template_directory() . '/inc/seo.php';
 // Szerkesztés a weboldalon (Olivia, 11.13): only on her Hungarian sites, not the US one or the Hathaflow demo
 add_filter( 'oye_enabled', fn( $on ) => $on && ( oy_online_only() || 'hu' === oy_default_lang() ) && ! oy_is_demo() );
 require_once get_template_directory() . '/inc/page-editor.php';
+// The booking plugin's „By paying you accept the terms” links to the ÁSZF when the site has one (online edition, 11.13)
+add_filter( 'oys_terms_url', function ( $url ) {
+	$p = get_page_by_path( 'aszf' );
+	return $p && 'publish' === $p->post_status ? get_permalink( $p ) : $url;
+} );
 if ( is_admin() ) {
 	require_once get_template_directory() . '/inc/demo-import.php';
 	require_once get_template_directory() . '/inc/translations-admin.php';

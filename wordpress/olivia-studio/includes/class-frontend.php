@@ -358,6 +358,15 @@ class OYS_Frontend {
 	}
 
 	/** Small script: show/hide guest rows and update the party size and card total on each option. */
+	/**
+	 * „By paying you accept the terms” under the pay buttons, when the site has terms of sale (the theme gives their
+	 * address: filter oys_terms_url).
+	 */
+	public static function terms_note() {
+		$url = (string) apply_filters( 'oys_terms_url', '' );
+		return '' === $url ? '' : '<p class="oys-small oys-terms">' . wp_kses( sprintf( __( 'By paying you accept the <a href="%s" target="_blank">terms of sale</a>.', 'olivia-studio' ), esc_url( $url ) ), array( 'a' => array( 'href' => array(), 'target' => array() ) ) ) . '</p>';
+	}
+
 	private static function party_script() {
 		return '<script>(function(){document.querySelectorAll("[data-party]").forEach(function(f){var box=f.querySelector("[data-guests]");var rows=box?[].slice.call(box.querySelectorAll("[data-guest]")):[];var add=box&&box.querySelector("[data-guest-add]");var host=parseInt(f.getAttribute("data-host"),10);'
 			. 'function count(){return rows.filter(function(r){return !r.hidden&&r.querySelector("input[type=text]").value.trim()!=="";}).length;}'
@@ -611,6 +620,7 @@ class OYS_Frontend {
 		$out .= self::waiver_field()
 			. '<p class="oys-policy">' . esc_html( OYS_Settings::get( 'cancel_policy' ) ) . '</p>'
 			. '<button class="btn btn--primary oys-submit" type="submit">' . esc_html__( 'Continue', 'olivia-studio' ) . '</button>'
+			. self::terms_note()
 			. '<p class="oys-secure">' . esc_html__( 'Card payments are processed securely by Stripe. Apple Pay and Google Pay are accepted.', 'olivia-studio' ) . '</p></form>' . self::party_script();
 		return $out . '</div></div>';
 	}
@@ -645,7 +655,7 @@ class OYS_Frontend {
 			$out .= self::form_open( 'oys_join', 'class="oys-card oys-pay"' ) . '<h2>' . esc_html__( 'Join', 'olivia-studio' ) . '</h2><input type="hidden" name="product" value="' . esc_attr( $p['id'] ) . '">'
 				. '<p>' . sprintf( esc_html__( 'You pay %1$s today, then %1$s %2$s until you cancel. Cancel any time in your account; you keep access until the end of the paid period.', 'olivia-studio' ), esc_html( oys_money( $p['price_cents'] ) ), esc_html( OYS_Products::period_label( $p ) ) ) . '</p>'
 				. self::waiver_field()
-				. '<button class="btn btn--primary oys-submit" type="submit">' . sprintf( esc_html__( 'Join for %s', 'olivia-studio' ), esc_html( oys_money( $p['price_cents'] ) ) ) . '</button>'
+				. '<button class="btn btn--primary oys-submit" type="submit">' . sprintf( esc_html__( 'Join for %s', 'olivia-studio' ), esc_html( oys_money( $p['price_cents'] ) ) ) . '</button>' . self::terms_note()
 				. '<p class="oys-secure">' . esc_html__( 'Recurring payments are processed securely by Stripe. Update your card or cancel from your account.', 'olivia-studio' ) . '</p></form>';
 			return $out . '</div></div>';
 		}
@@ -653,7 +663,7 @@ class OYS_Frontend {
 			. '<p>' . esc_html__( 'After paying, book any class from the timetable in one click. You can use your pass for guests you bring, too.', 'olivia-studio' ) . '</p>'
 			. self::coupon_field( get_current_user_id() )
 			. self::waiver_field()
-			. '<button class="btn btn--primary oys-submit" type="submit">' . sprintf( esc_html__( 'Pay %s', 'olivia-studio' ), esc_html( oys_money( $p['price_cents'] ) ) ) . '</button>'
+			. '<button class="btn btn--primary oys-submit" type="submit">' . sprintf( esc_html__( 'Pay %s', 'olivia-studio' ), esc_html( oys_money( $p['price_cents'] ) ) ) . '</button>' . self::terms_note()
 			. '<p class="oys-secure">' . esc_html__( 'Card payments are processed securely by Stripe. Apple Pay and Google Pay are accepted.', 'olivia-studio' ) . '</p></form>';
 		return $out . '</div></div>';
 	}
@@ -1410,7 +1420,7 @@ class OYS_Frontend {
 			. '<div class="oys-card"><div class="form__row"><label class="field"><span>' . esc_html__( 'Recipient\'s name', 'olivia-studio' ) . '</span><input type="text" name="recipient_name" id="oys-g-name" required></label>'
 			. '<label class="field"><span>' . esc_html__( 'Recipient\'s email', 'olivia-studio' ) . '</span><input type="email" name="recipient_email" id="oys-g-email" required></label></div>'
 			. '<label class="field"><span>' . esc_html__( 'Personal message (optional)', 'olivia-studio' ) . '</span><textarea name="message" id="oys-g-msg" rows="3"></textarea></label>'
-			. '<button class="btn btn--primary" type="submit">' . esc_html__( 'Continue to payment', 'olivia-studio' ) . '</button>'
+			. '<button class="btn btn--primary" type="submit">' . esc_html__( 'Continue to payment', 'olivia-studio' ) . '</button>' . self::terms_note()
 			. '<p class="oys-small">' . esc_html__( 'The gift card is emailed to the recipient right after payment. You get the receipt.', 'olivia-studio' ) . '</p></div></form>';
 	}
 

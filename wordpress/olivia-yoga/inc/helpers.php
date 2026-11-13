@@ -189,6 +189,15 @@ function oy_specialities_line( $cls = 'specialities' ) {
 	return '<p class="' . esc_attr( $cls ) . '">' . implode( '<i aria-hidden="true">•</i>', array_map( 'esc_html', oy_specialities() ) ) . '</p>';
 }
 
+/** The theme's legal pages that exist (for the footer): slug → [title, url]. */
+function oy_legal_pages() {
+	$out = array();
+	foreach ( get_posts( array( 'post_type' => 'page', 'post_status' => 'publish', 'numberposts' => 5, 'meta_key' => 'oy_legal', 'orderby' => 'menu_order title', 'order' => 'ASC' ) ) as $p ) {
+		$out[ get_post_meta( $p->ID, 'oy_legal', true ) ] = array( get_the_title( $p ), get_permalink( $p ) );
+	}
+	return $out;
+}
+
 /** The name of the timetable & prices page in buttons and menus: on the online site „Bejelentkezés és árak” (Olivia, 11.13). */
 function oy_schedule_label() {
 	return oy_online_only() ? __( 'Sign-up & pricing', 'olivia-yoga' ) : __( 'Schedule & pricing', 'olivia-yoga' );

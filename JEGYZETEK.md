@@ -193,6 +193,12 @@
   és onnan nem jönnek ki (a CRM így készült; a QuickBooks-token is csak egy helyen élhet) → az oldal a CRM-en át fizettet.
   olivia-studio **1.9.0** (DEVELOPER 6.13f) + olivia-yoga **3.5.1**; a CRM-modul a hlprv-ben (`shop-pay.php`), a fő
   chatnek kell beolvasztania és kiadnia. Tesztek 879/0; a CRM-modul helyi próbája 25/25.
+- **ÁSZF és impresszum (olivia-yoga 3.5.2, olivia-studio 1.9.1):** `/aszf/`, `/impresszum/` az Arovia Group LLC-vel mint
+  eladóval (a cím a helloprovision.com nyilvános feltételeiből), az órákat Kovács Olívia tartja; elállás (14 nap a
+  bérletre / utalványra, időponthoz kötött órára nincs – 45/2014. Korm. r.), panasz, irányadó jog (Florida, a fogyasztó
+  kötelező szabályai megmaradnak). Az adatvédelmi tájékoztató adatkezelője az Arovia (Stripe, QuickBooks, USA). Lábléc:
+  ÁSZF · Impresszum · Adatvédelem; a fizetés gombjai alatt „A vásárlással elfogadod az ÁSZF-et”. **Nyitott (Áron):**
+  az Arovia EIN-je / floridai nyilvántartási száma az impresszumba, uniós képviselő (GDPR 27. cikk), OSS-ÁFA.
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).

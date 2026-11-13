@@ -316,7 +316,7 @@ function oy_import_all( $refresh = false ) {
 		$posts++;
 	}
 	$log[] = sprintf( '%d journal posts', $posts );
-	$log   = array_merge( $log, oy_remove_wp_samples(), oy_import_privacy( $data, $refresh ) );
+	$log   = array_merge( $log, oy_remove_wp_samples(), oy_import_privacy( $data, $refresh ), oy_import_legal( $data, $refresh ) );
 
 	// Past events (with photos).
 	$moments = 0;
@@ -533,6 +533,49 @@ function oy_import_privacy( array $data, $refresh = false ) {
 }
 
 /**
+ * The legal pages of the content file's "legal" list (the online edition: ÁSZF and Impresszum, Arovia Group LLC as the
+ * seller – Áron, 11.13). Like the privacy notice: a page with the same address that someone wrote themselves is kept;
+ * ours is rewritten only on refresh. {email}, {privacy} and {terms} are filled in.
+ */
+function oy_import_legal( array $data, $refresh = false ) {
+	$log = array();
+	foreach ( (array) ( $data['legal'] ?? array() ) as $l ) {
+		if ( empty( $l['slug'] ) || empty( $l['content'] ) ) {
+			continue;
+		}
+		$page = get_page_by_path( $l['slug'] );
+		$ours = $page && get_post_meta( $page->ID, 'oy_legal', true );
+		if ( $page && 'publish' === $page->post_status && ( ! $ours || ! $refresh ) ) {
+			continue;
+		}
+		$args = array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => $l['title'], 'post_name' => $l['slug'], 'post_content' => '' );
+		if ( $page ) {
+			$args['ID'] = $page->ID;
+			wp_update_post( wp_slash( $args ) );
+			$id = $page->ID;
+		} else {
+			$id = wp_insert_post( wp_slash( $args ) );
+		}
+		update_post_meta( $id, 'oy_legal', $l['slug'] );
+		update_post_meta( $id, 'oy_seo_desc', $l['seo_desc'] ?? '' );
+		$log[] = 'legal: /' . $l['slug'] . '/';
+	}
+	// the text last, when every legal page has its address (they link to each other)
+	foreach ( (array) ( $data['legal'] ?? array() ) as $l ) {
+		$page = empty( $l['slug'] ) ? null : get_page_by_path( $l['slug'] );
+		if ( $page && get_post_meta( $page->ID, 'oy_legal', true ) && ( $refresh || '' === trim( $page->post_content ) ) ) {
+			$terms = get_page_by_path( 'aszf' );
+			wp_update_post( wp_slash( array( 'ID' => $page->ID, 'post_content' => strtr( $l['content'], array(
+				'{email}'   => OY_EMAIL,
+				'{privacy}' => get_privacy_policy_url() ?: home_url( '/adatvedelem/' ),
+				'{terms}'   => $terms ? get_permalink( $terms ) : home_url( '/aszf/' ),
+			) ) ) ) );
+		}
+	}
+	return $log;
+}
+
+/**
  * Settings the edition got after a site was set up (setup.studio in the content file): the sender, reply-to and
  * notification addresses, and the birthday code and loyalty draw switched off on the online site (Áron, 2026-11-13:
  * only what the online yoga uses). Once, and only where the value is still the plugin's default, so anything someone
@@ -574,7 +617,7 @@ function oy_mail_setup() {
  * the live site before this, so there is nothing of hers to overwrite.
  */
 function oy_migrate_1113() {
-	$rev = '2026-11-13';
+	$rev = '2026-11-13b'; // b: + ÁSZF, Impresszum, the privacy notice with Arovia as the controller
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_content_rev' ) === $rev ) {
 		return array();
 	}

@@ -5984,3 +5984,6 @@ msgstr "A CRM nem fogadta el a kapcsolatot: %s"
 
 msgid "Connected to the CRM: card payments go to Arovia."
 msgstr "Kapcsolódva a CRM-hez: a kártyás fizetések az Arovia-hoz mennek."
+
+msgid "By paying you accept the <a href=\"%s\" target=\"_blank\">terms of sale</a>."
+msgstr "A vásárlással elfogadod az <a href=\"%s\" target=\"_blank\">általános szerződési feltételeket</a>."

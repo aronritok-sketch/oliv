@@ -1737,7 +1737,10 @@ test( 'online edition: Hungarian addresses and its own copy', function () {
 	$data = json_decode( (string) file_get_contents( oy_content_file( 'hu-online' ) ), true );
 	$text = wp_json_encode( $data, JSON_UNESCAPED_UNICODE );
 	ok( is_array( $data ) && ! str_contains( $text, '—' ), 'online copy: valid, no em dash' );
-	ok( ! preg_match( '/Fort Myers|Florid|lanai|tenger|strand|homok|pickleball|tenisz|golf|klubház/iu', $text ), 'online copy: written for Hungary (no Fort Myers, sea, beach, tennis, golf …)' );
+	// the seller is Arovia Group LLC in Fort Myers, Florida (Áron, 11.13): its address belongs in the legal pages and the privacy notice
+	$copy = wp_json_encode( array_diff_key( $data, array_flip( array( 'legal', 'privacy' ) ) ), JSON_UNESCAPED_UNICODE );
+	ok( ! preg_match( '/Fort Myers|Florid|lanai|tenger|strand|homok|pickleball|tenisz|golf|klubház/iu', $copy ), 'online copy: written for Hungary (no Fort Myers, sea, beach, tennis, golf …)' );
+	ok( str_contains( wp_json_encode( $data['legal'], JSON_UNESCAPED_UNICODE ), 'Arovia Group LLC' ) && str_contains( $data['privacy']['content'], 'Arovia Group LLC' ), 'the seller and controller is Arovia' );
 	ok( ! str_contains( $text, 'Kovacs' ), 'online copy: her name in Hungarian (Kovács Olívia)' );
 	ok( empty( array_diff( array_keys( $data['pages'] ), array_keys( OY_PAGE_SLUGS ) ) ), 'online pages are theme pages' );
 	foreach ( $data['sessions'] as $s ) {
@@ -2540,6 +2543,15 @@ test( 'Arovia payments through the CRM: the site registers itself, every Stripe 
 	remove_filter( 'pre_http_request', $fake, 4 );
 	OYS_Settings::update( array( 'pay_provider' => 'stripe' ) );
 	delete_option( OYS_HPV_Pay::OPTION );
+} );
+
+test( 'terms of sale: the line under the pay buttons links the ÁSZF when the site has one', function () {
+	eq( '', OYS_Frontend::terms_note(), 'no terms page, no line' );
+	$f = fn() => 'https://example.test/aszf/';
+	add_filter( 'oys_terms_url', $f );
+	$html = OYS_I18n::with( 'hu', fn() => OYS_Frontend::terms_note() );
+	remove_filter( 'oys_terms_url', $f );
+	ok( str_contains( $html, 'href="https://example.test/aszf/"' ) && str_contains( $html, 'általános szerződési feltételeket' ), 'Hungarian line with the link' );
 } );
 
 test( 'helpers: money and periods', function () {
