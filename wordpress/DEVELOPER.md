@@ -718,6 +718,32 @@ cserélődik). Ehelyett `Studio → Settings → Payments go to: Arovia Group LL
 - A téma beállítója az online kiadáson egyszer `hpv`-re állítja (`oy_mail_setup`, rev 2026-11-13b) – de csak ha az
   oldalon nincs saját Stripe-kulcs.
 
+### 6.13g Egyéni órák több hosszban, árlista-kapcsolók, csak az órás napok (olivia-studio 1.10.0)
+
+Olivia doksija, 2026. 11. 13. 21:35.
+
+- **Szolgáltatás több hosszban:** `oys_services[key]['durations']` (pl. `"60,90"`; az első a `duration`). A nem alap
+  hosszú alkalomnak saját kreditje van: `OYS_Services::credit_kind( $key, $people, $minutes )` → `egyeni-joga_90`
+  (párban `egyeni-joga_duo_90`). A termék hossza a `duration_min`; `OYS_Services::lengths()`, `price( $key, $people,
+  $minutes )`, `product_minutes()`. Az időpontkérő űrlap a több hosszú szolgáltatásnál hosszt kér (`?length=90`
+  előválaszt), az ajánlat ilyenkor is kreditezhető, a magánóra kreditfajtája a kérés hosszából jön
+  (`OYS_Privates::credit_kind_for`).
+- **Oktatói lemondás:** a magánóra lemondásakor is meghosszabbodik a foglaló ember azonos fajtájú bérlete
+  (`cancel_extend_days`, `OYS_Passes::extend_private_for_cancelled`).
+- **Árlista:** a szolgáltatások saját kártyákat kapnak (`service_prices`): alkalom + bérlet egymás mellett, a kártya
+  címe a szolgáltatás neve, alatta „alkalmanként, 60 perc” / „5 alkalom × 60 perc”; hossz-kapcsoló (`.oys-seg`) és
+  „Párban olcsóbb” kapcsoló (`.oys-pair`), ha van kétfős termék. Minden változat benne van a HTML-ben, az
+  `assets/oys.js` mutatja a választottat (JS nélkül mind látszik). Szűrők: `oys_price_gift_line` (kiemelt
+  „Ajándékutalványként is megveheted” sor az ajándékozható termékeken, link az utalvány oldalra), `oys_dropin_features`,
+  `oys_pricing_groups` (csoportcímek), a meglévő `oys_featured_badge`. Az online kiadás (téma) mindet használja.
+- **Órarend csak az órás napokkal:** beállítás `schedule_empty_days` = `no` → nincs „Ma nincs csoportos óra” sor, a
+  következő `next` (alapból 6) óra látszik, bármilyen messze; a Foglalás oldal alján külön doboz az egyéni órákhoz
+  (`[oys_private_box]`).
+- **Fizetési oldal:** a bal oldali bérletkártya már nem ragadós (magasabb volt a képernyőnél, az alja nem látszott).
+- Téma (olivia-yoga 3.6.0): Olivia új fotói (nyitókép, három óra-sor), a „Jógáról” tetején „A jóga 8 ága” blokk
+  (`#a-joga-8-aga`, `oy_limbs_url()`), légzés: „3 kör, majd figyeld meg az érzeteket”, a végén narancs felirattal a
+  lótuszban. Élesen `oy_migrate_1113` rev d + `oy_apply_online_prices()`.
+
 ### 6.14 Mobil API és iOS app
 
 **API** – `OYS_App_API` (`includes/class-app-api.php`), útvonalak a `oys/v1/app/` alatt:

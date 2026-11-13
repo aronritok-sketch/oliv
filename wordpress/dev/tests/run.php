@@ -549,7 +549,8 @@ test( 'calendar: validation and capacity below bookings', function () {
 	ok( is_wp_error( $bad ), 'a class needs a class type' );
 	$past = OYS_Calendar::rest_save( cal_req( array( 'kind' => 'event', 'title' => 'Old', 'date' => wp_date( 'Y-m-d', time() - 3 * DAY_IN_SECONDS ), 'start' => '10:00' ) ) );
 	ok( is_wp_error( $past ), 'no new sessions in the past' );
-	$s = make_session( array( 'capacity' => 3 ) );
+	// at 10:00 in three days: a class that starts late in the evening would run past midnight
+	$s = make_session( array( 'capacity' => 3, 'in_hours' => ( ( new DateTimeImmutable( 'today 10:00', wp_timezone() ) )->modify( '+3 days' )->getTimestamp() - time() ) / HOUR_IN_SECONDS ) );
 	OYS_Bookings::book_party( make_user(), $s, array( 'method' => 'free', 'guests' => guests( 'A' ), 'notify' => false ) );
 	$d = OYS_Calendar::out( OYS_Schedule::get( $s->id ) );
 	OYS_Calendar::rest_save( cal_req( array_merge( $d, array( 'capacity' => 1 ) ), $s->id ), $s->id );
@@ -1025,7 +1026,7 @@ test( 'one-to-one services: their own credits, alone or with a friend; a single 
 		ok( 'private_pack' === $legacy['kind'] && 'prenatal' === $legacy['service'] && 2 === $legacy['people'], '1.5.0 prenatal_duo_pack is read as a prenatal pack for two' );
 		ok( isset( OYS_Products::purchasable()['pn-5'] ) && ! isset( OYS_Products::purchasable()['pn-1'] ), 'packs are bought, singles are booked by request' );
 		$prices = OYS_Frontend::sc_pricing( array() );
-		ok( str_contains( $prices, 'Relax 1' ) && str_contains( $prices, 'topic=relax' ), 'a 30-minute session of a service has its own card on the price list' );
+		ok( str_contains( $prices, 'per session, 30 minutes' ) && str_contains( $prices, 'topic=relax' ), 'a 30-minute session of a service has its own card on the price list' );
 		$u = make_user( 'Mia' );
 		foreach ( array( array( 'prenatal', 1, 60, 'kismamatorna', 'prenatal' ), array( 'relax', 1, 30, 'relaxacio', 'relax' ), array( 'prenatal', 2, 60, 'kismamatorna-duo', 'prenatal_duo' ) ) as $n => [ $topic, $people, $dur, $slug, $kind ] ) {
 			$wpdb->insert( OYS_Install::table( 'private_requests' ), array( 'user_id' => $u, 'topic' => $topic, 'duration_min' => $dur, 'people' => $people, 'location_type' => 'online', 'preferred' => 'mornings', 'status' => 'new', 'created_at' => oys_now() ) );
@@ -1044,6 +1045,85 @@ test( 'one-to-one services: their own credits, alone or with a friend; a single 
 	} finally {
 		update_option( OYS_Products::OPTION, $products );
 		false === $services ? delete_option( OYS_Services::OPTION ) : update_option( OYS_Services::OPTION, $services );
+	}
+} );
+
+test( 'one-to-one in two lengths (60 / 90 minutes): own credits, own cards, the price list switches (Olivia, 13 Nov)', function () {
+	global $wpdb;
+	$products = get_option( OYS_Products::OPTION );
+	$services = get_option( OYS_Services::OPTION );
+	try {
+		update_option( OYS_Services::OPTION, array(
+			'yoga1' => array( 'label' => 'One-to-one yoga', 'class' => 'egyeni', 'duration' => 60, 'durations' => '60,90', 'duo' => 0, 'sort' => 1 ),
+			'pn'    => array( 'label' => 'Prenatal', 'class' => 'kismama', 'duration' => 60, 'duo' => 1, 'sort' => 2 ),
+		) );
+		$p = fn( $kind, $svc, $min, $price, $people = 1 ) => array( 'name' => "$svc $kind $min $people", 'kind' => $kind, 'service' => $svc, 'people' => $people, 'credits' => 'private_pack' === $kind ? 5 : 1, 'validity_days' => 'private_pack' === $kind ? 42 : 365, 'price_cents' => $price, 'features' => "One-to-one\nPlanned for you", 'giftable' => 1, 'active' => 1, 'duration_min' => $min );
+		update_option( OYS_Products::OPTION, array(
+			'y60-1' => $p( 'private_single', 'yoga1', 60, 500000 ), 'y60-5' => $p( 'private_pack', 'yoga1', 60, 2200000 ),
+			'y90-1' => $p( 'private_single', 'yoga1', 90, 700000 ), 'y90-5' => $p( 'private_pack', 'yoga1', 90, 3000000 ),
+			'pn-1'  => $p( 'private_single', 'pn', 60, 500000 ), 'pn-2' => $p( 'private_single', 'pn', 60, 800000, 2 ),
+			'pn-5'  => $p( 'private_pack', 'pn', 60, 2200000 ), 'pn-d5' => $p( 'private_pack', 'pn', 60, 3600000, 2 ),
+		) );
+		eq( array( 60, 90 ), OYS_Services::lengths( 'yoga1' ), 'the service is sold in 60 and 90 minutes' );
+		eq( 700000, OYS_Services::price( 'yoga1', 1, 90 ), '90 minutes: its own price' );
+		eq( 500000, OYS_Services::price( 'yoga1' ), 'the first length is the default' );
+		eq( 'yoga1', OYS_Products::credit_kind( OYS_Products::get( 'y60-5' ) ), 'the 60-minute pass: the service credits' );
+		eq( 'yoga1_90', OYS_Products::credit_kind( OYS_Products::get( 'y90-5' ) ), 'the 90-minute pass: credits of its own' );
+		ok( isset( OYS_Passes::kinds()['yoga1_90'] ), 'the 90-minute credits are a kind of their own' );
+		$u = make_user( 'Lena' );
+		$wpdb->insert( OYS_Install::table( 'private_requests' ), array( 'user_id' => $u, 'topic' => 'yoga1', 'duration_min' => 90, 'people' => 1, 'location_type' => 'online', 'preferred' => 'evenings', 'status' => 'new', 'created_at' => oys_now() ) );
+		$s = OYS_Schedule::get( OYS_Privates::offer( (int) $wpdb->insert_id, wp_date( 'Y-m-d', time() + 4 * DAY_IN_SECONDS ) . 'T10:00', 90, 700000, '', 'https://meet.example/y' ) );
+		eq( 1, (int) $s->credits_allowed, 'a 90-minute session can be paid with a pass' );
+		eq( 'yoga1_90', OYS_Bookings::credit_kind( $s ), 'with the 90-minute credits' );
+		OYS_Passes::grant_product( $u, OYS_Products::get( 'y60-5' ) );
+		eq( 0, OYS_Passes::available_for( $u, $s ), 'a 60-minute pass does not pay for 90 minutes' );
+		$p90 = OYS_Passes::get( OYS_Passes::grant_product( $u, OYS_Products::get( 'y90-5' ) ) );
+		eq( 5, OYS_Passes::available_for( $u, $s ), 'the 90-minute pass does' );
+		// the studio cancels the private session: the 90-minute pass runs a week longer (as the group passes)
+		OYS_Bookings::book_party( $u, $s, array( 'method' => 'credit', 'notify' => false ) );
+		OYS_Schedule::cancel_session( $s->id, 'test' );
+		eq( oys_ts( $p90->expires_at ) + 7 * DAY_IN_SECONDS, oys_ts( OYS_Passes::get( $p90->id )->expires_at ), 'studio cancels a private session: the pass is valid 7 days longer' );
+
+		add_filter( 'oys_price_gift_line', '__return_true' );
+		$html = OYS_Frontend::sc_pricing( array() );
+		remove_filter( 'oys_price_gift_line', '__return_true' );
+		ok( str_contains( $html, 'data-oys-variants' ) && str_contains( $html, 'data-len="60"' ) && str_contains( $html, 'data-len="90"' ), 'a length switch for the service in two lengths' );
+		ok( 1 === substr_count( $html, 'Cheaper as a pair' ), '„Cheaper as a pair” only where there is a price for two' );
+		ok( str_contains( $html, '5 sessions × 90 minutes' ), 'the pass: 5 sessions × 90 minutes' );
+		ok( str_contains( $html, 'per session, 60 minutes, for the two of you' ), 'the single for two' );
+		ok( str_contains( $html, 'length=90' ), 'the 90-minute single asks for a 90-minute time' );
+		ok( str_contains( $html, 'class="price__gift"' ), 'the gift card as its own line' );
+		eq( 4, preg_match_all( '/data-len="60" data-people="1" data-on/', $html ), 'first shown: the 60-minute single and pass, alone' );
+		ok( str_contains( OYS_Frontend::sc_private_box(), 'One-to-one yoga' ) && str_contains( OYS_Frontend::sc_private_box(), 'tab=private' ), 'the one-to-one box lists the services and asks for a time' );
+		$form = OYS_I18n::with( 'en', function () {
+			$_GET['topic'] = 'yoga1';
+			$_GET['length'] = '90';
+			$m = new ReflectionMethod( 'OYS_Frontend', 'private_form' );
+			$m->setAccessible( true );
+			$out = $m->invoke( null );
+			unset( $_GET['topic'], $_GET['length'] );
+			return $out;
+		} );
+		ok( str_contains( $form, 'data-lengths="60,90"' ) && str_contains( $form, 'id="oys-pr-length"' ) && str_contains( $form, '<option value="90" selected' ), 'the request form asks for the length, 90 minutes chosen' );
+	} finally {
+		update_option( OYS_Products::OPTION, $products );
+		false === $services ? delete_option( OYS_Services::OPTION ) : update_option( OYS_Services::OPTION, $services );
+	}
+} );
+
+test( 'timetable with only the days that have a class: the next ones, however far, and the one-to-one box (Olivia, 13 Nov)', function () {
+	$far = make_session( array( 'format' => 'online', 'online_capacity' => 10, 'in_hours' => 24 * 30 ) );
+	$all = do_shortcode( '[oys_schedule days="7"]' );
+	ok( str_contains( $all, 'is-empty' ) && ! str_contains( $all, wp_date( oys_date_format( 'M j' ), oys_ts( $far->starts_at ) ) ), 'by default: every day of the week, empty ones too, nothing further' );
+	OYS_Settings::update( array( 'schedule_empty_days' => 'no' ) );
+	try {
+		$html = do_shortcode( '[oys_schedule days="7" next="500"]' ); // the test site has many classes before it
+		ok( ! str_contains( $html, 'is-empty' ), 'no empty days' );
+		eq( 6, substr_count( do_shortcode( '[oys_schedule days="7"]' ), '<li class="session ' ), 'by default the next six classes' );
+		ok( str_contains( $html, wp_date( oys_date_format( 'M j' ), oys_ts( $far->starts_at ) ) ), 'the class in 30 days is listed' );
+	} finally {
+		OYS_Settings::update( array( 'schedule_empty_days' => 'yes' ) );
+		OYS_Schedule::cancel_session( $far->id, 'test' );
 	}
 } );
 

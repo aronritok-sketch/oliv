@@ -158,6 +158,27 @@ function oy_section_head( $title, $text = '', $kicker = '', $id = '' ) {
 	return '<header class="section__head" data-reveal>' . ( $kicker ? oy_kicker( $kicker ) : '' ) . '<h2' . ( $id ? ' id="' . esc_attr( $id ) . '"' : '' ) . '>' . esc_html( $title ) . '</h2>' . ( $text ? '<p class="lead">' . esc_html( $text ) . '</p>' : '' ) . '</header>';
 }
 
+/**
+ * The articles on the eight limbs of yoga (category „A jóga 8 ága”), in their order 1–8 – shown together at the top
+ * of „Jógáról” (Olivia, 13 November: the hatha button „vigyen a jógáról aloldalra, és egyből görgessen le a jóga 8
+ * ágához”).
+ */
+const OY_LIMBS_CATEGORY = 'a-joga-8-aga';
+
+function oy_limbs_posts() {
+	$term = get_term_by( 'slug', OY_LIMBS_CATEGORY, 'category' );
+	if ( ! $term ) {
+		return array();
+	}
+	$posts = get_posts( array( 'numberposts' => 20, 'category' => $term->term_id, 'suppress_filters' => false ) );
+	usort( $posts, fn( $a, $b ) => strnatcmp( $a->post_title, $b->post_title ) );
+	return $posts;
+}
+
+function oy_limbs_url() {
+	return oy_limbs_posts() ? oy_page_link( 'journal' ) . '#' . OY_LIMBS_CATEGORY : oy_page_link( 'faq' );
+}
+
 /** Olivia's title and her specialities, used on the hero name card, the About page and articles. */
 function oy_title_line() {
 	if ( oy_is_demo() ) {

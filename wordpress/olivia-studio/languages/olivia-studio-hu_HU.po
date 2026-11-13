@@ -5987,3 +5987,37 @@ msgstr "Kapcsolódva a CRM-hez: a kártyás fizetések az Arovia-hoz mennek."
 
 msgid "By paying you accept the <a href=\"%s\" target=\"_blank\">terms of sale</a>."
 msgstr "A vásárlással elfogadod az <a href=\"%s\" target=\"_blank\">általános szerződési feltételeket</a>."
+
+#. olivia-studio 1.10.0 (Olivia, 13 November)
+msgid "per session, %d minutes"
+msgstr "alkalmanként, %d perc"
+
+msgid "per session, %d minutes, for the two of you"
+msgstr "alkalmanként, %d perc, kettőtöknek"
+
+msgid "%1$d sessions × %2$d minutes"
+msgstr "%1$d alkalom × %2$d perc"
+
+msgid "%1$d sessions × %2$d minutes, for the two of you"
+msgstr "%1$d alkalom × %2$d perc, kettőtöknek"
+
+msgid "You can also give it as a gift card"
+msgstr "Ajándékutalványként is megveheted"
+
+msgid "Length of the session"
+msgstr "Az óra hossza"
+
+msgid "Cheaper as a pair"
+msgstr "Párban olcsóbb"
+
+msgid "with a friend"
+msgstr "a barátnőddel"
+
+msgid "%1$s, %2$d minutes"
+msgstr "%1$s, %2$d perc"
+
+msgid "One-to-one sessions"
+msgstr "Egyéni órák"
+
+msgid "We agree on a time that suits you: tell me when you are free, and I reply within a day."
+msgstr "Az időpontot egyénileg egyeztetjük: írd meg, mikor érnél rá, és egy napon belül visszaírok."

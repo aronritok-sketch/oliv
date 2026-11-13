@@ -159,9 +159,11 @@ class OYS_Passes {
 	public static function service_kinds() {
 		$out = array();
 		foreach ( OYS_Services::all() as $key => $s ) {
-			$out[ OYS_Services::credit_kind( $key ) ] = OYS_Services::label( $key );
-			if ( $s['duo'] ) {
-				$out[ OYS_Services::credit_kind( $key, 2 ) ] = OYS_Services::label( $key, 2 );
+			foreach ( $s['durations'] as $m ) {
+				$out[ OYS_Services::credit_kind( $key, 1, $m ) ] = OYS_Services::label( $key, 1, $m );
+				if ( $s['duo'] ) {
+					$out[ OYS_Services::credit_kind( $key, 2, $m ) ] = OYS_Services::label( $key, 2, $m );
+				}
 			}
 		}
 		return $out;
@@ -174,7 +176,13 @@ class OYS_Passes {
 	 */
 	public static function extend_for_cancelled( $session ) {
 		$days = (int) OYS_Settings::get( 'cancel_extend_days' );
-		if ( $days <= 0 || ! $session || ! in_array( $session->kind, array( 'group', 'event' ), true ) || ! $session->credits_allowed ) {
+		if ( $days <= 0 || ! $session || ! $session->credits_allowed ) {
+			return 0;
+		}
+		if ( 'private' === $session->kind ) {
+			return self::extend_private_for_cancelled( $session, $days );
+		}
+		if ( ! in_array( $session->kind, array( 'group', 'event' ), true ) ) {
 			return 0;
 		}
 		$kinds = 'online' === $session->format ? array( 'online', 'class' ) : ( 'hybrid' === $session->format ? array( 'class', 'online' ) : array( 'class' ) );
@@ -184,6 +192,26 @@ class OYS_Passes {
 		$sql = $wpdb->prepare(
 			"UPDATE $t SET expires_at = DATE_ADD(expires_at, INTERVAL %d DAY) WHERE kind IN ($in) AND credits_left > 0 AND expires_at IS NOT NULL AND expires_at > %s AND created_at < %s", // phpcs:ignore
 			array_merge( array( $days ), $kinds, array( oys_now(), $session->starts_at ) )
+		);
+		return (int) $wpdb->query( $sql ); // phpcs:ignore
+	}
+
+	/**
+	 * The studio cancelled a private session (Olivia, 13 November: „Oktatói lemondás esetén 1 héttel hosszabb
+	 * érvényesség” on the one-to-one passes too): the booked person's passes of that kind run that many days longer.
+	 */
+	private static function extend_private_for_cancelled( $session, $days ) {
+		$users = array_unique( array_map( fn( $b ) => (int) $b->user_id, OYS_Bookings::for_session( $session->id ) ) );
+		$users = array_filter( $users );
+		if ( ! $users ) {
+			return 0;
+		}
+		global $wpdb;
+		$t   = OYS_Install::table( 'passes' );
+		$in  = implode( ',', array_fill( 0, count( $users ), '%d' ) );
+		$sql = $wpdb->prepare(
+			"UPDATE $t SET expires_at = DATE_ADD(expires_at, INTERVAL %d DAY) WHERE kind = %s AND user_id IN ($in) AND credits_left > 0 AND expires_at IS NOT NULL AND expires_at > %s", // phpcs:ignore
+			array_merge( array( $days, OYS_Bookings::credit_kind( $session ) ), $users, array( oys_now() ) )
 		);
 		return (int) $wpdb->query( $sql ); // phpcs:ignore
 	}

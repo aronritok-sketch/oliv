@@ -209,7 +209,7 @@ msgstr "Órák"
 
 #: front-page.php:78
 msgid "sun: effort, heat, strength"
-msgstr "nap: erőfeszítés, hő, erő"
+msgstr "nap: aktivitás, hő, erő"
 
 #: front-page.php:78
 msgid "moon: ease, cool, surrender"
@@ -225,7 +225,7 @@ msgstr "A ha a nap. A tha a hold."
 
 #: front-page.php:82
 msgid "Hatha yoga balances the active and the receptive in us: effort and ease, strength and surrender. When that balance tips, we feel it first as tension or restlessness."
-msgstr "A hatha jóga egyensúlyba hozza bennünk az aktívat és a befogadót: az erőfeszítést és a könnyedséget, az erőt és az elengedést. Ha ez az egyensúly felborul, először feszültségként vagy nyugtalanságként érezzük."
+msgstr "A hatha jóga egyensúlyba hozza bennünk az aktívat és a befogadót: az aktivitást és a könnyedséget, az erőt és az elengedést. Ha ez az egyensúly felborul, először feszültségként vagy nyugtalanságként érezzük."
 
 #: front-page.php:83
 msgid "On the mat we use the body to find the balance again. The poses are a doorway to meditation, a more dynamic doorway, and only one of the eight limbs of yoga."
@@ -1595,3 +1595,49 @@ msgstr "Számomra ez a legfontosabb különbség, amit a jóga tanított eddig."
 
 msgid "One-to-one or with a friend: breathing, pelvic floor, circulation, cardio, strength, spine, mobility, yoga and relaxation, combined for your trimester."
 msgstr "Egyénileg vagy a barátnőddel: légzőtorna, gátizomtorna, keringésjavítás, kardió, izomerősítés, gerinctréning, mobilizáció, jóga és relaxáció, a trimeszteredhez igazítva."
+
+#. Olivia, 13 November (21:35)
+msgid "No traffic, no parking, no queue in the changing room. At home you can get ready in peace: light a candle, or create whatever helps you arrive."
+msgstr "Nincs dugó, parkolás, sorban állás az öltözőben. Otthon nyugodtan felkészülhetsz: gyújts egy gyertyát, vagy teremtsd meg azt, ami segít ráhangolódni."
+
+msgid "The cushion and blanket are for the relaxation at the end of class."
+msgstr "A párna és a pléd a relaxációhoz kell, az óra végén."
+
+msgid "It is not compulsory. If I can see you, I can help you with the poses."
+msgstr "Nem kötelező. Ha látlak, tudok segíteni a pózokban."
+
+msgid "Only I see your picture."
+msgstr "A képedet csak én látom."
+
+msgid "This is not a video to follow. We practice together, at the same time: I guide you, and you can ask anything before and after class."
+msgstr "Ez nem egy videó, amit követsz. Együtt gyakorlunk, ugyanabban az időben: vezetlek, és óra előtt és után bármit kérdezhetsz."
+
+msgid "Next classes"
+msgstr "Következő órák"
+
+msgid "Prices"
+msgstr "Árak"
+
+msgid "Group live online flow yoga classes"
+msgstr "Csoportos, élő online flow jóga órák"
+
+msgid "90 minutes, every Wednesday from 18:30 to 20:00. Come with a drop-in ticket, or save with a pass."
+msgstr "90 perces órák szerdánként 18:30-tól 20:00-ig. Gyere alkalmi jeggyel, vagy spórolj bérlettel."
+
+msgid "Notice the sensations"
+msgstr "Figyeld meg az érzeteket"
+
+msgid "rounds, then %s"
+msgstr "kör, majd %s"
+
+msgid "All eight limbs, one article each, in order."
+msgstr "Mind a nyolc ág, egy-egy írásban, sorrendben."
+
+msgid "Olivia Kovacs in a side backbend at sunset, the light glowing through the trees"
+msgstr "Olivia Kovacs hátrahajlásban naplementekor, a fák között átszűrődő fényben"
+
+msgid "Olivia Kovacs in a one-legged wheel pose on the sand above a valley"
+msgstr "Olivia Kovacs egylábas kerékpózban a homokon, a völgy fölött"
+
+msgid "Students resting in child's pose on a wooden deck during an evening class"
+msgstr "Gyakorlók gyermekpózban pihennek egy fateraszon egy esti órán"

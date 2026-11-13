@@ -141,7 +141,7 @@ class OYS_Products {
 			return 'online';
 		}
 		if ( in_array( $product['kind'], array( 'private_pack', 'private_single' ), true ) && ! empty( $product['service'] ) ) {
-			return OYS_Services::credit_kind( $product['service'], (int) ( $product['people'] ?? 1 ) );
+			return OYS_Services::credit_kind( $product['service'], (int) ( $product['people'] ?? 1 ), OYS_Services::product_minutes( $product ) );
 		}
 		return in_array( $product['kind'], array( 'private_pack', 'private_single' ), true ) ? 'private' : 'class';
 	}

@@ -619,13 +619,16 @@ function oy_mail_setup() {
 function oy_migrate_1113() {
 	// b: + ÁSZF, Impresszum, the privacy notice with Arovia as the controller
 	// c: her 20:17 notes – „Olívia” with a long í, the prenatal modules and why each one matters, the yogic-life sentence
-	$rev = '2026-11-13c';
+	// d: her 21:35 notes – her photos on the class rows, the one-to-one prices (90 minutes for individual yoga, 6 weeks
+	//    for every 5-session pass, one set of lines), only the Wednesdays on the timetables
+	$rev = '2026-11-13d';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_content_rev' ) === $rev ) {
 		return array();
 	}
 	kses_remove_filters();
 	$log = oy_import_all( true );
 	kses_init_filters();
+	$log = array_merge( $log, oy_apply_online_prices() );
 	// her name with a long í in the site's name and the sender's name – only where it is still the old spelling
 	$old = 'Olivia Jóga – Online';
 	$new = 'Olívia Jóga – Online';
@@ -639,6 +642,36 @@ function oy_migrate_1113() {
 	}
 	update_option( 'oy_content_rev', $rev );
 	return array_merge( array( 'content: Olivia 13 November' ), $log );
+}
+
+/**
+ * The online edition's passes, one-to-one services and timetable setting from its content file, on a live site. Passes
+ * someone has bought keep their own expiry; products the edition no longer has go off sale.
+ */
+function oy_apply_online_prices() {
+	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+	$log  = array();
+	if ( class_exists( 'OYS_Products' ) && ! empty( $data['setup']['products'] ) ) {
+		$all = get_option( OYS_Products::OPTION, array() );
+		$all = is_array( $all ) ? $all : array();
+		foreach ( $all as $id => $p ) {
+			if ( ! isset( $data['setup']['products'][ $id ] ) ) {
+				$all[ $id ]['active'] = 0;
+			}
+		}
+		foreach ( $data['setup']['products'] as $id => $p ) {
+			$all[ $id ] = $p;
+		}
+		update_option( OYS_Products::OPTION, $all );
+		$log[] = sprintf( 'prices: %d passes and sessions', count( $data['setup']['products'] ) );
+	}
+	if ( class_exists( 'OYS_Services' ) && ! empty( $data['setup']['services'] ) ) {
+		update_option( OYS_Services::OPTION, (array) $data['setup']['services'] );
+	}
+	if ( class_exists( 'OYS_Settings' ) ) {
+		OYS_Settings::update( array_intersect_key( (array) $data['setup']['studio'], array_flip( array( 'cancel_extend_days', 'schedule_empty_days' ) ) ) );
+	}
+	return $log;
 }
 
 function oy_migrate_online() {

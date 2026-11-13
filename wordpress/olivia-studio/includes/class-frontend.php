@@ -16,7 +16,7 @@ defined( 'ABSPATH' ) || exit;
 class OYS_Frontend {
 
 	public static function init() {
-		foreach ( array( 'schedule', 'events', 'pricing', 'book', 'account', 'gift_cards', 'private_request' ) as $sc ) {
+		foreach ( array( 'schedule', 'events', 'pricing', 'book', 'account', 'gift_cards', 'private_request', 'private_box' ) as $sc ) {
 			add_shortcode( 'oys_' . $sc, array( __CLASS__, 'sc_' . $sc ) );
 		}
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'assets' ) );
@@ -36,6 +36,8 @@ class OYS_Frontend {
 
 	public static function assets() {
 		wp_enqueue_style( 'olivia-studio', OYS_URL . 'assets/oys.css', array(), OYS_VERSION );
+		// the price list's switches (length, „with a friend”) and the private request form
+		wp_enqueue_script( 'olivia-studio', OYS_URL . 'assets/oys.js', array(), OYS_VERSION, array( 'in_footer' => true, 'strategy' => 'defer' ) );
 	}
 
 	private static function form_open( $action, $extra = '' ) {
@@ -53,15 +55,23 @@ class OYS_Frontend {
 	   ====================================================================== */
 
 	public static function sc_schedule( $atts ) {
-		$atts  = shortcode_atts( array( 'days' => 14, 'kind' => 'group,event', 'class' => '', 'empty_days' => 'yes' ), $atts );
+		$atts  = shortcode_atts( array( 'days' => 14, 'kind' => 'group,event', 'class' => '', 'empty_days' => '', 'next' => 0 ), $atts );
+		// Without days that have no class (setting `schedule_empty_days`), the timetable lists the next classes however
+		// far they are (`next`, 6 by default), so a timetable never stands empty while the next class is weeks away.
+		$atts['empty_days'] = in_array( $atts['empty_days'], array( 'yes', 'no' ), true ) ? $atts['empty_days'] : ( 'no' === OYS_Settings::get( 'schedule_empty_days' ) ? 'no' : 'yes' );
+		$next  = 'no' === $atts['empty_days'] ? ( (int) $atts['next'] ?: 6 ) : 0;
 		$kinds = array_filter( array_map( 'trim', explode( ',', $atts['kind'] ) ) );
 		$items = OYS_Schedule::query( array(
 			'kind'       => $kinds,
 			'from'       => oys_now(),
-			'to'         => oys_utc_plus( (int) $atts['days'] * DAY_IN_SECONDS ),
+			'to'         => oys_utc_plus( ( $next ? max( 120, (int) $atts['days'] ) : (int) $atts['days'] ) * DAY_IN_SECONDS ),
 			'status'     => 'scheduled',
 			'class_slug' => sanitize_title( $atts['class'] ),
 		) );
+		if ( $next ) {
+			$items        = array_slice( $items, 0, $next );
+			$atts['days'] = $items ? (int) ceil( ( oys_ts( end( $items )->starts_at ) - strtotime( 'today', time() ) ) / DAY_IN_SECONDS ) + 2 : 0;
+		}
 		$by_day = array();
 		foreach ( $items as $s ) {
 			$by_day[ wp_date( 'Y-m-d', oys_ts( $s->starts_at ) ) ][] = $s;
@@ -159,13 +169,25 @@ class OYS_Frontend {
 		$online_price = (int) OYS_Settings::get( 'online_price_cents' );
 		$ratio        = OYS_Passes::online_per_credit();
 		$online_only  = (bool) OYS_Settings::get( 'online_only' );
+		// Olivia, 13 November: „Az ajándékutalvány legyen látványosabb” – a site may show it as its own highlighted line
+		$gift_line = (bool) apply_filters( 'oys_price_gift_line', false );
 		if ( $online_only ) {
-			$cards[] = array( 'tone' => 'paper', 'title' => __( 'Live online class', 'olivia-studio' ), 'price' => oys_money( $online_price ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array( __( 'Any live online group class', 'olivia-studio' ), ( OYS_Zoom::enabled() ? __( 'Join from home on Zoom', 'olivia-studio' ) : __( 'Join from home in your browser, no app needed', 'olivia-studio' ) ), __( 'The link comes by email and is in your account', 'olivia-studio' ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
+			// the one-class online pass at the drop-in price (the gift version of the drop-in) gives the card its length
+			$single = null;
+			foreach ( OYS_Products::all( true ) as $p ) {
+				if ( 'online_pack' === $p['kind'] && 1 === (int) $p['credits'] && (int) $p['price_cents'] === $online_price ) {
+					$single = $p;
+				}
+			}
+			$minutes  = $single ? (int) $single['duration_min'] : 0;
+			$features = apply_filters( 'oys_dropin_features', array( __( 'Any live online group class', 'olivia-studio' ), ( OYS_Zoom::enabled() ? __( 'Join from home on Zoom', 'olivia-studio' ) : __( 'Join from home in your browser, no app needed', 'olivia-studio' ) ), __( 'The link comes by email and is in your account', 'olivia-studio' ) ) );
+			$cards[]  = array( 'tone' => 'paper', 'title' => __( 'Live online class', 'olivia-studio' ), 'price' => oys_money( $online_price ), 'unit' => $minutes ? sprintf( __( 'per session, %d minutes', 'olivia-studio' ), $minutes ) : __( 'per class', 'olivia-studio' ), 'features' => (array) $features, 'gift' => $gift_line && $single && ! empty( $single['giftable'] ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
 		} else {
 			$cards[] = array( 'tone' => 'paper', 'title' => __( 'Drop-in class', 'olivia-studio' ), 'price' => oys_money( $dropin ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array_filter( array( __( 'Any group class in person', 'olivia-studio' ), $online_price ? sprintf( __( 'Online classes: %s', 'olivia-studio' ), oys_money( $online_price ) ) : '', __( 'Bring friends: add guests when you book', 'olivia-studio' ), 'off' !== OYS_Settings::get( 'pay_later' ) ? __( 'Pay online or at the studio', 'olivia-studio' ) : '' ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
 		}
 		$tones = array( 'lilac', 'sun', 'pink' );
 		$i     = 0;
+		$svc_products = array();
 		foreach ( OYS_Products::all( true ) as $p ) {
 			// private yoga's 75 and 90 minutes are lines on the 60-minute card; a service's single session has its own card
 			if ( 'private_single' === $p['kind'] && '' === $p['service'] && 60 !== (int) $p['duration_min'] ) {
@@ -177,10 +199,11 @@ class OYS_Frontend {
 			}
 			$features = array_filter( array_map( 'trim', explode( "\n", $p['features'] ) ) );
 			$svc = '' !== $p['service'] ? OYS_Services::get( $p['service'] ) : null;
-			if ( 'private_single' === $p['kind'] && $svc ) {
-				$cta  = array( __( 'Ask for a time', 'olivia-studio' ), add_query_arg( 'topic', $svc['key'], oys_account_url( 'private' ) ) );
-				$unit = sprintf( (int) $p['people'] > 1 ? __( '%d minutes, for the two of you', 'olivia-studio' ) : __( '%d minutes, one-to-one', 'olivia-studio' ), $svc['duration'] );
-			} elseif ( 'private_single' === $p['kind'] ) {
+			if ( $svc && in_array( $p['kind'], array( 'private_single', 'private_pack' ), true ) ) {
+				$svc_products[ $svc['key'] ][] = $p; // a one-to-one service: its own cards, with a length and a „with a friend” switch
+				continue;
+			}
+			if ( 'private_single' === $p['kind'] ) {
 				$cta  = array( __( 'Request a private session', 'olivia-studio' ), oys_account_url( 'private' ) );
 				$unit = sprintf( __( '%d minutes', 'olivia-studio' ), (int) $p['duration_min'] );
 				foreach ( OYS_Products::all( true ) as $q ) {
@@ -200,12 +223,15 @@ class OYS_Frontend {
 			} else {
 				$cta  = array( 'intro' === $p['kind'] ? __( 'Claim the intro offer', 'olivia-studio' ) : __( 'Buy now', 'olivia-studio' ), oys_page_url( 'book', array( 'product' => $p['id'] ) ) );
 				$unit = 'private_pack' === $p['kind'] ? __( 'per pack', 'olivia-studio' ) : sprintf( 'online_pack' === $p['kind'] ? _n( '%d online class', '%d online classes', (int) $p['credits'], 'olivia-studio' ) : _n( '%d class', '%d classes', (int) $p['credits'], 'olivia-studio' ), (int) $p['credits'] );
+				if ( 'online_pack' === $p['kind'] && (int) $p['duration_min'] ) {
+					$unit = sprintf( __( '%1$d sessions × %2$d minutes', 'olivia-studio' ), (int) $p['credits'], (int) $p['duration_min'] );
+				}
 				if ( in_array( $p['kind'], array( 'pack', 'intro' ), true ) && $ratio > 1 ) {
 					$features[] = sprintf( __( 'Online classes: 1 class = %d online', 'olivia-studio' ), $ratio );
 				}
 			}
-			$group   = 'membership' === $p['kind'] ? 'members' : ( $svc ? 'svc-' . $svc['key'] : ( in_array( $p['kind'], array( 'private_single', 'private_pack' ), true ) ? 'private' : 'classes' ) );
-			$cards[] = array( 'tone' => $p['featured'] ? 'forest' : $tones[ $i++ % 3 ], 'title' => oys_product_name( $p ), 'price' => oys_money( $p['price_cents'] ), 'unit' => $unit, 'features' => array_map( 'oys_product_text', $features ), 'cta' => $cta, 'featured' => (bool) $p['featured'], 'group' => $group );
+			$group   = 'membership' === $p['kind'] ? 'members' : ( in_array( $p['kind'], array( 'private_single', 'private_pack' ), true ) ? 'private' : 'classes' );
+			$cards[] = array( 'tone' => $p['featured'] ? 'forest' : $tones[ $i++ % 3 ], 'title' => oys_product_name( $p ), 'price' => oys_money( $p['price_cents'] ), 'unit' => $unit, 'features' => array_map( 'oys_product_text', $features ), 'gift' => $gift_line && ! empty( $p['giftable'] ), 'cta' => $cta, 'featured' => (bool) $p['featured'], 'group' => $group );
 		}
 		$teams = $online_only ? null : array( 'tone' => 'pink', 'title' => __( 'Teams & companies', 'olivia-studio' ), 'price' => __( 'Custom', 'olivia-studio' ), 'unit' => __( 'quote', 'olivia-studio' ), 'features' => array( __( 'On-site, outdoors or online', 'olivia-studio' ), __( 'One-off or weekly', 'olivia-studio' ), __( 'Sports teams and clubs too', 'olivia-studio' ) ), 'cta' => array( __( 'Request a proposal', 'olivia-studio' ), apply_filters( 'oys_corporate_contact_url', home_url( '/contact/?topic=corporate#book' ) ) ), 'featured' => false, 'group' => 'private' );
 		if ( $teams ) {
@@ -222,25 +248,92 @@ class OYS_Frontend {
 			array_map( fn( $k ) => 'svc-' . $k, array_keys( OYS_Services::offered() ) ),
 			array_map( fn( $s ) => array( oys_t( $s['label'] ), oys_t( $s['description'] ), array() ), array_values( OYS_Services::offered() ) )
 		) + array_slice( $groups, 2, null, true );
+		/** Titles and leads of the price groups (key => [title, lead]), e.g. the length of the group class in its title. */
+		$heads = (array) apply_filters( 'oys_pricing_groups', array() );
+		foreach ( $heads as $key => $h ) {
+			if ( isset( $groups[ $key ] ) ) {
+				$groups[ $key ][0] = (string) ( $h[0] ?? $groups[ $key ][0] );
+				$groups[ $key ][1] = (string) ( $h[1] ?? $groups[ $key ][1] );
+			}
+		}
 		foreach ( $cards as $c ) {
 			$groups[ $c['group'] ?? 'classes' ][2][] = $c;
 		}
 		$out = '<div class="pricing oys-pricing">';
 		foreach ( $groups as $key => $g ) {
+			$svc_key = str_starts_with( $key, 'svc-' ) ? substr( $key, 4 ) : '';
+			if ( '' !== $svc_key && ! empty( $svc_products[ $svc_key ] ) ) {
+				$out .= self::service_prices( $svc_key, $g, $svc_products[ $svc_key ], $gift_line );
+				continue;
+			}
 			if ( ! $g[2] ) {
 				continue;
 			}
 			$out .= '<section class="price-group price-group--' . esc_attr( $key ) . '"><header class="price-group__head"><h3>' . esc_html( $g[0] ) . '</h3><p>' . esc_html( $g[1] ) . '</p></header><div class="price-group__cards" style="--n:' . min( 3, count( $g[2] ) ) . '">';
 			foreach ( $g[2] as $c ) {
-				$out .= '<article class="price price--' . esc_attr( $c['tone'] ) . '">'
-					. ( $c['featured'] ? apply_filters( 'oys_featured_badge', '<span class="price__tag">' . esc_html__( 'Most popular', 'olivia-studio' ) . '</span>' ) : '' )
-					. '<h4>' . esc_html( $c['title'] ) . '</h4><p class="price__amount">' . esc_html( $c['price'] ) . '</p><p class="price__unit">' . esc_html( $c['unit'] ) . '</p>'
-					. '<ul>' . implode( '', array_map( fn( $f ) => '<li>' . esc_html( $f ) . '</li>', $c['features'] ) ) . '</ul>'
-					. '<a class="btn ' . ( $c['featured'] ? 'btn--orchid' : 'btn--dark' ) . '" href="' . esc_url( $c['cta'][1] ) . '">' . esc_html( $c['cta'][0] ) . '</a></article>';
+				$out .= self::price_card( $c );
 			}
 			$out .= '</div></section>';
 		}
 		return $out . '</div>';
+	}
+
+	/** One card of the price list. */
+	private static function price_card( array $c, $attrs = '' ) {
+		$gift = ! empty( $c['gift'] ) ? '<li class="price__gift"><a href="' . esc_url( oys_page_url( 'gifts' ) ) . '">' . oys_icon( 'gift' ) . '<span>' . esc_html__( 'You can also give it as a gift card', 'olivia-studio' ) . '</span></a></li>' : '';
+		return '<article class="price price--' . esc_attr( $c['tone'] ) . '"' . $attrs . '>'
+			. ( $c['featured'] ? apply_filters( 'oys_featured_badge', '<span class="price__tag">' . esc_html__( 'Most popular', 'olivia-studio' ) . '</span>' ) : '' )
+			. '<h4>' . esc_html( $c['title'] ) . '</h4><p class="price__amount">' . esc_html( $c['price'] ) . '</p><p class="price__unit">' . esc_html( $c['unit'] ) . '</p>'
+			. '<ul>' . implode( '', array_map( fn( $f ) => '<li>' . esc_html( $f ) . '</li>', $c['features'] ) ) . $gift . '</ul>'
+			. '<a class="btn ' . ( $c['featured'] ? 'btn--orchid' : 'btn--dark' ) . '" href="' . esc_url( $c['cta'][1] ) . '">' . esc_html( $c['cta'][0] ) . '</a></article>';
+	}
+
+	/**
+	 * A one-to-one service on the price list (Olivia, 13 November): one session and the pass side by side, a switch
+	 * for the length (60 or 90 minutes) when there is more than one, and „Párban olcsóbb” – the prices for two –
+	 * when the service can be booked with a friend. Every variant is in the page (it works without JavaScript: then
+	 * all are listed); assets/oys.js shows the chosen one.
+	 */
+	private static function service_prices( $key, array $g, array $products, $gift_line ) {
+		$svc     = OYS_Services::get( $key );
+		$lengths = array();
+		$duo     = false;
+		foreach ( $products as $p ) {
+			$lengths[ OYS_Services::product_minutes( $p ) ] = true;
+			$duo = $duo || (int) $p['people'] > 1;
+		}
+		$lengths = array_keys( $lengths );
+		sort( $lengths );
+		usort( $products, fn( $a, $b ) => array( (int) $a['people'], OYS_Services::product_minutes( $a ), 'private_pack' === $a['kind'] ) <=> array( (int) $b['people'], OYS_Services::product_minutes( $b ), 'private_pack' === $b['kind'] ) );
+		$switch = '';
+		if ( count( $lengths ) > 1 ) {
+			$switch .= '<div class="oys-seg" role="group" aria-label="' . esc_attr__( 'Length of the session', 'olivia-studio' ) . '">';
+			foreach ( $lengths as $n => $m ) {
+				$switch .= '<button type="button" data-len="' . (int) $m . '" aria-pressed="' . ( 0 === $n ? 'true' : 'false' ) . '">' . esc_html( sprintf( __( '%d minutes', 'olivia-studio' ), $m ) ) . '</button>';
+			}
+			$switch .= '</div>';
+		}
+		if ( $duo ) {
+			$switch .= '<label class="oys-pair"><input type="checkbox" data-duo><span class="oys-pair__track" aria-hidden="true"></span><span><b>' . esc_html__( 'Cheaper as a pair', 'olivia-studio' ) . '</b> ' . esc_html__( 'with a friend', 'olivia-studio' ) . '</span></label>';
+		}
+		$tones = array( 'lilac', 'sun' );
+		$cards = '';
+		foreach ( $products as $p ) {
+			$m     = OYS_Services::product_minutes( $p );
+			$two   = (int) $p['people'] > 1;
+			$pack  = 'private_pack' === $p['kind'];
+			$unit  = $pack
+				? sprintf( $two ? __( '%1$d sessions × %2$d minutes, for the two of you', 'olivia-studio' ) : __( '%1$d sessions × %2$d minutes', 'olivia-studio' ), (int) $p['credits'], $m )
+				: sprintf( $two ? __( 'per session, %d minutes, for the two of you', 'olivia-studio' ) : __( 'per session, %d minutes', 'olivia-studio' ), $m );
+			$cta   = $pack
+				? array( __( 'Buy now', 'olivia-studio' ), oys_page_url( 'book', array( 'product' => $p['id'] ) ) )
+				: array( __( 'Ask for a time', 'olivia-studio' ), add_query_arg( array_filter( array( 'topic' => $key, 'length' => count( $lengths ) > 1 ? $m : 0, 'people' => $two ? 2 : 0 ) ), oys_account_url( 'private' ) ) );
+			$card  = array( 'tone' => $tones[ $pack ? 1 : 0 ], 'title' => oys_t( $svc['label'] ), 'price' => oys_money( $p['price_cents'] ), 'unit' => $unit, 'features' => array_map( 'oys_product_text', array_filter( array_map( 'trim', explode( "\n", $p['features'] ) ) ) ), 'gift' => $gift_line && ! empty( $p['giftable'] ), 'cta' => $cta, 'featured' => false );
+			$on    = (int) $m === (int) $lengths[0] && ! $two;
+			$cards .= self::price_card( $card, ' data-len="' . (int) $m . '" data-people="' . ( $two ? 2 : 1 ) . '"' . ( $on ? ' data-on' : '' ) );
+		}
+		return '<section class="price-group price-group--svc-' . esc_attr( $key ) . ( $switch ? ' oys-variants' : '' ) . '"' . ( $switch ? ' data-oys-variants' : '' ) . '><header class="price-group__head"><h3>' . esc_html( $g[0] ) . '</h3>' . ( '' !== $g[1] ? '<p>' . esc_html( $g[1] ) . '</p>' : '' ) . ( $switch ? '<div class="oys-switches">' . $switch . '</div>' : '' ) . '</header>'
+			. '<div class="price-group__cards" style="--n:2">' . $cards . '</div></section>';
 	}
 
 	/* ======================================================================
@@ -283,7 +376,29 @@ class OYS_Frontend {
 		if ( ! empty( $_GET['product'] ) ) {
 			return $out . self::render_product_checkout( sanitize_key( $_GET['product'] ) );
 		}
-		return $out . '<div class="oys-intro"><p class="lead">' . esc_html__( 'Choose a class from the timetable below. Beginners are welcome in every class.', 'olivia-studio' ) . '</p></div>' . self::sc_schedule( array( 'days' => 21 ) );
+		return $out . '<div class="oys-intro"><p class="lead">' . esc_html__( 'Choose a class from the timetable below. Beginners are welcome in every class.', 'olivia-studio' ) . '</p></div>' . self::sc_schedule( array( 'days' => 21 ) )
+			. ( 'no' === OYS_Settings::get( 'schedule_empty_days' ) ? self::sc_private_box() : '' );
+	}
+
+	/**
+	 * The one-to-one sessions in a box of their own, under the timetable (Olivia, 13 November: „legyen egy külön boxban
+	 * az egyéni időpontfoglalás miatti kapcsolatfelvétel”). Shortcode [oys_private_box].
+	 */
+	public static function sc_private_box() {
+		$offered = OYS_Services::offered();
+		if ( ! $offered && ! OYS_Products::has_plain_private() ) {
+			return '';
+		}
+		$items = '';
+		foreach ( $offered as $k => $sv ) {
+			$url    = apply_filters( 'oys_class_url', '', $sv['class'] );
+			$label  = esc_html( OYS_Services::label( $k ) );
+			$items .= '<li>' . ( $url ? '<a href="' . esc_url( $url ) . '">' . $label . '</a>' : $label ) . '</li>';
+		}
+		return '<aside class="oys-private-box" aria-labelledby="oys-private-box-title"><div><h3 id="oys-private-box-title">' . esc_html__( 'One-to-one sessions', 'olivia-studio' ) . '</h3>'
+			. ( $items ? '<ul class="oys-private-box__list">' . $items . '</ul>' : '' )
+			. '<p>' . esc_html__( 'We agree on a time that suits you: tell me when you are free, and I reply within a day.', 'olivia-studio' ) . '</p></div>'
+			. '<a class="btn btn--dark" href="' . esc_url( oys_account_url( 'private' ) ) . '">' . esc_html__( 'Ask for a time', 'olivia-studio' ) . '</a></aside>';
 	}
 
 	private static function session_card( $s ) {
@@ -1072,8 +1187,10 @@ class OYS_Frontend {
 		$private = OYS_Passes::balance( $user_id, 'private' );
 		$services = '';
 		foreach ( OYS_Services::all() as $key => $s ) {
-			$n = OYS_Passes::balance( $user_id, OYS_Services::credit_kind( $key ) ) + OYS_Passes::balance( $user_id, OYS_Services::credit_kind( $key, 2 ) );
-			$services .= $n ? '<div class="oys-stat oys-stat--sun"><dt>' . esc_html( OYS_Services::label( $key ) ) . '</dt><dd>' . (int) $n . '</dd></div>' : '';
+			foreach ( $s['durations'] as $m ) {
+				$n = OYS_Passes::balance( $user_id, OYS_Services::credit_kind( $key, 1, $m ) ) + OYS_Passes::balance( $user_id, OYS_Services::credit_kind( $key, 2, $m ) );
+				$services .= $n ? '<div class="oys-stat oys-stat--sun"><dt>' . esc_html( OYS_Services::label( $key, 1, $m ) ) . '</dt><dd>' . (int) $n . '</dd></div>' : '';
+			}
 		}
 		$online  = OYS_Passes::balance( $user_id, 'online' );
 		$member  = OYS_Memberships::current_for( $user_id );
@@ -1324,22 +1441,40 @@ class OYS_Frontend {
 			$want = isset( $topics[ $want ] ) ? $want : (string) array_key_first( $topics );
 			$opt  = '';
 			foreach ( $topics as $k => $v ) {
-				$opt .= '<option value="' . esc_attr( $k ) . '"' . selected( $want, $k, false ) . '>' . esc_html( $v ) . '</option>';
+				$lens = isset( $offered[ $k ] ) ? OYS_Services::lengths( $k ) : array();
+				$opt .= '<option value="' . esc_attr( $k ) . '"' . selected( $want, $k, false ) . ' data-lengths="' . esc_attr( implode( ',', $lens ) ) . '" data-duo="' . ( ! empty( $offered[ $k ]['duo'] ) ? 1 : 0 ) . '">' . esc_html( $v ) . '</option>';
 			}
 			$info = '';
 			foreach ( $offered as $k => $sv ) {
-				$one  = OYS_Services::price( $k );
-				$two  = $sv['duo'] ? OYS_Services::price( $k, 2 ) : 0;
-				$info .= '<li><b>' . esc_html( OYS_Services::label( $k ) ) . ':</b> ' . esc_html( sprintf( __( '%d minutes', 'olivia-studio' ), $sv['duration'] ) )
-					. ( $one ? ', ' . esc_html( oys_money( $one ) ) : '' ) . ( $two ? ' · ' . esc_html( sprintf( __( 'with a friend: %s for the two of you', 'olivia-studio' ), oys_money( $two ) ) ) : '' ) . '</li>';
+				$bits = array();
+				foreach ( OYS_Services::lengths( $k ) ?: array( $sv['duration'] ) as $m ) {
+					$one    = OYS_Services::price( $k, 1, $m );
+					$two    = $sv['duo'] ? OYS_Services::price( $k, 2, $m ) : 0;
+					$bits[] = esc_html( sprintf( __( '%d minutes', 'olivia-studio' ), $m ) ) . ( $one ? ', ' . esc_html( oys_money( $one ) ) : '' ) . ( $two ? ' · ' . esc_html( sprintf( __( 'with a friend: %s for the two of you', 'olivia-studio' ), oys_money( $two ) ) ) : '' );
+				}
+				$info .= '<li><b>' . esc_html( OYS_Services::label( $k ) ) . ':</b> ' . implode( '; ', $bits ) . '</li>';
 			}
 			$topic = '<label class="field"><span>' . esc_html__( 'What would you like?', 'olivia-studio' ) . '</span><select name="topic" id="oys-pr-topic">' . $opt . '</select></label>'
 				. '<ul class="oys-small oys-pr-services">' . $info . '</ul>';
 		}
 		$length = $plain ? '<label class="field"><span>' . esc_html__( 'Length', 'olivia-studio' ) . ( $offered ? ' (' . esc_html__( 'private yoga', 'olivia-studio' ) . ')' : '' ) . '</span><select name="duration_min" id="oys-pr-duration">' . $dur . '</select></label>' : '';
+		// a service sold in more than one length (Olivia, 13 November: 60 or 90 minutes): choose it here
+		$multi = array();
+		foreach ( $offered as $k => $sv ) {
+			if ( count( OYS_Services::lengths( $k ) ) > 1 ) {
+				$multi = array_merge( $multi, OYS_Services::lengths( $k ) );
+			}
+		}
+		if ( ! $plain && $multi ) {
+			$multi = array_values( array_unique( $multi ) );
+			sort( $multi );
+			$pick  = (int) ( $_GET['length'] ?? 0 ); // phpcs:ignore WordPress.Security.NonceVerification
+			$length = '<label class="field" data-oys-length><span>' . esc_html__( 'Length', 'olivia-studio' ) . '</span><select name="duration_min" id="oys-pr-length">'
+				. implode( '', array_map( fn( $m ) => '<option value="' . (int) $m . '"' . selected( $pick, $m, false ) . '>' . esc_html( sprintf( __( '%d minutes', 'olivia-studio' ), $m ) ) . '</option>', $multi ) ) . '</select></label>';
+		}
 		$people = $plain || array_filter( $offered, fn( $sv ) => $sv['duo'] )
-			? '<label class="field"><span>' . esc_html__( 'How many people', 'olivia-studio' ) . '</span><input type="number" name="people" id="oys-pr-people" min="1" max="' . ( $plain ? 10 : 2 ) . '" value="1"></label>' : '';
-		return self::form_open( 'oys_private_request', 'class="oys-form oys-card"' )
+			? '<label class="field" data-oys-people><span>' . esc_html__( 'How many people', 'olivia-studio' ) . '</span><input type="number" name="people" id="oys-pr-people" min="1" max="' . ( $plain ? 10 : 2 ) . '" value="' . max( 1, min( $plain ? 10 : 2, (int) ( $_GET['people'] ?? 1 ) ) ) . '"></label>' : ''; // phpcs:ignore WordPress.Security.NonceVerification
+		return self::form_open( 'oys_private_request', 'class="oys-form oys-card" data-oys-private' )
 			. self::private_note() . $topic
 			. ( $length || $people ? '<div class="form__row">' . $length . $people . '</div>' : '' )
 			. ( $online_only ? '<input type="hidden" name="location_type" value="online"><input type="hidden" name="address" value="">' : '<div class="form__row"><label class="field"><span>' . esc_html__( 'Where', 'olivia-studio' ) . '</span><select name="location_type" id="oys-pr-type">' . $opts . '</select></label>'

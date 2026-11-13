@@ -604,5 +604,23 @@
   "pos": "50% 50%",
   "w": 600,
   "h": 682
+ },
+ "olivia-golden-backbend": {
+  "alt": "Olivia Kovacs in a side backbend at sunset, the light glowing through the trees",
+  "pos": "20% 38%",
+  "w": 1200,
+  "h": 675
+ },
+ "olivia-sand-one-leg-wheel": {
+  "alt": "Olivia Kovacs in a one-legged wheel pose on the sand above a valley",
+  "pos": "58% 62%",
+  "w": 1200,
+  "h": 675
+ },
+ "group-childs-pose-deck": {
+  "alt": "Students resting in child's pose on a wooden deck during an evening class",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 1035
  }
 }

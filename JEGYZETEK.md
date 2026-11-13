@@ -209,6 +209,16 @@
   (főoldali doboz, óra-kivonat, Online órák, Bejelentkezés és árak, GYIK), az aloldalon modulonként, miért kell a szüléshez,
   plusz a sportmúlt és az első alkalom mint felmérés. Élesen `oy_migrate_1113` rev c. Tesztek 891/0. Nyitott (Olíviától
   kérdezzük): „Az első kép legyen inkább ez” (nincs kép a doksiban) és „Ide ezt a képet szeretném” (a csoportos óra sora).
+- **Olivia doksija 11.13, 21:35-ös kiegészítés (olivia-yoga 3.6.0, olivia-studio 1.10.0, DEVELOPER 6.13g):** nyitókép =
+  „Olívia (36)” (napnyugtás hátrahajlás), az óra-sorok képei: csoportos flow = ugyanaz, stretching = „27067” (homok),
+  relaxáció = az újbudai gyermekpózos csoportkép. Szövegek: gyertyás mondat, „vezetlek” (figyellek/igazítok ki), „a
+  relaxációhoz” (hosszú ki), kamera: „Nem kötelező” + kiemelve „A képedet csak én látom”, „aktivitás” az erőfeszítés
+  helyett, „Árak” cím (forintban-felirat ki), légzés: kicker ki, „3 kör, majd figyeld meg az érzeteket” (narancs, a
+  végén a lótuszban is). Órarend: csak a szerdák + külön „Egyéni órák” doboz (főoldal, Foglalás). Hatha gomb →
+  Jógáról#a-joga-8-aga. Árak: „Legnépszerűbb” ki, kiemelt ajándékutalvány-sor, csoportos cím „Csoportos, élő online flow
+  jóga órák” + 90 perc; egyéni jóga 60/90 perc kapcsolóval (90 perc: 7 000 / 30 000 Ft), minden 5 alkalmas egyéni
+  bérlet 6 hét (+1 hét oktatói lemondásnál), „Párban olcsóbb” kapcsoló (kismamatornánál; egyéni jógához kérdeztük a
+  párban árat). Fizetési oldal: a bérletkártya nem ragad. Tesztek 919/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

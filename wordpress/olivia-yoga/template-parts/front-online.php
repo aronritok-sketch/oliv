@@ -19,15 +19,16 @@ $ways   = array(
 );
 $why    = array(
 	array( 'home', __( 'No courage needed for the first class', 'olivia-yoga' ), __( 'Nervous about your first yoga class? Try it at home, on your own mat. Nobody is watching, and your camera can stay off if you like.', 'olivia-yoga' ), 'lilac' ),
-	array( 'clock', __( 'No travel', 'olivia-yoga' ), __( 'No traffic, no parking, no queue in the changing room. At home you can get ready in peace and set the mood: light a candle, or whatever helps you arrive.', 'olivia-yoga' ), 'pink' ),
+	array( 'clock', __( 'No travel', 'olivia-yoga' ), __( 'No traffic, no parking, no queue in the changing room. At home you can get ready in peace: light a candle, or create whatever helps you arrive.', 'olivia-yoga' ), 'pink' ),
 	array( 'group', __( 'The power of the group', 'olivia-yoga' ), __( 'You are at home, but the motivation stays: the class is live, you need to be there on time, and the others are waiting for you.', 'olivia-yoga' ), 'sage' ),
 	array( 'user', __( 'A real teacher, present', 'olivia-yoga' ), __( 'You are not following a video: you get live cues, you can ask questions and get feedback, and the teacher can respond to what the group needs.', 'olivia-yoga' ), 'sun' ),
 );
 $needs  = array(
 	array( 'home', __( 'A quiet corner', 'olivia-yoga' ), __( 'Room for a mat, and a door you can close for an hour.', 'olivia-yoga' ), 'lilac' ),
-	array( 'lotus', __( 'A mat, a cushion and a blanket', 'olivia-yoga' ), __( 'The cushion and blanket are for the long relaxation at the end.', 'olivia-yoga' ), 'pink' ),
+	array( 'lotus', __( 'A mat, a cushion and a blanket', 'olivia-yoga' ), __( 'The cushion and blanket are for the relaxation at the end of class.', 'olivia-yoga' ), 'pink' ),
 	array( 'online', __( 'A phone, tablet or laptop', 'olivia-yoga' ), __( 'Any device with a camera and a browser, no app to install. A bigger screen is easier to follow.', 'olivia-yoga' ), 'sage' ),
-	array( 'group', __( 'Camera on, if you like', 'olivia-yoga' ), __( 'If I can see you, I can help you with the poses. Only I see your picture.', 'olivia-yoga' ), 'sun' ),
+	// Olivia, 13 November: „írd bele, hogy nem kötelező, és emeld ki szépen, láthatóan, hogy a képedet csak én látom”
+	array( 'group', __( 'Camera on, if you like', 'olivia-yoga' ), __( 'It is not compulsory. If I can see you, I can help you with the poses.', 'olivia-yoga' ), 'sun', __( 'Only I see your picture.', 'olivia-yoga' ) ),
 );
 $steps  = array(
 	array( __( 'Choose a class', 'olivia-yoga' ), __( 'Book from the timetable with a drop-in or a class pass.', 'olivia-yoga' ) ),
@@ -46,7 +47,7 @@ $steps  = array(
 		</div>
 		<div class="hero__visual">
 			<?php echo oy_soft_blob( 'pink', 'right' ); // phpcs:ignore ?>
-			<div class="frame hero__photo"><?php echo oy_photo( 'online-yoga-living-room', '(min-width: 960px) 52vw, 92vw', true ); // phpcs:ignore ?></div>
+			<div class="frame hero__photo"><?php echo oy_photo( 'olivia-golden-backbend', '(min-width: 960px) 52vw, 92vw', true ); // phpcs:ignore ?></div>
 			<?php echo oy_name_card( 'hero__card' ); // phpcs:ignore ?>
 		</div>
 	</div>
@@ -95,8 +96,8 @@ $steps  = array(
 	<div data-reveal>
 		<?php echo oy_kicker( __( 'How online classes work', 'olivia-yoga' ) ); // phpcs:ignore ?>
 		<h2 id="how-title"><?php esc_html_e( 'A real class, just in your living room', 'olivia-yoga' ); ?></h2>
-		<p class="lead"><?php esc_html_e( 'This is not a video to follow. We practice together, at the same time: I watch, guide and adjust, and you can ask anything before and after class.', 'olivia-yoga' ); ?></p>
-		<ul class="places"><?php foreach ( $needs as $n ) : ?><li><?php echo oy_pictogram( $n[0], $n[3] ); // phpcs:ignore ?><div><h3><?php echo esc_html( $n[1] ); ?></h3><p><?php echo esc_html( $n[2] ); ?></p></div></li><?php endforeach; ?></ul>
+		<p class="lead"><?php esc_html_e( 'This is not a video to follow. We practice together, at the same time: I guide you, and you can ask anything before and after class.', 'olivia-yoga' ); ?></p>
+		<ul class="places"><?php foreach ( $needs as $n ) : ?><li><?php echo oy_pictogram( $n[0], $n[3] ); // phpcs:ignore ?><div><h3><?php echo esc_html( $n[1] ); ?></h3><p><?php echo esc_html( $n[2] ); ?></p><?php if ( ! empty( $n[4] ) ) : ?><p class="oj-only-me"><?php echo oy_icon( 'check' ) . esc_html( $n[4] ); // phpcs:ignore ?></p><?php endif; ?></div></li><?php endforeach; ?></ul>
 	</div>
 	<div class="private__side" data-reveal>
 		<div class="frame"><?php echo oy_photo( 'olivia-dancer-home', '(min-width: 960px) 34vw, 92vw' ); // phpcs:ignore ?></div>
@@ -106,8 +107,9 @@ $steps  = array(
 </div></section>
 
 <section class="section section--tight" id="schedule" aria-labelledby="schedule-title"><div class="container">
-	<header class="section__head section__head--row" data-reveal><div><?php echo oy_kicker( __( 'This week', 'olivia-yoga' ) ); // phpcs:ignore ?><h2 id="schedule-title"><?php esc_html_e( 'Weekly live classes', 'olivia-yoga' ); ?></h2><p class="lead"><?php esc_html_e( 'Times are in Hungarian time. Book in a minute; beginners are welcome in every class.', 'olivia-yoga' ); ?></p></div><?php echo oy_btn( oy_page_link( 'schedule-pricing' ), oy_schedule_label(), 'ghost' ); // phpcs:ignore ?></header>
-	<?php echo shortcode_exists( 'oys_schedule' ) ? do_shortcode( '[oys_schedule days="7"]' ) : ''; // phpcs:ignore ?>
+	<header class="section__head section__head--row" data-reveal><div><?php echo oy_kicker( __( 'Next classes', 'olivia-yoga' ) ); // phpcs:ignore ?><h2 id="schedule-title"><?php esc_html_e( 'Weekly live classes', 'olivia-yoga' ); ?></h2><p class="lead"><?php esc_html_e( 'Times are in Hungarian time. Book in a minute; beginners are welcome in every class.', 'olivia-yoga' ); ?></p></div><?php echo oy_btn( oy_page_link( 'schedule-pricing' ), oy_schedule_label(), 'ghost' ); // phpcs:ignore ?></header>
+	<?php // Olivia, 13 November: only the Wednesdays (the next ones, however far), and the one-to-one sessions in a box of their own ?>
+	<?php echo shortcode_exists( 'oys_schedule' ) ? do_shortcode( '[oys_schedule days="7" next="4"]' ) . ( shortcode_exists( 'oys_private_box' ) ? do_shortcode( '[oys_private_box]' ) : '' ) : ''; // phpcs:ignore ?>
 </div></section>
 
 <section class="section section--moss hatha" aria-labelledby="hatha-title"><div class="container hatha__grid">
@@ -117,14 +119,16 @@ $steps  = array(
 		<h2 id="hatha-title"><?php esc_html_e( 'Ha is the sun. Tha is the moon.', 'olivia-yoga' ); ?></h2>
 		<p class="lead"><?php esc_html_e( 'Hatha yoga balances the active and the receptive in us: effort and ease, strength and surrender. When that balance tips, we feel it first as tension or restlessness.', 'olivia-yoga' ); ?></p>
 		<p><?php esc_html_e( 'On the mat we use the body to find the balance again. The poses are a doorway to meditation, a more dynamic doorway, and only one of the eight limbs of yoga.', 'olivia-yoga' ); ?></p>
-		<p class="btn-row"><?php echo oy_btn( oy_page_link( 'faq' ), __( 'Read more about hatha yoga', 'olivia-yoga' ), 'line-light' ); // phpcs:ignore ?></p>
+		<?php // Olivia, 13 November: to „Jógáról”, straight down to the eight limbs of yoga ?>
+		<p class="btn-row"><?php echo oy_btn( oy_limbs_url(), __( 'Read more about hatha yoga', 'olivia-yoga' ), 'line-light' ); // phpcs:ignore ?></p>
 	</div>
 </div></section>
 
 <section class="section section--forest section--breath" aria-label="<?php esc_attr_e( 'Breathing exercise', 'olivia-yoga' ); ?>"><div class="container"><?php echo oy_breath(); // phpcs:ignore ?></div></section>
 
 <section class="section section--tight" id="pricing" aria-labelledby="pricing-title"><div class="container">
-	<?php echo oy_section_head( __( 'Simple pricing', 'olivia-yoga' ), __( 'Pay per class, save with a 5-class pass, or give someone a gift card.', 'olivia-yoga' ), __( 'Prices in forints', 'olivia-yoga' ), 'pricing-title' ); // phpcs:ignore ?>
+	<?php // Olivia, 13 November: „Az »árak forintban«-t szedjük ki. A főcím legyen csak árak” ?>
+	<?php echo oy_section_head( __( 'Prices', 'olivia-yoga' ), __( 'Pay per class, save with a 5-class pass, or give someone a gift card.', 'olivia-yoga' ), '', 'pricing-title' ); // phpcs:ignore ?>
 	<?php echo $studio( 'oys_pricing' ); // phpcs:ignore ?>
 </div></section>
 

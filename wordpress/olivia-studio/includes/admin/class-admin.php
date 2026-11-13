@@ -577,8 +577,8 @@ class OYS_Admin {
 				if ( in_array( $r->status, array( 'new', 'offered' ), true ) ) {
 					$s     = $r->session_id ? OYS_Schedule::get( $r->session_id ) : null;
 					$svc   = OYS_Services::get( (string) ( $r->topic ?? '' ) );
-					$price = $r->price_cents ?: ( $svc ? OYS_Services::price( $svc['key'], (int) $r->people ) : OYS_Products::private_price_for( $r->duration_min, 'online' === $r->location_type ) );
-					$durs  = array_unique( array_merge( $svc ? array( (int) $svc['duration'] ) : array(), array( 60, 75, 90 ) ) );
+					$price = $r->price_cents ?: ( $svc ? OYS_Services::price( $svc['key'], (int) $r->people, (int) $r->duration_min ) : OYS_Products::private_price_for( $r->duration_min, 'online' === $r->location_type ) );
+					$durs  = array_unique( array_merge( $svc ? $svc['durations'] : array(), array( 60, 75, 90 ) ) );
 					echo '<h2>' . ( $s ? esc_html__( 'Change the offer', 'olivia-studio' ) : esc_html__( 'Send an offer', 'olivia-studio' ) ) . '</h2>' . self::form( 'private_offer' ) . '<input type="hidden" name="id" value="' . (int) $r->id . '"><table class="form-table">' // phpcs:ignore
 						. '<tr><th>' . esc_html__( 'Date and time', 'olivia-studio' ) . '</th><td><input type="datetime-local" name="starts" required value="' . esc_attr( $s ? oys_utc_to_local_input( $s->starts_at ) : '' ) . '"></td></tr>'
 						. '<tr><th>' . esc_html__( 'Length (min)', 'olivia-studio' ) . '</th><td><select name="duration">' . implode( '', array_map( fn( $d ) => '<option value="' . $d . '"' . selected( (int) $r->duration_min, $d, false ) . '>' . $d . '</option>', $durs ) ) . '</select></td></tr>'

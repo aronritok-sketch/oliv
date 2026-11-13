@@ -97,13 +97,14 @@ function oy_breath() {
 		'round' => __( 'Breath %1$d of %2$d', 'olivia-yoga' ),
 		'done'  => __( 'Welcome back. Notice how you feel now. That is how every class begins.', 'olivia-yoga' ),
 		'stop'  => __( 'Stop', 'olivia-yoga' ),
+		'notice' => __( 'Notice the sensations', 'olivia-yoga' ),
 	);
 	return '<div class="breath" data-breath data-words="' . esc_attr( wp_json_encode( $words ) ) . '">'
 		. '<div class="breath__text">'
-		. oy_kicker( __( 'Try it now · 30 seconds', 'olivia-yoga' ) )
+		. ( oy_online_only() ? '' : oy_kicker( __( 'Try it now · 30 seconds', 'olivia-yoga' ) ) ) // Olivia, 13 November: „ezt szedjük ki”
 		. '<h2>' . esc_html__( 'Before you decide, take three breaths with me', 'olivia-yoga' ) . '</h2>'
 		. '<p class="lead">' . esc_html__( 'A longer exhale is the quickest way to tell your nervous system it is safe to slow down. Follow the lotus: it opens as you breathe in and folds as you breathe out.', 'olivia-yoga' ) . '</p>'
-		. '<ol class="breath__guide"><li><b>4</b><span>' . esc_html__( 'counts in, through the nose', 'olivia-yoga' ) . '</span></li><li><b>6</b><span>' . esc_html__( 'counts out, slow and soft', 'olivia-yoga' ) . '</span></li><li><b>3</b><span>' . esc_html__( 'rounds, then notice the difference', 'olivia-yoga' ) . '</span></li></ol>'
+		. '<ol class="breath__guide"><li><b>4</b><span>' . esc_html__( 'counts in, through the nose', 'olivia-yoga' ) . '</span></li><li><b>6</b><span>' . esc_html__( 'counts out, slow and soft', 'olivia-yoga' ) . '</span></li><li><b>3</b><span>' . sprintf( esc_html__( 'rounds, then %s', 'olivia-yoga' ), '<em class="breath__notice-word">' . esc_html( mb_strtolower( $words['notice'] ) ) . '</em>' ) . '</span></li></ol>'
 		. '<button type="button" class="btn btn--light" data-breath-start>' . esc_html__( 'Start breathing', 'olivia-yoga' ) . '</button>'
 		. '<p class="breath__status" aria-live="polite" data-breath-status></p></div>'
 		. '<div class="breath__stage" aria-hidden="true"><div class="breath__glow"></div><div class="breath__lotus">' . $petals . '</div>'

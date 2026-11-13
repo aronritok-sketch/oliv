@@ -10,6 +10,9 @@
  *  - A session of a service: kind `private`, class_slug = the service's class (+ "-duo" for two people).
  *  - Credit kind: the service key (+ "_duo"). Private sessions without a service (private yoga as before) keep
  *    the `private` credits.
+ *  - Lengths (Olivia, 13 November: „itt lett egy új konstrukció: 90 perc”): a service may come in more than one length
+ *    (`durations`, e.g. "60,90"; the first is `duration`). A session of another length has its own credits
+ *    (service key + "_90"), so a 60-minute pass never pays for a 90-minute session.
  */
 
 defined( 'ABSPATH' ) || exit;
@@ -37,10 +40,12 @@ class OYS_Services {
 	}
 
 	private static function shape( $key, array $s ) {
-		$s        = wp_parse_args( $s, array( 'label' => $key, 'class' => $key, 'duration' => 60, 'duo' => 0, 'description' => '', 'sort' => 50 ) );
+		$s        = wp_parse_args( $s, array( 'label' => $key, 'class' => $key, 'duration' => 60, 'durations' => '', 'duo' => 0, 'description' => '', 'sort' => 50 ) );
 		$s['key'] = $key;
 		$s['duration'] = max( 15, (int) $s['duration'] );
 		$s['duo']      = empty( $s['duo'] ) ? 0 : 1;
+		$list          = array_map( 'intval', is_array( $s['durations'] ) ? $s['durations'] : explode( ',', (string) $s['durations'] ) );
+		$s['durations'] = array_values( array_unique( array_merge( array( $s['duration'] ), array_filter( $list, fn( $m ) => $m >= 15 ) ) ) );
 		return $s;
 	}
 
@@ -60,9 +65,16 @@ class OYS_Services {
 		return array_intersect_key( self::all(), $keys );
 	}
 
-	/** The credit kind of a service session: the service key, "_duo" for two people. */
-	public static function credit_kind( $key, $people = 1 ) {
-		return $key . ( (int) $people > 1 ? '_duo' : '' );
+	/** The credit kind of a service session: the service key, "_duo" for two people, "_90" for another length. */
+	public static function credit_kind( $key, $people = 1, $minutes = 0 ) {
+		$s = (int) $minutes ? self::get( $key ) : null;
+		return $key . ( (int) $people > 1 ? '_duo' : '' ) . ( $s && (int) $minutes !== (int) $s['duration'] ? '_' . (int) $minutes : '' );
+	}
+
+	/** Is this one of the service's lengths? */
+	public static function has_length( $key, $minutes ) {
+		$s = self::get( $key );
+		return $s && in_array( (int) $minutes, $s['durations'], true );
 	}
 
 	/** [service key, people] of a session's class, or null (private yoga, group classes). */
@@ -78,23 +90,45 @@ class OYS_Services {
 		return null;
 	}
 
-	/** Price of one session of a service, alone or for two (the service's private_single product). */
-	public static function price( $key, $people = 1 ) {
-		$people = (int) $people > 1 ? 2 : 1;
+	/** Price of one session of a service, alone or for two, of a length (the service's private_single product). */
+	public static function price( $key, $people = 1, $minutes = 0 ) {
+		$people  = (int) $people > 1 ? 2 : 1;
+		$s       = self::get( $key );
+		$minutes = (int) $minutes ?: ( $s ? (int) $s['duration'] : 0 );
 		foreach ( OYS_Products::all( true ) as $p ) {
-			if ( 'private_single' === $p['kind'] && $key === $p['service'] && (int) $p['people'] === $people ) {
+			if ( 'private_single' === $p['kind'] && $key === $p['service'] && (int) $p['people'] === $people && self::product_minutes( $p ) === $minutes ) {
 				return (int) $p['price_cents'];
 			}
 		}
 		return 0;
 	}
 
-	public static function label( $key, $people = 1 ) {
+	/** A service product's length: its own, or the service's. */
+	public static function product_minutes( array $p ) {
+		$s = ! empty( $p['service'] ) ? self::get( $p['service'] ) : null;
+		return (int) ( $p['duration_min'] ?? 0 ) ?: ( $s ? (int) $s['duration'] : 60 );
+	}
+
+	/** The lengths a service is sold in (those with an active product), shortest first. */
+	public static function lengths( $key ) {
+		$out = array();
+		foreach ( OYS_Products::all( true ) as $p ) {
+			if ( $key === ( $p['service'] ?? '' ) && in_array( $p['kind'], array( 'private_single', 'private_pack' ), true ) ) {
+				$out[ self::product_minutes( $p ) ] = true;
+			}
+		}
+		$out = array_keys( $out );
+		sort( $out );
+		return $out;
+	}
+
+	public static function label( $key, $people = 1, $minutes = 0 ) {
 		$s = self::get( $key );
 		if ( ! $s ) {
 			return __( 'Private session', 'olivia-studio' );
 		}
 		$label = oys_t( $s['label'] );
-		return (int) $people > 1 ? sprintf( __( '%s, with a friend', 'olivia-studio' ), $label ) : $label;
+		$label = (int) $people > 1 ? sprintf( __( '%s, with a friend', 'olivia-studio' ), $label ) : $label;
+		return (int) $minutes && (int) $minutes !== (int) $s['duration'] ? sprintf( __( '%1$s, %2$d minutes', 'olivia-studio' ), $label, (int) $minutes ) : $label;
 	}
 }

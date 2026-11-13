@@ -113,7 +113,7 @@
 			}
 			function stop(msg) {
 				timers.forEach(clearTimeout); timers = [];
-				breath.classList.remove('is-in', 'is-out');
+				breath.classList.remove('is-in', 'is-out', 'is-notice');
 				stage.style.setProperty('--dur', '1.2s');
 				btn.textContent = label;
 				status.textContent = msg || '';
@@ -125,6 +125,8 @@
 			btn.addEventListener('click', function () {
 				if (breath.dataset.running) { stop(''); return; }
 				breath.dataset.running = '1';
+				timers.forEach(clearTimeout); timers = [];
+				breath.classList.remove('is-notice');
 				btn.textContent = words.stop || 'Stop';
 				dots.forEach(function (d) { d.classList.remove('is-done', 'is-now'); });
 				for (var i = 0; i < ROUNDS; i++) {
@@ -151,6 +153,12 @@
 				later(function () {
 					dots.forEach(function (d) { d.classList.remove('is-now'); d.classList.add('is-done'); });
 					stop(words.done || 'Welcome back.');
+					// after the third round the lotus rests and asks you to notice (Olivia, 13 November)
+					if (words.notice) {
+						breath.classList.add('is-notice');
+						phase.textContent = words.notice; count.textContent = '';
+						later(function () { breath.classList.remove('is-notice'); phase.textContent = idle.phase; count.textContent = idle.count; }, 9000);
+					}
 				}, ROUNDS * (IN + OUT) * 1000);
 			});
 		});

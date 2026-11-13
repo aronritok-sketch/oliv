@@ -30,7 +30,8 @@
 			"cancel_policy": "A csoportos órát 12 órával a kezdés előtt még ingyen lemondhatod: az alkalom visszakerül a bérletedre. Ha alkalmi jeggyel foglaltál, helyette egy órakreditet kapsz. A később lemondott vagy kihagyott óra elhasználódik. Az egyéni órát 24 órával előtte lehet áttenni vagy lemondani.",
 			"private_note": "Az első egyéni óránk elején kb. 15 perccel tovább beszélgetünk a céljaidról, ezért számolj egy kicsivel több idővel. Később is szánhatunk erre néhány percet.",
 			"pay_later_note": "",
-			"cancel_extend_days": 7
+			"cancel_extend_days": 7,
+			"schedule_empty_days": "no"
 		},
 		"products": {
 			"online-1": {
@@ -44,7 +45,7 @@
 				"featured": 0,
 				"giftable": 1,
 				"active": 1,
-				"duration_min": 0,
+				"duration_min": 90,
 				"sort": 9
 			},
 			"online-5": {
@@ -54,21 +55,21 @@
 				"validity_days": 56,
 				"price_cents": 1300000,
 				"description": "Öt élő online csoportos flow jógaóra (90 perc), alkalmanként 2 600 Ft. 8 hétig érvényes; ha én mondok le egy órát, az érvényessége egy héttel kitolódik.",
-				"features": "5 élő online óra, 90 perc\nSzerdánként 18:30-tól 20:00-ig\n8 hétig érvényes\nHa én mondok le órát, egy héttel tovább érvényes\nAjándékutalványként is megveheted",
+				"features": "8 hétig érvényes\nOktatói lemondás esetén 1 héttel hosszabb érvényesség",
 				"featured": 1,
 				"giftable": 1,
 				"active": 1,
-				"duration_min": 0,
+				"duration_min": 90,
 				"sort": 10
 			},
 			"egyeni-1": {
-				"name": "Egyéni online jóga, 1 alkalom",
+				"name": "Egyéni online jóga, 60 perc",
 				"kind": "private_single",
 				"credits": 1,
 				"validity_days": 365,
 				"price_cents": 500000,
 				"description": "60 perc négyszemközt, arra fókuszálva, amire neked szükséged van.",
-				"features": "60 perc, négyszemközt\nA testedre és a céljaidra szabva\nAjándékutalványként is megveheted",
+				"features": "Négyszemközt\nA testedre és a céljaidra szabva",
 				"featured": 0,
 				"giftable": 1,
 				"active": 1,
@@ -78,13 +79,13 @@
 				"people": 1
 			},
 			"egyeni-5": {
-				"name": "5 alkalmas egyéni online jóga bérlet",
+				"name": "5 alkalmas egyéni online jóga bérlet, 60 perc",
 				"kind": "private_pack",
 				"credits": 5,
-				"validity_days": 0,
+				"validity_days": 42,
 				"price_cents": 2200000,
-				"description": "Öt 60 perces egyéni online jógaóra, lejárat nélkül.",
-				"features": "5 × 60 perc, négyszemközt\nNincs lejárata\nAlkalomról alkalomra épülő terv",
+				"description": "Öt 60 perces egyéni online jógaóra, 6 hétig érvényes; ha én mondok le egy órát, egy héttel tovább érvényes.",
+				"features": "Négyszemközt\nA testedre és a céljaidra szabva\n6 hétig érvényes\nOktatói lemondás esetén 1 héttel hosszabb érvényesség\nAlkalomról alkalomra épülő terv",
 				"featured": 0,
 				"giftable": 1,
 				"active": 1,
@@ -93,14 +94,46 @@
 				"service": "egyeni-joga",
 				"people": 1
 			},
+			"egyeni90-1": {
+				"name": "Egyéni online jóga, 90 perc",
+				"kind": "private_single",
+				"credits": 1,
+				"validity_days": 365,
+				"price_cents": 700000,
+				"description": "90 perc négyszemközt, arra fókuszálva, amire neked szükséged van.",
+				"features": "Négyszemközt\nA testedre és a céljaidra szabva",
+				"featured": 0,
+				"giftable": 1,
+				"active": 1,
+				"duration_min": 90,
+				"sort": 22,
+				"service": "egyeni-joga",
+				"people": 1
+			},
+			"egyeni90-5": {
+				"name": "5 alkalmas egyéni online jóga bérlet, 90 perc",
+				"kind": "private_pack",
+				"credits": 5,
+				"validity_days": 42,
+				"price_cents": 3000000,
+				"description": "Öt 90 perces egyéni online jógaóra, 6 hétig érvényes; ha én mondok le egy órát, egy héttel tovább érvényes.",
+				"features": "Négyszemközt\nA testedre és a céljaidra szabva\n6 hétig érvényes\nOktatói lemondás esetén 1 héttel hosszabb érvényesség\nAlkalomról alkalomra épülő terv",
+				"featured": 0,
+				"giftable": 1,
+				"active": 1,
+				"duration_min": 90,
+				"sort": 23,
+				"service": "egyeni-joga",
+				"people": 1
+			},
 			"kismama-1": {
-				"name": "Online kismamatorna, 1 alkalom",
+				"name": "Online kismamatorna, 60 perc",
 				"kind": "private_single",
 				"credits": 1,
 				"validity_days": 365,
 				"price_cents": 500000,
 				"description": "60 perc, egyénileg: a trimeszteredhez és az aznapi állapotodhoz igazítva.",
-				"features": "60 perc, négyszemközt\nEgy pár perces beszélgetéssel kezdünk\nAjándékutalványként is megveheted",
+				"features": "Négyszemközt\nA trimeszteredhez és az aznapi állapotodhoz szabva",
 				"featured": 0,
 				"giftable": 1,
 				"active": 1,
@@ -110,13 +143,13 @@
 				"people": 1
 			},
 			"kismama-duo-1": {
-				"name": "Online kismamatorna barátnővel, 1 alkalom",
+				"name": "Online kismamatorna barátnővel, 60 perc",
 				"kind": "private_single",
 				"credits": 1,
 				"validity_days": 365,
 				"price_cents": 800000,
 				"description": "60 perc kettőtöknek: neked és a barátnődnek.",
-				"features": "60 perc, kettőtöknek\nMindkettőtökhöz igazítva",
+				"features": "Kettőtöknek: neked és a barátnődnek\nMindkettőtökhöz igazítva",
 				"featured": 0,
 				"giftable": 1,
 				"active": 1,
@@ -129,10 +162,10 @@
 				"name": "5 alkalmas online kismamatorna-bérlet",
 				"kind": "private_pack",
 				"credits": 5,
-				"validity_days": 0,
+				"validity_days": 42,
 				"price_cents": 2200000,
-				"description": "Öt 60 perces online kismamatorna, lejárat nélkül.",
-				"features": "5 × 60 perc, egyénileg\nNincs lejárata\nAjándékutalványként is megveheted",
+				"description": "Öt 60 perces online kismamatorna, 6 hétig érvényes; ha én mondok le egy órát, egy héttel tovább érvényes.",
+				"features": "Négyszemközt\nA trimeszteredhez és az aznapi állapotodhoz szabva\n6 hétig érvényes\nOktatói lemondás esetén 1 héttel hosszabb érvényesség\nAlkalomról alkalomra épülő terv",
 				"featured": 0,
 				"giftable": 1,
 				"active": 1,
@@ -145,10 +178,10 @@
 				"name": "5 alkalmas online kismamatorna-bérlet barátnővel",
 				"kind": "private_pack",
 				"credits": 5,
-				"validity_days": 0,
+				"validity_days": 42,
 				"price_cents": 3600000,
-				"description": "Öt 60 perces online kismamatorna kettőtöknek, lejárat nélkül.",
-				"features": "5 × 60 perc, kettőtöknek\nNincs lejárata",
+				"description": "Öt 60 perces online kismamatorna kettőtöknek, 6 hétig érvényes; ha én mondok le egy órát, egy héttel tovább érvényes.",
+				"features": "Kettőtöknek: neked és a barátnődnek\nMindkettőtökhöz igazítva\n6 hétig érvényes\nOktatói lemondás esetén 1 héttel hosszabb érvényesség\nAlkalomról alkalomra épülő terv",
 				"featured": 0,
 				"giftable": 1,
 				"active": 1,
@@ -158,13 +191,13 @@
 				"people": 2
 			},
 			"stretching-1": {
-				"name": "Online stretching és mobilizáció, 1 alkalom",
+				"name": "Online stretching és mobilizáció, 60 perc",
 				"kind": "private_single",
 				"credits": 1,
 				"validity_days": 56,
 				"price_cents": 300000,
 				"description": "60 perc egyéni nyújtás és mobilizáció a te tempódban.",
-				"features": "60 perc, négyszemközt\nCsípő, váll, gerinc\nAjándékutalványként is megveheted",
+				"features": "Négyszemközt\nA testedre és a céljaidra szabva",
 				"featured": 0,
 				"giftable": 1,
 				"active": 1,
@@ -177,10 +210,10 @@
 				"name": "5 alkalmas stretching-bérlet",
 				"kind": "private_pack",
 				"credits": 5,
-				"validity_days": 56,
+				"validity_days": 42,
 				"price_cents": 1300000,
-				"description": "Öt 60 perces egyéni online stretching és mobilizáció, 8 hétig érvényes.",
-				"features": "5 × 60 perc, négyszemközt\n8 hétig érvényes\nAjándékutalványként is megveheted",
+				"description": "Öt 60 perces egyéni online stretching és mobilizáció, 6 hétig érvényes; ha én mondok le egy órát, egy héttel tovább érvényes.",
+				"features": "Négyszemközt\nA testedre és a céljaidra szabva\n6 hétig érvényes\nOktatói lemondás esetén 1 héttel hosszabb érvényesség\nAlkalomról alkalomra épülő terv",
 				"featured": 0,
 				"giftable": 1,
 				"active": 1,
@@ -190,13 +223,13 @@
 				"people": 1
 			},
 			"relax-1": {
-				"name": "Relaxáció és légzés, 1 alkalom",
+				"name": "Relaxáció és légzés, 30 perc",
 				"kind": "private_single",
 				"credits": 1,
 				"validity_days": 42,
 				"price_cents": 200000,
 				"description": "30 perc egyéni légzőgyakorlat és vezetett relaxáció.",
-				"features": "30 perc, négyszemközt\nLégzőgyakorlatok és relaxáció\nAjándékutalványként is megveheted",
+				"features": "Négyszemközt\nA testedre és a céljaidra szabva",
 				"featured": 0,
 				"giftable": 1,
 				"active": 1,
@@ -211,8 +244,8 @@
 				"credits": 5,
 				"validity_days": 42,
 				"price_cents": 900000,
-				"description": "Öt 30 perces egyéni relaxáció és légzés, 6 hétig érvényes.",
-				"features": "5 × 30 perc, négyszemközt\n6 hétig érvényes\nAjándékutalványként is megveheted",
+				"description": "Öt 30 perces egyéni relaxáció és légzés, 6 hétig érvényes; ha én mondok le egy órát, egy héttel tovább érvényes.",
+				"features": "Négyszemközt\nA testedre és a céljaidra szabva\n6 hétig érvényes\nOktatói lemondás esetén 1 héttel hosszabb érvényesség\nAlkalomról alkalomra épülő terv",
 				"featured": 0,
 				"giftable": 1,
 				"active": 1,
@@ -229,7 +262,8 @@
 				"class": "egyeni-online-joga",
 				"duration": 60,
 				"duo": 0,
-				"sort": 10
+				"sort": 10,
+				"durations": "60,90"
 			},
 			"prenatal": {
 				"label": "Online kismamatorna",
@@ -305,7 +339,7 @@
 			"title": "Bejelentkezés és árak",
 			"excerpt": "Csoportos online flow jóga szerdánként 18:30-tól 20:00-ig: alkalmi jegy 3 000 Ft, 5 alkalmas bérlet 13 000 Ft. Egyéni online jóga, kismamatorna, stretching, relaxáció és légzés, ajándékutalvány.",
 			"seo_title": "Online jóga: bejelentkezés és árak | Élő órák otthonról",
-			"seo_desc": "Csoportos online flow jóga szerdánként 18:30-tól 20:00-ig, magyar idő szerint. Alkalmi jegy 3 000 Ft, 5 alkalmas bérlet 13 000 Ft. Egyéni online jóga és kismamatorna 5 000 Ft-tól, stretching 3 000 Ft, relaxáció és légzés 2 000 Ft.",
+			"seo_desc": "Csoportos online flow jóga szerdánként 18:30-tól 20:00-ig, magyar idő szerint. Alkalmi jegy 3 000 Ft, 5 alkalmas bérlet 13 000 Ft. Egyéni online jóga és kismamatorna 5 000 Ft-tól (90 perces egyéni jóga 7 000 Ft), stretching 3 000 Ft, relaxáció és légzés 2 000 Ft.",
 			"photo": "olivia-dancer-home",
 			"content": "<h2>Csoportos online flow jóga szerdánként</h2>\n<p>Szerdánként 18:30-tól 20:00-ig, 90 percben. Az első óra 2026. december 16-án lesz; december 23-án nincs óra, utána december 30-án folytatjuk. A gyakorlás alatt részed lesz légzőgyakorlatban, erősítésben, nyújtásban, egyensúlyozásban, flow élményben és relaxációban egyaránt, közben pedig hétköznapi példákon keresztül, elméleti és gyakorlati síkon is jobban megismerkedhetsz a jógikus életvitellel.</p>\n<p>Az időpontok magyar idő szerint értendők. Minden óra élő, itt az oldalon, a böngésződben.</p>\n[oy_schedule]\n<p>Kérlek, foglalj előre, hogy időben megkapd a linket. Az órák legalább 3 fővel indulnak. Kezdőket minden órára szeretettel várok.</p>\n<h2>Egyéni online órák</h2>\n<p>Az <a href=\"{{class:egyeni-online-joga}}\">egyéni online jógára</a>, az <a href=\"{{class:kismamatorna}}\">online kismamatornára</a>, a <a href=\"{{class:stretching}}\">stretchingre</a> és a <a href=\"{{class:relaxacio-legzes}}\">relaxációra és légzésre</a> időpontot kérsz, és egy napon belül visszaírok. Az árakat lent találod.</p>\n<p>Az online kismamatornába beépül a légzőtorna, gátizomtorna, keringésjavítás, kardiótréning, izomerősítés és súlyzós edzés, gerinctréning, mobilizáció és stretching, jóga és relaxáció. Természetesen nem mind egyetlen órába: ezek kombinációja ad megfelelő felkészülést a szülésre.</p>\n<h2>Árak</h2>\n[oy_pricing]\n<h2 id=\"gift-cards\">Ajándékutalványok</h2>\n<p>Ajándékozz online jóga bérletet, egyéni órát vagy online kismamatornát. Az ajándékutalványt e-mailben kapja meg az, akinek szánod, egy kóddal, amit a fiókjában vált be.</p>\n<p>[oy_gift_link]</p>\n<h2>Jó tudni</h2>\n<h3>Amire szükséged lesz</h3>\n<ul>\n<li>Jógaszőnyeg, egy ülőpárna és egy pléd a relaxációhoz</li>\n<li>Kényelmes öltözet és víz, ha megszomjaznál; a gyakorlást mezítláb ajánlom</li>\n<li>Telefon, tablet vagy laptop kamerával, és egy jógamatracnyi hely</li>\n</ul>\n<p><strong>Bérlet:</strong> a csoportos 5 alkalmas bérlet 8 hétig érvényes. Ha én mondok le egy órát, az érvényessége egy héttel kitolódik.</p>\n<p><strong>Lemondás:</strong> a csoportos órát 12 órával előtte még ingyen lemondhatod, és az alkalom visszakerül a bérletedre. Ha 3 főnél kevesebben jelentkeznek, szólok, és visszakapod az alkalmat. Az egyéni órát 24 órával előtte lehet áttenni vagy lemondani.</p>\n<p><strong>Új vagy a jógában?</strong> Olvasd el a <a href=\"{{page:faq}}\">leggyakoribb kérdéseket</a>, vagy <a href=\"{{page:contact}}\">írj nekem</a> az első órád előtt.</p>"
 		},
@@ -341,21 +375,21 @@
 			"duration": "90 perc",
 			"lang": "magyar",
 			"seo_title": "Online flow jóga élőben, csoportban | Szerdánként 18:30-tól",
-			"photo": "olivia-mandala-lunge",
+			"photo": "olivia-golden-backbend",
 			"aside": "deck-down-dog",
 			"link": "",
 			"content": "<h2>Mi történik egy online flow jógaórán</h2>\n<p>Megérkezéssel kezdünk: néhány perc légzés, hogy a napot a nappali ajtaján kívül hagyd. Aztán felmelegítünk napüdvözletekkel, álló sorozatokkal, a has, a hát és a láb mély izmait erősítő gyakorlatokkal, és fókuszt kívánó egyensúlyozó pózokkal. Van, ami a légzéssel áramlik, és van, amit kicsit tovább tartunk, hogy mindenkinek megérkezzen a figyelme.</p>\n<p>Az óra utolsó része lelassul: nyújtás, néhány pillanat csend és egy hosszú relaxáció.</p>\n<h2>Kinek szól</h2>\n<p>Mindenkinek, aki szeretne rendszeresen, közösségben gyakorolni. Az óráimra kezdőket is szeretettel várok: minden pózhoz adok könnyebb és erősebb változatot, így az is élvezi, aki régóta gyakorol. Nem kell hajlékonynak lenned, és senkinek nem kell „szerepelnie”.</p>\n<h2>Amit hazaviszel</h2>\n<ul>\n<li>Erő a has és a hát mély izmaiban, ami a jó tartást támogatja</li>\n<li>Szabadabb csípő, váll és gerinc</li>\n<li>Stabilabb egyensúly és fókusz</li>\n<li>Egy légzés, amit akkor is használhatsz, amikor hangos a nap</li>\n</ul>\n<h2>Szerdánként 18:30-tól 20:00-ig</h2>\n<p>Az első óra 2026. december 16-án, szerdán lesz. December 23-án nincs óra, utána december 30-án folytatjuk, és onnantól minden szerdán.</p>\n<p>A gyakorlás alatt részed lesz légzőgyakorlatban, erősítésben, nyújtásban, egyensúlyozásban, flow élményben és relaxációban egyaránt, közben pedig hétköznapi példákon keresztül, elméleti és gyakorlati síkon is jobban megismerkedhetsz a jógikus életvitellel. Az órák csoportosak, de ha szeretnéd, beszélgethetünk és kapcsolódhatunk is.</p>\n<h2>Online, élőben</h2>\n<p>Az óra élő, itt az oldalon: nem kell hozzá semmilyen alkalmazás, a böngésződben fut. Foglalás után e-mailben megkapod a saját belépőlinkedet, és a fiókodban is megtalálod. Kell hozzá egy jógamatracnyi hely, és egy kamerás telefon, tablet vagy laptop. Ha bekapcsolod a kamerádat, látlak, és tudok segíteni a pózokban.</p>\n<p>Az óráról felvétel készül, de azon csak én látszom és hallatszom, te nem. Ha lemaradtál valamiről, egy hétig visszanézheted. Az óra chatje az óra után is megmarad, ott tovább beszélgethetünk, és az óra eleji gondolataim rövid összefoglalóját is ott találod.</p>\n[oy_booking_link]"
 		},
 		"egyeni-online-joga": {
 			"title": "Egyéni online jóga",
-			"excerpt": "Négyszemközti, 60 perces online jógaóra arra fókuszálva, amire neked szükséged van: fáj a hátad vagy a derekad, kezdőként tanulnál, vagy a stresszből keresel kiutat.",
-			"duration": "60 perc",
+			"excerpt": "Négyszemközti, 60 vagy 90 perces online jógaóra arra fókuszálva, amire neked szükséged van: fáj a hátad vagy a derekad, kezdőként tanulnál, vagy a stresszből keresel kiutat.",
+			"duration": "60 vagy 90 perc",
 			"lang": "magyar",
 			"seo_title": "Egyéni online jógaóra | Hátfájásra, stressz ellen, kezdőknek",
 			"photo": "private-tree-pose",
 			"aside": "olivia-dancer-home",
 			"link": "",
-			"content": "<p>Csoportos órán a csoportnak tanítok. Egyéni órán neked: a te testedre, a te tempódra és arra, amiért jöttél. Videón látlak, pontosan látom, min dolgozzunk, és minden alkalom az előzőre épít.</p>\n<h2>Miben segíthet az egyéni online jóga?</h2>\n<h3>Fáj a hátad?</h3>\n<p>Az évekig tartó ülőmunka, a sok telefonozás és a stressz a vállban és a hát közepén is megül. A törzs mély izmainak erősítése és a gerinc átmozgatása sokaknak sokat segít.</p>\n<h3>Fáj a derekad?</h3>\n<p>A derék sokszor a csípő merevségét és a gyenge hasizmokat fizeti meg. Megkeressük, mi húzza, és lépésről lépésre dolgozunk rajta, a te határaidon belül.</p>\n<h3>Többet szeretnél megtudni a jógáról?</h3>\n<p>Ha kezdő vagy, egyéni órán nyugodtan, közönség nélkül tanulhatod meg az alapokat: a pózokat, a légzést és azt, hogyan figyelj a testedre. Ha már gyakorolsz, elmélyíthetjük azt, ami érdekel.</p>\n<h3>Menekülnél a stressz elől?</h3>\n<p>Lassabb tempó, légzőgyakorlatok és egy hosszú relaxáció, hogy a túlpörgött idegrendszer is lecsendesedjen.</p>\n<h2>Kinek szól</h2>\n<ul>\n<li>Teljesen kezdőknek, akik biztonságban szeretnék megtanulni az alapokat, mielőtt csoportba járnának</li>\n<li>Bárkinek, aki szívesebben gyakorol közönség nélkül</li>\n<li>Akik merevséggel, régi sérüléssel vagy korlátozott mozgással dolgoznak, az orvosuk jóváhagyásával</li>\n<li>Friss anyukáknak, akik visszatérnének a mozgáshoz</li>\n</ul>\n<h2>Árak</h2>\n<ul>\n<li><strong>1 alkalom:</strong> 5 000 Ft (60 perc)</li>\n<li><strong>5 alkalmas bérlet:</strong> 22 000 Ft, lejárat nélkül</li>\n</ul>\n<h2>Hogyan működik</h2>\n<p>Kérj időpontot a fiókodban: írd meg, mikor érsz rá és min szeretnél dolgozni. Egy napon belül visszaírok egy időponttal, amit egy kattintással elfogadsz, és kifizeted vagy a bérletedből foglalod. Az óra élő, itt az oldalon, a böngésződben; csak egy jógamatracnyi hely, egy kamerás telefon vagy laptop és egy kis csend kell hozzá.</p>\n<p>[oy_button url=\"{{private:egyeni-joga}}\" label=\"Időpontot kérek\"]</p>"
+			"content": "<p>Csoportos órán a csoportnak tanítok. Egyéni órán neked: a te testedre, a te tempódra és arra, amiért jöttél. Videón látlak, pontosan látom, min dolgozzunk, és minden alkalom az előzőre épít.</p>\n<h2>Miben segíthet az egyéni online jóga?</h2>\n<h3>Fáj a hátad?</h3>\n<p>Az évekig tartó ülőmunka, a sok telefonozás és a stressz a vállban és a hát közepén is megül. A törzs mély izmainak erősítése és a gerinc átmozgatása sokaknak sokat segít.</p>\n<h3>Fáj a derekad?</h3>\n<p>A derék sokszor a csípő merevségét és a gyenge hasizmokat fizeti meg. Megkeressük, mi húzza, és lépésről lépésre dolgozunk rajta, a te határaidon belül.</p>\n<h3>Többet szeretnél megtudni a jógáról?</h3>\n<p>Ha kezdő vagy, egyéni órán nyugodtan, közönség nélkül tanulhatod meg az alapokat: a pózokat, a légzést és azt, hogyan figyelj a testedre. Ha már gyakorolsz, elmélyíthetjük azt, ami érdekel.</p>\n<h3>Menekülnél a stressz elől?</h3>\n<p>Lassabb tempó, légzőgyakorlatok és egy hosszú relaxáció, hogy a túlpörgött idegrendszer is lecsendesedjen.</p>\n<h2>Kinek szól</h2>\n<ul>\n<li>Teljesen kezdőknek, akik biztonságban szeretnék megtanulni az alapokat, mielőtt csoportba járnának</li>\n<li>Bárkinek, aki szívesebben gyakorol közönség nélkül</li>\n<li>Akik merevséggel, régi sérüléssel vagy korlátozott mozgással dolgoznak, az orvosuk jóváhagyásával</li>\n<li>Friss anyukáknak, akik visszatérnének a mozgáshoz</li>\n</ul>\n<h2>Árak</h2>\n<ul>\n<li><strong>60 perc:</strong> alkalmanként 5 000 Ft, 5 alkalom 22 000 Ft</li>\n<li><strong>90 perc:</strong> alkalmanként 7 000 Ft, 5 alkalom 30 000 Ft</li>\n<li>Az 5 alkalmas bérlet 6 hétig érvényes; ha én mondok le egy órát, egy héttel tovább érvényes.</li>\n</ul>\n<h2>Hogyan működik</h2>\n<p>Kérj időpontot a fiókodban: írd meg, mikor érsz rá és min szeretnél dolgozni. Egy napon belül visszaírok egy időponttal, amit egy kattintással elfogadsz, és kifizeted vagy a bérletedből foglalod. Az óra élő, itt az oldalon, a böngésződben; csak egy jógamatracnyi hely, egy kamerás telefon vagy laptop és egy kis csend kell hozzá.</p>\n<p>[oy_button url=\"{{private:egyeni-joga}}\" label=\"Időpontot kérek\"]</p>"
 		},
 		"kismamatorna": {
 			"title": "Online kismamatorna",
@@ -366,7 +400,7 @@
 			"photo": "prenatal-ball-training",
 			"aside": "",
 			"link": "",
-			"content": "<p>Az online kismamatorna egyéni óra, de jöhetsz akár a barátnőddel is. Ez a 60 perc minden kismamánál és minden alkalommal egyénre szabott: a jelenlegi állapotodtól és hangulatodtól is függ, és a gyakorlatokat az is meghatározza, éppen hányadik trimeszterben, akár hányadik hétben jársz. Minden órát egy pár perces felmérés, beszélgetés előz meg arról, hogyan érzed magad, milyen az állapotod.</p>\n<p>A várandósság nem ok arra, hogy lemondj a mozgás öröméről. A pre- és postnatális tréneri képzéseim után azért tartok kismama tornát, hogy erősnek és mozgékonynak maradhass, könnyebben lélegezz, és testileg-lelkileg felkészülten érkezz a szüléshez.</p>\n<h2>Miért jó a kismama torna?</h2>\n<ul>\n<li>Erőt ad a hátnak, a csípőnek és a lábnak, amelyek a változó testet hordozzák</li>\n<li>A mobilizáció enyhítheti a várandósság kellemetlenségeit, például a derék és a csípő feszülését</li>\n<li>Megtanulod érezni, erősíteni és ellazítani a gátizmaidat</li>\n<li>A légzőgyakorlatok a vajúdáshoz és a nyugalomhoz is jól jönnek</li>\n<li>Egy óra csak magadra és a babára, a hét rohanása közepén</li>\n</ul>\n<h2>Mi épül be a kismamatornába?</h2>\n<p>A kismamatornába ezek a mozgásmodulok mind beépülnek. Természetesen nem egyetlen órába: ezek kombinációja ad megfelelő felkészülést a szülésre.</p>\n<ul class=\"oj-modules oj-modules--why\">\n<li><strong>Légzőtorna</strong><span>A vajúdás minden szakaszában a légzés vezet: ha begyakorlod, a fájások között is meg tudsz nyugodni, és a babád is jobb oxigénellátást kap. A rekeszizom és a medencefenék együtt dolgozik, ezt is itt tanuljuk meg.</span></li>\n<li><strong>Gátizomtorna</strong><span>Megtanulod érezni, erősíteni és, ami a szüléshez legalább ennyire fontos, elengedni a gátizmaidat. Ez segít a kitolási szakaszban, és a szülés utáni regenerációt is gyorsíthatja.</span></li>\n<li><strong>Keringésjavítás</strong><span>A várandósság alatt több vér kering a testedben, és lassabban áramlik vissza a lábakból. A keringést segítő gyakorlatok enyhíthetik a lábdagadást és a vádligörcsöt, és frissebbnek érzed magad tőlük.</span></li>\n<li><strong>Kardiótréning</strong><span>A vajúdás órákig tartó munka, ehhez állóképesség kell. Kíméletes, ritmusos mozgással építjük, mindig a pulzusodhoz és az energiádhoz igazítva.</span></li>\n<li><strong>Izomerősítés, súlyzós edzések</strong><span>A hát, a csípő, a láb és a kar ereje hordozza a változó testet, és a szülés után is kell a baba emeléséhez, hordozásához, szoptatáshoz. Könnyű kézisúlyzóval és gumiszalaggal dolgozunk.</span></li>\n<li><strong>Gerinctréning</strong><span>A pocak súlya előrebillenti a medencét és terheli a derekat. A törzsizmok erősítése és a gerinc átmozgatása enyhítheti a hát- és derékfájást, és jobb tartást ad.</span></li>\n<li><strong>Mobilizáció, stretching</strong><span>A csípő és a medence mozgékonysága helyet ad a babának, és megkönnyíti a szüléshez szükséges testhelyzeteket. A nyújtás oldja a feszülést, amit a változó test okoz.</span></li>\n<li><strong>Jóga</strong><span>Összeköti a mozgást, a légzést és a figyelmet. Ez a testtudat és belső nyugalom a szülés alatt is veled lesz.</span></li>\n<li><strong>Relaxáció</strong><span>A szülés alatt sokat számít, hogy el tudsz-e lazulni: ha a test nem feszül, könnyebben halad a folyamat. A vezetett relaxáció ezt gyakoroltatja, és a pihenés is a felkészülés része.</span></li>\n</ul>\n<h2>A sportmúltad is számít</h2>\n<p>A torna felépítésénél abból indulunk ki, amit eddig is csináltál. Ha csak ritkán sportoltál, vagy egy-egy mozgásformát még nem végeztél, kismamaként nem kezdünk bele egy intenzívebb mozgástípusba, mint amit korábban megszoktál. Az első alkalom mindig egy felmérés és egy beszélgetés ezekről. Amit szeretnél megosztani, azt nyugodtan írd meg már akkor, amikor időpontot kérsz.</p>\n<h2>Miért online és miért egyéni?</h2>\n<p>Várandósan nem mindig van kedved átutazni a városon egy óráért. Online a saját nappalidban tornázol, a mosdó két lépésre van, és ha pihenned kell, pihensz. Mivel egyéni az óra, mindig ahhoz igazítom, ahogy aznap vagy. A barátnőddel is jöhetsz, akkor kettőtökhöz tervezem.</p>\n<h2>Mire lesz szükséged?</h2>\n<ul>\n<li>1 kg-os kézisúlyzó</li>\n<li>Gumiszalag</li>\n<li>Fitball (nagy gimnasztikai labda)</li>\n<li>Softball (kis, puha labda)</li>\n<li>Ülőpárna, jógaszőnyeg és egy kis víz</li>\n</ul>\n<p>Ha valamelyik eszköz még nincs meg, írj, és megmutatom, mivel helyettesítheted otthon.</p>\n<h2>Árak</h2>\n<ul>\n<li><strong>1 alkalom:</strong> 5 000 Ft (60 perc)</li>\n<li><strong>5 alkalmas bérlet:</strong> 22 000 Ft, lejárat nélkül</li>\n<li><strong>Barátnővel, 1 alkalom:</strong> 8 000 Ft kettőtöknek</li>\n<li><strong>Barátnővel, 5 alkalmas bérlet:</strong> 36 000 Ft kettőtöknek, lejárat nélkül</li>\n</ul>\n<h2>Hogyan működik</h2>\n<p>Kérj időpontot a fiókodban: írd meg, mikor érsz rá, hányadik hétben jársz és hogy érzed magad. Visszaírok egy időponttal, amit egy kattintással elfogadsz, és kifizeted vagy a bérletedből foglalod. Az óra élő, itt az oldalon, a böngésződben. Kérlek, kezdés előtt egyeztess a nőgyógyászoddal vagy a védőnőddel.</p>\n<p>[oy_button url=\"{{private:prenatal}}\" label=\"Időpontot kérek\"]</p>"
+			"content": "<p>Az online kismamatorna egyéni óra, de jöhetsz akár a barátnőddel is. Ez a 60 perc minden kismamánál és minden alkalommal egyénre szabott: a jelenlegi állapotodtól és hangulatodtól is függ, és a gyakorlatokat az is meghatározza, éppen hányadik trimeszterben, akár hányadik hétben jársz. Minden órát egy pár perces felmérés, beszélgetés előz meg arról, hogyan érzed magad, milyen az állapotod.</p>\n<p>A várandósság nem ok arra, hogy lemondj a mozgás öröméről. A pre- és postnatális tréneri képzéseim után azért tartok kismama tornát, hogy erősnek és mozgékonynak maradhass, könnyebben lélegezz, és testileg-lelkileg felkészülten érkezz a szüléshez.</p>\n<h2>Miért jó a kismama torna?</h2>\n<ul>\n<li>Erőt ad a hátnak, a csípőnek és a lábnak, amelyek a változó testet hordozzák</li>\n<li>A mobilizáció enyhítheti a várandósság kellemetlenségeit, például a derék és a csípő feszülését</li>\n<li>Megtanulod érezni, erősíteni és ellazítani a gátizmaidat</li>\n<li>A légzőgyakorlatok a vajúdáshoz és a nyugalomhoz is jól jönnek</li>\n<li>Egy óra csak magadra és a babára, a hét rohanása közepén</li>\n</ul>\n<h2>Mi épül be a kismamatornába?</h2>\n<p>A kismamatornába ezek a mozgásmodulok mind beépülnek. Természetesen nem egyetlen órába: ezek kombinációja ad megfelelő felkészülést a szülésre.</p>\n<ul class=\"oj-modules oj-modules--why\">\n<li><strong>Légzőtorna</strong><span>A vajúdás minden szakaszában a légzés vezet: ha begyakorlod, a fájások között is meg tudsz nyugodni, és a babád is jobb oxigénellátást kap. A rekeszizom és a medencefenék együtt dolgozik, ezt is itt tanuljuk meg.</span></li>\n<li><strong>Gátizomtorna</strong><span>Megtanulod érezni, erősíteni és, ami a szüléshez legalább ennyire fontos, elengedni a gátizmaidat. Ez segít a kitolási szakaszban, és a szülés utáni regenerációt is gyorsíthatja.</span></li>\n<li><strong>Keringésjavítás</strong><span>A várandósság alatt több vér kering a testedben, és lassabban áramlik vissza a lábakból. A keringést segítő gyakorlatok enyhíthetik a lábdagadást és a vádligörcsöt, és frissebbnek érzed magad tőlük.</span></li>\n<li><strong>Kardiótréning</strong><span>A vajúdás órákig tartó munka, ehhez állóképesség kell. Kíméletes, ritmusos mozgással építjük, mindig a pulzusodhoz és az energiádhoz igazítva.</span></li>\n<li><strong>Izomerősítés, súlyzós edzések</strong><span>A hát, a csípő, a láb és a kar ereje hordozza a változó testet, és a szülés után is kell a baba emeléséhez, hordozásához, szoptatáshoz. Könnyű kézisúlyzóval és gumiszalaggal dolgozunk.</span></li>\n<li><strong>Gerinctréning</strong><span>A pocak súlya előrebillenti a medencét és terheli a derekat. A törzsizmok erősítése és a gerinc átmozgatása enyhítheti a hát- és derékfájást, és jobb tartást ad.</span></li>\n<li><strong>Mobilizáció, stretching</strong><span>A csípő és a medence mozgékonysága helyet ad a babának, és megkönnyíti a szüléshez szükséges testhelyzeteket. A nyújtás oldja a feszülést, amit a változó test okoz.</span></li>\n<li><strong>Jóga</strong><span>Összeköti a mozgást, a légzést és a figyelmet. Ez a testtudat és belső nyugalom a szülés alatt is veled lesz.</span></li>\n<li><strong>Relaxáció</strong><span>A szülés alatt sokat számít, hogy el tudsz-e lazulni: ha a test nem feszül, könnyebben halad a folyamat. A vezetett relaxáció ezt gyakoroltatja, és a pihenés is a felkészülés része.</span></li>\n</ul>\n<h2>A sportmúltad is számít</h2>\n<p>A torna felépítésénél abból indulunk ki, amit eddig is csináltál. Ha csak ritkán sportoltál, vagy egy-egy mozgásformát még nem végeztél, kismamaként nem kezdünk bele egy intenzívebb mozgástípusba, mint amit korábban megszoktál. Az első alkalom mindig egy felmérés és egy beszélgetés ezekről. Amit szeretnél megosztani, azt nyugodtan írd meg már akkor, amikor időpontot kérsz.</p>\n<h2>Miért online és miért egyéni?</h2>\n<p>Várandósan nem mindig van kedved átutazni a városon egy óráért. Online a saját nappalidban tornázol, a mosdó két lépésre van, és ha pihenned kell, pihensz. Mivel egyéni az óra, mindig ahhoz igazítom, ahogy aznap vagy. A barátnőddel is jöhetsz, akkor kettőtökhöz tervezem.</p>\n<h2>Mire lesz szükséged?</h2>\n<ul>\n<li>1 kg-os kézisúlyzó</li>\n<li>Gumiszalag</li>\n<li>Fitball (nagy gimnasztikai labda)</li>\n<li>Softball (kis, puha labda)</li>\n<li>Ülőpárna, jógaszőnyeg és egy kis víz</li>\n</ul>\n<p>Ha valamelyik eszköz még nincs meg, írj, és megmutatom, mivel helyettesítheted otthon.</p>\n<h2>Árak</h2>\n<ul>\n<li><strong>60 perc:</strong> alkalmanként 5 000 Ft, 5 alkalom 22 000 Ft</li>\n<li><strong>Párban olcsóbb, a barátnőddel:</strong> alkalmanként 8 000 Ft, 5 alkalom 36 000 Ft kettőtöknek</li>\n<li>Az 5 alkalmas bérlet 6 hétig érvényes; ha én mondok le egy órát, egy héttel tovább érvényes.</li>\n</ul>\n<h2>Hogyan működik</h2>\n<p>Kérj időpontot a fiókodban: írd meg, mikor érsz rá, hányadik hétben jársz és hogy érzed magad. Visszaírok egy időponttal, amit egy kattintással elfogadsz, és kifizeted vagy a bérletedből foglalod. Az óra élő, itt az oldalon, a böngésződben. Kérlek, kezdés előtt egyeztess a nőgyógyászoddal vagy a védőnőddel.</p>\n<p>[oy_button url=\"{{private:prenatal}}\" label=\"Időpontot kérek\"]</p>"
 		},
 		"stretching": {
 			"title": "Online stretching és mobilizáció",
@@ -374,10 +408,10 @@
 			"duration": "60 perc",
 			"lang": "magyar",
 			"seo_title": "Online stretching és mobilizációs gyakorlatok egyénileg | 60 perc",
-			"photo": "olivia-forward-fold",
+			"photo": "olivia-sand-one-leg-wheel",
 			"aside": "olivia-garland-deck",
 			"link": "",
-			"content": "<p>Egy óra, ami csak arról szól, hogy újra szabadon mozogj. Nyújtó gyakorlatokkal és mobilizációval dolgozunk a csípőn, a vállon és a gerincen, a te tempódban, egyénileg.</p>\n<h2>Nyújtás és mobilizáció: mi a különbség?</h2>\n<p>A nyújtás az izmoknak ad hosszt és lazaságot. A mobilizáció az ízületek mozgástartományán dolgozik, és azon, hogy ezt a mozgást erővel, kontrolláltan is használni tudd. A kettő együtt adja azt az érzést, hogy könnyebb lehajolni, megfordulni, felállni.</p>\n<h2>Kinek ajánlom</h2>\n<ul>\n<li>Ha sokat ülsz, és a csípőd, a vállad vagy a hátad merev</li>\n<li>Ha futsz, súlyzós edzést végzel vagy más sportot űzöl, és kell a regeneráció</li>\n<li>Ha szeretnél hajlékonyabb lenni, de nem tudod, hol kezdd</li>\n<li>Ha a jógaórán egy-egy póznál elakadsz, és ezen szeretnél dolgozni</li>\n</ul>\n<h2>Mit csinálunk egy órán</h2>\n<p>Átmelegítéssel kezdünk, utána a testednek szükséges mobilizációs gyakorlatok és nyújtások jönnek, végül egy rövid relaxáció. Minden alkalom az előzőre épít, így alkalomról alkalomra érzed a változást. Kell hozzá egy jógaszőnyeg, egy párna és egy öv vagy heveder.</p>\n<h2>Árak</h2>\n<ul>\n<li><strong>1 alkalom:</strong> 3 000 Ft (60 perc)</li>\n<li><strong>5 alkalmas bérlet:</strong> 13 000 Ft, 8 hétig érvényes</li>\n</ul>\n<h2>Hogyan működik</h2>\n<p>Kérj időpontot a fiókodban, és visszaírok egy időponttal. Az óra élő, itt az oldalon, a böngésződben.</p>\n<p>[oy_button url=\"{{private:stretching}}\" label=\"Időpontot kérek\"]</p>"
+			"content": "<p>Egy óra, ami csak arról szól, hogy újra szabadon mozogj. Nyújtó gyakorlatokkal és mobilizációval dolgozunk a csípőn, a vállon és a gerincen, a te tempódban, egyénileg.</p>\n<h2>Nyújtás és mobilizáció: mi a különbség?</h2>\n<p>A nyújtás az izmoknak ad hosszt és lazaságot. A mobilizáció az ízületek mozgástartományán dolgozik, és azon, hogy ezt a mozgást erővel, kontrolláltan is használni tudd. A kettő együtt adja azt az érzést, hogy könnyebb lehajolni, megfordulni, felállni.</p>\n<h2>Kinek ajánlom</h2>\n<ul>\n<li>Ha sokat ülsz, és a csípőd, a vállad vagy a hátad merev</li>\n<li>Ha futsz, súlyzós edzést végzel vagy más sportot űzöl, és kell a regeneráció</li>\n<li>Ha szeretnél hajlékonyabb lenni, de nem tudod, hol kezdd</li>\n<li>Ha a jógaórán egy-egy póznál elakadsz, és ezen szeretnél dolgozni</li>\n</ul>\n<h2>Mit csinálunk egy órán</h2>\n<p>Átmelegítéssel kezdünk, utána a testednek szükséges mobilizációs gyakorlatok és nyújtások jönnek, végül egy rövid relaxáció. Minden alkalom az előzőre épít, így alkalomról alkalomra érzed a változást. Kell hozzá egy jógaszőnyeg, egy párna és egy öv vagy heveder.</p>\n<h2>Árak</h2>\n<ul>\n<li><strong>60 perc:</strong> alkalmanként 3 000 Ft, 5 alkalom 13 000 Ft</li>\n<li>Az 5 alkalmas bérlet 6 hétig érvényes; ha én mondok le egy órát, egy héttel tovább érvényes.</li>\n</ul>\n<h2>Hogyan működik</h2>\n<p>Kérj időpontot a fiókodban, és visszaírok egy időponttal. Az óra élő, itt az oldalon, a böngésződben.</p>\n<p>[oy_button url=\"{{private:stretching}}\" label=\"Időpontot kérek\"]</p>"
 		},
 		"relaxacio-legzes": {
 			"title": "Relaxáció és légzés",
@@ -385,10 +419,10 @@
 			"duration": "30 perc",
 			"lang": "magyar",
 			"seo_title": "Online relaxáció és légzőgyakorlatok | 30 perces egyéni óra",
-			"photo": "studio-relaxation",
+			"photo": "group-childs-pose-deck",
 			"aside": "olivia-childs-pose",
 			"link": "",
-			"content": "<p>Fél óra, ami csak a megnyugvásról szól. Légzőgyakorlatokkal, néhány kíméletes nyújtással és vezetett relaxációval segítek, hogy a túlpörgött idegrendszered lecsendesedjen.</p>\n<h2>Miért a légzés?</h2>\n<p>A légzés az egyetlen olyan működésünk, ami magától is megy, de tudatosan is irányíthatjuk. Ha lelassítod, a tested is jelzést kap, hogy biztonságban van. Ezt a légzést aztán a hétköznapokban is magaddal viszed: egy nehéz megbeszélés előtt, elalvás előtt vagy akkor, amikor hangos a nap.</p>\n<h2>Kinek ajánlom</h2>\n<ul>\n<li>Ha stresszes vagy, és nehezen kapcsolsz ki</li>\n<li>Ha nehezen alszol el</li>\n<li>Ha szeretnéd megtanulni, hogyan nyugtathatod meg magad pár perc alatt</li>\n<li>Ha a mozgásnál most a pihenésre van nagyobb szükséged</li>\n</ul>\n<h2>Mit csinálunk egy órán</h2>\n<p>Néhány perc beszélgetés után légzőgyakorlatok jönnek, utána kíméletes nyújtás, végül vezetett relaxáció. Kell hozzá egy jógaszőnyeg vagy egy kényelmes hely, ahol le tudsz feküdni, egy párna és egy pléd.</p>\n<h2>Árak</h2>\n<ul>\n<li><strong>1 alkalom:</strong> 2 000 Ft (30 perc)</li>\n<li><strong>5 alkalmas bérlet:</strong> 9 000 Ft, 6 hétig érvényes</li>\n</ul>\n<h2>Hogyan működik</h2>\n<p>Kérj időpontot a fiókodban, és visszaírok egy időponttal. Az óra élő, itt az oldalon, a böngésződben.</p>\n<p>[oy_button url=\"{{private:relax}}\" label=\"Időpontot kérek\"]</p>"
+			"content": "<p>Fél óra, ami csak a megnyugvásról szól. Légzőgyakorlatokkal, néhány kíméletes nyújtással és vezetett relaxációval segítek, hogy a túlpörgött idegrendszered lecsendesedjen.</p>\n<h2>Miért a légzés?</h2>\n<p>A légzés az egyetlen olyan működésünk, ami magától is megy, de tudatosan is irányíthatjuk. Ha lelassítod, a tested is jelzést kap, hogy biztonságban van. Ezt a légzést aztán a hétköznapokban is magaddal viszed: egy nehéz megbeszélés előtt, elalvás előtt vagy akkor, amikor hangos a nap.</p>\n<h2>Kinek ajánlom</h2>\n<ul>\n<li>Ha stresszes vagy, és nehezen kapcsolsz ki</li>\n<li>Ha nehezen alszol el</li>\n<li>Ha szeretnéd megtanulni, hogyan nyugtathatod meg magad pár perc alatt</li>\n<li>Ha a mozgásnál most a pihenésre van nagyobb szükséged</li>\n</ul>\n<h2>Mit csinálunk egy órán</h2>\n<p>Néhány perc beszélgetés után légzőgyakorlatok jönnek, utána kíméletes nyújtás, végül vezetett relaxáció. Kell hozzá egy jógaszőnyeg vagy egy kényelmes hely, ahol le tudsz feküdni, egy párna és egy pléd.</p>\n<h2>Árak</h2>\n<ul>\n<li><strong>30 perc:</strong> alkalmanként 2 000 Ft, 5 alkalom 9 000 Ft</li>\n<li>Az 5 alkalmas bérlet 6 hétig érvényes; ha én mondok le egy órát, egy héttel tovább érvényes.</li>\n</ul>\n<h2>Hogyan működik</h2>\n<p>Kérj időpontot a fiókodban, és visszaírok egy időponttal. Az óra élő, itt az oldalon, a böngésződben.</p>\n<p>[oy_button url=\"{{private:relax}}\" label=\"Időpontot kérek\"]</p>"
 		}
 	},
 	"faqs": [

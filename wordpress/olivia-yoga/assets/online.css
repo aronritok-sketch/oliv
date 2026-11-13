@@ -158,3 +158,21 @@ h1, h2, .page-head .page-head__title, .namecard__name, .price-group__head h3, .w
 .oj-modules--why li::before { margin-top: .45rem; grid-row: 1 / span 2; }
 .oj-modules--why strong { font-weight: 700; }
 @media (min-width: 760px) { .oj-modules--why { grid-template-columns: 1fr 1fr; } }
+
+/* Olivia, 13 November (21:35) */
+/* the breathing exercise: „3 kör, majd figyeld meg az érzeteket”, the same words in orange in the lotus afterwards */
+.breath__notice-word { font-style: normal; font-weight: 700; color: var(--sun); }
+.breath.is-notice .breath__phase { color: var(--sun); font-size: clamp(1.05rem, .9rem + .6vw, 1.35rem); font-weight: 800; letter-spacing: .04em; text-transform: none; max-width: 13ch; line-height: 1.2; text-shadow: 0 1px 2px rgba(18, 35, 26, .85), 0 2px 16px rgba(18, 35, 26, .75); }
+.breath.is-notice .breath__count { display: none; }
+/* „Kamera, ha szeretnéd”: only I see your picture, clearly */
+.oj-only-me { display: inline-flex; align-items: center; gap: .45rem; margin-top: .55rem !important; padding: .4rem .8rem; border-radius: 12px; background: var(--orchid); color: #fff !important; font-weight: 700; font-size: .9rem; line-height: 1.3; }
+.oj-only-me svg { width: 16px; height: 16px; flex: none; }
+/* the timetable's box for the one-to-one sessions */
+.oys-private-box { background: var(--lilac); }
+/* „Jógáról”: the eight limbs first */
+.oj-limbs { scroll-margin-top: calc(var(--header-h) + 24px); margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+.oj-limbs .section__head { margin-bottom: 1.5rem; }
+.oj-all-title { font-size: clamp(1.6rem, 1.3rem + 1vw, 2.2rem); margin: 0 0 1.5rem; }
+/* price list: the switches sit under the service's name */
+.price-group__head .oys-switches { margin-top: 1.1rem; }
+@media (min-width: 1000px) { .price-group__head .oys-switches { flex-direction: column; align-items: flex-start; } }

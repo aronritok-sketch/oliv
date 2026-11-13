@@ -70,10 +70,17 @@ class OYS_Privates {
 		return OYS_Services::get( (string) $topic ) ? OYS_Services::label( $topic, $people ) : __( 'Private session', 'olivia-studio' );
 	}
 
-	/** A service session is paid with that service's credits (alone, or with a friend), private yoga with private credits. */
+	/**
+	 * A service session is paid with that service's credits (alone, or with a friend, of its length), private yoga
+	 * with private credits.
+	 */
 	public static function credit_kind_for( $session ) {
 		$svc = OYS_Services::for_class( (string) $session->class_slug );
-		return $svc ? OYS_Services::credit_kind( $svc[0], $svc[1] ) : 'private';
+		if ( ! $svc ) {
+			return 'private';
+		}
+		$request = ! empty( $session->id ) ? self::for_session( (int) $session->id ) : null;
+		return OYS_Services::credit_kind( $svc[0], $svc[1], $request ? (int) $request->duration_min : 0 );
 	}
 
 	public static function handle_request() {
@@ -91,8 +98,8 @@ class OYS_Privates {
 		$row      = array(
 			'user_id'       => $user_id,
 			'topic'         => $service ? $service['key'] : 'yoga',
-			// a service has its own length, and is for one person or, with a friend, for two
-			'duration_min'  => $service ? $service['duration'] : ( in_array( $duration, array( 60, 75, 90 ), true ) ? $duration : 60 ),
+			// a service has its own length (or one of its lengths), and is for one person or, with a friend, for two
+			'duration_min'  => $service ? ( in_array( $duration, $service['durations'], true ) ? $duration : $service['duration'] ) : ( in_array( $duration, array( 60, 75, 90 ), true ) ? $duration : 60 ),
 			'people'        => min( $service ? ( $service['duo'] ? 2 : 1 ) : 10, max( 1, (int) ( $_POST['people'] ?? 1 ) ) ),
 			'location_type' => isset( $types[ $type ] ) ? $type : 'home',
 			'address'       => sanitize_text_field( wp_unslash( $_POST['address'] ?? '' ) ),
@@ -143,8 +150,9 @@ class OYS_Privates {
 			'format'          => 'online' === $request->location_type || ( $online_url && ! $location ) ? 'online' : 'studio',
 			'online_url'      => $online_url,
 			'price_cents'     => $price_cents,
-			// A private credit covers a 60-minute session, a service credit a session of the service's length.
-			'credits_allowed' => (int) $duration_min === ( $service ? (int) $service['duration'] : 60 ) ? 1 : 0,
+			// A private credit covers a 60-minute session, a service credit a session of one of the service's lengths
+			// (each length has its own credits).
+			'credits_allowed' => ( $service ? in_array( (int) $duration_min, $service['durations'], true ) : 60 === (int) $duration_min ) ? 1 : 0,
 			'status'          => 'scheduled',
 		);
 		$session_id = OYS_Schedule::save( $data, $request->session_id ?: 0 );

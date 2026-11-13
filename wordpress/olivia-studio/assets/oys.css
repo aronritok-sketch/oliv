@@ -26,7 +26,7 @@
 
 /* Checkout */
 .oys-checkout { display: grid; gap: 1.5rem; align-items: start; }
-@media (min-width: 900px) { .oys-checkout { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 2.5rem; } .oys-summary { position: sticky; top: calc(var(--header-h, 72px) + 24px); } }
+@media (min-width: 900px) { .oys-checkout { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 2.5rem; align-items: start; } }
 .oys-summary { background: var(--oys-lilac); box-shadow: 8px 8px 0 var(--oys-ink); }
 .oys-facts { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; gap: .55rem; border-top: 2px solid var(--oys-ink); padding-top: 1rem; }
 .oys-facts li { display: flex; gap: .6rem; align-items: center; font-weight: 600; color: var(--oys-ink); }
@@ -321,3 +321,33 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 	.oys-live.is-live .oys-live__tiles .oys-live__tile { width: 96px; }
 }
 .oys-live .screen-reader-text { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+
+/* Price list: a one-to-one service's switches (length, „with a friend”) and the gift line (1.10.0) */
+.oys-switches { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem 1rem; margin-top: 1rem; }
+.oys-seg { display: inline-flex; padding: 4px; border-radius: 999px; background: var(--oys-card, #fff); box-shadow: inset 0 0 0 1px var(--oys-line, rgba(0, 0, 0, .15)); }
+.oys-seg button { border: 0; background: none; padding: .5rem .95rem; border-radius: 999px; font: inherit; font-size: .85rem; font-weight: 700; color: inherit; cursor: pointer; }
+.oys-seg button[aria-pressed="true"] { background: var(--oys-ink, #13201B); color: var(--oys-paper, #fff); }
+.oys-seg button:focus-visible, .oys-pair input:focus-visible + .oys-pair__track { outline: 2px solid var(--oys-orchid, #D92B86); outline-offset: 2px; }
+.oys-pair { display: inline-flex; align-items: center; gap: .6rem; cursor: pointer; font-size: .9rem; line-height: 1.3; }
+.oys-pair input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.oys-pair__track { flex: none; position: relative; width: 44px; height: 26px; border-radius: 999px; background: var(--oys-line, rgba(0, 0, 0, .2)); transition: background .2s; }
+.oys-pair__track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); transition: transform .2s; }
+.oys-pair input:checked + .oys-pair__track { background: var(--oys-orchid, #D92B86); }
+.oys-pair input:checked + .oys-pair__track::after { transform: translateX(18px); }
+.oys-variants.is-live .price[hidden] { display: none; }
+.price li.price__gift { padding-left: 0; }
+.price li.price__gift::before { display: none; }
+.price__gift a { display: flex; align-items: center; gap: .55rem; padding: .55rem .8rem; border-radius: 12px; background: var(--oys-orchid, #D92B86); color: #fff; font-weight: 700; text-decoration: none; line-height: 1.3; }
+.price__gift a:hover { filter: brightness(1.08); }
+.price__gift svg { flex: none; width: 20px; height: 20px; }
+[data-oys-length][hidden], [data-oys-people][hidden] { display: none; }
+/* The one-to-one sessions under the timetable (schedule_empty_days = no) */
+.oys-private-box { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.1rem 2rem; margin-top: 1.75rem; padding: clamp(1.2rem, 3vw, 1.8rem); border-radius: var(--radius, 14px); background: var(--oys-lilac); color: var(--oys-ink); }
+.oys-private-box > div { flex: 1 1 26rem; }
+.oys-private-box h3 { margin: 0 0 .6rem; font-size: 1.15rem; }
+.oys-private-box p { margin: .6rem 0 0; max-width: 56ch; }
+.oys-private-box__list { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: .45rem; }
+.oys-private-box__list li { padding: .3rem .75rem; border-radius: 999px; background: rgba(255, 255, 255, .55); font-size: .88rem; font-weight: 600; }
+.oys-private-box__list a { color: inherit; text-decoration: none; }
+.oys-private-box__list a:hover { text-decoration: underline; }
+.oys-private-box .btn { flex: none; }

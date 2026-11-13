@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OY_VERSION', '3.5.3' );
+define( 'OY_VERSION', '3.6.0' );
 
 require_once get_template_directory() . '/inc/edition.php';
 
@@ -25,6 +25,26 @@ require_once get_template_directory() . '/inc/page-editor.php';
 add_filter( 'oys_terms_url', function ( $url ) {
 	$p = get_page_by_path( 'aszf' );
 	return $p && 'publish' === $p->post_status ? get_permalink( $p ) : $url;
+} );
+// Olivia's notes of 13 November on the online price list: no „Most popular” label, the gift card as its own
+// highlighted line, the drop-in card with only that line, the group class's length in its title
+add_filter( 'oys_featured_badge', fn( $html ) => oy_online_only() ? '' : $html );
+add_filter( 'oys_price_gift_line', fn( $on ) => $on || oy_online_only() );
+add_filter( 'oys_dropin_features', fn( $f ) => oy_online_only() ? array() : $f );
+add_filter( 'oys_pricing_groups', function ( $g ) {
+	if ( oy_online_only() ) {
+		$g['classes'] = array( __( 'Group live online flow yoga classes', 'olivia-yoga' ), __( '90 minutes, every Wednesday from 18:30 to 20:00. Come with a drop-in ticket, or save with a pass.', 'olivia-yoga' ) );
+	}
+	return $g;
+} );
+// „Jógáról”: the eight limbs of yoga stand together at the top of the first page, so the list below leaves them out
+add_action( 'pre_get_posts', function ( $q ) {
+	if ( ! is_admin() && $q->is_main_query() && $q->is_home() ) {
+		$term = get_term_by( 'slug', OY_LIMBS_CATEGORY, 'category' );
+		if ( $term ) {
+			$q->set( 'category__not_in', array( (int) $term->term_id ) );
+		}
+	}
 } );
 if ( is_admin() ) {
 	require_once get_template_directory() . '/inc/demo-import.php';
