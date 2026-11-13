@@ -617,13 +617,26 @@ function oy_mail_setup() {
  * the live site before this, so there is nothing of hers to overwrite.
  */
 function oy_migrate_1113() {
-	$rev = '2026-11-13b'; // b: + ÁSZF, Impresszum, the privacy notice with Arovia as the controller
+	// b: + ÁSZF, Impresszum, the privacy notice with Arovia as the controller
+	// c: her 20:17 notes – „Olívia” with a long í, the prenatal modules and why each one matters, the yogic-life sentence
+	$rev = '2026-11-13c';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_content_rev' ) === $rev ) {
 		return array();
 	}
 	kses_remove_filters();
 	$log = oy_import_all( true );
 	kses_init_filters();
+	// her name with a long í in the site's name and the sender's name – only where it is still the old spelling
+	$old = 'Olivia Jóga – Online';
+	$new = 'Olívia Jóga – Online';
+	if ( get_option( 'blogname' ) === $old ) {
+		update_option( 'blogname', $new );
+		$log[] = 'site name: ' . $new;
+	}
+	if ( class_exists( 'OYS_Settings' ) && OYS_Settings::get( 'email_from_name' ) === $old ) {
+		OYS_Settings::update( array( 'email_from_name' => $new ) );
+		$log[] = 'sender name: ' . $new;
+	}
 	update_option( 'oy_content_rev', $rev );
 	return array_merge( array( 'content: Olivia 13 November' ), $log );
 }

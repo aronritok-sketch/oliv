@@ -167,7 +167,7 @@ msgstr "Ismerd meg az oktatód"
 
 #: front-page.php:62
 msgid "Meet Olivia"
-msgstr "Ismerd meg Oliviát"
+msgstr "Ismerd meg Olíviát"
 
 #: front-page.php:62
 msgid "See all classes"
@@ -403,7 +403,7 @@ msgstr "Továbbiak"
 
 #: footer.php:20
 msgid "About Olivia"
-msgstr "Oliviáról"
+msgstr "Olíviáról"
 
 #: footer.php:20
 #: functions.php:59
@@ -1115,7 +1115,7 @@ msgid "Live online yoga classes in Hungarian with Olivia Kovacs: hatha flow, slo
 msgstr "Élő online jógaórák magyarul Kovács Olíviával: hatha flow, slow flow és kismamatorna otthonról, Zoomon, és online magánóra. Kezdőket is szeretettel várok."
 
 msgid "Online Yoga Classes, Live in Hungarian: Hatha Flow, Slow Flow & Prenatal | Olivia Jóga"
-msgstr "Online jógaóra élőben, magyarul: hatha flow, slow flow, kismama | Olivia Jóga"
+msgstr "Online jógaóra élőben, magyarul: hatha flow, slow flow, kismama | Olívia Jóga"
 
 msgid "Live online yoga classes in Hungarian: hatha flow, slow flow, prenatal fitness and private online sessions with Olivia Kovacs."
 msgstr "Élő online jógaórák magyarul: hatha flow, slow flow, kismamatorna és online magánóra Kovács Olíviával."
@@ -1354,7 +1354,7 @@ msgid "Join a live online class, ask for a one-to-one session, or just send a qu
 msgstr "Gyere el egy élő online órára, kérj egyéni órát, vagy csak küldd el a kérdésed. Kezdőket is szeretettel várok."
 
 msgid "Online Yoga, Live in Hungarian: Flow Yoga, Prenatal & One-to-One Classes | Olivia Jóga"
-msgstr "Online jóga élőben, magyarul: flow jóga, kismamatorna, egyéni órák | Olivia Jóga"
+msgstr "Online jóga élőben, magyarul: flow jóga, kismamatorna, egyéni órák | Olívia Jóga"
 
 # 3.4.4: the admin (content types, setup, translations) in Hungarian
 msgid "Book, pay and practice in one place."
@@ -1442,7 +1442,7 @@ msgid "SEO title"
 msgstr "SEO-cím"
 
 msgid "Olivia setup"
-msgstr "Olivia beállítás"
+msgstr "Olívia beállítás"
 
 msgid "Olivia Kovacs Yoga: content setup"
 msgstr "Olivia Kovacs Yoga: tartalom beállítása"
@@ -1563,7 +1563,7 @@ msgid "Live online yoga classes with Olivia Kovacs: group flow yoga on Wednesday
 msgstr "Élő online jógaórák Kovács Olíviával: csoportos flow jóga szerdánként, egyéni online jóga, kismamatorna, stretching, relaxáció és légzés otthonról. Kezdőknek is."
 
 msgid "Online Yoga, Live from Home: Flow Yoga, Prenatal & One-to-One Classes | Olivia Jóga"
-msgstr "Online jóga élőben, otthonról: flow jóga, kismamatorna, egyéni órák | Olivia Jóga"
+msgstr "Online jóga élőben, otthonról: flow jóga, kismamatorna, egyéni órák | Olívia Jóga"
 
 msgid "Live online yoga classes with Olivia Kovacs: group flow yoga, individual online yoga, prenatal fitness, stretching, relaxation and breathing."
 msgstr "Élő online jógaórák Kovács Olíviával: csoportos flow jóga, egyéni online jóga, kismamatorna, stretching, relaxáció és légzés."
@@ -1573,3 +1573,25 @@ msgstr "Jógaoktató | Pre- és postnatális tréner | Mozgás- és wellness coa
 
 msgid "Mobilization"
 msgstr "Mobilizáció"
+
+#. Olivia, 11.13 (20:17)
+msgid "A real teacher, present"
+msgstr "Valódi oktatói jelenlét"
+
+msgid "You are not following a video: you get live cues, you can ask questions and get feedback, and the teacher can respond to what the group needs."
+msgstr "Nem egy videót követsz: élő instrukciókat kapsz, kérdezhetsz, visszajelzést kaphatsz, és az oktató is tud reagálni a csoport igényeire."
+
+msgid "Awareness and control"
+msgstr "Tudatosság és kontroll"
+
+msgid "I notice, I see, I observe, I allow, then I respond"
+msgstr "észreveszem, látom, megfigyelem, engedem, majd reagálok"
+
+msgid "I want to steer it, I grip it, I regulate it, I push it down"
+msgstr "irányítani akarom, szorítom, szabályozom, elnyomom"
+
+msgid "To me, this is the most important difference yoga has taught me so far."
+msgstr "Számomra ez a legfontosabb különbség, amit a jóga tanított eddig."
+
+msgid "One-to-one or with a friend: breathing, pelvic floor, circulation, cardio, strength, spine, mobility, yoga and relaxation, combined for your trimester."
+msgstr "Egyénileg vagy a barátnőddel: légzőtorna, gátizomtorna, keringésjavítás, kardió, izomerősítés, gerinctréning, mobilizáció, jóga és relaxáció, a trimeszteredhez igazítva."

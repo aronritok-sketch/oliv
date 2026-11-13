@@ -111,7 +111,8 @@ class OYS_Frontend {
 				$tags   = ( $online ? '<span class="session__online">' . esc_html__( 'Online', 'olivia-studio' ) . '</span>' : '' )
 					. ( oys_is_hybrid( $s ) ? '<span class="session__online">' . esc_html__( '+ Live online', 'olivia-studio' ) . '</span>' : '' )
 					. ( oys_is_donation( $s ) ? '<span class="session__donation">' . esc_html__( 'By donation', 'olivia-studio' ) . '</span>' : '' )
-					. '<span class="session__lang" title="' . esc_attr( sprintf( __( 'Taught in %s', 'olivia-studio' ), translate( OYS_I18n::LANGS[ $lang ]['name'], 'olivia-studio' ) ) ) . '">' . esc_html( oys_lang_short( $lang ) ) . '</span>' // phpcs:ignore WordPress.WP.I18n
+					// one-language site (Olivia, 11.13: no language anywhere on oliviajoga.online): no language chip
+					. ( count( OYS_I18n::languages() ) > 1 ? '<span class="session__lang" title="' . esc_attr( sprintf( __( 'Taught in %s', 'olivia-studio' ), translate( OYS_I18n::LANGS[ $lang ]['name'], 'olivia-studio' ) ) ) . '">' . esc_html( oys_lang_short( $lang ) ) . '</span>' : '' ) // phpcs:ignore WordPress.WP.I18n
 					. ( $s->note ? '<span class="session__note">' . esc_html( oys_t( $s->note ) ) . '</span>' : '' );
 				$minutes = (int) round( ( oys_ts( $s->ends_at ) - oys_ts( $s->starts_at ) ) / 60 );
 				$out[]   = '<li class="session session--' . esc_attr( $tone ) . ( $online ? ' session--online' : '' ) . '">'

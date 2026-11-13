@@ -1714,6 +1714,13 @@ test( 'one-language site: Hungarian only, no address prefix, forints', function 
 		$pricing = do_shortcode( '[oys_pricing]' );
 		ok( str_contains( $pricing, 'Live online class' ) && ! str_contains( $pricing, 'Teams &amp; companies' ), 'online only: the price list starts with the live online class, no teams card' );
 		ok( str_contains( $pricing, "2\u{00A0}500\u{00A0}Ft" ), 'online drop-in price in forints' );
+		// Olivia, 11.13: no language anywhere on a one-language site – the timetable has no „HU” chip
+		$one = make_session( array( 'format' => 'online', 'online_capacity' => 10 ) );
+		$tt  = do_shortcode( '[oys_schedule days="7"]' );
+		ok( str_contains( $tt, 'session--online' ) && ! str_contains( $tt, 'session__lang' ), 'one language: no language chip on the timetable' );
+		OYS_Settings::update( array( 'languages' => 'hu,en' ) );
+		ok( str_contains( do_shortcode( '[oys_schedule days="7"]' ), 'session__lang' ), 'two languages: the chip is back' );
+		$GLOBALS['wpdb']->delete( OYS_Install::table( 'sessions' ), array( 'id' => $one->id ) );
 	} finally {
 		OYS_Settings::update( array( 'languages' => 'en,hu,es', 'default_lang' => 'en', 'currency' => 'usd', 'online_only' => 0, 'online_price_cents' => 600 ) );
 	}
@@ -1728,7 +1735,7 @@ test( 'online edition: Hungarian addresses and its own copy', function () {
 	try {
 		eq( 'rolam', oy_page_slug( 'about' ), 'online edition: Hungarian address' );
 		eq( 'schedule-pricing', oy_page_key( 'orarend-es-arak' ), 'and back to the theme\'s own slug' );
-		eq( 'Olivia Jóga – Online', oy_site_name(), 'site name' );
+		eq( 'Olívia Jóga – Online', oy_site_name(), 'site name: Olívia with a long í (Olivia, 11.13)' );
 		ok( '' === oy_areas_list(), 'no Fort Myers areas' );
 		ok( str_starts_with( oy_alt( 'Olivia Kovacs in dancer pose in a living room' ), 'Kovács Olívia' ), 'photo alt texts: Hungarian name order' );
 	} finally {
@@ -1742,6 +1749,18 @@ test( 'online edition: Hungarian addresses and its own copy', function () {
 	ok( ! preg_match( '/Fort Myers|Florid|lanai|tenger|strand|homok|pickleball|tenisz|golf|klubház/iu', $copy ), 'online copy: written for Hungary (no Fort Myers, sea, beach, tennis, golf …)' );
 	ok( str_contains( wp_json_encode( $data['legal'], JSON_UNESCAPED_UNICODE ), 'Arovia Group LLC' ) && str_contains( $data['privacy']['content'], 'Arovia Group LLC' ), 'the seller and controller is Arovia' );
 	ok( ! str_contains( $text, 'Kovacs' ), 'online copy: her name in Hungarian (Kovács Olívia)' );
+	ok( ! preg_match( '/Olivi[aá]/u', $text ), 'online copy: Olívia with a long í everywhere (Olivia, 11.13)' );
+	// Olivia, 11.13 (20:17): the prenatal modules wherever the prenatal class is mentioned, and why each one matters
+	$mods = array( 'légzőtorna', 'gátizomtorna', 'keringésjavítás', 'kardiótréning', 'izomerősítés', 'gerinctréning', 'mobilizáció', 'jóga', 'relaxáció' );
+	$faq  = implode( ' ', array_column( array_filter( $data['faqs'], fn( $f ) => str_starts_with( $f['q'], 'Várandós' ) ), 'a' ) );
+	foreach ( array( 'excerpt' => $data['classes']['kismamatorna']['excerpt'], 'classes page' => $data['pages']['classes']['content'], 'FAQ' => $faq ) as $where => $html ) {
+		ok( count( array_filter( $mods, fn( $m ) => str_contains( mb_strtolower( $html ), $m ) ) ) === count( $mods ), "prenatal modules listed: $where" );
+	}
+	$pre = $data['classes']['kismamatorna']['content'];
+	$why = preg_match( '~<ul class="oj-modules oj-modules--why">(.*?)</ul>~s', $pre, $mm ) ? $mm[1] : '';
+	ok( 9 === substr_count( $why, '<li><strong>' ) && 9 === substr_count( $why, '<span>' ) && ! str_contains( $pre, 'kettőt húzunk' ), 'prenatal page: nine modules, each with why, combined (not two per class)' );
+	ok( str_contains( $pre, 'sportmúlt' ) && str_contains( $pre, 'felmérés' ), 'prenatal page: the sports background and the first session as an assessment' );
+	ok( str_contains( $data['pages']['home']['content'], 'jógikus életvitellel' ), 'home intro: the yogic-life sentence as on oliviajoga.hu' );
 	ok( empty( array_diff( array_keys( $data['pages'] ), array_keys( OY_PAGE_SLUGS ) ) ), 'online pages are theme pages' );
 	foreach ( $data['sessions'] as $s ) {
 		ok( isset( $data['classes'][ $s['class'] ] ) && 'online' === $s['format'], 'timetable: ' . $s['class'] . ' is an online class of this edition' );

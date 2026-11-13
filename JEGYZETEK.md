@@ -187,7 +187,7 @@
   stílusában (lélegző lila blokk, lágy rózsaszín hullám, zöld gombok, a JÓGA ékezete a blokkban), névkártya: „Jógaoktató |
   Pre- és postnatális tréner | Mozgás- és wellness coach”, „Jóga • Kismamatorna • Mobilizáció • Relaxáció és légzés”; új
   hős-szöveg; öt külön szolgáltatás-doboz eltolva; „Nem kell utaznod” gyertyás mondattal; „magyarul” sehol; „Bejelentkezés
-  és árak”; kismamatorna: a kilenc mozgásmodul, óránként kettő. Élesen egyszeri tartalomfrissítés (`oy_migrate_1113`).
+  és árak”; kismamatorna: a kilenc mozgásmodul (az „óránként kettő” tévedés volt, lásd a 20:17-es kiegészítést). Élesen egyszeri tartalomfrissítés (`oy_migrate_1113`).
   **Szerkesztés a weboldalon** mindkét oldalon (DEVELOPER 6.13e); oliviayoga (oliviajoga.hu) **1.5.0**. Tesztek 867/0.
 - **Fizetés (Áron, 11.13 este):** az Arovia Group LLC számláz → Stripe (Arovia) + QuickBooks. A kulcsok a CRM-ben vannak,
   és onnan nem jönnek ki (a CRM így készült; a QuickBooks-token is csak egy helyen élhet) → az oldal a CRM-en át fizettet.
@@ -200,6 +200,15 @@
   ÁSZF · Impresszum · Adatvédelem; a fizetés gombjai alatt „A vásárlással elfogadod az ÁSZF-et”. **Nyitott (Áron):**
   az Arovia EIN-je / floridai nyilvántartási száma az impresszumba, uniós képviselő (GDPR 27. cikk), OSS-ÁFA.
 
+- **Olivia doksija 11.13, 20:17-es kiegészítés (olivia-yoga 3.5.3, olivia-studio 1.9.2):** „Olívia” hosszú í-vel
+  mindenhol (márkanév, címek, fordítások; az élő oldal neve és a levelek feladója is, ha még a régi); a 4. „miért online”
+  doboz „Valódi oktatói jelenlét”; az „Ismerd meg az oktatód” felirat ki; a bevezetőben a .hu jógikus-életvitel mondata;
+  a gomb és az „Összes óra” egy vonalban; Tudatosság / Kontroll a .hu mintájára (zsályás sáv, „= …”, „Számomra ez a
+  legfontosabb különbség…”); egynyelvű oldalon nincs nyelvjelzés az órarendben. **Kismamatorna (javítás):** NEM „óránként
+  kettő” – a kilenc modul kombinációja adja a felkészülést; a modulok felsorolva mindenhol, ahol a kismamatorna szerepel
+  (főoldali doboz, óra-kivonat, Online órák, Bejelentkezés és árak, GYIK), az aloldalon modulonként, miért kell a szüléshez,
+  plusz a sportmúlt és az első alkalom mint felmérés. Élesen `oy_migrate_1113` rev c. Tesztek 891/0. Nyitott (Olíviától
+  kérdezzük): „Az első kép legyen inkább ez” (nincs kép a doksiban) és „Ide ezt a képet szeretném” (a csoportos óra sora).
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -147,3 +147,14 @@ h1, h2, .page-head .page-head__title, .namecard__name, .price-group__head h3, .w
 .oj-modules li::before { content: ""; flex: none; width: .7rem; height: .7rem; border-radius: 50%; background: var(--orchid); }
 .oj-modules li:nth-child(3n + 2)::before { background: var(--lilac); }
 .oj-modules li:nth-child(3n)::before { background: var(--sage); }
+
+/* Olivia, 11.13 (20:17): the button and the link on one line; Tudatosság / Kontroll on the pale band as on oliviajoga.hu;
+   the prenatal modules with why each one matters for the birth */
+.prose .btn-row.oj-inline { align-items: center; }
+.prose .btn-row.oj-inline .btn { margin-top: 0; }
+.oj-contrast .contrast { margin-top: 0; }
+.oj-modules--why { grid-template-columns: 1fr; gap: .75rem; }
+.oj-modules--why li { display: grid; grid-template-columns: .7rem 1fr; align-items: start; align-content: start; column-gap: .8rem; row-gap: .2rem; padding: 1rem 1.15rem; font-weight: 400; }
+.oj-modules--why li::before { margin-top: .45rem; grid-row: 1 / span 2; }
+.oj-modules--why strong { font-weight: 700; }
+@media (min-width: 760px) { .oj-modules--why { grid-template-columns: 1fr 1fr; } }
