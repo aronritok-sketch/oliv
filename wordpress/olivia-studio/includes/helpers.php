@@ -45,17 +45,28 @@ function oys_date_format( $format ) {
 		return $format;
 	}
 	$map = array(
-		'M j, Y g:i a'   => 'Y. M j. G:i',
-		'D M j, g:i a'   => 'M j., D G:i',
+		'M j, Y g:i a'   => 'Y. M. j. G:i',
+		'D M j, g:i a'   => 'M. j., D G:i',
 		'l, F j · g:i a' => 'F j., l · G:i',
-		'M j, g:i a'     => 'M j. G:i',
-		'M j, Y'         => 'Y. M j.',
+		'M j, g:i a'     => 'M. j. G:i',
+		'M j, Y'         => 'Y. M. j.',
 		'l, F j'         => 'F j., l',
 		'l, g:i a'       => 'l G:i',
 		'F j'            => 'F j.',
-		'M j'            => 'M j.',
+		'M j'            => 'M. j.', // WordPress's Hungarian short months have no full stop (nov) – the date needs it (nov. 7.)
 	);
 	return $map[ $format ] ?? str_replace( array( 'g:i a', 'g a' ), array( 'G:i', 'G' ), $format );
+}
+
+/**
+ * Hungarian: a suffix after a date that ends in a full stop drops the stop („2026. november 20.” + „-ig” →
+ * „2026. november 20-ig”, „dec. 16.-án” → „dec. 16-án”). Other languages: unchanged.
+ */
+function oys_hu_suffix( $text ) {
+	if ( 0 !== strpos( get_locale(), 'hu' ) ) {
+		return $text;
+	}
+	return preg_replace( '/(\d)\.-(ig|tól|től|án|én|ra|re|i)(?![\p{L}])/u', '$1-$2', (string) $text );
 }
 
 function oys_time( $utc ) {

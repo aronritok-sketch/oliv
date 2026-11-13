@@ -652,6 +652,22 @@ Olivia oldala és a HathaFlow ugyanazt használja: fizetés (Stripe) → hozzáf
   `livekit-server --dev` (devkey / secret) + Playwright `--use-fake-device-for-media-stream`: oktató indít, tanuló belép,
   lát és hall, kamera-csempe, kéz, chat, felvétel, mindenki némítása.
 
+### 6.13c Levélküldés: saját SMTP, Reply-To (1.8.1)
+
+- `OYS_Mailer` (`includes/class-mailer.php`): `phpmailer_init` (5-ös prioritás – egy SMTP-bővítmény később fut, az
+  nyer) → SMTP a Studio → Emails → „Sending server (SMTP)” beállításaiból: `smtp_host`, `smtp_port` (587),
+  `smtp_secure` (`tls` = STARTTLS, `ssl`, `none`), `smtp_user`, `smtp_pass` (titok: `OYS_Admin::SECRETS`, sosem íródik
+  vissza, üresen hagyva megmarad). A wp-config.php konstansai nyernek: `OYS_SMTP_HOST`, `OYS_SMTP_PORT`,
+  `OYS_SMTP_SECURE`, `OYS_SMTP_USER`, `OYS_SMTP_PASS` (az adminban ilyenkor zárolt a mező). Üres szerver: minden marad
+  a régiben.
+- Feladó: `email_from` / `email_from_name`; **Reply-To**: `email_reply_to` (ha eltér a feladótól) – `OYS_Mailer::headers()`,
+  minden levél ezt használja. A WordPress saját levelei (`wordpress@…`, „WordPress”) a stúdió címét és nevét kapják.
+- „Próbalevél küldése” gomb (`smtp_test`): a bejelentkezett adminnak; hibánál a PHPMailer válasza látszik
+  (`wp_mail_failed` → `oys_mail_last_error`, egy hétig).
+- Brevo: `smtp-relay.brevo.com`, 587, STARTTLS, a belépési név és az SMTP-kulcs a Brevo „SMTP & API” oldaláról; a domaint
+  (DKIM, DMARC, brevo-code) a Brevóban kell hitelesíteni, a feladó cím ezen a domainen legyen.
+- A regisztrációs levél (`welcome`) a következő 3 nyilvános órát is listázza foglalás-linkkel (`OYS_Emails::upcoming_html()`).
+
 ### 6.14 Mobil API és iOS app
 
 **API** – `OYS_App_API` (`includes/class-app-api.php`), útvonalak a `oys/v1/app/` alatt:

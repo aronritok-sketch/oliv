@@ -1395,7 +1395,7 @@ msgstr "Kód (kártyás fizetéshez)"
 
 #: includes/class-frontend.php:410
 msgid "Log in to see and confirm your private session."
-msgstr "Lépj be, hogy lásd és jóváhagyd a egyéni órádat."
+msgstr "Lépj be, hogy lásd és jóváhagyd az egyéni órádat."
 
 #: includes/class-frontend.php:413
 msgid "This class could not be found. Please pick another from the timetable."
@@ -2780,7 +2780,7 @@ msgstr "Remélem, hamarosan látlak egy másik órán."
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "{class} needs {missing}"
-msgstr "A(z) {class} órához kell még {missing}"
+msgstr "{class}: kell {missing}"
 
 #: data
 #. Default text stored as data (email template, product or timetable).
@@ -2790,7 +2790,7 @@ msgstr "Hozol egy barátot?"
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "Hi {first_name}, {class} on {day} at {time} needs {missing} to go ahead. Know someone who'd enjoy it? Bring them along!"
-msgstr "Szia {first_name}! A(z) {class} órához ({day}, {time}) még {missing} kell, hogy elinduljon. Ismersz valakit, akinek tetszene? Hozd el!"
+msgstr "Szia {first_name}! A(z) {class} órához ({day}, {time}) kell {missing}, hogy elinduljon. Ismersz valakit, akinek tetszene? Hozd el!"
 
 #: data
 #. Default text stored as data (email template, product or timetable).
@@ -2915,22 +2915,22 @@ msgstr "Használd fel az alkalmaidat"
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "Hi {first_name}, you still have {classes_left} on your {pass}, valid until {expires}. Book a class so they don't go to waste."
-msgstr "Szia {first_name}! Még {classes_left} van a(z) {pass} bérleteden, ami {expires}-ig érvényes. Foglalj órát, hogy ne vesszenek el."
+msgstr "Szia {first_name}! Még {classes_left} van a bérletedben ({pass}), {expires}-ig érvényes. Foglalj órát, hogy ne vesszenek el."
 
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "Welcome to {studio}"
-msgstr "Üdv a(z) {studio} oldalán"
+msgstr "Köszönöm a regisztrációt – {studio}"
 
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "Welcome"
-msgstr "Üdv"
+msgstr "Köszönöm a regisztrációt!"
 
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "Hi {first_name}, welcome! Your account is ready."
-msgstr "Szia {first_name}, üdv! Elkészült a fiókod."
+msgstr "Szia {first_name}! Elkészült a fiókod, örülök, hogy itt vagy."
 
 #: data
 #. Default text stored as data (email template, product or timetable).
@@ -3090,17 +3090,17 @@ msgstr "Egyéni órád: kérlek, hagyd jóvá"
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "Your private session"
-msgstr "A egyéni órád"
+msgstr "Az egyéni órád"
 
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "Here is your private session. Confirm it by paying below (or with a private session credit if you have one)."
-msgstr "Itt a egyéni órád. Hagyd jóvá a lenti fizetéssel (vagy egy egyéni alkalommal, ha van)."
+msgstr "Itt az egyéni órád. Hagyd jóvá a lenti fizetéssel (vagy egy egyéni alkalommal, ha van)."
 
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "About your private session request"
-msgstr "A egyéni óra kérésedről"
+msgstr "Az egyéni óra kérésedről"
 
 #: data
 #. Default text stored as data (email template, product or timetable).
@@ -3936,3 +3936,97 @@ msgstr "Egy óra, ami nincs az órarendben és nem foglalható: indíts élő ad
 
 msgid "Connect the LiveKit project above first."
 msgstr "Előbb kösd be fent a LiveKit-projektet."
+
+# 1.8.1: sending server (SMTP), welcome email with the next classes, 2026-11-13
+msgid "Email test"
+msgstr "E-mail-teszt"
+
+msgid "This is a test from your website. If it arrived in your inbox (not in spam), the email set-up works."
+msgstr "Ez egy próbalevél a weboldaladról. Ha a beérkezett levelek közé jött (nem a spambe), a levélküldés rendben van."
+
+msgid "Email test – %s"
+msgstr "E-mail-teszt – %s"
+
+msgid "The server did not accept the email."
+msgstr "A szerver nem fogadta el a levelet."
+
+msgid "No SMTP server is set: emails go out through the web server's own mail (or an SMTP plugin) and may land in spam."
+msgstr "Nincs SMTP-szerver beállítva: a levelek a webszerver saját levelezésén (vagy egy SMTP-bővítményen) mennek ki, és a spambe kerülhetnek."
+
+msgid "no encryption"
+msgstr "titkosítás nélkül"
+
+msgid "Sending through %1$s:%2$d (%3$s) as %4$s."
+msgstr "Küldés ezen keresztül: %1$s:%2$d (%3$s), feladó: %4$s."
+
+msgid "An address on your own domain (e.g. info@yourdomain), the one your sending service has verified – then emails land in the inbox."
+msgstr "Egy cím a saját domainedről (pl. info@domained.hu), amit a levélküldő szolgáltatód igazolt – így a levelek a beérkezők közé kerülnek."
+
+msgid "Replies go to"
+msgstr "A válaszok ide mennek"
+
+msgid "When someone answers an email, the answer goes here (e.g. your own mailbox). Empty: to the sender address."
+msgstr "Ha valaki válaszol egy levélre, a válasz ide érkezik (pl. a saját postafiókodba). Üresen: a feladó címére."
+
+msgid "Set in wp-config.php on the server."
+msgstr "A szerveren, a wp-config.php-ban van megadva."
+
+msgid "Sending server (SMTP)"
+msgstr "Levélküldő szerver (SMTP)"
+
+msgid "The login of your email sending service (e.g. Brevo: smtp-relay.brevo.com, port 587, STARTTLS, the login and SMTP key from SMTP & API). Leave the server empty to send without it (or with an SMTP plugin)."
+msgstr "A levélküldő szolgáltatásod belépési adatai (pl. Brevo: smtp-relay.brevo.com, 587-es port, STARTTLS, a belépési név és az SMTP-kulcs az „SMTP & API” oldalról). Ha a szervert üresen hagyod, nélküle küld (vagy egy SMTP-bővítménnyel)."
+
+msgid "SMTP server"
+msgstr "SMTP-szerver"
+
+msgid "Port"
+msgstr "Port"
+
+msgid "STARTTLS (port 587)"
+msgstr "STARTTLS (587-es port)"
+
+msgid "SSL (port 465)"
+msgstr "SSL (465-ös port)"
+
+msgid "None"
+msgstr "Nincs"
+
+msgid "Encryption"
+msgstr "Titkosítás"
+
+msgid "Login"
+msgstr "Belépési név"
+
+msgid "Password / SMTP key"
+msgstr "Jelszó / SMTP-kulcs"
+
+msgid "Now"
+msgstr "Most"
+
+msgid "Last error (%1$s): %2$s"
+msgstr "Utolsó hiba (%1$s): %2$s"
+
+msgid "Send a test email to %s"
+msgstr "Próbalevél küldése ide: %s"
+
+msgid "Save first, then test."
+msgstr "Előbb ments, utána próbáld ki."
+
+msgid "The test email could not be sent: %s"
+msgstr "A próbalevelet nem sikerült elküldeni: %s"
+
+msgid "Test sent to %s. Check the inbox (and the spam folder)."
+msgstr "Próbalevél elküldve ide: %s. Nézd meg a beérkezőket (és a spam mappát is)."
+
+msgid "The test could not be sent. Check the sending server (SMTP) on the Emails page."
+msgstr "A próbát nem sikerült elküldeni. Nézd meg az E-mailek oldalon a levélküldő szervert (SMTP)."
+
+msgid "Next classes"
+msgstr "A következő órák"
+
+msgid "Sorry, I am ill."
+msgstr "Sajnos beteg vagyok."
+
+msgid "a free class"
+msgstr "egy ingyenes óra"

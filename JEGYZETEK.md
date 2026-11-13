@@ -174,6 +174,15 @@
   vissza, a korszak-rács animált. Nyitott: admin-fiók Áronnak és Oliviának az élesen (a távirányító élesen nem futtat
   WP-CLI-t), a bővítmény frissítése élesen (GitHub-kiadás alapú frissítő kell), SMTP / küldő cím.
 
+- **18d. kör (Áron, 2026-11-13, „ma élesítem … sokan fognak regisztrálni”):** olivia-studio **1.8.1** – saját
+  **SMTP** (Studio → Emails → „Levélküldő szerver (SMTP)”, vagy `OYS_SMTP_*` a wp-config.php-ban; a kulcs titokmező;
+  próbalevél gomb, utolsó hiba), **Reply-To** cím, a WordPress saját levelei (jelszó-visszaállítás) a stúdió nevében;
+  a regisztrációs levél **megköszöni** a regisztrációt és **felsorolja a következő órákat** foglalás-linkkel; magyar
+  dátum „dec. 16.”, „20-ig” (nem „20.-ig”); névelők („az egyéni órád”); a belépés előtti levélben nincs dupla tipp; a
+  mobilhálózatok közös IP-je nem zár ki mindenkit (IP-n 20 hibás belépés, címenként 6; IP-nként 10 regisztráció /
+  15 perc). olivia-yoga **3.4.4:** az online kiadás feladója `info@oliviajoga.online`, a válasz és a stúdió-értesítés
+  Olivia címére (élesen egyszer, csak ha még az alapérték áll ott). Tesztek 846/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

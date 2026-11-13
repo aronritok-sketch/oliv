@@ -213,7 +213,7 @@ class OYS_Email_Templates {
 
 	/** Fill {placeholders}. */
 	public static function fill( $text, array $vars ) {
-		return trim( preg_replace_callback( '/\{([a-z_]+)\}/', fn( $m ) => array_key_exists( $m[1], $vars ) ? (string) $vars[ $m[1] ] : $m[0], (string) $text ) );
+		return trim( oys_hu_suffix( preg_replace_callback( '/\{([a-z_]+)\}/', fn( $m ) => array_key_exists( $m[1], $vars ) ? (string) $vars[ $m[1] ] : $m[0], (string) $text ) ) );
 	}
 
 	/** Plain text with blank lines between paragraphs → HTML paragraphs (escaped). */

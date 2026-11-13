@@ -41,6 +41,7 @@ add_action( 'hpv_child_setup', function ( $from, $to, $slug ) {
 		update_option( 'permalink_structure', '/%postname%/' );
 	}
 	$log = array_merge( $log, oy_migrate_online() ); // the online site after Olivia's notes of 12 November (once)
+	$log = array_merge( $log, oy_mail_setup() ); // the edition's sender and reply-to addresses (once, where still default)
 	kses_remove_filters();
 	$log = array_merge( $log, oy_import_all( false ) );
 	kses_init_filters();

@@ -1237,7 +1237,7 @@ class OYS_Frontend {
 	private static function rewards_html( $user_id ) {
 		$out = '';
 		foreach ( OYS_Coupons::for_user( $user_id ) as $c ) {
-			$out .= '<div class="oys-card oys-gift-code"><p class="kicker">' . esc_html( 'birthday' === $c->source ? __( 'Birthday gift', 'olivia-studio' ) : __( 'Your code', 'olivia-studio' ) ) . '</p><p class="oys-gift-code__code">' . esc_html( $c->code ) . '</p><p>' . esc_html( OYS_Coupons::label( $c ) ) . ( $c->expires_at ? ' · ' . sprintf( esc_html__( 'until %s', 'olivia-studio' ), esc_html( oys_date( $c->expires_at, 'M j' ) ) ) : '' ) . ' · ' . esc_html__( 'filled in when you pay by card', 'olivia-studio' ) . '</p></div>';
+			$out .= '<div class="oys-card oys-gift-code"><p class="kicker">' . esc_html( 'birthday' === $c->source ? __( 'Birthday gift', 'olivia-studio' ) : __( 'Your code', 'olivia-studio' ) ) . '</p><p class="oys-gift-code__code">' . esc_html( $c->code ) . '</p><p>' . esc_html( OYS_Coupons::label( $c ) ) . ( $c->expires_at ? ' · ' . esc_html( oys_hu_suffix( sprintf( __( 'until %s', 'olivia-studio' ), oys_date( $c->expires_at, 'M j' ) ) ) ) : '' ) . ' · ' . esc_html__( 'filled in when you pay by card', 'olivia-studio' ) . '</p></div>';
 		}
 		$r = OYS_Rewards::status( $user_id );
 		if ( $r ) {

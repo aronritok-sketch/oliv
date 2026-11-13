@@ -11,7 +11,7 @@ class OYS_Admin {
 	const CAP = 'oys_manage';
 
 	/** Settings that are secrets: shown as empty password fields, an empty field keeps the saved value. */
-	const SECRETS = array( 'stripe_test_secret', 'stripe_test_webhook', 'stripe_live_secret', 'stripe_live_webhook', 'zoom_client_secret', 'livekit_api_secret' );
+	const SECRETS = array( 'stripe_test_secret', 'stripe_test_webhook', 'stripe_live_secret', 'stripe_live_webhook', 'zoom_client_secret', 'livekit_api_secret', 'smtp_pass' );
 
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'menu' ) );
@@ -24,7 +24,7 @@ class OYS_Admin {
 			}
 		} );
 		$actions = array( 'save_session', 'cancel_session', 'roster', 'save_template', 'delete_template', 'generate', 'private_offer', 'private_decline',
-			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'live_test', 'live_test_open', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'message', 'pay_later_reset', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_delete', 'save_ai' );
+			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'live_test', 'live_test_open', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'smtp_test', 'message', 'pay_later_reset', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_delete', 'save_ai' );
 		foreach ( $actions as $a ) {
 			add_action( 'admin_post_oys_admin_' . $a, array( __CLASS__, 'guard' ) );
 		}
@@ -1362,8 +1362,10 @@ class OYS_Admin {
 		$num = fn( $k, $unit ) => '<input type="number" min="0" class="small-text" name="s[' . $k . ']" value="' . (int) $st[ $k ] . '"> ' . esc_html( $unit );
 		echo self::form( 'save_emails' ) . '<h2>' . esc_html__( 'Sender', 'olivia-studio' ) . '</h2><table class="form-table">'; // phpcs:ignore
 		echo '<tr><th>' . esc_html__( 'Sender name', 'olivia-studio' ) . '</th><td><input type="text" class="regular-text" name="s[email_from_name]" value="' . esc_attr( $st['email_from_name'] ) . '"></td></tr>';
-		echo '<tr><th>' . esc_html__( 'Sender email', 'olivia-studio' ) . '</th><td><input type="email" class="regular-text" name="s[email_from]" value="' . esc_attr( $st['email_from'] ) . '"><p class="description">' . esc_html__( 'Use an address on your own domain, and an SMTP plugin, so emails land in the inbox.', 'olivia-studio' ) . '</p></td></tr>';
+		echo '<tr><th>' . esc_html__( 'Sender email', 'olivia-studio' ) . '</th><td><input type="email" class="regular-text" name="s[email_from]" value="' . esc_attr( $st['email_from'] ) . '"><p class="description">' . esc_html__( 'An address on your own domain (e.g. info@yourdomain), the one your sending service has verified – then emails land in the inbox.', 'olivia-studio' ) . '</p></td></tr>';
+		echo '<tr><th>' . esc_html__( 'Replies go to', 'olivia-studio' ) . '</th><td><input type="email" class="regular-text" name="s[email_reply_to]" value="' . esc_attr( $st['email_reply_to'] ) . '"><p class="description">' . esc_html__( 'When someone answers an email, the answer goes here (e.g. your own mailbox). Empty: to the sender address.', 'olivia-studio' ) . '</p></td></tr>';
 		echo '<tr><th>' . esc_html__( 'Studio notifications go to', 'olivia-studio' ) . '</th><td><input type="email" class="regular-text" name="s[notify_email]" value="' . esc_attr( $st['notify_email'] ) . '"></td></tr></table>';
+		self::smtp_fields( $st );
 		echo '<h2>' . esc_html__( 'Reminders', 'olivia-studio' ) . '</h2><p class="description">' . esc_html__( '0 turns a reminder off. They go out automatically; people who book after a reminder\'s time just get their confirmation.', 'olivia-studio' ) . '</p><table class="form-table">';
 		echo '<tr><th>' . esc_html__( 'Class reminder', 'olivia-studio' ) . '</th><td>' . $num( 'reminder_hours', __( 'hours before the class', 'olivia-studio' ) ) . '</td></tr>'; // phpcs:ignore
 		echo '<tr><th>' . esc_html__( 'Second reminder', 'olivia-studio' ) . '</th><td>' . $num( 'reminder2_hours', __( 'hours before the class (e.g. 2 on the day)', 'olivia-studio' ) ) . '</td></tr>'; // phpcs:ignore
@@ -1386,7 +1388,30 @@ class OYS_Admin {
 			echo '</tbody></table>';
 		}
 		submit_button( __( 'Save emails and reminders', 'olivia-studio' ) );
-		echo '</form></div>';
+		echo '</form>' . self::form( 'smtp_test', 'id="oys-smtp-test"' ) . '</form></div>'; // phpcs:ignore
+	}
+
+	/** Sending server (SMTP): host, port, encryption, user, password (never shown), a test button and the last error. */
+	private static function smtp_fields( array $st ) {
+		$locked = OYS_Mailer::locked();
+		$lock   = fn( $k ) => in_array( $k, $locked, true ) ? ' disabled' : '';
+		$note   = '<p class="description">' . esc_html__( 'Set in wp-config.php on the server.', 'olivia-studio' ) . '</p>';
+		echo '<h2 id="smtp">' . esc_html__( 'Sending server (SMTP)', 'olivia-studio' ) . '</h2><p class="description">' . esc_html__( 'The login of your email sending service (e.g. Brevo: smtp-relay.brevo.com, port 587, STARTTLS, the login and SMTP key from SMTP & API). Leave the server empty to send without it (or with an SMTP plugin).', 'olivia-studio' ) . '</p><table class="form-table">';
+		echo '<tr><th>' . esc_html__( 'SMTP server', 'olivia-studio' ) . '</th><td><input type="text" class="regular-text" name="s[smtp_host]" placeholder="smtp-relay.brevo.com" value="' . esc_attr( $st['smtp_host'] ) . '"' . $lock( 'host' ) . '>' . ( $lock( 'host' ) ? $note : '' ) . '</td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'Port', 'olivia-studio' ) . '</th><td><input type="number" min="1" max="65535" class="small-text" name="s[smtp_port]" value="' . (int) $st['smtp_port'] . '"' . $lock( 'port' ) . '></td></tr>'; // phpcs:ignore
+		$sec = array( 'tls' => __( 'STARTTLS (port 587)', 'olivia-studio' ), 'ssl' => __( 'SSL (port 465)', 'olivia-studio' ), 'none' => __( 'None', 'olivia-studio' ) );
+		echo '<tr><th>' . esc_html__( 'Encryption', 'olivia-studio' ) . '</th><td><select name="s[smtp_secure]"' . $lock( 'secure' ) . '>'; // phpcs:ignore
+		foreach ( $sec as $k => $label ) {
+			echo '<option value="' . esc_attr( $k ) . '"' . selected( $st['smtp_secure'], $k, false ) . '>' . esc_html( $label ) . '</option>';
+		}
+		echo '</select></td></tr>';
+		echo '<tr><th>' . esc_html__( 'Login', 'olivia-studio' ) . '</th><td><input type="text" class="regular-text" name="s[smtp_user]" autocomplete="off" value="' . esc_attr( $st['smtp_user'] ) . '"' . $lock( 'user' ) . '></td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'Password / SMTP key', 'olivia-studio' ) . '</th><td><input type="password" class="regular-text" name="s[smtp_pass]" autocomplete="new-password" value=""' . $lock( 'pass' ) . '>' // phpcs:ignore
+			. ( '' !== (string) $st['smtp_pass'] || $lock( 'pass' ) ? '<p class="description">' . esc_html( $lock( 'pass' ) ? __( 'Set in wp-config.php on the server.', 'olivia-studio' ) : __( 'A key is saved. Leave empty to keep it.', 'olivia-studio' ) ) . '</p>' : '' ) . '</td></tr>';
+		$err = OYS_Mailer::last_error();
+		echo '<tr><th>' . esc_html__( 'Now', 'olivia-studio' ) . '</th><td><p>' . esc_html( OYS_Mailer::describe() ) . '</p>'
+			. ( $err ? '<p class="oys-status oys-status--cancelled" style="display:inline-block">' . esc_html( sprintf( __( 'Last error (%1$s): %2$s', 'olivia-studio' ), wp_date( 'Y-m-d H:i', $err['time'] ), $err['message'] ) ) . '</p>' : '' )
+			. '<p><button type="submit" form="oys-smtp-test" class="button">' . esc_html( sprintf( __( 'Send a test email to %s', 'olivia-studio' ), wp_get_current_user()->user_email ) ) . '</button></p><p class="description">' . esc_html__( 'Save first, then test.', 'olivia-studio' ) . '</p></td></tr></table>';
 	}
 
 	/** The email language being edited (?lang=hu); English by default. */
@@ -1426,7 +1451,23 @@ class OYS_Admin {
 			'email_from_name' => sanitize_text_field( $in['email_from_name'] ?? '' ),
 			'email_from'      => sanitize_email( $in['email_from'] ?? '' ),
 			'notify_email'    => sanitize_email( $in['notify_email'] ?? '' ),
+			'email_reply_to'  => sanitize_email( $in['email_reply_to'] ?? '' ),
 		);
+		if ( isset( $in['smtp_host'] ) ) {
+			$clean['smtp_host'] = preg_replace( '/[^a-z0-9.\-]/i', '', (string) $in['smtp_host'] );
+		}
+		if ( isset( $in['smtp_port'] ) ) {
+			$clean['smtp_port'] = max( 1, min( 65535, (int) $in['smtp_port'] ) );
+		}
+		if ( isset( $in['smtp_secure'] ) ) {
+			$clean['smtp_secure'] = in_array( $in['smtp_secure'], array( 'tls', 'ssl', 'none' ), true ) ? $in['smtp_secure'] : 'tls';
+		}
+		if ( isset( $in['smtp_user'] ) ) {
+			$clean['smtp_user'] = sanitize_text_field( $in['smtp_user'] );
+		}
+		if ( '' !== trim( (string) ( $in['smtp_pass'] ?? '' ) ) ) { // empty keeps the saved key
+			$clean['smtp_pass'] = trim( (string) $in['smtp_pass'] );
+		}
 		foreach ( array( 'reminder_hours', 'reminder2_hours', 'join_reminder_minutes', 'pass_expiry_days' ) as $k ) {
 			$clean[ $k ] = max( 0, (int) ( $in[ $k ] ?? 0 ) );
 		}
@@ -1471,7 +1512,13 @@ class OYS_Admin {
 		$to   = wp_get_current_user()->user_email;
 		$lang = self::email_lang( wp_unslash( $_POST['lang'] ?? 'en' ) );
 		$ok   = OYS_Email_Templates::get( $key ) && OYS_I18n::with( $lang, fn() => OYS_Emails::send_test( $key, $to ) );
-		self::back( 'oys-emails', array( 'edit' => $key, 'lang' => $lang ), $ok ? sprintf( __( 'Test sent to %s.', 'olivia-studio' ), $to ) : __( 'The test could not be sent. Check the email set-up (SMTP plugin).', 'olivia-studio' ) );
+		self::back( 'oys-emails', array( 'edit' => $key, 'lang' => $lang ), $ok ? sprintf( __( 'Test sent to %s.', 'olivia-studio' ), $to ) : __( 'The test could not be sent. Check the sending server (SMTP) on the Emails page.', 'olivia-studio' ) );
+	}
+
+	private static function do_smtp_test() {
+		$to  = wp_get_current_user()->user_email;
+		$res = OYS_Mailer::test( $to );
+		self::back( 'oys-emails', array(), is_wp_error( $res ) ? sprintf( __( 'The test email could not be sent: %s', 'olivia-studio' ), $res->get_error_message() ) : sprintf( __( 'Test sent to %s. Check the inbox (and the spam folder).', 'olivia-studio' ), $to ), is_wp_error( $res ) ? 'error' : 'success' );
 	}
 
 	private static function do_live_test_open() {

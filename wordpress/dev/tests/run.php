@@ -1637,7 +1637,7 @@ test( 'languages: emails in the customer\'s language, texts edited per language'
 	$u = make_user( 'Kata' );
 	update_user_meta( $u, 'oys_lang', 'hu' );
 	$mails = sent_mails( fn() => OYS_Emails::welcome( $u ) );
-	ok( $mails && str_contains( $mails[0]['subject'], 'Üdv' ), 'welcome email in Hungarian' );
+	ok( $mails && str_contains( $mails[0]['subject'], 'Köszönöm a regisztrációt' ), 'welcome email in Hungarian' );
 	ok( $mails && str_contains( $mails[0]['html'], 'Szia Kata' ), 'Hungarian greeting' );
 	update_user_meta( $u, 'oys_lang', 'es' );
 	$mails = sent_mails( fn() => OYS_Emails::welcome( $u ) );
@@ -1707,7 +1707,7 @@ test( 'one-language site: Hungarian only, no address prefix, forints', function 
 		eq( 'hu', OYS_I18n::lang_from_url( $home . '/rolam/' ), 'every address is Hungarian' );
 		eq( "2\u{00A0}500\u{00A0}Ft", oys_money( 250000 ), 'forints: the sign after the number, a space between thousands' );
 		eq( 250000, oys_cents_from_input( "2\u{00A0}500 Ft" ), 'forint input parsed' );
-		eq( 'M j., D G:i', OYS_I18n::with( 'hu', fn() => oys_date_format( 'D M j, g:i a' ) ), 'Hungarian date order and 24-hour clock' );
+		eq( 'M. j., D G:i', OYS_I18n::with( 'hu', fn() => oys_date_format( 'D M j, g:i a' ) ), 'Hungarian date order and 24-hour clock' );
 		eq( 'D M j, g:i a', oys_date_format( 'D M j, g:i a' ), 'English formats untouched' );
 		OYS_Settings::update( array( 'online_only' => 1, 'online_price_cents' => 250000 ) );
 		$pricing = do_shortcode( '[oys_pricing]' );
@@ -2255,6 +2255,108 @@ test( 'live: after class – the opening words, written down in the teacher\'s b
 		OYS_Settings::update( array( 'languages' => 'en,hu,es', 'default_lang' => 'en' ) );
 		live_off();
 	}
+} );
+
+/* ---------- 1.8.1: sending server (SMTP), welcome email, Hungarian dates, shared mobile IPs ---------- */
+
+test( 'emails: the studio\'s own SMTP server, its sender for WordPress\'s emails, and a reply-to address', function () {
+	$before = OYS_Settings::all();
+	try {
+		OYS_Settings::update( array( 'smtp_host' => 'smtp.example.test', 'smtp_port' => 587, 'smtp_secure' => 'tls', 'smtp_user' => 'login@example.test', 'smtp_pass' => 'key-123', 'email_from' => 'info@studio.test', 'email_from_name' => 'Studio', 'email_reply_to' => 'olivia@example.test' ) );
+		require_once ABSPATH . WPINC . '/PHPMailer/PHPMailer.php';
+		$m = new PHPMailer\PHPMailer\PHPMailer();
+		OYS_Mailer::smtp( $m );
+		eq( 'smtp', $m->Mailer, 'sends through SMTP' );
+		ok( 'smtp.example.test' === $m->Host && 587 === (int) $m->Port && 'tls' === $m->SMTPSecure, 'server, port and STARTTLS' );
+		ok( $m->SMTPAuth && 'login@example.test' === $m->Username && 'key-123' === $m->Password, 'with the login and key' );
+		eq( 'info@studio.test', apply_filters( 'wp_mail_from', 'wordpress@studio.test' ), 'WordPress\'s own emails (password reset) come from the studio' );
+		eq( 'someone@else.test', apply_filters( 'wp_mail_from', 'someone@else.test' ), 'another sender is left alone' );
+		eq( 'Studio', apply_filters( 'wp_mail_from_name', 'WordPress' ), 'and with the studio\'s name' );
+		$sent = array();
+		$grab = function ( $args ) use ( &$sent ) {
+			$sent[] = $args;
+			return $args;
+		};
+		add_filter( 'wp_mail', $grab );
+		OYS_Emails::send( 'anna@example.test', 'Hello', 'Hello', '<p>Hi</p>' );
+		remove_filter( 'wp_mail', $grab );
+		$h = implode( "\n", (array) ( $sent[0]['headers'] ?? array() ) );
+		ok( str_contains( $h, 'From: Studio <info@studio.test>' ) && str_contains( $h, 'Reply-To: Studio <olivia@example.test>' ), 'customer emails: From the studio, answers to the reply-to address' );
+		OYS_Settings::update( array( 'smtp_host' => '' ) );
+		$m2 = new PHPMailer\PHPMailer\PHPMailer();
+		OYS_Mailer::smtp( $m2 );
+		eq( 'mail', $m2->Mailer, 'no server set: sends as before' );
+		ok( str_contains( OYS_Mailer::describe(), 'spam' ), 'and the admin says what that means' );
+	} finally {
+		update_option( OYS_Settings::OPTION, $before );
+	}
+} );
+
+test( 'emails page: the SMTP key is never printed back into the page', function () {
+	if ( ! class_exists( 'OYS_Admin' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/admin.php';
+		require_once OYS_DIR . 'includes/admin/class-admin.php';
+	}
+	$before = OYS_Settings::all();
+	OYS_Settings::update( array( 'smtp_host' => 'smtp-relay.brevo.com', 'smtp_user' => 'olivia-login', 'smtp_pass' => 'xsmtpsib-should-not-show' ) );
+	wp_set_current_user( get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0] );
+	ob_start();
+	OYS_Admin::page_emails();
+	$html = ob_get_clean();
+	wp_set_current_user( 0 );
+	update_option( OYS_Settings::OPTION, $before );
+	ok( str_contains( $html, 'name="s[smtp_host]"' ) && str_contains( $html, 'name="s[smtp_pass]"' ) && str_contains( $html, 'name="s[email_reply_to]"' ), 'the SMTP and reply-to fields are on the emails page' );
+	ok( ! str_contains( $html, 'xsmtpsib-should-not-show' ), 'the saved key is not in the page' );
+	ok( str_contains( $html, 'smtp-relay.brevo.com' ) && str_contains( $html, 'olivia-login' ), 'the server and login are shown' );
+	ok( str_contains( $html, 'oys-smtp-test' ), 'with a test button' );
+	ok( in_array( 'smtp_pass', OYS_Admin::SECRETS, true ), 'listed as a secret' );
+} );
+
+test( 'welcome email: thanks for signing up and lists the next classes to book', function () {
+	$u   = make_user( 'Vera' );
+	$s   = make_session( array( 'in_hours' => 30 ) );
+	$log = sent_mails( fn() => OYS_Emails::welcome( $u ) );
+	ok( isset( $log[0] ) && str_contains( $log[0]['html'], 'Next classes' ), 'the next classes are in the email' );
+	ok( isset( $log[0] ) && str_contains( $log[0]['html'], esc_url( oys_book_url( $s->id ) ) ), 'with a booking link' );
+	OYS_Schedule::save( array( 'status' => 'cancelled' ), $s->id );
+	ok( ! str_contains( OYS_Emails::upcoming_html( 50 ), esc_url( oys_book_url( $s->id ) ) ), 'a cancelled class is not offered' );
+} );
+
+test( 'join reminder: the "set up where the camera sees your mat" tip is there once', function () {
+	$u   = make_user( 'Ida' );
+	$s   = make_session( array( 'format' => 'online', 'online_url' => 'https://meet.example/x', 'in_hours' => 0.2 ) );
+	$id  = OYS_Bookings::book_manual( $u, $s, 'comp', false, true, 'online' ); // forced: online booking closes shortly before
+	$log = sent_mails( fn() => OYS_Emails::join_reminder( $id ) );
+	eq( 1, substr_count( $log[0]['html'] ?? '', 'camera sees your mat' ), 'not repeated' );
+	ok( str_contains( $log[0]['html'] ?? '', 'https://meet.example/x' ), 'the link is in it' );
+} );
+
+test( 'hungarian dates: a full stop after the short month, none before a suffix', function () {
+	$hu = fn() => 'hu_HU';
+	add_filter( 'locale', $hu );
+	try {
+		eq( 'M. j.', oys_date_format( 'M j' ), 'nov. 7.' );
+		eq( 'Y. M. j.', oys_date_format( 'M j, Y' ), '2026. nov. 7.' );
+		eq( '2026. november 20-ig érvényes', oys_hu_suffix( '2026. november 20.-ig érvényes' ), 'until: the date drops its full stop' );
+		eq( 'dec. 16-án', oys_hu_suffix( 'dec. 16.-án' ), 'on: too' );
+		eq( 'Mindenki 3. a sorban', oys_hu_suffix( 'Mindenki 3. a sorban' ), 'other text stays' );
+	} finally {
+		remove_filter( 'locale', $hu );
+	}
+	eq( '20.-ig', oys_hu_suffix( '20.-ig' ), 'not Hungarian: unchanged' );
+} );
+
+test( 'rate limiting: many people behind one mobile IP are not locked out together', function () {
+	$_SERVER['REMOTE_ADDR'] = '100.64.9.' . wp_rand( 1, 250 );
+	for ( $i = 0; $i < OYS_Security::MAX_LOGIN_FAILS + 4; $i++ ) {
+		OYS_Security::record_failure( 'typo' . $i . '@example.test' );
+	}
+	ok( ! OYS_Security::login_locked( 'careful@example.test' ), 'ten mistyped logins from one network: the next person can still log in' );
+	for ( $i = 0; $i < OYS_Security::MAX_IP_FAILS; $i++ ) {
+		OYS_Security::record_failure( 'bot' . $i . '@example.test' );
+	}
+	ok( OYS_Security::login_locked( 'careful@example.test' ), 'a real attack from one address is still stopped' );
+	ok( OYS_Security::MAX_SIGNUPS >= 10, 'up to ten sign-ups per address in 15 minutes' );
 } );
 
 test( 'helpers: money and periods', function () {

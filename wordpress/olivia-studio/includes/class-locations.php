@@ -259,6 +259,6 @@ class OYS_Locations {
 		if ( time() >= $at ) {
 			return ''; // Being decided right now.
 		}
-		return sprintf( __( 'This class goes ahead with %1$d or more people. If fewer sign up, it\'s cancelled by %2$s and we let you know; your class comes back to you.', 'olivia-studio' ), $min, wp_date( 'D g:i a', $at ) );
+		return sprintf( __( 'This class goes ahead with %1$d or more people. If fewer sign up, it\'s cancelled by %2$s and we let you know; your class comes back to you.', 'olivia-studio' ), $min, wp_date( oys_date_format( 'D g:i a' ), $at ) );
 	}
 }

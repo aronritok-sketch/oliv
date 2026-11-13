@@ -3914,3 +3914,97 @@ msgstr "Una clase que no está en el horario y no se puede reservar: empieza en 
 
 msgid "Connect the LiveKit project above first."
 msgstr "Primero conecta arriba el proyecto de LiveKit."
+
+# 1.8.1: sending server (SMTP), welcome email with the next classes, 2026-11-13
+msgid "Email test"
+msgstr "Prueba de correo"
+
+msgid "This is a test from your website. If it arrived in your inbox (not in spam), the email set-up works."
+msgstr "Esta es una prueba desde tu sitio web. Si llegó a tu bandeja de entrada (no a spam), el envío de correo funciona."
+
+msgid "Email test – %s"
+msgstr "Prueba de correo – %s"
+
+msgid "The server did not accept the email."
+msgstr "El servidor no aceptó el correo."
+
+msgid "No SMTP server is set: emails go out through the web server's own mail (or an SMTP plugin) and may land in spam."
+msgstr "No hay servidor SMTP: los correos salen por el correo del propio servidor web (o un plugin SMTP) y pueden acabar en spam."
+
+msgid "no encryption"
+msgstr "sin cifrado"
+
+msgid "Sending through %1$s:%2$d (%3$s) as %4$s."
+msgstr "Envío a través de %1$s:%2$d (%3$s) como %4$s."
+
+msgid "An address on your own domain (e.g. info@yourdomain), the one your sending service has verified – then emails land in the inbox."
+msgstr "Una dirección de tu propio dominio (p. ej. info@tudominio), la que tu servicio de envío ha verificado: así los correos llegan a la bandeja de entrada."
+
+msgid "Replies go to"
+msgstr "Las respuestas van a"
+
+msgid "When someone answers an email, the answer goes here (e.g. your own mailbox). Empty: to the sender address."
+msgstr "Cuando alguien responde a un correo, la respuesta llega aquí (p. ej. a tu propio buzón). Vacío: a la dirección del remitente."
+
+msgid "Set in wp-config.php on the server."
+msgstr "Definido en wp-config.php en el servidor."
+
+msgid "Sending server (SMTP)"
+msgstr "Servidor de envío (SMTP)"
+
+msgid "The login of your email sending service (e.g. Brevo: smtp-relay.brevo.com, port 587, STARTTLS, the login and SMTP key from SMTP & API). Leave the server empty to send without it (or with an SMTP plugin)."
+msgstr "Los datos de acceso de tu servicio de envío de correo (p. ej. Brevo: smtp-relay.brevo.com, puerto 587, STARTTLS, el usuario y la clave SMTP de «SMTP & API»). Deja el servidor vacío para enviar sin él (o con un plugin SMTP)."
+
+msgid "SMTP server"
+msgstr "Servidor SMTP"
+
+msgid "Port"
+msgstr "Puerto"
+
+msgid "STARTTLS (port 587)"
+msgstr "STARTTLS (puerto 587)"
+
+msgid "SSL (port 465)"
+msgstr "SSL (puerto 465)"
+
+msgid "None"
+msgstr "Ninguno"
+
+msgid "Encryption"
+msgstr "Cifrado"
+
+msgid "Login"
+msgstr "Usuario"
+
+msgid "Password / SMTP key"
+msgstr "Contraseña / clave SMTP"
+
+msgid "Now"
+msgstr "Ahora"
+
+msgid "Last error (%1$s): %2$s"
+msgstr "Último error (%1$s): %2$s"
+
+msgid "Send a test email to %s"
+msgstr "Enviar un correo de prueba a %s"
+
+msgid "Save first, then test."
+msgstr "Guarda primero y luego prueba."
+
+msgid "The test email could not be sent: %s"
+msgstr "No se pudo enviar el correo de prueba: %s"
+
+msgid "Test sent to %s. Check the inbox (and the spam folder)."
+msgstr "Prueba enviada a %s. Revisa la bandeja de entrada (y la carpeta de spam)."
+
+msgid "The test could not be sent. Check the sending server (SMTP) on the Emails page."
+msgstr "No se pudo enviar la prueba. Revisa el servidor de envío (SMTP) en la página de correos."
+
+msgid "Next classes"
+msgstr "Próximas clases"
+
+msgid "Sorry, I am ill."
+msgstr "Lo siento, estoy enferma."
+
+msgid "a free class"
+msgstr "una clase gratis"

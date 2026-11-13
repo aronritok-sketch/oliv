@@ -9,8 +9,9 @@ defined( 'ABSPATH' ) || exit;
 
 class OYS_Security {
 
-	const MAX_LOGIN_FAILS  = 6;   // per IP or per email, within the window
-	const MAX_SIGNUPS      = 5;   // new accounts per IP, within the window
+	const MAX_LOGIN_FAILS  = 6;   // per email, within the window
+	const MAX_IP_FAILS     = 20;  // per IP: mobile networks put many people behind one address (CGNAT)
+	const MAX_SIGNUPS      = 10;  // new accounts per IP, within the window (an Instagram post brings many at once)
 	const WINDOW           = 900; // 15 minutes
 
 	public static function init() {
@@ -39,7 +40,7 @@ class OYS_Security {
 	}
 
 	public static function login_locked( $login = '' ) {
-		return self::count( self::key( 'ip', self::ip() ) ) >= self::MAX_LOGIN_FAILS
+		return self::count( self::key( 'ip', self::ip() ) ) >= self::MAX_IP_FAILS
 			|| ( $login && self::count( self::key( 'user', $login ) ) >= self::MAX_LOGIN_FAILS );
 	}
 

@@ -532,6 +532,34 @@ function oy_import_privacy( array $data, $refresh = false ) {
 	return array( 'privacy notice: /' . $pv['slug'] . '/' );
 }
 
+/**
+ * The edition's sender, reply-to and notification addresses (setup.studio in the content file) on a site that was set
+ * up before they were there – once, and only where the value is still the plugin's default (the admin email or empty),
+ * so an address someone set in Studio → Emails stays.
+ */
+function oy_mail_setup() {
+	$rev = '2026-11-13';
+	if ( ! class_exists( 'OYS_Settings' ) || get_option( 'oy_mail_rev' ) === $rev ) {
+		return array();
+	}
+	update_option( 'oy_mail_rev', $rev );
+	$data  = json_decode( (string) file_get_contents( oy_content_file() ), true );
+	$want  = array_intersect_key( (array) ( $data['setup']['studio'] ?? array() ), array_flip( array( 'email_from', 'email_reply_to', 'notify_email' ) ) );
+	$admin = strtolower( (string) get_option( 'admin_email' ) );
+	$set   = array();
+	foreach ( $want as $k => $v ) {
+		$have = strtolower( (string) OYS_Settings::get( $k ) );
+		if ( is_email( $v ) && ( '' === $have || $admin === $have ) ) {
+			$set[ $k ] = $v;
+		}
+	}
+	if ( ! $set ) {
+		return array();
+	}
+	OYS_Settings::update( $set );
+	return array( 'emails: ' . implode( ', ', array_map( fn( $k, $v ) => $k . ' ' . $v, array_keys( $set ), $set ) ) );
+}
+
 function oy_migrate_online() {
 	$rev = '2026-11-12b';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_online_rev' ) === $rev ) {

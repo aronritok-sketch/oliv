@@ -66,13 +66,8 @@ class OYS_Emails {
 
 	/** Send ready HTML (already wrapped) with the studio as the sender. */
 	public static function send_raw( $to, $subject, $html, array $extra_headers = array(), $attachments = array() ) {
-		$from_name = OYS_Settings::get( 'email_from_name' );
-		$from      = OYS_Settings::get( 'email_from' );
-		$headers   = array_merge( array( 'Content-Type: text/html; charset=UTF-8' ), $extra_headers );
-		if ( $from ) {
-			$headers[] = sprintf( 'From: %s <%s>', $from_name, $from );
-		}
-		$sent = wp_mail( $to, $subject, $html, $headers, $attachments );
+		$headers = array_merge( array( 'Content-Type: text/html; charset=UTF-8' ), $extra_headers, OYS_Mailer::headers() );
+		$sent    = wp_mail( $to, $subject, $html, $headers, $attachments );
 		foreach ( $attachments as $file ) {
 			if ( str_contains( $file, 'oys-tmp' ) ) {
 				wp_delete_file( $file );
@@ -87,6 +82,11 @@ class OYS_Emails {
 		$pre  = $preheader ? '<div style="display:none;max-height:0;overflow:hidden;opacity:0">' . esc_html( $preheader ) . '</div>' : '';
 		$foot = '<br><a href="' . esc_url( $unsubscribe_url ) . '" style="color:#53635A">' . esc_html__( 'Unsubscribe from the newsletter', 'olivia-studio' ) . '</a>';
 		return str_replace( '<body style="', '<body data-newsletter="1" style="', self::wrap( $heading, $body, $cta, $foot, $pre ) );
+	}
+
+	/** The studio's email frame around ready HTML (e.g. the sending test). */
+	public static function wrap_public( $heading, $body, $cta = null ) {
+		return self::wrap( $heading, $body, $cta );
 	}
 
 	private static function wrap( $heading, $body, $cta, $footer_extra = '', $preheader = '' ) {
@@ -179,7 +179,8 @@ class OYS_Emails {
 	}
 
 	/** The join link (or a note that it's coming) for someone taking part online; '' in the studio. */
-	private static function join_html( $booking, $session ) {
+	/** The join button and link for an online booking; $tip adds the "join a few minutes early" line. */
+	private static function join_html( $booking, $session, $tip = true ) {
 		if ( ! $booking || 'online' !== oys_mode_for( $session, $booking->mode ) ) {
 			return '';
 		}
@@ -192,7 +193,7 @@ class OYS_Emails {
 		if ( $session->zoom_password && ! str_contains( $url, 'pwd=' ) ) {
 			$html .= '<p style="font-size:13px;color:#53635A">' . esc_html__( 'Passcode:', 'olivia-studio' ) . ' <b>' . esc_html( $session->zoom_password ) . '</b></p>';
 		}
-		return $html . '<p style="font-size:13px;color:#53635A">' . esc_html__( 'Join a few minutes early, set up where the camera sees your mat (or leave it off), and keep your microphone muted.', 'olivia-studio' ) . '</p>';
+		return $html . ( $tip ? '<p style="font-size:13px;color:#53635A">' . esc_html__( 'Join a few minutes early, set up where the camera sees your mat (or leave it off), and keep your microphone muted.', 'olivia-studio' ) . '</p>' : '' );
 	}
 
 	/** "To pay at the studio: $25" for bookings that are paid on the day. */
@@ -373,7 +374,7 @@ class OYS_Emails {
 		if ( $b->guest_of ) {
 			$vars['first_name'] = $b->guest_name;
 		}
-		return self::compose( 'join_reminder', $b->guest_of ? $b->guest_email : self::user_email( $b->user_id ), $vars, self::join_html( $b, $s ), array(), '', '', true );
+		return self::compose( 'join_reminder', $b->guest_of ? $b->guest_email : self::user_email( $b->user_id ), $vars, self::join_html( $b, $s, false ), array(), '', '', true );
 	}
 
 	/** Unused classes on a pass are about to expire. */
@@ -399,7 +400,22 @@ class OYS_Emails {
 	}
 
 	protected static function welcome( $user_id ) {
-		self::compose( 'welcome', self::user_email( $user_id ), OYS_Email_Templates::vars_for( $user_id ), '', array(), oys_account_url() );
+		self::compose( 'welcome', self::user_email( $user_id ), OYS_Email_Templates::vars_for( $user_id ), self::upcoming_html(), array(), oys_account_url() );
+	}
+
+	/** The next few public classes with a booking link – so a new account can book its first class from the email. */
+	public static function upcoming_html( $limit = 3 ) {
+		$list = OYS_Schedule::query( array( 'kind' => array( 'group', 'event' ), 'from' => oys_now(), 'to' => oys_utc_plus( 60 * DAY_IN_SECONDS ), 'status' => 'scheduled', 'limit' => $limit ) );
+		if ( ! $list ) {
+			return '';
+		}
+		$rows = '';
+		foreach ( $list as $s ) {
+			$rows .= '<tr><td style="padding:9px 12px 9px 0;border-bottom:1px solid #d8d8d0;vertical-align:top"><b>' . esc_html( oys_session_title( $s ) ) . '</b><br><span style="font-size:14px;color:#53635A">' . esc_html( oys_date( $s->starts_at, 'l, F j · g:i a' ) ) . '</span></td>'
+				. '<td style="padding:9px 0;border-bottom:1px solid #d8d8d0;text-align:right;vertical-align:middle;white-space:nowrap"><a href="' . esc_url( oys_book_url( $s->id ) ) . '" style="color:#2B5036;font-weight:700">' . esc_html__( 'Book', 'olivia-studio' ) . ' →</a></td></tr>';
+		}
+		return '<p style="margin:22px 0 4px;font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:#53635A">' . esc_html__( 'Next classes', 'olivia-studio' ) . '</p>'
+			. '<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-top:2px solid #12231A;margin:0 0 18px">' . $rows . '</table>';
 	}
 
 	protected static function gift_card( $gift ) {
@@ -509,7 +525,7 @@ class OYS_Emails {
 	protected static function minimum_nudge( $booking, $session, $missing, $decide_at ) {
 		$vars = array_merge( OYS_Email_Templates::vars_for( $booking->user_id, $session ), array(
 			'missing'  => sprintf( _n( '%d more person', '%d more people', $missing, 'olivia-studio' ), $missing ),
-			'deadline' => wp_date( 'l g:i a', $decide_at ),
+			'deadline' => wp_date( oys_date_format( 'l, g:i a' ), $decide_at ),
 		) );
 		$blocks = self::session_block( $session ) . '<p style="font-size:14px;color:#53635A">' . esc_html__( 'Share this link with a friend, or add them as your guest from your booking:', 'olivia-studio' ) . '<br><a href="' . esc_url( oys_book_url( $session->id ) ) . '" style="color:#2B5036;word-break:break-all">' . esc_html( oys_book_url( $session->id ) ) . '</a></p>';
 		return self::compose( 'minimum_nudge', self::user_email( $booking->user_id ), $vars, $blocks, array(), oys_book_url( $session->id ) );
@@ -562,14 +578,26 @@ class OYS_Emails {
 
 	/** Sample values for previews and test emails. */
 	public static function sample_vars() {
-		$user = wp_get_current_user();
+		$user   = wp_get_current_user();
+		$start  = gmdate( 'Y-m-d 17:00:00', time() + 2 * DAY_IN_SECONDS );
+		$online = (int) OYS_Settings::get( 'online_only' );
+		$pass   = '';
+		foreach ( (array) OYS_Products::all() as $p ) {
+			if ( 'pack' === $p['kind'] && ! empty( $p['active'] ) ) {
+				$pass = oys_product_name( $p );
+				break;
+			}
+		}
+		$pass = $pass ?: __( '5-class pass', 'olivia-studio' );
 		return array(
 			'first_name' => $user && $user->first_name ? $user->first_name : 'Emma', 'studio' => OYS_Settings::get( 'email_from_name' ),
-			'class' => 'Slow Flow', 'date' => wp_date( 'l, F j', time() + 2 * DAY_IN_SECONDS ), 'date_short' => wp_date( 'M j', time() + 2 * DAY_IN_SECONDS ),
-			'day' => wp_date( 'D', time() + 2 * DAY_IN_SECONDS ), 'time' => '6:00 pm', 'location' => 'Fort Myers', 'teacher' => OYS_Settings::get( 'owner_name' ), 'host' => 'Emma', 'guest_name' => 'Sofia',
-			'reason' => 'Olivia is unwell.', 'how' => 'One class was taken from your pass.', 'pass' => '5-class pass', 'classes_left' => '2 classes',
-			'expires' => wp_date( get_option( 'date_format' ), time() + 7 * DAY_IN_SECONDS ), 'recipient' => 'Sofia', 'from' => 'Emma', 'gift' => '5-class pass',
+			'class' => 'Slow Flow', 'date' => oys_date( $start, 'l, F j' ), 'date_short' => oys_date( $start, 'M j' ),
+			'day' => oys_date( $start, 'D' ), 'time' => oys_time( $start ), 'location' => $online ? __( 'Online', 'olivia-studio' ) : 'Fort Myers', 'teacher' => OYS_Settings::get( 'owner_name' ), 'host' => 'Emma', 'guest_name' => 'Sofia',
+			'reason' => __( 'Sorry, I am ill.', 'olivia-studio' ), 'how' => __( 'One class was taken from your pass.', 'olivia-studio' ), 'pass' => $pass, 'classes_left' => sprintf( _n( '%d class', '%d classes', 2, 'olivia-studio' ), 2 ),
+			'expires' => wp_date( get_option( 'date_format' ), time() + 7 * DAY_IN_SECONDS ), 'recipient' => 'Sofia', 'from' => 'Emma', 'gift' => $pass,
 			'recipient_email' => 'sofia@example.com', 'ends' => wp_date( get_option( 'date_format' ), time() + 20 * DAY_IN_SECONDS ),
+			'missing' => sprintf( _n( '%d more person', '%d more people', 2, 'olivia-studio' ), 2 ), 'deadline' => oys_date( gmdate( 'Y-m-d 17:00:00', time() + DAY_IN_SECONDS ), 'l, g:i a' ),
+			'percent' => '15%', 'prize' => __( 'a free class', 'olivia-studio' ), 'period' => wp_date( 'F' ), 'tickets' => 8, 'entrants' => 24, 'next_draw' => wp_date( get_option( 'date_format' ), time() + 30 * DAY_IN_SECONDS ),
 		);
 	}
 
@@ -590,11 +618,8 @@ class OYS_Emails {
 
 	public static function send_test( $key, $to ) {
 		[ $subject, $html ] = self::preview( $key );
-		$headers = array( 'Content-Type: text/html; charset=UTF-8' );
-		if ( OYS_Settings::get( 'email_from' ) ) {
-			$headers[] = sprintf( 'From: %s <%s>', OYS_Settings::get( 'email_from_name' ), OYS_Settings::get( 'email_from' ) );
-		}
-		$sent = wp_mail( $to, '[Test] ' . $subject, $html, $headers );
+		$headers = array_merge( array( 'Content-Type: text/html; charset=UTF-8' ), OYS_Mailer::headers() );
+		$sent    = wp_mail( $to, '[Test] ' . $subject, $html, $headers );
 		do_action( 'oys_email_sent', $to, '[Test] ' . $subject, $html );
 		return $sent;
 	}
