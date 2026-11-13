@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OY_VERSION', '3.4.5' );
+define( 'OY_VERSION', '3.5.0' );
 
 require_once get_template_directory() . '/inc/edition.php';
 
@@ -58,7 +58,7 @@ add_filter( 'excerpt_more', fn() => '…' );
 function oy_menu_items() {
 	if ( oy_online_only() ) {
 		return array(
-			'schedule-pricing' => __( 'Schedule & pricing', 'olivia-yoga' ),
+			'schedule-pricing' => oy_schedule_label(),
 			'about'            => __( 'About', 'olivia-yoga' ),
 			'faq'              => __( 'FAQ', 'olivia-yoga' ),
 			'journal'          => __( 'About yoga', 'olivia-yoga' ),
@@ -192,7 +192,7 @@ function oy_page_aside( $slug ) {
 				. ( OY_FACEBOOK ? '<li>' . oy_icon( 'facebook' ) . '<a href="' . esc_url( OY_FACEBOOK ) . '" target="_blank" rel="noopener">Facebook</a></li>' : '' )
 				. ( function_exists( 'oys_fb_group_url' ) && oys_fb_group_url() ? '<li>' . oy_icon( 'group', 'icon' ) . '<a href="' . esc_url( oys_fb_group_url() ) . '" target="_blank" rel="noopener">' . esc_html__( 'Our Facebook group', 'olivia-yoga' ) . '</a></li>' : '' )
 				. ( oy_online_only()
-					? '<li>' . oy_icon( 'globe' ) . '<span>' . esc_html__( 'Online, in Hungarian', 'olivia-yoga' ) . '</span></li></ul>'
+					? '<li>' . oy_icon( 'globe' ) . '<span>' . esc_html__( 'Online, live', 'olivia-yoga' ) . '</span></li></ul>'
 					: '<li>' . oy_icon( 'pin' ) . '<span>' . esc_html( oy_brand( 'place' ) ) . '</span></li><li>' . oy_icon( 'globe' ) . '<span>' . esc_html( oy_is_demo() ? __( 'English', 'olivia-yoga' ) : __( 'English, Hungarian', 'olivia-yoga' ) ) . '</span></li></ul>' )
 				. '<p>' . esc_html__( 'Ready to book? Group classes and passes can be booked and paid online.', 'olivia-yoga' ) . '</p>' . oy_btn( oy_book_url(), __( 'Book a class', 'olivia-yoga' ), 'orchid' ) . '</div>';
 	}

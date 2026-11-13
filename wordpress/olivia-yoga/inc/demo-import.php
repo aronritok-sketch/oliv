@@ -562,6 +562,24 @@ function oy_mail_setup() {
 	return array( 'settings: ' . implode( ', ', array_map( fn( $k, $v ) => $k . ' ' . $v, array_keys( $set ), $set ) ) );
 }
 
+/**
+ * Olivia's notes of 13 November („oliviajoga.online módosítások 11.13.”) on a live online site: the content that came
+ * with the theme gets the new copy once (no „magyarul”, „Bejelentkezés és árak”, the nine prenatal modules) and the menu
+ * is rebuilt. Bookings, the timetable, prices and pages someone added are not touched. Olivia had no admin login on
+ * the live site before this, so there is nothing of hers to overwrite.
+ */
+function oy_migrate_1113() {
+	$rev = '2026-11-13';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_content_rev' ) === $rev ) {
+		return array();
+	}
+	kses_remove_filters();
+	$log = oy_import_all( true );
+	kses_init_filters();
+	update_option( 'oy_content_rev', $rev );
+	return array_merge( array( 'content: Olivia 13 November' ), $log );
+}
+
 function oy_migrate_online() {
 	$rev = '2026-11-12b';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_online_rev' ) === $rev ) {

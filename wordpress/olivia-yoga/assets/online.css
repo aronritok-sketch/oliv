@@ -87,3 +87,63 @@
 
 /* The closing block in peach („ez a rész legyen ez a szín”) */
 .cta.oj-cta--peach { background: var(--sun-soft); }
+
+/* ==========================================================================
+   Olivia, 11.13 („oliviajoga.online módosítások”)
+   ========================================================================== */
+
+/* Headings: room for the accents (Á, É, Ó, Ő on Anton capitals), as on oliviajoga.hu – „a jóga ékezete ne lógjon bele
+   az online feliratba”, and in the boxes „ne lógjon az ékezet a felette lévő betűkbe” */
+h1, h2, .page-head .page-head__title, .namecard__name, .price-group__head h3, .way h3 { line-height: 1.18; }
+.page-head .page-head__title { line-height: 1.04; padding-top: .06em; }
+.hero__title { line-height: 1; }
+.hero__title mark { line-height: 1.1; padding-top: .05em; }
+.oj-hero .hero__title .hero__l2 { margin-top: .07em; }
+.oj-hero .hero__title mark { padding-top: .13em; } /* the accent of Ó stays inside the lilac block */
+.oj-hero .hero__title .hero__l3 { margin-top: .3em; }
+.contrast__word { line-height: 1; }
+
+/* The hero as on oliviajoga.hu: the lilac block behind „JÓGA” breathes (in 4 s, out 6 s), the soft pink wave behind
+   the picture, the two buttons in green */
+:root { --breath-in: 4s; --breath-out: 6s; --ease-breath: cubic-bezier(.45, .05, .35, 1); }
+.hero__title mark.oj-breath { position: relative; background: none; z-index: 0; }
+.hero__title mark.oj-breath::before { content: ""; position: absolute; inset: 0; background: var(--lilac); border-radius: 4px; z-index: -1; transform-origin: 0 60%; }
+@media (prefers-reduced-motion: no-preference) {
+	.hero__title mark.oj-breath::before { animation: oj-breath calc(var(--breath-in) + var(--breath-out)) var(--ease-breath) infinite; }
+	@keyframes oj-breath { 0%, 100% { transform: scale(1, 1); } 40% { transform: scale(1.07, 1.12); } }
+}
+.oj-hero .hero__visual { padding-bottom: 0; }
+.oj-hero .hero__visual > .oj-blob--right:not(.oj-brush) { right: calc(-1 * var(--oj-bleed)); width: calc(114% + var(--oj-bleed)); top: 8%; height: 92%; }
+.btn--forest { background: var(--forest); color: var(--paper); }
+.btn--forest:hover { background: var(--moss); color: var(--paper); box-shadow: 0 12px 26px -14px rgba(18, 35, 26, .6); }
+.oj-twins { display: flex; flex-wrap: wrap; gap: .75rem; max-width: 600px; }
+.oj-twins .btn { flex: 1 1 auto; justify-content: center; text-align: center; white-space: nowrap; }
+@media (max-width: 600px) { .oj-twins .btn { font-size: .8rem; letter-spacing: .08em; padding-inline: 1rem; white-space: nowrap; } }
+
+/* The name card: her title in three parts, the specialities under it */
+.oj-hero .namecard__title { line-height: 1.45; }
+
+/* Five services, each in its own box, staggered: three on top, two below shifted by half a box („akár egymás alatt
+   elcsúsztatva”) */
+@media (min-width: 700px) {
+	.ways--five { grid-template-columns: repeat(4, 1fr); }
+	.ways--five .way { grid-column: span 2; }
+	.ways--five .way:last-child { grid-column: 2 / span 2; }
+}
+@media (min-width: 1100px) {
+	.ways--five { grid-template-columns: repeat(6, 1fr); }
+	.ways--five .way { grid-column: span 2; }
+	.ways--five .way:nth-child(4) { grid-column: 2 / span 2; }
+	.ways--five .way:nth-child(5) { grid-column: 4 / span 2; }
+	.ways--five { padding-bottom: 1.4rem; }
+	.ways--five .way:nth-child(2), .ways--five .way:nth-child(5) { top: 1.4rem; } /* a gentle zigzag; `top`, so the hover lift still works */
+	.ways--five .way p { max-width: 36ch; }
+}
+.way--lilac { --tone: var(--lilac); }
+
+/* The prenatal modules: nine small tiles (Olivia, 11.13) */
+.oj-modules { list-style: none; margin: 1.2rem 0 1.6rem; padding: 0; display: grid; gap: .6rem; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)); }
+.oj-modules li { margin: 0; padding: .85rem 1rem; border-radius: var(--radius); background: var(--card, #fff); box-shadow: var(--shadow); font-weight: 700; display: flex; align-items: center; gap: .6rem; line-height: 1.3; }
+.oj-modules li::before { content: ""; flex: none; width: .7rem; height: .7rem; border-radius: 50%; background: var(--orchid); }
+.oj-modules li:nth-child(3n + 2)::before { background: var(--lilac); }
+.oj-modules li:nth-child(3n)::before { background: var(--sage); }

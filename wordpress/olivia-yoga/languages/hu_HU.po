@@ -1521,3 +1521,55 @@ msgstr "Fordítások"
 
 msgid "The Hungarian and Spanish site show these versions. Leave a field empty and the English original is shown there."
 msgstr "A magyar és a spanyol oldal ezeket a változatokat mutatja. Ha egy mezőt üresen hagysz, ott az angol eredeti látszik."
+
+# 3.5.0: Olivia, 11.13 (oliviajoga.online módosítások)
+msgid "Online yoga | Olivia Kovacs"
+msgstr "Online jóga | Kovács Olívia"
+
+msgid "Live group online yoga every Wednesday, and individual online yoga, prenatal fitness, stretching, relaxation and breathing tailored to you, from your living room. Beginners very welcome."
+msgstr "Élő, csoportos online jóga minden szerdán, valamint egyéni online jóga, kismamatorna, stretching, relaxáció és légzés egyénre szabottan, a nappalidból. Kezdőket is szeretettel várok."
+
+msgid "Sign-up & pricing"
+msgstr "Bejelentkezés és árak"
+
+msgid "Every Wednesday, 18:30 to 20:00, live. Beginners welcome."
+msgstr "Szerdánként 18:30-tól 20:00-ig, élőben. Kezdőket is szeretettel várok."
+
+msgid "Stretching & mobility"
+msgstr "Stretching és mobilizáció"
+
+msgid "One-to-one stretching and mobility work for a stiff hip, shoulder and spine, at your own pace."
+msgstr "Egyéni nyújtás és mobilizáció a merev csípőnek, vállnak és gerincnek, a te tempódban."
+
+msgid "Relaxation & breathing"
+msgstr "Relaxáció és légzés"
+
+msgid "Half an hour of breathing and guided relaxation for an overloaded nervous system, even at the end of a long day."
+msgstr "Fél óra légzés és vezetett relaxáció a túlpörgött idegrendszernek, akár egy hosszú nap végén."
+
+msgid "No traffic, no parking, no queue in the changing room. At home you can get ready in peace and set the mood: light a candle, or whatever helps you arrive."
+msgstr "Nincs dugó, parkolás, sorban állás az öltözőben. Otthon nyugodtan felkészülhetsz, és megteremtheted a hangulatot: gyújts egy gyertyát, vagy bármi mást, ami segít ráhangolódni."
+
+msgid "Breathwork, strength, stretching, balance, a real flow state and a long relaxation, live. Join the group on Wednesdays, or ask for a one-to-one session."
+msgstr "Légzés, erősítés, nyújtás, egyensúly, igazi flow élmény és hosszú relaxáció, élőben. Gyere a szerdai csoportba, vagy kérj egyéni órát."
+
+msgid "Online, live"
+msgstr "Online, élőben"
+
+msgid "Online · live classes"
+msgstr "Online · élő órák"
+
+msgid "Live online yoga classes with Olivia Kovacs: group flow yoga on Wednesdays, individual online yoga, prenatal fitness, stretching, relaxation and breathing from home. Beginners welcome."
+msgstr "Élő online jógaórák Kovács Olíviával: csoportos flow jóga szerdánként, egyéni online jóga, kismamatorna, stretching, relaxáció és légzés otthonról. Kezdőknek is."
+
+msgid "Online Yoga, Live from Home: Flow Yoga, Prenatal & One-to-One Classes | Olivia Jóga"
+msgstr "Online jóga élőben, otthonról: flow jóga, kismamatorna, egyéni órák | Olivia Jóga"
+
+msgid "Live online yoga classes with Olivia Kovacs: group flow yoga, individual online yoga, prenatal fitness, stretching, relaxation and breathing."
+msgstr "Élő online jógaórák Kovács Olíviával: csoportos flow jóga, egyéni online jóga, kismamatorna, stretching, relaxáció és légzés."
+
+msgid "Yoga Teacher | Pre- & Postnatal Trainer | Movement & Wellness Coach"
+msgstr "Jógaoktató | Pre- és postnatális tréner | Mozgás- és wellness coach"
+
+msgid "Mobilization"
+msgstr "Mobilizáció"

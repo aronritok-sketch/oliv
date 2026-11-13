@@ -158,7 +158,13 @@ function oy_section_head( $title, $text = '', $kicker = '', $id = '' ) {
 
 /** Olivia's title and her specialities, used on the hero name card, the About page and articles. */
 function oy_title_line() {
-	$line = oy_is_demo() ? __( 'Yoga studio | Group, private & online classes', 'olivia-yoga' ) : __( 'Yoga Teacher | Movement & Wellness Coach', 'olivia-yoga' );
+	if ( oy_is_demo() ) {
+		$line = __( 'Yoga studio | Group, private & online classes', 'olivia-yoga' );
+	} elseif ( oy_online_only() ) {
+		$line = __( 'Yoga Teacher | Pre- & Postnatal Trainer | Movement & Wellness Coach', 'olivia-yoga' ); // Olivia, 11.13
+	} else {
+		$line = __( 'Yoga Teacher | Movement & Wellness Coach', 'olivia-yoga' );
+	}
 	return (string) apply_filters( 'oy_title_line', $line );
 }
 
@@ -172,13 +178,18 @@ function oy_specialities() {
 		return array( __( 'Hatha flow', 'olivia-yoga' ), __( 'Slow flow', 'olivia-yoga' ), __( 'Private sessions', 'olivia-yoga' ), __( 'Online classes', 'olivia-yoga' ) );
 	}
 	if ( oy_online_only() ) {
-		return array( __( 'Yoga', 'olivia-yoga' ), __( 'Mobility', 'olivia-yoga' ), __( 'Prenatal Fitness', 'olivia-yoga' ), __( 'Meditation', 'olivia-yoga' ) );
+		return array( __( 'Yoga', 'olivia-yoga' ), __( 'Prenatal Fitness', 'olivia-yoga' ), __( 'Mobilization', 'olivia-yoga' ), __( 'Relaxation & breathing', 'olivia-yoga' ) ); // Olivia, 11.13
 	}
 	return array( __( 'Yoga', 'olivia-yoga' ), __( 'Mobility', 'olivia-yoga' ), __( 'Prenatal Fitness', 'olivia-yoga' ), __( 'Meditation', 'olivia-yoga' ), __( 'Private Singing Bowl Massage', 'olivia-yoga' ) );
 }
 
 function oy_specialities_line( $cls = 'specialities' ) {
 	return '<p class="' . esc_attr( $cls ) . '">' . implode( '<i aria-hidden="true">•</i>', array_map( 'esc_html', oy_specialities() ) ) . '</p>';
+}
+
+/** The name of the timetable & prices page in buttons and menus: on the online site „Bejelentkezés és árak” (Olivia, 11.13). */
+function oy_schedule_label() {
+	return oy_online_only() ? __( 'Sign-up & pricing', 'olivia-yoga' ) : __( 'Schedule & pricing', 'olivia-yoga' );
 }
 
 /** Name card: name, title line and specialities. */
@@ -263,7 +274,7 @@ function oy_class_facts( $post_id, $cls = 'chips' ) {
 	if ( $len ) {
 		$out .= '<span class="chip">' . oy_icon( 'clock' ) . esc_html( $len ) . '</span>';
 	}
-	$lang = oy_class_meta( $post_id, 'oy_lang' );
+	$lang = oy_online_only() ? '' : oy_class_meta( $post_id, 'oy_lang' ); // online every class is in Hungarian, no need to say it (Olivia, 11.13)
 	if ( $lang ) {
 		$out .= '<span class="chip">' . oy_icon( 'globe' ) . esc_html( $lang ) . '</span>';
 	}
@@ -303,6 +314,17 @@ function oy_brush_d( $w, $h, $amp, $th, $periods = 1.5, $phase = 0.0, $n = 96 ) 
 }
 
 /** Two brush strokes behind a picture, like the wave in her logo: a broad one in the tone, a thin orchid one. */
+/**
+ * The soft two-layer wave behind the hero picture of oliviajoga.hu (its 1.3.0 shape, Olivia 11.12: „nem a gomb, hanem
+ * a háttér”), running off the screen on the picture's side. The online hero has it too (Olivia, 11.13).
+ */
+function oy_soft_blob( $tone = 'pink', $side = 'right' ) {
+	$flip = 'right' === $side ? ' transform="matrix(-1 0 0 1 100 0)"' : '';
+	return '<svg class="oj-blob oj-blob--' . esc_attr( $side ) . ' oj-tone--' . esc_attr( $tone ) . '" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><g' . $flip . '>'
+		. '<path class="oj-blob__back" d="M0 6C14 0 34 2 50 8C70 15 92 22 96 40C100 56 86 66 90 80C94 94 76 100 56 98C38 96 18 90 0 94Z"/>'
+		. '<path class="oj-blob__front" d="M0 30C18 22 40 28 56 38C74 49 80 64 72 76C64 88 42 90 24 86C14 84 6 84 0 86Z"/></g></svg>';
+}
+
 function oy_brush_blob( $tone = 'pink', $side = 'right' ) {
 	return '<svg class="oj-blob oj-brush oj-blob--' . esc_attr( $side ) . ' oj-tone--' . esc_attr( $tone ) . '" viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true" focusable="false">'
 		. '<path class="oj-blob__back" d="' . oy_brush_d( 400, 100, 22, 30 ) . '"/><path class="oj-blob__front" d="' . oy_brush_d( 400, 100, 18, 12, 1.5, .7 ) . '"/></svg>';

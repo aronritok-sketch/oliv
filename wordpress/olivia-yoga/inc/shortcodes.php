@@ -17,7 +17,7 @@ function oy_classes_list( $exclude = '' ) {
 		$tone  = OY_ACCENTS[ $n++ % 4 ];
 		$thumb = oy_post_photo( $c->ID, '', '200px', false, '' );
 		$meta  = '';
-		foreach ( array( 'clock' => oy_class_meta( $c->ID, 'oy_duration' ), 'globe' => oy_class_meta( $c->ID, 'oy_lang' ) ) as $icon => $value ) {
+		foreach ( array( 'clock' => oy_class_meta( $c->ID, 'oy_duration' ), 'globe' => oy_online_only() ? '' : oy_class_meta( $c->ID, 'oy_lang' ) ) as $icon => $value ) {
 			$meta .= $value ? '<span>' . oy_icon( $icon ) . esc_html( $value ) . '</span>' : '';
 		}
 		$rows .= '<li class="class-row class-row--' . $tone . '"><a href="' . esc_url( oy_class_url( $c->post_name ) ) . '"><span class="class-row__name">' . esc_html( get_the_title( $c ) ) . '</span>'

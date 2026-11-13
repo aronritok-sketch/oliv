@@ -141,7 +141,7 @@ function oy_brand( $key ) {
 		case 'fort-myers/sub':
 			return __( 'Yoga & movement · Fort Myers', 'olivia-yoga' );
 		case 'hu-online/sub':
-			return __( 'Online · live classes in Hungarian', 'olivia-yoga' );
+			return __( 'Online · live classes', 'olivia-yoga' );
 		case 'hu-online/place':
 			return __( 'Online, from anywhere', 'olivia-yoga' );
 		case 'hathaflow/sub':
