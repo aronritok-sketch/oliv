@@ -32,7 +32,7 @@ add_action( 'hpv_child_setup', function ( $from, $to, $slug ) {
 		}
 	}
 	require_once get_stylesheet_directory() . '/inc/demo-import.php';
-	$log = array();
+	$log = oy_bundled_plugin_update(); // the booking plugin that came with this version of the theme
 	if ( '' === (string) $from || get_option( 'oy_edition' ) !== oy_edition() ) {
 		$log = array_merge( $log, oy_switch_edition( oy_edition() ) );
 	}
@@ -50,3 +50,37 @@ add_action( 'hpv_child_setup', function ( $from, $to, $slug ) {
 		WP_CLI::log( $slug . ' ' . $to . ': ' . implode( ' · ', $log ) );
 	}
 }, 10, 3 );
+
+/**
+ * The booking plugin rides along with the theme (plugin/olivia-studio.zip + .version, wordpress/hpv/build-child-themes.py):
+ * a live site gets new code only through its pinned theme version (deploy/sites.json), so the theme's setup installs the
+ * bundled plugin when it is newer than the one on the site (Áron, 2026-11-13: „tedd fel te az élesre”). Never downgrades.
+ */
+function oy_bundled_plugin_update() {
+	$dir  = get_stylesheet_directory() . '/plugin';
+	$zip  = $dir . '/olivia-studio.zip';
+	$want = is_readable( $dir . '/olivia-studio.version' ) ? trim( (string) file_get_contents( $dir . '/olivia-studio.version' ) ) : '';
+	if ( '' === $want || ! is_readable( $zip ) ) {
+		return array();
+	}
+	if ( ! function_exists( 'get_plugins' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+	$file = 'olivia-studio/olivia-studio.php';
+	$have = (string) ( get_plugins()[ $file ]['Version'] ?? '' );
+	if ( '' !== $have && version_compare( $have, $want, '>=' ) ) {
+		return array();
+	}
+	require_once ABSPATH . 'wp-admin/includes/file.php';
+	require_once ABSPATH . 'wp-admin/includes/misc.php';
+	require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php';
+	$up = new Plugin_Upgrader( new Automatic_Upgrader_Skin() );
+	$ok = $up->install( $zip, array( 'overwrite_package' => true ) );
+	if ( true !== $ok ) {
+		return array( 'olivia-studio ' . $want . ' NOT installed: ' . ( is_wp_error( $ok ) ? $ok->get_error_message() : 'unknown error' ) );
+	}
+	if ( ! is_plugin_active( $file ) ) {
+		activate_plugin( $file );
+	}
+	return array( 'olivia-studio ' . ( '' !== $have ? $have : '–' ) . ' → ' . $want );
+}

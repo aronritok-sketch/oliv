@@ -642,6 +642,10 @@ Olivia oldala és a HathaFlow ugyanazt használja: fizetés (Stripe) → hozzáf
   felvétele, kezei törlődnek). Linkek: az oktatóé (bejelentkezve) és 3 próba résztvevőé (`test_links()`, belépés nélkül:
   `b = TEST_BASE + n`, aláírva – nincs mögötte foglalás, fizetés, levél). Bejelentkezett admin is résztvevőként nyitja a
   résztvevői linket, így egy gépen két böngészővel is kipróbálható.
+- **A bővítmény frissítése élesen (olivia-yoga 3.4.3):** az éles oldal csak a témáját frissíti (iu_theme, a
+  `deploy/sites.json` pinje szerint), ezért a booking- és az US-téma viszi a bővítményt: `plugin/olivia-studio.zip` +
+  `.version` (`build-child-themes.py`), a téma setupja (`oy_bundled_plugin_update()`, `wordpress/hpv/hpv.php`) feltelepíti,
+  ha újabb, mint a fent lévő (soha nem lép vissza). Új bővítményverzió élesre: dist zip → gyerektémák → kiadás → pin.
 - **Stripe:** változatlan – a foglalás / bérlet / fizetés ugyanaz, mint eddig (Olivia saját Stripe-fiókja); az élő óra
   csak a foglalóknak nyílik. Olivia oldalán nincs HathaFlow-platformdíj (Áron jóváhagyta, 2026-11-12).
 - Tesztek: `live:` kezdetű tesztek a `dev/tests/run.php`-ban (LiveKit és AI szimulálva). Kétböngészős próba helyben:

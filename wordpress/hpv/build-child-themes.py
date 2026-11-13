@@ -29,14 +29,16 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SRC = os.path.join(ROOT, 'wordpress', 'olivia-yoga')
 HPV = os.path.join(ROOT, 'wordpress', 'hpv', 'hpv.php')
+PLUGIN_ZIP = os.path.join(ROOT, 'wordpress', 'dist', 'olivia-studio.zip')
+PLUGIN_MAIN = os.path.join(ROOT, 'wordpress', 'olivia-studio', 'olivia-studio.php')
 
 VARIANTS = {
     'oliviayoga-us': {
-        'project': 'oliviayoga', 'edition': 'fort-myers', 'name': 'Olivia Kovacs Yoga (US)', 'content': 'content.json',
+        'project': 'oliviayoga', 'edition': 'fort-myers', 'name': 'Olivia Kovacs Yoga (US)', 'content': 'content.json', 'plugin': True,
         'desc': 'Olivia Kovacs Yoga, Fort Myers (FL): the US booking site in English, Hungarian and Spanish – classes, private yoga, passes, memberships, online classes. iu_theme child; booking: Olivia Studio plugin.',
     },
     'oliviayoga-booking': {
-        'project': 'oliviayoga', 'edition': 'hu-online', 'name': 'Olivia Jóga – Online', 'content': 'content-hu-online.json',
+        'project': 'oliviayoga', 'edition': 'hu-online', 'name': 'Olivia Jóga – Online', 'content': 'content-hu-online.json', 'plugin': True,
         'desc': 'Olivia Jóga – Online: élő online jógaórák magyarul, foglalással és fizetéssel (forint). iu_theme child; foglalás: Olivia Studio bővítmény.',
     },
     'hathaflow': {
@@ -103,6 +105,13 @@ def build_variant(slug, v, hlprv):
             "require_once get_stylesheet_directory() . '/inc/hpv.php';\n\n")
     open(fn, 'w', encoding='utf-8').write(head + body)
     shutil.copy(HPV, os.path.join(dst, 'inc', 'hpv.php'))
+    if v.get('plugin'):
+        # The booking plugin rides along (Áron, 2026-11-13: „tedd fel te az élesre”): a live site updates only its
+        # theme (iu_theme, pinned in deploy/sites.json); the theme's setup installs this zip when it is newer.
+        os.makedirs(os.path.join(dst, 'plugin'), exist_ok=True)
+        shutil.copy(PLUGIN_ZIP, os.path.join(dst, 'plugin', 'olivia-studio.zip'))
+        pv = re.search(r'Version:\s*([0-9.]+)', open(PLUGIN_MAIN, encoding='utf-8').read()).group(1)
+        open(os.path.join(dst, 'plugin', 'olivia-studio.version'), 'w', encoding='utf-8').write(pv + '\n')
     for f in CONTENT_FILES:  # only this edition's copy
         if f != v['content']:
             os.remove(os.path.join(dst, 'demo', f))
