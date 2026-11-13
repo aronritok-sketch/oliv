@@ -98,6 +98,10 @@ Olivia doksija két részből áll: amit most kért, és amit **november 26-tól
 - **Facebook-borító „online jóga”** (Áron, 2026-11-13): `tools/facebook/cover.py` + `cover.js` – oldal 1640 × 624
   (a telefon a középső 16:9-et mutatja, a szöveg és a fotó ott van), csoport 1640 × 856; az oliviajoga.online
   stílusában. A képek + borítók + posztszöveg zipben Olivia portálján (CRM-chat, 2026-11-13).
+- **Olivia második kérése (portál, 2026-11-13 18:12–18:40):** a Facebook-képek teljes egészükben, csak a hullámmal,
+  felirat nélkül (`tools/facebook/wave_only.py`, a fotó saját arányában, 2048 px), és **online órarend** a régi
+  ORAREND.png mintájára (`tools/facebook/orarend.py`, 1080 × 1920: „online jóga ÓRAREND”, szerda 18.30–20.00 hatha flow,
+  privát jóga és privát kismamatorna egyeztetett időpontban, „Bejelentkezés: oliviajoga.online”). Zipben a portálon.
 
 ## Fájlok
 
