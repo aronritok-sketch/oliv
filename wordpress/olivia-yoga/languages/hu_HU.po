@@ -1355,3 +1355,169 @@ msgstr "Gyere el egy élő online órára, kérj egyéni órát, vagy csak küld
 
 msgid "Online Yoga, Live in Hungarian: Flow Yoga, Prenatal & One-to-One Classes | Olivia Jóga"
 msgstr "Online jóga élőben, magyarul: flow jóga, kismamatorna, egyéni órák | Olivia Jóga"
+
+# 3.4.4: the admin (content types, setup, translations) in Hungarian
+msgid "Book, pay and practice in one place."
+msgstr "Foglalás, fizetés és gyakorlás egy helyen."
+
+msgid "Come to a class"
+msgstr "Gyere el egy órára"
+
+msgid "Beginners are always welcome. Book a drop-in or a class pass online."
+msgstr "Kezdőket is mindig szeretettel várok. Foglalj alkalmi jegyet vagy bérletet online."
+
+msgid "60, 75 or 90 minutes in the studio or online, planned around your body and your goals."
+msgstr "60, 75 vagy 90 perc a stúdióban vagy online, a testedhez és a céljaidhoz igazítva."
+
+msgid "In the studio or online"
+msgstr "A stúdióban vagy online"
+
+msgid "English"
+msgstr "Angol"
+
+msgid "Demo site: a sample studio. The classes, times, prices and pictures are examples."
+msgstr "Bemutató oldal: egy minta stúdió. Az órák, időpontok, árak és képek példák."
+
+msgid "Class types"
+msgstr "Óratípusok"
+
+msgid "Class type"
+msgstr "Óratípus"
+
+msgid "Add class type"
+msgstr "Óratípus hozzáadása"
+
+msgid "Edit class type"
+msgstr "Óratípus szerkesztése"
+
+msgid "FAQs"
+msgstr "GYIK"
+
+msgid "Add question"
+msgstr "Kérdés hozzáadása"
+
+msgid "Past events"
+msgstr "Korábbi események"
+
+msgid "Past event"
+msgstr "Korábbi esemény"
+
+msgid "Add past event"
+msgstr "Korábbi esemény hozzáadása"
+
+msgid "Edit past event"
+msgstr "Korábbi esemény szerkesztése"
+
+msgid "Class details"
+msgstr "Az óra adatai"
+
+msgid "Show on home page"
+msgstr "Megjelenik a kezdőlapon"
+
+msgid "Show this question on the home page"
+msgstr "Ez a kérdés jelenjen meg a kezdőlapon"
+
+msgid "When and where"
+msgstr "Mikor és hol"
+
+msgid "Date"
+msgstr "Dátum"
+
+msgid "Place"
+msgstr "Helyszín"
+
+msgid "The photo is the featured image. Past events show on the Events page, newest first."
+msgstr "A fotó a kiemelt kép. A korábbi események az Események oldalon látszanak, a legújabb elöl."
+
+msgid "Length"
+msgstr "Hossz"
+
+msgid "For example \"English\" or \"English or Hungarian\"."
+msgstr "Például „Angol” vagy „Angol vagy magyar”."
+
+msgid "Link to a page instead (slug)"
+msgstr "Helyette link egy oldalra (slug)"
+
+msgid "SEO title"
+msgstr "SEO-cím"
+
+msgid "Olivia setup"
+msgstr "Olivia beállítás"
+
+msgid "Olivia Kovacs Yoga: content setup"
+msgstr "Olivia Kovacs Yoga: tartalom beállítása"
+
+msgid "Edition"
+msgstr "Kiadás"
+
+msgid "Which version of the site this is. Switching sets the languages, currency, prices and time zone for that edition; do it on a fresh site, before setting up the content."
+msgstr "Az oldal melyik változata ez. Váltáskor a kiadás nyelvei, pénzneme, árai és időzónája állnak be; friss oldalon tedd, a tartalom beállítása előtt."
+
+msgid "Switch edition"
+msgstr "Kiadás váltása"
+
+msgid "Content"
+msgstr "Tartalom"
+
+msgid "Creates the pages, class types, FAQs, journal posts, past events, photos and menus from the approved site copy of this edition, and the weekly timetable in the booking plugin. Items that already exist are not changed, so it is safe to run again."
+msgstr "Létrehozza a kiadás jóváhagyott szövegéből az oldalakat, óratípusokat, GYIK-et, cikkeket, korábbi eseményeket, fotókat és menüket, valamint a heti órarendet a foglaló bővítményben. A már meglévőket nem módosítja, így nyugodtan újra futtatható."
+
+msgid "Set up the site content"
+msgstr "Az oldal tartalmának beállítása"
+
+msgid "Refresh the content"
+msgstr "A tartalom frissítése"
+
+msgid "Overwrites the pages, class types, FAQs, journal posts and past events that came with the theme with the current copy, photos and translations, rebuilds the main menu and removes photos the theme no longer uses. Edits you made to those items are lost. Pages and posts you added yourself, bookings and the timetable are not touched."
+msgstr "Felülírja a témával érkezett oldalakat, óratípusokat, GYIK-et, cikkeket és korábbi eseményeket az aktuális szöveggel, fotókkal és fordításokkal, újraépíti a főmenüt, és törli a téma által már nem használt fotókat. Az ezeken tett módosításaid elvesznek. A saját oldalaidhoz és cikkeidhez, a foglalásokhoz és az órarendhez nem nyúl."
+
+msgid "Overwrite the theme content with the current copy?"
+msgstr "Felülírod a téma tartalmát az aktuális szöveggel?"
+
+msgid "Yoga studio · booking demo"
+msgstr "Jógastúdió · foglalási bemutató"
+
+msgid "Studio & online"
+msgstr "Stúdió és online"
+
+msgid "About the studio"
+msgstr "A stúdióról"
+
+msgid "Yoga studio | Group, private & online classes"
+msgstr "Jógastúdió | Csoportos, egyéni és online órák"
+
+msgid "Hatha flow"
+msgstr "Hatha flow"
+
+msgid "Slow flow"
+msgstr "Slow flow"
+
+msgid "Hathaflow is a booking system for yoga studios and teachers: timetable, online booking and payment, class passes, memberships, private sessions, online classes and gift cards. This is a demo studio."
+msgstr "A Hathaflow foglalórendszer jógastúdióknak és oktatóknak: órarend, online foglalás és fizetés, bérletek, tagság, egyéni és online órák, ajándékutalványok. Ez egy bemutató stúdió."
+
+msgid "Hathaflow: yoga studio booking demo – timetable, passes, memberships and online classes"
+msgstr "Hathaflow: jógastúdió foglalási bemutató – órarend, bérletek, tagság és online órák"
+
+msgid "Title"
+msgstr "Cím"
+
+msgid "Summary (excerpt)"
+msgstr "Kivonat"
+
+msgid "Text"
+msgstr "Szöveg"
+
+msgid "Question"
+msgstr "Kérdés"
+
+msgid "Answer"
+msgstr "Válasz"
+
+msgid "SEO description"
+msgstr "SEO-leírás"
+
+msgid "Translations"
+msgstr "Fordítások"
+
+msgid "The Hungarian and Spanish site show these versions. Leave a field empty and the English original is shown there."
+msgstr "A magyar és a spanyol oldal ezeket a változatokat mutatja. Ha egy mezőt üresen hagysz, ott az angol eredeti látszik."

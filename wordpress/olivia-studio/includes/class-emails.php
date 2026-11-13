@@ -588,10 +588,12 @@ class OYS_Emails {
 				break;
 			}
 		}
-		$pass = $pass ?: __( '5-class pass', 'olivia-studio' );
+		$pass  = $pass ?: __( '5-class pass', 'olivia-studio' );
+		$next  = OYS_Schedule::query( array( 'kind' => 'group', 'from' => oys_now(), 'status' => 'scheduled', 'limit' => 1 ) );
+		$class = $next ? oys_session_title( $next[0] ) : 'Hatha Flow'; // the site's own class, not a made-up one
 		return array(
 			'first_name' => $user && $user->first_name ? $user->first_name : 'Emma', 'studio' => OYS_Settings::get( 'email_from_name' ),
-			'class' => 'Slow Flow', 'date' => oys_date( $start, 'l, F j' ), 'date_short' => oys_date( $start, 'M j' ),
+			'class' => $class, 'date' => oys_date( $start, 'l, F j' ), 'date_short' => oys_date( $start, 'M j' ),
 			'day' => oys_date( $start, 'D' ), 'time' => oys_time( $start ), 'location' => $online ? __( 'Online', 'olivia-studio' ) : 'Fort Myers', 'teacher' => OYS_Settings::get( 'owner_name' ), 'host' => 'Emma', 'guest_name' => 'Sofia',
 			'reason' => __( 'Sorry, I am ill.', 'olivia-studio' ), 'how' => __( 'One class was taken from your pass.', 'olivia-studio' ), 'pass' => $pass, 'classes_left' => sprintf( _n( '%d class', '%d classes', 2, 'olivia-studio' ), 2 ),
 			'expires' => wp_date( get_option( 'date_format' ), time() + 7 * DAY_IN_SECONDS ), 'recipient' => 'Sofia', 'from' => 'Emma', 'gift' => $pass,
@@ -605,7 +607,8 @@ class OYS_Emails {
 	public static function preview( $key, array $t = array() ) {
 		$t    = array_merge( OYS_Email_Templates::get( $key ), $t );
 		$vars = self::sample_vars();
-		$demo = (object) array( 'title' => '', 'class_slug' => 'slow-flow', 'starts_at' => gmdate( 'Y-m-d 22:00:00', time() + 2 * DAY_IN_SECONDS ), 'ends_at' => gmdate( 'Y-m-d 23:00:00', time() + 2 * DAY_IN_SECONDS ), 'location' => 'Fort Myers', 'format' => 'studio' );
+		$online = (int) OYS_Settings::get( 'online_only' );
+		$demo   = (object) array( 'title' => $vars['class'], 'class_slug' => '', 'starts_at' => gmdate( 'Y-m-d 17:00:00', time() + 2 * DAY_IN_SECONDS ), 'ends_at' => gmdate( 'Y-m-d 18:30:00', time() + 2 * DAY_IN_SECONDS ), 'location' => $online ? '' : 'Fort Myers', 'format' => $online ? 'online' : 'studio', 'teacher_id' => 0, 'kind' => 'group' );
 		$details = in_array( $key, array( 'booking_confirmed', 'guests_added', 'guest_invite', 'booking_cancelled', 'class_cancelled', 'guest_cancelled', 'session_changed', 'waitlist_promoted', 'waitlist_spot_open', 'reminder', 'private_offer' ), true )
 			? self::session_block( $demo ) : '';
 		if ( 'join_reminder' === $key ) {

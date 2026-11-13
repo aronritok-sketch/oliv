@@ -40,8 +40,13 @@ function oys_date( $utc, $format = null ) {
  * The code's date formats are American (Nov 7, 6:00 pm). In Hungarian the order and the clock differ
  * (nov. 7. 18:00), so the formats are rewritten while the locale is Hungarian.
  */
+/** Hungarian dates and suffixes: the language the page or email is written in (in the admin: the user's language). */
+function oys_is_hu() {
+	return 0 === strpos( function_exists( 'determine_locale' ) ? determine_locale() : get_locale(), 'hu' );
+}
+
 function oys_date_format( $format ) {
-	if ( 0 !== strpos( get_locale(), 'hu' ) ) {
+	if ( ! oys_is_hu() ) {
 		return $format;
 	}
 	$map = array(
@@ -63,7 +68,7 @@ function oys_date_format( $format ) {
  * „2026. november 20-ig”, „dec. 16.-án” → „dec. 16-án”). Other languages: unchanged.
  */
 function oys_hu_suffix( $text ) {
-	if ( 0 !== strpos( get_locale(), 'hu' ) ) {
+	if ( ! oys_is_hu() ) {
 		return $text;
 	}
 	return preg_replace( '/(\d)\.-(ig|tól|től|án|én|ra|re|i)(?![\p{L}])/u', '$1-$2', (string) $text );

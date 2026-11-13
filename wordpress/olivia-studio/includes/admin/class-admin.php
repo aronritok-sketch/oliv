@@ -1369,16 +1369,24 @@ class OYS_Admin {
 		echo '<h2>' . esc_html__( 'Reminders', 'olivia-studio' ) . '</h2><p class="description">' . esc_html__( '0 turns a reminder off. They go out automatically; people who book after a reminder\'s time just get their confirmation.', 'olivia-studio' ) . '</p><table class="form-table">';
 		echo '<tr><th>' . esc_html__( 'Class reminder', 'olivia-studio' ) . '</th><td>' . $num( 'reminder_hours', __( 'hours before the class', 'olivia-studio' ) ) . '</td></tr>'; // phpcs:ignore
 		echo '<tr><th>' . esc_html__( 'Second reminder', 'olivia-studio' ) . '</th><td>' . $num( 'reminder2_hours', __( 'hours before the class (e.g. 2 on the day)', 'olivia-studio' ) ) . '</td></tr>'; // phpcs:ignore
-		echo '<tr><th>' . esc_html__( 'Online: link to join', 'olivia-studio' ) . '</th><td>' . $num( 'join_reminder_minutes', __( 'minutes before an online or hybrid class', 'olivia-studio' ) ) . '</td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'Online: link to join', 'olivia-studio' ) . '</th><td>' . $num( 'join_reminder_minutes', (int) $st['online_only'] ? __( 'minutes before the class', 'olivia-studio' ) : __( 'minutes before an online or hybrid class', 'olivia-studio' ) ) . '</td></tr>'; // phpcs:ignore
 		echo '<tr><th>' . esc_html__( 'Pass about to expire', 'olivia-studio' ) . '</th><td>' . $num( 'pass_expiry_days', __( 'days before unused classes expire', 'olivia-studio' ) ) . '</td></tr></table>'; // phpcs:ignore
 
-		$to = array( 'customer' => __( 'Customer', 'olivia-studio' ), 'guest' => __( 'Guest / recipient', 'olivia-studio' ), 'studio' => __( 'You', 'olivia-studio' ) );
+		$to       = array( 'customer' => __( 'Customer', 'olivia-studio' ), 'guest' => __( 'Guest / recipient', 'olivia-studio' ), 'studio' => __( 'You', 'olivia-studio' ) );
+		$show_all = ! empty( $_GET['all'] ); // phpcs:ignore WordPress.Security.NonceVerification
+		$hidden   = array_filter( array_keys( OYS_Email_Templates::registry() ), fn( $k ) => ! OYS_Email_Templates::in_use( $k ) );
+		if ( $hidden ) {
+			echo '<p class="description">' . ( $show_all
+				? esc_html__( 'All emails are listed, also those of features you don\'t use.', 'olivia-studio' ) . ' <a href="' . esc_url( admin_url( 'admin.php?page=oys-emails' ) ) . '">' . esc_html__( 'Show only the ones in use', 'olivia-studio' ) . '</a>'
+				: esc_html( sprintf( _n( '%d email is hidden: its feature is not in use (e.g. memberships).', '%d emails are hidden: their features are not in use (e.g. memberships).', count( $hidden ), 'olivia-studio' ), count( $hidden ) ) ) . ' <a href="' . esc_url( admin_url( 'admin.php?page=oys-emails&all=1' ) ) . '">' . esc_html__( 'Show all', 'olivia-studio' ) . '</a>' ) . '</p>';
+		}
 		foreach ( OYS_Email_Templates::groups() as $group => $label ) {
+			$rows = array_filter( OYS_Email_Templates::registry(), fn( $d, $k ) => $group === $d['group'] && ( $show_all || OYS_Email_Templates::in_use( $k ) ), ARRAY_FILTER_USE_BOTH );
+			if ( ! $rows ) {
+				continue;
+			}
 			echo '<h2>' . esc_html( $label ) . '</h2><table class="widefat striped oys-table oys-emails"><thead><tr><th style="width:70px">' . esc_html__( 'On', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Email', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Sent when', 'olivia-studio' ) . '</th><th>' . esc_html__( 'To', 'olivia-studio' ) . '</th><th></th></tr></thead><tbody>';
-			foreach ( OYS_Email_Templates::registry() as $k => $d ) {
-				if ( $group !== $d['group'] ) {
-					continue;
-				}
+			foreach ( $rows as $k => $d ) {
 				$t = OYS_Email_Templates::get( $k );
 				echo '<tr' . ( $t['enabled'] ? '' : ' class="is-off"' ) . '><td><input type="hidden" name="on[' . esc_attr( $k ) . ']" value="0"><label class="oys-switch"><input type="checkbox" name="on[' . esc_attr( $k ) . ']" value="1"' . checked( $t['enabled'], true, false ) . ' aria-label="' . esc_attr( $d['label'] ) . '"><span></span></label></td>'
 					. '<td><b>' . esc_html( $d['label'] ) . '</b>' . ( $d['editable'] ? '<br><small>' . esc_html( OYS_Email_Templates::fill( $t['subject'], OYS_Emails::sample_vars() ) ) . '</small>' : '' ) . ( $t['customized'] ? ' <span class="oys-status oys-status--offered">' . esc_html__( 'edited', 'olivia-studio' ) . '</span>' : '' ) . '</td>'

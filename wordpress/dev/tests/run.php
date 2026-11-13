@@ -727,7 +727,8 @@ test( 'emails: edited texts with placeholders, and switched-off emails are not s
 	OYS_Email_Templates::save( 'studio_cancellation', array( 'enabled' => 0 ) );
 	ok( false === OYS_Emails::admin_notice( 'x', 'y', 'studio_cancellation' ), 'studio notice switched off' );
 	[ $subject, $html ] = OYS_Emails::preview( 'reminder' );
-	ok( str_starts_with( $subject, 'Reminder: Slow Flow' ) && str_contains( $html, 'See you soon' ), 'preview with sample details' );
+	ok( str_starts_with( $subject, 'Reminder: ' . OYS_Emails::sample_vars()['class'] ) && str_contains( $html, 'See you soon' ), 'preview with sample details' );
+	ok( ! str_contains( $subject, 'Slow Flow' ), 'the preview uses the site\'s own class, not a made-up one' );
 	delete_option( OYS_Email_Templates::OPTION );
 } );
 
@@ -2357,6 +2358,55 @@ test( 'rate limiting: many people behind one mobile IP are not locked out togeth
 	}
 	ok( OYS_Security::login_locked( 'careful@example.test' ), 'a real attack from one address is still stopped' );
 	ok( OYS_Security::MAX_SIGNUPS >= 10, 'up to ten sign-ups per address in 15 minutes' );
+} );
+
+test( 'emails page: only the emails of features in use are listed, all of them with ?all=1', function () {
+	if ( ! class_exists( 'OYS_Admin' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/admin.php';
+		require_once OYS_DIR . 'includes/admin/class-admin.php';
+	}
+	$before   = OYS_Settings::all();
+	$products = get_option( OYS_Products::OPTION );
+	try {
+		update_option( OYS_Products::OPTION, array( 'p5' => array( 'name' => '5 classes', 'kind' => 'online_pack', 'credits' => 5, 'price_cents' => 1300000, 'active' => 1, 'giftable' => 1 ) ) );
+		OYS_Settings::update( array( 'birthday_on' => 0, 'raffle_period' => 'off', 'max_guests' => 0 ) );
+		ok( ! OYS_Email_Templates::in_use( 'membership_started' ) && ! OYS_Email_Templates::in_use( 'birthday' ) && ! OYS_Email_Templates::in_use( 'raffle_winner' ) && ! OYS_Email_Templates::in_use( 'guest_invite' ), 'no memberships, birthdays, draws or guests: their emails are not in use' );
+		ok( OYS_Email_Templates::in_use( 'booking_confirmed' ) && OYS_Email_Templates::in_use( 'pass_purchased' ) && OYS_Email_Templates::in_use( 'gift_card' ) && OYS_Email_Templates::in_use( 'join_reminder' ), 'bookings, passes, gifts, the join link: in use' );
+		wp_set_current_user( get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0] );
+		ob_start();
+		OYS_Admin::page_emails();
+		$html = ob_get_clean();
+		$_GET['all'] = 1;
+		ob_start();
+		OYS_Admin::page_emails();
+		$all = ob_get_clean();
+		unset( $_GET['all'] );
+		wp_set_current_user( 0 );
+		ok( ! str_contains( $html, 'edit=membership_started' ) && str_contains( $html, 'edit=booking_confirmed' ), 'the page lists only those in use' );
+		ok( str_contains( $html, 'all=1' ), 'with a link to show all' );
+		ok( str_contains( $all, 'edit=membership_started' ), 'show all: every email is there' );
+	} finally {
+		update_option( OYS_Settings::OPTION, $before );
+		update_option( OYS_Products::OPTION, $products );
+	}
+} );
+
+test( 'admin in Hungarian: the emails page has no English left', function () {
+	if ( ! class_exists( 'OYS_Admin' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/admin.php';
+		require_once OYS_DIR . 'includes/admin/class-admin.php';
+	}
+	wp_set_current_user( get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0] );
+	$html = OYS_I18n::with( 'hu', function () {
+		ob_start();
+		OYS_Admin::page_emails();
+		return ob_get_clean();
+	} );
+	wp_set_current_user( 0 );
+	foreach ( array( 'Sent when', 'Edit text', 'Booking confirmation', 'Customer', 'Online: link to join', 'days before unused classes expire' ) as $en ) {
+		ok( ! str_contains( $html, '>' . $en ), 'not in English: ' . $en );
+	}
+	ok( str_contains( $html, 'Mikor megy ki' ) && str_contains( $html, 'Szöveg szerkesztése' ), 'Hungarian column and button' );
 } );
 
 test( 'helpers: money and periods', function () {

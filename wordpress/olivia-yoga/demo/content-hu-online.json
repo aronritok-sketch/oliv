@@ -23,6 +23,8 @@
 			"email_from": "info@oliviajoga.online",
 			"email_reply_to": "olivia.kovacs6@gmail.com",
 			"notify_email": "olivia.kovacs6@gmail.com",
+			"birthday_on": 0,
+			"raffle_period": "off",
 			"waiver_text": "Tudomásul veszem, hogy a jóga testmozgással jár, és ezzel sérülésveszély is együtt jár. Kijelentem, hogy egészséges vagyok, vagy az orvosom jóváhagyta a gyakorlást, és óra előtt szólok Oliviának, ha sérülésem van, várandós vagyok vagy egészségügyi problémám van. Odafigyelek a testemre, pihenek, amikor szükségem van rá, és a saját gyakorlásomért magam felelek. Az online órán úgy rendezem be a helyet, hogy biztonságosan tudjak mozogni. Kovács Olíviát nem terheli felelősség az esetleges sérülésért, kivéve a súlyos gondatlanság esetét.",
 			"cancel_policy": "A csoportos órát 12 órával a kezdés előtt még ingyen lemondhatod: az alkalom visszakerül a bérletedre. Ha alkalmi jeggyel foglaltál, helyette egy órakreditet kapsz. A később lemondott vagy kihagyott óra elhasználódik. Az egyéni órát 24 órával előtte lehet áttenni vagy lemondani.",
 			"private_note": "Az első egyéni óránk elején kb. 15 perccel tovább beszélgetünk a céljaidról, ezért számolj egy kicsivel több idővel. Később is szánhatunk erre néhány percet.",

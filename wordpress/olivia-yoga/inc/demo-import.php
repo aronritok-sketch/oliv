@@ -533,9 +533,10 @@ function oy_import_privacy( array $data, $refresh = false ) {
 }
 
 /**
- * The edition's sender, reply-to and notification addresses (setup.studio in the content file) on a site that was set
- * up before they were there – once, and only where the value is still the plugin's default (the admin email or empty),
- * so an address someone set in Studio → Emails stays.
+ * Settings the edition got after a site was set up (setup.studio in the content file): the sender, reply-to and
+ * notification addresses, and the birthday code and loyalty draw switched off on the online site (Áron, 2026-11-13:
+ * only what the online yoga uses). Once, and only where the value is still the plugin's default, so anything someone
+ * set in the admin stays.
  */
 function oy_mail_setup() {
 	$rev = '2026-11-13';
@@ -544,12 +545,13 @@ function oy_mail_setup() {
 	}
 	update_option( 'oy_mail_rev', $rev );
 	$data  = json_decode( (string) file_get_contents( oy_content_file() ), true );
-	$want  = array_intersect_key( (array) ( $data['setup']['studio'] ?? array() ), array_flip( array( 'email_from', 'email_reply_to', 'notify_email' ) ) );
-	$admin = strtolower( (string) get_option( 'admin_email' ) );
-	$set   = array();
+	$admin    = strtolower( (string) get_option( 'admin_email' ) );
+	$defaults = array( 'email_from' => $admin, 'email_reply_to' => '', 'notify_email' => $admin, 'birthday_on' => '1', 'raffle_period' => 'half' );
+	$want     = array_intersect_key( (array) ( $data['setup']['studio'] ?? array() ), $defaults );
+	$set      = array();
 	foreach ( $want as $k => $v ) {
 		$have = strtolower( (string) OYS_Settings::get( $k ) );
-		if ( is_email( $v ) && ( '' === $have || $admin === $have ) ) {
+		if ( (string) $v !== $have && ( '' === $have || (string) $defaults[ $k ] === $have ) ) {
 			$set[ $k ] = $v;
 		}
 	}
@@ -557,7 +559,7 @@ function oy_mail_setup() {
 		return array();
 	}
 	OYS_Settings::update( $set );
-	return array( 'emails: ' . implode( ', ', array_map( fn( $k, $v ) => $k . ' ' . $v, array_keys( $set ), $set ) ) );
+	return array( 'settings: ' . implode( ', ', array_map( fn( $k, $v ) => $k . ' ' . $v, array_keys( $set ), $set ) ) );
 }
 
 function oy_migrate_online() {

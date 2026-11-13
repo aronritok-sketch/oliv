@@ -75,31 +75,31 @@ msgstr "A fizetést nem sikerült elindítani. Próbáld újra, vagy írj nekün
 
 #: includes/class-stripe.php:285
 msgid "This order has no card payment to refund."
-msgstr ""
+msgstr "Ehhez a rendeléshez nincs visszatéríthető kártyás fizetés."
 
 #: includes/class-teachers.php:96
 msgid "Add the teacher's name."
-msgstr ""
+msgstr "Add meg az oktató nevét."
 
 #: includes/class-teachers.php:100
 msgid "That email address doesn't look right."
-msgstr ""
+msgstr "Ez az e-mail-cím nem tűnik helyesnek."
 
 #: includes/class-teachers.php:182
 msgid "Photos must be JPG, PNG, GIF or WebP images."
-msgstr ""
+msgstr "A fotó JPG, PNG, GIF vagy WebP kép lehet."
 
 #: includes/class-teachers.php:224
 msgid "Add the teacher's email address first."
-msgstr ""
+msgstr "Előbb add meg az oktató e-mail-címét."
 
 #: includes/class-teachers.php:228
 msgid "This email belongs to a studio manager account."
-msgstr ""
+msgstr "Ez az e-mail-cím egy stúdióvezetői fiókhoz tartozik."
 
 #: includes/class-teachers.php:232
 msgid "This account is already linked to another teacher."
-msgstr ""
+msgstr "Ez a fiók már egy másik oktatóhoz tartozik."
 
 #: includes/class-teachers.php:300
 #: includes/admin/class-admin.php:344
@@ -468,27 +468,27 @@ msgstr[1] "%d havonta"
 
 #: includes/class-products.php:137
 msgid "Class pass (group classes)"
-msgstr ""
+msgstr "Bérlet (csoportos órák)"
 
 #: includes/class-products.php:138
 msgid "Intro offer (new students only)"
-msgstr ""
+msgstr "Bevezető ajánlat (csak új vendégeknek)"
 
 #: includes/class-products.php:139
 msgid "Online class pass"
-msgstr ""
+msgstr "Online bérlet"
 
 #: includes/class-products.php:140
 msgid "Private session pack"
-msgstr ""
+msgstr "Egyéni óra bérlet"
 
 #: includes/class-products.php:141
 msgid "Single private session (price list and gifts)"
-msgstr ""
+msgstr "Egyéni alkalom (árlista és ajándék)"
 
 #: includes/class-products.php:142
 msgid "Membership (monthly or yearly subscription)"
-msgstr ""
+msgstr "Tagság (havi vagy éves előfizetés)"
 
 #: includes/class-newsletter.php:44
 msgid "This unsubscribe link is not valid."
@@ -521,11 +521,11 @@ msgstr "kedves vendég"
 #: includes/class-newsletter.php:133
 #: includes/class-newsletter.php:140
 msgid "This newsletter was already sent."
-msgstr ""
+msgstr "Ezt a hírlevelet már elküldtük."
 
 #: includes/class-newsletter.php:136
 msgid "Write a subject and a message first."
-msgstr ""
+msgstr "Előbb írj tárgyat és üzenetet."
 
 #: includes/class-newsletter.php:207
 #: includes/class-frontend.php:1215
@@ -535,15 +535,15 @@ msgstr "egy ingyenes bérlet"
 
 #: includes/class-install.php:367
 msgid "Studio customer"
-msgstr ""
+msgstr "Stúdió vendég"
 
 #: includes/class-install.php:369
 msgid "Studio manager"
-msgstr ""
+msgstr "Stúdió vezető"
 
 #: includes/class-install.php:371
 msgid "Studio teacher"
-msgstr ""
+msgstr "Stúdió oktató"
 
 #: includes/class-install.php:381
 #: includes/class-frontend.php:106
@@ -627,11 +627,11 @@ msgstr "Kimaradt néhány óra, amit helyszíni fizetéssel foglaltál, ezért m
 
 #: includes/class-bookings.php:487
 msgid "Class is over capacity by one"
-msgstr ""
+msgstr "Eggyel túlfoglalt óra"
 
 #: includes/class-bookings.php:488
 msgid "A payment for booking #%d arrived after its hold expired and the class had filled up in the meantime. The booking was confirmed anyway."
-msgstr ""
+msgstr "A(z) #%d foglalás fizetése a helyfoglalás lejárta után érkezett, és közben betelt az óra. A foglalást ennek ellenére visszaigazoltuk."
 
 #: includes/class-bookings.php:554
 msgid "You're already booked into this class."
@@ -718,11 +718,11 @@ msgstr "Túl sok sikertelen próbálkozás. Várj 15 percet, vagy állíts be ú
 
 #: includes/class-email-templates.php:27
 msgid "Booking confirmation"
-msgstr ""
+msgstr "Foglalás visszaigazolása"
 
 #: includes/class-email-templates.php:27
 msgid "Right after booking or paying; with a calendar file and the join link for online"
-msgstr ""
+msgstr "Rögtön foglalás vagy fizetés után; naptárfájllal, online órához a belépő linkkel"
 
 #: includes/class-email-templates.php:29
 msgid "Guests added"
@@ -730,191 +730,191 @@ msgstr "Vendégek hozzáadva"
 
 #: includes/class-email-templates.php:29
 msgid "When someone adds guests to their booking later"
-msgstr ""
+msgstr "Ha valaki később vendéget ad a foglalásához"
 
 #: includes/class-email-templates.php:31
 msgid "Invitation to a guest"
-msgstr ""
+msgstr "Meghívó vendégnek"
 
 #: includes/class-email-templates.php:31
 msgid "To a guest who was given an email address"
-msgstr ""
+msgstr "Annak a vendégnek, akinek megadták az e-mail-címét"
 
 #: includes/class-email-templates.php:33
 msgid "Booking cancelled by the customer"
-msgstr ""
+msgstr "A vendég lemondta a foglalását"
 
 #: includes/class-email-templates.php:33
 msgid "When someone cancels their booking or removes a guest"
-msgstr ""
+msgstr "Ha valaki lemondja a foglalását vagy töröl egy vendéget"
 
 #: includes/class-email-templates.php:35
 msgid "Class cancelled by the studio"
-msgstr ""
+msgstr "A stúdió lemondta az órát"
 
 #: includes/class-email-templates.php:35
 msgid "When you cancel a class or a booking; the reason you type is added"
-msgstr ""
+msgstr "Ha lemondasz egy órát vagy foglalást; a beírt indok bekerül"
 
 #: includes/class-email-templates.php:37
 msgid "Cancellation to a guest"
-msgstr ""
+msgstr "Lemondás vendégnek"
 
 #: includes/class-email-templates.php:37
 msgid "To a guest with an email when their spot is cancelled"
-msgstr ""
+msgstr "E-mail-címmel megadott vendégnek, ha a helyét lemondták"
 
 #: includes/class-email-templates.php:39
 msgid "Class cancelled: not enough people"
-msgstr ""
+msgstr "Az óra elmarad: kevés a jelentkező"
 
 #: includes/class-email-templates.php:39
 msgid "When a class is cancelled automatically because fewer than the minimum signed up; with other dates to book"
-msgstr ""
+msgstr "Ha az óra magától elmarad, mert kevesebben jelentkeztek a minimumnál; más időpontokkal"
 
 #: includes/class-email-templates.php:41
 msgid "Bring a friend (class needs more people)"
-msgstr ""
+msgstr "Hozz egy barátot (kell még jelentkező)"
 
 #: includes/class-email-templates.php:41
 msgid "Before the decision time, when a class has fewer people than its minimum (hours set under Locations)"
-msgstr ""
+msgstr "A döntés előtt, ha egy órára kevesebben vannak a minimumnál (az órák száma a Helyszíneknél)"
 
 #: includes/class-email-templates.php:43
 msgid "Class time or place changed"
-msgstr ""
+msgstr "Változott az óra időpontja vagy helye"
 
 #: includes/class-email-templates.php:43
 msgid "When you move a class in the calendar and tick \"email the people booked\""
-msgstr ""
+msgstr "Ha áthelyezel egy órát a naptárban, és bepipálod: „e-mail a foglalóknak”"
 
 #: includes/class-email-templates.php:45
 msgid "Moved in from the waitlist"
-msgstr ""
+msgstr "Bekerült a várólistáról"
 
 #: includes/class-email-templates.php:45
 msgid "When a spot opens and someone with a pass or membership is booked in automatically"
-msgstr ""
+msgstr "Ha felszabadul egy hely, és a bérletes vagy tag magától bekerül"
 
 #: includes/class-email-templates.php:47
 msgid "A spot opened (waitlist)"
-msgstr ""
+msgstr "Felszabadult egy hely (várólista)"
 
 #: includes/class-email-templates.php:47
 msgid "When a spot opens for someone on the waitlist who can't be booked in automatically"
-msgstr ""
+msgstr "Ha felszabadul egy hely annak, aki a várólistán van, de nem kerülhet be magától"
 
 #: includes/class-email-templates.php:50
 msgid "Before the class, at the times set under Reminders"
-msgstr ""
+msgstr "Az óra előtt, az Emlékeztetőknél beállított időkben"
 
 #: includes/class-email-templates.php:52
 msgid "Online: link before the class"
-msgstr ""
+msgstr "Online: belépő link az óra előtt"
 
 #: includes/class-email-templates.php:52
 msgid "To everyone joining online, shortly before the class starts"
-msgstr ""
+msgstr "Minden online résztvevőnek, röviddel az óra kezdete előtt"
 
 #: includes/class-email-templates.php:54
 msgid "When unused classes on a pass are about to expire (days set under Reminders)"
-msgstr ""
+msgstr "Ha egy bérlet fel nem használt alkalmai hamarosan lejárnak (napok az Emlékeztetőknél)"
 
 #: includes/class-email-templates.php:57
 msgid "Welcome (new account)"
-msgstr ""
+msgstr "Üdvözlés (új fiók)"
 
 #: includes/class-email-templates.php:57
 msgid "When someone creates an account"
-msgstr ""
+msgstr "Amikor valaki fiókot hoz létre"
 
 #: includes/class-email-templates.php:59
 msgid "Pass bought"
-msgstr ""
+msgstr "Bérlet vásárlása"
 
 #: includes/class-email-templates.php:59
 msgid "After buying a class pass"
-msgstr ""
+msgstr "Bérlet megvétele után"
 
 #: includes/class-email-templates.php:61
 msgid "Gift card to the recipient"
-msgstr ""
+msgstr "Ajándékutalvány a megajándékozottnak"
 
 #: includes/class-email-templates.php:61
 msgid "To the person who receives a gift card"
-msgstr ""
+msgstr "Annak, aki ajándékutalványt kap"
 
 #: includes/class-email-templates.php:63
 msgid "Gift card receipt"
-msgstr ""
+msgstr "Ajándékutalvány nyugtája"
 
 #: includes/class-email-templates.php:63
 msgid "To the buyer of a gift card"
-msgstr ""
+msgstr "Az ajándékutalvány vásárlójának"
 
 #: includes/class-email-templates.php:66
 msgid "Birthday gift code"
-msgstr ""
+msgstr "Születésnapi ajándékkód"
 
 #: includes/class-email-templates.php:66
 msgid "On the birthday of customers who added it to their profile (percentage and days under Coupons & rewards)"
-msgstr ""
+msgstr "Azoknak a vendégeknek a születésnapján, akik megadták a profiljukban (százalék és napok a Kuponok és jutalmaknál)"
 
 #: includes/class-email-templates.php:68
 msgid "Loyalty draw: the winner"
-msgstr ""
+msgstr "Hűségsorsolás: a nyertes"
 
 #: includes/class-email-templates.php:68
 msgid "To the customer whose ticket was drawn"
-msgstr ""
+msgstr "Annak a vendégnek, akinek a sorsjegyét kihúzták"
 
 #: includes/class-email-templates.php:70
 msgid "Loyalty draw: newsletter to everyone"
-msgstr ""
+msgstr "Hűségsorsolás: hírlevél mindenkinek"
 
 #: includes/class-email-templates.php:70
 msgid "Sent to the newsletter subscribers after the draw (no names); the heading is the preview line"
-msgstr ""
+msgstr "A sorsolás után a hírlevél-feliratkozóknak (nevek nélkül); a cím az előnézeti sor"
 
 #: includes/class-email-templates.php:73
 msgid "Private request received"
-msgstr ""
+msgstr "Egyéni óra kérés beérkezett"
 
 #: includes/class-email-templates.php:73
 msgid "When someone sends a private session request"
-msgstr ""
+msgstr "Amikor valaki egyéni órát kér"
 
 #: includes/class-email-templates.php:75
 msgid "Private session offer"
-msgstr ""
+msgstr "Egyéni óra ajánlat"
 
 #: includes/class-email-templates.php:75
 msgid "When you send an offer with a time and price"
-msgstr ""
+msgstr "Amikor időponttal és árral ajánlatot küldesz"
 
 #: includes/class-email-templates.php:77
 msgid "Private request declined"
-msgstr ""
+msgstr "Egyéni óra kérés elutasítva"
 
 #: includes/class-email-templates.php:77
 msgid "When you decline a request; your message is added"
-msgstr ""
+msgstr "Ha elutasítasz egy kérést; az üzeneted bekerül"
 
 #: includes/class-email-templates.php:80
 msgid "Membership started"
-msgstr ""
+msgstr "Tagság elindult"
 
 #: includes/class-email-templates.php:80
 msgid "When a membership becomes active"
-msgstr ""
+msgstr "Amikor egy tagság aktív lesz"
 
 #: includes/class-email-templates.php:82
 msgid "Membership will end"
-msgstr ""
+msgstr "A tagság véget ér"
 
 #: includes/class-email-templates.php:82
 msgid "When a membership is cancelled at the end of the period"
-msgstr ""
+msgstr "Ha egy tagságot az időszak végére lemondanak"
 
 #: includes/class-email-templates.php:84
 msgid "Membership ended"
@@ -922,70 +922,70 @@ msgstr "Tagság vége"
 
 #: includes/class-email-templates.php:84
 msgid "When a membership has ended"
-msgstr ""
+msgstr "Amikor egy tagság véget ért"
 
 #: includes/class-email-templates.php:86
 #: includes/class-emails.php:480
 msgid "Membership payment failed"
-msgstr ""
+msgstr "Sikertelen tagsági fizetés"
 
 #: includes/class-email-templates.php:86
 msgid "When a monthly payment is declined"
-msgstr ""
+msgstr "Ha egy havi fizetést elutasítanak"
 
 #: includes/class-email-templates.php:89
 #: includes/class-emails.php:555
 msgid "New payment"
-msgstr ""
+msgstr "Új fizetés"
 
 #: includes/class-email-templates.php:89
 msgid "Every payment received"
-msgstr ""
+msgstr "Minden beérkezett fizetés"
 
 #: includes/class-email-templates.php:90
 #: includes/class-emails.php:433
 msgid "New private request"
-msgstr ""
+msgstr "Új egyéni óra kérés"
 
 #: includes/class-email-templates.php:90
 msgid "Every private session request"
-msgstr ""
+msgstr "Minden egyéni óra kérés"
 
 #: includes/class-email-templates.php:91
 msgid "Customer cancellations"
-msgstr ""
+msgstr "Vendégek lemondásai"
 
 #: includes/class-email-templates.php:91
 msgid "When a customer cancels"
-msgstr ""
+msgstr "Amikor egy vendég lemond"
 
 #: includes/class-email-templates.php:92
 msgid "New, cancelled and failed memberships"
-msgstr ""
+msgstr "Új, lemondott és sikertelen tagságok"
 
 #: includes/class-email-templates.php:93
 msgid "Minimum number of people"
-msgstr ""
+msgstr "Minimális létszám"
 
 #: includes/class-email-templates.php:93
 msgid "At the decision time: the class is on, or it was cancelled for too few people"
-msgstr ""
+msgstr "A döntéskor: az óra megtartható, vagy kevés jelentkező miatt elmaradt"
 
 #: includes/class-email-templates.php:94
 msgid "Problems that need you"
-msgstr ""
+msgstr "Teendőt igénylő problémák"
 
 #: includes/class-email-templates.php:94
 msgid "A class over capacity, a Zoom meeting that could not be created"
-msgstr ""
+msgstr "Túlfoglalt óra, létre nem jött Zoom-meeting"
 
 #: includes/class-email-templates.php:119
 msgid "Account, passes and gifts"
-msgstr ""
+msgstr "Fiók, bérletek és ajándékok"
 
 #: includes/class-email-templates.php:122
 msgid "Notifications to the studio"
-msgstr ""
+msgstr "Értesítések a stúdiónak"
 
 #: includes/class-orders.php:189
 #: includes/class-memberships.php:380
@@ -2230,15 +2230,15 @@ msgstr "Nem jelentkeztek elegen, így most elmarad."
 #: includes/class-locations.php:164
 #: includes/class-locations.php:168
 msgid "Cancelled automatically: %s"
-msgstr ""
+msgstr "Magától elmaradt: %s"
 
 #: includes/class-locations.php:165
 msgid "Only %1$d booked (minimum %2$d). Everyone was emailed with other dates and got their class back."
-msgstr ""
+msgstr "Csak %1$d fő foglalt (minimum %2$d). Mindenki e-mailt kapott más időpontokkal, és visszakapta az alkalmát."
 
 #: includes/class-locations.php:168
 msgid "Only %1$d booked (minimum %2$d), so the class was cancelled and everyone was emailed. No need to come in."
-msgstr ""
+msgstr "Csak %1$d fő foglalt (minimum %2$d), ezért az óra elmaradt, és mindenki e-mailt kapott. Nem kell bemenned."
 
 #: includes/class-locations.php:239
 msgid "Join another class instead"
@@ -2300,13 +2300,13 @@ msgstr[1] "Vendégeid (%d)"
 
 #: includes/class-emails.php:273
 msgid "New booking: %s"
-msgstr ""
+msgstr "Új foglalás: %s"
 
 #: includes/class-emails.php:274
 msgid "%1$s booked (%2$d person). %3$d of %4$d spots are taken."
 msgid_plural "%1$s booked (%2$d people). %3$d of %4$d spots are taken."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s foglalt (%2$d fő). %3$d / %4$d hely foglalt."
+msgstr[1] "%1$s foglalt (%2$d fő). %3$d / %4$d hely foglalt."
 
 #: includes/class-emails.php:283
 msgid "Please arrive 10 minutes early."
@@ -2347,13 +2347,13 @@ msgstr "Mivel a lemondási határidőn belül történt, az alkalom felhasznált
 #: includes/class-emails.php:322
 #: includes/class-emails.php:323
 msgid "Cancellation: %s"
-msgstr ""
+msgstr "Lemondás: %s"
 
 #: includes/class-emails.php:322
 msgid "%1$s cancelled (%2$d person)."
 msgid_plural "%1$s cancelled (%2$d people)."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s lemondta (%2$d fő)."
+msgstr[1] "%1$s lemondta (%2$d fő)."
 
 #: includes/class-emails.php:323
 msgid "person"
@@ -2403,11 +2403,11 @@ msgstr "Kód:"
 
 #: includes/class-emails.php:433
 msgid "New private session request"
-msgstr ""
+msgstr "Új egyéni óra kérés"
 
 #: includes/class-emails.php:433
 msgid "Open in dashboard"
-msgstr ""
+msgstr "Megnyitás az adminban"
 
 #: includes/class-emails.php:453
 msgid "%d group class per period"
@@ -2425,7 +2425,7 @@ msgstr "Következő megújulás: %s."
 
 #: includes/class-emails.php:461
 msgid "New membership"
-msgstr ""
+msgstr "Új tagság"
 
 #: includes/class-emails.php:468
 msgid "Membership cancelled"
@@ -2459,31 +2459,31 @@ msgstr "Szia %s!"
 
 #: includes/class-emails.php:544
 msgid "You now have a teacher login at %s. There you can see who is booked into your classes, write to them, keep your profile and photos up to date, connect your Stripe account for card payments and see your monthly statement."
-msgstr ""
+msgstr "Mostantól oktatói belépésed van ide: %s. Ott látod, ki foglalt az óráidra, írhatsz nekik, frissítheted a profilodat és a fotóidat, bekötheted a Stripe-fiókodat a kártyás fizetéshez, és megnézheted a havi elszámolásodat."
 
 #: includes/class-emails.php:545
 msgid "Set your password with the button below, then log in. Your classes are under Teaching."
-msgstr ""
+msgstr "Állítsd be a jelszavadat a lenti gombbal, aztán lépj be. Az óráidat a Tanítás menüpont alatt találod."
 
 #: includes/class-emails.php:546
 msgid "Your teacher login at %s"
-msgstr ""
+msgstr "Oktatói belépésed ide: %s"
 
 #: includes/class-emails.php:546
 msgid "Welcome to the team"
-msgstr ""
+msgstr "Üdv a csapatban"
 
 #: includes/class-emails.php:546
 msgid "Set your password"
-msgstr ""
+msgstr "Jelszó beállítása"
 
 #: includes/class-emails.php:557
 msgid "Paid to the teacher's own Stripe account; your fee: %s."
-msgstr ""
+msgstr "Az oktató saját Stripe-fiókjába fizetve; a te díjad: %s."
 
 #: includes/class-emails.php:558
 msgid "Open orders"
-msgstr ""
+msgstr "Rendelések megnyitása"
 
 #: includes/class-memberships.php:113
 msgid "Your membership isn't active."
@@ -2551,19 +2551,19 @@ msgstr "Szüneteltetve"
 
 #: includes/class-coupons.php:22
 msgid "Passes and classes"
-msgstr ""
+msgstr "Bérletek és órák"
 
 #: includes/class-coupons.php:23
 msgid "Passes only"
-msgstr ""
+msgstr "Csak bérletek"
 
 #: includes/class-coupons.php:24
 msgid "Drop-in classes only"
-msgstr ""
+msgstr "Csak alkalmi órák"
 
 #: includes/class-coupons.php:61
 msgid "That code already exists."
-msgstr ""
+msgstr "Ez a kód már létezik."
 
 #: includes/class-coupons.php:88
 msgid "That code isn't valid. Check the spelling and try again."
@@ -2627,7 +2627,7 @@ msgstr "A kérés nem található."
 
 #: includes/class-privates.php:100
 msgid "Choose a date and time."
-msgstr ""
+msgstr "Válassz dátumot és időpontot."
 
 #: includes/class-privates.php:105
 msgid "Private session (%d min)"
@@ -4030,3 +4030,1892 @@ msgstr "Sajnos beteg vagyok."
 
 msgid "a free class"
 msgstr "egy ingyenes óra"
+
+# 1.8.1: the whole admin in Hungarian (Áron, 2026-11-13: „magyar legyen az összes”)
+msgid "Studio"
+msgstr "Stúdió"
+
+msgid "Today"
+msgstr "Ma"
+
+msgid "Calendar"
+msgstr "Naptár"
+
+msgid "Rosters & list"
+msgstr "Névsorok és lista"
+
+msgid "Private requests"
+msgstr "Egyéni óra kérések"
+
+msgid "Customers"
+msgstr "Vendégek"
+
+msgid "Prices & passes"
+msgstr "Árak és bérletek"
+
+msgid "Locations"
+msgstr "Helyszínek"
+
+msgid "Newsletter"
+msgstr "Hírlevél"
+
+msgid "Coupons & rewards"
+msgstr "Kuponok és jutalmak"
+
+msgid "Emails & reminders"
+msgstr "E-mailek és emlékeztetők"
+
+msgid "Settings"
+msgstr "Beállítások"
+
+msgid "Weekly timetable"
+msgstr "Heti órarend"
+
+msgid "Online payments are off until you add your Stripe keys in <a href=\"%s\">Studio → Settings</a>. Bookings with passes and free sessions still work."
+msgstr "Az online fizetés ki van kapcsolva, amíg nem adod meg a Stripe-kulcsokat itt: <a href=\"%s\">Stúdió → Beállítások</a>. A bérletes és az ingyenes foglalás addig is működik."
+
+msgid "You don't have permission to do this."
+msgstr "Ehhez nincs jogosultságod."
+
+msgid "Language of the class"
+msgstr "Az óra nyelve"
+
+msgid "In %s"
+msgstr "Nyelv: %s"
+
+msgid "Studio · Today"
+msgstr "Stúdió · Ma"
+
+msgid "Revenue, last 30 days"
+msgstr "Bevétel, elmúlt 30 nap"
+
+msgid "Booked, next 7 days"
+msgstr "Foglalások, következő 7 nap"
+
+msgid "Active members · MRR"
+msgstr "Aktív tagok · havi bevétel"
+
+msgid "New private requests"
+msgstr "Új egyéni óra kérések"
+
+msgid "No sessions today."
+msgstr "Ma nincs óra."
+
+msgid "Private requests waiting for an answer"
+msgstr "Válaszra váró egyéni óra kérések"
+
+msgid "Next 7 days"
+msgstr "Következő 7 nap"
+
+msgid "Roster"
+msgstr "Névsor"
+
+msgid "health note"
+msgstr "egészségügyi megjegyzés"
+
+msgid "Nothing scheduled."
+msgstr "Nincs betervezve semmi."
+
+msgid "Session"
+msgstr "Alkalom"
+
+msgid "Type"
+msgstr "Típus"
+
+msgid "Waitlist"
+msgstr "Várólista"
+
+msgid "Price"
+msgstr "Ár"
+
+msgid "Edit"
+msgstr "Szerkesztés"
+
+msgid "Open the calendar"
+msgstr "Naptár megnyitása"
+
+msgid "Add session or event"
+msgstr "Óra vagy esemény hozzáadása"
+
+msgid "Weekly timetable (table)"
+msgstr "Heti órarend (táblázat)"
+
+msgid "Past"
+msgstr "Korábbiak"
+
+msgid "Edit session"
+msgstr "Óra szerkesztése"
+
+msgid "— none (use title) —"
+msgstr "— nincs (a cím számít) —"
+
+msgid "Title (events)"
+msgstr "Cím (eseményeknél)"
+
+msgid "Description"
+msgstr "Leírás"
+
+msgid "Starts"
+msgstr "Kezdés"
+
+msgid "Length (min)"
+msgstr "Hossz (perc)"
+
+msgid "Capacity"
+msgstr "Létszám"
+
+msgid "Location"
+msgstr "Helyszín"
+
+msgid "Online link (Zoom etc.)"
+msgstr "Online link (pl. Zoom)"
+
+msgid "Only shown to people who booked."
+msgstr "Csak a foglalók látják."
+
+msgid "Class passes can be used"
+msgstr "Bérlettel is foglalható"
+
+msgid "By donation (the price is the suggested amount)"
+msgstr "Adomány alapú (az ár a javasolt összeg)"
+
+msgid "People can pay at the studio"
+msgstr "A helyszínen is fizethetnek"
+
+msgid "Short note"
+msgstr "Rövid megjegyzés"
+
+msgid "Taught in"
+msgstr "Az óra nyelve"
+
+msgid "Save session"
+msgstr "Óra mentése"
+
+msgid "Create session"
+msgstr "Óra létrehozása"
+
+msgid "Cancel this session"
+msgstr "Óra lemondása"
+
+msgid "Everyone booked is emailed. Pass bookings get their class back; card payments become a class credit (refund in Payments if you prefer)."
+msgstr "Minden foglaló e-mailt kap. A bérlettel foglalók visszakapják az alkalmat, a kártyával fizetők órakreditet kapnak (ha inkább visszatérítenéd, a Fizetéseknél megteheted)."
+
+msgid "Cancel the session and email everyone?"
+msgstr "Lemondod az órát, és mindenkinek e-mailt küldesz?"
+
+msgid "Reason shown in the email (optional)"
+msgstr "Az e-mailben megjelenő indok (nem kötelező)"
+
+msgid "Cancel session"
+msgstr "Óra lemondása"
+
+msgid "Not saved: this overlaps with %s. One teacher can only lead one class at a time."
+msgstr "Nincs mentve: ütközik ezzel: %s. Egy oktató egyszerre csak egy órát tarthat."
+
+msgid "Session saved."
+msgstr "Óra mentve."
+
+msgid "Session cancelled. %d people were emailed."
+msgstr "Óra lemondva. %d főnek ment e-mail."
+
+msgid "Session not found"
+msgstr "Az óra nem található"
+
+msgid "Edit in calendar"
+msgstr "Szerkesztés a naptárban"
+
+msgid "Teacher: %s"
+msgstr "Oktató: %s"
+
+msgid "%1$d of %2$d booked"
+msgstr "%1$d / %2$d foglalva"
+
+msgid "%1$d online (%2$s)"
+msgstr "%1$d online (%2$s)"
+
+msgid "of %d"
+msgstr "/ %d"
+
+msgid "no limit"
+msgstr "nincs korlát"
+
+msgid "by donation"
+msgstr "adomány alapú"
+
+msgid "To collect at the studio: %s"
+msgstr "A helyszínen beszedendő: %s"
+
+msgid "Paid with"
+msgstr "Fizetés módja"
+
+msgid "Health notes"
+msgstr "Egészségügyi megjegyzések"
+
+msgid "Attendance"
+msgstr "Jelenlét"
+
+msgid "Here"
+msgstr "Itt van"
+
+msgid "Cancel this booking and give the class back?"
+msgstr "Lemondod ezt a foglalást, és visszaadod az alkalmat?"
+
+msgid "No bookings yet."
+msgstr "Még nincs foglalás."
+
+msgid "Add someone"
+msgstr "Valaki hozzáadása"
+
+msgid "Name (new customers)"
+msgstr "Név (új vendégnél)"
+
+msgid "Use their pass"
+msgstr "A bérletéből"
+
+msgid "Paid at the door"
+msgstr "Az ajtóban fizetett"
+
+msgid "Will pay at the studio"
+msgstr "A helyszínen fizet"
+
+msgid "Email confirmation"
+msgstr "Visszaigazoló e-mail"
+
+msgid "Add to roster"
+msgstr "Hozzáadás a névsorhoz"
+
+msgid "notified"
+msgstr "értesítve"
+
+msgid "Paid at the studio (%s)"
+msgstr "A helyszínen fizetett (%s)"
+
+msgid "cash"
+msgstr "készpénz"
+
+msgid "other"
+msgstr "egyéb"
+
+msgid "Pays at the studio: %s"
+msgstr "A helyszínen fizet: %s"
+
+msgid "Paid: cash"
+msgstr "Fizetve: készpénz"
+
+msgid "Paid: other"
+msgstr "Fizetve: egyéb"
+
+msgid "Message everyone booked"
+msgstr "Üzenet minden foglalónak"
+
+msgid "Subject"
+msgstr "Tárgy"
+
+msgid "About %1$s on %2$s"
+msgstr "%1$s, %2$s"
+
+msgid "Hi {first_name}, …"
+msgstr "Szia {first_name}, …"
+
+msgid "Everyone gets their own email, with the class details and a link to their bookings. You can use {first_name}, {class}, {day}, {date_short}, {time}, {location} and {teacher}."
+msgstr "Mindenki külön e-mailt kap, az óra adataival és a foglalásai linkjével. Használhatod: {first_name}, {class}, {day}, {date_short}, {time}, {location} és {teacher}."
+
+msgid "Also guests who gave an email"
+msgstr "Az e-mailt megadó vendégek is"
+
+msgid "Also the waitlist"
+msgstr "A várólista is"
+
+msgid "Send the message"
+msgstr "Üzenet küldése"
+
+msgid "They can pay at the studio again."
+msgstr "Újra fizethetnek a helyszínen."
+
+msgid "Add a link to the class in the calendar, or connect Zoom in <a href=\"%s\">Settings</a> to create meetings automatically."
+msgstr "Adj meg linket az órához a naptárban, vagy kösd be a Zoomot a <a href=\"%s\">Beállításokban</a>, hogy a meetingek maguktól létrejöjjenek."
+
+msgid "Start the Zoom class (host)"
+msgstr "A Zoom-óra indítása (házigazdaként)"
+
+msgid "Meeting %s"
+msgstr "Meeting: %s"
+
+msgid "passcode"
+msgstr "jelkód"
+
+msgid "People joining online get their link by email and in their account."
+msgstr "Az online résztvevők e-mailben és a fiókjukban kapják meg a linket."
+
+msgid "The Zoom meeting is created when the first person books online, or a day before the class."
+msgstr "A Zoom-meeting az első online foglaláskor jön létre, vagy egy nappal az óra előtt."
+
+msgid "Create the Zoom meeting now"
+msgstr "Zoom-meeting létrehozása most"
+
+msgid "Added to the roster."
+msgstr "Hozzáadva a névsorhoz."
+
+msgid "Marked as paid."
+msgstr "Fizetettnek jelölve."
+
+msgid "Booking cancelled; the customer was emailed."
+msgstr "Foglalás lemondva; a vendég e-mailt kapott."
+
+msgid "Each row repeats every week. Sessions are created automatically %d weeks ahead; change one date (or cancel it) under Schedule & rosters."
+msgstr "Minden sor hetente ismétlődik. Az alkalmak %d hétre előre maguktól létrejönnek; egy-egy dátumot (vagy lemondást) az Órarend és névsorok alatt módosíthatsz."
+
+msgid "Start"
+msgstr "Kezdés"
+
+msgid "Min"
+msgstr "Perc"
+
+msgid "Spots"
+msgstr "Helyek"
+
+msgid "Location / online link / note"
+msgstr "Helyszín / online link / megjegyzés"
+
+msgid "Note"
+msgstr "Megjegyzés"
+
+msgid "Add"
+msgstr "Hozzáadás"
+
+msgid "Remove this weekly class? Already created dates stay until you cancel them."
+msgstr "Törlöd ezt a heti órát? A már létrehozott dátumok megmaradnak, amíg le nem mondod őket."
+
+msgid "Create upcoming dates now"
+msgstr "Következő dátumok létrehozása most"
+
+msgid "Saved. %d new dates created."
+msgstr "Mentve. %d új dátum létrejött."
+
+msgid "Weekly class removed."
+msgstr "Heti óra törölve."
+
+msgid "%d new dates created."
+msgstr "%d új dátum létrejött."
+
+msgid "Private request from %s"
+msgstr "Egyéni óra kérés tőle: %s"
+
+msgid "Health notes on profile"
+msgstr "Egészségügyi megjegyzés a profilban"
+
+msgid "Change the offer"
+msgstr "Ajánlat módosítása"
+
+msgid "Send an offer"
+msgstr "Ajánlat küldése"
+
+msgid "Date and time"
+msgstr "Dátum és időpont"
+
+msgid "Time to talk through goals"
+msgstr "Idő a célok átbeszélésére"
+
+msgid "Block %s extra minutes (not charged)"
+msgstr "Plusz %s perc beosztva (nem kerül pénzbe)"
+
+msgid "First private session with this person."
+msgstr "Az első egyéni órája veled."
+
+msgid "They have had a private session before."
+msgstr "Volt már egyéni órája."
+
+msgid "Small groups: set the total for the group."
+msgstr "Kis csoport: a csoport teljes árát add meg."
+
+msgid "Online link"
+msgstr "Online link"
+
+msgid "Send offer by email"
+msgstr "Ajánlat küldése e-mailben"
+
+msgid "Decline this request?"
+msgstr "Elutasítod ezt a kérést?"
+
+msgid "Message (optional)"
+msgstr "Üzenet (nem kötelező)"
+
+msgid "Decline"
+msgstr "Elutasítás"
+
+msgid "Received"
+msgstr "Beérkezett"
+
+msgid "Customer"
+msgstr "Vendég"
+
+msgid "Request"
+msgstr "Kérés"
+
+msgid "No requests yet."
+msgstr "Még nincs kérés."
+
+msgid "Offer sent to the customer."
+msgstr "Az ajánlatot elküldtük a vendégnek."
+
+msgid "Request declined; the customer was emailed."
+msgstr "Kérés elutasítva; a vendég e-mailt kapott."
+
+msgid "Search"
+msgstr "Keresés"
+
+msgid "Classes left"
+msgstr "Hátralévő órák"
+
+msgid "Private left"
+msgstr "Hátralévő egyéni"
+
+msgid "Joined"
+msgstr "Csatlakozott"
+
+msgid "Customer not found"
+msgstr "A vendég nem található"
+
+msgid "Emergency"
+msgstr "Vészhelyzet esetén"
+
+msgid "Agreement"
+msgstr "Nyilatkozat"
+
+msgid "accepted %s"
+msgstr "elfogadva: %s"
+
+msgid "not accepted (current version)"
+msgstr "nincs elfogadva (aktuális változat)"
+
+msgid "yes"
+msgstr "igen"
+
+msgid "no"
+msgstr "nem"
+
+msgid "Left"
+msgstr "Hátralévő"
+
+msgid "Expires"
+msgstr "Lejárat"
+
+msgid "Update"
+msgstr "Frissítés"
+
+msgid "Give classes"
+msgstr "Alkalmak adása"
+
+msgid "valid for"
+msgstr "érvényes"
+
+msgid "days"
+msgstr "nap"
+
+msgid "Label, e.g. Paid in cash"
+msgstr "Megjegyzés, pl. Készpénzzel fizetve"
+
+msgid "paused: %d missed classes that weren't paid"
+msgstr "felfüggesztve: %d kifizetetlen, kihagyott óra"
+
+msgid "Allow paying at the studio again"
+msgstr "Újra fizethet a helyszínen"
+
+msgid "allowed (%d missed so far)"
+msgstr "engedélyezve (eddig %d kihagyott)"
+
+msgid "allowed"
+msgstr "engedélyezve"
+
+msgid "Class credits"
+msgstr "Órakreditek"
+
+msgid "Classes added."
+msgstr "Alkalmak hozzáadva."
+
+msgid "Pass updated."
+msgstr "Bérlet frissítve."
+
+msgid "Active members"
+msgstr "Aktív tagok"
+
+msgid "Monthly recurring revenue"
+msgstr "Havi ismétlődő bevétel"
+
+msgid "Payment problems"
+msgstr "Fizetési problémák"
+
+msgid "Ending (cancel scheduled)"
+msgstr "Megszűnik (lemondás beütemezve)"
+
+msgid "Plans and prices: Studio → Prices & passes. Billing details, invoices and disputes are in your Stripe dashboard; changes made there appear here automatically."
+msgstr "Csomagok és árak: Stúdió → Árak és bérletek. A számlázási adatok, számlák és viták a Stripe-fiókodban vannak; az ott tett változások maguktól megjelennek itt."
+
+msgid "Member"
+msgstr "Tag"
+
+msgid "Used this period"
+msgstr "Ebben az időszakban felhasznált"
+
+msgid "Period"
+msgstr "Időszak"
+
+msgid "Since"
+msgstr "Kezdete"
+
+msgid "ends at period end"
+msgstr "az időszak végén megszűnik"
+
+msgid "Resume"
+msgstr "Folytatás"
+
+msgid "Cancel at period end"
+msgstr "Lemondás az időszak végén"
+
+msgid "The member keeps access until the end of the paid period and is emailed. Continue?"
+msgstr "A tag a kifizetett időszak végéig használhatja, és e-mailt kap róla. Folytatod?"
+
+msgid "End now"
+msgstr "Megszüntetés most"
+
+msgid "End the membership immediately? No refund is made automatically; future classes booked with it are cancelled."
+msgstr "Azonnal megszünteted a tagságot? Automatikus visszatérítés nincs; a vele foglalt jövőbeli órák lemondódnak."
+
+msgid "No memberships yet."
+msgstr "Még nincs tagság."
+
+msgid "Membership updated."
+msgstr "Tagság frissítve."
+
+msgid "All"
+msgstr "Mind"
+
+msgid "Card payments, payouts and disputes are also in your Stripe dashboard. Refunds made in Stripe are picked up here automatically."
+msgstr "A kártyás fizetések, kifizetések és viták a Stripe-fiókodban is megvannak. A Stripe-ban indított visszatérítések maguktól megjelennek itt."
+
+msgid "to %1$s's Stripe · your fee %2$s"
+msgstr "%1$s Stripe-fiókjába · a te díjad %2$s"
+
+msgid "the teacher"
+msgstr "az oktató"
+
+msgid "refunded %s"
+msgstr "visszatérítve: %s"
+
+msgid "Refund this payment to the customer's card?"
+msgstr "Visszatéríted ezt a fizetést a vendég kártyájára?"
+
+msgid "Refund"
+msgstr "Visszatérítés"
+
+msgid "Refund issued."
+msgstr "Visszatérítés elindítva."
+
+msgid "Customers buy gift cards on the <a href=\"%s\">Gift cards page</a>."
+msgstr "A vendégek az <a href=\"%s\">Ajándékutalvány oldalon</a> vehetnek ajándékutalványt."
+
+msgid "Code"
+msgstr "Kód"
+
+msgid "Gift"
+msgstr "Ajándék"
+
+msgid "From"
+msgstr "Feladó"
+
+msgid "To"
+msgstr "Címzett"
+
+msgid "Redeemed by"
+msgstr "Beváltotta"
+
+msgid "Drop-in prices are set per class in the weekly timetable (and per event). Here you set passes, private-session prices and the intro offer."
+msgstr "Az alkalmi jegy árát óránként a heti órarendben (és eseményenként) adod meg. Itt a bérleteket, az egyéni órák árait és a bevezető ajánlatot állítod be."
+
+msgid "Add a pass"
+msgstr "Bérlet hozzáadása"
+
+msgid "ID"
+msgstr "Azonosító"
+
+msgid "Classes / sessions"
+msgstr "Órák / alkalmak"
+
+msgid "days (0 = no expiry)"
+msgstr "nap (0 = nem jár le)"
+
+msgid "Session length (private)"
+msgstr "Egy alkalom hossza (egyéni)"
+
+msgid "online price"
+msgstr "online ár"
+
+msgid "Single private sessions only: price when the session is online (empty = same as in person)."
+msgstr "Csak egyéni alkalomnál: az ár, ha online van (üresen: ugyanannyi, mint személyesen)."
+
+msgid "Membership billing"
+msgstr "Tagsági díj"
+
+msgid "every"
+msgstr "minden"
+
+msgid "month(s)"
+msgstr "hónapban"
+
+msgid "year(s)"
+msgstr "évben"
+
+msgid "classes per period"
+msgstr "óra időszakonként"
+
+msgid "0 = unlimited. Only used for memberships; a price change applies to new members (existing members keep their price in Stripe)."
+msgstr "0 = korlátlan. Csak tagságnál számít; az árváltozás az új tagokra vonatkozik (a meglévők a régi áron maradnak a Stripe-ban)."
+
+msgid "Short description"
+msgstr "Rövid leírás"
+
+msgid "Bullet points (one per line)"
+msgstr "Felsorolás (soronként egy)"
+
+msgid "Options"
+msgstr "Beállítások"
+
+msgid "On sale"
+msgstr "Megvásárolható"
+
+msgid "Can be bought as a gift"
+msgstr "Ajándékba is megvehető"
+
+msgid "Highlight as most popular"
+msgstr "Kiemelés: legnépszerűbb"
+
+msgid "Order"
+msgstr "Sorrend"
+
+msgid "Add pass"
+msgstr "Bérlet hozzáadása"
+
+msgid "Delete this pass? Passes customers already bought are kept."
+msgstr "Törlöd ezt a bérletet? A vendégek által már megvett bérletek megmaradnak."
+
+msgid "Delete"
+msgstr "Törlés"
+
+msgid "Give the pass an ID."
+msgstr "Adj azonosítót a bérletnek."
+
+msgid "Deleted."
+msgstr "Törölve."
+
+msgid "Studio settings"
+msgstr "Stúdió beállításai"
+
+msgid "Payments (Stripe)"
+msgstr "Fizetés (Stripe)"
+
+msgid "Mode"
+msgstr "Mód"
+
+msgid "Test (no real charges)"
+msgstr "Teszt (nincs valódi terhelés)"
+
+msgid "Live"
+msgstr "Éles"
+
+msgid "Test secret key"
+msgstr "Teszt titkos kulcs"
+
+msgid "Test webhook signing secret"
+msgstr "Teszt webhook aláíró titok"
+
+msgid "Live secret key"
+msgstr "Éles titkos kulcs"
+
+msgid "Live webhook signing secret"
+msgstr "Éles webhook aláíró titok"
+
+msgid "Webhook URL"
+msgstr "Webhook URL"
+
+msgid "In Stripe → Developers → Webhooks, add this URL with the events: checkout.session.completed, checkout.session.async_payment_succeeded, checkout.session.async_payment_failed, checkout.session.expired, charge.refunded, customer.subscription.updated, customer.subscription.deleted, invoice.paid, invoice.payment_failed. For memberships also turn on the Customer portal (Settings → Billing → Customer portal)."
+msgstr "A Stripe → Fejlesztők → Webhookok alatt add hozzá ezt az URL-t ezekkel az eseményekkel: checkout.session.completed, checkout.session.async_payment_succeeded, checkout.session.async_payment_failed, checkout.session.expired, charge.refunded, customer.subscription.updated, customer.subscription.deleted, invoice.paid, invoice.payment_failed. Tagságokhoz kapcsold be az Ügyfélportált is (Beállítások → Számlázás → Ügyfélportál)."
+
+msgid "Currency"
+msgstr "Pénznem"
+
+msgid "Languages"
+msgstr "Nyelvek"
+
+msgid "The site is offered in"
+msgstr "Az oldal nyelvei"
+
+msgid "Main language"
+msgstr "Fő nyelv"
+
+msgid "Its addresses have no language prefix, and the site's own pages and posts are written in it. The other languages get /hu/ or /es/ addresses; with a single language there is no language switcher."
+msgstr "A címeiben nincs nyelvi előtag, és az oldal saját oldalai és bejegyzései ezen a nyelven íródnak. A többi nyelv /hu/ vagy /es/ címet kap; egy nyelvnél nincs nyelvválasztó."
+
+msgid "Booking rules"
+msgstr "Foglalási szabályok"
+
+msgid "Free cancellation until (hours before a group class)"
+msgstr "Ingyenes lemondás eddig (óra a csoportos óra előtt)"
+
+msgid "Free cancellation until (hours before a private session)"
+msgstr "Ingyenes lemondás eddig (óra az egyéni óra előtt)"
+
+msgid "Credit for a cancelled drop-in is valid for (days)"
+msgstr "A lemondott alkalmi jegy helyett kapott kredit érvényessége (nap)"
+
+msgid "Show classes this many days ahead"
+msgstr "Ennyi napra előre mutassa az órákat"
+
+msgid "Online booking closes (minutes before start)"
+msgstr "Az online foglalás lezárul (perccel a kezdés előtt)"
+
+msgid "Waitlist stops moving people in (hours before start)"
+msgstr "A várólistáról eddig léptet be (órával a kezdés előtt)"
+
+msgid "Create weekly classes this many weeks ahead"
+msgstr "A heti órák ennyi hétre előre jönnek létre"
+
+msgid "Hold a spot during card payment (minutes, 30 or more)"
+msgstr "Hely foglalva tartása kártyás fizetés alatt (perc, legalább 30)"
+
+msgid "Guests a customer can bring per booking (0 = off)"
+msgstr "Ennyi vendéget hozhat valaki foglalásonként (0 = ki)"
+
+msgid "Paying at the studio and donations"
+msgstr "Helyszíni fizetés és adomány"
+
+msgid "Who can book now and pay at the studio"
+msgstr "Ki foglalhat most, helyszíni fizetéssel"
+
+msgid "Everyone"
+msgstr "Mindenki"
+
+msgid "Only for their first class"
+msgstr "Csak az első órájára"
+
+msgid "Nobody (pay in advance)"
+msgstr "Senki (előre fizet)"
+
+msgid "For in-person group classes and events. Each class can switch it off in the calendar (e.g. workshops). Mark the payment on the roster with \"Paid: cash\" or \"Paid: other\"."
+msgstr "Személyes csoportos órákra és eseményekre. Minden óránál kikapcsolható a naptárban (pl. workshopnál). A fizetést a névsoron jelöld: „Fizetve: készpénz” vagy „Fizetve: egyéb”."
+
+msgid "Pay in advance after this many missed classes"
+msgstr "Előre kell fizetnie ennyi kihagyott óra után"
+
+msgid "Classes they booked to pay at the studio and didn't come to (marked \"No-show\" on the roster). 0 = never. You can allow it again on the customer's page."
+msgstr "Olyan órák, amelyekre helyszíni fizetéssel foglalt, és nem jött el (a névsoron „Nem jött”). 0 = soha. A vendég oldalán újra engedélyezheted."
+
+msgid "How to pay at the studio (shown when booking and in emails)"
+msgstr "Hogyan lehet a helyszínen fizetni (foglaláskor és az e-mailekben látszik)"
+
+msgid "Donation classes: minimum per person"
+msgstr "Adományos órák: minimum fejenként"
+
+msgid "Suggested donation amounts"
+msgstr "Javasolt adományösszegek"
+
+msgid "Separated by commas. Make a class \"by donation\" in the calendar; people choose one of these or type their own amount, and pay by card or at the studio."
+msgstr "Vesszővel elválasztva. A naptárban tehetsz egy órát „adomány alapúvá”; a vendég ezek közül választ vagy saját összeget ír, és kártyával vagy a helyszínen fizet."
+
+msgid "Extra time for a first session (minutes)"
+msgstr "Plusz idő az első alkalomhoz (perc)"
+
+msgid "Added to the time you block when you send an offer to someone new, to talk through their goals. The price stays the same."
+msgstr "Hozzáadódik a beosztott időhöz, amikor új vendégnek küldesz ajánlatot, hogy átbeszéljétek a céljait. Az ár nem változik."
+
+msgid "Note shown with private sessions"
+msgstr "Megjegyzés az egyéni óráknál"
+
+msgid "Shown on the private session request form, prices and booking page, and in the offer email."
+msgstr "Az egyéni óra kérése űrlapon, az árakon, a foglalási oldalon és az ajánlat e-mailben látszik."
+
+msgid "Community"
+msgstr "Közösség"
+
+msgid "Facebook group link"
+msgstr "Facebook-csoport linkje"
+
+msgid "Shown next to the newsletter sign-up, after booking, in the account, the app and at the bottom of every email. Leave empty to hide it."
+msgstr "A hírlevél-feliratkozás mellett, foglalás után, a fiókban, az appban és minden e-mail alján látszik. Üresen elrejti."
+
+msgid "Test the connection"
+msgstr "Kapcsolat tesztelése"
+
+msgid "With Zoom connected, online and hybrid classes get their Zoom meeting automatically; people joining online get the link in their emails and account, and you start the class from the calendar or the roster. In the Zoom App Marketplace create a \"Server-to-Server OAuth\" app, add the scopes to create, update and delete meetings and to manage registrants, activate it and copy its Account ID, Client ID and Client Secret here. A class with an online link typed in by hand keeps that link."
+msgstr "Bekötött Zoommal az online és hibrid órák maguktól kapnak Zoom-meetinget; az online résztvevők e-mailben és a fiókjukban kapják meg a linket, te pedig a naptárból vagy a névsorból indítod az órát. A Zoom App Marketplace-en hozz létre egy „Server-to-Server OAuth” appot, add hozzá a meetingek létrehozásához, módosításához, törléséhez és a regisztrálók kezeléséhez szükséges jogokat, aktiváld, és másold ide az Account ID-t, a Client ID-t és a Client Secretet. A kézzel beírt online link megmarad."
+
+msgid "Account ID"
+msgstr "Account ID"
+
+msgid "Client ID"
+msgstr "Client ID"
+
+msgid "Client Secret"
+msgstr "Client Secret"
+
+msgid "Meetings belong to"
+msgstr "A meetingek gazdája"
+
+msgid "\"me\" = the account owner, or the email of the Zoom user who teaches."
+msgstr "„me” = a fiók tulajdonosa, vagy a tanító Zoom-felhasználó e-mail-címe."
+
+msgid "Create Zoom meetings automatically for online and hybrid classes"
+msgstr "Zoom-meetingek automatikus létrehozása az online és hibrid órákhoz"
+
+msgid "Personal link for everyone who joins online (Zoom registration; online guests need an email)"
+msgstr "Saját link mindenkinek, aki online csatlakozik (Zoom-regisztráció; az online vendégeknek e-mail kell)"
+
+msgid "Waiting room (you let people in)"
+msgstr "Várószoba (te engeded be az embereket)"
+
+msgid "Connected details saved; meetings are created automatically."
+msgstr "Kapcsolódási adatok mentve; a meetingek maguktól létrejönnek."
+
+msgid "Details saved; automatic meetings are off."
+msgstr "Adatok mentve; az automatikus meetingek ki vannak kapcsolva."
+
+msgid "Not connected."
+msgstr "Nincs bekötve."
+
+msgid "Cancellation policy (shown at booking and in emails)"
+msgstr "Lemondási feltételek (foglaláskor és az e-mailekben látszik)"
+
+msgid "Participation agreement (waiver)"
+msgstr "Részvételi nyilatkozat"
+
+msgid "Text"
+msgstr "Szöveg"
+
+msgid "Have this checked by a lawyer before going live."
+msgstr "Élesítés előtt nézesd át jogásszal."
+
+msgid "Version"
+msgstr "Változat"
+
+msgid "Change the version after editing the text: everyone is asked to accept the new version at their next booking."
+msgstr "A szöveg módosítása után változtasd meg a változatot: mindenkitől a következő foglaláskor kéri az új változat elfogadását."
+
+msgid "Emails"
+msgstr "E-mailek"
+
+msgid "Sender, reminders and the text of every automatic email are in <a href=\"%s\">Studio → Emails &amp; reminders</a>."
+msgstr "A feladó, az emlékeztetők és minden automatikus e-mail szövege itt van: <a href=\"%s\">Stúdió → E-mailek és emlékeztetők</a>."
+
+msgid "Each place can have its own minimum number of people. At the decision time before a class, if fewer people are booked, the class is cancelled automatically: everyone gets their class back and an email with other dates (the next one at the same place, other classes in the next days and a live online class). If enough people are booked, you get a \"class is on\" email. A class in the calendar can set its own minimum and decision time; a class at a place not listed here uses the defaults below."
+msgstr "Minden helyszínnek lehet saját minimális létszáma. Az óra előtti döntési időpontban, ha kevesebben foglaltak, az óra magától elmarad: mindenki visszakapja az alkalmát, és e-mailt kap más időpontokkal (a következő ugyanott, más órák a következő napokban és egy élő online óra). Ha elegen vannak, te e-mailt kapsz, hogy az óra megtartható. A naptárban egy óra saját minimumot és döntési időt is kaphat; a nem listázott helyszínen tartott óra a lenti alapértékeket használja."
+
+msgid "Name (as typed on the class)"
+msgstr "Név (ahogy az óránál szerepel)"
+
+msgid "Address"
+msgstr "Cím"
+
+msgid "Minimum people"
+msgstr "Minimális létszám"
+
+msgid "Decide (hours before)"
+msgstr "Döntés (órával előtte)"
+
+msgid "Classes in the next 4 weeks"
+msgstr "Órák a következő 4 hétben"
+
+msgid "e.g. Riverside studio"
+msgstr "pl. Folyóparti stúdió"
+
+msgid "Minimum 0 = the class always goes ahead. To remove a place, clear its name. Empty rows add new places."
+msgstr "Minimum 0 = az óra mindig megtartható. Helyszín törléséhez töröld a nevét. Az üres sorok új helyszínt adnak hozzá."
+
+msgid "%d upcoming classes are at a place that isn't listed; they use the defaults below."
+msgstr "%d közelgő óra nem listázott helyszínen van; ezek a lenti alapértékeket használják."
+
+msgid "Defaults"
+msgstr "Alapértékek"
+
+msgid "Minimum people (places not listed)"
+msgstr "Minimális létszám (nem listázott helyszín)"
+
+msgid "Decide (hours before, places not listed)"
+msgstr "Döntés (órával előtte, nem listázott helyszín)"
+
+msgid "\"Bring a friend\" email"
+msgstr "„Hozz egy barátot” e-mail"
+
+msgid "%s hours before the decision, to the people booked when a class is short (0 = off)"
+msgstr "%s órával a döntés előtt, a foglalóknak, ha kevés a jelentkező (0 = ki)"
+
+msgid "Save locations"
+msgstr "Helyszínek mentése"
+
+msgid "Locations saved."
+msgstr "Helyszínek mentve."
+
+msgid "Now: %1$s · %2$d tickets so far · drawn on %3$s."
+msgstr "Most: %1$s · eddig %2$d sorsjegy · sorsolás: %3$s."
+
+msgid "Tickets (classes)"
+msgstr "Sorsjegyek (órák)"
+
+msgid "Chance"
+msgstr "Esély"
+
+msgid "Past draws"
+msgstr "Korábbi sorsolások"
+
+msgid "won by %1$s (%2$d of %3$d tickets)"
+msgstr "nyertes: %1$s (%2$d / %3$d sorsjegy)"
+
+msgid "no tickets"
+msgstr "nincs sorsjegy"
+
+msgid "Draw every"
+msgstr "Sorsolás"
+
+msgid "Half-year (Jan–Jun, Jul–Dec)"
+msgstr "Félévente (jan–jún, júl–dec)"
+
+msgid "Year"
+msgstr "Évente"
+
+msgid "Quarter"
+msgstr "Negyedévente"
+
+msgid "Off"
+msgstr "Ki"
+
+msgid "Every class a customer comes to is one ticket. When the period ends, one ticket is drawn; the winner gets the prize in their account and an email."
+msgstr "Minden óra, amire a vendég eljön, egy sorsjegy. Az időszak végén egyet kihúzunk; a nyertes a fiókjába kapja a nyereményt, és e-mailt kap."
+
+msgid "Prize"
+msgstr "Nyeremény"
+
+msgid "Announcement"
+msgstr "Bejelentés"
+
+msgid "Send a newsletter to the subscribers after the draw (without the name): who won stays private, and the new round starts."
+msgstr "Hírlevél a feliratkozóknak a sorsolás után (név nélkül): a nyertes kiléte titok marad, és indul az új kör."
+
+msgid "Send a gift code on customers' birthdays"
+msgstr "Ajándékkód a vendégek születésnapján"
+
+msgid "%1$s%% off, valid for %2$s days"
+msgstr "%1$s%% kedvezmény, %2$s napig érvényes"
+
+msgid "Customers can add their birthday (optional) in their profile. %d have so far."
+msgstr "A vendégek a profiljukban megadhatják a születésnapjukat (nem kötelező). Eddig %d adta meg."
+
+msgid "Draw the last finished period now (if it hasn't been drawn)?"
+msgstr "Kisorsolod most az utolsó lezárt időszakot (ha még nem volt sorsolás)?"
+
+msgid "Draw the last period now"
+msgstr "Az utolsó időszak sorsolása most"
+
+msgid "Normally this happens by itself, the hour after the period ends."
+msgstr "Ez rendesen magától történik, az időszak vége utáni órában."
+
+msgid "Discount codes"
+msgstr "Kedvezménykódok"
+
+msgid "For card payments on passes and drop-in classes. Customers type the code before paying; their own codes (birthday) are filled in for them."
+msgstr "Bérletek és alkalmi órák kártyás fizetéséhez. A vendég fizetés előtt beírja a kódot; a saját kódjai (születésnap) maguktól kitöltődnek."
+
+msgid "Code (empty = random)"
+msgstr "Kód (üresen: véletlen)"
+
+msgid "Uses"
+msgstr "Felhasználás"
+
+msgid "Until"
+msgstr "Eddig"
+
+msgid "Create code"
+msgstr "Kód létrehozása"
+
+msgid "Uses 0 = unlimited."
+msgstr "Felhasználás 0 = korlátlan."
+
+msgid "Discount"
+msgstr "Kedvezmény"
+
+msgid "For"
+msgstr "Kinek"
+
+msgid "Used"
+msgstr "Felhasználva"
+
+msgid "anyone"
+msgstr "bárki"
+
+msgid "Delete this code?"
+msgstr "Törlöd ezt a kódot?"
+
+msgid "No codes yet."
+msgstr "Még nincs kód."
+
+msgid "Drawn."
+msgstr "Kisorsolva."
+
+msgid "The last period has already been drawn."
+msgstr "Az utolsó időszakot már kisorsoltuk."
+
+msgid "Code %s created."
+msgstr "%s kód létrehozva."
+
+msgid "Code deleted."
+msgstr "Kód törölve."
+
+msgid "Write a newsletter"
+msgstr "Hírlevél írása"
+
+msgid "Emails go out in small batches every few minutes. Every email has an unsubscribe link."
+msgstr "Az e-mailek kis adagokban mennek ki pár percenként. Minden e-mailben van leiratkozó link."
+
+msgid "Sent"
+msgstr "Elküldve"
+
+msgid "Draft"
+msgstr "Piszkozat"
+
+msgid "Sending…"
+msgstr "Küldés folyamatban…"
+
+msgid "(no subject)"
+msgstr "(nincs tárgy)"
+
+msgid "View"
+msgstr "Megtekintés"
+
+msgid "No newsletters yet."
+msgstr "Még nincs hírlevél."
+
+msgid "AI settings"
+msgstr "MI-beállítások"
+
+msgid "The \"Write it with AI\" button uses Claude from Anthropic. Create an API key at console.anthropic.com (Settings → API keys) and paste it here. A newsletter draft costs a few cents."
+msgstr "Az „Írd meg MI-vel” gomb az Anthropic Claude-ját használja. Hozz létre API-kulcsot a console.anthropic.com oldalon (Settings → API keys), és másold ide. Egy hírlevél-piszkozat pár centbe kerül."
+
+msgid "Anthropic API key"
+msgstr "Anthropic API-kulcs"
+
+msgid "Set in wp-config.php."
+msgstr "A wp-config.php-ban van megadva."
+
+msgid "Not set yet."
+msgstr "Még nincs megadva."
+
+msgid "Model"
+msgstr "Modell"
+
+msgid "Default: claude-opus-5."
+msgstr "Alapértelmezett: claude-opus-5."
+
+msgid "Save AI settings"
+msgstr "MI-beállítások mentése"
+
+msgid "Edit newsletter"
+msgstr "Hírlevél szerkesztése"
+
+msgid "All newsletters"
+msgstr "Összes hírlevél"
+
+msgid "Write it with AI"
+msgstr "Írd meg MI-vel"
+
+msgid "e.g. New Sunday sunrise class on the beach from next month; the full moon flow on the 17th; thank everyone for a lovely summer."
+msgstr "pl. Jövő hónaptól új vasárnapi napfelkeltés óra a parton; telihold flow 17-én; köszönet mindenkinek a szép nyárért."
+
+msgid "A few words about what to say. It knows your timetable and events for the next three weeks and writes as you. With a draft below, it improves that draft following your note."
+msgstr "Pár szó arról, mit szeretnél mondani. Ismeri az órarendedet és az eseményeidet a következő három hétre, és a te hangodon ír. Ha lent már van piszkozat, a megjegyzésed szerint javítja."
+
+msgid "Write a new draft"
+msgstr "Új piszkozat írása"
+
+msgid "Improve my draft"
+msgstr "A piszkozatom javítása"
+
+msgid "Add an Anthropic API key under <a href=\"%s\">AI settings</a> to draft newsletters with AI."
+msgstr "Adj meg Anthropic API-kulcsot az <a href=\"%s\">MI-beállításoknál</a>, hogy MI-vel írhass hírlevelet."
+
+msgid "Preview line (shown next to the subject in the inbox)"
+msgstr "Előnézeti sor (a postafiókban a tárgy mellett látszik)"
+
+msgid "Blank line = new paragraph · \"## \" heading · \"- \" list · **bold** · [link text](https://…) · {first_name} = each reader's name."
+msgstr "Üres sor = új bekezdés · „## ” cím · „- ” felsorolás · **félkövér** · [link szövege](https://…) · {first_name} = az olvasó neve."
+
+msgid "Button"
+msgstr "Gomb"
+
+msgid "links to"
+msgstr "ide visz"
+
+msgid "Save draft"
+msgstr "Piszkozat mentése"
+
+msgid "Preview"
+msgstr "Előnézet"
+
+msgid "Email preview"
+msgstr "E-mail előnézete"
+
+msgid "Send a test"
+msgstr "Próba küldése"
+
+msgid "Delete this draft?"
+msgstr "Törlöd ezt a piszkozatot?"
+
+msgid "Delete draft"
+msgstr "Piszkozat törlése"
+
+msgid "Sent to %1$d of %2$d subscribers."
+msgstr "Elküldve %1$d / %2$d feliratkozónak."
+
+msgid "Draft saved."
+msgstr "Piszkozat mentve."
+
+msgid "Draft written. Read it through, change anything you like, and send a test to yourself."
+msgstr "A piszkozat kész. Olvasd át, írd át, amit szeretnél, és küldj magadnak egy próbát."
+
+msgid "Test sent."
+msgstr "Próba elküldve."
+
+msgid "The test could not be sent."
+msgstr "A próbát nem sikerült elküldeni."
+
+msgid "Draft deleted."
+msgstr "Piszkozat törölve."
+
+msgid "AI settings saved."
+msgstr "MI-beállítások mentve."
+
+msgid "Sender"
+msgstr "Feladó"
+
+msgid "Sender name"
+msgstr "Feladó neve"
+
+msgid "Sender email"
+msgstr "Feladó e-mail-címe"
+
+msgid "Studio notifications go to"
+msgstr "A stúdió értesítései ide mennek"
+
+msgid "0 turns a reminder off. They go out automatically; people who book after a reminder's time just get their confirmation."
+msgstr "0 kikapcsolja az emlékeztetőt. Maguktól mennek ki; aki az emlékeztető ideje után foglal, csak a visszaigazolást kapja."
+
+msgid "hours before the class"
+msgstr "órával az óra előtt"
+
+msgid "Second reminder"
+msgstr "Második emlékeztető"
+
+msgid "hours before the class (e.g. 2 on the day)"
+msgstr "órával az óra előtt (pl. 2 az óra napján)"
+
+msgid "Online: link to join"
+msgstr "Online: belépő link"
+
+msgid "minutes before the class"
+msgstr "perccel az óra előtt"
+
+msgid "minutes before an online or hybrid class"
+msgstr "perccel az online vagy hibrid óra előtt"
+
+msgid "days before unused classes expire"
+msgstr "nappal a fel nem használt alkalmak lejárta előtt"
+
+msgid "Guest / recipient"
+msgstr "Vendég / címzett"
+
+msgid "All emails are listed, also those of features you don't use."
+msgstr "Minden e-mail látszik, azoké a funkcióké is, amiket nem használsz."
+
+msgid "Show only the ones in use"
+msgstr "Csak a használtak mutatása"
+
+msgid "Show all"
+msgstr "Mind mutatása"
+
+msgid "On"
+msgstr "Be"
+
+msgid "Sent when"
+msgstr "Mikor megy ki"
+
+msgid "edited"
+msgstr "szerkesztve"
+
+msgid "Edit text"
+msgstr "Szöveg szerkesztése"
+
+msgid "Save emails and reminders"
+msgstr "E-mailek és emlékeztetők mentése"
+
+msgid "Email: %s"
+msgstr "E-mail: %s"
+
+msgid "← All emails"
+msgstr "← Összes e-mail"
+
+msgid "Customers get this email in the language they use on the site. Each language has its own text; the original texts are already translated."
+msgstr "A vendégek azon a nyelven kapják ezt az e-mailt, amit az oldalon használnak. Minden nyelvnek saját szövege van; az eredeti szövegek már le vannak fordítva."
+
+msgid "Send this email"
+msgstr "Ez az e-mail menjen ki"
+
+msgid "Heading"
+msgstr "Cím"
+
+msgid "Shown before the automatic details (class, time, place, guests, join link, receipt…). An empty line starts a new paragraph."
+msgstr "Az automatikus részletek (óra, időpont, hely, vendégek, belépő link, nyugta…) előtt látszik. Üres sor új bekezdést kezd."
+
+msgid "Closing note"
+msgstr "Záró megjegyzés"
+
+msgid "After the details. Can be empty."
+msgstr "A részletek után. Lehet üres."
+
+msgid "Empty = no button."
+msgstr "Üres = nincs gomb."
+
+msgid "Placeholders"
+msgstr "Helyőrzők"
+
+msgid "Send a test to %s"
+msgstr "Próba küldése ide: %s"
+
+msgid "Go back to the original text?"
+msgstr "Visszaállítod az eredeti szöveget?"
+
+msgid "Reset to the original text"
+msgstr "Eredeti szöveg visszaállítása"
+
+msgid "Preview with sample details (save to update):"
+msgstr "Előnézet mintaadatokkal (mentés után frissül):"
+
+msgid "Back to the original text."
+msgstr "Visszaállítva az eredeti szöveg."
+
+msgid "Test sent to %s."
+msgstr "Próba elküldve ide: %s."
+
+msgid "Zoom: %s"
+msgstr "Zoom: %s"
+
+msgid "Zoom is connected (%s)."
+msgstr "A Zoom be van kötve (%s)."
+
+msgid "Zoom did not return a start link."
+msgstr "A Zoom nem adott indító linket."
+
+msgid "Zoom meeting ready."
+msgstr "A Zoom-meeting kész."
+
+msgid "Settings saved."
+msgstr "Beállítások mentve."
+
+msgid "%d person"
+msgid_plural "%d people"
+msgstr[0] "%d fő"
+msgstr[1] "%d fő"
+
+msgid "Message sent to %d person."
+msgid_plural "Message sent to %d people."
+msgstr[0] "Üzenet elküldve %d főnek."
+msgstr[1] "Üzenet elküldve %d főnek."
+
+msgid "%d subscriber (customers who ticked the newsletter box)."
+msgid_plural "%d subscribers (customers who ticked the newsletter box)."
+msgstr[0] "%d feliratkozó (a hírlevél-jelölőnégyzetet bepipáló vendégek)."
+msgstr[1] "%d feliratkozó (a hírlevél-jelölőnégyzetet bepipáló vendégek)."
+
+msgid "Send this newsletter to %d subscriber?"
+msgid_plural "Send this newsletter to %d subscribers?"
+msgstr[0] "Elküldöd ezt a hírlevelet %d feliratkozónak?"
+msgstr[1] "Elküldöd ezt a hírlevelet %d feliratkozónak?"
+
+msgid "Send to %d subscriber"
+msgid_plural "Send to %d subscribers"
+msgstr[0] "Küldés %d feliratkozónak"
+msgstr[1] "Küldés %d feliratkozónak"
+
+msgid "Sending to %d subscriber: it goes out over the next few minutes."
+msgid_plural "Sending to %d subscribers: it goes out over the next few minutes."
+msgstr[0] "Küldés %d feliratkozónak: a következő percekben megy ki."
+msgstr[1] "Küldés %d feliratkozónak: a következő percekben megy ki."
+
+msgid "%d email is hidden: its feature is not in use (e.g. memberships)."
+msgid_plural "%d emails are hidden: their features are not in use (e.g. memberships)."
+msgstr[0] "%d e-mail rejtve van: a hozzá tartozó funkció nincs használatban (pl. tagság)."
+msgstr[1] "%d e-mail rejtve van: a hozzájuk tartozó funkció nincs használatban (pl. tagság)."
+
+msgid "List view"
+msgstr "Lista nézet"
+
+msgid "Loading the calendar…"
+msgstr "A naptár töltődik…"
+
+msgid "The calendar needs JavaScript. Use the list view instead."
+msgstr "A naptárhoz JavaScript kell. Használd a lista nézetet."
+
+msgid "%s (guest)"
+msgstr "%s (vendég)"
+
+msgid "online"
+msgstr "online"
+
+msgid "Every %1$s at %2$s"
+msgstr "Minden %1$s %2$s-kor"
+
+msgid "Choose a date and a start time."
+msgstr "Válassz dátumot és kezdési időt."
+
+msgid "Choose which class this is."
+msgstr "Válaszd ki, melyik óra ez."
+
+msgid "Give the session a title."
+msgstr "Adj címet az alkalomnak."
+
+msgid "This session no longer exists."
+msgstr "Ez az alkalom már nem létezik."
+
+msgid "That time has already passed."
+msgstr "Ez az időpont már elmúlt."
+
+msgid "Weekly class created: %d dates added."
+msgstr "Heti óra létrehozva: %d dátum hozzáadva."
+
+msgid "Session created."
+msgstr "Alkalom létrehozva."
+
+msgid "Capacity kept at %d: that many people are already booked."
+msgstr "A létszám %d maradt: ennyien már foglaltak."
+
+msgid "This overlaps with %s. One teacher can only lead one class at a time: choose another time, or another teacher."
+msgstr "Ütközik ezzel: %s. Egy oktató egyszerre csak egy órát tarthat: válassz másik időpontot vagy másik oktatót."
+
+msgid "Weekly class updated (%d date)."
+msgid_plural "Weekly class updated (%d dates)."
+msgstr[0] "Heti óra frissítve (%d dátum)."
+msgstr[1] "Heti óra frissítve (%d dátum)."
+
+msgid "%d person was emailed."
+msgid_plural "%d people were emailed."
+msgstr[0] "%d fő kapott e-mailt."
+msgstr[1] "%d fő kapott e-mailt."
+
+msgid "Weekly class stopped: %1$d date cancelled"
+msgid_plural "Weekly class stopped: %1$d dates cancelled"
+msgstr[0] "Heti óra leállítva: %1$d dátum lemondva"
+msgstr[1] "Heti óra leállítva: %1$d dátum lemondva"
+
+msgid "%d booking cancelled and emailed."
+msgid_plural "%d bookings cancelled and emailed."
+msgstr[0] "%d foglalás lemondva, e-mail elküldve."
+msgstr[1] "%d foglalás lemondva, e-mail elküldve."
+
+msgid "Session cancelled; %d booking was cancelled and emailed."
+msgid_plural "Session cancelled; %d bookings were cancelled and emailed."
+msgstr[0] "Alkalom lemondva; %d foglalás lemondva, e-mail elküldve."
+msgstr[1] "Alkalom lemondva; %d foglalás lemondva, e-mail elküldve."
+
+msgid "Add an Anthropic API key in Studio → Newsletter → AI settings first."
+msgstr "Előbb adj meg Anthropic API-kulcsot: Stúdió → Hírlevél → MI-beállítások."
+
+msgid "Write a few words about what the newsletter should say."
+msgstr "Írj pár szót arról, miről szóljon a hírlevél."
+
+msgid "The AI answer could not be read. Please try again."
+msgstr "Az MI válaszát nem sikerült beolvasni. Próbáld újra."
+
+msgid "Could not reach the AI service: %s"
+msgstr "Az MI-szolgáltatás nem érhető el: %s"
+
+msgid "The AI service did not accept the API key. Check it in the AI settings."
+msgstr "Az MI-szolgáltatás nem fogadta el az API-kulcsot. Nézd meg az MI-beállításokban."
+
+msgid "The AI service answered with an error (%1$d). %2$s"
+msgstr "Az MI-szolgáltatás hibával válaszolt (%1$d). %2$s"
+
+msgid "The AI declined to write this one. Try rephrasing the brief."
+msgstr "Az MI ezt nem írta meg. Fogalmazd át a kérést."
+
+msgid "The draft was cut off. Try a shorter brief."
+msgstr "A piszkozat félbemaradt. Próbálj rövidebb kérést."
+
+msgid "%d recording."
+msgid_plural "%d recordings."
+msgstr[0] "%d felvétel."
+msgstr[1] "%d felvétel."
+
+msgid "Write a subject and a message."
+msgstr "Írj tárgyat és üzenetet."
+
+msgid "Nobody is booked into this class yet."
+msgstr "Erre az órára még senki nem foglalt."
+
+msgid "Yoga bookings and passes"
+msgstr "Jógafoglalások és bérletek"
+
+msgid "Yoga profile details"
+msgstr "Jóga-profil adatai"
+
+msgid "When you create an account we store your name, email, phone, optional emergency contact and health notes, your bookings, passes, membership and payments. If you bring guests, we store the name and (optional) email you give for them, only to put them on the class list and send them their booking details. Health notes are only visible to the teacher. Card payments are processed by Stripe; we never see or store card numbers."
+msgstr "Amikor fiókot hozol létre, tároljuk a nevedet, e-mail-címedet, telefonszámodat, a nem kötelező vészhelyzeti kapcsolattartót és egészségügyi megjegyzéseket, a foglalásaidat, bérleteidet, tagságodat és fizetéseidet. Ha vendéget hozol, a megadott nevét és (nem kötelező) e-mail-címét csak azért tároljuk, hogy felkerüljön a névsorra, és megkapja a foglalása adatait. Az egészségügyi megjegyzéseket csak az oktató látja. A kártyás fizetést a Stripe kezeli; a kártyaszámokat soha nem látjuk és nem tároljuk."
+
+msgid "Yoga profile"
+msgstr "Jóga-profil"
+
+msgid "Payment and booking records were kept for accounting."
+msgstr "A fizetési és foglalási adatokat a könyveléshez megőriztük."
+
+msgid "Zoom did not accept the app credentials: %s"
+msgstr "A Zoom nem fogadta el az app adatait: %s"
+
+msgid "connected"
+msgstr "bekötve"
+
+msgid "Creating the Zoom meeting failed a moment ago; it will be retried shortly."
+msgstr "A Zoom-meeting létrehozása az előbb nem sikerült; hamarosan újrapróbáljuk."
+
+msgid "The Zoom meeting is being created; the link will be ready in a moment."
+msgstr "A Zoom-meeting most készül; a link mindjárt meglesz."
+
+msgid "Live yoga class. Set up where the camera sees your mat (or keep it off), and keep your microphone muted."
+msgstr "Élő jógaóra. Helyezkedj el úgy, hogy a kamera lássa a matracodat (vagy hagyd kikapcsolva), és némítsd le a mikrofonod."
+
+msgid "Zoom meeting could not be created"
+msgstr "A Zoom-meetinget nem sikerült létrehozni"
+
+msgid "%1$s on %2$s: %3$s. Check Studio → Settings → Zoom, or paste a link on the class in the calendar."
+msgstr "%1$s, %2$s: %3$s. Nézd meg: Stúdió → Beállítások → Zoom, vagy illessz be linket az órához a naptárban."
+
+# 1.8.1: teachers, Stripe Connect and the app in Hungarian too
+msgid "Teachers"
+msgstr "Oktatók"
+
+msgid "Teaching"
+msgstr "Tanítás"
+
+msgid "My classes"
+msgstr "Óráim"
+
+msgid "My profile"
+msgstr "Profilom"
+
+msgid "My statement"
+msgstr "Elszámolásom"
+
+msgid "Show"
+msgstr "Mutasd"
+
+msgid "Add a teacher"
+msgstr "Oktató hozzáadása"
+
+msgid "Teachers get a profile on the website, their name on their classes, a login where they see their rosters and write to their students, and a monthly statement. If they connect their own Stripe account, card payments for their classes go straight to them and your part comes to you automatically, so you never take in (or invoice) their money."
+msgstr "Az oktatók profilt kapnak a weboldalon, a nevük megjelenik az óráiknál, saját belépéssel látják a névsoraikat és írhatnak a tanítványaiknak, és havi elszámolást kapnak. Ha bekötik a saját Stripe-fiókjukat, az óráik kártyás fizetése egyenesen hozzájuk megy, a te részed pedig magától hozzád, így soha nem kell az ő pénzüket átvenned (vagy számláznod)."
+
+msgid "No teachers yet. Classes without a teacher are yours."
+msgstr "Még nincs oktató. Az oktató nélküli órák a tieid."
+
+msgid "Their share"
+msgstr "Részesedése"
+
+msgid "Next 30 days"
+msgstr "Következő 30 nap"
+
+msgid "hidden"
+msgstr "rejtett"
+
+msgid "Statement"
+msgstr "Elszámolás"
+
+msgid "Your name on your own classes"
+msgstr "A neved a saját óráidnál"
+
+msgid "Share for new teachers"
+msgstr "Új oktatók részesedése"
+
+msgid "The part of the class income that goes to the teacher. Each teacher can have their own."
+msgstr "Az órabevételnek az oktatóhoz kerülő része. Minden oktatónak lehet sajátja."
+
+msgid "Value of a membership visit"
+msgstr "Egy tagsági látogatás értéke"
+
+msgid "Memberships are unlimited, so for the statement a member's visit counts as this amount."
+msgstr "A tagság korlátlan, ezért az elszámolásban egy tagsági látogatás ennyit ér."
+
+msgid "Stripe Connect webhook secret"
+msgstr "Stripe Connect webhook titok"
+
+msgid "In Stripe → Developers → Webhooks, add an endpoint that listens to events on connected accounts, with this address: %s — events: checkout.session.completed, checkout.session.async_payment_succeeded, checkout.session.async_payment_failed, checkout.session.expired, charge.refunded, account.updated."
+msgstr "A Stripe → Fejlesztők → Webhookok alatt adj hozzá egy végpontot, ami a csatlakoztatott fiókok eseményeit figyeli, ezzel a címmel: %s – események: checkout.session.completed, checkout.session.async_payment_succeeded, checkout.session.async_payment_failed, checkout.session.expired, charge.refunded, account.updated."
+
+msgid "Save settings"
+msgstr "Beállítások mentése"
+
+msgid "Teachers page"
+msgstr "Oktatók oldal"
+
+msgid "The teachers are shown on"
+msgstr "Az oktatók itt látszanak:"
+
+msgid "Add it to the menu in Appearance → Menus if it isn't there yet."
+msgstr "Ha még nincs a menüben, add hozzá: Megjelenés → Menük."
+
+msgid "Show the teachers on the website: this creates a \"Teachers\" page with everyone's photos, bio and next classes (shortcode [oys_teachers])."
+msgstr "Az oktatók megjelenítése a weboldalon: létrejön egy „Oktatók” oldal mindenki fotójával, bemutatkozásával és következő óráival ([oys_teachers] rövidkód)."
+
+msgid "Create the Teachers page"
+msgstr "Az Oktatók oldal létrehozása"
+
+msgid "Statements"
+msgstr "Elszámolások"
+
+msgid "Classes"
+msgstr "Órák"
+
+msgid "Class income"
+msgstr "Órabevétel"
+
+msgid "Paid to their Stripe"
+msgstr "A Stripe-jukba fizetve"
+
+msgid "You owe them"
+msgstr "Tartozol neki"
+
+msgid "They owe you"
+msgstr "Tartozik neked"
+
+msgid "Balance"
+msgstr "Egyenleg"
+
+msgid "Settled"
+msgstr "Rendezve"
+
+msgid "The studio pays you %s"
+msgstr "A stúdió fizet neked: %s"
+
+msgid "You pay the studio %s"
+msgstr "Te fizetsz a stúdiónak: %s"
+
+msgid "You pay %s"
+msgstr "Te fizetsz: %s"
+
+msgid "They pay you %s"
+msgstr "Ő fizet neked: %s"
+
+msgid "Stripe is connected: card payments for their classes now go to their account."
+msgstr "A Stripe be van kötve: az óráik kártyás fizetése mostantól az ő fiókjukba megy."
+
+msgid "Stripe isn't finished yet. They can continue any time from their Teaching → My profile page."
+msgstr "A Stripe-beállítás még nincs kész. Bármikor folytathatják a Tanítás → Profilom oldalon."
+
+msgid "All teachers"
+msgstr "Összes oktató"
+
+msgid "For their login and booking notices. Not shown on the website."
+msgstr "A belépéshez és a foglalási értesítésekhez. A weboldalon nem látszik."
+
+msgid "Headline"
+msgstr "Alcím"
+
+msgid "About"
+msgstr "Bemutatkozás"
+
+msgid "of the income of their classes"
+msgstr "az óráik bevételéből"
+
+msgid "Payments at the studio"
+msgstr "Fizetés a helyszínen"
+
+msgid "The teacher collects them at their classes (and pays your part in the statement)"
+msgstr "Az oktató szedi be az óráin (és a te részedet az elszámolásban fizeti)"
+
+msgid "You collect them"
+msgstr "Te szeded be"
+
+msgid "Email them about bookings, cancellations and go/no-go decisions of their classes"
+msgstr "E-mail neki az órái foglalásairól, lemondásairól és arról, megtartható-e az óra"
+
+msgid "Show on the website and in the calendar"
+msgstr "Látszik a weboldalon és a naptárban"
+
+msgid "Save teacher"
+msgstr "Oktató mentése"
+
+msgid "Add teacher"
+msgstr "Oktató hozzáadása"
+
+msgid "They log in as %s and see Teaching in the dashboard: their classes, rosters, messages, profile and statement."
+msgstr "%s néven lép be, és az adminban a Tanítás menüt látja: az óráit, a névsorokat, az üzeneteket, a profilját és az elszámolását."
+
+msgid "Send the login email again"
+msgstr "A belépési e-mail újraküldése"
+
+msgid "Remove their login"
+msgstr "Belépés megszüntetése"
+
+msgid "With a login they can see who is booked into their classes and write to them. They get an email to set their password."
+msgstr "Belépéssel látja, ki foglalt az óráira, és írhat nekik. E-mailt kap a jelszava beállításához."
+
+msgid "Give them a login"
+msgstr "Belépés adása"
+
+msgid "Card payments (Stripe)"
+msgstr "Kártyás fizetés (Stripe)"
+
+msgid "When connected, a drop-in or donation paid by card for their class is charged on their own Stripe account; your %d%% comes to your Stripe as a fee. Passes and memberships are always paid to you and settled in the statement. They can connect from their own login too."
+msgstr "Ha be van kötve, az órájára kártyával fizetett alkalmi jegy vagy adomány az ő Stripe-fiókját terheli; a te %d%%-od díjként a te Stripe-odba kerül. A bérleteket és a tagságot mindig neked fizetik, és az elszámolásban rendeződnek. A saját belépéséből is bekötheti."
+
+msgid "Open their Stripe setup"
+msgstr "Stripe-beállításának megnyitása"
+
+msgid "Set up Stripe with them now"
+msgstr "Stripe beállítása vele most"
+
+msgid "Check status"
+msgstr "Állapot ellenőrzése"
+
+msgid "Card payments for their classes will go to your account again. Continue?"
+msgstr "Az órái kártyás fizetése újra a te fiókodba megy. Folytatod?"
+
+msgid "Disconnect"
+msgstr "Leválasztás"
+
+msgid "Photos"
+msgstr "Fotók"
+
+msgid "Make main"
+msgstr "Legyen ez a fő"
+
+msgid "Main photo"
+msgstr "Fő fotó"
+
+msgid "Upload photos"
+msgstr "Fotók feltöltése"
+
+msgid "The first photo is the main one (on class pages and in the app). Up to 8."
+msgstr "Az első fotó a fő (az óraoldalakon és az appban). Legfeljebb 8."
+
+msgid "Teacher not found"
+msgstr "Az oktató nem található"
+
+msgid "Statement: %1$s, %2$s"
+msgstr "Elszámolás: %1$s, %2$s"
+
+msgid "Teacher's part (%d%%)"
+msgstr "Az oktató része (%d%%)"
+
+msgid "Paid by card straight to the teacher's Stripe: %1$s (the studio's %2$s was taken as a fee automatically, nothing to settle)."
+msgstr "Kártyával egyenesen az oktató Stripe-jába fizetve: %1$s (a stúdió %2$s része díjként magától levonódott, nincs mit rendezni)."
+
+msgid "The studio owes the teacher: %s (their part of passes, memberships and card payments the studio received)."
+msgstr "A stúdió tartozik az oktatónak: %s (az ő része a stúdióhoz befolyt bérletekből, tagságokból és kártyás fizetésekből)."
+
+msgid "The teacher owes the studio: %s (the studio's part of payments the teacher collected at class)."
+msgstr "Az oktató tartozik a stúdiónak: %s (a stúdió része az oktató által az órán beszedett fizetésekből)."
+
+msgid "Still to collect at the studio: %s (counted once marked as paid)."
+msgstr "Még beszedendő a helyszínen: %s (fizetettnek jelölés után számít)."
+
+msgid "No finished classes with bookings this month."
+msgstr "Ebben a hónapban nincs lezárt, foglalásos óra."
+
+msgid "Download CSV"
+msgstr "CSV letöltése"
+
+msgid "Person"
+msgstr "Személy"
+
+msgid "Value"
+msgstr "Érték"
+
+msgid "To settle"
+msgstr "Rendezendő"
+
+msgid "→ the studio pays the teacher · ← the teacher pays the studio. A pass class is worth what the customer paid per class; free passes and gifts from the studio count at the class price."
+msgstr "→ a stúdió fizet az oktatónak · ← az oktató fizet a stúdiónak. Egy bérletes óra annyit ér, amennyit a vendég alkalmanként fizetett; a stúdió ingyenes bérletei és ajándékai az óra árán számítanak."
+
+msgid "Teacher saved."
+msgstr "Oktató mentve."
+
+msgid "Photos updated."
+msgstr "Fotók frissítve."
+
+msgid "Login removed. Their classes and statements stay."
+msgstr "Belépés megszüntetve. Az órái és elszámolásai megmaradnak."
+
+msgid "Done: they got an email to set their password."
+msgstr "Kész: e-mailt kapott a jelszava beállításához."
+
+msgid "Stripe is connected: card payments for their classes go to their account."
+msgstr "A Stripe be van kötve: az órái kártyás fizetése az ő fiókjába megy."
+
+msgid "Stripe isn't finished yet."
+msgstr "A Stripe-beállítás még nincs kész."
+
+msgid "Disconnected: card payments for their classes go to your account again."
+msgstr "Leválasztva: az órái kártyás fizetése újra a te fiókodba megy."
+
+msgid "The Teachers page is ready."
+msgstr "Az Oktatók oldal kész."
+
+msgid "Your login isn't linked to a teacher profile yet. Please ask the studio."
+msgstr "A belépésed még nincs oktatói profilhoz kötve. Kérlek, szólj a stúdiónak."
+
+msgid "Hi %s"
+msgstr "Szia %s!"
+
+msgid "Your next classes"
+msgstr "A következő óráid"
+
+msgid "No classes assigned to you yet. The studio adds you to classes in its calendar."
+msgstr "Még nincs órád. A stúdió a naptárában ad hozzá órákhoz."
+
+msgid "Recent classes"
+msgstr "Legutóbbi órák"
+
+msgid "Confirmed"
+msgstr "Visszaigazolva"
+
+msgid "Needs %d to go ahead"
+msgstr "Még %d fő kell, hogy megtartható legyen"
+
+msgid "Scheduled"
+msgstr "Betervezve"
+
+msgid "Class not found"
+msgstr "Az óra nem található"
+
+msgid "This class isn't one of yours."
+msgstr "Ez az óra nem a tiéd."
+
+msgid "All my classes"
+msgstr "Összes órám"
+
+msgid "Online link:"
+msgstr "Online link:"
+
+msgid "First class"
+msgstr "Első óra"
+
+msgid "Paid at the studio · %s"
+msgstr "A helyszínen fizetett · %s"
+
+msgid "Everyone gets their own email from the studio with the class details; replies come to you (%s)."
+msgstr "Mindenki külön e-mailt kap a stúdiótól az óra adataival; a válaszok hozzád jönnek (%s)."
+
+msgid "Your Stripe account is connected. Card payments for your classes now go straight to you."
+msgstr "A Stripe-fiókod be van kötve. Az óráid kártyás fizetése mostantól egyenesen hozzád megy."
+
+msgid "Stripe isn't finished yet. You can continue any time."
+msgstr "A Stripe-beállítás még nincs kész. Bármikor folytathatod."
+
+msgid "This is what students see on the website and in the app, next to your classes."
+msgstr "Ezt látják a tanítványok a weboldalon és az appban, az óráid mellett."
+
+msgid "the studio can change it"
+msgstr "a stúdió módosíthatja"
+
+msgid "About you"
+msgstr "Rólad"
+
+msgid "Email me about bookings, cancellations and whether my classes go ahead"
+msgstr "E-mail nekem a foglalásokról, lemondásokról, és arról, megtartható-e az órám"
+
+msgid "Save my profile"
+msgstr "Profilom mentése"
+
+msgid "Card payments"
+msgstr "Kártyás fizetés"
+
+msgid "Connect your own Stripe account and card payments for your drop-in classes go straight to you: you are the seller, and the studio's %d%% is taken automatically as a fee. Passes and memberships are paid to the studio and settled in your monthly statement."
+msgstr "Kösd be a saját Stripe-fiókodat, és az alkalmi óráid kártyás fizetése egyenesen hozzád megy: te vagy az eladó, a stúdió %d%%-a díjként magától levonódik. A bérleteket és a tagságot a stúdiónak fizetik, és a havi elszámolásodban rendeződnek."
+
+msgid "Open my Stripe setup"
+msgstr "Stripe-beállításom megnyitása"
+
+msgid "Continue with Stripe"
+msgstr "Folytatás a Stripe-ban"
+
+msgid "Connect Stripe"
+msgstr "Stripe bekötése"
+
+msgid "My statement: %s"
+msgstr "Elszámolásom: %s"
+
+msgid "%d photo added."
+msgid_plural "%d photos added."
+msgstr[0] "%d fotó hozzáadva."
+msgstr[1] "%d fotó hozzáadva."
+
+msgid "Please log in again."
+msgstr "Kérlek, lépj be újra."
+
+msgid "The email or password is not right."
+msgstr "Hibás e-mail-cím vagy jelszó."
+
+msgid "Use my membership"
+msgstr "A tagságommal"
+
+msgid "Unlimited"
+msgstr "Korlátlan"
+
+msgid "Use my pass"
+msgstr "A bérletemmel"
+
+msgid "Secure Stripe checkout opens in your browser"
+msgstr "A biztonságos Stripe-fizetés a böngésződben nyílik meg"
+
+msgid "Please accept the participation agreement first."
+msgstr "Előbb fogadd el a részvételi nyilatkozatot."
+
+msgid "This class is not free."
+msgstr "Ez az óra nem ingyenes."
+
+msgid "Card payment is not available for this class."
+msgstr "Ehhez az órához nincs kártyás fizetés."
+
+msgid "Choose how to pay."
+msgstr "Válaszd ki, hogyan fizetsz."
+
+msgid "Cancelled. You have a class credit to use."
+msgstr "Lemondva. Kaptál egy órakreditet."
+
+msgid "Cancelled. It was inside the cancellation window, so the class counts as used."
+msgstr "Lemondva. A lemondási határidőn belül volt, ezért az alkalom felhasználtnak számít."
+
+msgid "%d class left"
+msgid_plural "%d classes left"
+msgstr[0] "%d alkalom maradt"
+msgstr[1] "%d alkalom maradt"
+
+msgid "Not connected"
+msgstr "Nincs bekötve"
+
+msgid "Connected: card payments go to their Stripe"
+msgstr "Bekötve: a kártyás fizetés az ő Stripe-jába megy"
+
+msgid "Started, not finished"
+msgstr "Elkezdve, nincs befejezve"
+
+msgid "Teacher not found."
+msgstr "Az oktató nem található."
+
+msgid "Card, paid to the teacher's Stripe"
+msgstr "Kártya, az oktató Stripe-jába"
+
+msgid "Card, paid to the studio"
+msgstr "Kártya, a stúdiónak"
+
+msgid "Class pass"
+msgstr "Bérlet"
+
+msgid "Paid at the studio"
+msgstr "A helyszínen fizetve"
+
+msgid "Not collected yet"
+msgstr "Még nincs beszedve"

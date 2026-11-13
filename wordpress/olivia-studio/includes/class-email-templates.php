@@ -123,6 +123,45 @@ class OYS_Email_Templates {
 		);
 	}
 
+	/**
+	 * Is the feature behind this email in use on the site? The Emails page lists only these (Áron, 2026-11-13: on the
+	 * online site the membership, birthday, raffle… emails were confusing). Sending does not depend on it: a feature that
+	 * is off never triggers its email anyway.
+	 */
+	public static function in_use( $key ) {
+		$f = null;
+		if ( null === $f ) { // computed each time: settings can change within a request (tests, saving)
+			$products = OYS_Products::all( true );
+			$kinds    = array_map( fn( $p ) => (string) $p['kind'], $products );
+			$min      = (int) OYS_Settings::get( 'min_people_default' ) > 0;
+			foreach ( OYS_Locations::all() as $l ) {
+				$min = $min || (int) $l['min_people'] > 0;
+			}
+			$f = array(
+				'guests'     => (int) OYS_Settings::get( 'max_guests' ) > 0,
+				'minimum'    => $min,
+				'membership' => in_array( 'membership', $kinds, true ),
+				'private'    => (bool) array_filter( $kinds, fn( $k ) => str_starts_with( $k, 'private' ) || str_starts_with( $k, 'prenatal' ) ) || ( class_exists( 'OYS_Services' ) && OYS_Services::all() ),
+				'passes'     => (bool) array_filter( $kinds, fn( $k ) => in_array( $k, array( 'pack', 'online_pack', 'intro', 'private_pack' ), true ) || str_starts_with( $k, 'prenatal' ) ),
+				'gifts'      => (bool) array_filter( $products, fn( $p ) => ! empty( $p['giftable'] ) ),
+				'birthday'   => (bool) (int) OYS_Settings::get( 'birthday_on' ),
+				'raffle'     => OYS_Rewards::period_months() > 0,
+			);
+		}
+		$needs = array(
+			'guests_added' => 'guests', 'guest_invite' => 'guests', 'guest_cancelled' => 'guests',
+			'class_cancelled_minimum' => 'minimum', 'minimum_nudge' => 'minimum', 'studio_minimum' => 'minimum',
+			'membership_started' => 'membership', 'membership_cancel_scheduled' => 'membership', 'membership_ended' => 'membership',
+			'membership_payment_failed' => 'membership', 'studio_membership' => 'membership',
+			'private_request_received' => 'private', 'private_offer' => 'private', 'private_declined' => 'private', 'studio_private' => 'private',
+			'pass_expiring' => 'passes', 'pass_purchased' => 'passes',
+			'gift_card' => 'gifts', 'gift_receipt' => 'gifts',
+			'birthday' => 'birthday',
+			'raffle_winner' => 'raffle', 'raffle_announcement' => 'raffle',
+		);
+		return ! isset( $needs[ $key ] ) || ! empty( $f[ $needs[ $key ] ] );
+	}
+
 	const FIELDS = array( 'subject', 'heading', 'message', 'closing', 'button' );
 
 	/**
