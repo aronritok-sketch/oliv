@@ -697,6 +697,27 @@ pont, alul Mentés / Elvetés / Képek a lapon / Lista és súgó / Kilépés, C
   új eredeti látszik). Olivia átírásait az admin lista mutatja.
 - Online kiadáson és a magyar oldalon él; az amerikai kiadáson és a Hathaflow demón ki van kapcsolva (`oye_enabled`).
 
+### 6.13f Fizetés az Arovia nevében, a HelloProVision CRM-en át (olivia-studio 1.9.0)
+
+Áron (11.13): „az Arovia Group LLC fogja számlázni, szóval Stripe kell hozzá, meg QuickBooks … szedd ki a CRM-ből”. A
+Stripe-kulcs és a QuickBooks-kapcsolat a CRM-ben marad (a CRM REST-je titkot nem ad ki, a QuickBooks-token frissítéskor
+cserélődik). Ehelyett `Studio → Settings → Payments go to: Arovia Group LLC, through the HelloProVision CRM`
+(`pay_provider = hpv`, vagy `OYS_PAY_PROVIDER`):
+
+- `OYS_Stripe::request()` minden hívása a CRM-hez megy (`class-hpv-pay.php`, `OYS_HPV_PAY_URL`, alapból
+  `https://crm.helloprovision.com/wp-json/hpv/v1/shop`), aláírva: `X-HPV-Site`, `X-HPV-Time`,
+  `X-HPV-Signature = HMAC-SHA256(titok, "idő.törzs")`. A CRM csak ezt engedi: Checkout „payment” módban az oldal
+  pénznemében és saját visszatérő címével; a saját munkamenet olvasása / lejáratása; a saját fizetés visszatérítése.
+  Mentett Stripe-ügyfél nincs (`customer_for()` üres), az oktatók saját Stripe-fiókja (Connect) itt nem megy.
+- **Titok kézzel sehol:** az oldal maga készíti, elküldi a CRM-nek (`/register`), a CRM visszahívja
+  `/wp-json/oys/v1/hpv-proof?c=…` (HMAC-válasz), és csak a CRM engedélylistáján lévő címet fogadja el. A regisztráció a
+  cronnal (`oys_frequent`, 10 percenként) addig ismétlődik, amíg sikerül; az adminban „Csatlakozás most”.
+- A Stripe-eseményeket a CRM aláírva továbbítja (`/wp-json/oys/v1/hpv-webhook`) → `OYS_Stripe::handle_event()`.
+- A CRM-oldal (hlprv `plugins/helloprovision-portal/includes/shop-pay.php`): a fizetés QuickBooks Sales Receipt
+  (USD, a Stripe egyenlegtranzakciójából), a díj kiadás, a visszatérítés Refund Receipt; Eszközök → Webshop-fizetések.
+- A téma beállítója az online kiadáson egyszer `hpv`-re állítja (`oy_mail_setup`, rev 2026-11-13b) – de csak ha az
+  oldalon nincs saját Stripe-kulcs.
+
 ### 6.14 Mobil API és iOS app
 
 **API** – `OYS_App_API` (`includes/class-app-api.php`), útvonalak a `oys/v1/app/` alatt:

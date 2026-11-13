@@ -33,6 +33,10 @@ class OYS_Stripe {
 	 * @return array|WP_Error decoded response
 	 */
 	public static function request( $method, $path, array $params = array(), $idempotency_key = '', $account = '' ) {
+		if ( OYS_HPV_Pay::active() ) {
+			// Arovia's Stripe, through the HelloProVision CRM (class-hpv-pay.php): no teachers' accounts there
+			return $account ? new WP_Error( 'oys_stripe_connect', 'Teachers\' own Stripe accounts are not used with CRM payments.' ) : OYS_HPV_Pay::stripe( $method, $path, $params, $idempotency_key );
+		}
 		$secret = OYS_Settings::stripe_secret();
 		if ( ! $secret ) {
 			return new WP_Error( 'oys_stripe_keys', __( 'Online payments are not set up yet.', 'olivia-studio' ) );
@@ -80,6 +84,9 @@ class OYS_Stripe {
 
 	/** Reuse one Stripe customer per account so receipts and saved details line up. */
 	public static function customer_for( $user_id ) {
+		if ( OYS_HPV_Pay::active() ) {
+			return ''; // Arovia's Stripe through the CRM: the buyer's e-mail goes with the payment, no saved customer
+		}
 		$meta_key = OYS_Settings::is_live() ? 'oys_stripe_customer_live' : 'oys_stripe_customer_test';
 		$existing = get_user_meta( $user_id, $meta_key, true );
 		if ( $existing ) {
@@ -348,7 +355,11 @@ class OYS_Stripe {
 		if ( empty( $event['id'] ) || empty( $event['type'] ) ) {
 			return new WP_REST_Response( array( 'error' => 'bad payload' ), 400 );
 		}
+		return self::handle_event( $event );
+	}
 
+	/** A verified Stripe event (from Stripe itself, or forwarded by the CRM: class-hpv-pay.php). Each one once. */
+	public static function handle_event( array $event ) {
 		global $wpdb;
 		$t     = OYS_Install::table( 'stripe_events' );
 		$fresh = $wpdb->query( $wpdb->prepare( "INSERT IGNORE INTO $t (event_id, type, received_at) VALUES (%s, %s, %s)", $event['id'], $event['type'], oys_now() ) );

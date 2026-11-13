@@ -24,7 +24,7 @@ class OYS_Admin {
 			}
 		} );
 		$actions = array( 'save_session', 'cancel_session', 'roster', 'save_template', 'delete_template', 'generate', 'private_offer', 'private_decline',
-			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'live_test', 'live_test_open', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'smtp_test', 'message', 'pay_later_reset', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_delete', 'save_ai' );
+			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'live_test', 'live_test_open', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'smtp_test', 'hpv_register', 'message', 'pay_later_reset', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_delete', 'save_ai' );
 		foreach ( $actions as $a ) {
 			add_action( 'admin_post_oys_admin_' . $a, array( __CLASS__, 'guard' ) );
 		}
@@ -923,6 +923,15 @@ class OYS_Admin {
 			: '<input type="' . $type . '" name="s[' . $k . ']" value="' . esc_attr( $s[ $k ] ) . '" class="' . $cls . '" ' . $extra . '>';
 		$hook = rest_url( 'oys/v1/stripe-webhook' );
 		echo self::form( 'save_settings' ) . '<h2>' . esc_html__( 'Payments (Stripe)', 'olivia-studio' ) . '</h2><table class="form-table">'; // phpcs:ignore
+		// Who takes the card payments: the studio's own Stripe, or Arovia's through the HelloProVision CRM (class-hpv-pay.php)
+		$hpv = OYS_HPV_Pay::state();
+		echo '<tr><th>' . esc_html__( 'Payments go to', 'olivia-studio' ) . '</th><td><select name="s[pay_provider]"' . ( defined( 'OYS_PAY_PROVIDER' ) ? ' disabled' : '' ) . '><option value="stripe"' . selected( OYS_Settings::pay_provider(), 'stripe', false ) . '>' . esc_html__( 'The studio\'s own Stripe account (the keys below)', 'olivia-studio' ) . '</option><option value="hpv"' . selected( OYS_Settings::pay_provider(), 'hpv', false ) . '>' . esc_html__( 'Arovia Group LLC, through the HelloProVision CRM (Stripe + QuickBooks)', 'olivia-studio' ) . '</option></select>';
+		if ( OYS_HPV_Pay::active() ) {
+			echo '<p class="description">' . ( OYS_HPV_Pay::ready()
+				? '✅ ' . esc_html( sprintf( __( 'Connected to the CRM since %1$s (%2$s). No keys are needed here.', 'olivia-studio' ), wp_date( 'Y-m-d H:i', (int) $hpv['registered'] ), 'live' === $hpv['mode'] ? __( 'live payments', 'olivia-studio' ) : __( 'test payments', 'olivia-studio' ) ) )
+				: '⏳ ' . esc_html__( 'Connecting to the CRM…', 'olivia-studio' ) . ( '' !== $hpv['error'] ? ' ' . esc_html( sprintf( __( 'Last answer: %s', 'olivia-studio' ), $hpv['error'] ) ) : '' ) ) . ' <button class="button" form="oys-hpv-register">' . esc_html__( 'Connect now', 'olivia-studio' ) . '</button></p>';
+		}
+		echo '</td></tr>';
 		echo '<tr><th>' . esc_html__( 'Mode', 'olivia-studio' ) . '</th><td><select name="s[stripe_mode]"><option value="test"' . selected( $s['stripe_mode'], 'test', false ) . '>' . esc_html__( 'Test (no real charges)', 'olivia-studio' ) . '</option><option value="live"' . selected( $s['stripe_mode'], 'live', false ) . '>' . esc_html__( 'Live', 'olivia-studio' ) . '</option></select></td></tr>';
 		echo '<tr><th>' . esc_html__( 'Test secret key', 'olivia-studio' ) . '</th><td>' . $f( 'stripe_test_secret', 'password', 'regular-text', 'autocomplete="off" placeholder="sk_test_…"' ) . '</td></tr>'; // phpcs:ignore
 		echo '<tr><th>' . esc_html__( 'Test webhook signing secret', 'olivia-studio' ) . '</th><td>' . $f( 'stripe_test_webhook', 'password', 'regular-text', 'autocomplete="off" placeholder="whsec_…"' ) . '</td></tr>'; // phpcs:ignore
@@ -1045,7 +1054,7 @@ class OYS_Admin {
 		echo '<tr><th>' . esc_html__( 'Version', 'olivia-studio' ) . '</th><td>' . $f( 'waiver_version', 'text', 'small-text' ) . '<p class="description">' . esc_html__( 'Change the version after editing the text: everyone is asked to accept the new version at their next booking.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
 		echo '</table><h2>' . esc_html__( 'Emails', 'olivia-studio' ) . '</h2><p>' . wp_kses_post( sprintf( __( 'Sender, reminders and the text of every automatic email are in <a href="%s">Studio → Emails &amp; reminders</a>.', 'olivia-studio' ), esc_url( admin_url( 'admin.php?page=oys-emails' ) ) ) ) . '</p>';
 		submit_button();
-		echo '</form>' . self::form( 'zoom_test', 'id="oys-zoom-test"' ) . '</form>' . self::form( 'live_test', 'id="oys-live-test"' ) . '</form>' . self::form( 'live_test_open', 'id="oys-live-test-open"' ) . '</form></div>'; // phpcs:ignore
+		echo '</form>' . self::form( 'hpv_register', 'id="oys-hpv-register"' ) . '</form>' . self::form( 'zoom_test', 'id="oys-zoom-test"' ) . '</form>' . self::form( 'live_test', 'id="oys-live-test"' ) . '</form>' . self::form( 'live_test_open', 'id="oys-live-test-open"' ) . '</form></div>'; // phpcs:ignore
 	}
 
 	/* ======================================================================
@@ -1523,6 +1532,11 @@ class OYS_Admin {
 		self::back( 'oys-emails', array( 'edit' => $key, 'lang' => $lang ), $ok ? sprintf( __( 'Test sent to %s.', 'olivia-studio' ), $to ) : __( 'The test could not be sent. Check the sending server (SMTP) on the Emails page.', 'olivia-studio' ) );
 	}
 
+	private static function do_hpv_register() {
+		$res = OYS_HPV_Pay::register();
+		self::back( 'oys-settings', array(), is_wp_error( $res ) ? sprintf( __( 'The CRM did not accept the connection: %s', 'olivia-studio' ), $res->get_error_message() ) : __( 'Connected to the CRM: card payments go to Arovia.', 'olivia-studio' ), is_wp_error( $res ) ? 'error' : 'success' );
+	}
+
 	private static function do_smtp_test() {
 		$to  = wp_get_current_user()->user_email;
 		$res = OYS_Mailer::test( $to );
@@ -1579,6 +1593,9 @@ class OYS_Admin {
 			}
 		}
 		$clean['stripe_mode'] = 'live' === ( $clean['stripe_mode'] ?? '' ) ? 'live' : 'test';
+		if ( isset( $clean['pay_provider'] ) ) {
+			$clean['pay_provider'] = 'hpv' === $clean['pay_provider'] ? 'hpv' : 'stripe';
+		}
 		$clean['currency']    = strtolower( substr( preg_replace( '/[^a-z]/i', '', $clean['currency'] ?? 'usd' ), 0, 3 ) ) ?: 'usd';
 		$clean['hold_minutes'] = max( 30, (int) ( $clean['hold_minutes'] ?? 30 ) );
 		$clean['online_per_credit'] = max( 1, (int) ( $clean['online_per_credit'] ?? 4 ) );

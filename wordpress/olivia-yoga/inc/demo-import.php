@@ -539,14 +539,19 @@ function oy_import_privacy( array $data, $refresh = false ) {
  * set in the admin stays.
  */
 function oy_mail_setup() {
-	$rev = '2026-11-13';
+	$rev = '2026-11-13b';
 	if ( ! class_exists( 'OYS_Settings' ) || get_option( 'oy_mail_rev' ) === $rev ) {
 		return array();
 	}
 	update_option( 'oy_mail_rev', $rev );
 	$data  = json_decode( (string) file_get_contents( oy_content_file() ), true );
 	$admin    = strtolower( (string) get_option( 'admin_email' ) );
-	$defaults = array( 'email_from' => $admin, 'email_reply_to' => '', 'notify_email' => $admin, 'birthday_on' => '1', 'raffle_period' => 'half' );
+	$defaults = array( 'email_from' => $admin, 'email_reply_to' => '', 'notify_email' => $admin, 'birthday_on' => '1', 'raffle_period' => 'half', 'pay_provider' => 'stripe' );
+	// 13 November, evening (Áron): Arovia Group LLC takes the payments, through the HelloProVision CRM – but a site
+	// that already has its own Stripe key keeps it
+	if ( method_exists( 'OYS_Settings', 'pay_provider' ) && '' !== (string) OYS_Settings::stripe_secret() ) {
+		unset( $defaults['pay_provider'] );
+	}
 	$want     = array_intersect_key( (array) ( $data['setup']['studio'] ?? array() ), $defaults );
 	$set      = array();
 	foreach ( $want as $k => $v ) {

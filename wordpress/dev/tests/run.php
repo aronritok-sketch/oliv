@@ -2460,6 +2460,88 @@ test( 'page editor: saved text and photo show to everyone, links, booking and pr
 	delete_option( 'oye_edits_prev' );
 } );
 
+test( 'Arovia payments through the CRM: the site registers itself, every Stripe call is signed, events come back signed', function () {
+	$calls = array();
+	$fake  = function ( $pre, $args, $url ) use ( &$calls ) {
+		if ( ! str_starts_with( $url, OYS_HPV_Pay::base() ) ) {
+			return $pre;
+		}
+		$path = substr( $url, strlen( OYS_HPV_Pay::base() ) );
+		$body = (string) ( $args['body'] ?? '' );
+		$in   = json_decode( $body, true );
+		$json = array();
+		$code = 200;
+		if ( '/register' === $path ) {
+			// the CRM asks the site to prove the registration came from it
+			$c     = wp_generate_password( 32, false );
+			$r     = new WP_REST_Request( 'GET', '/oys/v1/hpv-proof' );
+			$r->set_param( 'c', $c );
+			$proof = OYS_HPV_Pay::proof( $r )->get_data()['proof'] ?? '';
+			$json  = hash_equals( hash_hmac( 'sha256', 'proof.' . $c, $in['secret'] ), $proof ) && home_url() === $in['url'] ? array( 'ok' => true, 'site' => 's_unit', 'mode' => 'test' ) : array( 'message' => 'no proof' );
+			$code  = isset( $json['ok'] ) ? 200 : 403;
+		} elseif ( '/stripe' === $path ) {
+			$h  = $args['headers'];
+			$ok = 's_unit' === $h['X-HPV-Site'] && hash_equals( hash_hmac( 'sha256', $h['X-HPV-Time'] . '.' . $body, OYS_HPV_Pay::state()['secret'] ), $h['X-HPV-Signature'] );
+			$calls[] = array( $in['method'], $in['path'], $in['params'], $ok );
+			if ( ! $ok ) {
+				$code = 401;
+			} elseif ( '/v1/checkout/sessions' === $in['path'] ) {
+				$json = array( 'id' => 'cs_hpv_1', 'url' => 'https://checkout.stripe.test/arovia' );
+			} elseif ( str_starts_with( $in['path'], '/v1/checkout/sessions/cs_hpv_1' ) ) {
+				$json = array( 'id' => 'cs_hpv_1', 'status' => 'complete', 'payment_status' => 'paid', 'amount_total' => 3000, 'payment_intent' => array( 'id' => 'pi_hpv_1', 'latest_charge' => array( 'receipt_url' => 'https://pay.stripe.test/r' ) ) );
+			} elseif ( '/v1/refunds' === $in['path'] ) {
+				$json = array( 'id' => 're_hpv_1', 'amount' => (int) ( $in['params']['amount'] ?? 3000 ), 'payment_intent' => $in['params']['payment_intent'] );
+			} else {
+				$code = 403;
+				$json = array( 'message' => 'This Stripe call is not allowed through the CRM.' );
+			}
+		}
+		return array( 'headers' => array(), 'body' => wp_json_encode( $json ), 'response' => array( 'code' => $code, 'message' => 'OK' ), 'cookies' => array(), 'filename' => null );
+	};
+	add_filter( 'pre_http_request', $fake, 4, 3 );
+	delete_option( OYS_HPV_Pay::OPTION );
+	OYS_Settings::update( array( 'pay_provider' => 'hpv' ) );
+	ok( OYS_HPV_Pay::active() && ! OYS_Settings::payments_ready(), 'CRM payments chosen, not connected yet' );
+	ok( true === OYS_HPV_Pay::register() && OYS_Settings::payments_ready(), 'registered: the CRM checked the proof, no key typed in anywhere' );
+	$stripe_before = count( $GLOBALS['stripe_calls'] );
+
+	$u        = make_user();
+	$s        = make_session();
+	$order_id = OYS_Orders::create( array( 'user_id' => $u, 'type' => 'dropin', 'session_id' => $s->id, 'amount_cents' => 3000 ) );
+	OYS_Bookings::hold( $u, $s, $order_id );
+	$url = OYS_Stripe::start_checkout( $order_id, 'Hatha Flow', 'szerda' );
+	eq( 'https://checkout.stripe.test/arovia', $url, 'the Stripe page comes through the CRM' );
+	eq( $stripe_before, count( $GLOBALS['stripe_calls'] ), 'not a single direct Stripe call from the site' );
+	ok( $calls && $calls[0][3] && ! isset( $calls[0][2]['customer'] ) && ! empty( $calls[0][2]['customer_email'] ), 'signed, with the buyer\'s e-mail, no saved Stripe customer' );
+
+	// the CRM forwards the Stripe event, signed with the site's secret
+	$event = array( 'id' => 'evt_hpv_' . wp_generate_password( 6, false ), 'type' => 'checkout.session.completed', 'data' => array( 'object' => array( 'id' => 'cs_hpv_1', 'payment_status' => 'paid', 'status' => 'complete' ) ) );
+	$send  = function ( $event, $secret ) {
+		$payload = wp_json_encode( $event );
+		$t       = time();
+		$r       = new WP_REST_Request( 'POST', '/oys/v1/hpv-webhook' );
+		$r->set_body( $payload );
+		$r->set_header( 'x-hpv-site', 's_unit' );
+		$r->set_header( 'x-hpv-time', (string) $t );
+		$r->set_header( 'x-hpv-signature', hash_hmac( 'sha256', $t . '.' . $payload, $secret ) );
+		return OYS_HPV_Pay::webhook( $r );
+	};
+	eq( 400, $send( $event, 'not-the-secret' )->get_status(), 'a forged event is refused' );
+	eq( 'pending', OYS_Orders::get( $order_id )->status, 'and changes nothing' );
+	eq( 200, $send( $event, OYS_HPV_Pay::state()['secret'] )->get_status(), 'the real one is accepted' );
+	$o = OYS_Orders::get( $order_id );
+	ok( 'paid' === $o->status && 'pi_hpv_1' === $o->stripe_payment_intent, 'the order is paid, with the payment intent for refunds' );
+
+	$res = OYS_Stripe::refund( $order_id, 1000 );
+	ok( ! is_wp_error( $res ) && 'partially_refunded' === OYS_Orders::get( $order_id )->status, 'a refund goes through the CRM too' );
+	eq( 'pi_hpv_1', end( $calls )[2]['payment_intent'], 'refund of this payment' );
+	ok( is_wp_error( OYS_Stripe::request( 'GET', '/v1/balance' ) ), 'anything else is refused by the CRM' );
+
+	remove_filter( 'pre_http_request', $fake, 4 );
+	OYS_Settings::update( array( 'pay_provider' => 'stripe' ) );
+	delete_option( OYS_HPV_Pay::OPTION );
+} );
+
 test( 'helpers: money and periods', function () {
 	eq( '$25', oys_money( 2500, 'usd' ), 'whole dollars' );
 	eq( '$25.50', oys_money( 2550, 'usd' ), 'cents' );

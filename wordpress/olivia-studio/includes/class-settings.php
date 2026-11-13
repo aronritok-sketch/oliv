@@ -13,6 +13,7 @@ class OYS_Settings {
 
 	public static function defaults() {
 		return array(
+			'pay_provider'            => 'stripe',
 			'stripe_mode'             => 'test',
 			'stripe_test_secret'      => '',
 			'stripe_test_webhook'     => '',
@@ -144,6 +145,15 @@ class OYS_Settings {
 	}
 
 	public static function payments_ready() {
-		return (bool) self::stripe_secret();
+		return 'hpv' === self::pay_provider() ? OYS_HPV_Pay::ready() : (bool) self::stripe_secret();
+	}
+
+	/**
+	 * Who takes the card payments: „stripe” – the studio's own Stripe account (the keys above); „hpv” – Arovia Group LLC's
+	 * Stripe through the HelloProVision CRM, booked in its QuickBooks (class-hpv-pay.php). OYS_PAY_PROVIDER wins.
+	 */
+	public static function pay_provider() {
+		$p = defined( 'OYS_PAY_PROVIDER' ) ? (string) OYS_PAY_PROVIDER : (string) self::get( 'pay_provider' );
+		return 'hpv' === $p ? 'hpv' : 'stripe';
 	}
 }

@@ -191,6 +191,8 @@
   **Szerkesztés a weboldalon** mindkét oldalon (DEVELOPER 6.13e); oliviayoga (oliviajoga.hu) **1.5.0**. Tesztek 867/0.
 - **Fizetés (Áron, 11.13 este):** az Arovia Group LLC számláz → Stripe (Arovia) + QuickBooks. A kulcsok a CRM-ben vannak,
   és onnan nem jönnek ki (a CRM így készült; a QuickBooks-token is csak egy helyen élhet) → az oldal a CRM-en át fizettet.
+  olivia-studio **1.9.0** (DEVELOPER 6.13f) + olivia-yoga **3.5.1**; a CRM-modul a hlprv-ben (`shop-pay.php`), a fő
+  chatnek kell beolvasztania és kiadnia. Tesztek 879/0; a CRM-modul helyi próbája 25/25.
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
