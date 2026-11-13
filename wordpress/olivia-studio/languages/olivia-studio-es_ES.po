@@ -3880,3 +3880,37 @@ msgstr "El resumen te está esperando."
 
 msgid "A key is saved. Leave empty to keep it."
 msgstr "Hay una clave guardada. Si lo dejas vacío, se conserva."
+
+# The live test class, 2026-11-13
+msgid "This is a test class, it can't be booked."
+msgstr "Esta es una clase de prueba, no se puede reservar."
+
+msgid "Test class"
+msgstr "Clase de prueba"
+
+msgid "Test participant %d"
+msgstr "Participante de prueba %d"
+
+msgid "The test class is open for two hours."
+msgstr "La clase de prueba está abierta durante dos horas."
+
+msgid "Open it again (fresh, for two hours)"
+msgstr "Abrirla de nuevo (desde cero, dos horas)"
+
+msgid "Open the test class now (for two hours)"
+msgstr "Abrir la clase de prueba ahora (dos horas)"
+
+msgid "Open until %s."
+msgstr "Abierta hasta las %s."
+
+msgid "The teacher (you, logged in):"
+msgstr "Profesora (tú, con tu sesión iniciada):"
+
+msgid "Participants (no login needed – open them on a phone or in another browser):"
+msgstr "Participantes (sin iniciar sesión: ábrelos en un móvil o en otro navegador):"
+
+msgid "A class that is not on the timetable and can't be booked: go live, let the test participants in, try the camera, the chat, raising a hand, muting everyone and the recording. Opening it again starts afresh (the earlier test's chat and recording are deleted)."
+msgstr "Una clase que no está en el horario y no se puede reservar: empieza en directo, deja entrar a los participantes de prueba y prueba la cámara, el chat, levantar la mano, silenciar a todos y la grabación. Al abrirla de nuevo empieza desde cero (se borran el chat y la grabación de la prueba anterior)."
+
+msgid "Connect the LiveKit project above first."
+msgstr "Primero conecta arriba el proyecto de LiveKit."

@@ -294,6 +294,9 @@ class OYS_App_API {
 		) );
 		$out = array();
 		foreach ( $rows as $s ) {
+			if ( 'test' === $s->kind ) { // the live test class is nobody's to book
+				continue;
+			}
 			if ( 'private' === $s->kind && ! OYS_Privates::may_book( $user_id, $s ) ) {
 				continue;
 			}

@@ -24,7 +24,7 @@ class OYS_Admin {
 			}
 		} );
 		$actions = array( 'save_session', 'cancel_session', 'roster', 'save_template', 'delete_template', 'generate', 'private_offer', 'private_decline',
-			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'live_test', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'message', 'pay_later_reset', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_delete', 'save_ai' );
+			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'live_test', 'live_test_open', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'message', 'pay_later_reset', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_delete', 'save_ai' );
 		foreach ( $actions as $a ) {
 			add_action( 'admin_post_oys_admin_' . $a, array( __CLASS__, 'guard' ) );
 		}
@@ -1002,6 +1002,28 @@ class OYS_Admin {
 		echo '<tr><th>' . esc_html__( 'People can keep writing in the class chat for (days)', 'olivia-studio' ) . '</th><td>' . $f( 'live_chat_days', 'number', 'small-text', 'min="0"' ) . '</td></tr>'; // phpcs:ignore
 		$live = OYS_Live::enabled() ? __( 'On: online classes run in our live room.', 'olivia-studio' ) : ( OYS_Live::configured() ? __( 'Switched off.', 'olivia-studio' ) : __( 'No LiveKit project connected yet.', 'olivia-studio' ) );
 		echo '<tr><th>' . esc_html__( 'Status', 'olivia-studio' ) . '</th><td>' . esc_html( $live ) . ( OYS_Live::configured() ? ' <button class="button" form="oys-live-test">' . esc_html__( 'Test the connection', 'olivia-studio' ) . '</button>' : '' ) . '</td></tr>';
+		// The test class (Áron, 2026-11-13): open any time, try everything – nothing is booked, paid or emailed.
+		echo '<tr id="live-test"><th>' . esc_html__( 'Test class', 'olivia-studio' ) . '</th><td>';
+		if ( OYS_Live::enabled() ) {
+			$ts   = OYS_Schedule::get( (int) get_option( OYS_Live::TEST_OPTION ) ); // made by the first „Open”, not by looking
+			$open = OYS_Live::is_test( $ts ) && 'scheduled' === $ts->status && time() < oys_ts( $ts->ends_at );
+			echo '<p><button class="button button-primary" form="oys-live-test-open">' . esc_html( $open ? __( 'Open it again (fresh, for two hours)', 'olivia-studio' ) : __( 'Open the test class now (for two hours)', 'olivia-studio' ) ) . '</button></p>';
+			if ( $open ) {
+				$links = OYS_Live::test_links();
+				/* translators: %s: time the test class closes */
+				echo '<p>' . esc_html( sprintf( __( 'Open until %s.', 'olivia-studio' ), wp_date( get_option( 'time_format' ), oys_ts( $ts->ends_at ) ) ) ) . '</p>';
+				echo '<p><strong>' . esc_html__( 'The teacher (you, logged in):', 'olivia-studio' ) . '</strong><br><a href="' . esc_url( $links['teacher'] ) . '" target="_blank" rel="noopener">' . esc_html( $links['teacher'] ) . '</a></p>';
+				echo '<p><strong>' . esc_html__( 'Participants (no login needed – open them on a phone or in another browser):', 'olivia-studio' ) . '</strong></p><ol>';
+				foreach ( $links['people'] as $u ) {
+					echo '<li><input type="text" class="large-text code" readonly value="' . esc_attr( $u ) . '" onclick="this.select()"></li>';
+				}
+				echo '</ol>';
+			}
+			echo '<p class="description">' . esc_html__( 'A class that is not on the timetable and can\'t be booked: go live, let the test participants in, try the camera, the chat, raising a hand, muting everyone and the recording. Opening it again starts afresh (the earlier test\'s chat and recording are deleted).', 'olivia-studio' ) . '</p>';
+		} else {
+			echo '<p class="description">' . esc_html__( 'Connect the LiveKit project above first.', 'olivia-studio' ) . '</p>';
+		}
+		echo '</td></tr>';
 		echo '</table><h2 id="zoom">' . esc_html__( 'Zoom (live online classes)', 'olivia-studio' ) . '</h2>';
 		if ( OYS_Live::enabled() ) {
 			echo '<p class="description">' . esc_html__( 'Not used while our own live streaming is on.', 'olivia-studio' ) . '</p>';
@@ -1023,7 +1045,7 @@ class OYS_Admin {
 		echo '<tr><th>' . esc_html__( 'Version', 'olivia-studio' ) . '</th><td>' . $f( 'waiver_version', 'text', 'small-text' ) . '<p class="description">' . esc_html__( 'Change the version after editing the text: everyone is asked to accept the new version at their next booking.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
 		echo '</table><h2>' . esc_html__( 'Emails', 'olivia-studio' ) . '</h2><p>' . wp_kses_post( sprintf( __( 'Sender, reminders and the text of every automatic email are in <a href="%s">Studio → Emails &amp; reminders</a>.', 'olivia-studio' ), esc_url( admin_url( 'admin.php?page=oys-emails' ) ) ) ) . '</p>';
 		submit_button();
-		echo '</form>' . self::form( 'zoom_test', 'id="oys-zoom-test"' ) . '</form>' . self::form( 'live_test', 'id="oys-live-test"' ) . '</form></div>'; // phpcs:ignore
+		echo '</form>' . self::form( 'zoom_test', 'id="oys-zoom-test"' ) . '</form>' . self::form( 'live_test', 'id="oys-live-test"' ) . '</form>' . self::form( 'live_test_open', 'id="oys-live-test-open"' ) . '</form></div>'; // phpcs:ignore
 	}
 
 	/* ======================================================================
@@ -1450,6 +1472,11 @@ class OYS_Admin {
 		$lang = self::email_lang( wp_unslash( $_POST['lang'] ?? 'en' ) );
 		$ok   = OYS_Email_Templates::get( $key ) && OYS_I18n::with( $lang, fn() => OYS_Emails::send_test( $key, $to ) );
 		self::back( 'oys-emails', array( 'edit' => $key, 'lang' => $lang ), $ok ? sprintf( __( 'Test sent to %s.', 'olivia-studio' ), $to ) : __( 'The test could not be sent. Check the email set-up (SMTP plugin).', 'olivia-studio' ) );
+	}
+
+	private static function do_live_test_open() {
+		OYS_Live::open_test();
+		self::back( 'oys-settings', array( 'test' => 1 ), __( 'The test class is open for two hours.', 'olivia-studio' ) );
 	}
 
 	private static function do_live_test() {

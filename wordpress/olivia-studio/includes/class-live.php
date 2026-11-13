@@ -93,6 +93,70 @@ class OYS_Live {
 		return count( $langs ) > 1 ? oys_valid_lang( $session->lang ?? 'en' ) : oys_valid_lang( $langs[0] ?? 'en' );
 	}
 
+	/* ---------- The test class (Áron, 2026-11-13: „egy teszt jóga órát, amit bármikor meg tudunk nyitni”) ---------- */
+
+	const TEST_OPTION = 'oys_live_test_session';
+	const TEST_BASE   = 4000000000; // the test participants' links: booking ids nobody has (TEST_BASE + 1 …)
+	const TEST_PEOPLE = 3;
+
+	public static function is_test( $session ) {
+		return $session && 'test' === $session->kind;
+	}
+
+	/** The hidden test class (kind „test”: not on the timetable, not bookable), made the first time. */
+	public static function test_session() {
+		$s = OYS_Schedule::get( (int) get_option( self::TEST_OPTION ) );
+		if ( $s && self::is_test( $s ) ) {
+			return $s;
+		}
+		$now = time();
+		$id  = OYS_Schedule::save( array(
+			'kind'        => 'test',
+			'class_slug'  => '',
+			'title'       => __( 'Test class', 'olivia-studio' ),
+			'starts_at'   => gmdate( 'Y-m-d H:i:s', $now ),
+			'ends_at'     => gmdate( 'Y-m-d H:i:s', $now + 2 * HOUR_IN_SECONDS ),
+			'capacity'    => 10,
+			'format'      => 'online',
+			'location'    => 'Online',
+			'price_cents' => 0,
+			'status'      => 'scheduled',
+			'lang'        => oys_valid_lang( array_keys( OYS_I18n::languages() )[0] ?? 'en' ),
+		) );
+		update_option( self::TEST_OPTION, (int) $id, false );
+		return OYS_Schedule::get( (int) $id );
+	}
+
+	/** Opens the test class now, for two hours, fresh: the earlier test's chat, recordings and summary go. */
+	public static function open_test() {
+		$s   = self::test_session();
+		$now = time();
+		OYS_Schedule::save( array( 'starts_at' => gmdate( 'Y-m-d H:i:s', $now ), 'ends_at' => gmdate( 'Y-m-d H:i:s', $now + 2 * HOUR_IN_SECONDS ), 'status' => 'scheduled' ), $s->id );
+		global $wpdb;
+		$row = self::row( $s->id );
+		if ( $row ) {
+			foreach ( self::recordings( $row ) as $r ) {
+				if ( ! empty( $r['file'] ) && is_file( self::rec_dir() . '/' . $r['file'] ) ) {
+					wp_delete_file( self::rec_dir() . '/' . $r['file'] );
+				}
+			}
+			$wpdb->delete( self::table(), array( 'session_id' => (int) $s->id ) );
+		}
+		$wpdb->delete( self::table( 'live_chat' ), array( 'session_id' => (int) $s->id ) );
+		delete_transient( self::hands_key( $s->id ) );
+		return OYS_Schedule::get( $s->id );
+	}
+
+	/** The links of the test class: the teacher's and one for each test participant (no login needed). */
+	public static function test_links() {
+		$s     = self::test_session();
+		$links = array( 'teacher' => self::url( $s->id ), 'people' => array() );
+		for ( $n = 1; $n <= self::TEST_PEOPLE; $n++ ) {
+			$links['people'][ $n ] = self::url( $s->id, self::TEST_BASE + $n );
+		}
+		return $links;
+	}
+
 	/* ---------- LiveKit: tokens and the server API ---------- */
 
 	private static function b64( $data ) {
@@ -234,6 +298,13 @@ class OYS_Live {
 			return null;
 		}
 		$user_id = get_current_user_id();
+		$n       = (int) $b - self::TEST_BASE;
+		if ( self::is_test( $session ) && $n >= 1 && $n <= self::TEST_PEOPLE && $k && hash_equals( self::sign( $session->id, $b ), (string) $k ) ) {
+			// a test participant: a booking that isn't in the database (nothing is booked, nothing paid, no emails)
+			$booking = (object) array( 'id' => (int) $b, 'session_id' => (int) $session->id, 'user_id' => 0, 'status' => 'confirmed', 'mode' => 'online', 'guest_of' => 0, 'guest_name' => '' );
+			/* translators: %d: number of the test participant (1–3) */
+			return array( 'owner' => false, 'booking' => $booking, 'user_id' => 0, 'name' => sprintf( __( 'Test participant %d', 'olivia-studio' ), $n ), 'test' => true );
+		}
 		if ( self::is_owner( $session, $user_id ) ) {
 			$u = get_userdata( $user_id );
 			return array( 'owner' => true, 'booking' => null, 'user_id' => $user_id, 'name' => $u ? ( $u->display_name ?: $u->first_name ) : '' );

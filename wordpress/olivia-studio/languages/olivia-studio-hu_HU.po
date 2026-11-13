@@ -3902,3 +3902,37 @@ msgstr "Az összefoglaló rád vár."
 
 msgid "A key is saved. Leave empty to keep it."
 msgstr "Van mentett kulcs. Ha üresen hagyod, megmarad."
+
+# The live test class, 2026-11-13
+msgid "This is a test class, it can't be booked."
+msgstr "Ez egy próbaóra, nem foglalható."
+
+msgid "Test class"
+msgstr "Próbaóra"
+
+msgid "Test participant %d"
+msgstr "Próba résztvevő %d"
+
+msgid "The test class is open for two hours."
+msgstr "A próbaóra két órára nyitva van."
+
+msgid "Open it again (fresh, for two hours)"
+msgstr "Újranyitás (tisztán, két órára)"
+
+msgid "Open the test class now (for two hours)"
+msgstr "Próbaóra megnyitása most (két órára)"
+
+msgid "Open until %s."
+msgstr "Nyitva eddig: %s."
+
+msgid "The teacher (you, logged in):"
+msgstr "Oktató (te, bejelentkezve):"
+
+msgid "Participants (no login needed – open them on a phone or in another browser):"
+msgstr "Résztvevők (belépés nélkül – nyisd meg telefonon vagy másik böngészőben):"
+
+msgid "A class that is not on the timetable and can't be booked: go live, let the test participants in, try the camera, the chat, raising a hand, muting everyone and the recording. Opening it again starts afresh (the earlier test's chat and recording are deleted)."
+msgstr "Egy óra, ami nincs az órarendben és nem foglalható: indíts élő adást, engedd be a próba résztvevőket, próbáld ki a kamerát, a chatet, a kézfeltartást, a mindenki némítását és a felvételt. Újranyitáskor tisztán indul (az előző próba chatje és felvétele törlődik)."
+
+msgid "Connect the LiveKit project above first."
+msgstr "Előbb kösd be fent a LiveKit-projektet."

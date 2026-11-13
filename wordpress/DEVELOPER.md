@@ -635,6 +635,13 @@ Olivia oldala és a HathaFlow ugyanazt használja: fizetés (Stripe) → hozzáf
 - **Chat:** saját (`oys_live_chat`), REST pollinggal (4 mp óra alatt, 15 mp egyébként); az óra után is megmarad,
   `live_chat_days` napig lehet írni, utána olvasható. 2 mp-es küldési korlát; a résztvevő a sajátját, az oktató bármit
   törölhet.
+- **Próbaóra (1.8.0, Áron 2026-11-13: „egy teszt jóga órát, amit bármikor meg tudunk nyitni”):** Studio → Settings →
+  Élő online órák → *Próbaóra megnyitása most (két órára)*. Rejtett `kind = test` óra (`OYS_Live::test_session()`,
+  opció `oys_live_test_session`): nincs a nyilvános órarendben, a naptárban és az appban, nem foglalható
+  (`OYS_Schedule::closed_reason`). A gomb (`open_test()`) most-tól két órára nyitja, és tisztán indul (az előző próba chatje,
+  felvétele, kezei törlődnek). Linkek: az oktatóé (bejelentkezve) és 3 próba résztvevőé (`test_links()`, belépés nélkül:
+  `b = TEST_BASE + n`, aláírva – nincs mögötte foglalás, fizetés, levél). Bejelentkezett admin is résztvevőként nyitja a
+  résztvevői linket, így egy gépen két böngészővel is kipróbálható.
 - **Stripe:** változatlan – a foglalás / bérlet / fizetés ugyanaz, mint eddig (Olivia saját Stripe-fiókja); az élő óra
   csak a foglalóknak nyílik. Olivia oldalán nincs HathaFlow-platformdíj (Áron jóváhagyta, 2026-11-12).
 - Tesztek: `live:` kezdetű tesztek a `dev/tests/run.php`-ban (LiveKit és AI szimulálva). Kétböngészős próba helyben:

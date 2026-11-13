@@ -255,6 +255,9 @@ class OYS_Schedule {
 		if ( ! $session || 'scheduled' !== $session->status ) {
 			return __( 'This class is no longer available.', 'olivia-studio' );
 		}
+		if ( 'test' === $session->kind ) { // the live test class (OYS_Live::open_test): nobody books it
+			return __( 'This is a test class, it can\'t be booked.', 'olivia-studio' );
+		}
 		$close = oys_ts( $session->starts_at ) - (int) OYS_Settings::get( 'booking_close_minutes' ) * MINUTE_IN_SECONDS;
 		if ( time() > $close ) {
 			return __( 'Online booking for this class has closed.', 'olivia-studio' );

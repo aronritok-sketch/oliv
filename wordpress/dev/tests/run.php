@@ -2051,6 +2051,34 @@ test( 'signed links are bound to the site (on a network one teacher\'s link must
 	eq( $a[0], OYS_Live::sign( 7, 3 ), 'stable on the same site' );
 } );
 
+test( 'live: the test class – open any time, test participants without bookings, never on the timetable or bookable', function () {
+	live_on();
+	try {
+		$s = OYS_Live::open_test();
+		ok( OYS_Live::is_test( $s ) && 'open' === OYS_Live::phase( $s ) && 'open' === OYS_Live::phase( $s, true ), 'open right away, for the teacher and the participants' );
+		ok( ! in_array( (int) $s->id, array_map( fn( $x ) => (int) $x->id, OYS_Schedule::upcoming_public( 30 ) ), true ), 'not on the public timetable' );
+		ok( '' !== OYS_Schedule::closed_reason( $s ), 'not bookable' );
+		$links = OYS_Live::test_links();
+		eq( OYS_Live::TEST_PEOPLE, count( $links['people'] ), 'a link for each test participant' );
+		parse_str( (string) wp_parse_url( $links['people'][2], PHP_URL_QUERY ), $q );
+		$who = OYS_Live::who( $s, (int) $q['b'], $q['k'] );
+		ok( $who && ! $who['owner'] && str_contains( $who['name'], '2' ), 'the participant link lets test participant 2 in (no booking, no login)' );
+		ok( null === OYS_Live::who( $s, (int) $q['b'], 'wrong' ), 'not with a wrong signature' );
+		ok( null === OYS_Live::who( make_session( array( 'format' => 'online', 'in_hours' => 0.1 ) ), (int) $q['b'], $q['k'] ), 'and a test link opens no other class' );
+		$r = OYS_Live::join( $s, $who );
+		ok( ! is_wp_error( $r ) && str_starts_with( $r['me'], 'b' ) && false === $r['owner'], 'the test participant gets a token' );
+		ok( OYS_Live::post_message( $s, $who, 'Szia!' ) > 0, 'and can write in the chat' );
+		list( $code, $data ) = api( 'GET', '/live/' . $s->id . '/chat?b=' . $q['b'] . '&k=' . $q['k'] );
+		ok( 200 === $code && 1 === count( $data['messages'] ) && $data['messages'][0]['mine'], 'sees the message as their own' );
+		$again = OYS_Live::open_test();
+		eq( (int) $s->id, (int) $again->id, 'opening it again keeps the same class' );
+		list( , $data ) = api( 'GET', '/live/' . $s->id . '/chat?b=' . $q['b'] . '&k=' . $q['k'] );
+		eq( 0, count( $data['messages'] ), 'and starts afresh (the chat is empty)' );
+	} finally {
+		live_off();
+	}
+} );
+
 test( 'live: raise hand – the teacher sees it in her chat poll and lowers it', function () {
 	live_on();
 	try {

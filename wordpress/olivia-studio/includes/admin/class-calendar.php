@@ -99,6 +99,7 @@ class OYS_Calendar {
 			'from' => $a->setTimezone( $utc )->format( 'Y-m-d H:i:s' ),
 			'to'   => $b->setTimezone( $utc )->format( 'Y-m-d H:i:s' ),
 		) );
+		$rows = array_values( array_filter( $rows, fn( $s ) => 'test' !== $s->kind ) ); // the live test class: Settings → Live
 		return rest_ensure_response( array(
 			'from'     => $from,
 			'days'     => $days,
