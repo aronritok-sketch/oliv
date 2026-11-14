@@ -2957,6 +2957,8 @@ test( 'online edition, Olívia\'s doc of 14 November, last points: one level for
 		ok( 9 === preg_match_all( '/\.oj-modules li:nth-child\(\d\) \{ --dot: (#[0-9A-F]{6}); \}/', $css, $m ) && 9 === count( array_unique( $m[1] ) ), 'nine modules, nine colours' );
 		ok( str_contains( $home, 'section--breath oj-breath-peach' ) && ! str_contains( $home, 'Egy perc a foglalás' ), 'the breathing lotus on peach; no line under „Heti élő órák”' );
 		ok( ! str_contains( $home, 'id="classes"' ), 'no „Online órák” list on the home page' );
+		$duo = do_shortcode( '[oy_figures photos="korall-stretching-circuit,outdoor-group-bands"]' );
+		ok( str_contains( $duo, 'class="oj-duo"' ) && 2 === substr_count( $duo, '<figure' ) && str_contains( $duo, 'gumiszalaggal' ), 'About: her two training photos side by side, with Hungarian text' );
 		ok( (bool) preg_match( '/\[oys_schedule[^\]]*next="3"/', (string) file_get_contents( get_template_directory() . '/template-parts/front-online.php' ) ), 'the timetable: the next three classes' );
 		$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
 		eq( 10, (int) $data['setup']['studio']['weeks_ahead'], 'weekly classes made 10 weeks ahead' );

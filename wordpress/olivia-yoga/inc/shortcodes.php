@@ -229,6 +229,9 @@ add_action( 'init', function () {
 	add_shortcode( 'oy_fitmummy', fn() => oy_fitmummy() );
 	// a photo in a page's text, by its key (the About page, Olívia 14 Nov: „törjük meg a folyószöveget”)
 	add_shortcode( 'oy_figure', fn( $a ) => oy_figure( sanitize_key( $a['photo'] ?? '' ), (string) ( $a['class'] ?? '' ) ) );
+	// two (or more) photos side by side, between paragraphs – nothing floats beside the text (Olívia, 14 November: „az
+	// elején nagyon belelóg a szöveg a képbe, legyen inkább ez a 2 kép valahogy elosztva”)
+	add_shortcode( 'oy_figures', fn( $a ) => '<div class="oj-duo">' . implode( '', array_map( fn( $k ) => oy_figure( sanitize_key( $k ) ), array_filter( array_map( 'trim', explode( ',', (string) ( $a['photos'] ?? '' ) ) ) ) ) ) . '</div>' );
 	add_shortcode( 'oy_picto', fn( $a ) => oy_pictogram( sanitize_key( $a['icon'] ?? 'lotus' ), sanitize_key( $a['tone'] ?? 'lilac' ) ) );
 } );
 

@@ -804,5 +804,25 @@
    "file": "gyermekpoz-relaxacio-legzes-jogaora",
    "alt": "Jógázók gyermekpózban pihennek egy fateraszon – relaxáció és légzés a jógaóra végén"
   }
+ },
+ "korall-stretching-circuit": {
+  "alt": "A dynamic stretching circuit class Olivia Kovacs led at Korall Sportsziget, Budapest",
+  "pos": "50% 45%",
+  "w": 1200,
+  "h": 1600,
+  "hu": {
+   "file": "dinamikus-stretching-koredzes-korall-sportsziget-kovacs-olivia",
+   "alt": "Dinamikus stretching köredzés a Korall Sportszigeten, Kovács Olívia edzői óráján"
+  }
+ },
+ "outdoor-group-bands": {
+  "alt": "An outdoor group workout with resistance bands, led by Olivia Kovacs",
+  "pos": "50% 55%",
+  "w": 800,
+  "h": 600,
+  "hu": {
+   "file": "szabadteri-csoportos-edzes-gumiszalaggal-kovacs-olivia",
+   "alt": "Szabadtéri csoportos edzés gumiszalaggal, Kovács Olívia női edzőcsoportjával"
+  }
  }
 }
