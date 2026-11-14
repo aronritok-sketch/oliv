@@ -2853,6 +2853,31 @@ test( 'online edition, live update: her raw journal photos fill the frame, the p
 	}
 } );
 
+test( 'online edition, live update: 2015 on her timeline, the web copy of her Fitmummy photo gets our name and text', function () {
+	require_once get_template_directory() . '/inc/demo-import.php';
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		$data  = json_decode( (string) file_get_contents( oy_content_file() ), true );
+		$pair  = $data['pages']['about']['_insert'][0];
+		$page  = get_page_by_path( oy_page_slug( 'about' ) );
+		$id    = $page ? $page->ID : wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Rólam', 'post_name' => oy_page_slug( 'about' ) ) );
+		wp_update_post( array( 'ID' => $id, 'post_content' => "<ol>\n" . $pair[0] . "\n<li><b>Ma</b> élő online órák.</li>\n</ol>" ) );
+		$src  = self_test_photo( '877949486_122357927816006820_7146063380598239498_n.jpg', 900, 1200, '2026/11' );
+		$copy = self_test_photo( '877949486-122357927816006820-7146063380598239498-n.jpg', 900, 1200, '2026/11' );
+		update_post_meta( $copy, 'oye_web', $src );
+		delete_option( 'oy_1114c_rev' );
+		$log = oy_migrate_1114c();
+		$c   = get_post_field( 'post_content', $id );
+		ok( str_contains( $c, $pair[0] . "\n" . $pair[1] ), 'the 2015 line after the „19 évesen” one' );
+		ok( (bool) preg_match( '/^fitmummy-pre-es-postnatalis-trenerkepzes-kovacs-olivia(-\d+)?\.jpg$/', basename( (string) get_attached_file( $copy ) ) ), 'the web copy: our name' );
+		ok( str_starts_with( (string) get_post_meta( $copy, '_wp_attachment_image_alt', true ), 'Fitmummy pre- és postnatális trénerképzés' ), '… and our text' );
+		ok( in_array( 'about: 2015 on the timeline', $log, true ), 'logged' );
+		eq( array(), oy_migrate_1114c(), 'once' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+} );
+
 test( 'Arovia payments through the CRM: the site registers itself, every Stripe call is signed, events come back signed', function () {
 	$calls = array();
 	$fake  = function ( $pre, $args, $url ) use ( &$calls ) {

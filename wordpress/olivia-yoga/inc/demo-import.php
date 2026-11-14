@@ -978,6 +978,51 @@ function oy_migrate_doc_1114() {
 }
 
 /**
+ * Olívia, 14 November, later on: „Rólamnál az idővonalba mindenképp írd bele, hogy 2015-től főállású edző voltam …” –
+ * the new line goes into „Az utam” on the live About page (after the „19 évesen” one, only if it is not there yet); and the
+ * web copies of her own photos that were named before we had looked at them (the content file's „uploads”) get the name
+ * and the text we gave them.
+ */
+function oy_migrate_1114c() {
+	$rev = '2026-11-14c';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114c_rev' ) === $rev ) {
+		return array();
+	}
+	update_option( 'oy_1114c_rev', $rev );
+	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+	$log  = array();
+	$post = get_page_by_path( oy_page_slug( 'about' ) );
+	if ( $post ) {
+		$content = $post->post_content;
+		foreach ( (array) ( $data['pages']['about']['_insert'] ?? array() ) as $pair ) {
+			if ( str_contains( $content, (string) $pair[0] ) && ! str_contains( $content, (string) $pair[1] ) ) {
+				$content = str_replace( (string) $pair[0], $pair[0] . "\n" . $pair[1], $content );
+			}
+		}
+		if ( $content !== $post->post_content ) {
+			kses_remove_filters();
+			wp_update_post( wp_slash( array( 'ID' => $post->ID, 'post_content' => $content ) ) );
+			kses_init_filters();
+			$log[] = 'about: 2015 on the timeline';
+		}
+	}
+	foreach ( get_posts( array( 'post_type' => 'attachment', 'post_status' => 'any', 'meta_key' => 'oye_web', 'numberposts' => -1, 'fields' => 'ids' ) ) as $copy ) {
+		$entry = oy_upload_entry( (int) get_post_meta( $copy, 'oye_web', true ) );
+		if ( ! $entry ) {
+			continue;
+		}
+		if ( oy_rename_attachment( $copy, (string) $entry['file'] ) ) {
+			$log[] = 'renamed: ' . $entry['file'];
+		}
+		if ( get_post_meta( $copy, '_wp_attachment_image_alt', true ) !== $entry['alt'] ) {
+			update_post_meta( $copy, '_wp_attachment_image_alt', $entry['alt'] );
+			wp_update_post( array( 'ID' => $copy, 'post_title' => $entry['alt'] ) );
+		}
+	}
+	return $log;
+}
+
+/**
  * The online edition's passes, one-to-one services and timetable setting from its content file, on a live site. Passes
  * someone has bought keep their own expiry; products the edition no longer has go off sale.
  */
