@@ -161,6 +161,7 @@ function oy_icon( $name, $cls = 'icon' ) {
 	static $ui = array(
 		'clock'     => '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
 		'play'      => '<circle cx="12" cy="12" r="8.5"/><path d="M10.2 8.6v6.8l5.3-3.4z"/>',
+		'gift'      => '<rect x="3.5" y="8.5" width="17" height="12" rx="1.5"/><path d="M3.5 12.5h17M12 8.5v12M12 8.5C10.6 5 6.5 4.6 6.5 7c0 1.6 2.7 1.5 5.5 1.5zm0 0c1.4-3.5 5.5-3.9 5.5-1.5 0 1.6-2.7 1.5-5.5 1.5z"/>',
 		'pin'       => '<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10" r="2.3"/>',
 		'mail'      => '<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.5 7 8.5 6.3L20.5 7"/>',
 		'instagram' => '<rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6" fill="currentColor"/>',
@@ -260,7 +261,7 @@ function oy_replay_note( $cls = '' ) {
 		return '';
 	}
 	$head = 7 === $days ? __( 'You can watch it again for a week.', 'olivia-yoga' ) : sprintf( __( 'You can watch it again for %d days.', 'olivia-yoga' ), $days );
-	return '<p class="oj-replay' . ( $cls ? ' ' . esc_attr( $cls ) : '' ) . '">' . oy_icon( 'play' ) . '<span><b>' . esc_html( $head ) . '</b> ' . esc_html__( 'The group class is recorded (only I am on it): if you missed it, or would like to do it again, it is waiting in your account.', 'olivia-yoga' ) . '</span></p>';
+	return '<p class="oj-replay' . ( $cls ? ' ' . esc_attr( $cls ) : '' ) . '">' . oy_icon( 'play' ) . '<span><b>' . esc_html( $head ) . '</b> ' . esc_html__( 'Only the group class can be watched again, and only I am on the recording, nobody else: if you missed it, or would like to do it again, it is waiting in your account.', 'olivia-yoga' ) . '</span></p>';
 }
 
 function oy_section_head( $title, $text = '', $kicker = '', $id = '' ) {

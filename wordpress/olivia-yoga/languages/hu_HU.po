@@ -1832,3 +1832,27 @@ msgstr "%d napig visszanézheted."
 
 msgid "The group class is recorded (only I am on it): if you missed it, or would like to do it again, it is waiting in your account."
 msgstr "A csoportos óráról felvétel készül (csak én látszom rajta): ha lemaradtál, vagy újra csinálnád, a fiókodban megtalálod."
+
+msgid "60 or 90 minutes"
+msgstr "60 vagy 90 perc"
+
+msgid "alone or as a pair – cheaper as a pair"
+msgstr "egyedül vagy párban – párban olcsóbb"
+
+msgid "live, from your living room"
+msgstr "élőben, a nappalidból"
+
+msgid "As a gift, too"
+msgstr "Ajándéknak is"
+
+msgid "Surprise someone you love with a pretty gift card."
+msgstr "Lepj meg valakit, akit szeretsz, egy szép ajándékutalvánnyal."
+
+msgid "Cheaper as a pair"
+msgstr "Párban még olcsóbb"
+
+msgid "I guide you in real time. Afterwards the class chat stays open, and a group class can be watched again for a week: only I am on the recording, nobody else."
+msgstr "Valós időben vezetlek. Az óra után a chat nyitva marad, és a csoportos órát egy hétig visszanézheted: a felvételen csak én szerepelek, más nem."
+
+msgid "Only the group class can be watched again, and only I am on the recording, nobody else: if you missed it, or would like to do it again, it is waiting in your account."
+msgstr "Csak a csoportos óra nézhető vissza, és a felvételen csak én szerepelek, más nem: ha lemaradtál, vagy újra csinálnád, a fiókodban megtalálod."

@@ -3006,6 +3006,32 @@ test( 'Olívia\'s doc of 14 November: the brush wave dissolves at its ends; ever
 	ok( str_contains( $on, '.home main .photo:hover, .home main .frame:hover img' ), 'home: every picture in colour under the cursor, linked or not' );
 } );
 
+test( 'Olívia\'s doc of 14 November: „legyen extrább, legyél nagyon kreatív” – the one-to-one block and the stretching / relaxation cards; only the group class can be watched again', function () {
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		foreach ( array( 'stretching' => '60 perc', 'relaxacio-legzes' => '30 perc' ) as $slug => $len ) {
+			$cl = get_page_by_path( $slug, OBJECT, 'oy_class' );
+			$id = $cl ? $cl->ID : wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => $slug, 'post_name' => $slug ) );
+			update_post_meta( $id, 'oy_duration', $len );
+		}
+		ob_start();
+		load_template( get_template_directory() . '/template-parts/front-online.php', false );
+		$home = (string) ob_get_clean();
+		ok( 11 === substr_count( $home, 'class="oj-bubble oj-bubble--' ) && str_contains( $home, 'oj-bubble--sun' ), 'one-to-one: the reasons as a cloud of bubbles in her four colours' );
+		ok( (bool) preg_match( '~<ul class="oj-facts">(?:<li><svg.*?</li>){3}</ul>~s', $home ), '… the length, the pair price and „from your living room” as three facts' );
+		ok( str_contains( $home, 'class="oj-voucher"' ) && str_contains( $home, 'oj-voucher__icon' ), '… the gift as a voucher' );
+		ok( ! str_contains( $home, 'oj-private .oj-checklist' ) && ! str_contains( $home, 'and as a gift: surprise' ), '… no plain tick list' );
+		ok( 2 === substr_count( $home, 'class="oj-more__stamp"' ) && 2 === substr_count( $home, 'class="oj-more__wave"' ), 'stretching and relaxation: her brush stroke across the top, the length as a stamp' );
+		ok( str_contains( $home, '<span class="oj-more__stamp"><b>60</b><small>perc</small></span>' ), '… the stamp from the class\'s own length' );
+		ok( 2 === substr_count( $home, 'class="oj-more__list"' ) && 2 === substr_count( $home, 'class="oj-more__meta"' ), '… the reasons as soft rows, „cheaper as a pair” as a ribbon' );
+		ok( str_contains( $home, esc_html__( 'I guide you in real time. Afterwards the class chat stays open, and a group class can be watched again for a week: only I am on the recording, nobody else.', 'olivia-yoga' ) ), 'step 4: only a group class, only she is on the recording' );
+		$css = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
+		ok( str_contains( $css, '.oj-voucher { position: relative;' ) && str_contains( $css, '.oj-more__stamp { position: absolute;' ), 'the styles are there' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+} );
+
 test( 'Olívia\'s doc of 14 November: the side column is never cut off while scrolling; her two training photos in one line', function () {
 	$css = (string) file_get_contents( get_template_directory() . '/assets/site.css' );
 	ok( (bool) preg_match( '/\.aside-sticky \{ position: sticky; top: calc\(var\(--header-h\) \+ 24px\); align-self: start; \}/', $css ) && ! str_contains( $css, 'scrollbar-width: none' ), 'the side column: no hidden inner scroll that cuts its bottom off' );

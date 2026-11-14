@@ -1213,3 +1213,27 @@ msgstr "Puedes volver a verla durante %d días."
 
 msgid "The group class is recorded (only I am on it): if you missed it, or would like to do it again, it is waiting in your account."
 msgstr "La clase grupal se graba (solo salgo yo): si te la perdiste o quieres repetirla, te espera en tu cuenta."
+
+msgid "60 or 90 minutes"
+msgstr "60 o 90 minutos"
+
+msgid "alone or as a pair – cheaper as a pair"
+msgstr "sola o en pareja – en pareja, más barato"
+
+msgid "live, from your living room"
+msgstr "en directo, desde tu salón"
+
+msgid "As a gift, too"
+msgstr "También para regalar"
+
+msgid "Surprise someone you love with a pretty gift card."
+msgstr "Sorprende a alguien a quien quieres con una bonita tarjeta regalo."
+
+msgid "Cheaper as a pair"
+msgstr "En pareja, más barato"
+
+msgid "I guide you in real time. Afterwards the class chat stays open, and a group class can be watched again for a week: only I am on the recording, nobody else."
+msgstr "Te guío en tiempo real. Después, el chat de la clase sigue abierto, y la clase grupal se puede volver a ver durante una semana: en la grabación solo salgo yo, nadie más."
+
+msgid "Only the group class can be watched again, and only I am on the recording, nobody else: if you missed it, or would like to do it again, it is waiting in your account."
+msgstr "Solo la clase grupal se puede volver a ver, y en la grabación solo salgo yo, nadie más: si te la perdiste o quieres repetirla, te espera en tu cuenta."

@@ -36,7 +36,7 @@ $steps  = array(
 	array( __( 'Choose a class', 'olivia-yoga' ), __( 'Book from the timetable with a drop-in or a class pass.', 'olivia-yoga' ) ),
 	array( __( 'Get the link', 'olivia-yoga' ), __( 'Your own link comes by email and is waiting in your account. It opens in the browser.', 'olivia-yoga' ) ),
 	array( __( 'Roll out your mat', 'olivia-yoga' ), __( 'Charge your device and join a few minutes early, so we can say hello before we start.', 'olivia-yoga' ) ),
-	array( __( 'Practice together, live', 'olivia-yoga' ), __( 'I guide you in real time. Afterwards the class chat stays open, and you can watch the class again for a week.', 'olivia-yoga' ) ),
+	array( __( 'Practice together, live', 'olivia-yoga' ), __( 'I guide you in real time. Afterwards the class chat stays open, and a group class can be watched again for a week: only I am on the recording, nobody else.', 'olivia-yoga' ) ),
 );
 ?>
 <section class="hero oj-hero" aria-labelledby="hero-title">
@@ -118,12 +118,20 @@ $for_whom = array(
 	__( 'if a part of your body aches or feels tight and you would like to strengthen or stretch it', 'olivia-yoga' ),
 	__( 'as a yoga teacher or a teacher in training, to sit in and gain experience', 'olivia-yoga' ),
 	__( 'if the Wednesday group class does not fit your week', 'olivia-yoga' ),
-	__( 'and as a gift: surprise someone you love with a pretty gift card!', 'olivia-yoga' ),
+);
+$gift_url = function_exists( 'oys_page_url' ) ? oys_page_url( 'gifts' ) : '';
+// Olívia, 14 November: „ez a része a blokknak nem annyira tetszik, legyen extrább” – the list becomes a cloud of soft
+// bubbles in her four colours, the length and the pair price three small facts, the gift its own voucher
+$tones    = array( 'lilac', 'pink', 'sage', 'sun' );
+$facts    = array(
+	array( 'clock', __( '60 or 90 minutes', 'olivia-yoga' ) ),
+	array( 'user', __( 'alone or as a pair – cheaper as a pair', 'olivia-yoga' ) ),
+	array( 'home', __( 'live, from your living room', 'olivia-yoga' ) ),
 );
 $modules  = array( __( 'Breathing exercises', 'olivia-yoga' ), __( 'Pelvic floor training', 'olivia-yoga' ), __( 'Better circulation', 'olivia-yoga' ), __( 'Cardio training', 'olivia-yoga' ), __( 'Strength and weight training', 'olivia-yoga' ), __( 'Spine training', 'olivia-yoga' ), __( 'Mobility and stretching', 'olivia-yoga' ), __( 'Yoga', 'olivia-yoga' ), __( 'Relaxation', 'olivia-yoga' ) );
 $more     = array(
-	array( 'mobility', 'sun', __( 'Online stretching and mobility', 'olivia-yoga' ), __( 'An hour that is only about moving freely again: stretches and mobility work for the hips, shoulders and spine, at your own pace.', 'olivia-yoga' ), array( __( 'if you sit a lot and your hips, shoulders or back feel stiff', 'olivia-yoga' ), __( 'next to running, weights or another sport, for recovery', 'olivia-yoga' ), __( 'if you would like to be more flexible', 'olivia-yoga' ) ), __( '60 minutes · cheaper as a pair', 'olivia-yoga' ), 'stretching' ),
-	array( 'lotus', 'lilac', __( 'Relaxation and breathing', 'olivia-yoga' ), __( 'Half an hour that is only about calming down: breathing exercises, gentle stretches and guided relaxation for an overloaded nervous system.', 'olivia-yoga' ), array( __( 'if you are stressed and find it hard to switch off', 'olivia-yoga' ), __( 'if you find it hard to fall asleep', 'olivia-yoga' ), __( 'to learn how to calm yourself in a few minutes', 'olivia-yoga' ) ), __( '30 minutes · cheaper as a pair', 'olivia-yoga' ), 'relaxacio-legzes' ),
+	array( 'mobility', 'sun', __( 'Online stretching and mobility', 'olivia-yoga' ), __( 'An hour that is only about moving freely again: stretches and mobility work for the hips, shoulders and spine, at your own pace.', 'olivia-yoga' ), array( __( 'if you sit a lot and your hips, shoulders or back feel stiff', 'olivia-yoga' ), __( 'next to running, weights or another sport, for recovery', 'olivia-yoga' ), __( 'if you would like to be more flexible', 'olivia-yoga' ) ), __( 'Cheaper as a pair', 'olivia-yoga' ), 'stretching' ),
+	array( 'lotus', 'lilac', __( 'Relaxation and breathing', 'olivia-yoga' ), __( 'Half an hour that is only about calming down: breathing exercises, gentle stretches and guided relaxation for an overloaded nervous system.', 'olivia-yoga' ), array( __( 'if you are stressed and find it hard to switch off', 'olivia-yoga' ), __( 'if you find it hard to fall asleep', 'olivia-yoga' ), __( 'to learn how to calm yourself in a few minutes', 'olivia-yoga' ) ), __( 'Cheaper as a pair', 'olivia-yoga' ), 'relaxacio-legzes' ),
 );
 ?>
 <section class="section oj-private" id="egyeni" aria-labelledby="private-title"><div class="container">
@@ -132,8 +140,10 @@ $more     = array(
 			<?php echo oy_kicker( __( 'One-to-one sessions', 'olivia-yoga' ) ); // phpcs:ignore ?>
 			<h2 id="private-title"><?php esc_html_e( 'One-to-one online yoga, entirely tailored to you', 'olivia-yoga' ); ?></h2>
 			<p class="lead"><?php esc_html_e( 'A one-to-one session is shaped entirely around you. It is for you, for example:', 'olivia-yoga' ); ?></p>
-			<ul class="oj-checklist"><?php foreach ( $for_whom as $w ) : ?><li><?php echo esc_html( $w ); ?></li><?php endforeach; ?></ul>
-			<p class="oj-split__meta"><?php esc_html_e( '60 or 90 minutes, alone or as a pair (cheaper as a pair), live on video from your living room.', 'olivia-yoga' ); ?></p>
+			<ul class="oj-bubbles"><?php foreach ( $for_whom as $i => $w ) : ?><li class="oj-bubble oj-bubble--<?php echo esc_attr( $tones[ $i % 4 ] ); ?>" style="--i:<?php echo (int) $i; ?>"><?php echo esc_html( $w ); ?></li><?php endforeach; ?></ul>
+			<ul class="oj-facts"><?php foreach ( $facts as $f ) : ?><li><?php echo oy_icon( $f[0] ); // phpcs:ignore ?><span><?php echo esc_html( $f[1] ); ?></span></li><?php endforeach; ?></ul>
+			<?php $gift_tag = $gift_url ? 'a' : 'p'; ?>
+			<<?php echo $gift_tag; // phpcs:ignore ?> class="oj-voucher"<?php echo $gift_url ? ' href="' . esc_url( $gift_url ) . '"' : ''; // phpcs:ignore ?>><span class="oj-voucher__icon"><?php echo oy_icon( 'gift' ); // phpcs:ignore ?></span><span class="oj-voucher__text"><b><?php esc_html_e( 'As a gift, too', 'olivia-yoga' ); ?></b> <?php esc_html_e( 'Surprise someone you love with a pretty gift card.', 'olivia-yoga' ); ?></span><?php if ( $gift_url ) : ?><span class="oj-voucher__go" aria-hidden="true"><?php echo oy_icon( 'arrow' ); // phpcs:ignore ?></span><?php endif; ?></<?php echo $gift_tag; // phpcs:ignore ?>>
 			<p class="btn-row oj-inline"><?php echo oy_btn( $ask( 'egyeni-joga' ), __( 'Ask for a time', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore ?><a class="text-link" href="<?php echo esc_url( oy_class_url( 'egyeni-online-joga' ) ); ?>"><?php esc_html_e( 'More about one-to-one yoga', 'olivia-yoga' ); ?></a></p>
 		</div>
 		<div class="oj-split__art" data-reveal><div class="oj-waved oj-waved--soft"><?php echo oy_soft_blob( 'lilac', 'right' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'private-tree-pose', '(min-width: 960px) 34vw, 92vw' ); // phpcs:ignore ?></div></div></div>
@@ -159,13 +169,23 @@ $more     = array(
 <section class="section section--tight oj-more" aria-labelledby="more-title"><div class="container">
 	<?php echo oy_section_head( __( 'Stretching, relaxation and breathing', 'olivia-yoga' ), __( 'One-to-one sessions for a stiff body and an overloaded mind.', 'olivia-yoga' ), '', 'more-title' ); // phpcs:ignore ?>
 	<div class="oj-more__grid">
-		<?php foreach ( $more as $c ) : ?>
+		<?php
+		// Olívia, 14 November: „legyen extrább, legyél nagyon kreatív, ne legyen átlagos” – each card in its colour, her
+		// logo's brush stroke across the top, the length as a round stamp (from the class's own setting), the reasons as
+		// soft rows and „cheaper as a pair” as a ribbon
+		foreach ( $more as $c ) :
+			$oy_class = get_page_by_path( $c[6], OBJECT, 'oy_class' );
+			$oy_len   = $oy_class ? trim( (string) oy_class_meta( $oy_class->ID, 'oy_duration' ) ) : '';
+			$oy_num   = preg_match( '/^(\d+)\s*(.*)$/u', $oy_len, $mm ) ? array( $mm[1], $mm[2] ) : array( $oy_len, '' );
+			?>
 		<article class="oj-more__card oj-more__card--<?php echo esc_attr( $c[1] ); ?>" data-reveal>
+			<svg class="oj-more__wave" viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="oj-more__wave-back" d="<?php echo esc_attr( oy_brush_d( 400, 100, 20, 34, 1.25, .4 ) ); ?>"/><path class="oj-more__wave-front" d="<?php echo esc_attr( oy_brush_d( 400, 100, 16, 9, 1.25, 1.1 ) ); ?>"/></svg>
+			<?php if ( '' !== $oy_len ) : ?><span class="oj-more__stamp"><b><?php echo esc_html( $oy_num[0] ); ?></b><?php if ( '' !== $oy_num[1] ) : ?><small><?php echo esc_html( $oy_num[1] ); ?></small><?php endif; ?></span><?php endif; ?>
 			<?php echo oy_pictogram( $c[0], $c[1] ); // phpcs:ignore ?>
 			<h3><?php echo esc_html( $c[2] ); ?></h3>
 			<p><?php echo esc_html( $c[3] ); ?></p>
-			<ul class="oj-checklist"><?php foreach ( $c[4] as $w ) : ?><li><?php echo esc_html( $w ); ?></li><?php endforeach; ?></ul>
-			<p class="oj-more__meta"><?php echo esc_html( $c[5] ); ?></p>
+			<ul class="oj-more__list"><?php foreach ( $c[4] as $w ) : ?><li><?php echo esc_html( $w ); ?></li><?php endforeach; ?></ul>
+			<p class="oj-more__meta"><?php echo oy_icon( 'user' ); // phpcs:ignore ?><?php echo esc_html( $c[5] ); ?></p>
 			<p class="btn-row oj-inline"><?php echo oy_btn( $ask( 'stretching' === $c[6] ? 'stretching' : 'relax' ), __( 'Ask for a time', 'olivia-yoga' ), 'dark' ); // phpcs:ignore ?><a class="text-link" href="<?php echo esc_url( oy_class_url( $c[6] ) ); ?>"><?php esc_html_e( 'Read more', 'olivia-yoga' ); ?></a></p>
 		</article>
 		<?php endforeach; ?>

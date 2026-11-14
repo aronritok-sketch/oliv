@@ -6062,9 +6062,9 @@ msgid "5-session pass:"
 msgstr "5 alkalmas bérlet:"
 
 msgid "You can watch this class again for a week: the recording (only the teacher is on it) waits in your account."
-msgstr "Egy hétig visszanézheted az órát: a felvételt (csak az oktató látszik rajta) a fiókodban találod."
+msgstr "Ezt a csoportos órát egy hétig visszanézheted a fiókodban. A felvételen csak az oktató szerepel, más résztvevő nem."
 
 msgid "You can watch this class again for %d day: the recording (only the teacher is on it) waits in your account."
 msgid_plural "You can watch this class again for %d days: the recording (only the teacher is on it) waits in your account."
-msgstr[0] "%d napig visszanézheted az órát: a felvételt (csak az oktató látszik rajta) a fiókodban találod."
-msgstr[1] "%d napig visszanézheted az órát: a felvételt (csak az oktató látszik rajta) a fiókodban találod."
+msgstr[0] "Ezt a csoportos órát %d napig visszanézheted a fiókodban. A felvételen csak az oktató szerepel, más résztvevő nem."
+msgstr[1] "Ezt a csoportos órát %d napig visszanézheted a fiókodban. A felvételen csak az oktató szerepel, más résztvevő nem."
