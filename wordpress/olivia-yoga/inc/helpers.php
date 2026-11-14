@@ -433,6 +433,9 @@ function oy_page_head( $h1, $lead, array $trail, $seed, $meta = '', $photo = '' 
 	$lead = $lead ? '<p class="lead">' . esc_html( $lead ) . '</p>' : '';
 	$text = '<div class="page-head__text">' . oy_crumbs( $trail ) . '<h1>' . esc_html( $h1 ) . '</h1>' . $lead . $meta . '</div>';
 	if ( $photo ) {
+		// the photo fills its tall frame (cropped), so it shows much wider than its column: ask for the large version,
+		// or the browser stretches a small one and it looks blurred (Olívia, 14 November: „miért esik így szét a minősége?”)
+		$photo = (string) preg_replace( '/ sizes="[^"]*"/', ' sizes="(min-width: 960px) 66vw, 100vw"', $photo, 1 );
 		return '<header class="page-head page-head--' . $tone . $size . '"><div class="container page-head__grid">' . $text
 			. '<div class="page-head__photo"><div class="frame">' . $photo . '</div></div></div></header>';
 	}

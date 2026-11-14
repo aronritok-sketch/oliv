@@ -79,7 +79,7 @@ $steps  = array(
 
 <section class="section" id="intro" aria-labelledby="intro-title"><div class="container">
 	<div class="intro__grid">
-		<div class="intro__visual" data-reveal><div class="oj-waved"><?php echo oy_brush_blob( 'lilac', 'left' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'olivia-golden-hour-arms', '(min-width: 960px) 36vw, 92vw' ); // phpcs:ignore ?></div></div></div>
+		<div class="intro__visual" data-reveal><div class="oj-waved"><?php echo oy_brush_blob( 'lilac', 'left' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'olivia-golden-hour-arms', '(min-width: 960px) 50vw, 100vw' ); // phpcs:ignore ?></div></div></div>
 		<div class="prose" data-reveal>
 			<?php
 			while ( have_posts() ) {
@@ -146,7 +146,7 @@ $more     = array(
 			<<?php echo $gift_tag; // phpcs:ignore ?> class="oj-voucher"<?php echo $gift_url ? ' href="' . esc_url( $gift_url ) . '"' : ''; // phpcs:ignore ?>><span class="oj-voucher__icon"><?php echo oy_icon( 'gift' ); // phpcs:ignore ?></span><span class="oj-voucher__text"><b><?php esc_html_e( 'As a gift, too', 'olivia-yoga' ); ?></b> <?php esc_html_e( 'Surprise someone you love with a pretty gift card.', 'olivia-yoga' ); ?></span><?php if ( $gift_url ) : ?><span class="oj-voucher__go" aria-hidden="true"><?php echo oy_icon( 'arrow' ); // phpcs:ignore ?></span><?php endif; ?></<?php echo $gift_tag; // phpcs:ignore ?>>
 			<p class="btn-row oj-inline"><?php echo oy_btn( $ask( 'egyeni-joga' ), __( 'Ask for a time', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore ?><a class="text-link" href="<?php echo esc_url( oy_class_url( 'egyeni-online-joga' ) ); ?>"><?php esc_html_e( 'More about one-to-one yoga', 'olivia-yoga' ); ?></a></p>
 		</div>
-		<div class="oj-split__art" data-reveal><div class="oj-waved oj-waved--soft"><?php echo oy_soft_blob( 'lilac', 'right' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'private-tree-pose', '(min-width: 960px) 34vw, 92vw' ); // phpcs:ignore ?></div></div></div>
+		<div class="oj-split__art" data-reveal><div class="oj-waved oj-waved--soft"><?php echo oy_soft_blob( 'lilac', 'right' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'private-tree-pose', '(min-width: 960px) 50vw, 100vw' ); // phpcs:ignore ?></div></div></div>
 	</div>
 </div></section>
 
@@ -162,7 +162,7 @@ $more     = array(
 			<p class="btn-row oj-inline"><?php echo oy_btn( $ask( 'prenatal' ), __( 'Ask for a time', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore ?><a class="text-link" href="<?php echo esc_url( oy_class_url( oy_prenatal_slug() ) ); ?>"><?php esc_html_e( 'More about prenatal fitness', 'olivia-yoga' ); ?></a></p>
 		</div>
 		<?php // Olívia, 14 November: „a hullám a kép mögött legyen hasonló mint a legelső blokkban” – the soft wave of the hero, not a stroke that runs into the text ?>
-		<div class="oj-split__art" data-reveal><div class="oj-waved oj-waved--soft"><?php echo oy_soft_blob( 'pink', 'left' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'prenatal-ball-training', '(min-width: 960px) 34vw, 92vw' ); // phpcs:ignore ?></div></div></div>
+		<div class="oj-split__art" data-reveal><div class="oj-waved oj-waved--soft"><?php echo oy_soft_blob( 'pink', 'left' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'prenatal-ball-training', '(min-width: 960px) 50vw, 100vw' ); // phpcs:ignore ?></div></div></div>
 	</div>
 </div></section>
 
@@ -202,7 +202,7 @@ $more     = array(
 		<ul class="places"><?php foreach ( $needs as $n ) : ?><li><?php echo oy_pictogram( $n[0], $n[3] ); // phpcs:ignore ?><div><h3><?php echo esc_html( $n[1] ); ?></h3><p><?php echo esc_html( $n[2] ); ?></p><?php if ( ! empty( $n[4] ) ) : ?><p class="oj-only-me"><?php echo oy_icon( 'check' ) . esc_html( $n[4] ); // phpcs:ignore ?></p><?php endif; ?></div></li><?php endforeach; ?></ul>
 	</div>
 	<div class="private__side" data-reveal>
-		<div class="frame"><?php echo oy_photo( 'olivia-dancer-home', '(min-width: 960px) 34vw, 92vw' ); // phpcs:ignore ?></div>
+		<div class="frame"><?php echo oy_photo( 'olivia-dancer-home', '(min-width: 960px) 50vw, 100vw' ); // phpcs:ignore ?></div>
 		<ol class="steps"><?php foreach ( $steps as $s ) : ?><li><div><b><?php echo esc_html( $s[0] ); ?></b><span><?php echo esc_html( $s[1] ); ?></span></div></li><?php endforeach; ?></ol>
 		<p class="btn-row"><?php echo oy_btn( oy_book_url(), __( 'Book a class', 'olivia-yoga' ), 'orchid' ) . oy_btn( oy_page_link( 'faq' ), __( 'Questions about online classes', 'olivia-yoga' ), 'ghost' ); // phpcs:ignore ?></p>
 	</div>

@@ -3151,6 +3151,7 @@ test( 'Olívia\'s doc of 14 November, night: „Online órák” – the two blo
 	ok( 5 === substr_count( $pg['content'], 'class="oj-guide__box' ) && str_contains( $pg['content'], '{{class:relaxacio-legzes}}' ), '„Melyik órát válasszam?”: five boxes, the links kept' );
 	ok( str_contains( $pg['content'], 'Egyéni órán csak rád figyelek' ) && ! str_contains( $pg['content'], 'Egyéni órán csak neked tanítok' ), 'a new first sentence for „Egyéni online órák”' );
 	ok( ! str_contains( $data['classes']['hatha-flow']['content'], 'napüdvözlet' ), 'the group class: no sun salutations in its description („nem napüdvözletezünk”)' );
+	ok( str_contains( oy_page_head( 'X', '', array(), 'x', '', '<img src="a.jpg" sizes="(min-width: 960px) 36vw, 90vw">' ), 'sizes="(min-width: 960px) 66vw, 100vw"' ), 'page-head photos: the large version is asked for, so they are not blurred („miért esik így szét a minősége?”)' );
 	update_option( 'oy_edition', 'hu-online' );
 	try {
 		$page = get_page_by_path( oy_page_slug( 'yoga-classes' ) );
