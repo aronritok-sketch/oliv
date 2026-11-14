@@ -61,20 +61,22 @@ function oy_class_cards( $exclude = '' ) {
 	$tones = array( 'hatha-flow' => 'lilac', 'egyeni-online-joga' => 'pink', oy_prenatal_slug() => 'sage', 'stretching' => 'sun', 'relaxacio-legzes' => 'lilac' );
 	$out   = '';
 	$n     = 0;
-	foreach ( oy_classes() as $c ) {
-		if ( $c->post_name === $exclude ) {
-			continue;
-		}
+	$all   = array_values( array_filter( oy_classes(), fn( $c ) => $c->post_name !== $exclude ) );
+	// Olívia, 14 November: „nem jó az elrendezés, hogy az 5. egy új sorban van” – with five, the group class (the one that
+	// is every week) opens the row wide, and the four one-to-one sessions sit in one row under it
+	$lead  = 5 === count( $all );
+	foreach ( $all as $c ) {
 		$tone = $tones[ $c->post_name ] ?? OY_ACCENTS[ $n % 4 ];
+		$wide = $lead && 0 === $n;
 		$n++;
 		$len  = oy_class_meta( $c->ID, 'oy_duration' );
 		$out .= '<a class="oj-class-card oj-class-card--' . esc_attr( $tone ) . '" href="' . esc_url( oy_class_url( $c->post_name ) ) . '">'
-			. '<span class="oj-class-card__photo">' . oy_post_photo( $c->ID, '', '(min-width: 960px) 30vw, 92vw' ) . '</span>'
+			. '<span class="oj-class-card__photo">' . oy_post_photo( $c->ID, '', $wide ? '(min-width: 960px) 50vw, 92vw' : '(min-width: 960px) 30vw, 92vw' ) . '</span>'
 			. '<span class="oj-class-card__body"><span class="oj-class-card__name">' . esc_html( get_the_title( $c ) ) . '</span>'
 			. '<span class="oj-class-card__desc">' . esc_html( get_the_excerpt( $c ) ) . '</span>'
 			. '<span class="oj-class-card__foot">' . ( $len ? '<span class="oj-class-card__len">' . oy_icon( 'clock' ) . esc_html( $len ) . '</span>' : '<span></span>' ) . '<span class="oj-class-card__go" aria-hidden="true">' . oy_icon( 'arrow' ) . '</span></span></span></a>';
 	}
-	return '<div class="oj-class-cards">' . $out . '</div>';
+	return '<div class="oj-class-cards' . ( $lead ? ' oj-class-cards--lead' : '' ) . '">' . $out . '</div>';
 }
 
 function oy_faq_list( $home_only = false ) {

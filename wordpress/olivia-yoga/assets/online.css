@@ -633,3 +633,45 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY
 .entry ul:not([class]) li:not([class]):nth-child(4n + 2) { --wave: var(--sun); }
 .entry ul:not([class]) li:not([class]):nth-child(4n + 3) { --wave: var(--lilac); }
 .entry ul:not([class]) li:not([class]):nth-child(4n) { --wave: var(--sage); }
+
+/* Olívia, 14 November: „ez a blokk még nem tetszik, hozd be az oldal stílusát … túl hosszú a felsorolás” – four soft boxes
+   with a corner circle, like the boxes and cards around them; the whole list is on the one-to-one class page */
+.oj-fit { list-style: none; margin: 1.4rem 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; }
+.oj-fit__item { --bg: var(--lilac-soft); --edge: var(--lilac); --dot: #9C6ADE; position: relative; display: flex; flex-direction: column; gap: .3rem; margin: 0; padding: 1rem 1.15rem 1.1rem; border-radius: 20px; background: var(--bg); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--edge) 45%, transparent); overflow: hidden; isolation: isolate; font-size: .93rem; line-height: 1.45; color: color-mix(in srgb, var(--ink) 82%, transparent); }
+.oj-fit__item::before { content: ""; position: absolute; z-index: -1; right: -34px; top: -34px; width: 88px; height: 88px; border-radius: 50%; background: color-mix(in srgb, var(--edge) 38%, #fff); }
+.oj-fit__item b { display: flex; align-items: center; gap: .5rem; color: var(--ink); font-size: 1.02rem; }
+.oj-fit__item b::before { content: ""; flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--dot); }
+.oj-fit__item--pink { --bg: var(--pink-soft); --edge: var(--pink); --dot: var(--orchid); }
+.oj-fit__item--sage { --bg: var(--sage-soft); --edge: var(--sage); --dot: #5E8F72; }
+.oj-fit__item--sun { --bg: var(--sun-soft); --edge: var(--sun); --dot: #E9701F; }
+.oj-fit__more { margin: .95rem 0 0; font-size: .95rem; }
+@media (max-width: 520px) { .oj-fit { grid-template-columns: 1fr; } }
+/* the whole list on the one-to-one page, in two columns */
+@media (min-width: 720px) { .entry .oj-cols > ul { columns: 2; column-gap: 2.2rem; } .entry .oj-cols > ul > li { break-inside: avoid; } }
+
+/* „Nagyon tetszik ez, csak nem felhasználóbarát az elrendezés”: the five questions one under the other, each a row you
+   read from left to right – the question, the class, a line about it, and a button – instead of 2 + 2 + 1 boxes */
+.entry .oj-guide { grid-template-columns: 1fr; gap: .8rem; }
+.entry .oj-guide__go { align-self: flex-start; margin-top: .35rem; padding: .5rem 1.05rem; border-radius: 999px; background: var(--ink); color: var(--paper); text-decoration: none; white-space: nowrap; transition: background .3s ease, transform .3s ease; }
+.entry .oj-guide__box:hover .oj-guide__go { background: var(--orchid); transform: translateX(3px); }
+@media (min-width: 640px) {
+	.entry .oj-guide__box { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; grid-template-areas: "art q go" "art name go" "art text go"; column-gap: 1.15rem; row-gap: .4rem; align-items: start; padding: 1.15rem 1.35rem 1.2rem 1.1rem; }
+	.entry .oj-guide__box .way__art { grid-area: art; width: 64px; height: 64px; margin: -4px 0 0; }
+	.entry .oj-guide__q { grid-area: q; }
+	.entry .oj-guide__name { grid-area: name; justify-self: start; }
+	.entry .oj-guide__text { grid-area: text; }
+	.entry .oj-guide__go { grid-area: go; align-self: center; margin: 0 0 0 .4rem; }
+}
+
+/* „nem jó az elrendezés itt sem, hogy az 5. egy új sorban van”: the weekly group class opens the row wide, photo beside the
+   text, and the four one-to-one sessions sit in one row under it */
+@media (min-width: 640px) {
+	.oj-class-cards--lead { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.oj-class-cards--lead > :first-child { grid-column: 1 / -1; flex-direction: row; }
+	.oj-class-cards--lead > :first-child .oj-class-card__photo { flex: 0 0 50%; aspect-ratio: auto; min-height: 300px; }
+	.oj-class-cards--lead > :first-child .oj-class-card__body { justify-content: center; gap: .8rem; padding: clamp(1.4rem, 3vw, 2.4rem); }
+	.oj-class-cards--lead > :first-child .oj-class-card__name { font-size: clamp(1.8rem, 2.8vw, 2.5rem); }
+	.oj-class-cards--lead > :first-child .oj-class-card__desc { max-width: 44ch; font-size: 1.04rem; }
+	.oj-class-cards--lead > :first-child .oj-class-card__foot { margin-top: .6rem; }
+}
+@media (min-width: 1080px) { .oj-class-cards--lead { grid-template-columns: repeat(4, minmax(0, 1fr)); } }

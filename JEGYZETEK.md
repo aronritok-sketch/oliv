@@ -339,6 +339,13 @@
   pötty; a fejléc gombja „Fiókom”. Az 1114d `_insert`/`_replace` párok mostantól feloldják a `{{class:…}}` linkeket.
   **Nyitott (Áron dönt):** Olívia a lábléc készítő-sorába Áron nevét és egyéni oldalát kérte a „Készítette:
   HelloProVision” helyett – márkaszabály-ütközés, nem változtattam. Üzenet Olíviának: 9148658. Tesztek 1155/0.
+- **3.11.27–3.11.31:** „Ismerj meg” gomb; a csoportos óra leírása Olívia szavaival (nincs napüdvözlet, talajgyakorlatokkal
+  indul, rövid relaxáció, minden óra egy testrészre fókuszál), a kezdő dátumok bekezdése ki, az „Online, élőben” részbe az
+  eszközök; „elfogadhatsz, majd ki tudod fizetni, vagy a bérletedből foglalhatsz”; élesebb fotók (a kivágott képek `sizes`
+  értéke); az „Online órák” lapon a csoportos óra széles kártyaként felül, alatta egy sorban a négy egyéni (nincs árva 5.),
+  a „Melyik órát válasszam?” soronként egy kérdés; a főoldali egyéni blokkban a hosszú buborék-lista helyett négy lágy doboz,
+  a teljes lista az egyéni óra oldalán (`#kinek-szol`, két hasáb). 1114d rev t: a kártyák rövid szövege (`_excerpt_prev`)
+  is frissül, ha még a régi. Tesztek 1172/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

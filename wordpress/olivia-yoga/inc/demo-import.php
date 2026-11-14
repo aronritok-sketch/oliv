@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-14s';
+	$rev = '2026-11-14t';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1045,12 +1045,18 @@ function oy_migrate_1114d() {
 		$targets[] = array( $key, $class, fn() => get_page_by_path( $key, OBJECT, 'oy_class' ) );
 	}
 	foreach ( $targets as list( $key, $page, $find ) ) {
-		if ( empty( $page['_insert'] ) && empty( $page['_replace'] ) ) {
+		if ( empty( $page['_insert'] ) && empty( $page['_replace'] ) && empty( $page['_excerpt_prev'] ) ) {
 			continue;
 		}
 		$post = $find();
 		if ( ! $post ) {
 			continue;
+		}
+		// the short text on the cards („A relaxáció nem hosszú”): only while it is still the old one word for word
+		if ( ! empty( $page['_excerpt_prev'] ) && trim( $post->post_excerpt ) === trim( $page['_excerpt_prev'] ) && ! empty( $page['excerpt'] ) ) {
+			wp_update_post( wp_slash( array( 'ID' => $post->ID, 'post_excerpt' => $page['excerpt'] ) ) );
+			$log[] = 'excerpt: ' . $key;
+			$post = get_post( $post->ID );
 		}
 		$content = $post->post_content;
 		foreach ( (array) ( $page['_insert'] ?? array() ) as $pair ) {

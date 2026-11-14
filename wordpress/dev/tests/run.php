@@ -3017,7 +3017,8 @@ test( 'Olívia\'s doc of 14 November: „legyen extrább, legyél nagyon kreatí
 		ob_start();
 		load_template( get_template_directory() . '/template-parts/front-online.php', false );
 		$home = (string) ob_get_clean();
-		ok( 11 === substr_count( $home, 'class="oj-bubble oj-bubble--' ) && str_contains( $home, 'oj-bubble--sun' ), 'one-to-one: the reasons as a cloud of bubbles in her four colours' );
+		ok( 4 === substr_count( $home, 'class="oj-fit__item oj-fit__item--' ) && str_contains( $home, 'oj-fit__item--sun' ) && ! str_contains( $home, 'class="oj-bubble' ), 'one-to-one: four of the reasons as soft boxes in her four colours, not the long bubble list („túl hosszú ez a felsorolás”)' );
+		ok( str_contains( $home, esc_url( oy_class_url( 'egyeni-online-joga' ) . '#kinek-szol' ) ), '… and a link to the whole list on the one-to-one page' );
 		ok( (bool) preg_match( '~<ul class="oj-facts">(?:<li><svg.*?</li>){3}</ul>~s', $home ), '… the length, the pair price and „from your living room” as three facts' );
 		ok( str_contains( $home, 'class="oj-voucher"' ) && str_contains( $home, 'oj-voucher__icon' ), '… the gift as a voucher' );
 		ok( ! str_contains( $home, 'oj-private .oj-checklist' ) && ! str_contains( $home, 'and as a gift: surprise' ), '… no plain tick list' );
@@ -3157,7 +3158,8 @@ test( 'Olívia\'s doc of 14 November, night: „Online órák” – the two blo
 		$page = get_page_by_path( oy_page_slug( 'yoga-classes' ) );
 		$id   = $page ? $page->ID : wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Online jógaórák', 'post_name' => oy_page_slug( 'yoga-classes' ) ) );
 		$old  = array_values( array_filter( $pg['_replace'], fn( $r ) => str_contains( $r[0], 'Melyik órát válasszam?' ) ) )[0];
-		wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => oy_resolve_tokens( $old[0] ) . '<p>' . $pg['_replace'][ count( $pg['_replace'] ) - 1 ][0] . ' Saját mondatom.</p>' ) ) );
+		$first = array_values( array_filter( $pg['_replace'], fn( $r ) => str_contains( $r[1], 'csak rád figyelek' ) ) )[0];
+		wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => oy_resolve_tokens( $old[0] ) . '<p>' . $first[0] . ' Saját mondatom.</p>' ) ) );
 		delete_option( 'oy_1114d_rev' );
 		oy_migrate_1114d();
 		$c = get_post_field( 'post_content', $id );
@@ -3169,6 +3171,54 @@ test( 'Olívia\'s doc of 14 November, night: „Online órák” – the two blo
 	}
 	$css = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
 	ok( str_contains( $css, '.entry ul:not([class]) li:not([class])::before { -webkit-mask: none; mask: none; left: .15rem; top: .62em; width: 9px;' ), 'lists: a soft pastel dot, not a dash („a gondolatjelek bénák”) and not a wave' );
+} );
+
+test( 'Olívia\'s doc of 14 November, late night: the group class – a short relaxation, one part of the body in focus, no start dates, the kit; „elfogadhatsz”; the five classes and the five questions laid out', function () {
+	update_option( 'oy_edition', 'hu-online' );
+	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+	update_option( 'oy_edition', 'fort-myers' );
+	$hf = $data['classes']['hatha-flow'];
+	ok( ! str_contains( $hf['content'], 'hosszú relaxáció' ) && ! str_contains( $hf['excerpt'], 'hosszú relaxáció' ) && str_contains( $hf['content'], 'rövid relaxáció' ), 'the group class: the relaxation is not long („A relaxáció nem hosszú”)' );
+	ok( ! str_contains( $data['pages']['classes']['content'], 'hosszú relaxáció' ) && ! str_contains( $data['pages']['about']['content'], 'hosszú relaxáció' ), '… nor on the classes page and the About page' );
+	ok( str_contains( $hf['content'], 'a vállra, a csípőre vagy a gerincre' ), '… every class focuses on one part of the body („pl. váll, csípő, gerinc”)' );
+	ok( ! str_contains( $hf['content'], 'december 16' ), '… the start dates out („ez a rész nem kell”)' );
+	ok( str_contains( $hf['content'], 'jógaheveder' ) && str_contains( $hf['content'], 'jógatégla' ) && str_contains( $hf['content'], 'pléd' ), '… the kit in its „Online, élőben” part („ide belefogalmazhatjuk az eszközöket”)' );
+	$all = (string) wp_json_encode( array( $data['pages'], $data['classes'] ), JSON_UNESCAPED_UNICODE );
+	ok( ! str_contains( preg_replace( '/"_replace":\[.*?\]\]/s', '', $all ), 'elfogadsz, és kifizeted' ) && str_contains( $data['pages']['classes']['content'], 'elfogadhatsz, majd ki tudod fizetni, vagy a bérletedből foglalhatsz' ), '„elfogadhatsz, ki tudod fizetni vagy a bérletedből foglalhatsz”' );
+	$eg   = $data['classes']['egyeni-online-joga']['content'];
+	$list = substr( $eg, (int) strpos( $eg, '<div class="oj-cols">' ) );
+	$list = substr( $list, 0, (int) strpos( $list, '</div>' ) );
+	ok( str_contains( $eg, '<h2 id="kinek-szol">' ) && substr_count( $list, '<li>' ) >= 11 && str_contains( $list, 'hospitálnál' ), 'the one-to-one page: the whole list of whom it is for („majd csak az aloldalon kell ezt mind megjeleníteni”)' );
+	$css = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
+	ok( str_contains( $css, '.oj-class-cards--lead > :first-child { grid-column: 1 / -1; flex-direction: row; }' ) && str_contains( $css, '@media (min-width: 1080px) { .oj-class-cards--lead { grid-template-columns: repeat(4, minmax(0, 1fr)); } }' ), 'the five classes: the group class wide on top, the four one-to-one ones in one row („az 5. egy új sorban van”)' );
+	ok( str_contains( $css, 'grid-template-areas: "art q go" "art name go" "art text go";' ) && str_contains( $css, '.entry .oj-guide { grid-template-columns: 1fr; gap: .8rem; }' ), '„Melyik órát válasszam?”: one row per question, read from left to right („nem felhasználóbarát az elrendezés”)' );
+	update_option( 'oy_edition', 'hu-online' );
+	$five = 5 === count( oy_classes() );
+	ok( $five === str_contains( oy_class_cards(), 'oj-class-cards--lead' ), 'the wide first card only when there are five classes' );
+	$post    = get_page_by_path( 'hatha-flow', OBJECT, 'oy_class' );
+	$made    = ! $post;
+	$id      = $post ? $post->ID : wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Csoportos online flow jóga', 'post_name' => 'hatha-flow' ) );
+	$keep    = $post ? array( $post->post_content, $post->post_excerpt ) : null;
+	$olds    = array_map( fn( $r ) => $r[0], array_slice( $hf['_replace'], -4 ) );
+	try {
+		wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => implode( "\n", $olds ) . "\n<p>Saját mondatom.</p>", 'post_excerpt' => $hf['_excerpt_prev'] ) ) );
+		delete_option( 'oy_1114d_rev' );
+		oy_migrate_1114d();
+		$c = get_post_field( 'post_content', $id );
+		ok( str_contains( $c, 'rövid relaxáció' ) && str_contains( $c, 'a csípőre vagy a gerincre' ) && ! str_contains( $c, 'december 16' ) && str_contains( $c, 'jógatégla' ) && str_contains( $c, 'Saját mondatom.' ), 'live update: the group class\'s text changed, her own words stay' );
+		ok( get_post_field( 'post_excerpt', $id ) === $hf['excerpt'], 'live update: the card\'s short text too, while it is still the old one' );
+		wp_update_post( wp_slash( array( 'ID' => $id, 'post_excerpt' => 'Az én szövegem.' ) ) );
+		delete_option( 'oy_1114d_rev' );
+		oy_migrate_1114d();
+		ok( 'Az én szövegem.' === get_post_field( 'post_excerpt', $id ), '… a short text she wrote herself stays' );
+	} finally {
+		if ( $made ) {
+			wp_delete_post( $id, true );
+		} else {
+			wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => $keep[0], 'post_excerpt' => $keep[1] ) ) );
+		}
+		update_option( 'oy_edition', 'fort-myers' );
+	}
 } );
 
 test( 'Olívia\'s doc of 14 November: the side column is never cut off while scrolling; her two training photos in one line', function () {

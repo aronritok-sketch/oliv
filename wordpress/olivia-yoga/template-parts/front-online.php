@@ -123,6 +123,15 @@ $gift_url = function_exists( 'oys_page_url' ) ? oys_page_url( 'gifts' ) : '';
 // Olívia, 14 November: „ez a része a blokknak nem annyira tetszik, legyen extrább” – the list becomes a cloud of soft
 // bubbles in her four colours, the length and the pair price three small facts, the gift its own voucher
 $tones    = array( 'lilac', 'pink', 'sage', 'sun' );
+// Olívia, 14 November: „ez a blokk még nem tetszik, hozd be az oldal stílusát … Lehet hogy túl hosszú is ez a felsorolás …
+// majd csak az aloldalon kell ezt mind megjeleníteni” – four of them here, as small soft boxes like the rest of the page; the
+// whole list is on the one-to-one class page
+$fit      = array(
+	array( __( 'For beginners', 'olivia-yoga' ), $for_whom[0] ),
+	array( __( 'For advanced students', 'olivia-yoga' ), $for_whom[2] ),
+	array( __( 'Targeted', 'olivia-yoga' ), $for_whom[8] ),
+	array( __( 'Together', 'olivia-yoga' ), __( 'with a friend, your sister or brother, or as a date with your partner – cheaper as a pair', 'olivia-yoga' ) ),
+);
 $facts    = array(
 	array( 'clock', __( '60 or 90 minutes', 'olivia-yoga' ) ),
 	array( 'user', __( 'alone or as a pair – cheaper as a pair', 'olivia-yoga' ) ),
@@ -140,7 +149,8 @@ $more     = array(
 			<?php echo oy_kicker( __( 'One-to-one sessions', 'olivia-yoga' ) ); // phpcs:ignore ?>
 			<h2 id="private-title"><?php esc_html_e( 'One-to-one online yoga, entirely tailored to you', 'olivia-yoga' ); ?></h2>
 			<p class="lead"><?php esc_html_e( 'A one-to-one session is shaped entirely around you. It is for you, for example:', 'olivia-yoga' ); ?></p>
-			<ul class="oj-bubbles"><?php foreach ( $for_whom as $i => $w ) : ?><li class="oj-bubble oj-bubble--<?php echo esc_attr( $tones[ $i % 4 ] ); ?>" style="--i:<?php echo (int) $i; ?>"><?php echo esc_html( $w ); ?></li><?php endforeach; ?></ul>
+			<ul class="oj-fit"><?php foreach ( $fit as $i => $f ) : ?><li class="oj-fit__item oj-fit__item--<?php echo esc_attr( $tones[ $i % 4 ] ); ?>"><b><?php echo esc_html( $f[0] ); ?></b><span><?php echo esc_html( $f[1] ); ?></span></li><?php endforeach; ?></ul>
+			<p class="oj-fit__more"><a class="text-link" href="<?php echo esc_url( oy_class_url( 'egyeni-online-joga' ) . '#kinek-szol' ); ?>"><?php esc_html_e( 'Who else is it for? You will find them all on the one-to-one page', 'olivia-yoga' ); ?></a></p>
 			<ul class="oj-facts"><?php foreach ( $facts as $f ) : ?><li><?php echo oy_icon( $f[0] ); // phpcs:ignore ?><span><?php echo esc_html( $f[1] ); ?></span></li><?php endforeach; ?></ul>
 			<?php $gift_tag = $gift_url ? 'a' : 'p'; ?>
 			<<?php echo $gift_tag; // phpcs:ignore ?> class="oj-voucher"<?php echo $gift_url ? ' href="' . esc_url( $gift_url ) . '"' : ''; // phpcs:ignore ?>><span class="oj-voucher__icon"><?php echo oy_icon( 'gift' ); // phpcs:ignore ?></span><span class="oj-voucher__text"><b><?php esc_html_e( 'As a gift, too', 'olivia-yoga' ); ?></b> <?php esc_html_e( 'Surprise someone you love with a pretty gift card.', 'olivia-yoga' ); ?></span><?php if ( $gift_url ) : ?><span class="oj-voucher__go" aria-hidden="true"><?php echo oy_icon( 'arrow' ); // phpcs:ignore ?></span><?php endif; ?></<?php echo $gift_tag; // phpcs:ignore ?>>

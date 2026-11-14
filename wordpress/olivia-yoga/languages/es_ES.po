@@ -1243,3 +1243,21 @@ msgstr "Sobre mí"
 
 msgid "Get to know me"
 msgstr "Conóceme"
+
+msgid "For beginners"
+msgstr "Para principiantes"
+
+msgid "For advanced students"
+msgstr "Para avanzados"
+
+msgid "Targeted"
+msgstr "Con un objetivo"
+
+msgid "Together"
+msgstr "En compañía"
+
+msgid "with a friend, your sister or brother, or as a date with your partner – cheaper as a pair"
+msgstr "con una amiga, tu hermana o hermano, o como cita con tu pareja: en pareja es más barato"
+
+msgid "Who else is it for? You will find them all on the one-to-one page"
+msgstr "¿Para quién más? Los encontrarás todos en la página de la clase individual"

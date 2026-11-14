@@ -797,6 +797,9 @@ Olivia doksija, 2026. 11. 13. 21:35.
   `oy_replay_days()` / `oy_replay_note()` / `oy_replay_label()` (téma) és `OYS_Live::replay_days()` / `replay_text()`
   (bővítmény): „egy hétig visszanézheted” – online, kézi link nélküli, felvett (`live_record`) órán. `.aside-sticky`: nincs
   belső görgetés; a site.js `fitAsides()` az ablaknál magasabb oldaldoboznak negatív `top`-ot ad.
+- 3.11.31: `oy_migrate_1114d` rev 2026-11-14t – a tartalomfájl lapjainak/óráinak `_excerpt_prev` mezője: ha az élő
+  kivonat szó szerint ez, az `excerpt` váltja. `oy_class_cards()`: öt órával `oj-class-cards--lead` (az első széles, fotó a
+  szöveg mellett, nagyobb `sizes`), alatta négy oszlop (1080 px fölött).
 
 ### 6.14 Mobil API és iOS app
 

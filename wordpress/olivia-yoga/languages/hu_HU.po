@@ -1862,3 +1862,21 @@ msgstr "Rólam"
 
 msgid "Get to know me"
 msgstr "Ismerj meg"
+
+msgid "For beginners"
+msgstr "Kezdőknek"
+
+msgid "For advanced students"
+msgstr "Haladóknak"
+
+msgid "Targeted"
+msgstr "Célzottan"
+
+msgid "Together"
+msgstr "Kettesben"
+
+msgid "with a friend, your sister or brother, or as a date with your partner – cheaper as a pair"
+msgstr "a barátnőddel, a testvéreddel, vagy randiként a pároddal – párban olcsóbb"
+
+msgid "Who else is it for? You will find them all on the one-to-one page"
+msgstr "Kinek szól még? Az egyéni óra oldalán mindet megtalálod"
