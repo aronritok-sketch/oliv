@@ -420,3 +420,12 @@ body .hero__title .hero__l3 { display: block; margin-top: .14em; }
 	.entry .oj-float { margin: .4rem 0 1.4rem 2.6rem; }
 	.entry .oj-float--left { margin: .4rem 2.6rem 1.4rem 14px; }
 }
+
+/* About side column: the next live class and the five services (instead of the trainings, which are in the text) */
+.aside-card--practice h2 { margin-bottom: .8rem; }
+.aside-next { display: flex; gap: .6rem; align-items: flex-start; margin: 0 0 1.1rem; padding: .8rem .9rem; border-radius: 12px; background: rgba(255, 255, 255, .1); color: var(--paper); font-size: .92rem; line-height: 1.45; }
+.aside-next svg { width: 18px; height: 18px; flex: none; margin-top: .15em; color: var(--pink); }
+.aside-next b { display: block; color: var(--paper); }
+.aside-card--practice .aside-list a { color: var(--paper); text-decoration: none; font-weight: 700; }
+.aside-card--practice .aside-list a:hover { color: var(--pink); }
+.aside-card--practice .aside-list small { display: block; color: #BFCEB9; font-size: .82rem; }

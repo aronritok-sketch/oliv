@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OY_VERSION', '3.11.8' );
+define( 'OY_VERSION', '3.11.9' );
 
 require_once get_template_directory() . '/inc/edition.php';
 
@@ -197,6 +197,24 @@ function oy_page_aside( $slug ) {
 		case 'about':
 			if ( oy_is_demo() ) {
 				return $card( __( 'Come to a class', 'olivia-yoga' ), __( 'Beginners are always welcome. Book a drop-in or a class pass online.', 'olivia-yoga' ), oy_book_url(), __( 'Book a class', 'olivia-yoga' ), 'olivia-riverside-profile' );
+			}
+			if ( oy_online_only() ) {
+				// Olívia, 14 November: „ez a rész teljesen jöjjön ki, legyen helyette más” – the trainings are in the text
+				// already; beside it now: the next live class and her five services with their lengths
+				$next = '';
+				if ( class_exists( 'OYS_Schedule' ) && function_exists( 'oys_now' ) ) {
+					$soon = OYS_Schedule::query( array( 'kind' => array( 'group' ), 'from' => oys_now(), 'to' => oys_utc_plus( 120 * DAY_IN_SECONDS ), 'status' => 'scheduled' ) );
+					if ( $soon ) {
+						$next = '<p class="aside-next">' . oy_icon( 'calendar' ) . '<span>' . esc_html__( 'Next live group class:', 'olivia-yoga' ) . ' <b>' . esc_html( wp_date( 'F j., l, H:i', oys_ts( $soon[0]->starts_at ) ) ) . '</b></span></p>';
+					}
+				}
+				$items = '';
+				foreach ( oy_classes() as $c ) {
+					$len    = oy_class_meta( $c->ID, 'oy_duration' );
+					$items .= '<li>' . oy_icon( 'arrow' ) . '<span><a href="' . esc_url( oy_class_url( $c->post_name ) ) . '">' . esc_html( get_the_title( $c ) ) . '</a>' . ( $len ? ' <small>' . esc_html( $len ) . '</small>' : '' ) . '</span></li>';
+				}
+				return '<div class="aside-card aside-card--forest aside-card--practice"><h2>' . esc_html__( 'Practise with me, live', 'olivia-yoga' ) . '</h2>' . $next
+					. ( $items ? '<ul class="aside-list aside-list--light">' . $items . '</ul>' : '' ) . oy_btn( oy_page_link( 'schedule-pricing' ), oy_schedule_label(), 'orchid' ) . '</div>';
 			}
 			return '<div class="aside-card"><div class="frame">' . oy_photo( 'olivia-riverside-profile', '340px' ) . '</div><h2>' . esc_html__( 'Training', 'olivia-yoga' ) . '</h2>' . oy_training_list() . oy_btn( oy_book_url(), __( 'Practice with me', 'olivia-yoga' ), 'orchid' ) . '</div>';
 		case 'private-yoga':

@@ -1808,3 +1808,9 @@ msgstr "Az egyéni óra teljesen hozzád igazodik. Neked szól például:"
 
 msgid "Made by"
 msgstr "Készítette:"
+
+msgid "Next live group class:"
+msgstr "A következő élő csoportos óra:"
+
+msgid "Practise with me, live"
+msgstr "Gyakorolj velem élőben"
