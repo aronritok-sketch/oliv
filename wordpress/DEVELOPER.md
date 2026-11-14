@@ -804,6 +804,10 @@ Olivia doksija, 2026. 11. 13. 21:35.
   szövegből; ha a rész másképp néz ki, érintetlen). `oy_price_cards( $service )` / `[oy_prices service="…"]` – a szolgáltatás
   aktív `private_single`/`private_pack` termékei (fő × perc csoportokban); `oy_price_section()` az „Árak” lista „Ft”-os sorait
   cseréli rá, a többi sor `oj-price-note` bekezdés lesz. A régi `oy_migrate_prices()` már nem talál listát a tartalomfájlban.
+- 3.11.43–45 / 1.10.12: `oy_kit_up()` (a „Mire lesz/lehet szükséged?” rész az első rész után, `oj-kit` kártyák; `_kit` a tartalomfájlban),
+  `oy_kit_items()` (a kártyák adatként). Bővítmény: `OYS_Emails::kit_html( $session )` a visszaigazolásban és a vendégmeghívóban,
+  a lista az `oys_session_kit` szűrőből jön (`array( 'items' => [ [név, megjegyzés], … ], 'note' => '' )`); a téma az óra
+  oldaláról adja (`class_slug`, páros órán `-duo` nélkül).
 
 ### 6.14 Mobil API és iOS app
 

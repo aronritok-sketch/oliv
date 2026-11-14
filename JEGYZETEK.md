@@ -379,6 +379,10 @@
 - **3.11.44:** az órák oldaldoboza az online oldalon kép nélküli (a kismamáé is, Fitmummy-kép nélkül), és csak az adott órára
   vonatkozó lemondási szabályt mutatja (egyéni órán az egyénit, a csoportoson a csoportosat); a szűkítés soha nem vág le szöveget
   (nincs „…”), csak képet és térközt. Minden mért ablakméretben fixált marad. Tesztek 1222/0.
+- **3.11.45 (olivia-studio 1.10.12):** a „Bejelentkezés és árak” árkártyái ugyanúgy néznek ki, mint a főoldalon (saját pipák, nem a
+  szöveg pasztell pöttyei); a foglalás visszaigazoló e-mailjében (és a vendég meghívójában) „Mire lesz szükséged az órán?” doboz
+  az óra oldaláról vett eszközlistával (`oys_session_kit` szűrő → `oy_kit_items()`); a Rólam oldalon a Fitmummy-képzés kártya:
+  kép balra, felirat mellette. Tesztek 1229/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

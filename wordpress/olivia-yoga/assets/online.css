@@ -773,3 +773,17 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .entry ul.oj-kit li:nth-child(4n) { --dot: var(--sage); }
 .entry ul.oj-kit li span { font-weight: 400; font-size: .86rem; color: color-mix(in srgb, var(--ink) 70%, transparent); }
 .entry .oj-kit-device { margin: 0 0 2rem; padding: .85rem 1.1rem; border-radius: 14px; background: var(--sun-soft); font-size: .93rem; }
+
+/* „A bejelentkezés és áraknál pontosan ugyanúgy nézzen ki mint a főoldalon”: the price cards' lists keep their own little
+   ticks on a page too – the page text's pastel dots are not for them */
+.entry .price ul { margin: 0 0 1.75rem; padding: 1.1rem 0 0; }
+.entry .price ul li:not([class]) { margin: 0; padding-left: 1.4rem; }
+.entry .price ul li:not([class])::before { content: ""; position: absolute; left: 0; top: .5em; width: 10px; height: 6px; border-radius: 0; border-left: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; background: none; box-shadow: none; -webkit-mask: none; mask: none; transform: rotate(-45deg); }
+
+/* „ez itt hülyén néz ki, javítsd” (the Fitmummy training on the About page): a soft card – the photo on the left, cut to a
+   gentle portrait, the caption beside it – instead of a small tall photo alone with empty space next to it */
+.entry .credential:not(.credential--aside) { position: relative; overflow: hidden; isolation: isolate; display: grid; grid-template-columns: clamp(110px, 24%, 160px) minmax(0, 1fr); align-items: center; gap: 1.2rem; max-width: 560px; margin: 1.6rem 0 2rem; padding: .9rem 1.4rem .9rem .9rem; border-radius: 22px; background: var(--card, #fff); box-shadow: var(--shadow); }
+.entry .credential:not(.credential--aside)::before { content: ""; position: absolute; z-index: -1; right: -40px; top: -40px; width: 110px; height: 110px; border-radius: 50%; background: color-mix(in srgb, var(--sage) 40%, #fff); }
+.entry .credential:not(.credential--aside) img { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 14px; }
+.entry .credential:not(.credential--aside) figcaption { font-size: 1rem; font-weight: 700; color: var(--ink); line-height: 1.45; }
+.entry .credential:not(.credential--aside) img[src$=".svg"] { aspect-ratio: auto; object-fit: contain; border-radius: 0; }

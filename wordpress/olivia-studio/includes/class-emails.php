@@ -198,6 +198,28 @@ class OYS_Emails {
 		return $html . ( $tip ? '<p style="font-size:13px;color:#53635A">' . esc_html__( 'Charge your device, join a few minutes early, set up where the camera sees your mat (or leave it off), and keep your microphone muted.', 'olivia-studio' ) . '</p>' : '' );
 	}
 
+	/**
+	 * What to have ready for the class, in the booking email (Olívia, 14 November: „az eszközöket, hogy mire lesz szükség …
+	 * a visszaigazoló emailbe is írd!”). The site gives the list through the oys_session_kit filter – the theme takes it from
+	 * the class's own page, so it is always what the page says: array( 'items' => [ [ name, note ], … ], 'note' => '' ).
+	 */
+	public static function kit_html( $session ) {
+		$kit   = (array) apply_filters( 'oys_session_kit', array(), $session );
+		$items = array_filter( (array) ( $kit['items'] ?? array() ), fn( $i ) => '' !== trim( (string) ( $i[0] ?? '' ) ) );
+		if ( ! $items ) {
+			return '';
+		}
+		$li = '';
+		foreach ( $items as $i ) {
+			$li .= '<li style="margin:0 0 4px"><b>' . esc_html( $i[0] ) . '</b>' . ( '' !== trim( (string) ( $i[1] ?? '' ) ) ? ' – ' . esc_html( $i[1] ) : '' ) . '</li>';
+		}
+		$note = trim( (string) ( $kit['note'] ?? '' ) );
+		return '<div style="margin:18px 0;padding:14px 16px;background:#F3EDFB;border-radius:12px;color:#12231A">'
+			. '<p style="margin:0 0 8px;font-weight:700">' . esc_html__( 'What to have ready for the class', 'olivia-studio' ) . '</p>'
+			. '<ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.55">' . $li . '</ul>'
+			. ( '' !== $note ? '<p style="margin:10px 0 0;font-size:13px;color:#53635A">' . esc_html( $note ) . '</p>' : '' ) . '</div>';
+	}
+
 	/** "To pay at the studio: $25" for bookings that are paid on the day. */
 	private static function due_html( array $rows ) {
 		$due = array_sum( array_map( fn( $r ) => $r && 'door' === $r->paid_with && '' === $r->collected_with ? (int) $r->due_cents : 0, $rows ) );
@@ -262,6 +284,7 @@ class OYS_Emails {
 		$key    = $only_g ? 'guests_added' : 'booking_confirmed';
 		$online = 'online' === oys_mode_for( $s, $host->mode );
 		$blocks = self::session_block( $s )
+			. self::kit_html( $s )
 			. self::guest_list_html( $all_g, sprintf( _n( 'Your guest (%d)', 'Your guests (%d)', count( $all_g ), 'olivia-studio' ), count( $all_g ) ) )
 			. self::due_html( array_merge( array( $host ), $all_g ) )
 			. self::join_html( $host, $s );
@@ -284,7 +307,7 @@ class OYS_Emails {
 		}
 		$vars = array_merge( OYS_Email_Templates::vars_for( 0, $s ), array( 'guest_name' => $g->guest_name, 'host' => self::first_name( $g->user_id ), 'first_name' => $g->guest_name ) );
 		$note = 'online' === oys_mode_for( $s, $g->mode ) ? '' : '<p>' . esc_html__( 'Please arrive 10 minutes early.', 'olivia-studio' ) . '</p>';
-		self::compose( 'guest_invite', $g->guest_email, $vars, self::session_block( $s ) . self::join_html( $g, $s ) . $note, array( self::ics_file( $s, $g->id ) ), home_url( '/' ), '<p style="font-size:14px;color:#53635A">' . esc_html( OYS_Settings::get( 'waiver_text' ) ) . '</p>' );
+		self::compose( 'guest_invite', $g->guest_email, $vars, self::session_block( $s ) . self::kit_html( $s ) . self::join_html( $g, $s ) . $note, array( self::ics_file( $s, $g->id ) ), home_url( '/' ), '<p style="font-size:14px;color:#53635A">' . esc_html( OYS_Settings::get( 'waiver_text' ) ) . '</p>' );
 	}
 
 	/**

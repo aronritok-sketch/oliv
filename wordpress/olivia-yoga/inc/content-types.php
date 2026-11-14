@@ -150,4 +150,31 @@ add_filter( 'oys_class_url', function ( $url, $slug ) {
 	return oy_class_url( $slug );
 }, 10, 2 );
 add_filter( 'oys_corporate_contact_url', fn() => oy_contact_url( 'corporate' ) );
+// the booking email lists what to have ready, straight from the class's page (a pair session's slug ends in „-duo”)
+add_filter( 'oys_session_kit', function ( $kit, $session ) {
+	$slug = preg_replace( '/-duo$/', '', (string) ( $session->class_slug ?? '' ) );
+	$post = '' !== $slug ? get_page_by_path( $slug, OBJECT, 'oy_class' ) : null;
+	return $post ? oy_kit_items( $post->post_content ) : $kit;
+}, 10, 2 );
+
+/**
+ * The kit of a class page as data: the cards of its „Mire lesz szükséged?” part ([ name, note ] each) and the lines under
+ * them as one note.
+ */
+function oy_kit_items( $content ) {
+	if ( ! preg_match( '~<ul class="oj-kit">(.*?)</ul>(.*?)(?=<h2[\s>]|\[oy_|$)~su', (string) $content, $m ) ) {
+		return array();
+	}
+	$clean = fn( $t ) => trim( (string) preg_replace( '/\s+/u', ' ', html_entity_decode( wp_strip_all_tags( (string) $t ), ENT_QUOTES, 'UTF-8' ) ) );
+	$items = array();
+	preg_match_all( '~<li[^>]*>(.*?)</li>~su', $m[1], $li );
+	foreach ( $li[1] as $one ) {
+		if ( preg_match( '~<b>(.*?)</b>(.*)~su', $one, $p ) ) {
+			$items[] = array( $clean( $p[1] ), $clean( $p[2] ) );
+		} else {
+			$items[] = array( $clean( $one ), '' );
+		}
+	}
+	return array( 'items' => $items, 'note' => $clean( $m[2] ) );
+}
 add_filter( 'oys_featured_badge', fn() => '<span class="price__tag">' . esc_html__( 'Most popular', 'olivia-yoga' ) . '</span>' );

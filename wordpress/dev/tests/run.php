@@ -3341,6 +3341,26 @@ test( 'Olívia\'s doc of 14 November, past midnight: „Mire lesz szükséged?�
 	ok( str_contains( $css, '.entry ul.oj-kit { list-style: none;' ) && str_contains( $css, '.entry ul.oj-kit li::before {' ), 'the kit cards with the peeking pastel circles' );
 } );
 
+test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the same on the prices page; the kit in the booking email; the training card on About', function () {
+	$css = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
+	ok( str_contains( $css, '.entry .price ul li:not([class])::before { content: ""; position: absolute; left: 0; top: .5em; width: 10px; height: 6px; border-radius: 0;' ), 'the prices page: the cards\' lists with their own ticks, like on the home page („pontosan ugyanúgy nézzen ki mint a főoldalon”)' );
+	ok( str_contains( $css, '.entry .credential:not(.credential--aside) { position: relative;' ) && str_contains( $css, 'grid-template-columns: clamp(110px, 24%, 160px) minmax(0, 1fr);' ), 'About: the Fitmummy training as a card, the photo beside the caption („ez itt hülyén néz ki”)' );
+	$page = "<h2>Első</h2>\n<h2>Mire lesz szükséged?</h2>\n<ul class=\"oj-kit\">\n<li><b>Jógaszőnyeg</b><span>ez mindenképp kell</span></li>\n<li>Gumiszalag</li>\n</ul>\n<p class=\"oj-kit-device\">Kell még egy kamerás telefon is.</p>\n<h2>Árak</h2>";
+	$kit  = oy_kit_items( $page );
+	ok( array( array( 'Jógaszőnyeg', 'ez mindenképp kell' ), array( 'Gumiszalag', '' ) ) === $kit['items'] && 'Kell még egy kamerás telefon is.' === $kit['note'], 'the kit of a class page as data: the cards and the line under them' );
+	ok( array() === oy_kit_items( '<p>nincs</p>' ), '… nothing for a page without it' );
+	$id = wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Teszt kit', 'post_name' => 'teszt-kit-ora', 'post_content' => $page ) );
+	try {
+		$html = OYS_Emails::kit_html( (object) array( 'class_slug' => 'teszt-kit-ora-duo', 'kind' => 'private' ) );
+		ok( str_contains( $html, '<b>Jógaszőnyeg</b> – ez mindenképp kell' ) && str_contains( $html, '<b>Gumiszalag</b></li>' ) && str_contains( $html, 'Kell még egy kamerás telefon is.' ), 'the booking email: what to have ready, from the class\'s page, a pair session too („a visszaigazoló emailbe is írd!”)' );
+		ok( '' === OYS_Emails::kit_html( (object) array( 'class_slug' => 'nincs-ilyen-ora', 'kind' => 'group' ) ), '… and nothing when the class has no kit' );
+	} finally {
+		wp_delete_post( $id, true );
+	}
+	$src = (string) file_get_contents( WP_PLUGIN_DIR . '/olivia-studio/includes/class-emails.php' );
+	ok( str_contains( $src, '. self::kit_html( $s )' ) && substr_count( $src, 'self::kit_html( $s )' ) >= 2, '… in the confirmation and in a guest\'s invite' );
+} );
+
 test( 'Olívia\'s doc of 14 November: the side column is never cut off while scrolling; her two training photos in one line', function () {
 	$css = (string) file_get_contents( get_template_directory() . '/assets/site.css' );
 	ok( (bool) preg_match( '/\.aside-sticky \{ position: sticky; top: calc\(var\(--header-h\) \+ var\(--wp-bar, 0px\) \+ 24px\); align-self: start; \}/', $css ) && ! str_contains( $css, 'scrollbar-width: none' ), 'the side column: no hidden inner scroll that cuts its bottom off' );

@@ -6095,3 +6095,6 @@ msgstr "Ez egy páros ajándék: %s is megkapta veled együtt. Egyikőtök vált
 
 msgid "This is a gift for two: one of you redeems the code in their account, and you book together."
 msgstr "Ez egy páros ajándék: egyikőtök váltja be a kódot a fiókjában, és együtt foglaltok."
+
+msgid "What to have ready for the class"
+msgstr "Mire lesz szükséged az órán?"

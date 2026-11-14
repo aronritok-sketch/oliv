@@ -4094,3 +4094,6 @@ msgstr "Es un regalo para dos: también lo ha recibido %s. Una de vosotras canje
 
 msgid "This is a gift for two: one of you redeems the code in their account, and you book together."
 msgstr "Es un regalo para dos: una de vosotras canjea el código en su cuenta y reserváis juntas."
+
+msgid "What to have ready for the class"
+msgstr "Qué tener preparado para la clase"
