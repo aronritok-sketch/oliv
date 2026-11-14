@@ -445,3 +445,11 @@ body .hero__title .hero__l3 { display: block; margin-top: .14em; }
 .oj-replay svg { width: 22px; height: 22px; flex: none; margin-top: .1em; color: var(--orchid); }
 .oj-replay b { display: block; font-size: 1.02rem; }
 .oj-replay--aside { margin-top: 1rem; padding: .8rem .9rem; font-size: .85rem; text-align: left; }
+
+/* the About side column on a short laptop screen: tighter, so the whole of it fits while it follows the page */
+@media (min-width: 1000px) and (max-height: 880px) {
+	.aside-card--practice h2 { margin-bottom: .5rem; }
+	.aside-sticky .aside-next { margin-bottom: .7rem; padding: .55rem .75rem; font-size: .86rem; }
+	.aside-card--practice .aside-list small { display: inline; }
+	.aside-card--practice .aside-list small::before { content: "· "; }
+}

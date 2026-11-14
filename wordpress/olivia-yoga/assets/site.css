@@ -690,9 +690,18 @@ abbr[title] { text-decoration: none; }
 .layout { display: grid; gap: 3.5rem; padding-block: clamp(56px, 8vw, 104px) clamp(72px, 10vw, 140px); }
 @media (min-width: 1000px) {
 	.layout--aside { grid-template-columns: minmax(0, 1fr) 340px; gap: 6rem; }
-	/* a side column taller than the window is not cut off: it scrolls with the page until its bottom shows, then stays
-	   (site.js sets a lower top; Olívia, 14 November: „levágódik a box alja, ahogy görgetek”) */
+	/* the side column follows the page only when it fits in the window (site.js), never cut off at the top or bottom
+	   (Olívia, 14 November); on a short laptop screen it is tighter, so it fits more often */
 	.aside-sticky { position: sticky; top: calc(var(--header-h) + 24px); align-self: start; }
+}
+@media (min-width: 1000px) and (max-height: 880px) {
+	.aside-sticky { top: calc(var(--header-h) + 14px); }
+	.aside-sticky .aside-card { padding: 1.2rem 1.35rem; }
+	.aside-sticky .aside-card h2 { font-size: 1.55rem; margin-bottom: .35em; }
+	.aside-sticky .aside-card .frame { aspect-ratio: 16 / 10; margin-bottom: .9rem; }
+	.aside-sticky .aside-card p { font-size: .9rem; }
+	.aside-sticky .aside-list { gap: .3rem; margin-bottom: .8rem; font-size: .9rem; line-height: 1.35; }
+	.aside-sticky .aside-card .btn { padding-block: .75rem; }
 }
 
 .prose { max-width: 68ch; }

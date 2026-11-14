@@ -211,16 +211,16 @@
 		document.querySelectorAll('.site-footer, .oys-schedule, .oys-checkout, .cta').forEach(function (el) { fio.observe(el); });
 	}
 
-	/* A side column taller than the window: it scrolls with the page until its bottom shows, then stays there (a negative
-	   sticky top), so its button is never cut off (Olívia, 14 November: „levágódik a box alja, ahogy görgetek”) */
+	/* The side column follows the page only when the whole of it fits in the window; a taller one (a short laptop screen)
+	   simply scrolls with the page, so neither its top nor its bottom is ever cut off (Olívia, 14 November: „levágódik
+	   a box alja”, then „most a teteje tűnik el”) */
 	var asides = document.querySelectorAll('.aside-sticky');
 	function fitAsides() {
 		asides.forEach(function (el) {
-			el.style.top = '';
+			el.style.position = '';
 			var cs = getComputedStyle(el);
 			if (cs.position !== 'sticky') return;
-			var room = window.innerHeight - el.offsetHeight - 24;
-			if (room < (parseFloat(cs.top) || 0)) el.style.top = room + 'px';
+			if (el.offsetHeight + (parseFloat(cs.top) || 0) + 16 > window.innerHeight) el.style.position = 'static';
 		});
 	}
 	if (asides.length) {

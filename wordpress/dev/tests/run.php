@@ -3001,7 +3001,8 @@ test( 'Olívia\'s doc of 14 November: the side column is never cut off while scr
 	$css = (string) file_get_contents( get_template_directory() . '/assets/site.css' );
 	ok( (bool) preg_match( '/\.aside-sticky \{ position: sticky; top: calc\(var\(--header-h\) \+ 24px\); align-self: start; \}/', $css ) && ! str_contains( $css, 'scrollbar-width: none' ), 'the side column: no hidden inner scroll that cuts its bottom off' );
 	$js = (string) file_get_contents( get_template_directory() . '/assets/site.js' );
-	ok( str_contains( $js, 'function fitAsides' ) && str_contains( $js, 'window.innerHeight - el.offsetHeight - 24' ), '… taller than the window, it scrolls until its bottom shows, then stays' );
+	ok( str_contains( $js, 'function fitAsides' ) && str_contains( $js, "el.style.position = 'static'" ) && ! str_contains( $js, "el.style.top = room + 'px'" ), '… it follows the page only when the whole of it fits; a taller one scrolls with the page (neither top nor bottom cut off)' );
+	ok( str_contains( $css, '@media (min-width: 1000px) and (max-height: 880px)' ), '… and on a short laptop screen it is tighter, so it fits' );
 	$on = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
 	ok( ! str_contains( $on, '.oj-duo .oj-figure:nth-child(2) { margin-top' ), 'About: the two photos in one line, no step' );
 } );
