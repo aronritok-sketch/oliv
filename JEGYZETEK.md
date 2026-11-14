@@ -327,6 +327,10 @@
   fölött; Jógáról: minden írás egy oldalon, a 8 ág a végén; lábléc „Rólam”; foglalás: a vendéghozásnál a JS „$”-t írt
   forint helyett (javítva), az „1 alkalmas jegy megvétele” opció kikerült; Kapcsolat: „Online, élőben” ki. Üzenet
   Olíviának: 9148655. Tesztek 1122/0.
+- **3.11.20 (olivia-studio 1.10.11):** páros ajándékutalvány két címre (ugyanaz a kód, az e-mail a másikat is
+  megnevezi; rendelés-meta `recipient_name2/email2`); a Jógáról „Összes írás” végre minden cikket mutat (a
+  `template-parts/cards.php` `$posts` változója a fő lekérdezés listáját írta felül – referenciával kötött globális!);
+  a fejlécszöveg nem ér a fotó hullámába. Minta ajándékutalvány-e-mail képként Olíviának (chat 9148656). Tesztek 1128/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
