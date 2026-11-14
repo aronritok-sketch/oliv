@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-14r';
+	$rev = '2026-11-14s';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
