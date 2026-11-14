@@ -191,7 +191,7 @@ $more     = array(
 <section class="section section--tight" id="schedule" aria-labelledby="schedule-title"><div class="container">
 	<header class="section__head section__head--row" data-reveal><div><?php echo oy_kicker( __( 'Next classes', 'olivia-yoga' ) ); // phpcs:ignore ?><h2 id="schedule-title"><?php esc_html_e( 'Weekly live classes', 'olivia-yoga' ); ?></h2><?php // Olívia, 14 November: „ezt is kiszedhetjük” – no line under the title ?></div><?php echo oy_btn( oy_page_link( 'schedule-pricing' ), oy_schedule_label(), 'ghost' ); // phpcs:ignore ?></header>
 	<?php // Olivia, 13 November: only the Wednesdays (the next ones, however far), and the one-to-one sessions in a box of their own; 14 November: „itt mindig a következő 3 óra legyen látható” ?>
-	<?php echo shortcode_exists( 'oys_schedule' ) ? do_shortcode( '[oys_schedule days="7" next="3" empty_days="no"]' ) . ( shortcode_exists( 'oys_private_box' ) ? do_shortcode( '[oys_private_box]' ) : '' ) : ''; // phpcs:ignore ?>
+	<?php echo shortcode_exists( 'oys_schedule' ) ? do_shortcode( '[oys_schedule days="7" next="3" empty_days="no"]' ) . ( shortcode_exists( 'oys_private_box' ) ? do_shortcode( '[oys_private_box]' ) : '' ) . oy_cancel_note() : ''; // phpcs:ignore ?>
 </div></section>
 
 <section class="section section--moss hatha" aria-labelledby="hatha-title"><div class="container hatha__grid">

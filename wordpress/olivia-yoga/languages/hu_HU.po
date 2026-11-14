@@ -1814,3 +1814,6 @@ msgstr "A következő élő csoportos óra:"
 
 msgid "Practise with me, live"
 msgstr "Gyakorolj velem élőben"
+
+msgid "Cancellation:"
+msgstr "Lemondás:"

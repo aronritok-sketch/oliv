@@ -1525,6 +1525,7 @@ class OYS_Frontend {
 			. '<label class="field"><span>' . esc_html__( 'Address or area', 'olivia-studio' ) . '</span><input type="text" name="address" id="oys-pr-address" placeholder="' . esc_attr__( 'e.g. McGregor Blvd, Fort Myers Beach', 'olivia-studio' ) . '"></label></div>' )
 			. '<label class="field"><span>' . esc_html__( 'Days and times that suit you', 'olivia-studio' ) . '</span><textarea name="preferred" id="oys-pr-preferred" rows="3" required placeholder="' . esc_attr( $online_only ? __( 'e.g. weekday evenings after 6, or Saturday afternoon', 'olivia-studio' ) : __( 'e.g. Tuesday or Thursday mornings, or Saturday at sunrise', 'olivia-studio' ) ) . '"></textarea></label>'
 			. '<label class="field"><span>' . esc_html__( 'Anything I should know? (goals, injuries, experience)', 'olivia-studio' ) . '</span><textarea name="notes" id="oys-pr-notes" rows="4"></textarea></label>'
+			. ( trim( (string) OYS_Settings::get( 'cancel_policy' ) ) ? '<p class="oys-policy">' . esc_html( OYS_Settings::get( 'cancel_policy' ) ) . '</p>' : '' ) // the rule before asking, too (Olívia, 14 November)
 			. '<button class="btn btn--primary" type="submit">' . esc_html__( 'Send request', 'olivia-studio' ) . '</button>'
 			. '<p class="oys-small">' . esc_html__( 'Nothing is charged now. You\'ll get a suggested time and price to confirm.', 'olivia-studio' ) . '</p></form>';
 	}

@@ -222,6 +222,18 @@ function oy_kicker( $text ) {
 	return oy_online_only() ? '' : '<p class="kicker">' . esc_html( $text ) . '</p>';
 }
 
+/**
+ * The cancellation rule (the booking plugin's setting, so it is written in one place), for the online site's timetables,
+ * class pages and request form (Olívia, 14 November: „a lemondási szabály jelenjen meg kicsivel több helyen”).
+ */
+function oy_cancel_note( $cls = '' ) {
+	if ( ! oy_online_only() || ! class_exists( 'OYS_Settings' ) ) {
+		return '';
+	}
+	$text = trim( (string) OYS_Settings::get( 'cancel_policy' ) );
+	return '' === $text ? '' : '<p class="oj-policy' . ( $cls ? ' ' . esc_attr( $cls ) : '' ) . '">' . oy_icon( 'calendar' ) . '<span><b>' . esc_html__( 'Cancellation:', 'olivia-yoga' ) . '</b> ' . esc_html( $text ) . '</span></p>';
+}
+
 function oy_section_head( $title, $text = '', $kicker = '', $id = '' ) {
 	return '<header class="section__head" data-reveal>' . ( $kicker ? oy_kicker( $kicker ) : '' ) . '<h2' . ( $id ? ' id="' . esc_attr( $id ) . '"' : '' ) . '>' . esc_html( $title ) . '</h2>' . ( $text ? '<p class="lead">' . esc_html( $text ) . '</p>' : '' ) . '</header>';
 }

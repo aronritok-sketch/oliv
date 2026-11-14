@@ -2957,6 +2957,9 @@ test( 'online edition, Olívia\'s doc of 14 November, last points: one level for
 		ok( 9 === preg_match_all( '/\.oj-modules li:nth-child\(\d\) \{ --dot: (#[0-9A-F]{6}); \}/', $css, $m ) && 9 === count( array_unique( $m[1] ) ), 'nine modules, nine colours' );
 		ok( str_contains( $home, 'section--breath oj-breath-peach' ) && ! str_contains( $home, 'Egy perc a foglalás' ), 'the breathing lotus on peach; no line under „Heti élő órák”' );
 		ok( ! str_contains( $home, 'id="classes"' ), 'no „Online órák” list on the home page' );
+		$note = oy_cancel_note();
+		ok( str_contains( $note, 'oj-policy' ) && str_contains( $note, esc_html( (string) OYS_Settings::get( 'cancel_policy' ) ) ), 'the cancellation rule, from the booking settings' );
+		ok( str_contains( do_shortcode( '[oy_schedule]' ), 'oj-policy' ) && str_contains( $home, 'oj-policy' ), '… under the timetables (home page, prices page)' );
 		$side = oy_page_aside( 'about' );
 		ok( str_contains( $side, 'aside-card--practice' ) && ! str_contains( $side, 'aside-list"><li>' . oy_icon( 'check' ) ), 'About side column: the next class and the services, not the trainings again' );
 		$duo = do_shortcode( '[oy_figures photos="korall-stretching-circuit,outdoor-group-bands"]' );
