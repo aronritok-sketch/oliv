@@ -361,6 +361,9 @@
   volt), a csoportos óránál az eszközök kikerültek az „Online, élőben” bekezdésből; új `_before` pár a tartalomfájlban (egyszer
   szúr be, jelölő alapján). Bejelentkezve (admin sáv) az oldaldoboz a sáv alá is számol (`--wp-bar`), nem vágódik le a teteje.
   1114d rev x. Tesztek 1193/0.
+- **3.11.37:** a „Melyik órát válasszam?” sorok a lap teljes szélességében (kérdés + óra | leírás | gomb); az „Ajándéknak is”
+  sávból kikerült a jegy-kivágás, a szaggatott keret, a dőlés és a nagybetűs cím (az átmenet maradt); a zöld kismama-blokkon
+  nincs zöld sarokkör (sárga helyette); „A képedet csak én látom.”: pipa helyett sarokba belógó pasztell kör. Tesztek 1193/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

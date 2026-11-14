@@ -209,7 +209,7 @@ $more     = array(
 		<?php echo oy_kicker( __( 'How online classes work', 'olivia-yoga' ) ); // phpcs:ignore ?>
 		<h2 id="how-title"><?php esc_html_e( 'A real class, just in your living room', 'olivia-yoga' ); ?></h2>
 		<p class="lead"><?php esc_html_e( 'This is not a video to follow. We practice together, at the same time: I guide you, and you can ask anything before and after class.', 'olivia-yoga' ); ?></p>
-		<ul class="places"><?php foreach ( $needs as $n ) : ?><li><?php echo oy_pictogram( $n[0], $n[3] ); // phpcs:ignore ?><div><h3><?php echo esc_html( $n[1] ); ?></h3><p><?php echo esc_html( $n[2] ); ?></p><?php if ( ! empty( $n[4] ) ) : ?><p class="oj-only-me"><?php echo oy_icon( 'check' ) . esc_html( $n[4] ); // phpcs:ignore ?></p><?php endif; ?></div></li><?php endforeach; ?></ul>
+		<ul class="places"><?php foreach ( $needs as $n ) : ?><li><?php echo oy_pictogram( $n[0], $n[3] ); // phpcs:ignore ?><div><h3><?php echo esc_html( $n[1] ); ?></h3><p><?php echo esc_html( $n[2] ); ?></p><?php if ( ! empty( $n[4] ) ) : ?><p class="oj-only-me"><?php echo esc_html( $n[4] ); ?></p><?php endif; ?></div></li><?php endforeach; ?></ul>
 	</div>
 	<div class="private__side" data-reveal>
 		<div class="frame"><?php echo oy_photo( 'olivia-dancer-home', '(min-width: 960px) 50vw, 100vw' ); // phpcs:ignore ?></div>

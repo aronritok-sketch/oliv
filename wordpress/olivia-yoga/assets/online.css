@@ -717,3 +717,33 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY
 .entry .oj-price__rows dd { margin: 0; font-weight: 800; font-size: 1.12rem; white-space: nowrap; }
 .entry .oj-price__for { margin: .55rem 0 0; font-size: .82rem; color: color-mix(in srgb, var(--ink) 65%, transparent); }
 .entry .oj-price-note { margin: 0 0 2rem; font-size: .9rem; color: color-mix(in srgb, var(--ink) 75%, transparent); }
+
+/* „ez még mindig nagyon tetszik, de az elrendezés nem optimális”: the questions use the whole width of the page – the
+   question and the class on the left, what it is in the middle, the button on the right – instead of a narrow column */
+.entry > .oj-guide { max-width: none; }
+@media (min-width: 1000px) {
+	.entry .oj-guide__box { grid-template-columns: 64px minmax(0, 1fr) minmax(0, 1.35fr) auto; grid-template-areas: "art q text go" "art name text go"; column-gap: 1.8rem; row-gap: .45rem; align-items: center; padding: 1.25rem 1.6rem 1.25rem 1.3rem; }
+	.entry .oj-guide__q { align-self: end; }
+	.entry .oj-guide__name { align-self: start; }
+	.entry .oj-guide__box .way__art { align-self: center; margin: 0; }
+	.entry .oj-guide__text { padding-left: 1.6rem; border-left: 1.5px solid color-mix(in srgb, var(--edge) 55%, transparent); }
+}
+
+/* „Az átmenet tetszik, de a többi túl csicsa”: the gift line keeps its soft colour fade, without the ticket notches, the
+   dashed frame, the tilt and the big capitals */
+.oj-voucher { transform: none; -webkit-mask: none; mask: none; border-radius: 20px; padding: 1rem 1.35rem 1rem 1.1rem; box-shadow: none; }
+.oj-voucher::after { content: none; }
+a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); box-shadow: 0 18px 30px -24px rgba(217, 43, 134, .7); }
+.oj-voucher__icon { width: 40px; height: 40px; background: #fff; color: var(--orchid); transform: none; }
+.oj-voucher__icon svg { width: 20px; height: 20px; }
+.oj-voucher__text b { display: block; font-family: inherit; font-weight: 700; font-size: 1rem; letter-spacing: 0; text-transform: none; color: var(--ink); }
+
+/* „tetszik, de a zöld összeolvad a háttérrel”: on the green prenatal block the corner circles are lilac, pink, yellow and
+   orange – no green circle on the green */
+.oj-prenatal .oj-modules:not(.oj-modules--why) li:nth-child(4n + 3) { --dot: #E8B523; }
+
+/* „pipát vegyük ki, inkább a fenti félköröket alkalmazzuk ilyen esetekben”: „A képedet csak én látom.” without the tick –
+   a soft card with a pastel circle peeking into its corner, like the prenatal modules */
+.oj-only-me { position: relative; overflow: hidden; isolation: isolate; padding: .6rem 1rem .6rem 1.75rem; border-radius: 14px; background: var(--card, #fff); color: var(--orchid) !important; box-shadow: var(--shadow); }
+.oj-only-me::before { content: ""; position: absolute; z-index: -1; left: -1.05rem; top: -1.05rem; width: 2.6rem; height: 2.6rem; border-radius: 50%; background: color-mix(in srgb, var(--pink) 45%, #fff); }
+.oj-only-me::after { content: ""; position: absolute; z-index: -1; left: -.3rem; top: 1.05rem; width: .85rem; height: .85rem; border-radius: 50%; background: color-mix(in srgb, var(--pink) 22%, #fff); }
