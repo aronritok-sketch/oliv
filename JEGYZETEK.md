@@ -395,6 +395,8 @@
   úsznak be, egérre kicsit megemelkednek. „A képedet csak én látom” mindenhonnan ki (a GYIK-válasz élesen `text_swap`-pel):
   élőben a résztvevők is látják egymást, ha bekapcsolják a kamerát – **az élő teremben is így lett**: kis órán és egyéni órán
   mindenki látja mindenkit (live.js `seesEveryone()`), nagy órán csak az oktató. A felvételen továbbra is csak Olívia. Tesztek 1239/0.
+- **3.11.51:** a lábléc készítő-sora „Készítette: Ritók-Filip Áron”, az aronritok.com-ra linkelve (Olívia kérése; Áron 11.15-én
+  engedélyezte: „Csinálj meg mindent az élesbe”; a tudásbázisban kivételként rögzítve). Tesztek 1240/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

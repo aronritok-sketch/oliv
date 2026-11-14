@@ -3381,6 +3381,8 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	update_option( 'oy_edition', 'fort-myers' );
 	ok( ! str_contains( $fr, esc_html__( 'One-to-one sessions for a stiff body and an overloaded mind.', 'olivia-yoga' ) ), 'the line under „Stretching, relaxáció és légzés” is gone („Ezt szedjük ki”)' );
 	ok( ! str_contains( $fr, 'oj-only-me' ), 'the home page: no „A képedet csak én látom” badge („szedjük ki mindenhonnan”)' );
+	$ft = (string) file_get_contents( get_template_directory() . '/footer.php' );
+	ok( str_contains( $ft, '<a href="https://aronritok.com/">Ritók-Filip Áron</a>' ) && ! str_contains( $ft, '>HelloProVision</a>' ), 'online footer: made by Áron, linked to his own page („itt Áron neve legyen és Áron egyéni oldala legyen belinkelve”)' );
 	update_option( 'oy_edition', 'hu-online' );
 	$cd = json_decode( (string) file_get_contents( oy_content_file() ), true );
 	update_option( 'oy_edition', 'fort-myers' );
@@ -3440,7 +3442,7 @@ test( 'online edition, Olívia\'s doc of 14 November, last points: one level for
 		ob_start();
 		load_template( get_template_directory() . '/footer.php', false );
 		$foot = (string) ob_get_clean();
-		ok( str_contains( $foot, 'href="https://helloprovision.com/"' ), 'footer: who made the site, linked' );
+		ok( str_contains( $foot, 'href="https://aronritok.com/"' ), 'footer: who made the site, linked (Áron\'s own page)' );
 		$css = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
 		ok( ! str_contains( $css, '.ways--five .way:nth-child(2), .ways--five .way:nth-child(5) { top' ), 'the five boxes in straight lines' );
 		ok( 9 === preg_match_all( '/\.oj-modules li:nth-child\(\d\) \{ --dot: (#[0-9A-F]{6}); \}/', $css, $m ) && 9 === count( array_unique( $m[1] ) ), 'nine modules, nine colours' );
