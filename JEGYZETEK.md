@@ -346,6 +346,9 @@
   a „Melyik órát válasszam?” soronként egy kérdés; a főoldali egyéni blokkban a hosszú buborék-lista helyett négy lágy doboz,
   a teljes lista az egyéni óra oldalán (`#kinek-szol`, két hasáb). 1114d rev t: a kártyák rövid szövege (`_excerpt_prev`)
   is frissül, ha még a régi. Tesztek 1172/0.
+- **3.11.32:** az órák oldaldoboza nem vágódik le görgetéskor („ez megint kicsit levágódik”): ha nem fér az ablakba,
+  előbb a fotó tűnik el (`is-compact`), aztán a hosszú megjegyzések 3 sorra rövidülnek (`is-tight`, kattintásra kinyílnak),
+  és csak ha így sem fér el, görög a lappal. Tesztek 1174/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
