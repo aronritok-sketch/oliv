@@ -87,7 +87,7 @@ $steps  = array(
 				echo preg_replace( '/<h2>/', '<h2 id="intro-title">', apply_filters( 'the_content', get_the_content() ), 1 ); // phpcs:ignore
 			}
 			?>
-			<p class="btn-row oj-inline"><?php echo oy_btn( oy_page_link( 'about' ), __( 'Meet Olivia', 'olivia-yoga' ), 'ghost' ); // phpcs:ignore ?><a class="text-link" href="<?php echo esc_url( oy_page_link( 'yoga-classes' ) ); ?>"><?php esc_html_e( 'See all classes', 'olivia-yoga' ); ?></a></p>
+			<p class="btn-row oj-inline"><?php echo oy_btn( oy_page_link( 'about' ), __( 'Get to know me', 'olivia-yoga' ), 'ghost' ) /* Olívia, 14 November: „itt legyen inkább az, hogy Ismerj meg” */; // phpcs:ignore ?><a class="text-link" href="<?php echo esc_url( oy_page_link( 'yoga-classes' ) ); ?>"><?php esc_html_e( 'See all classes', 'olivia-yoga' ); ?></a></p>
 		</div>
 	</div>
 </div></section>

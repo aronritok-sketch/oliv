@@ -1859,3 +1859,6 @@ msgstr "Csak a csoportos óra nézhető vissza, és a felvételen csak én szere
 
 msgid "About me"
 msgstr "Rólam"
+
+msgid "Get to know me"
+msgstr "Ismerj meg"

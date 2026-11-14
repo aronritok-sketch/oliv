@@ -3128,6 +3128,7 @@ test( 'Olívia\'s doc of 14 November, night: the service boxes get soft, feminin
 		load_template( get_template_directory() . '/template-parts/front-online.php', false );
 		$home = (string) ob_get_clean();
 		eq( 7, substr_count( $home, 'class="way__icon way__art"' ), 'home: all five boxes use it (and the two stretching / relaxation cards)' );
+		ok( str_contains( $home, '>' . esc_html__( 'Get to know me', 'olivia-yoga' ) . '<' ) && ! str_contains( $home, esc_html__( 'Meet Olivia', 'olivia-yoga' ) ), 'home: „Ismerj meg”, not „Ismerd meg Olíviát”' );
 		ok( str_contains( (string) file_get_contents( get_template_directory() . '/assets/online.css' ), '.oj-modules:not(.oj-modules--why) li::before { position: absolute;' ), 'prenatal modules: a pastel circle peeking into each box\'s corner, not a dot' );
 		$css = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
 		ok( str_contains( $css, '.oj-modules:not(.oj-modules--why) li:nth-child(4n + 2) { --dot: var(--pink); }' ) && str_contains( $css, '.oj-modules:not(.oj-modules--why) li::after { display: none; }' ), '… in the site\'s own four colours, one circle each' );

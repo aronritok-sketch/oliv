@@ -1240,3 +1240,6 @@ msgstr "Solo la clase grupal se puede volver a ver, y en la grabación solo salg
 
 msgid "About me"
 msgstr "Sobre mí"
+
+msgid "Get to know me"
+msgstr "Conóceme"
