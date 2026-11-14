@@ -336,6 +336,10 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 .oys-pair:has(input:checked) .oys-pair__text b { color: #fff; }
 .oys-pair:has(input:checked) .oys-pair__track { background: rgba(255, 255, 255, .35); }
 .price__each { margin: -.6rem 0 1.1rem; font-size: .85rem; font-weight: 700; color: var(--oys-orchid, #D92B86); }
+/* a pass: what one session comes to (Olívia, 14 Nov: „kiemelten, hogy milyen összegre jön ki egy óra”) */
+.price__per { justify-self: start; align-self: start; display: inline-block; margin: -.4rem 0 1.1rem; padding: .4rem .85rem; border-radius: 999px; background: rgba(255, 255, 255, .78); color: #12231A; font-size: .92rem; font-weight: 700; box-shadow: inset 0 0 0 1.5px var(--oys-orchid, #D92B86); }
+.price__per + .price__each { margin-top: -.6rem; }
+.price--forest .price__per { background: rgba(255, 255, 255, .14); color: #fff; box-shadow: inset 0 0 0 1.5px rgba(255, 255, 255, .55); }
 .oys-pair input { position: absolute; opacity: 0; width: 1px; height: 1px; }
 .oys-pair__track { flex: none; position: relative; width: 44px; height: 26px; border-radius: 999px; background: var(--oys-line, rgba(0, 0, 0, .2)); transition: background .2s; }
 .oys-pair__track::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); transition: transform .2s; }
@@ -346,6 +350,8 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 .price li.price__gift::before { display: none; }
 .price__gift a { display: flex; align-items: center; gap: .55rem; padding: .55rem .8rem; border-radius: 12px; background: var(--oys-orchid, #D92B86); color: #fff; font-weight: 700; text-decoration: none; line-height: 1.3; }
 .price__gift a:hover { filter: brightness(1.08); }
+/* the label stays white under the pointer (Olívia, 14 Nov: „eltűnik a felirat a gombról” – a page's link colour took over) */
+.oys-pricing .price .price__gift a:hover, .oys-pricing .price .price__gift a:focus-visible, .price .price__gift a:hover span { color: #fff; }
 .price__gift svg { flex: none; width: 20px; height: 20px; }
 [data-oys-length][hidden], [data-oys-people][hidden] { display: none; }
 /* The one-to-one sessions under the timetable (schedule_empty_days = no) */

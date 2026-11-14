@@ -1959,6 +1959,11 @@ test( 'online edition, live update: the prices of 14 November, only the „Árak
 		eq( 0, (int) OYS_Products::get( 'kismama-5' )['validity_days'], 'the prenatal pass has no expiry' );
 		ok( (bool) OYS_Services::get( 'relax' )['duo'], 'relaxation can be booked as a pair' );
 		ok( 2000000 === (int) OYS_Products::get( 'relax-5' )['price_cents'] && 3200000 === (int) OYS_Products::get( 'relax-duo-5' )['price_cents'], 'relaxation pass 20 000 Ft, the pair\'s 32 000 Ft (Olívia, chat)' );
+		// (the test site counts in dollars: only the numbers and the words are checked)
+		$per = OYS_I18n::with( 'hu', fn() => array_map( fn( $id ) => (string) preg_replace( '/(&nbsp;|[\s\x{00A0}\x{202F}$]|Ft)+/u', ' ', OYS_Frontend::per_session( (array) OYS_Products::get( $id ) ) ), array( 'relax-5', 'egyeni-duo-5', 'relax-1' ) ) );
+		eq( 'Egy óra: 4 000', trim( $per[0] ), 'a pass: what one session comes to (Olívia: „milyen összegre jön ki egy óra”)' );
+		eq( 'Egy óra: 10 400 (fejenként 5 200)', trim( $per[1] ), 'a pass for two: and what it is each' );
+		eq( '', $per[2], 'a single session: nothing to work out' );
 		eq( array(), oy_migrate_prices(), 'once' );
 	} finally {
 		update_option( 'oy_edition', 'fort-myers' );
@@ -2747,6 +2752,72 @@ test( 'online edition, live update: the theme\'s photos get Hungarian names and 
 	} finally {
 		update_option( 'oy_edition', 'fort-myers' );
 		delete_option( 'oye_edits' );
+	}
+} );
+
+test( 'online edition, Olívia\'s doc of 14 November: timetable cards, the hero button, no big name in the footer, line breaks', function () {
+	require_once get_template_directory() . '/inc/typography.php';
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		$online = (object) array( 'format' => 'online', 'kind' => 'group', 'class_slug' => 'hatha-flow' );
+		if ( function_exists( 'oys_is_online' ) && oys_is_online( $online ) ) {
+			eq( 'Csoportos flow jóga', apply_filters( 'oys_card_title', 'Csoportos online flow jóga', $online ), 'a card: „online” is on its tag, not in the title' );
+		}
+		$flow = get_page_by_path( 'hatha-flow', OBJECT, 'oy_class' );
+		eq( $flow ? get_the_title( $flow ) : '5 alkalmas bérlet', apply_filters( 'oys_price_card_title', '5 alkalmas bérlet', array( 'kind' => 'online_pack' ) ), 'a group pass card: the class above the price, like the one-to-one cards' );
+		eq( 'Egyéni online jóga', apply_filters( 'oys_price_card_title', 'Egyéni online jóga', array( 'kind' => 'private_pack' ) ), 'a one-to-one card keeps its service' );
+		$studio = (object) array( 'format' => 'studio', 'kind' => 'group', 'class_slug' => 'x' );
+		eq( 'Online jóga a teremben', apply_filters( 'oys_card_title', 'Online jóga a teremben', $studio ), 'a class in a room keeps its title' );
+		ob_start();
+		get_template_part( 'template-parts/front-online' );
+		$home = ob_get_clean();
+		ok( str_contains( $home, 'oj-hero-cta' ) && ! str_contains( $home, 'oj-twins' ), 'the hero: one button (Bejelentkezés és árak)' );
+		ob_start();
+		load_template( get_template_directory() . '/footer.php', false );
+		$foot = ob_get_clean();
+		ok( str_contains( $foot, 'footer__bottom' ) && ! str_contains( $foot, 'footer__word' ), 'no big name in the footer' );
+		$t = oy_typo_html( '<body><p>Élő jóga a nappalidból. Kezdőket is várok, 8 000 Ft, 90 perc – szerdán</p><script>var a = "a b";</script></body>' );
+		ok( str_contains( $t, "a\u{00A0}nappalidból" ) && str_contains( $t, "Kezdőket\u{00A0}is" ) && str_contains( $t, "8\u{00A0}000\u{00A0}Ft" ) && str_contains( $t, "90\u{00A0}perc" ) && str_contains( $t, "perc\u{00A0}–" ), 'Hungarian line breaks: short words, numbers with units, no dash at a line start' );
+		ok( str_contains( $t, 'var a = "a b";' ), 'scripts are left alone' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+	ob_start();
+	load_template( get_template_directory() . '/footer.php', false );
+	ok( str_contains( ob_get_clean(), 'footer__word' ), 'the US site keeps its big name' );
+} );
+
+test( 'online edition, live update: the About page broken up – only while its text is still the theme\'s, every sentence of hers stays', function () {
+	require_once get_template_directory() . '/inc/demo-import.php';
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		$old  = (string) file_get_contents( __DIR__ . '/fixtures/about-online-3.8.0.html' );
+		$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+		$new  = $data['pages']['about']['content'];
+		preg_match_all( '~<(?:p|li)>(.*?)</(?:p|li)>~s', $old, $m );
+		$missing = array_filter( $m[1], fn( $x ) => ! str_contains( $new, $x ) );
+		eq( array(), array_values( $missing ), 'every paragraph of the old page is in the new one, word for word (her page-editor changes keep applying)' );
+		foreach ( array( 'oj-chapter', 'oj-float', 'oj-note', 'oj-statement', 'oj-path', 'oj-areas', 'oj-creds', 'oj-places', 'oj-ways', 'oj-secret' ) as $c ) {
+			ok( str_contains( $new, $c ), 'the new page has: ' . $c );
+		}
+		$page = get_page_by_path( oy_page_slug( 'about' ) );
+		$id   = $page ? $page->ID : wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Rólam', 'post_name' => oy_page_slug( 'about' ) ) );
+		kses_remove_filters();
+		wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => $old ) ) );
+		kses_init_filters();
+		delete_option( 'oy_about_rev' );
+		ok( in_array( 'about: the new layout', oy_migrate_about(), true ), 'the theme\'s text: the new layout' );
+		$saved = get_post_field( 'post_content', $id );
+		ok( str_contains( $saved, 'oj-path' ) && str_contains( $saved, 'Amiben ma segítek' ) && ! str_contains( $saved, '{{class:' ), 'saved, with her other areas and real links' );
+		eq( array(), oy_migrate_about(), 'once' );
+		wp_update_post( array( 'ID' => $id, 'post_content' => $old . '<p>Olívia saját bekezdése.</p>' ) );
+		delete_option( 'oy_about_rev' );
+		eq( array( 'about: kept as it is (changed on the site)' ), oy_migrate_about(), 'changed on the site: left as it is' );
+		ok( str_contains( get_post_field( 'post_content', $id ), 'Olívia saját bekezdése.' ), '… her paragraph is there' );
+		$fig = do_shortcode( '[oy_figure photo="olivia-dancer-home" class="oj-float"]' );
+		ok( str_contains( $fig, '<figure class="oj-figure oj-float">' ) && str_contains( $fig, 'data-oyp="olivia-dancer-home"' ), 'a photo in the text, one the page editor can swap' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
 	}
 } );
 

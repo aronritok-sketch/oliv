@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OY_VERSION', '3.8.0' );
+define( 'OY_VERSION', '3.9.0' );
 
 require_once get_template_directory() . '/inc/edition.php';
 
@@ -21,6 +21,7 @@ require_once get_template_directory() . '/inc/seo.php';
 // Szerkesztés a weboldalon (Olivia, 11.13): only on her Hungarian sites, not the US one or the Hathaflow demo
 add_filter( 'oye_enabled', fn( $on ) => $on && ( oy_online_only() || 'hu' === oy_default_lang() ) && ! oy_is_demo() );
 require_once get_template_directory() . '/inc/page-editor.php';
+require_once get_template_directory() . '/inc/typography.php';
 // The booking plugin's „By paying you accept the terms” links to the ÁSZF when the site has one (online edition, 11.13)
 add_filter( 'oys_terms_url', function ( $url ) {
 	$p = get_page_by_path( 'aszf' );
@@ -29,6 +30,17 @@ add_filter( 'oys_terms_url', function ( $url ) {
 // Olivia's notes of 13 November on the online price list: no „Most popular” label, the gift card as its own
 // highlighted line, the drop-in card with only that line, the group class's length in its title
 add_filter( 'oys_featured_badge', fn( $html ) => oy_online_only() ? '' : $html );
+// Olívia, 14 November: „Legyenek egységesek a bérletes boxok, tehát pl az ár fölött a szolgáltatás” – the group class's
+// cards are named after the class, like the one-to-one ones; the number of sessions and the minutes are under the price
+add_filter( 'oys_price_card_title', function ( $title, $p ) {
+	if ( ! oy_online_only() || ! in_array( $p['kind'] ?? '', array( 'online_pack', 'pack', 'drop_in', 'online_drop', 'intro' ), true ) ) {
+		return $title;
+	}
+	$class = get_page_by_path( 'hatha-flow', OBJECT, 'oy_class' );
+	return $class ? get_the_title( $class ) : $title;
+}, 10, 2 );
+// Olívia, 14 November: „elég alul jelezni, hogy online, a címben ne legyen” – on a timetable card the „Online” tag says it
+add_filter( 'oys_card_title', fn( $title, $s ) => oy_online_only() && function_exists( 'oys_is_online' ) && oys_is_online( $s ) ? trim( (string) preg_replace( '/\s*\bonline\b\s*/iu', ' ', (string) $title ) ) : $title, 10, 2 );
 add_filter( 'oys_price_gift_line', fn( $on ) => $on || oy_online_only() );
 add_filter( 'oys_dropin_features', fn( $f ) => oy_online_only() ? array() : $f );
 add_filter( 'oys_pricing_groups', function ( $g ) {

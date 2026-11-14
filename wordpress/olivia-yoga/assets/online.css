@@ -119,6 +119,16 @@ h1, h2, .page-head .page-head__title, .namecard__name, .price-group__head h3, .w
 .oj-twins { display: flex; flex-wrap: wrap; gap: .75rem; max-width: 600px; }
 .oj-twins .btn { flex: 1 1 auto; justify-content: center; text-align: center; white-space: nowrap; }
 @media (max-width: 600px) { .oj-twins .btn { font-size: .8rem; letter-spacing: .08em; padding-inline: 1rem; white-space: nowrap; } }
+/* Olívia, 14 Nov: „A bejelentkezés és árak maradjon, az óra foglalása gomb jöjjön ki … igazítsuk be a másik gombot szépen” –
+   one button under the text, lined up with it; on a phone the full width, like every other main button there */
+.oj-hero-cta { margin-top: 1.9rem; }
+.oj-hero-cta .btn { min-width: 18rem; justify-content: center; text-align: center; }
+@media (max-width: 600px) { .oj-hero-cta .btn { width: 100%; min-width: 0; } }
+
+/* Olívia, 14 Nov: „Figyelj a szövegtördelésre mindenhol” – no lone word on a paragraph's last line, titles in even lines
+   (with inc/typography.php: the short words stay with the next one, a number with its unit) */
+p, li, dd, blockquote, figcaption, .lead, .hero__lead { text-wrap: pretty; }
+h1, h2, h3, h4, .kicker { text-wrap: balance; }
 
 /* The name card: her title in three parts, the specialities under it */
 .oj-hero .namecard__title { line-height: 1.45; }
@@ -199,3 +209,95 @@ h1, h2, .page-head .page-head__title, .namecard__name, .price-group__head h3, .w
 .oj-more__card p { margin: 0; }
 .oj-more__meta { margin-top: .9rem !important; font-weight: 700; color: var(--orchid); }
 .oj-more__card .btn-row { margin-top: auto; padding-top: 1rem; }
+
+/* ---------- The About page, broken up (Olívia, 14 Nov: „törjük meg a folyószöveget kreatív megjelenítésekkel”) ---------- */
+.entry { counter-reset: oj-chap; }
+.entry .oj-chapter { counter-increment: oj-chap; display: flex; align-items: baseline; gap: .85rem; margin: 2.6rem 0 .9rem; font-size: clamp(1.35rem, 1.15rem + .8vw, 1.75rem); color: var(--forest); }
+.entry .oj-chapter::before { content: "0" counter(oj-chap); font-family: var(--f-display); font-size: 1.15em; line-height: 1; color: var(--orchid); }
+.entry .oj-chapter::after { content: ""; flex: 1; height: 1.5px; background: var(--line); align-self: center; }
+
+.oj-figure { margin: .4rem 0 1.4rem; }
+.oj-figure .frame { aspect-ratio: 4 / 5; box-shadow: 14px 14px 0 var(--pink-soft); }
+.oj-figure .frame > img { height: 100%; }
+@media (min-width: 700px) { .oj-float--left .frame { box-shadow: -14px 14px 0 var(--sage-soft); } }
+@media (max-width: 699px) { .oj-figure .frame { box-shadow: 10px 10px 0 var(--pink-soft); } .oj-figure { margin-right: 10px; } }
+@media (min-width: 700px) {
+	.oj-float { float: right; width: 42%; margin: .4rem 0 1.2rem 2.2rem; }
+	.oj-float--left { float: left; margin: .4rem 2.2rem 1.2rem 0; }
+	.entry .oj-chapter, .entry h2, .oj-note, .oj-statement, .oj-path, .oj-creds, .oj-places, .oj-ways, .oj-secret, .entry blockquote { clear: both; }
+}
+
+.oj-note { position: relative; margin: 2rem 0; padding: 1.6rem 1.75rem 1.6rem 4.4rem; background: var(--lilac-soft); border-radius: var(--radius); }
+.oj-note::before { content: ""; position: absolute; left: 1.5rem; top: 1.7rem; width: 1.6rem; height: 1.6rem; border-radius: 50%; background: radial-gradient(circle at 50% 50%, var(--orchid) 0 28%, transparent 30%), color-mix(in srgb, var(--orchid) 22%, transparent); }
+.oj-note p { margin: 0; font-size: 1.06rem; color: var(--ink); }
+.oj-note--sun { background: var(--sun-soft); }
+.oj-note--sun::before { background: radial-gradient(circle at 50% 50%, var(--sun) 0 30%, transparent 32%), color-mix(in srgb, var(--sun) 30%, transparent); }
+
+.entry .oj-lede { font-size: 1.15rem; line-height: 1.6; color: var(--ink); font-weight: 500; }
+.entry .oj-statement { margin: 2.2rem 0 1.4rem; font-size: clamp(1.2rem, 1.05rem + .6vw, 1.45rem); font-weight: 600; line-height: 1.55; color: var(--forest); }
+.entry .oj-statement { text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--pink) 55%, transparent); text-decoration-thickness: .42em; text-underline-offset: -.22em; text-decoration-skip-ink: none; }
+.entry .oj-statement + blockquote { margin-top: 2.2rem; }
+
+.oj-path { margin: 3rem 0; padding: 2rem 1.9rem 1.4rem; background: var(--forest); color: var(--paper); border-radius: var(--radius); }
+.oj-path h3 { margin: 0 0 1.3rem; color: var(--paper); font-family: var(--f-display); text-transform: uppercase; font-weight: 400; font-size: clamp(1.7rem, 1.3rem + 1.4vw, 2.3rem); line-height: 1; }
+.entry .oj-path ol { position: relative; margin: 0; padding: 0; counter-reset: none; }
+.entry .oj-path ol::before { content: ""; position: absolute; left: 6px; top: .5rem; bottom: .8rem; width: 1.5px; background: color-mix(in srgb, var(--paper) 30%, transparent); }
+.entry .oj-path ol li { position: relative; margin: 0 0 1.05rem; padding: 0 0 0 2rem; color: color-mix(in srgb, var(--paper) 86%, transparent); line-height: 1.5; }
+.entry .oj-path ol li::before { content: ""; position: absolute; left: 0; top: .32rem; width: 13px; height: 13px; border-radius: 50%; background: var(--lilac); box-shadow: 0 0 0 4px var(--forest); font: inherit; }
+.entry .oj-path ol li:nth-child(4n+2)::before { background: var(--pink); }
+.entry .oj-path ol li:nth-child(4n+3)::before { background: var(--sun); }
+.entry .oj-path ol li:nth-child(4n)::before { background: var(--sage); }
+.entry .oj-path ol li:last-child::before { background: var(--orchid); box-shadow: 0 0 0 4px var(--forest), 0 0 0 6px var(--orchid); }
+.oj-path li b { display: block; color: var(--paper); font-family: var(--f-display); text-transform: uppercase; font-weight: 400; font-size: 1.2rem; letter-spacing: .02em; line-height: 1.1; margin-bottom: .1rem; }
+
+.entry .oj-creds { display: grid; gap: .8rem; margin: 1.6rem 0; }
+@media (min-width: 700px) { .entry .oj-creds { grid-template-columns: 1fr 1fr; } }
+.entry .oj-creds li { position: relative; margin: 0; padding: 1.1rem 1.2rem 1.1rem 3.1rem; background: var(--card); border-radius: var(--radius-sm); box-shadow: 0 1px 0 var(--line); font-size: .97rem; line-height: 1.5; color: var(--ink); }
+.entry .oj-creds li::before { content: ""; position: absolute; left: 1.2rem; top: 1.35rem; width: 11px; height: 6px; border-left: 2px solid var(--orchid); border-bottom: 2px solid var(--orchid); transform: rotate(-45deg); background: none; }
+
+.oj-places { margin: 2rem 0; padding: 1.5rem 1.7rem; border: 1.5px dashed color-mix(in srgb, var(--forest) 35%, transparent); border-radius: var(--radius); }
+.entry .oj-places h3 { margin: 0 0 .5rem; font-size: .8rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; color: var(--orchid); }
+.oj-places p { margin: 0; }
+
+.oj-ways { display: grid; gap: 1rem; margin: 1.4rem 0 2rem; counter-reset: oj-way; }
+.oj-ways p { counter-increment: oj-way; position: relative; margin: 0; padding: 1.3rem 1.4rem 1.3rem 4.2rem; background: var(--card); border-radius: var(--radius); box-shadow: 0 1px 0 var(--line); }
+.oj-ways p::before { content: counter(oj-way); position: absolute; left: 1.2rem; top: 1.05rem; display: grid; place-items: center; width: 2.1rem; height: 2.1rem; border-radius: 50%; background: var(--lilac); color: var(--ink); font-family: var(--f-display); font-size: 1.15rem; line-height: 1; }
+.oj-ways p:nth-child(2)::before { background: var(--pink); }
+.oj-ways p:nth-child(3)::before { background: var(--sun); }
+.oj-ways p:nth-child(4)::before { background: var(--sage); }
+
+.oj-secret { position: relative; max-width: 30rem; margin: 2.2rem 0 2.4rem .4rem; padding: 1.9rem 1.7rem 1.5rem; background: var(--pink-soft); border-radius: 4px; transform: rotate(-1.4deg); box-shadow: 0 16px 30px -22px rgba(18, 35, 26, .55); }
+.oj-secret::before { content: ""; position: absolute; left: 50%; top: -.7rem; width: 5.5rem; height: 1.4rem; transform: translateX(-50%) rotate(2deg); background: color-mix(in srgb, var(--lilac) 70%, transparent); border-radius: 2px; }
+.oj-secret p { margin: 0; font-size: 1.05rem; color: var(--ink); }
+
+@media (max-width: 600px) {
+	.oj-note { padding: 1.3rem 1.2rem 1.3rem 3.5rem; }
+	.oj-note::before { left: 1.1rem; top: 1.4rem; }
+	.oj-path { padding: 1.6rem 1.3rem 1rem; }
+	.oj-ways p { padding: 1.1rem 1.1rem 1.1rem 3.6rem; }
+	.oj-ways p::before { left: .9rem; }
+	.oj-secret { margin-left: 0; transform: rotate(-1deg); }
+}
+
+/* her other areas on the About page (Olívia, 14 Nov: „fogalmazzuk át más területekre is”) */
+.layout > .main-col { min-width: 0; }
+.oj-areas { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; margin: 1.4rem 0 2.6rem; }
+@media (min-width: 600px) { .oj-areas { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.oj-area { --tone: var(--lilac); display: grid; align-content: start; gap: .55rem; padding: 1.3rem 1.3rem 1.4rem; background: var(--card); border-radius: var(--radius); border-top: 4px solid var(--tone); box-shadow: 0 1px 0 var(--line); }
+.oj-area--pink { --tone: var(--pink); }
+.oj-area--sun { --tone: var(--sun); }
+.oj-area--sage { --tone: var(--sage); }
+.oj-area .picto { width: 3rem; height: 3rem; }
+.entry .oj-area h3 { margin: .2rem 0 0; font-size: 1.12rem; line-height: 1.3; }
+.entry .oj-area h3 a { color: var(--forest); text-decoration: none; }
+.entry .oj-area h3 a:hover { color: var(--orchid); }
+.oj-area p { margin: 0; font-size: .95rem; line-height: 1.55; }
+
+/* the price list (Olívia, 14 Nov): under the price the sessions and minutes, a little more visible */
+.price__unit { font-size: 1rem; font-weight: 700; color: var(--on, var(--ink)); letter-spacing: .01em; }
+/* the service's name stays in view while scrolling – also under the admin bar when she is logged in
+   („nem látszik a betűk teteje asztali nézetben”) */
+@media (min-width: 1000px) {
+	.price-group__head { padding-top: .2rem; }
+	body.admin-bar .price-group__head { top: calc(var(--header-h) + 24px + 32px); }
+}

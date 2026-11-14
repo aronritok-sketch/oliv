@@ -845,6 +845,50 @@ function oy_rename_attachment( $id, $slug ) {
 }
 
 /**
+ * Olívia, 14 November: „a Rólam rész nagyon jó … tetszik a design is, de még egy kicsit törjük meg a folyószöveget kreatív
+ * megjelenítésekkel”. On a live site the About page gets its new layout once – only while its text is still the one the
+ * theme put there (the content file's „_content_prev_md5”). Her changes made in the page editor stay: they are stored
+ * apart, by the sentence they replace, and every one of her sentences is still on the page, word for word.
+ */
+function oy_migrate_about() {
+	// b: „Amiben ma segítek” – her other areas, the lead and the search description too (Olívia: „Igen, a Rólamot kicsit
+	//    fogalmazzuk át más területekre is”)
+	$rev = '2026-11-14b';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_about_rev' ) === $rev ) {
+		return array();
+	}
+	update_option( 'oy_about_rev', $rev );
+	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+	$page = $data['pages']['about'] ?? null;
+	$post = get_page_by_path( oy_page_slug( 'about' ) );
+	if ( ! $page || ! $post ) {
+		return array();
+	}
+	$log = array();
+	// the lead under the title and the search description: her other areas too („fogalmazzuk át más területekre is”)
+	if ( ! empty( $page['_excerpt_prev'] ) && trim( $post->post_excerpt ) === $page['_excerpt_prev'] ) {
+		wp_update_post( wp_slash( array( 'ID' => $post->ID, 'post_excerpt' => $page['excerpt'] ) ) );
+		$log[] = 'about: lead';
+	}
+	if ( ! empty( $page['_seo_desc_prev'] ) && (string) get_post_meta( $post->ID, 'oy_seo_desc', true ) === $page['_seo_desc_prev'] ) {
+		update_post_meta( $post->ID, 'oy_seo_desc', $page['seo_desc'] );
+	}
+	$norm = fn( $h ) => md5( (string) preg_replace( '/\s+/', ' ', trim( (string) $h ) ) );
+	$new  = oy_resolve_tokens( $page['content'] );
+	$now  = $norm( $post->post_content );
+	if ( $now === $norm( $new ) ) {
+		return $log;
+	}
+	if ( ! in_array( $now, (array) ( $page['_content_prev_md5'] ?? array() ), true ) ) {
+		return array_merge( $log, array( 'about: kept as it is (changed on the site)' ) );
+	}
+	kses_remove_filters();
+	wp_update_post( wp_slash( array( 'ID' => $post->ID, 'post_content' => $new ) ) );
+	kses_init_filters();
+	return array_merge( $log, array( 'about: the new layout' ) );
+}
+
+/**
  * The online edition's passes, one-to-one services and timetable setting from its content file, on a live site. Passes
  * someone has bought keep their own expiry; products the edition no longer has go off sale.
  */

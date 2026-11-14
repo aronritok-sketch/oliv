@@ -101,7 +101,8 @@ class OYS_Frontend {
 				$mine  = $user_id ? OYS_Bookings::active_for( $user_id, $s->id ) : null;
 				$wait  = $user_id && ! $mine ? OYS_Bookings::waitlist_position( $user_id, $s->id ) : 0;
 				$class_url = apply_filters( 'oys_class_url', '', $s->class_slug );
-				$plain     = esc_html( oys_session_title( $s ) );
+				// a site can shorten the card's title (oliviajoga.online: the „Online” tag says it, the title need not)
+				$plain     = esc_html( (string) apply_filters( 'oys_card_title', oys_session_title( $s ), $s ) );
 				$title     = $class_url && 'group' === $s->kind ? '<a href="' . esc_url( $class_url ) . '">' . $plain . '</a>' : $plain;
 
 				if ( $mine && 'pending' !== $mine->status ) {
@@ -181,7 +182,7 @@ class OYS_Frontend {
 			}
 			$minutes  = $single ? (int) $single['duration_min'] : 0;
 			$features = apply_filters( 'oys_dropin_features', array( __( 'Any live online group class', 'olivia-studio' ), ( OYS_Zoom::enabled() ? __( 'Join from home on Zoom', 'olivia-studio' ) : __( 'Join from home in your browser, no app needed', 'olivia-studio' ) ), __( 'The link comes by email and is in your account', 'olivia-studio' ) ) );
-			$cards[]  = array( 'tone' => 'paper', 'title' => __( 'Live online class', 'olivia-studio' ), 'price' => oys_money( $online_price ), 'unit' => $minutes ? sprintf( __( 'per session, %d minutes', 'olivia-studio' ), $minutes ) : __( 'per class', 'olivia-studio' ), 'features' => (array) $features, 'gift' => $gift_line && $single && ! empty( $single['giftable'] ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
+			$cards[]  = array( 'tone' => 'paper', 'title' => (string) apply_filters( 'oys_price_card_title', __( 'Live online class', 'olivia-studio' ), $single ? $single : array( 'kind' => 'online_drop' ) ), 'price' => oys_money( $online_price ), 'unit' => $minutes ? sprintf( __( 'per session, %d minutes', 'olivia-studio' ), $minutes ) : __( 'per class', 'olivia-studio' ), 'features' => (array) $features, 'gift' => $gift_line && $single && ! empty( $single['giftable'] ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
 		} else {
 			$cards[] = array( 'tone' => 'paper', 'title' => __( 'Drop-in class', 'olivia-studio' ), 'price' => oys_money( $dropin ), 'unit' => __( 'per class', 'olivia-studio' ), 'features' => array_filter( array( __( 'Any group class in person', 'olivia-studio' ), $online_price ? sprintf( __( 'Online classes: %s', 'olivia-studio' ), oys_money( $online_price ) ) : '', __( 'Bring friends: add guests when you book', 'olivia-studio' ), 'off' !== OYS_Settings::get( 'pay_later' ) ? __( 'Pay online or at the studio', 'olivia-studio' ) : '' ) ), 'cta' => array( __( 'Book a class', 'olivia-studio' ), oys_page_url( 'book' ) ), 'featured' => false );
 		}
@@ -231,7 +232,8 @@ class OYS_Frontend {
 				}
 			}
 			$group   = 'membership' === $p['kind'] ? 'members' : ( in_array( $p['kind'], array( 'private_single', 'private_pack' ), true ) ? 'private' : 'classes' );
-			$cards[] = array( 'tone' => $p['featured'] ? 'forest' : $tones[ $i++ % 3 ], 'title' => oys_product_name( $p ), 'price' => oys_money( $p['price_cents'] ), 'unit' => $unit, 'features' => array_map( 'oys_product_text', $features ), 'gift' => $gift_line && ! empty( $p['giftable'] ), 'cta' => $cta, 'featured' => (bool) $p['featured'], 'group' => $group );
+			// a site can name the service above the price instead of the pass (Olívia, 14 Nov: „Legyenek egységesek a bérletes boxok”)
+			$cards[] = array( 'tone' => $p['featured'] ? 'forest' : $tones[ $i++ % 3 ], 'title' => (string) apply_filters( 'oys_price_card_title', oys_product_name( $p ), $p ), 'price' => oys_money( $p['price_cents'] ), 'unit' => $unit, 'per' => self::per_session( $p ), 'features' => array_map( 'oys_product_text', $features ), 'gift' => $gift_line && ! empty( $p['giftable'] ), 'cta' => $cta, 'featured' => (bool) $p['featured'], 'group' => $group );
 		}
 		$teams = $online_only ? null : array( 'tone' => 'pink', 'title' => __( 'Teams & companies', 'olivia-studio' ), 'price' => __( 'Custom', 'olivia-studio' ), 'unit' => __( 'quote', 'olivia-studio' ), 'features' => array( __( 'On-site, outdoors or online', 'olivia-studio' ), __( 'One-off or weekly', 'olivia-studio' ), __( 'Sports teams and clubs too', 'olivia-studio' ) ), 'cta' => array( __( 'Request a proposal', 'olivia-studio' ), apply_filters( 'oys_corporate_contact_url', home_url( '/contact/?topic=corporate#book' ) ) ), 'featured' => false, 'group' => 'private' );
 		if ( $teams ) {
@@ -278,12 +280,28 @@ class OYS_Frontend {
 		return $out . '</div>';
 	}
 
+	/**
+	 * What one session of a pass comes to (Olívia, 14 November: „minden bérlethez legyen odaírva kiemelten, hogy milyen
+	 * összegre jön ki egy óra”), for two also what it is each. Empty for a single session and for a membership.
+	 */
+	public static function per_session( array $p ) {
+		$n = (int) ( $p['credits'] ?? 0 );
+		if ( $n < 2 || ! in_array( $p['kind'] ?? '', array( 'pack', 'online_pack', 'intro', 'private_pack' ), true ) ) {
+			return '';
+		}
+		$one = (int) round( (int) $p['price_cents'] / $n );
+		return (int) ( $p['people'] ?? 1 ) > 1
+			? sprintf( __( '%1$s per session (%2$s each)', 'olivia-studio' ), oys_money( $one ), oys_money( (int) round( $one / 2 ) ) )
+			: sprintf( __( '%s per session', 'olivia-studio' ), oys_money( $one ) );
+	}
+
 	/** One card of the price list. */
 	private static function price_card( array $c, $attrs = '' ) {
 		$gift = ! empty( $c['gift'] ) ? '<li class="price__gift"><a href="' . esc_url( oys_page_url( 'gifts' ) ) . '">' . oys_icon( 'gift' ) . '<span>' . esc_html__( 'You can also give it as a gift card', 'olivia-studio' ) . '</span></a></li>' : '';
 		return '<article class="price price--' . esc_attr( $c['tone'] ) . '"' . $attrs . '>'
 			. ( $c['featured'] ? apply_filters( 'oys_featured_badge', '<span class="price__tag">' . esc_html__( 'Most popular', 'olivia-studio' ) . '</span>' ) : '' )
 			. '<h4>' . esc_html( $c['title'] ) . '</h4><p class="price__amount">' . esc_html( $c['price'] ) . '</p><p class="price__unit">' . esc_html( $c['unit'] ) . '</p>'
+			. ( ! empty( $c['per'] ) ? '<p class="price__per">' . esc_html( $c['per'] ) . '</p>' : '' )
 			. ( ! empty( $c['each'] ) ? '<p class="price__each">' . esc_html( $c['each'] ) . '</p>' : '' )
 			. '<ul>' . implode( '', array_map( fn( $f ) => '<li>' . esc_html( $f ) . '</li>', $c['features'] ) ) . $gift . '</ul>'
 			. '<a class="btn ' . ( $c['featured'] ? 'btn--orchid' : 'btn--dark' ) . '" href="' . esc_url( $c['cta'][1] ) . '">' . esc_html( $c['cta'][0] ) . '</a></article>';
@@ -337,7 +355,7 @@ class OYS_Frontend {
 			$cta   = $pack
 				? array( __( 'Buy now', 'olivia-studio' ), oys_page_url( 'book', array( 'product' => $p['id'] ) ) )
 				: array( __( 'Ask for a time', 'olivia-studio' ), add_query_arg( array_filter( array( 'topic' => $key, 'length' => count( $lengths ) > 1 ? $m : 0, 'people' => $two ? 2 : 0 ) ), oys_account_url( 'private' ) ) );
-			$card  = array( 'tone' => $tones[ $pack ? 1 : 0 ], 'title' => oys_t( $svc['label'] ), 'price' => oys_money( $p['price_cents'] ), 'unit' => $unit, 'each' => $two ? sprintf( __( '%s each', 'olivia-studio' ), oys_money( (int) round( $p['price_cents'] / 2 ) ) ) : '', 'features' => array_map( 'oys_product_text', array_filter( array_map( 'trim', explode( "\n", $p['features'] ) ) ) ), 'gift' => $gift_line && ! empty( $p['giftable'] ), 'cta' => $cta, 'featured' => false );
+			$card  = array( 'tone' => $tones[ $pack ? 1 : 0 ], 'title' => oys_t( $svc['label'] ), 'price' => oys_money( $p['price_cents'] ), 'unit' => $unit, 'per' => self::per_session( $p ), 'each' => $two && ! $pack ? sprintf( __( '%s each', 'olivia-studio' ), oys_money( (int) round( $p['price_cents'] / 2 ) ) ) : '', 'features' => array_map( 'oys_product_text', array_filter( array_map( 'trim', explode( "\n", $p['features'] ) ) ) ), 'gift' => $gift_line && ! empty( $p['giftable'] ), 'cta' => $cta, 'featured' => false );
 			$on    = (int) $m === (int) $lengths[0] && ! $two;
 			$cards .= self::price_card( $card, ' data-len="' . (int) $m . '" data-people="' . ( $two ? 2 : 1 ) . '"' . ( $on ? ' data-on' : '' ) );
 		}

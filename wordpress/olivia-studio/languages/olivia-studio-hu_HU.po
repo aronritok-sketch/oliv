@@ -6028,3 +6028,9 @@ msgstr "fejenként %s-tól"
 
 msgid "%s each"
 msgstr "fejenként %s"
+
+msgid "%s per session"
+msgstr "Egy óra: %s"
+
+msgid "%1$s per session (%2$s each)"
+msgstr "Egy óra: %1$s (fejenként %2$s)"

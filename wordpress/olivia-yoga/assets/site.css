@@ -701,12 +701,12 @@ abbr[title] { text-decoration: none; }
 .prose > .kicker + h2 { margin-top: 0; }
 .prose h3 { margin-top: 1.5em; }
 .prose ul, .prose ol { padding-left: 0; list-style: none; margin: 0; }
-.prose ul li { position: relative; padding-left: 1.6rem; margin: .55rem 0; }
-.prose ul li::before { content: ""; position: absolute; left: .1rem; top: .72em; width: 12px; height: 1.5px; background: var(--orchid); border-radius: 2px; }
+.prose ul li:not([class]) { position: relative; padding-left: 1.6rem; margin: .55rem 0; }
+.prose ul li:not([class])::before { content: ""; position: absolute; left: .1rem; top: .72em; width: 12px; height: 1.5px; background: var(--orchid); border-radius: 2px; }
 .prose ol { counter-reset: o; }
 .prose ol li { counter-increment: o; position: relative; padding-left: 3rem; margin: 1rem 0; }
 .prose ol li::before { content: "0" counter(o); position: absolute; left: 0; top: -.15em; font-family: var(--f-display); color: var(--orchid); font-size: 1.6rem; line-height: 1; }
-.prose .schedule li, .entry .schedule li { padding-left: 0; margin: 0; }
+.prose .schedule li:not([class]), .entry .schedule li:not([class]) { padding-left: 0; margin: 0; }
 .prose .schedule li::before, .entry .schedule li::before { content: none; }
 .prose blockquote { margin: 2.4rem 0; padding: 1.75rem 2rem; background: var(--lilac-soft); border-left: 3px solid var(--orchid); border-radius: 0 var(--radius) var(--radius) 0; font-family: var(--f-display); text-transform: uppercase; font-size: var(--step-2); line-height: 1.12; color: var(--ink); }
 .prose blockquote p { margin: 0; }

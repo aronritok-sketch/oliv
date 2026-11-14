@@ -10,8 +10,10 @@
 .entry > h2:first-child { margin-top: 0; }
 .entry > h3 { margin-top: 1.6em; }
 .entry ul, .entry ol { padding-left: 0; list-style: none; }
-.entry ul:not([class]) li { position: relative; padding-left: 1.6rem; margin: .55rem 0; }
-.entry ul:not([class]) li::before { content: ""; position: absolute; left: .1rem; top: .78em; width: 12px; height: 1.5px; background: var(--orchid); border-radius: 2px; }
+/* a text list: a dash before each item. An item with a class of its own is a card (a timetable class, a plugin's list) and
+   keeps its own look (Olívia, 14 Nov: „azt a vonalat szedjük ki mindenhol” – the dash was on the timetable cards) */
+.entry ul:not([class]) li:not([class]) { position: relative; padding-left: 1.6rem; margin: .55rem 0; }
+.entry ul:not([class]) li:not([class])::before { content: ""; position: absolute; left: .1rem; top: .78em; width: 12px; height: 1.5px; background: var(--orchid); border-radius: 2px; }
 .entry ol:not([class]) { counter-reset: o; }
 .entry ol:not([class]) li { counter-increment: o; position: relative; padding-left: 3rem; margin: 1rem 0; }
 .entry ol:not([class]) li::before { content: "0" counter(o); position: absolute; left: 0; top: -.15em; font-family: var(--f-display); color: var(--orchid); font-size: 1.6rem; line-height: 1; }

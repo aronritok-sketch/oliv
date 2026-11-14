@@ -246,6 +246,19 @@
   neve kisbetű/ékezet nélkül; WordPress nagykép-határ 1920 px. Olívia mai 4 képe (nyitókép = táncos póz a nappaliban,
   IMG_7309 = kitörés a nappaliban, prenatal-training, 27067) megnézve, saját leírással (`content-hu-online.json` →
   `uploads`). Tesztek 982/0.
+- **Olívia doksija „oliviajoga.online módosítások 11.14.” (olivia-yoga 3.9.0, olivia-studio 1.10.2):** az órarend-kártyán
+  nincs rózsaszín vonal (a lap szövegének lista-jele csúszott rá: `.entry ul:not([class]) li` → csak osztály nélküli
+  tételek), a címben nincs „online” (`oys_card_title`, az ONLINE címke mondja); a nyitórészben csak a „Bejelentkezés és
+  árak” gomb; a lábléc nagy „KOVÁCS OLÍVIA” felirata kikerült (online kiadás); tördelés: `text-wrap: pretty/balance` és
+  `inc/typography.php` (a, az, s, és, egy … a következő szóhoz, „is” az előzőhöz, szám a mértékegységgel, nincs sor
+  eleji gondolatjel – a szerkesztő után fut, a kulcsai az eredeti szövegek). Rólam: fejezetek (01–03), úszó fotók,
+  kiemelt dobozok, aláhúzott mondat, „Az utam” idővonal, „Amiben ma segítek” (az öt terület), kártyás képzések,
+  „Ahol eddig tanítottam”, számozott „Hogyan tanítok”, „kis titok” cetli; minden régi bekezdés betűre megmaradt, így
+  Olívia szerkesztései továbbra is érvényesek; élesen `oy_migrate_about` csak akkor írja át, ha a tartalom még a témáé
+  (md5), a bevezetőt és a keresőleírást is csak, ha még az eredeti. Árlista: minden bérleten „Egy óra: X Ft” (párban
+  „fejenként” is), egységes dobozok (a szolgáltatás az ár fölött, `oys_price_card_title`), hangsúlyosabb „alkalom ×
+  perc”, az ajándéksor felirata hoverre nem tűnik el, belépve (admin sáv) a ragadós szolgáltatásnév teteje látszik.
+  Olívia kérte: „mehet minden módosítás egyből az élesre” – élesre Áron engedélyével. Tesztek 1016/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

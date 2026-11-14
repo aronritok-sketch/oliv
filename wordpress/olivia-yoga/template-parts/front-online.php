@@ -43,7 +43,8 @@ $steps  = array(
 			<?php echo oy_kicker( __( 'Online yoga | Olivia Kovacs', 'olivia-yoga' ) ); // phpcs:ignore ?>
 			<h1 class="hero__title" id="hero-title"><span class="hero__l1"><?php echo esc_html_x( 'Online', 'online hero title, line 1', 'olivia-yoga' ); ?></span> <span class="hero__l2"><mark class="oj-breath"><?php echo esc_html_x( 'yoga', 'online hero title, line 2', 'olivia-yoga' ); ?></mark></span> <span class="hero__l3"><?php echo esc_html_x( 'live, from home', 'online hero title, line 3', 'olivia-yoga' ); ?></span></h1>
 			<p class="hero__lead"><?php esc_html_e( 'Live group online yoga every Wednesday, and individual online yoga, prenatal fitness, stretching, relaxation and breathing tailored to you, from your living room. Beginners very welcome.', 'olivia-yoga' ); ?></p>
-			<p class="btn-row oj-twins"><?php echo oy_btn( oy_book_url(), __( 'Book a class', 'olivia-yoga' ), 'forest', 'btn--lg' ) . oy_btn( oy_page_link( 'schedule-pricing' ), oy_schedule_label(), 'forest', 'btn--lg' ); // phpcs:ignore ?></p>
+			<?php // Olívia, 14 November: „A bejelentkezés és árak maradjon, az óra foglalása gomb jöjjön ki” (the header has it) ?>
+			<p class="btn-row oj-hero-cta"><?php echo oy_btn( oy_page_link( 'schedule-pricing' ), oy_schedule_label(), 'forest', 'btn--lg' ); // phpcs:ignore ?></p>
 		</div>
 		<div class="hero__visual">
 			<?php echo oy_soft_blob( 'pink', 'right' ); // phpcs:ignore ?>

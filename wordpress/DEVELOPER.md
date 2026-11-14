@@ -761,6 +761,21 @@ Olivia doksija, 2026. 11. 13. 21:35.
   jelenik meg, ha az eredeti img-nek volt `sizes`-a. Feltöltéskor a név kisbetű, ékezet nélkül (`oye_file_name`), a
   WordPress nagykép-határa 1920 px.
 
+### 6.13i Olívia doksija 11.14: kártyák, tördelés, Rólam, egységes bérletdobozok (olivia-yoga 3.9.0, olivia-studio 1.10.2)
+
+- Szűrők a bővítményben: `oys_card_title` (órarend-kártya címe; az online kiadás kiveszi az „online” szót, ha a
+  kártyán ONLINE címke van), `oys_price_card_title` (az árlista kártyájának címe; az online kiadás a csoportos órák
+  kártyáin az óra nevét adja), `OYS_Frontend::per_session()` → `.price__per` („Egy óra: X Ft”, párban „fejenként” is).
+- Lista-jel: `.entry ul:not([class]) li:not([class])` / `.prose ul li:not([class])` – az osztályos tétel (órarend,
+  bővítmény) kártya, nem kap gondolatjelet és behúzást.
+- `inc/typography.php` (csak online kiadás): kimeneti puffer a `<body>` szövegére (szkript, stílus, űrlapmező, kód,
+  SVG kihagyva), a szerkesztő puffere után fut (prioritás 900 < 1000, a pufferek belülről kifelé futnak), szerkesztés
+  közben nem.
+- Rólam: `[oy_figure photo="kulcs" class="oj-float"]` (szerkeszthető fotó a szövegben), `.oj-chapter`, `.oj-note`,
+  `.oj-statement`, `.oj-path`, `.oj-areas`, `.oj-creds`, `.oj-places`, `.oj-ways`, `.oj-secret` (online.css).
+  `oy_migrate_about()` rev 2026-11-14b: csak akkor cseréli a tartalmat, ha az md5-je a korábbi témaszövegé
+  (`_content_prev_md5`), a bevezetőt/keresőleírást csak, ha még az eredeti (`_excerpt_prev`, `_seo_desc_prev`).
+
 ### 6.14 Mobil API és iOS app
 
 **API** – `OYS_App_API` (`includes/class-app-api.php`), útvonalak a `oys/v1/app/` alatt:

@@ -28,7 +28,9 @@ $gift = function_exists( 'oys_page_url' ) ? oys_page_url( 'gifts' ) : oy_contact
 				<?php echo oy_lang_switcher( 'langs langs--footer' ); // phpcs:ignore ?>
 			</div>
 		</div>
+		<?php if ( ! oy_online_only() ) : // Olívia, 14 November: the big name in the footer „szedjük ki mindenhonnan” ?>
 		<p class="footer__word" aria-hidden="true"><?php echo preg_replace( '/ (.+)$/', ' <span>$1</span>', esc_html( oy_teacher_name() ) ); // phpcs:ignore ?></p>
+		<?php endif; ?>
 		<div class="footer__bottom">
 			<p>&copy; <?php echo esc_html( wp_date( 'Y' ) . ' ' . oy_site_name() ); ?><?php foreach ( oy_legal_pages() as $oy_l ) : ?> · <a href="<?php echo esc_url( $oy_l[1] ); ?>"><?php echo esc_html( 'Általános szerződési feltételek' === $oy_l[0] ? 'ÁSZF' : $oy_l[0] ); ?></a><?php endforeach; ?> · <a href="<?php echo esc_url( get_privacy_policy_url() ?: oy_page_link( 'privacy-policy' ) ); ?>"><?php esc_html_e( 'Privacy', 'olivia-yoga' ); ?></a></p>
 			<p><?php esc_html_e( 'Yoga is not a substitute for medical care. If you have a health condition or are pregnant, talk to your doctor before starting a new practice.', 'olivia-yoga' ); ?></p>

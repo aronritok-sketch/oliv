@@ -7,6 +7,13 @@ defined( 'ABSPATH' ) || exit;
 
 const OY_AREAS = array( 'Downtown Fort Myers & the River District', 'McGregor Boulevard', 'Gateway', 'Whiskey Creek', 'Fort Myers Beach', 'Sanibel & Captiva', 'Cape Coral', 'Estero', 'Bonita Springs', 'Lehigh Acres' );
 
+/** A bundled photo inside a page's text, framed; „oj-float” puts it beside the text on a wide screen. */
+function oy_figure( $key, $cls = '' ) {
+	$img = '' !== $key ? oy_photo( $key, '(min-width: 960px) 300px, 92vw' ) : '';
+	$cls = implode( ' ', array_map( 'sanitize_html_class', preg_split( '/\s+/', trim( $cls ) ) ) );
+	return '' === $img ? '' : '<figure class="oj-figure ' . esc_attr( $cls ) . '"><div class="frame">' . $img . '</div></figure>';
+}
+
 function oy_classes_list( $exclude = '' ) {
 	$rows = '';
 	$n    = 0;
@@ -220,6 +227,8 @@ add_action( 'init', function () {
 	add_shortcode( 'oy_gift_link', fn( $a ) => oy_btn_row( oy_btn( function_exists( 'oys_page_url' ) ? oys_page_url( 'gifts' ) : oy_contact_url( 'gift' ), oy_t( $a['label'] ?? '' ) ?: __( 'Buy a gift card', 'olivia-yoga' ) ) ) );
 	add_shortcode( 'oy_button', fn( $a ) => oy_btn_row( oy_btn( oy_resolve_tokens( html_entity_decode( $a['url'] ?? '#' ) ), oy_t( $a['label'] ?? '' ) ?: __( 'Book', 'olivia-yoga' ) ) ) );
 	add_shortcode( 'oy_fitmummy', fn() => oy_fitmummy() );
+	// a photo in a page's text, by its key (the About page, Olívia 14 Nov: „törjük meg a folyószöveget”)
+	add_shortcode( 'oy_figure', fn( $a ) => oy_figure( sanitize_key( $a['photo'] ?? '' ), (string) ( $a['class'] ?? '' ) ) );
 	add_shortcode( 'oy_picto', fn( $a ) => oy_pictogram( sanitize_key( $a['icon'] ?? 'lotus' ), sanitize_key( $a['tone'] ?? 'lilac' ) ) );
 } );
 
