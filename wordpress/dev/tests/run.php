@@ -2914,6 +2914,7 @@ test( 'online edition, live update: 2018 on her timeline, the kit list for every
 		eq( $img['pos'], get_post_meta( $att, 'oy_pos', true ), 'the journal photo: the focus lower, she is in the frame' );
 		$c   = get_post_field( 'post_content', $aid );
 		ok( str_contains( $c, $li2015 . "\n" . $li2018 ) && 1 === substr_count( $c, '2018-tól' ), 'About: 2018 (massage) once, after 2015' );
+		ok( ! str_contains( $c, '19 évesen' ), 'About: „19 évesen” out of the timeline („ezt szedjük ki rólamnál”)' );
 		$p = get_post_field( 'post_content', $pid );
 		ok( str_contains( $p, $kit[0][1] ) && str_contains( $p, $kit[1][1] ) && str_contains( $p, 'Saját mondatom' ), 'prices page: the kit for every class and „charge it”, her own line stays' );
 		ok( str_contains( get_post_field( 'post_content', $faq ), 'töltsd fel' ), 'the FAQ answer: charge your device' );
