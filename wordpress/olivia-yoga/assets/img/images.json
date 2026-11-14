@@ -824,5 +824,15 @@
    "file": "szabadteri-csoportos-edzes-gumiszalaggal-kovacs-olivia",
    "alt": "Szabadtéri csoportos edzés gumiszalaggal, Kovács Olívia női edzőcsoportjával"
   }
+ },
+ "olivia-side-plank-festival": {
+  "alt": "Olivia Kovacs in a side plank with a lifted leg, teaching an outdoor festival yoga class",
+  "pos": "50% 40%",
+  "w": 1200,
+  "h": 1553,
+  "hu": {
+   "file": "kovacs-olivia-oldalso-plank-fesztival-jogaora",
+   "alt": "Kovács Olívia oldalsó plankban, emelt lábbal egy fesztivál szabadtéri jógaóráján"
+  }
  }
 }
