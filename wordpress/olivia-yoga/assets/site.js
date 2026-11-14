@@ -216,8 +216,8 @@
 	   a box alja”, then „most a teteje tűnik el”) */
 	var asides = document.querySelectorAll('.aside-sticky');
 	/* A side box taller than the window would be cut off while scrolling (Olívia: „ez megint kicsit levágódik ahogy
-	   görgetek lejjebb”), so it first makes itself smaller: the photo goes, then the long notes shrink to three lines (a
-	   click opens one again). Only if it still does not fit does it scroll with the page. */
+	   görgetek lejjebb”), so it first makes itself smaller: its photo goes, then the training photo and some air – never
+	   any text („lemaradt a vége”). Only if it still does not fit does it scroll with the page. */
 	function fitAsides() {
 		asides.forEach(function (el) {
 			el.style.position = '';
@@ -228,17 +228,11 @@
 			if (el.offsetHeight <= room) return;
 			el.classList.add('is-compact');
 			if (el.offsetHeight <= room) return;
-			if (!el.querySelector('.is-open')) {
-				el.classList.add('is-tight');
-				if (el.offsetHeight <= room) return;
-			}
+			el.classList.add('is-tight');
+			if (el.offsetHeight <= room) return;
 			el.style.position = 'static';
 		});
 	}
-	document.addEventListener('click', function (e) {
-		var note = e.target.closest && e.target.closest('.aside-sticky.is-tight .oj-policy, .aside-sticky.is-tight .oj-replay');
-		if (note) { note.classList.add('is-open'); fitAsides(); }
-	});
 	if (asides.length) {
 		fitAsides();
 		window.addEventListener('resize', fitAsides, { passive: true });

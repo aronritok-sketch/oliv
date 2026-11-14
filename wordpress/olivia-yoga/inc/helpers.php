@@ -228,11 +228,19 @@ function oy_kicker( $text ) {
  * The cancellation rule (the booking plugin's setting, so it is written in one place), for the online site's timetables,
  * class pages and request form (Olívia, 14 November: „a lemondási szabály jelenjen meg kicsivel több helyen”).
  */
-function oy_cancel_note( $cls = '' ) {
+function oy_cancel_note( $cls = '', $kind = '' ) {
 	if ( ! oy_online_only() || ! class_exists( 'OYS_Settings' ) ) {
 		return '';
 	}
 	$text = trim( (string) OYS_Settings::get( 'cancel_policy' ) );
+	// a class page shows only the rule that is about it (Olívia, 14 November: „lemaradt a vége” – the whole text did not fit
+	// beside the class): the sentences about one-to-one sessions on those, the others on the group class; all of it if a
+	// part would come out empty
+	if ( in_array( $kind, array( 'private', 'group' ), true ) && '' !== $text ) {
+		$parts = preg_split( '/(?<=[.!?])\s+/u', $text );
+		$pick  = array_filter( $parts, fn( $p ) => ( false !== mb_stripos( $p, 'egyéni' ) ) === ( 'private' === $kind ) );
+		$text  = $pick ? implode( ' ', $pick ) : $text;
+	}
 	return '' === $text ? '' : '<p class="oj-policy' . ( $cls ? ' ' . esc_attr( $cls ) : '' ) . '">' . oy_icon( 'calendar' ) . '<span><b>' . esc_html__( 'Cancellation:', 'olivia-yoga' ) . '</b> ' . esc_html( $text ) . '</span></p>';
 }
 

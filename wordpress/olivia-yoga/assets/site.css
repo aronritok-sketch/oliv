@@ -711,8 +711,10 @@ abbr[title] { text-decoration: none; }
 }
 /* site.js fitAsides(): a side box taller than the window makes itself smaller instead of being cut off */
 .aside-sticky.is-compact .aside-card .frame { display: none; }
-.aside-sticky.is-tight .oj-policy > span, .aside-sticky.is-tight .oj-replay > span { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; line-clamp: 3; overflow: hidden; cursor: pointer; }
-.aside-sticky.is-tight .is-open > span { display: block; -webkit-line-clamp: unset; line-clamp: none; cursor: auto; }
+.aside-sticky.is-tight .credential img { display: none; }
+.aside-sticky.is-tight .aside-card { padding-block: 1rem; }
+.aside-sticky.is-tight .oj-policy--aside, .aside-sticky.is-tight .oj-replay--aside { margin-top: .7rem; font-size: .8rem; line-height: 1.42; }
+.aside-sticky.is-tight .oj-replay--aside { padding: .6rem .75rem; }
 @media (min-width: 1000px) and (max-height: 600px) {
 	.aside-sticky .aside-card .frame { display: none; }
 }

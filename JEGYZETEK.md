@@ -376,6 +376,9 @@
 - **3.11.43:** a „Mire lesz szükséged?” minden óra oldalán előre került (az első rész után), kártyákon (eszköz + rövid megjegyzés,
   sarokkör), a kamerás eszköz külön sávban; a kismamánál Olívia saját listája csak átkerült és kártyás lett (`oy_kit_up()`,
   `_kit` a tartalomfájlban). 1114d rev 2026-11-15d. Tesztek 1219/0.
+- **3.11.44:** az órák oldaldoboza az online oldalon kép nélküli (a kismamáé is, Fitmummy-kép nélkül), és csak az adott órára
+  vonatkozó lemondási szabályt mutatja (egyéni órán az egyénit, a csoportoson a csoportosat); a szűkítés soha nem vág le szöveget
+  (nincs „…”), csak képet és térközt. Minden mért ablakméretben fixált marad. Tesztek 1222/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -26,16 +26,18 @@ while ( have_posts() ) :
 				<?php endif; ?>
 			</div>
 			<aside class="aside-sticky"><div class="aside-card aside-card--class">
-				<?php if ( $aside_photo ) : ?><div class="frame"><?php echo oy_photo( $aside_photo, '340px' ); // phpcs:ignore ?></div><?php endif; ?>
+				<?php // Olívia, 14 November: „legyen ez is kép nélküli mint a többinél, egységesen és fixált” – on the online site the side box has no picture, so it stays whole and fixed
+				$aside_pics = ! oy_online_only(); ?>
+				<?php if ( $aside_photo && $aside_pics ) : ?><div class="frame"><?php echo oy_photo( $aside_photo, '340px' ); // phpcs:ignore ?></div><?php endif; ?>
 				<h2><?php the_title(); ?></h2>
 				<?php echo oy_class_facts( $id, 'aside-facts' ); // phpcs:ignore ?>
-				<?php if ( $prenatal ) : ?><?php echo oy_fitmummy( 'credential--aside' ); // phpcs:ignore ?><?php endif; ?>
+				<?php if ( $prenatal && $aside_pics ) : ?><?php echo oy_fitmummy( 'credential--aside' ); // phpcs:ignore ?><?php endif; ?>
 				<?php
 				// the online site books a prenatal session through the request form (the booking plugin), the others ask by message
 				$ask = ( $service || $prenatal && oy_online_only() ) && function_exists( 'oys_account_url' ) ? add_query_arg( 'topic', $service ? $service[0] : 'prenatal', oy_private_url() ) : oy_contact_url( $prenatal ? 'prenatal' : 'massage' );
 				echo $private ? oy_btn( $ask, __( 'Ask for a session', 'olivia-yoga' ), 'orchid' ) : oy_btn( oy_book_url(), __( 'Book this class', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore
 				echo $private ? '' : oy_replay_note( 'oj-replay--aside' ); // phpcs:ignore
-				echo oy_cancel_note( 'oj-policy--aside' ); // phpcs:ignore
+				echo oy_cancel_note( 'oj-policy--aside', $private ? 'private' : 'group' ); // phpcs:ignore
 				?>
 			</div></aside>
 		</div>

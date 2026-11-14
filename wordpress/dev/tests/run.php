@@ -3346,8 +3346,23 @@ test( 'Olívia\'s doc of 14 November: the side column is never cut off while scr
 	ok( (bool) preg_match( '/\.aside-sticky \{ position: sticky; top: calc\(var\(--header-h\) \+ var\(--wp-bar, 0px\) \+ 24px\); align-self: start; \}/', $css ) && ! str_contains( $css, 'scrollbar-width: none' ), 'the side column: no hidden inner scroll that cuts its bottom off' );
 	$js = (string) file_get_contents( get_template_directory() . '/assets/site.js' );
 	ok( str_contains( $js, 'function fitAsides' ) && str_contains( $js, "el.style.position = 'static'" ) && ! str_contains( $js, "el.style.top = room + 'px'" ), '… it follows the page only when the whole of it fits; a taller one scrolls with the page (neither top nor bottom cut off)' );
-	ok( str_contains( $js, "el.classList.add('is-compact')" ) && str_contains( $js, "el.classList.add('is-tight')" ) && strpos( $js, "el.classList.add('is-tight')" ) < strpos( $js, "el.style.position = 'static'" ), '… before giving up it makes itself smaller – the photo goes, then the long notes shrink – so it stays whole and in view („ez megint kicsit levágódik ahogy görgetek lejjebb”)' );
-	ok( str_contains( $css, '.aside-sticky.is-compact .aside-card .frame { display: none; }' ) && str_contains( $css, '.aside-sticky.is-tight .oj-policy > span, .aside-sticky.is-tight .oj-replay > span {' ) && str_contains( $css, '.aside-sticky.is-tight .is-open > span {' ), '… the smaller steps in the styles, a shortened note opens again with a click' );
+	ok( str_contains( $js, "el.classList.add('is-compact')" ) && str_contains( $js, "el.classList.add('is-tight')" ) && strpos( $js, "el.classList.add('is-tight')" ) < strpos( $js, "el.style.position = 'static'" ), '… before giving up it makes itself smaller – the photos go – so it stays whole and in view („ez megint kicsit levágódik ahogy görgetek lejjebb”)' );
+	ok( str_contains( $css, '.aside-sticky.is-compact .aside-card .frame { display: none; }' ) && str_contains( $css, '.aside-sticky.is-tight .credential img { display: none; }' ) && ! str_contains( $css, 'line-clamp: 3' ), '… the smaller steps hide photos, never cut a text short („lemaradt a vége”)' );
+	update_option( 'oy_edition', 'hu-online' );
+	$pol = OYS_Settings::get( 'cancel_policy' );
+	try {
+		OYS_Settings::update( array( 'cancel_policy' => 'A csoportos órát 12 órával előtte lemondhatod. A később lemondott óra elhasználódik. Az egyéni órát 24 órával előtte lehet áttenni vagy lemondani.' ) );
+		$p = oy_cancel_note( 'x', 'private' );
+		$g = oy_cancel_note( 'x', 'group' );
+		ok( str_contains( $p, 'Az egyéni órát 24 órával' ) && ! str_contains( $p, 'csoportos' ) && str_contains( $g, 'A csoportos órát 12 órával' ) && str_contains( $g, 'elhasználódik' ) && ! str_contains( $g, 'egyéni' ), 'the side box: only the cancellation rule of that kind of class, so it fits whole' );
+		OYS_Settings::update( array( 'cancel_policy' => 'Bármelyik órát 12 órával előtte lemondhatod.' ) );
+		ok( str_contains( oy_cancel_note( 'x', 'private' ), 'Bármelyik órát' ), '… and all of it when no sentence is about one-to-one sessions' );
+		$tpl = (string) file_get_contents( get_template_directory() . '/single-oy_class.php' );
+		ok( str_contains( $tpl, '$aside_pics = ! oy_online_only();' ) && str_contains( $tpl, '$aside_photo && $aside_pics' ) && str_contains( $tpl, '$prenatal && $aside_pics' ), 'online: the side box without pictures on every class page, the prenatal one too („legyen ez is kép nélküli mint a többinél, egységesen és fixált”)' );
+	} finally {
+		OYS_Settings::update( array( 'cancel_policy' => $pol ) );
+		update_option( 'oy_edition', 'fort-myers' );
+	}
 	ok( str_contains( $css, '@media (min-width: 1000px) and (max-height: 880px)' ), '… and on a short laptop screen it is tighter, so it fits' );
 	$on = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
 	ok( ! str_contains( $on, '.oj-duo .oj-figure:nth-child(2) { margin-top' ), 'About: the two photos in one line, no step' );
