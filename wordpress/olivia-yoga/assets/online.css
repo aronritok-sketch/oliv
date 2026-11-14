@@ -789,12 +789,14 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .entry .credential:not(.credential--aside) img[src$=".svg"] { aspect-ratio: auto; object-fit: contain; border-radius: 0; }
 
 /* „Piktogramokat szedjük ki mindenhonnan. Legyen letisztultabb”: the lists that had a pictogram beside each point are plain
-   text now – a short line in the site's colours above each title keeps them in order */
+   text now. „A vonalak helyett itt is legyen valami kerek, körös, letisztult megoldás”: instead of a short line, a soft circle
+   in the site's colours peeks out from behind the start of each title, like the circles in the corners of the boxes */
 .places li { grid-template-columns: 1fr; gap: 0; }
-.places li > div::before { content: ""; display: block; width: 28px; height: 4px; margin: 0 0 .7rem; border-radius: 4px; background: var(--lilac); }
-.places li:nth-child(4n + 2) > div::before { background: var(--pink); }
+.places li > div { position: relative; isolation: isolate; padding-top: .35rem; }
+.places li > div::before { content: ""; position: absolute; z-index: -1; left: -.65rem; top: -.2rem; width: 2.6rem; height: 2.6rem; border-radius: 50%; background: color-mix(in srgb, var(--lilac) 55%, #fff); }
+.places li:nth-child(4n + 2) > div::before { background: color-mix(in srgb, var(--pink) 42%, #fff); }
 .places li:nth-child(4n + 3) > div::before { background: var(--sage); }
-.places li:nth-child(4n) > div::before { background: var(--sun); }
+.places li:nth-child(4n) > div::before { background: color-mix(in srgb, var(--sun) 48%, #fff); }
 .places h3 { margin-top: 0; }
 .entry .oj-area > p:empty, .entry .oj-area > br:first-child { display: none; }
 
@@ -837,3 +839,71 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 	0%, 100% { clip-path: circle(50% at 22% 50%); }
 	50% { clip-path: circle(50% at 12% 50%); }
 }
+
+/* The steps of the live class: „a folyamatábrán legyen sima szám, nem 01, 02 stb” – a plain number in a soft circle, and no
+   lines between them („A vonalak helyett … kerek, körös, letisztult megoldás”) */
+.steps__title { margin: 2rem 0 .5rem; font-size: 1.1rem; }
+.steps { border-top: 0; gap: .2rem; }
+.steps li { grid-template-columns: 2.6rem 1fr; gap: 1rem; align-items: start; padding: .7rem 0; border-bottom: 0; }
+.steps li::before { content: counter(s); display: grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 50%; font-size: 1.3rem; color: var(--ink); background: color-mix(in srgb, var(--lilac) 55%, #fff); }
+.steps li:nth-child(4n + 2)::before { background: color-mix(in srgb, var(--pink) 42%, #fff); }
+.steps li:nth-child(4n + 3)::before { background: var(--sage); }
+.steps li:nth-child(4n)::before { background: color-mix(in srgb, var(--sun) 48%, #fff); }
+.steps li > div { padding-top: .5rem; }
+
+/* „ezek legyenek lenyithatóak mert mobilon így túl hosszú lesz”: site.js puts the title of each card in a button; on a phone
+   only the titles show, with the same round plus as the questions, and a tap opens the text */
+.oj-fold { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; width: 100%; margin: 0; padding: 0; border: 0; background: none; font: inherit; color: inherit; text-align: left; cursor: default; }
+.oj-fold__icon { display: none; }
+@media (max-width: 699px) {
+	.oj-modules--fold li { row-gap: 0; }
+	.oj-modules--fold li > span { display: none; }
+	.oj-modules--fold li.is-open > span { display: block; padding-top: .45rem; }
+	.oj-fold { cursor: pointer; align-items: center; }
+	.oj-fold__icon { position: relative; display: block; flex: none; width: 30px; height: 30px; border-radius: 50%; background: var(--lilac-soft); transition: transform .3s var(--ease), background-color .2s; }
+	.oj-fold__icon::before, .oj-fold__icon::after { content: ""; position: absolute; left: 50%; top: 50%; width: 12px; height: 1.6px; margin: -.8px 0 0 -6px; border-radius: 2px; background: var(--ink); }
+	.oj-fold__icon::after { transform: rotate(90deg); }
+	.oj-modules--fold li.is-open .oj-fold__icon { transform: rotate(45deg); background: var(--pink); }
+	.oj-fold:focus-visible { outline: 2px solid var(--orchid); outline-offset: 4px; border-radius: 6px; }
+}
+
+/* „ezek az alcímek is legyenek egy kicsit megdesignolva”: the opening lines of a class page in a soft box of the class's
+   colour, with the round corner of the other boxes; the first sentence large, the rest under it */
+.entry .oj-opening { --soft: var(--lilac-soft); --edge: var(--lilac); position: relative; overflow: hidden; isolation: isolate; margin: 0 0 2.6rem; padding: 1.55rem 1.7rem 1.45rem; border-radius: 24px; background: var(--soft); }
+.entry .oj-opening--pink { --soft: var(--pink-soft); --edge: var(--pink); }
+.entry .oj-opening--sage { --soft: var(--sage-soft); --edge: var(--sage); }
+.entry .oj-opening--sun { --soft: var(--sun-soft); --edge: var(--sun); }
+.entry .oj-opening::before { content: ""; position: absolute; z-index: -1; right: -48px; top: -48px; width: 136px; height: 136px; border-radius: 50%; background: color-mix(in srgb, var(--edge) 55%, #fff); }
+.entry .oj-opening p { margin: 0 0 .7rem; font-size: 1.04rem; line-height: 1.7; }
+.entry .oj-opening p:last-child { margin-bottom: 0; }
+.entry .oj-opening .oj-opening__tag { max-width: 32ch; margin-bottom: .6rem; padding-right: 2.2rem; font-size: clamp(1.22rem, 1.05rem + .7vw, 1.55rem); font-weight: 700; line-height: 1.32; color: var(--ink); text-wrap: balance; }
+@media (max-width: 599px) { .entry .oj-opening { padding: 1.3rem 1.25rem 1.2rem; border-radius: 20px; } }
+
+/* „Bejelentkezés és árak” – „ezek az infok is legyenek már kicsit megdesignolva”: the group class's facts as small round
+   chips in a soft box, her text under them; the one-to-one part as the boxes of the classes page („legyen ugyanilyen”) */
+.entry .oj-info { position: relative; overflow: hidden; isolation: isolate; margin: 1.1rem 0 1.8rem; padding: 1.4rem 1.6rem 1.35rem; border-radius: 24px; background: var(--lilac-soft); }
+.entry .oj-info::before { content: ""; position: absolute; z-index: -1; right: -48px; top: -48px; width: 136px; height: 136px; border-radius: 50%; background: color-mix(in srgb, var(--lilac) 45%, #fff); }
+.entry .oj-info__facts { list-style: none; display: flex; flex-wrap: wrap; gap: .5rem; margin: 0 0 1rem; padding: 0 2.2rem 0 0; }
+.entry .oj-info__facts li { display: inline-flex; align-items: center; gap: .45rem; margin: 0; padding: .45rem .9rem .45rem .5rem; border-radius: 999px; background: #fff; font-size: .92rem; font-weight: 700; color: var(--ink); line-height: 1.2; }
+.entry .oj-info__facts li::before { content: none; }
+.entry .oj-info__facts .icon { width: 26px; height: 26px; padding: 5px; flex: none; border-radius: 50%; color: var(--ink); background: color-mix(in srgb, var(--lilac) 45%, #fff); }
+.entry .oj-info__facts li:nth-child(4n + 2) .icon { background: color-mix(in srgb, var(--pink) 38%, #fff); }
+.entry .oj-info__facts li:nth-child(4n + 3) .icon { background: color-mix(in srgb, var(--sage) 70%, #fff); }
+.entry .oj-info__facts li:nth-child(4n) .icon { background: color-mix(in srgb, var(--sun) 45%, #fff); }
+.entry .oj-info p { margin: 0 0 .6rem; }
+.entry .oj-info p:last-child { margin-bottom: 0; }
+.entry .oj-info__lead { margin-bottom: .2rem; }
+@media (max-width: 599px) { .entry .oj-info { padding: 1.2rem 1.1rem 1.15rem; border-radius: 20px; } .entry .oj-info__facts { padding-right: 0; } }
+
+/* „legyen simán egy visszahívást kérek gomb, ahova csak leírja a telefonszámát” – a soft box above the message form */
+.oj-callback { position: relative; overflow: hidden; isolation: isolate; margin: 1.4rem 0 2rem; padding: 1.3rem 1.5rem 1.35rem; border-radius: 24px; background: var(--pink-soft); }
+.oj-callback::before { content: ""; position: absolute; z-index: -1; right: -44px; top: -44px; width: 124px; height: 124px; border-radius: 50%; background: color-mix(in srgb, var(--pink) 30%, #fff); }
+.entry .oj-callback__text { margin: 0 0 .85rem; padding-right: 2rem; }
+.oj-callback__text b { color: var(--ink); }
+.oj-callback__row { display: flex; flex-wrap: wrap; gap: .6rem; }
+.oj-callback__row input { flex: 1 1 14rem; min-width: 0; padding: .8rem 1.1rem; border: 1.5px solid color-mix(in srgb, var(--pink) 35%, #fff); border-radius: 999px; background: #fff; font: inherit; color: var(--ink); }
+.oj-callback__row input:focus { outline: 2px solid var(--orchid); outline-offset: 2px; }
+.oj-callback__row .btn { flex: none; }
+.oj-callback .form__notice { margin: .8rem 0 0; }
+@media (max-width: 599px) { .oj-callback { padding: 1.15rem 1.1rem 1.2rem; border-radius: 20px; } .oj-callback__row .btn { width: 100%; justify-content: center; } }
+

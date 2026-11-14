@@ -19,7 +19,12 @@ while ( have_posts() ) :
 	<div class="container">
 		<div class="layout layout--aside">
 			<div class="main-col entry">
-				<?php the_content(); ?>
+				<?php
+				ob_start();
+				the_content();
+				$oy_body = (string) ob_get_clean();
+				echo oy_online_only() ? oy_opening( $oy_body, oy_class_tone( $slug ) ) : $oy_body; // phpcs:ignore
+				?>
 				<?php if ( shortcode_exists( 'oys_schedule' ) && ! $private ) : ?>
 					<h2><?php esc_html_e( 'Next dates', 'olivia-yoga' ); ?></h2>
 					<div class="block-wide"><?php echo do_shortcode( '[oys_schedule days="21" class="' . esc_attr( $slug ) . '" empty_days="no"]' ); // phpcs:ignore ?></div>

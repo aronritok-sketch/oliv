@@ -14,7 +14,12 @@ while ( have_posts() ) :
 	?>
 	<div class="container">
 		<div class="layout<?php echo $aside ? ' layout--aside' : ''; ?><?php echo $studio ? ' layout--studio' : ''; ?>">
-			<div class="main-col entry"><?php the_content(); ?></div>
+			<div class="main-col entry"><?php
+				ob_start();
+				the_content();
+				$oy_body = (string) ob_get_clean();
+				echo oy_online_only() && 'schedule-pricing' === $slug && ! $studio ? oy_pricing_design( $oy_body ) : $oy_body; // phpcs:ignore
+			?></div>
 			<?php if ( $aside ) : ?><aside class="aside-sticky"><?php echo $aside; // phpcs:ignore ?></aside><?php endif; ?>
 		</div>
 	</div>

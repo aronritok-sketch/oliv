@@ -251,6 +251,54 @@
 		Array.prototype.forEach.call(d.parentElement.children, function (o) { if (o !== d && o.tagName === 'DETAILS' && o.open) o.open = false; });
 	}, true);
 
+	/* Olívia, 14 November: „ezek legyenek lenyithatóak mert mobilon így túl hosszú lesz” – on a phone the cards with a
+	   longer text under the title (the prenatal modules, who one-to-one is for) show only their titles, a tap opens one.
+	   On a wider screen they stay as they are, open. */
+	(function foldCards() {
+		var lists = document.querySelectorAll('.oj-modules--why');
+		if (!lists.length || !window.matchMedia) return;
+		var mq = window.matchMedia('(max-width: 699px)');
+		var buttons = [];
+		var kid = function (el, tag) { for (var i = 0; i < el.children.length; i++) { if (el.children[i].tagName === tag) return el.children[i]; } return null; };
+		Array.prototype.forEach.call(lists, function (ul) {
+			Array.prototype.forEach.call(ul.children, function (li) {
+				var st = kid(li, 'STRONG'), sp = kid(li, 'SPAN');
+				if (!st || !sp) return;
+				sp.id = sp.id || 'oj-fold-' + (buttons.length + 1);
+				var b = document.createElement('button');
+				b.type = 'button';
+				b.className = 'oj-fold';
+				b.setAttribute('aria-controls', sp.id);
+				li.insertBefore(b, st);
+				b.appendChild(st);
+				var ic = document.createElement('span');
+				ic.className = 'oj-fold__icon';
+				ic.setAttribute('aria-hidden', 'true');
+				b.appendChild(ic);
+				b.addEventListener('click', function () {
+					if (!mq.matches) return;
+					var open = li.classList.toggle('is-open');
+					b.setAttribute('aria-expanded', open ? 'true' : 'false');
+				});
+				buttons.push(b);
+			});
+			ul.classList.add('oj-modules--fold');
+		});
+		var sync = function () {
+			buttons.forEach(function (b) {
+				if (mq.matches) {
+					b.removeAttribute('tabindex');
+					b.setAttribute('aria-expanded', b.parentElement.classList.contains('is-open') ? 'true' : 'false');
+				} else {
+					b.setAttribute('tabindex', '-1');
+					b.removeAttribute('aria-expanded');
+				}
+			});
+		};
+		sync();
+		if (mq.addEventListener) mq.addEventListener('change', sync); else if (mq.addListener) mq.addListener(sync);
+	})();
+
 	onScroll();
 
 	/* Expose for the single-file preview router */

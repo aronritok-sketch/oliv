@@ -251,7 +251,7 @@ function oy_contact_form() {
 		'required' => __( 'Fill in this field.', 'olivia-yoga' ),
 		'email'    => __( 'Enter an email address like name@example.com.', 'olivia-yoga' ),
 	);
-	return '<form class="form form--contact" id="book" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post" data-contact data-errors="' . esc_attr( wp_json_encode( $err ) ) . '">' . $notice
+	return oy_callback_form() . '<form class="form form--contact" id="book" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post" data-contact data-errors="' . esc_attr( wp_json_encode( $err ) ) . '">' . $notice
 		. '<input type="hidden" name="action" value="oy_contact">' . wp_nonce_field( 'oy_contact', '_wpnonce', true, false )
 		. '<input type="hidden" name="lang" value="' . esc_attr( oy_lang() ) . '">'
 		. '<div class="form__hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>'
@@ -263,6 +263,57 @@ function oy_contact_form() {
 		. '<label class="field"><span class="field__label">' . esc_html__( 'Message', 'olivia-yoga' ) . '</span><textarea name="message" id="oy-c-message" rows="5" required placeholder="' . esc_attr__( 'Tell me a little about your practice, any injuries or a pregnancy I should know about, and when you would like to start.', 'olivia-yoga' ) . '"></textarea><span class="field__error" aria-live="polite"></span></label>'
 		. '<div class="form__foot"><button type="submit" class="btn btn--orchid">' . esc_html__( 'Send message', 'olivia-yoga' ) . oy_icon( 'arrow' ) . '</button>'
 		. '<p class="form__small">' . esc_html__( 'I only use your details to reply to you.', 'olivia-yoga' ) . '</p></div></form>';
+}
+
+/**
+ * Olívia, 14 November: „kapcsolatnál legyen simán egy visszahívást kérek gomb, ahova csak leírja a telefonszámát” – on
+ * the online site, above the message form: one field for the phone number and a „Visszahívást kérek” button; the number
+ * goes to Olívia by email.
+ */
+function oy_callback_form() {
+	if ( ! oy_online_only() ) {
+		return '';
+	}
+	$notice = '';
+	if ( isset( $_GET['oy_called'] ) ) {
+		$notice = '1' === $_GET['oy_called']
+			? '<p class="form__notice form__notice--ok" role="status">' . esc_html__( 'Thank you, I will call you back soon.', 'olivia-yoga' ) . '</p>'
+			: '<p class="form__notice oys-notice--error" role="alert">' . esc_html__( 'Please enter a phone number I can call.', 'olivia-yoga' ) . '</p>';
+	}
+	return '<form class="oj-callback" id="visszahivas" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" method="post">'
+		. '<input type="hidden" name="action" value="oy_callback">' . wp_nonce_field( 'oy_callback', '_wpnonce', true, false )
+		. '<div class="form__hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>'
+		. '<p class="oj-callback__text"><b>' . esc_html__( 'Would you rather talk?', 'olivia-yoga' ) . '</b> ' . esc_html__( 'Leave your phone number and I will call you back.', 'olivia-yoga' ) . '</p>'
+		. '<div class="oj-callback__row"><label class="sr-only" for="oy-cb-phone">' . esc_html__( 'Your phone number', 'olivia-yoga' ) . '</label>'
+		. '<input type="tel" name="phone" id="oy-cb-phone" required autocomplete="tel" inputmode="tel" placeholder="' . esc_attr__( 'Your phone number', 'olivia-yoga' ) . '">'
+		. '<button type="submit" class="btn btn--orchid">' . esc_html__( 'Call me back', 'olivia-yoga' ) . '</button></div>' . $notice . '</form>';
+}
+
+add_action( 'admin_post_nopriv_oy_callback', 'oy_handle_callback' );
+add_action( 'admin_post_oy_callback', 'oy_handle_callback' );
+function oy_handle_callback() {
+	check_admin_referer( 'oy_callback' );
+	$back = preg_replace( '/#.*$/', '', remove_query_arg( 'oy_called', wp_get_referer() ?: oy_page_link( 'contact' ) ) );
+	$done = fn( $ok ) => wp_safe_redirect( add_query_arg( 'oy_called', $ok ? '1' : '0', $back ) . '#visszahivas' );
+	if ( ! empty( $_POST['website'] ) ) {
+		$done( true ); // honeypot: pretend success
+		exit;
+	}
+	$phone  = sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) );
+	$digits = preg_replace( '/\D/', '', $phone );
+	if ( strlen( $digits ) < 7 || strlen( $digits ) > 15 || preg_match( '/[^\d\s+\-\/().]/', $phone ) ) {
+		$done( false );
+		exit;
+	}
+	$key = 'oy_cb_' . md5( (string) ( $_SERVER['REMOTE_ADDR'] ?? '' ) );
+	if ( ! get_transient( $key ) ) { // one call-back request a minute from the same address
+		set_transient( $key, 1, MINUTE_IN_SECONDS );
+		$to = class_exists( 'OYS_Settings' ) ? OYS_Settings::get( 'notify_email' ) : get_option( 'admin_email' );
+		/* translators: %s: phone number */
+		wp_mail( $to, sprintf( __( 'Call-back request: %s', 'olivia-yoga' ), $phone ), sprintf( __( "Someone asked for a call back on the website.\n\nPhone number: %s", 'olivia-yoga' ), $phone ) );
+	}
+	$done( true );
+	exit;
 }
 
 add_action( 'admin_post_nopriv_oy_contact', 'oy_handle_contact' );

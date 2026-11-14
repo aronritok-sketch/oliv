@@ -233,6 +233,114 @@ function oy_kicker( $text ) {
  * The cancellation rule (the booking plugin's setting, so it is written in one place), for the online site's timetables,
  * class pages and request form (Olívia, 14 November: „a lemondási szabály jelenjen meg kicsivel több helyen”).
  */
+/**
+ * „Bejelentkezés és árak” on the online site, two parts of Olívia's text get a design when the page is shown (her own
+ * text stays editable as plain paragraphs):
+ * – „ezek az infok is legyenek már kicsit megdesignolva”: under the first title, the group class's facts become small
+ *   round chips (day and time, length, live in the browser, camera optional) in a soft box; the sentences the chips
+ *   repeat are left out of the box, the rest of her text stays in it;
+ * – „ez a rész inkább legyen ugyanilyen”: the one-to-one part (the paragraph that links the one-to-one classes) becomes
+ *   the same boxes as „Melyik órát válasszam?” on the classes page, taken from there without the group class.
+ */
+function oy_pricing_design( $html ) {
+	// 1. the group class's facts
+	if ( preg_match( '#^(\s*<h2[^>]*>.*?</h2>)((?:\s*<p(?:\s[^>]*)?>.*?</p>)+)#s', $html, $m ) ) {
+		$class = get_page_by_path( 'hatha-flow', OBJECT, 'oy_class' );
+		$len   = $class ? (string) oy_class_meta( $class->ID, 'oy_duration' ) : '';
+		$facts = array_filter(
+			array(
+				array( 'calendar', __( 'Wednesdays, 18:30–20:00', 'olivia-yoga' ) ),
+				array( 'clock', $len ),
+				array( 'globe', __( 'live, in your browser', 'olivia-yoga' ) ),
+				array( 'user', __( 'camera optional', 'olivia-yoga' ) ),
+			),
+			fn( $f ) => '' !== $f[1]
+		);
+		$chips = '<ul class="oj-info__facts">';
+		foreach ( $facts as $f ) {
+			$chips .= '<li>' . oy_icon( $f[0] ) . '<span>' . esc_html( $f[1] ) . '</span></li>';
+		}
+		$chips .= '</ul>';
+		$paras = '';
+		preg_match_all( '#<p(?:\s[^>]*)?>(.*?)</p>#s', $m[2], $ps );
+		foreach ( $ps[1] as $i => $inner ) {
+			$keep = array();
+			foreach ( preg_split( '#(?<=[.!?])\s+#u', trim( $inner ) ) as $sentence ) {
+				$plain = wp_strip_all_tags( $sentence );
+				// what the chips say already: the time (only at the start), live in the browser, the camera
+				if ( ( 0 === $i && ! $keep && preg_match( '#\d{1,2}:\d{2}#', $plain ) ) || preg_match( '#böngész|browser|kamer|camera#iu', $plain ) ) {
+					continue;
+				}
+				$keep[] = $sentence;
+			}
+			$text = trim( implode( ' ', $keep ) );
+			if ( '' !== trim( wp_strip_all_tags( $text ) ) ) {
+				$paras .= '<p>' . $text . '</p>';
+			}
+		}
+		$html = $m[1] . '<div class="oj-info">' . $chips . $paras . '</div>' . substr( $html, strlen( $m[0] ) );
+	}
+	// 2. the one-to-one classes as boxes
+	$private = array_filter( array( 'egyeni-online-joga', oy_prenatal_slug(), 'stretching', 'relaxacio-legzes' ), fn( $s ) => (bool) get_page_by_path( $s, OBJECT, 'oy_class' ) );
+	$classes = get_page_by_path( oy_page_slug( 'yoga-classes' ) );
+	if ( count( $private ) < 2 || ! $classes || ! preg_match( '#<div class="oj-guide">.*?</div>#s', (string) $classes->post_content, $g ) ) {
+		return $html;
+	}
+	$urls = array_map( 'oy_class_url', $private );
+	$offset = 0;
+	while ( preg_match( '#(<h2[^>]*>(?:(?!</h2>).)*</h2>)((?:\s*<p(?:\s[^>]*)?>.*?</p>)+)#s', $html, $pm, PREG_OFFSET_CAPTURE, $offset ) ) {
+		$links = 0;
+		foreach ( $urls as $u ) {
+			$links += str_contains( $pm[2][0], 'href="' . untrailingslashit( $u ) ) ? 1 : 0;
+		}
+		if ( $links >= 2 ) {
+			$guide = apply_filters( 'the_content', oy_resolve_tokens( $g[0] ) );
+			$guide = preg_replace_callback(
+				'#<a class="oj-guide__box[^"]*" href="([^"]+)".*?</a>\s*#s',
+				fn( $a ) => in_array( untrailingslashit( $a[1] ), array_map( 'untrailingslashit', $urls ), true ) ? $a[0] : '',
+				$guide
+			);
+			if ( substr_count( $guide, 'oj-guide__box' ) < 2 ) {
+				return $html;
+			}
+			$box  = '<p class="oj-info__lead">' . esc_html__( 'Choose what you would like a time for, and I will get back to you soon. You will find the prices below.', 'olivia-yoga' ) . '</p>' . $guide;
+			$html = substr( $html, 0, $pm[2][1] ) . $box . substr( $html, $pm[2][1] + strlen( $pm[2][0] ) );
+			break;
+		}
+		$offset = $pm[0][1] + strlen( $pm[1][0] );
+	}
+	return $html;
+}
+
+/** The colour of a class: the same one its card and box use everywhere. */
+function oy_class_tone( $slug ) {
+	$tones = array( 'hatha-flow' => 'lilac', 'egyeni-online-joga' => 'pink', oy_prenatal_slug() => 'sage', 'stretching' => 'sun', 'relaxacio-legzes' => 'lilac' );
+	return $tones[ $slug ] ?? 'lilac';
+}
+
+/**
+ * Olívia, 14 November: „ezek az alcímek is legyenek egy kicsit megdesignolva” – the opening paragraph of a class page (a
+ * short first sentence, then a line break and the rest) becomes a soft box in the class's colour: the first sentence
+ * large, the rest under it. Built from the text as it is when shown, so her own edits keep the look; a page that starts
+ * with anything else stays as it is.
+ */
+function oy_opening( $html, $tone = 'lilac' ) {
+	if ( ! preg_match( '#^\s*<p(?:\s[^>]*)?>(.*?)</p>#s', $html, $m ) ) {
+		return $html;
+	}
+	$parts = preg_split( '#<br\s*/?>#i', $m[1], 2 );
+	if ( 2 !== count( $parts ) || '' === trim( wp_strip_all_tags( $parts[0] ) ) || '' === trim( wp_strip_all_tags( $parts[1] ) ) ) {
+		return $html;
+	}
+	$rest  = preg_replace( '#^(\s*<br\s*/?>)+\s*#i', '', trim( $parts[1] ) );
+	$paras = array_filter( array_map( 'trim', preg_split( '#(?:<br\s*/?>\s*){2,}#i', $rest ) ), fn( $x ) => '' !== $x );
+	$box   = '<div class="oj-opening oj-opening--' . esc_attr( $tone ) . '"><p class="oj-opening__tag">' . trim( $parts[0] ) . '</p>';
+	foreach ( $paras as $para ) {
+		$box .= '<p>' . $para . '</p>';
+	}
+	return $box . '</div>' . substr( $html, strlen( $m[0] ) );
+}
+
 function oy_cancel_note( $cls = '', $kind = '' ) {
 	if ( ! oy_online_only() || ! class_exists( 'OYS_Settings' ) ) {
 		return '';

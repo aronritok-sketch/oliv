@@ -400,6 +400,16 @@
 - **3.11.52:** a főoldali Ha–Tha kép mozog: a Nap lassan izzik, a Hold fázist vált, és görgetéskor beúsznak (Olívia:
   „legyen animálva”; aki a rendszerében kikapcsolta a mozgást, annak áll). A főoldalon a kismamatorna került az egyéni
   jóga elé, a blokkokban és a felső dobozokban is („az egyéni online jógaórát és a kismamatornát a főoldalon cseréljük meg”).
+- **3.11.53:** Olívia 11.14-i doksijának újabb pontjai, élesben:
+  - főoldal: a „Hogyan működik” blokk most az élő csoportos óráról szól, röviden; a lépéseken sima szám áll pasztell
+    körben, vonalak nélkül; a pontok előtti vonalkák helyett is kerek jel van;
+  - a GYIK főcíme „Kérdésed van?” lett (az első kérdés túl erőltetett volt főcímnek);
+  - kismamatorna: mobilon a modulkártyák lenyithatók;
+  - az óraoldalak nyitó sorai az óra színében, dobozban jelennek meg; ez megjelenítéskor készül, Olívia szövege
+    szerkeszthető marad;
+  - „Bejelentkezés és árak”: a csoportos óra adatai kis kerek címkékben; az egyéni órák része ugyanolyan dobozsor,
+    mint az „Online órák” oldalon;
+  - Kapcsolat: „Visszahívást kérek” doboz, csak egy telefonszám-mezővel; a szám e-mailben megy Olíviának.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

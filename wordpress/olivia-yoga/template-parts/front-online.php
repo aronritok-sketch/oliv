@@ -185,13 +185,18 @@ $more     = array(
 
 <section class="section section--pale" id="how" aria-labelledby="how-title"><div class="container private__grid">
 	<div data-reveal>
-		<?php echo oy_kicker( __( 'How online classes work', 'olivia-yoga' ) ); // phpcs:ignore ?>
-		<h2 id="how-title"><?php esc_html_e( 'A real class, just in your living room', 'olivia-yoga' ); ?></h2>
-		<p class="lead"><?php esc_html_e( 'This is not a video to follow. We practice together, at the same time: I guide you, and you can ask anything before and after class.', 'olivia-yoga' ); ?></p>
+		<?php
+		// Olívia, 14 November: „ez a blokk inkább az élő csoportos online jógáról szóljon röviden, kreatívan, ami alatt vannak a
+		// következő időpontok, de ugyanígy röviden meg lehet fogalmazni, hogyan működik. a folyamatábrán legyen sima szám”
+		echo oy_kicker( __( 'Live group yoga', 'olivia-yoga' ) ); // phpcs:ignore
+		?>
+		<h2 id="how-title"><?php esc_html_e( 'Wednesday evenings together, everyone from home', 'olivia-yoga' ); ?></h2>
+		<p class="lead"><?php esc_html_e( 'You are not following a video: we practise together, live. If you turn your camera on, I can see you and help you with the poses.', 'olivia-yoga' ); ?></p>
 		<ul class="places"><?php foreach ( $needs as $n ) : ?><li><?php echo oy_pictogram( $n[0], $n[3] ); // phpcs:ignore ?><div><h3><?php echo esc_html( $n[1] ); ?></h3><p><?php echo esc_html( $n[2] ); ?></p><?php if ( ! empty( $n[4] ) ) : ?><p class="oj-only-me"><?php echo esc_html( $n[4] ); ?></p><?php endif; ?></div></li><?php endforeach; ?></ul>
 	</div>
 	<div class="private__side" data-reveal>
 		<div class="frame"><?php echo oy_photo( 'olivia-dancer-home', '(min-width: 960px) 50vw, 100vw' ); // phpcs:ignore ?></div>
+		<h3 class="steps__title"><?php esc_html_e( 'This is how it works', 'olivia-yoga' ); ?></h3>
 		<ol class="steps"><?php foreach ( $steps as $s ) : ?><li><div><b><?php echo esc_html( $s[0] ); ?></b><span><?php echo esc_html( $s[1] ); ?></span></div></li><?php endforeach; ?></ol>
 		<p class="btn-row"><?php echo oy_btn( oy_book_url(), __( 'Book a class', 'olivia-yoga' ), 'orchid' ) . oy_btn( oy_page_link( 'faq' ), __( 'Questions about online classes', 'olivia-yoga' ), 'ghost' ); // phpcs:ignore ?></p>
 	</div>
@@ -225,7 +230,7 @@ $more     = array(
 </div></section>
 
 <section class="section" id="faq" aria-labelledby="faq-title"><div class="container faq-grid">
-	<header class="section__head" data-reveal><?php echo oy_kicker( __( 'FAQ', 'olivia-yoga' ) ); // phpcs:ignore ?><h2 id="faq-title"><?php esc_html_e( 'Can yoga really work online?', 'olivia-yoga' ); ?></h2><p class="lead"><?php esc_html_e( 'The question everyone asks first, and a few others.', 'olivia-yoga' ); ?></p><p><a class="text-link" href="<?php echo esc_url( oy_page_link( 'faq' ) ); ?>"><?php esc_html_e( 'All questions', 'olivia-yoga' ); ?></a></p></header>
+	<header class="section__head" data-reveal><?php echo oy_kicker( __( 'FAQ', 'olivia-yoga' ) ); // phpcs:ignore ?><h2 id="faq-title"><?php esc_html_e( 'Got a question?', 'olivia-yoga' ) /* Olívia, 14 November: „ez kicsit erőltetett, ne ez legyen a fő kérdés” */; ?></h2><p><a class="text-link" href="<?php echo esc_url( oy_page_link( 'faq' ) ); ?>"><?php esc_html_e( 'All questions', 'olivia-yoga' ); ?></a></p></header>
 	<?php echo oy_faq_list( true ); // phpcs:ignore ?>
 </div></section>
 

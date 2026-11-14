@@ -1904,3 +1904,54 @@ msgstr "kettőtöknek összesen, fejenként olcsóbb"
 
 msgid "It is not compulsory. If you turn it on, we can see each other live, and I can help you with the poses. Only I am on the recording."
 msgstr "Nem kötelező. Ha bekapcsolod, élőben láthatjuk egymást, és tudok segíteni a pózokban. A felvételen csak én látszom."
+
+msgid "Live group yoga"
+msgstr "Élő csoportos jóga"
+
+msgid "Wednesday evenings together, everyone from home"
+msgstr "Szerda esténként együtt, mindenki otthonról"
+
+msgid "You are not following a video: we practise together, live. If you turn your camera on, I can see you and help you with the poses."
+msgstr "Nem videót követsz: együtt gyakorlunk, élőben. Ha bekapcsolod a kamerádat, látlak, és segítek a pózokban."
+
+msgid "This is how it works"
+msgstr "Így működik"
+
+msgid "Got a question?"
+msgstr "Kérdésed van?"
+
+msgid "Wednesdays, 18:30–20:00"
+msgstr "Szerdánként 18:30–20:00"
+
+msgid "live, in your browser"
+msgstr "élőben, a böngésződben"
+
+msgid "camera optional"
+msgstr "a kamera nem kötelező"
+
+msgid "Choose what you would like a time for, and I will get back to you soon. You will find the prices below."
+msgstr "Válaszd ki, mire kérsz időpontot, és hamarosan visszaírok. Az árakat lent találod."
+
+msgid "Would you rather talk?"
+msgstr "Inkább beszélnél?"
+
+msgid "Leave your phone number and I will call you back."
+msgstr "Írd be a telefonszámodat, és visszahívlak."
+
+msgid "Your phone number"
+msgstr "Telefonszámod"
+
+msgid "Call me back"
+msgstr "Visszahívást kérek"
+
+msgid "Thank you, I will call you back soon."
+msgstr "Köszönöm, hamarosan visszahívlak."
+
+msgid "Please enter a phone number I can call."
+msgstr "Adj meg egy telefonszámot, amin elérlek."
+
+msgid "Call-back request: %s"
+msgstr "Visszahívást kér: %s"
+
+msgid "Someone asked for a call back on the website.\n\nPhone number: %s"
+msgstr "Valaki visszahívást kért a weboldalon.\n\nTelefonszám: %s"

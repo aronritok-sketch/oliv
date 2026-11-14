@@ -1285,3 +1285,54 @@ msgstr "para los dos"
 
 msgid "It is not compulsory. If you turn it on, we can see each other live, and I can help you with the poses. Only I am on the recording."
 msgstr "No es obligatoria. Si la enciendes, en directo nos vemos, y puedo ayudarte con las posturas. En la grabación solo salgo yo."
+
+msgid "Live group yoga"
+msgstr "Yoga en grupo en directo"
+
+msgid "Wednesday evenings together, everyone from home"
+msgstr "Los miércoles por la tarde, juntas, cada una desde casa"
+
+msgid "You are not following a video: we practise together, live. If you turn your camera on, I can see you and help you with the poses."
+msgstr "No sigues un vídeo: practicamos juntas, en directo. Si enciendes la cámara, te veo y te ayudo con las posturas."
+
+msgid "This is how it works"
+msgstr "Así funciona"
+
+msgid "Got a question?"
+msgstr "¿Tienes alguna pregunta?"
+
+msgid "Wednesdays, 18:30–20:00"
+msgstr "Los miércoles, 18:30–20:00"
+
+msgid "live, in your browser"
+msgstr "en directo, en tu navegador"
+
+msgid "camera optional"
+msgstr "la cámara es opcional"
+
+msgid "Choose what you would like a time for, and I will get back to you soon. You will find the prices below."
+msgstr "Elige para qué quieres una cita y te responderé pronto. Los precios están más abajo."
+
+msgid "Would you rather talk?"
+msgstr "¿Prefieres hablar?"
+
+msgid "Leave your phone number and I will call you back."
+msgstr "Déjame tu número de teléfono y te llamo."
+
+msgid "Your phone number"
+msgstr "Tu número de teléfono"
+
+msgid "Call me back"
+msgstr "Llámame"
+
+msgid "Thank you, I will call you back soon."
+msgstr "Gracias, te llamaré pronto."
+
+msgid "Please enter a phone number I can call."
+msgstr "Escribe un número de teléfono al que pueda llamarte."
+
+msgid "Call-back request: %s"
+msgstr "Solicitud de llamada: %s"
+
+msgid "Someone asked for a call back on the website.\n\nPhone number: %s"
+msgstr "Alguien ha pedido que le llames desde la web.\n\nTeléfono: %s"
