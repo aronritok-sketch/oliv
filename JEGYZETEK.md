@@ -368,6 +368,11 @@
   érkezem…”, az utolsó a „Sérülésem vagy egészségügyi problémám van…” (`faqs_home` a tartalomfájlban; élesen a jelölő és a
   sorrend). Kikerült a „Négy ok, amiért…” és az „Az egyéni óra teljesen hozzád igazodik…” sor. 1114d rev 2026-11-15a. Tesztek 1200/0.
 - **3.11.41:** az órarend alatti „Egyéni órák” doboz mondata egy sorban (asztali nézetben). Tesztek 1201/0.
+- **3.11.42:** Áron: „Nem magyaros amit csinálsz” – a napi új szövegek természetes magyarul (összpontosít, „Kettesben vagy
+  más napon”, „ha nemrég szültél…”, „egy kattintással elfogadhatod, aztán kifizetheted…”, „Kell még egy kamerás telefon…”,
+  „Fájdalomra, feszülésre”, „kettőtöknek összesen, fejenként olcsóbb”); Olívia pontjai: az egyéni blokk tényei sötét körök
+  nélkül, az ajándéksáv nyila ki, a nagy címek sortávja nagyobb (ékezet ≠ vessző), a főoldali GYIK-ből a „Mennyire nehezek…”
+  ki. 1114d rev 2026-11-15c. Tesztek 1210/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

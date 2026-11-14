@@ -3197,7 +3197,11 @@ test( 'Olívia\'s doc of 14 November, late night: the group class – a short re
 	$sc  = (string) file_get_contents( get_template_directory() . '/assets/site.css' );
 	ok( str_contains( $wp, '@media (min-width: 783px) { body.admin-bar { --wp-bar: 32px; } }' ) && str_contains( $sc, '.aside-sticky { position: sticky; top: calc(var(--header-h) + var(--wp-bar, 0px) + 24px);' ), 'logged in: the side box sticks under the admin bar too, its top is not cut off („kicsit levágódik itt is a box teteje”)' );
 	$all = (string) wp_json_encode( array( $data['pages'], $data['classes'] ), JSON_UNESCAPED_UNICODE );
-	ok( ! str_contains( preg_replace( '/"_replace":\[.*?\]\]/s', '', $all ), 'elfogadsz, és kifizeted' ) && str_contains( $data['pages']['classes']['content'], 'elfogadhatsz, majd ki tudod fizetni, vagy a bérletedből foglalhatsz' ), '„elfogadhatsz, ki tudod fizetni vagy a bérletedből foglalhatsz”' );
+	ok( ! str_contains( preg_replace( '/"_replace":\[.*?\]\]/s', '', $all ), 'elfogadsz, és kifizeted' ) && str_contains( $data['pages']['classes']['content'], 'egy kattintással elfogadhatod, aztán kifizetheted, vagy lefoglalhatod a bérletedből' ), '„elfogadhatsz, ki tudod fizetni vagy a bérletedből foglalhatsz” – in natural Hungarian' );
+	$texts = implode( ' ', array_map( fn( $c ) => $c['content'] . ( $c['excerpt'] ?? '' ), $data['classes'] ) ) . $data['pages']['classes']['content'];
+	foreach ( array( 'fókuszál, például', 'a te idődben', 'És egy telefon', 'dolgozol, az orvosod', 'friss anyukaként' ) as $calque ) {
+		ok( ! str_contains( $texts, $calque ), 'natural Hungarian, no „' . $calque . '” (Áron: „Nem magyaros amit csinálsz”)' );
+	}
 	$eg   = $data['classes']['egyeni-online-joga']['content'];
 	$list = substr( $eg, (int) strpos( $eg, '<div class="oj-groups">' ) );
 	$list = substr( $list, 0, (int) strpos( $list, '<h2>' ) );
@@ -3217,7 +3221,7 @@ test( 'Olívia\'s doc of 14 November, late night: the group class – a short re
 	$made    = ! $post;
 	$id      = $post ? $post->ID : wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Csoportos online flow jóga', 'post_name' => 'hatha-flow' ) );
 	$keep    = $post ? array( $post->post_content, $post->post_excerpt ) : null;
-	$olds    = array_map( fn( $r ) => $r[0], array_slice( $hf['_replace'], -4 ) );
+	$olds    = array_values( array_map( fn( $r ) => $r[0], array_filter( $hf['_replace'], fn( $r ) => (bool) preg_match( '/megérkezzen a figyelme\.<\/p>$|hosszú relaxáció|december 16|Segíthet egy jógaheveder/u', $r[0] ) ) ) );
 	try {
 		wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => implode( "\n", $olds ) . "\n<p>Saját mondatom.</p>\n[oy_booking_link]", 'post_excerpt' => $hf['_excerpt_prev'] ) ) );
 		delete_option( 'oy_1114d_rev' );
@@ -3281,10 +3285,14 @@ test( 'Olívia\'s doc of 14 November, past midnight: the home page\'s questions 
 	ok( 'Sérülésem vagy egészségügyi problémám van. Jöhetek?' === end( $home ) && ! in_array( 'Miért jó online jógázni?', $home, true ), 'a fresh site: the injury question is the last on the home page, „Miért jó online jógázni?” only on the FAQ page' );
 	ok( in_array( 'Mi van, ha késve érkezem, vagy akadozik a net?', $home, true ), '… and the late-arrival / bad-connection question on the home page too („ezt a kérdést még tedd a gyikhez a főoldalra”)' );
 	$oc = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
+	ok( ! in_array( 'Mennyire nehezek a csoportos jóga órák?', $home, true ), '… „Mennyire nehezek a csoportos jóga órák?” off the home page („így túl hosszú”)' );
+	ok( str_contains( $oc, '.oj-facts svg { width: 18px; height: 18px; padding: 0; border-radius: 0; background: none; color: var(--orchid); }' ), 'the three facts without the dark circles („túl csicsás ez a box”)' );
+	ok( str_contains( $oc, '.section__head h2, .entry > h2, .oj-split__text h2 { line-height: 1.26; }' ), 'the big titles: room for the capitals\' accents („belelóg az é betű ékezete a vesszőbe”)' );
 	ok( str_contains( $oc, '.oys-private-box p { max-width: none; font-size: .97rem; }' ) && str_contains( $oc, '.oys-private-box p { white-space: nowrap; }' ), 'the one-to-one box under the timetable: its sentence on one line („Ezt próbáljuk meg egy sorba írni”)' );
 	ob_start();
 	load_template( get_template_directory() . '/template-parts/front-online.php', false );
 	$front = (string) ob_get_clean();
+	ok( ! str_contains( $front, 'oj-voucher__go' ), 'the gift line without the little arrow („ez a nyilacska nem tetszik”)' );
 	ok( ! str_contains( $front, esc_html__( 'Four reasons people choose live online yoga, and stay.', 'olivia-yoga' ) ), 'the line under „Miért jó online jógázni?” is gone („Ezt szedjük ki”)' );
 	ok( ! str_contains( $front, esc_html__( 'A one-to-one session is shaped entirely around you. It is for you, for example:', 'olivia-yoga' ) ) && ! str_contains( $data['classes']['egyeni-online-joga']['content'], 'Neked szól például' ), '… and „Az egyéni óra teljesen hozzád igazodik. Neked szól például:” („ezt is szedjük ki”)' );
 	$made = array();

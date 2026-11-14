@@ -1870,16 +1870,16 @@ msgid "For advanced students"
 msgstr "Haladóknak"
 
 msgid "Targeted"
-msgstr "Célzottan"
+msgstr "Fájdalomra, feszülésre"
 
 msgid "Together"
 msgstr "Kettesben"
 
 msgid "with a friend, your sister or brother, or as a date with your partner – cheaper as a pair"
-msgstr "a barátnőddel, a testvéreddel, vagy randiként a pároddal – párban olcsóbb"
+msgstr "a barátnőddel, a testvéreddel vagy a pároddal – kettesben olcsóbb"
 
 msgid "Who else is it for? You will find them all on the one-to-one page"
-msgstr "Kinek szól még? Az egyéni óra oldalán mindet megtalálod"
+msgstr "Kinek ajánlom még? Az egyéni óra oldalán mindet megtalálod."
 
 msgid "1 session"
 msgstr "1 alkalom"
@@ -1900,4 +1900,4 @@ msgid "%d minutes"
 msgstr "%d perc"
 
 msgid "for the two of you"
-msgstr "kettőtöknek együtt, így olcsóbb"
+msgstr "kettőtöknek összesen, fejenként olcsóbb"

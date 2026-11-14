@@ -752,3 +752,13 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
    characters), a touch smaller */
 .oys-private-box p { max-width: none; font-size: .97rem; }
 @media (min-width: 1000px) { .oys-private-box > div { flex-basis: 0; min-width: 0; } .oys-private-box p { white-space: nowrap; } }
+
+/* „ezek miatt túl csicsás ez a box, ezt finomítsd”: the three facts of the one-to-one block without the dark circles – a small
+   pink line icon beside quiet text */
+.oj-facts { gap: .5rem 1.15rem; margin-top: 1.4rem; }
+.oj-facts li { gap: .45rem; font-weight: 600; font-size: .93rem; color: color-mix(in srgb, var(--ink) 85%, transparent); }
+.oj-facts svg { width: 18px; height: 18px; padding: 0; border-radius: 0; background: none; color: var(--orchid); }
+
+/* „itt egy kicsit belelóg az é betű ékezete a vesszőbe”: more room between the lines of the big titles, so the accents of
+   the capitals (É, Á, Ó) do not touch the line above */
+.section__head h2, .entry > h2, .oj-split__text h2 { line-height: 1.26; }
