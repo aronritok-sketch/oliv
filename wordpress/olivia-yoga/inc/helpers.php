@@ -450,7 +450,9 @@ function oy_brush_d( $w, $h, $amp, $th, $periods = 1.5, $phase = 0.0, $n = 96 ) 
 		$t     = $i / $n;
 		$x     = $w * $t;
 		$y     = $h / 2 + $amp * sin( 2 * M_PI * $periods * $t + $phase );
-		$d     = ( .1 + .9 * pow( sin( M_PI * $t ), 1.15 ) ) * $th / 2;
+		// a long, gentle taper to nothing at both ends, like a real brush lifting off (Olívia, 14 November: „nem tetszik a
+		// hullámnak a széle, el van vágva”)
+		$d     = pow( sin( M_PI * $t ), 1.3 ) * $th / 2;
 		$top[] = sprintf( '%.1f %.1f', $x, $y - $d );
 		$bot[] = sprintf( '%.1f %.1f', $x, $y + $d );
 	}

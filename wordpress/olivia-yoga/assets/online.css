@@ -53,7 +53,7 @@
 }
 
 /* Every wave in the style of her logo: a brush stroke, thin at the ends, thick in the middle */
-.oj-brush.oj-blob, .oj-brush.oj-band { overflow: visible; }
+.oj-brush.oj-blob, .oj-brush.oj-band { overflow: visible; -webkit-mask: linear-gradient(90deg, transparent, #000 7%, #000 86%, transparent); mask: linear-gradient(90deg, transparent, #000 7%, #000 86%, transparent); } /* the ends dissolve, never cut */
 .oj-waved > .oj-blob--left.oj-brush { top: 58%; height: 40%; }
 .oj-waved > .oj-blob--right.oj-brush { top: 58%; height: 40%; }
 .oj-hero .hero__visual > .oj-blob--right.oj-brush { top: 52%; height: 40%; }
@@ -84,8 +84,9 @@
 /* Pictures on the home page in black and white, like on oliviajoga.hu */
 .home main .photo, .home main .frame img { filter: grayscale(1) contrast(1.05); }
 /* Olívia, 14 Nov: „A főoldalon ezek is lehetnek színesek, ha ráviszem a kurzort” – a photo that is a link comes to colour */
-.home main a .photo, .home main a .frame img { transition: filter .45s ease; }
-.home main a:hover .photo, .home main a:focus-visible .photo, .home main a:hover .frame img, .home main a:focus-visible .frame img { filter: none; }
+/* 14 Nov, later: „A főoldalon az ÖSZES kép legyen színes, ha ráviszem a kurzort” – every picture, linked or not */
+.home main .photo, .home main .frame img { transition: filter .45s ease; }
+.home main .photo:hover, .home main .frame:hover img, .home main a:hover .photo, .home main a:focus-visible .photo, .home main a:hover .frame img, .home main a:focus-visible .frame img { filter: none; }
 .home main .way .photo, .home main .cards .frame img { filter: none; }
 
 /* The closing block in peach („ez a rész legyen ez a szín”) */

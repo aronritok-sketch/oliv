@@ -2997,6 +2997,15 @@ test( 'online edition, Olívia\'s doc of 14 November: „az óra visszanézhető
 	}
 } );
 
+test( 'Olívia\'s doc of 14 November: the brush wave dissolves at its ends; every home page picture comes to colour under the cursor', function () {
+	$d = oy_brush_d( 400, 100, 22, 30 );
+	preg_match( '/^M([\d.]+) ([\d.]+) L([\d.]+) ([\d.]+)/', $d, $m );
+	ok( (bool) preg_match( '/ L400\.0 50\.0 L400\.0 50\.0 /', $d ) || abs( (float) $m[2] - 50 ) < .01, 'the stroke tapers to nothing at its ends (no cut edge)' );
+	$on = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
+	ok( str_contains( $on, '.oj-brush.oj-blob, .oj-brush.oj-band { overflow: visible; -webkit-mask: linear-gradient(90deg, transparent' ), '… and fades out' );
+	ok( str_contains( $on, '.home main .photo:hover, .home main .frame:hover img' ), 'home: every picture in colour under the cursor, linked or not' );
+} );
+
 test( 'Olívia\'s doc of 14 November: the side column is never cut off while scrolling; her two training photos in one line', function () {
 	$css = (string) file_get_contents( get_template_directory() . '/assets/site.css' );
 	ok( (bool) preg_match( '/\.aside-sticky \{ position: sticky; top: calc\(var\(--header-h\) \+ 24px\); align-self: start; \}/', $css ) && ! str_contains( $css, 'scrollbar-width: none' ), 'the side column: no hidden inner scroll that cuts its bottom off' );
