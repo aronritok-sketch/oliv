@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-14w';
+	$rev = '2026-11-14x';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1045,7 +1045,7 @@ function oy_migrate_1114d() {
 		$targets[] = array( $key, $class, fn() => get_page_by_path( $key, OBJECT, 'oy_class' ) );
 	}
 	foreach ( $targets as list( $key, $page, $find ) ) {
-		if ( empty( $page['_insert'] ) && empty( $page['_replace'] ) && empty( $page['_excerpt_prev'] ) ) {
+		if ( empty( $page['_insert'] ) && empty( $page['_replace'] ) && empty( $page['_excerpt_prev'] ) && empty( $page['_before'] ) ) {
 			continue;
 		}
 		$post = $find();
@@ -1068,6 +1068,15 @@ function oy_migrate_1114d() {
 		foreach ( (array) ( $page['_replace'] ?? array() ) as $pair ) {
 			$pair    = array_map( fn( $t ) => oy_resolve_tokens( (string) $t ), $pair );
 			$content = str_replace( $pair[0], $pair[1], $content );
+		}
+		// a new part in front of a heading or a button („Minden szolgáltatás aloldalon külön bekezdésbe írd, hogy milyen eszköz
+		// szükséges”): once, only where its marker is not on the page yet
+		foreach ( (array) ( $page['_before'] ?? array() ) as $add ) {
+			$add = array_map( fn( $t ) => oy_resolve_tokens( (string) $t ), $add );
+			$pos = strpos( $content, $add[0] );
+			if ( false !== $pos && ! str_contains( $content, $add[2] ?? $add[1] ) ) {
+				$content = substr( $content, 0, $pos ) . $add[1] . "\n" . substr( $content, $pos );
+			}
 		}
 		if ( $content !== $post->post_content ) {
 			kses_remove_filters();

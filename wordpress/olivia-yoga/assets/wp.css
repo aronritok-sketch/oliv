@@ -58,6 +58,9 @@
 
 /* Logged-in admins: keep the sticky header under the admin bar */
 .admin-bar .site-header { top: calc(32px + env(safe-area-inset-top, 0px)); }
+/* logged in (Olívia edits her pages): the side boxes stick under the header *and* the admin bar, not 32px under it („kicsit
+   levágódik itt is a box teteje”) */
+@media (min-width: 783px) { body.admin-bar { --wp-bar: 32px; } }
 @media (max-width: 782px) { .admin-bar .site-header { top: 0; } }
 
 /* Events list on a light page */

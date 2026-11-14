@@ -692,10 +692,10 @@ abbr[title] { text-decoration: none; }
 	.layout--aside { grid-template-columns: minmax(0, 1fr) 340px; gap: 6rem; }
 	/* the side column follows the page only when it fits in the window (site.js), never cut off at the top or bottom
 	   (Olívia, 14 November); on a short laptop screen it is tighter, so it fits more often */
-	.aside-sticky { position: sticky; top: calc(var(--header-h) + 24px); align-self: start; }
+	.aside-sticky { position: sticky; top: calc(var(--header-h) + var(--wp-bar, 0px) + 24px); align-self: start; }
 }
 @media (min-width: 1000px) and (max-height: 880px) {
-	.aside-sticky { top: calc(var(--header-h) + 14px); }
+	.aside-sticky { top: calc(var(--header-h) + var(--wp-bar, 0px) + 14px); }
 	.aside-sticky .aside-card { padding: 1.2rem 1.35rem; }
 	.aside-sticky .aside-card h2 { font-size: 1.55rem; margin-bottom: .35em; }
 	.aside-sticky .aside-card .frame { aspect-ratio: 16 / 10; margin-bottom: .9rem; }

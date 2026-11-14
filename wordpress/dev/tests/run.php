@@ -3186,7 +3186,16 @@ test( 'Olívia\'s doc of 14 November, late night: the group class – a short re
 	ok( ! str_contains( $data['pages']['classes']['content'], 'hosszú relaxáció' ) && ! str_contains( $data['pages']['about']['content'], 'hosszú relaxáció' ), '… nor on the classes page and the About page' );
 	ok( str_contains( $hf['content'], 'a vállra, a csípőre vagy a gerincre' ), '… every class focuses on one part of the body („pl. váll, csípő, gerinc”)' );
 	ok( ! str_contains( $hf['content'], 'december 16' ), '… the start dates out („ez a rész nem kell”)' );
-	ok( str_contains( $hf['content'], 'jógaheveder' ) && str_contains( $hf['content'], 'jógatégla' ) && str_contains( $hf['content'], 'pléd' ), '… the kit in its „Online, élőben” part („ide belefogalmazhatjuk az eszközöket”)' );
+	ok( str_contains( $hf['content'], 'jógaheveder' ) && str_contains( $hf['content'], 'jógatégl' ) && str_contains( $hf['content'], 'pléd' ), '… the kit on the page („ide belefogalmazhatjuk az eszközöket”)' );
+	foreach ( array( 'hatha-flow', 'egyeni-online-joga', 'stretching', 'relaxacio-legzes' ) as $k ) {
+		$kc = $data['classes'][ $k ]['content'];
+		ok( 1 === substr_count( $kc, '<h2>Mire lesz szükséged?</h2>' ) && str_contains( $kc, 'töltsd fel' ) && ! str_contains( $kc, 'Kell hozzá egy jógaszőnyeg' ), $k . ': what to have ready, in its own part („Minden szolgáltatás aloldalon külön bekezdésbe írd, hogy milyen eszköz szükséges”)' );
+	}
+	ok( str_contains( $data['classes']['kismamatorna']['content'], '<h2>Mire lehet szükséged?</h2>' ), '… the prenatal page has had its own already' );
+	ok( str_contains( $data['classes']['relaxacio-legzes']['content'], 'illóolaj' ) && str_contains( $data['classes']['stretching']['content'], 'edzőszőnyeg' ), '… each with its own kit (from the FAQ answer)' );
+	$wp  = (string) file_get_contents( get_template_directory() . '/assets/wp.css' );
+	$sc  = (string) file_get_contents( get_template_directory() . '/assets/site.css' );
+	ok( str_contains( $wp, '@media (min-width: 783px) { body.admin-bar { --wp-bar: 32px; } }' ) && str_contains( $sc, '.aside-sticky { position: sticky; top: calc(var(--header-h) + var(--wp-bar, 0px) + 24px);' ), 'logged in: the side box sticks under the admin bar too, its top is not cut off („kicsit levágódik itt is a box teteje”)' );
 	$all = (string) wp_json_encode( array( $data['pages'], $data['classes'] ), JSON_UNESCAPED_UNICODE );
 	ok( ! str_contains( preg_replace( '/"_replace":\[.*?\]\]/s', '', $all ), 'elfogadsz, és kifizeted' ) && str_contains( $data['pages']['classes']['content'], 'elfogadhatsz, majd ki tudod fizetni, vagy a bérletedből foglalhatsz' ), '„elfogadhatsz, ki tudod fizetni vagy a bérletedből foglalhatsz”' );
 	$eg   = $data['classes']['egyeni-online-joga']['content'];
@@ -3210,11 +3219,15 @@ test( 'Olívia\'s doc of 14 November, late night: the group class – a short re
 	$keep    = $post ? array( $post->post_content, $post->post_excerpt ) : null;
 	$olds    = array_map( fn( $r ) => $r[0], array_slice( $hf['_replace'], -4 ) );
 	try {
-		wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => implode( "\n", $olds ) . "\n<p>Saját mondatom.</p>", 'post_excerpt' => $hf['_excerpt_prev'] ) ) );
+		wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => implode( "\n", $olds ) . "\n<p>Saját mondatom.</p>\n[oy_booking_link]", 'post_excerpt' => $hf['_excerpt_prev'] ) ) );
 		delete_option( 'oy_1114d_rev' );
 		oy_migrate_1114d();
 		$c = get_post_field( 'post_content', $id );
-		ok( str_contains( $c, 'rövid relaxáció' ) && str_contains( $c, 'a csípőre vagy a gerincre' ) && ! str_contains( $c, 'december 16' ) && str_contains( $c, 'jógatégla' ) && str_contains( $c, 'Saját mondatom.' ), 'live update: the group class\'s text changed, her own words stay' );
+		ok( str_contains( $c, 'rövid relaxáció' ) && str_contains( $c, 'a csípőre vagy a gerincre' ) && ! str_contains( $c, 'december 16' ) && str_contains( $c, 'Saját mondatom.' ), 'live update: the group class\'s text changed, her own words stay' );
+		ok( 1 === substr_count( $c, '<h2>Mire lesz szükséged?</h2>' ) && str_contains( $c, 'jógatégl' ) && strpos( $c, 'Mire lesz szükséged?' ) < strpos( $c, '[oy_booking_link]' ), 'live update: the kit in its own part, before the booking button' );
+		delete_option( 'oy_1114d_rev' );
+		oy_migrate_1114d();
+		ok( 1 === substr_count( get_post_field( 'post_content', $id ), '<h2>Mire lesz szükséged?</h2>' ), '… only once, however often the update runs' );
 		ok( get_post_field( 'post_excerpt', $id ) === $hf['excerpt'], 'live update: the card\'s short text too, while it is still the old one' );
 		wp_update_post( wp_slash( array( 'ID' => $id, 'post_excerpt' => 'Az én szövegem.' ) ) );
 		delete_option( 'oy_1114d_rev' );
@@ -3263,7 +3276,7 @@ test( 'Olívia\'s doc of 14 November, past midnight: the prenatal modules three 
 
 test( 'Olívia\'s doc of 14 November: the side column is never cut off while scrolling; her two training photos in one line', function () {
 	$css = (string) file_get_contents( get_template_directory() . '/assets/site.css' );
-	ok( (bool) preg_match( '/\.aside-sticky \{ position: sticky; top: calc\(var\(--header-h\) \+ 24px\); align-self: start; \}/', $css ) && ! str_contains( $css, 'scrollbar-width: none' ), 'the side column: no hidden inner scroll that cuts its bottom off' );
+	ok( (bool) preg_match( '/\.aside-sticky \{ position: sticky; top: calc\(var\(--header-h\) \+ var\(--wp-bar, 0px\) \+ 24px\); align-self: start; \}/', $css ) && ! str_contains( $css, 'scrollbar-width: none' ), 'the side column: no hidden inner scroll that cuts its bottom off' );
 	$js = (string) file_get_contents( get_template_directory() . '/assets/site.js' );
 	ok( str_contains( $js, 'function fitAsides' ) && str_contains( $js, "el.style.position = 'static'" ) && ! str_contains( $js, "el.style.top = room + 'px'" ), '… it follows the page only when the whole of it fits; a taller one scrolls with the page (neither top nor bottom cut off)' );
 	ok( str_contains( $js, "el.classList.add('is-compact')" ) && str_contains( $js, "el.classList.add('is-tight')" ) && strpos( $js, "el.classList.add('is-tight')" ) < strpos( $js, "el.style.position = 'static'" ), '… before giving up it makes itself smaller – the photo goes, then the long notes shrink – so it stays whole and in view („ez megint kicsit levágódik ahogy görgetek lejjebb”)' );

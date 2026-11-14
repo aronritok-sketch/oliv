@@ -357,6 +357,10 @@
 - **3.11.35:** az egyéni órák (egyéni jóga, kismama, stretching, relaxáció) árai kártyákon: Egyedül / Párban × hossz, 1 alkalom
   és a bérlet (alkalmankénti árral) – `[oy_prices service=…]`, a foglalórendszer termékeiből, így mindig a pénztár szerinti ár
   látszik; Olívia megjegyzései (bérlet érvényessége) alatta maradnak (`oy_price_section()`). 1114d rev w. Tesztek 1184/0.
+- **3.11.36:** minden óra oldalán külön „Mire lesz szükséged?” rész (a GYIK eszközlistájából, órafajtánként; a kismamánál már
+  volt), a csoportos óránál az eszközök kikerültek az „Online, élőben” bekezdésből; új `_before` pár a tartalomfájlban (egyszer
+  szúr be, jelölő alapján). Bejelentkezve (admin sáv) az oldaldoboz a sáv alá is számol (`--wp-bar`), nem vágódik le a teteje.
+  1114d rev x. Tesztek 1193/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
