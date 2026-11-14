@@ -646,8 +646,6 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY
 .oj-fit__item--sun { --bg: var(--sun-soft); --edge: var(--sun); --dot: #E9701F; }
 .oj-fit__more { margin: .95rem 0 0; font-size: .95rem; }
 @media (max-width: 520px) { .oj-fit { grid-template-columns: 1fr; } }
-/* the whole list on the one-to-one page, in two columns */
-@media (min-width: 720px) { .entry .oj-cols > ul { columns: 2; column-gap: 2.2rem; } .entry .oj-cols > ul > li { break-inside: avoid; } }
 
 /* „Nagyon tetszik ez, csak nem felhasználóbarát az elrendezés”: the five questions one under the other, each a row you
    read from left to right – the question, the class, a line about it, and a button – instead of 2 + 2 + 1 boxes */
@@ -675,3 +673,18 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY
 	.oj-class-cards--lead > :first-child .oj-class-card__foot { margin-top: .6rem; }
 }
 @media (min-width: 1080px) { .oj-class-cards--lead { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+/* „ez egy picit legyen szebben összeszedve az egyéni online jóga aloldalon”: whom the one-to-one class is for, in four soft
+   boxes by theme (like the four on the home page) instead of one long list */
+.entry .oj-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; margin: 1.3rem 0 2.6rem; }
+.entry .oj-group { --bg: var(--lilac-soft); --edge: var(--lilac); --dot: #9C6ADE; position: relative; padding: 1.25rem 1.35rem 1.1rem; border-radius: 22px; background: var(--bg); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--edge) 45%, transparent); overflow: hidden; isolation: isolate; }
+.entry .oj-group::before { content: ""; position: absolute; z-index: -1; right: -40px; top: -40px; width: 104px; height: 104px; border-radius: 50%; background: color-mix(in srgb, var(--edge) 38%, #fff); }
+.entry .oj-group--pink { --bg: var(--pink-soft); --edge: var(--pink); --dot: var(--orchid); }
+.entry .oj-group--sage { --bg: var(--sage-soft); --edge: var(--sage); --dot: #5E8F72; }
+.entry .oj-group--sun { --bg: var(--sun-soft); --edge: var(--sun); --dot: #E9701F; }
+.entry .oj-group h3 { margin: 0 0 .7rem; font-size: 1.08rem; }
+.entry .oj-group ul { margin: 0; }
+.entry .oj-group ul:not([class]) li:not([class]) { margin-bottom: .45rem; font-size: .94rem; line-height: 1.5; }
+.entry .oj-group ul:not([class]) li:not([class]):nth-child(n) { --wave: var(--dot); }
+.entry .oj-group > br, .entry .oj-groups > br, .entry .oj-groups > p:empty { display: none; }
+@media (max-width: 640px) { .entry .oj-groups { grid-template-columns: 1fr; } }

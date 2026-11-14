@@ -349,6 +349,8 @@
 - **3.11.32:** az órák oldaldoboza nem vágódik le görgetéskor („ez megint kicsit levágódik”): ha nem fér az ablakba,
   előbb a fotó tűnik el (`is-compact`), aztán a hosszú megjegyzések 3 sorra rövidülnek (`is-tight`, kattintásra kinyílnak),
   és csak ha így sem fér el, görög a lappal. Tesztek 1174/0.
+- **3.11.33:** az egyéni óra oldalán a „Kinek szól” lista négy témás pasztell dobozban („Ha tanulnál, fejlődnél”, „Ha a
+  tested kéri”, „Ha a lelked kéri”, „Kettesben, a te idődben”) – Olívia: „legyen szebben összeszedve”. 1114d rev u. Tesztek 1177/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

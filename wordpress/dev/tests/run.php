@@ -3186,9 +3186,14 @@ test( 'Olívia\'s doc of 14 November, late night: the group class – a short re
 	$all = (string) wp_json_encode( array( $data['pages'], $data['classes'] ), JSON_UNESCAPED_UNICODE );
 	ok( ! str_contains( preg_replace( '/"_replace":\[.*?\]\]/s', '', $all ), 'elfogadsz, és kifizeted' ) && str_contains( $data['pages']['classes']['content'], 'elfogadhatsz, majd ki tudod fizetni, vagy a bérletedből foglalhatsz' ), '„elfogadhatsz, ki tudod fizetni vagy a bérletedből foglalhatsz”' );
 	$eg   = $data['classes']['egyeni-online-joga']['content'];
-	$list = substr( $eg, (int) strpos( $eg, '<div class="oj-cols">' ) );
-	$list = substr( $list, 0, (int) strpos( $list, '</div>' ) );
+	$list = substr( $eg, (int) strpos( $eg, '<div class="oj-groups">' ) );
+	$list = substr( $list, 0, (int) strpos( $list, '<h2>' ) );
 	ok( str_contains( $eg, '<h2 id="kinek-szol">' ) && substr_count( $list, '<li>' ) >= 11 && str_contains( $list, 'hospitálnál' ), 'the one-to-one page: the whole list of whom it is for („majd csak az aloldalon kell ezt mind megjeleníteni”)' );
+	ok( 4 === substr_count( $list, '<div class="oj-group oj-group--' ) && 4 === substr_count( $list, '<h3>' ) && ! str_contains( $eg, 'oj-cols' ), '… in four soft boxes by theme, not one long list („legyen szebben összeszedve”)' );
+	$css0 = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
+	ok( str_contains( $css0, '.entry .oj-groups { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr));' ), '… two by two' );
+	$olds = array_column( $data['classes']['egyeni-online-joga']['_replace'], 0 );
+	ok( (bool) array_filter( $olds, fn( $o ) => str_contains( $o, '<div class="oj-cols">' ) ), '… the live page changes from the two-column list too' );
 	$css = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
 	ok( str_contains( $css, '.oj-class-cards--lead > :first-child { grid-column: 1 / -1; flex-direction: row; }' ) && str_contains( $css, '@media (min-width: 1080px) { .oj-class-cards--lead { grid-template-columns: repeat(4, minmax(0, 1fr)); } }' ), 'the five classes: the group class wide on top, the four one-to-one ones in one row („az 5. egy új sorban van”)' );
 	ok( str_contains( $css, 'grid-template-areas: "art q go" "art name go" "art text go";' ) && str_contains( $css, '.entry .oj-guide { grid-template-columns: 1fr; gap: .8rem; }' ), '„Melyik órát válasszam?”: one row per question, read from left to right („nem felhasználóbarát az elrendezés”)' );
