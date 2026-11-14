@@ -729,7 +729,8 @@ test( 'emails: edited texts with placeholders, and switched-off emails are not s
 	ok( false === OYS_Emails::admin_notice( 'x', 'y', 'studio_cancellation' ), 'studio notice switched off' );
 	[ $subject, $html ] = OYS_Emails::preview( 'reminder' );
 	ok( str_starts_with( $subject, 'Reminder: ' . OYS_Emails::sample_vars()['class'] ) && str_contains( $html, 'See you soon' ), 'preview with sample details' );
-	ok( ! str_contains( $subject, 'Slow Flow' ), 'the preview uses the site\'s own class, not a made-up one' );
+	$next = OYS_Schedule::query( array( 'kind' => 'group', 'from' => oys_now(), 'status' => 'scheduled', 'limit' => 1 ) );
+	ok( str_contains( $subject, $next ? oys_session_title( $next[0] ) : 'Hatha Flow' ), 'the preview uses the site\'s own next class, not a made-up one' );
 	delete_option( OYS_Email_Templates::OPTION );
 } );
 
@@ -1828,6 +1829,10 @@ test( 'online edition: Hungarian addresses and its own copy', function () {
 	$copy = wp_json_encode( array_diff_key( $data, array_flip( array( 'legal', 'privacy' ) ) ), JSON_UNESCAPED_UNICODE );
 	ok( ! preg_match( '/Fort Myers|Florid|lanai|tenger|strand|homok|pickleball|tenisz|golf|klubház/iu', $copy ), 'online copy: written for Hungary (no Fort Myers, sea, beach, tennis, golf …)' );
 	ok( str_contains( wp_json_encode( $data['legal'], JSON_UNESCAPED_UNICODE ), 'Arovia Group LLC' ) && str_contains( $data['privacy']['content'], 'Arovia Group LLC' ), 'the seller and controller is Arovia' );
+	// Áron, 2026-11-14: „Nincs áfa. Mehet minden bele.” – the prices are final, the Arovia's EIN in the ÁSZF and Impresszum
+	$legal = array_column( $data['legal'], 'content', 'slug' );
+	ok( str_contains( $legal['aszf'], 'semmilyen adót vagy díjat nem számítunk fel' ) && ! preg_match( '/áfa/iu', $legal['aszf'] ), 'ÁSZF: the prices are final, no VAT line' );
+	ok( str_contains( $legal['aszf'], 'EIN): 36-5185016' ) && str_contains( $legal['impresszum'], 'EIN): 36-5185016' ), 'the Arovia\'s EIN in the ÁSZF and the Impresszum' );
 	ok( ! str_contains( $text, 'Kovacs' ), 'online copy: her name in Hungarian (Kovács Olívia)' );
 	ok( ! preg_match( '/Olivi[aá]/u', $text ), 'online copy: Olívia with a long í everywhere (Olivia, 11.13)' );
 	// Olivia, 11.13 (20:17): the prenatal modules wherever the prenatal class is mentioned, and why each one matters
@@ -1922,7 +1927,8 @@ test( 'online edition, first day live: English post addresses become Hungarian, 
 test( 'online edition: a weekly class leaves out a date (23 December)', function () {
 	require_once get_template_directory() . '/inc/demo-import.php';
 	$day  = wp_date( 'N', time() + 9 * DAY_IN_SECONDS );
-	$tpl  = OYS_Schedule::save_template( array( 'class_slug' => 'hatha-flow', 'weekday' => (int) $day, 'start_time' => '18:30', 'duration_min' => 90, 'format' => 'online', 'online_capacity' => 20, 'active' => 1, 'valid_from' => wp_date( 'Y-m-d', time() + 8 * DAY_IN_SECONDS ) ) );
+	// at 05:40: the test site's sample timetable has evening classes, and a weekly date never overlaps another class
+	$tpl  = OYS_Schedule::save_template( array( 'class_slug' => 'hatha-flow', 'weekday' => (int) $day, 'start_time' => '05:40', 'duration_min' => 90, 'format' => 'online', 'online_capacity' => 20, 'active' => 1, 'valid_from' => wp_date( 'Y-m-d', time() + 8 * DAY_IN_SECONDS ) ) );
 	OYS_Schedule::generate( 3 );
 	$dates = fn( $status ) => array_map( fn( $r ) => wp_date( 'Y-m-d', oys_ts( $r->starts_at ) ), array_filter( OYS_Schedule::query( array( 'from' => oys_now(), 'status' => $status ) ), fn( $r ) => (int) $r->template_id === $tpl ) );
 	eq( array( wp_date( 'Y-m-d', time() + 9 * DAY_IN_SECONDS ), wp_date( 'Y-m-d', time() + 16 * DAY_IN_SECONDS ) ), array_values( $dates( 'scheduled' ) ), 'nothing before the first date' );

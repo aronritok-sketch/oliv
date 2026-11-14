@@ -219,6 +219,12 @@
   jóga órák” + 90 perc; egyéni jóga 60/90 perc kapcsolóval (90 perc: 7 000 / 30 000 Ft), minden 5 alkalmas egyéni
   bérlet 6 hét (+1 hét oktatói lemondásnál), „Párban olcsóbb” kapcsoló (kismamatornánál; egyéni jógához kérdeztük a
   párban árat). Fizetési oldal: a bérletkártya nem ragad. Tesztek 919/0.
+- **Áfa és cégadatok (2026-11-14, olivia-yoga 3.6.1):** Áron: „Nincs áfa. Mehet minden bele.” (a fő chaten át, itt
+  megerősítve: „Igen. Megerősítem”). ÁSZF: „Az árak … végösszegek: ezen felül semmilyen adót vagy díjat nem számítunk
+  fel” (áfamentességet nem írunk ki); az Arovia EIN-je (36-5185016, a CRM `company_ein`) az ÁSZF-ben és az
+  impresszumban. Élesen csak a jogi oldalak frissülnek (`oy_migrate_legal`, rev 2026-11-14a) – Olívia már maga
+  szerkeszti az oldalt, a teljes tartalom nem töltődik újra. **Hiányzik:** a floridai cégjegyzékszám (Sunbiz Document
+  Number) és a GDPR 27. cikk szerinti uniós képviselő (ki legyen?) – Árontól. Két napfüggő teszt javítva. Tesztek 921/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

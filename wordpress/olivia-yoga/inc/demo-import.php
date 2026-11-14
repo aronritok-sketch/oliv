@@ -645,6 +645,24 @@ function oy_migrate_1113() {
 }
 
 /**
+ * The legal pages of the online edition once more from its content file (only the pages the theme made: ÁSZF,
+ * Impresszum), nothing else – Olivia edits her pages herself now. 2026-11-14a: no VAT on top of the prices, the
+ * Arovia's EIN (Áron: „Nincs áfa. Mehet minden bele.” – „Igen. Megerősítem”).
+ */
+function oy_migrate_legal() {
+	$rev = '2026-11-14a';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_legal_rev' ) === $rev ) {
+		return array();
+	}
+	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+	kses_remove_filters();
+	$log = oy_import_legal( (array) $data, true );
+	kses_init_filters();
+	update_option( 'oy_legal_rev', $rev );
+	return $log;
+}
+
+/**
  * The online edition's passes, one-to-one services and timetable setting from its content file, on a live site. Passes
  * someone has bought keep their own expiry; products the edition no longer has go off sale.
  */

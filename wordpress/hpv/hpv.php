@@ -43,6 +43,7 @@ add_action( 'hpv_child_setup', function ( $from, $to, $slug ) {
 	$log = array_merge( $log, oy_migrate_online() ); // the online site after Olivia's notes of 12 November (once)
 	$log = array_merge( $log, oy_mail_setup() ); // the edition's later settings: sender, reply-to, no birthday code / draw online (once, where still default)
 	$log = array_merge( $log, oy_migrate_1113() ); // the online site after Olivia's notes of 13 November (once)
+	$log = array_merge( $log, oy_migrate_legal() ); // the ÁSZF and Impresszum again when they change (once per revision)
 	kses_remove_filters();
 	$log = array_merge( $log, oy_import_all( false ) );
 	kses_init_filters();
