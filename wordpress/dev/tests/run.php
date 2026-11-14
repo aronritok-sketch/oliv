@@ -3084,6 +3084,39 @@ test( 'Olívia\'s doc of 14 November, late evening: forints (not dollars) when t
 	ok( str_contains( (string) file_get_contents( get_template_directory() . '/assets/site.css' ), '@media (min-width: 1000px) and (max-height: 740px)' ), 'the side card on a short screen: a slimmer photo, so all of it stays in view' );
 } );
 
+test( 'Olívia\'s doc of 14 November, night: a gift for two goes to two email addresses; Jógáról lists every article; page-head text clear of the photo wave', function () {
+	$sent = array();
+	$cap  = function ( $null, $atts ) use ( &$sent ) {
+		$sent[] = array( is_array( $atts['to'] ) ? implode( ',', $atts['to'] ) : $atts['to'], $atts['message'] );
+		return true;
+	};
+	add_filter( 'pre_wp_mail', $cap, 10, 2 );
+	$keep = get_option( OYS_Products::OPTION );
+	$all  = OYS_Products::all();
+	$all['pair-gift-test'] = array( 'id' => 'pair-gift-test', 'name' => 'Páros teszt', 'kind' => 'private_single', 'service' => '', 'people' => 2, 'credits' => 1, 'validity_days' => 30, 'price_cents' => 1200000, 'active' => 1, 'giftable' => 1 );
+	update_option( OYS_Products::OPTION, $all );
+	try {
+		$buyer = make_user( 'Giver' );
+		$oid   = OYS_Orders::create( array( 'user_id' => $buyer, 'type' => 'gift', 'product_id' => 'pair-gift-test', 'description' => 'x', 'amount_cents' => 1200000, 'meta' => array( 'recipient_name' => 'Kata', 'recipient_email' => 'kata@example.com', 'message' => '', 'recipient_name2' => 'Péter', 'recipient_email2' => 'peter@example.com' ) ) );
+		OYS_Gifts::issue_for_order( OYS_Orders::get( $oid ) );
+		$to = array_column( $sent, 0 );
+		ok( in_array( 'kata@example.com', $to, true ) && in_array( 'peter@example.com', $to, true ), 'a gift for two: both get it by email' );
+		$kata = array_values( array_filter( $sent, fn( $m ) => 'kata@example.com' === $m[0] ) )[0][1];
+		$code = preg_match( '/OY-[A-Z0-9]{4}-[A-Z0-9]{4}/', $kata, $mm ) ? $mm[0] : '';
+		$pet  = array_values( array_filter( $sent, fn( $m ) => 'peter@example.com' === $m[0] ) )[0][1];
+		ok( '' !== $code && str_contains( $pet, $code ), '… with the same code (one of them redeems it, they book together)' );
+		ok( str_contains( $kata, 'Péter' ) && str_contains( $pet, 'Kata' ), '… each email names the other one' );
+		$src = (string) file_get_contents( OYS_DIR . 'includes/class-frontend.php' );
+		ok( str_contains( $src, 'name="recipient_email2"' ) && str_contains( $src, 'data-people="' ), 'the gift form: a second address for a pair gift' );
+	} finally {
+		remove_filter( 'pre_wp_mail', $cap, 10 );
+		update_option( OYS_Products::OPTION, $keep );
+	}
+	$cards = (string) file_get_contents( get_template_directory() . '/template-parts/cards.php' );
+	ok( ! str_contains( $cards, '$posts = $args' ), 'the cards template no longer overwrites the main list (Jógáról showed only the eight limbs)' );
+	ok( str_contains( (string) file_get_contents( get_template_directory() . '/assets/online.css' ), 'calc(53vw - var(--oj-bleed, 20px) - 96px)' ), 'page heads: the text never runs into the photo wave' );
+} );
+
 test( 'Olívia\'s doc of 14 November: the side column is never cut off while scrolling; her two training photos in one line', function () {
 	$css = (string) file_get_contents( get_template_directory() . '/assets/site.css' );
 	ok( (bool) preg_match( '/\.aside-sticky \{ position: sticky; top: calc\(var\(--header-h\) \+ 24px\); align-self: start; \}/', $css ) && ! str_contains( $css, 'scrollbar-width: none' ), 'the side column: no hidden inner scroll that cuts its bottom off' );

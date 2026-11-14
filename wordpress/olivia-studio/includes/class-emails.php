@@ -420,8 +420,9 @@ class OYS_Emails {
 			. '<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-top:2px solid #12231A;margin:0 0 18px">' . $rows . '</table>';
 	}
 
-	protected static function gift_card( $gift ) {
+	protected static function gift_card( $gift, $partner = '' ) {
 		$product = OYS_Products::get( $gift->product_id );
+		$pair    = $product && (int) ( $product['people'] ?? 1 ) > 1;
 		$vars    = array_merge( OYS_Email_Templates::vars_for(), array(
 			'recipient'  => $gift->recipient_name ?: __( 'there', 'olivia-studio' ),
 			'first_name' => $gift->recipient_name ?: __( 'there', 'olivia-studio' ),
@@ -429,13 +430,15 @@ class OYS_Emails {
 			'gift'       => $product ? oys_product_name( $product ) : $gift->product_id,
 		) );
 		$blocks = ( $gift->message ? '<blockquote style="margin:18px 0;padding:14px 18px;background:#ECE1FA;border:2px solid #12231A">' . nl2br( esc_html( $gift->message ) ) . '</blockquote>' : '' )
-			. '<p>' . esc_html__( 'Your gift code:', 'olivia-studio' ) . '</p><p style="font-size:26px;font-weight:700;letter-spacing:.12em;background:#FF72B6;display:inline-block;padding:8px 14px;border:2px solid #12231A">' . esc_html( $gift->code ) . '</p>';
+			. '<p>' . esc_html__( 'Your gift code:', 'olivia-studio' ) . '</p><p style="font-size:26px;font-weight:700;letter-spacing:.12em;background:#FF72B6;display:inline-block;padding:8px 14px;border:2px solid #12231A">' . esc_html( $gift->code ) . '</p>'
+			. ( $pair ? '<p style="margin:14px 0;padding:10px 14px;background:#ECE1FA;border-radius:8px">' . esc_html( '' !== $partner ? sprintf( __( 'This is a gift for two: you got it together with %s. One of you redeems the code in their account, and you book together.', 'olivia-studio' ), $partner ) : __( 'This is a gift for two: one of you redeems the code in their account, and you book together.', 'olivia-studio' ) ) . '</p>' : '' );
 		self::compose( 'gift_card', $gift->recipient_email, $vars, $blocks, array(), oys_account_url( 'passes' ) );
 	}
 
 	protected static function gift_receipt( $gift, $order ) {
 		$blocks = '<p>' . esc_html__( 'Code:', 'olivia-studio' ) . ' <b>' . esc_html( $gift->code ) . '</b> · ' . esc_html( oys_money( $order->amount_cents, $order->currency ) ) . ( $order->receipt_url ? ' · <a href="' . esc_url( $order->receipt_url ) . '">' . esc_html__( 'Receipt', 'olivia-studio' ) . '</a>' : '' ) . '</p>';
-		self::compose( 'gift_receipt', self::user_email( $order->user_id ), array_merge( OYS_Email_Templates::vars_for( $order->user_id ), array( 'recipient_email' => $gift->recipient_email ) ), $blocks );
+		$to = $gift->recipient_email . ( is_email( (string) ( $order->meta['recipient_email2'] ?? '' ) ) ? ', ' . $order->meta['recipient_email2'] : '' );
+		self::compose( 'gift_receipt', self::user_email( $order->user_id ), array_merge( OYS_Email_Templates::vars_for( $order->user_id ), array( 'recipient_email' => $to ) ), $blocks );
 	}
 
 	protected static function private_request_received( $request ) {

@@ -48,6 +48,8 @@ class OYS_Gifts {
 		$name    = sanitize_text_field( wp_unslash( $_POST['recipient_name'] ?? '' ) );
 		$email   = sanitize_email( wp_unslash( $_POST['recipient_email'] ?? '' ) );
 		$message = sanitize_textarea_field( wp_unslash( $_POST['message'] ?? '' ) );
+		$name2   = sanitize_text_field( wp_unslash( $_POST['recipient_name2'] ?? '' ) );
+		$email2  = sanitize_email( wp_unslash( $_POST['recipient_email2'] ?? '' ) );
 		if ( ! $product || empty( $product['giftable'] ) || empty( $product['active'] ) ) {
 			oys_flash( __( 'Choose a gift.', 'olivia-studio' ), 'error' );
 			oys_redirect( $back );
@@ -56,13 +58,19 @@ class OYS_Gifts {
 			oys_flash( __( 'Enter the recipient\'s email address.', 'olivia-studio' ), 'error' );
 			oys_redirect( $back );
 		}
+		// a gift for two: the other person can get it by email too (only for a pair product)
+		$pair = (int) ( $product['people'] ?? 1 ) > 1;
+		if ( $pair && '' !== trim( (string) wp_unslash( $_POST['recipient_email2'] ?? '' ) ) && ! is_email( $email2 ) ) {
+			oys_flash( __( 'Check the other person\'s email address.', 'olivia-studio' ), 'error' );
+			oys_redirect( $back );
+		}
 		$order_id = OYS_Orders::create( array(
 			'user_id'      => $user_id,
 			'type'         => 'gift',
 			'product_id'   => $product['id'],
 			'description'  => sprintf( __( 'Gift card: %s', 'olivia-studio' ), $product['name'] ),
 			'amount_cents' => (int) $product['price_cents'],
-			'meta'         => array( 'recipient_name' => $name, 'recipient_email' => $email, 'message' => $message ),
+			'meta'         => array_merge( array( 'recipient_name' => $name, 'recipient_email' => $email, 'message' => $message ), $pair && ( $name2 || $email2 ) ? array( 'recipient_name2' => $name2, 'recipient_email2' => $email2 ) : array() ),
 		) );
 		$url = OYS_Stripe::start_checkout( $order_id, sprintf( __( 'Gift card: %s', 'olivia-studio' ), $product['name'] ), sprintf( __( 'For %s', 'olivia-studio' ), $name ?: $email ) );
 		if ( is_wp_error( $url ) ) {
@@ -92,7 +100,15 @@ class OYS_Gifts {
 		) );
 		$id   = (int) $wpdb->insert_id;
 		$gift = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . OYS_Install::table( 'gift_cards' ) . ' WHERE id = %d', $id ) );
-		OYS_Emails::gift_card( $gift );
+		$name2  = (string) ( $order->meta['recipient_name2'] ?? '' );
+		$email2 = (string) ( $order->meta['recipient_email2'] ?? '' );
+		OYS_Emails::gift_card( $gift, $name2 );
+		if ( is_email( $email2 ) && strtolower( $email2 ) !== strtolower( (string) $gift->recipient_email ) ) {
+			$other                  = clone $gift; // the same code: one of them redeems it, they book together
+			$other->recipient_name  = $name2;
+			$other->recipient_email = $email2;
+			OYS_Emails::gift_card( $other, (string) $gift->recipient_name );
+		}
 		OYS_Emails::gift_receipt( $gift, $order );
 		return $id;
 	}

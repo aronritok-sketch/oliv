@@ -11,6 +11,7 @@ echo oy_page_head( $title, $lead, array( array( $title, $page_id ? get_permalink
 global $wp_query;
 ?>
 <?php $limbs = is_paged() ? array() : oy_limbs_posts(); // the eight limbs of yoga together, first (Olivia, 13 November) ?>
+<?php $all = $wp_query->posts; // the list below, taken before anything else renders ?>
 <div class="container"><div class="layout">
 	<?php if ( $limbs ) : ?>
 	<section class="oj-limbs" id="<?php echo esc_attr( OY_LIMBS_CATEGORY ); ?>" aria-labelledby="limbs-title">
@@ -20,7 +21,6 @@ global $wp_query;
 	<h2 class="oj-all-title"><?php esc_html_e( 'All articles', 'olivia-yoga' ); ?></h2>
 	<?php endif; ?>
 	<?php
-	$all = $wp_query->posts;
 	if ( oy_online_only() && $limbs ) { // the other articles first (newest first), then the eight limbs in their order
 		$ids = wp_list_pluck( $limbs, 'ID' );
 		$all = array_merge( array_values( array_filter( $all, fn( $p ) => ! in_array( $p->ID, $ids, true ) ) ), $limbs );

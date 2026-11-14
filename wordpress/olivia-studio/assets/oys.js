@@ -59,6 +59,8 @@
 			box.querySelector('[data-gift-name]').textContent = r.getAttribute('data-name') || '';
 			box.querySelector('[data-gift-price]').textContent = r.getAttribute('data-price') || '';
 			box.classList.remove('is-new'); void box.offsetWidth; box.classList.add('is-new');
+			var second = form.querySelector('[data-oys-gift-second]');
+			if (second) second.hidden = parseInt(r.getAttribute('data-people') || '1', 10) < 2;
 			var rect = box.getBoundingClientRect();
 			if (rect.top < 0 || rect.bottom > window.innerHeight) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
 		});

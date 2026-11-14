@@ -6077,3 +6077,21 @@ msgstr "További ajándékok"
 
 msgid "Your gift:"
 msgstr "A választott ajándék:"
+
+msgid "A gift for two: we can email it to both of them. One of them redeems the code in their account, and they book together."
+msgstr "Páros ajándék: mindkettőjüknek elküldjük e-mailben. Egyikük váltja be a kódot a fiókjában, és együtt foglalnak."
+
+msgid "The other person's name"
+msgstr "A másik megajándékozott neve"
+
+msgid "The other person's email (optional)"
+msgstr "A másik megajándékozott e-mail-címe (nem kötelező)"
+
+msgid "Check the other person's email address."
+msgstr "Nézd meg a másik megajándékozott e-mail-címét."
+
+msgid "This is a gift for two: you got it together with %s. One of you redeems the code in their account, and you book together."
+msgstr "Ez egy páros ajándék: %s is megkapta veled együtt. Egyikőtök váltja be a kódot a fiókjában, és együtt foglaltok."
+
+msgid "This is a gift for two: one of you redeems the code in their account, and you book together."
+msgstr "Ez egy páros ajándék: egyikőtök váltja be a kódot a fiókjában, és együtt foglaltok."

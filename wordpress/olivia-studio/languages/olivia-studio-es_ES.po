@@ -4076,3 +4076,21 @@ msgstr "Más regalos"
 
 msgid "Your gift:"
 msgstr "Tu regalo:"
+
+msgid "A gift for two: we can email it to both of them. One of them redeems the code in their account, and they book together."
+msgstr "Un regalo para dos: se lo enviamos por email a ambas personas. Una de ellas canjea el código en su cuenta y reservan juntas."
+
+msgid "The other person's name"
+msgstr "Nombre de la otra persona"
+
+msgid "The other person's email (optional)"
+msgstr "Email de la otra persona (opcional)"
+
+msgid "Check the other person's email address."
+msgstr "Revisa el email de la otra persona."
+
+msgid "This is a gift for two: you got it together with %s. One of you redeems the code in their account, and you book together."
+msgstr "Es un regalo para dos: también lo ha recibido %s. Una de vosotras canjea el código en su cuenta y reserváis juntas."
+
+msgid "This is a gift for two: one of you redeems the code in their account, and you book together."
+msgstr "Es un regalo para dos: una de vosotras canjea el código en su cuenta y reserváis juntas."

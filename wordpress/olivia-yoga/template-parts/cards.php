@@ -3,10 +3,11 @@
  * Journal cards. $args['posts'] = WP_Post[]
  */
 defined( 'ABSPATH' ) || exit;
-$posts = $args['posts'] ?? array();
+// not $posts: in a template that is the main query's list (by reference), and overwriting it emptied „Összes írás”
+$oy_cards = $args['posts'] ?? array();
 ?>
 <div class="cards">
-	<?php foreach ( $posts as $i => $p ) : $cat = get_the_category( $p->ID ); ?>
+	<?php foreach ( $oy_cards as $i => $p ) : $cat = get_the_category( $p->ID ); ?>
 	<article class="card card--<?php echo esc_attr( OY_ACCENTS[ $i % 4 ] ); ?><?php echo get_post_meta( $p->ID, 'oy_art', true ) ? ' card--art' : ''; ?>"><a href="<?php echo esc_url( get_permalink( $p ) ); ?>">
 		<div class="card__media"><?php echo oy_post_photo( $p->ID, 'olivia-terrace-profile', '(min-width: 960px) 30vw, 92vw' ); // phpcs:ignore ?></div>
 		<div class="card__body">

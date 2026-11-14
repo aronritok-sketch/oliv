@@ -1629,7 +1629,7 @@ class OYS_Frontend {
 				$card = '<span class="oys-gift__card"><span class="oys-gift__name">' . esc_html( $p['name'] ) . '</span><span class="oys-gift__price">' . esc_html( oys_money( $p['price_cents'] ) ) . '</span>'
 					. ( $choose ? '<span class="oys-gift__tick" aria-hidden="true">' . oys_icon( 'check' ) . '</span>' : '' ) . '</span>';
 				$out .= $choose
-					? '<label class="oys-gift"><input type="radio" name="product" value="' . esc_attr( $p['id'] ) . '" data-name="' . esc_attr( $p['name'] ) . '" data-price="' . esc_attr( oys_money( $p['price_cents'] ) ) . '"' . checked( $first, true, false ) . '>' . $card . '</label>'
+					? '<label class="oys-gift"><input type="radio" name="product" value="' . esc_attr( $p['id'] ) . '" data-name="' . esc_attr( $p['name'] ) . '" data-price="' . esc_attr( oys_money( $p['price_cents'] ) ) . '" data-people="' . max( 1, (int) ( $p['people'] ?? 1 ) ) . '"' . checked( $first, true, false ) . '>' . $card . '</label>'
 					: '<div class="oys-gift">' . $card . '</div>';
 				$first = false;
 			}
@@ -1656,6 +1656,10 @@ class OYS_Frontend {
 		return $flash . self::form_open( 'oys_gift_buy', 'class="oys-form" data-oys-gift-form' ) . '<fieldset><legend class="kicker">' . esc_html__( 'Choose a gift', 'olivia-studio' ) . '</legend>' . self::gift_grid( $gifts, true ) . '</fieldset>'
 			. '<div class="oys-card">' . $chosen . '<div class="form__row"><label class="field"><span>' . esc_html__( 'Recipient\'s name', 'olivia-studio' ) . '</span><input type="text" name="recipient_name" id="oys-g-name" required></label>'
 			. '<label class="field"><span>' . esc_html__( 'Recipient\'s email', 'olivia-studio' ) . '</span><input type="email" name="recipient_email" id="oys-g-email" required></label></div>'
+			// a gift for two (Olívia, 14 November: „mivel lehet páros ajándékutalványt venni, ide lehessen 2 email címet írni”)
+			. '<div class="oys-gift-second" data-oys-gift-second' . ( (int) ( $gifts[0]['people'] ?? 1 ) > 1 ? '' : ' hidden' ) . '><p class="oys-small">' . esc_html__( 'A gift for two: we can email it to both of them. One of them redeems the code in their account, and they book together.', 'olivia-studio' ) . '</p>'
+			. '<div class="form__row"><label class="field"><span>' . esc_html__( 'The other person\'s name', 'olivia-studio' ) . '</span><input type="text" name="recipient_name2" id="oys-g-name2"></label>'
+			. '<label class="field"><span>' . esc_html__( 'The other person\'s email (optional)', 'olivia-studio' ) . '</span><input type="email" name="recipient_email2" id="oys-g-email2"></label></div></div>'
 			. '<label class="field"><span>' . esc_html__( 'Personal message (optional)', 'olivia-studio' ) . '</span><textarea name="message" id="oys-g-msg" rows="3"></textarea></label>'
 			. '<button class="btn btn--primary" type="submit">' . esc_html__( 'Continue to payment', 'olivia-studio' ) . '</button>' . self::terms_note()
 			. '<p class="oys-small">' . esc_html__( 'The gift card is emailed to the recipient right after payment. You get the receipt.', 'olivia-studio' ) . '</p></div></form>';
