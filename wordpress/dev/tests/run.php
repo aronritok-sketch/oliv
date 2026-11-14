@@ -13,6 +13,9 @@ if ( ! $wp_dir || ! file_exists( $wp_dir . '/wp-load.php' ) ) {
 }
 $_SERVER['REMOTE_ADDR'] = '10.9.8.7';
 $_SERVER['HTTP_HOST']   = '127.0.0.1:8080';
+// A sablonokat (header.php → wp_head → wp_resource_hints) CLI-ből is rendereljük: a mag a SERVER_NAME-et olvassa,
+// enélkül „Undefined array key SERVER_NAME” kerül a debug.log-ba, és a CI emiatt bukik.
+$_SERVER['SERVER_NAME'] = '127.0.0.1';
 require $wp_dir . '/wp-load.php';
 
 if ( ! class_exists( 'OYS_Bookings' ) ) {
