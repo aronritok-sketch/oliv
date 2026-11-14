@@ -788,6 +788,10 @@ Olivia doksija, 2026. 11. 13. 21:35.
 - Bővítmény: „töltsd fel az eszközöd” a foglalási e-mail tippjében, a `join_reminder` alapszövegében és az élő óra
   belépő képernyőjén (résztvevőknek).
 
+- 3.11.1: `oy_migrate_1114d` rev 2026-11-14e – az órák (`classes` a tartalomfájlban) `_replace` párjai is; a lapok
+  kulcsa `OY_PAGE_SLUGS` → `oy_page_slug()`; `images.json` `pos_prev`: a Médiatár `oy_key` mellékletének `oy_pos`-a csak
+  akkor változik, ha még a régi. `.oj-breath-peach`: a légzés szekció barack háttéren.
+
 ### 6.14 Mobil API és iOS app
 
 **API** – `OYS_App_API` (`includes/class-app-api.php`), útvonalak a `oys/v1/app/` alatt:

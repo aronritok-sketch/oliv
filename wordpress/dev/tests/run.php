@@ -549,10 +549,9 @@ test( 'calendar: validation and capacity below bookings', function () {
 	ok( is_wp_error( $bad ), 'a class needs a class type' );
 	$past = OYS_Calendar::rest_save( cal_req( array( 'kind' => 'event', 'title' => 'Old', 'date' => wp_date( 'Y-m-d', time() - 3 * DAY_IN_SECONDS ), 'start' => '10:00' ) ) );
 	ok( is_wp_error( $past ), 'no new sessions in the past' );
-	// in three days, at 9:00 or 20:00 – never late enough to run past midnight, and at least six hours from the clock time
-	// of the sessions other tests make for „in 72 hours” (at 10:00 it clashed with those when the suite ran in the morning)
-	$hour = (int) wp_date( 'G' ) >= 3 && (int) wp_date( 'G' ) <= 14 ? '20:00' : '09:00';
-	$s    = make_session( array( 'capacity' => 3, 'in_hours' => ( ( new DateTimeImmutable( 'today ' . $hour, wp_timezone() ) )->modify( '+3 days' )->getTimestamp() - time() ) / HOUR_IN_SECONDS ) );
+	// at 10:00 in three days (a class late in the evening would run past midnight), with a teacher of its own: one teacher
+	// cannot lead two classes at once, and other tests' sessions „in 72 hours” land near 10:00 when the suite runs in the morning
+	$s = make_session( array( 'capacity' => 3, 'teacher' => (int) make_teacher( array( 'name' => 'Capacity Teacher' ) )->id, 'in_hours' => ( ( new DateTimeImmutable( 'today 10:00', wp_timezone() ) )->modify( '+3 days' )->getTimestamp() - time() ) / HOUR_IN_SECONDS ) );
 	OYS_Bookings::book_party( make_user(), $s, array( 'method' => 'free', 'guests' => guests( 'A' ), 'notify' => false ) );
 	$d = OYS_Calendar::out( OYS_Schedule::get( $s->id ) );
 	OYS_Calendar::rest_save( cal_req( array_merge( $d, array( 'capacity' => 1 ) ), $s->id ), $s->id );
@@ -2901,8 +2900,18 @@ test( 'online edition, live update: 2018 on her timeline, the kit list for every
 		$f    = array_values( array_filter( $data['faqs'], fn( $x ) => 'Mit kell előkészítenem az online jóga órára?' === ( $x['_prev']['q'] ?? '' ) ) )[0];
 		$faq  = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => $f['_prev']['q'], 'post_content' => wpautop( esc_html( $f['_prev']['a'] ) ) ) );
 		$mine = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => $f['_prev']['q'], 'post_content' => '<p>Ezt én írtam át.</p>' ) );
+		$soon  = $data['classes']['egyeni-online-joga']['_replace'][0];
+		$class = get_page_by_path( 'egyeni-online-joga', OBJECT, 'oy_class' );
+		$cid   = $class ? $class->ID : wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Egyéni online jóga', 'post_name' => 'egyeni-online-joga' ) );
+		wp_update_post( array( 'ID' => $cid, 'post_content' => '<p>Kérj időpontot. ' . $soon[0] . ', amit egy kattintással elfogadsz.</p>' ) );
+		$img   = oy_images()['journal-01'];
+		$att   = self_test_photo( 'hatha-jogaora-nyujto-gyakorlatok-forditott-harcos-x.jpg', 600, 900 );
+		update_post_meta( $att, 'oy_key', 'journal-01' );
+		update_post_meta( $att, 'oy_pos', $img['pos_prev'] );
 		delete_option( 'oy_1114d_rev' );
 		$log = oy_migrate_1114d();
+		ok( str_contains( get_post_field( 'post_content', $cid ), 'Hamarosan visszaírok' ), 'one-to-one class: „soon”, not „within a day”' );
+		eq( $img['pos'], get_post_meta( $att, 'oy_pos', true ), 'the journal photo: the focus lower, she is in the frame' );
 		$c   = get_post_field( 'post_content', $aid );
 		ok( str_contains( $c, $li2015 . "\n" . $li2018 ) && 1 === substr_count( $c, '2018-tól' ), 'About: 2018 (massage) once, after 2015' );
 		$p = get_post_field( 'post_content', $pid );
@@ -2937,6 +2946,7 @@ test( 'online edition, Olívia\'s doc of 14 November, last points: one level for
 		$css = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
 		ok( ! str_contains( $css, '.ways--five .way:nth-child(2), .ways--five .way:nth-child(5) { top' ), 'the five boxes in straight lines' );
 		ok( 9 === preg_match_all( '/\.oj-modules li:nth-child\(\d\) \{ --dot: (#[0-9A-F]{6}); \}/', $css, $m ) && 9 === count( array_unique( $m[1] ) ), 'nine modules, nine colours' );
+		ok( str_contains( $home, 'section--breath oj-breath-peach' ) && ! str_contains( $home, 'Egy perc a foglalás' ), 'the breathing lotus on peach; no line under „Heti élő órák”' );
 	} finally {
 		update_option( 'oy_edition', 'fort-myers' );
 	}

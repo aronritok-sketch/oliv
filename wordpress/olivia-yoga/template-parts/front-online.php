@@ -186,7 +186,7 @@ $more     = array(
 </div></section>
 
 <section class="section section--tight" id="schedule" aria-labelledby="schedule-title"><div class="container">
-	<header class="section__head section__head--row" data-reveal><div><?php echo oy_kicker( __( 'Next classes', 'olivia-yoga' ) ); // phpcs:ignore ?><h2 id="schedule-title"><?php esc_html_e( 'Weekly live classes', 'olivia-yoga' ); ?></h2><p class="lead"><?php esc_html_e( 'Times are in Hungarian time. Book in a minute; beginners are welcome in every class.', 'olivia-yoga' ); ?></p></div><?php echo oy_btn( oy_page_link( 'schedule-pricing' ), oy_schedule_label(), 'ghost' ); // phpcs:ignore ?></header>
+	<header class="section__head section__head--row" data-reveal><div><?php echo oy_kicker( __( 'Next classes', 'olivia-yoga' ) ); // phpcs:ignore ?><h2 id="schedule-title"><?php esc_html_e( 'Weekly live classes', 'olivia-yoga' ); ?></h2><?php // Olívia, 14 November: „ezt is kiszedhetjük” – no line under the title ?></div><?php echo oy_btn( oy_page_link( 'schedule-pricing' ), oy_schedule_label(), 'ghost' ); // phpcs:ignore ?></header>
 	<?php // Olivia, 13 November: only the Wednesdays (the next ones, however far), and the one-to-one sessions in a box of their own ?>
 	<?php echo shortcode_exists( 'oys_schedule' ) ? do_shortcode( '[oys_schedule days="7" next="4"]' ) . ( shortcode_exists( 'oys_private_box' ) ? do_shortcode( '[oys_private_box]' ) : '' ) : ''; // phpcs:ignore ?>
 </div></section>
@@ -203,7 +203,8 @@ $more     = array(
 	</div>
 </div></section>
 
-<section class="section section--forest section--breath" aria-label="<?php esc_attr_e( 'Breathing exercise', 'olivia-yoga' ); ?>"><div class="container"><?php echo oy_breath(); // phpcs:ignore ?></div></section>
+<?php // Olívia, 14 November: „a lótuszos légzésnek legyen inkább ez a szín a háttere” – peach ?>
+<section class="section section--breath oj-breath-peach" aria-label="<?php esc_attr_e( 'Breathing exercise', 'olivia-yoga' ); ?>"><div class="container"><?php echo oy_breath(); // phpcs:ignore ?></div></section>
 
 <section class="section section--tight" id="pricing" aria-labelledby="pricing-title"><div class="container">
 	<?php // Olivia, 13 November: „Az »árak forintban«-t szedjük ki. A főcím legyen csak árak” ?>

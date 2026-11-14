@@ -106,7 +106,7 @@ msgstr "Kapsz időpontot és árat"
 
 #: front-page.php:24
 msgid "I reply within a day with a suggested session, ready to confirm."
-msgstr "Egy napon belül válaszolok egy javasolt időponttal, amit csak jóvá kell hagynod."
+msgstr "Hamarosan válaszolok egy javasolt időponttal, amit csak jóvá kell hagynod."
 
 #: front-page.php:25
 msgid "Confirm online"
@@ -559,7 +559,7 @@ msgstr "Angolul vagy magyarul"
 
 #: functions.php:139
 msgid "Reply within a day"
-msgstr "Válasz egy napon belül"
+msgstr "Hamarosan válaszolok"
 
 #: functions.php:141
 msgid "Areas I travel to"
@@ -733,7 +733,7 @@ msgstr "Valami más"
 
 #: inc/shortcodes.php:135
 msgid "Thank you, your message is on its way. I will reply as soon as I can, usually within a day."
-msgstr "Köszönöm, az üzeneted úton van. Amint tudok, válaszolok, általában egy napon belül."
+msgstr "Köszönöm, az üzeneted úton van. Hamarosan válaszolok."
 
 #: inc/shortcodes.php:136
 msgid "Please fill in your name, a valid email and a message."

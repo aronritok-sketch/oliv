@@ -367,3 +367,18 @@ body .hero__title .hero__l3 { display: block; margin-top: .14em; }
 
 /* who made the site */
 .footer__credit a { white-space: nowrap; }
+
+/* The breathing lotus on peach (Olívia, 14 November: „a lótuszos légzésnek legyen inkább ez a szín a háttere”): dark text,
+   the ring and the progress in ink and pink, a green button */
+.oj-breath-peach { background: var(--sun-soft); color: var(--ink); }
+.oj-breath-peach h2 { color: var(--ink); }
+.oj-breath-peach .lead { color: #4A5A50; }
+.oj-breath-peach .breath__guide li { background: rgba(255, 255, 255, .62); color: var(--ink); }
+.oj-breath-peach .breath__status { color: var(--orchid-dark); }
+.oj-breath-peach .breath__notice-word { color: var(--orchid-dark); }
+.oj-breath-peach .breath__track { stroke: rgba(18, 35, 26, .16); }
+.oj-breath-peach .breath__progress { stroke: var(--orchid); }
+.oj-breath-peach .breath__dots li { border-color: rgba(18, 35, 26, .4); }
+.oj-breath-peach .breath__glow { background: radial-gradient(circle, rgba(255, 114, 182, .42), rgba(198, 163, 238, .2) 55%, transparent 72%); }
+.oj-breath-peach .btn--light { background: var(--forest); color: var(--paper); }
+.oj-breath-peach .btn--light:hover { background: var(--moss); color: var(--paper); }

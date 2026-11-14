@@ -2619,7 +2619,7 @@ msgstr "Írj néhány neked megfelelő napot és időpontot."
 
 #: includes/class-privates.php:85
 msgid "Request sent. I'll reply within one working day with a time and price."
-msgstr "Kérés elküldve. Egy munkanapon belül válaszolok időponttal és árral."
+msgstr "Kérés elküldve. Hamarosan válaszolok egy időponttal és árral."
 
 #: includes/class-privates.php:96
 msgid "Request not found."
@@ -3075,7 +3075,7 @@ msgstr "Megkaptam a kérésed"
 #: data
 #. Default text stored as data (email template, product or timetable).
 msgid "Thank you for your request. I'll reply within one working day with a suggested time and price. You can pay and confirm from the email or your account."
-msgstr "Köszönöm a kérésed. Egy munkanapon belül válaszolok egy javasolt időponttal és árral. Az e-mailből vagy a fiókodból fizethetsz és hagyhatod jóvá."
+msgstr "Köszönöm a kérésed. Hamarosan válaszolok egy javasolt időponttal és árral. Az e-mailből vagy a fiókodból fizethetsz és hagyhatod jóvá."
 
 #: data
 #. Default text stored as data (email template, product or timetable).
@@ -6020,7 +6020,7 @@ msgid "One-to-one sessions"
 msgstr "Egyéni órák"
 
 msgid "We agree on a time that suits you: tell me when you are free, and I reply within a day."
-msgstr "Az időpontot egyénileg egyeztetjük: írd meg, mikor érnél rá, és egy napon belül visszaírok."
+msgstr "Az időpontot egyénileg egyeztetjük: írd meg, mikor érnél rá, és hamarosan visszaírok."
 
 #. Olivia, 14 November
 msgid "from %s each"

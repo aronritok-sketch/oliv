@@ -281,6 +281,14 @@
   (helloprovision.com). Élesen `oy_migrate_1114d()` (rev 2026-11-14d): `_insert` és `_replace` párok a lapokon, GYIK
   `_prev` – csak ahol még a régi szöveg áll szó szerint. Teszt: a naptár-kapacitás teszt délelőtt ütközött a „72 óra
   múlva” órákkal → 9:00 vagy 20:00, az órától függően. Tesztek 1047/0.
+- **A doksi 15:39-es pontjai (olivia-yoga 3.11.1, olivia-studio 1.10.4):** a főoldal „Heti élő órák” alatti sora
+  kikerült (Olívia már élesen átírta „Egy perc a foglalás…”-ra, most az egész sor megy); „egy napon belül” helyett
+  „hamarosan” visszaírok/válaszolok mindenhol az online oldalon (órarend egyéni doboza, Órák, árlap, Kapcsolat, egyéni
+  óra lapja, a kapcsolati űrlap köszönője, az időpontkérés visszaigazolása és e-mailje, az aside kártya; az ÁSZF marad);
+  a lótuszos légzés barack háttéren (sötét szöveg, zöld gomb, rózsaszín haladásjelző); a „Hatha jógaóra elemei: nyújtás”
+  képe (journal-01) lejjebb fókuszál (50% 62%), hogy Olívia látsszon, ne a fák teteje. Élesen `oy_migrate_1114d` rev
+  2026-11-14e: a lapok mellett az órák (`classes`) `_replace` párjai is, és a fotó fókusza, ha még a régi (`pos_prev`).
+  Teszt: a naptár-kapacitás teszt saját tanárt kap (az időponttól nem függ többé). Tesztek 1050/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

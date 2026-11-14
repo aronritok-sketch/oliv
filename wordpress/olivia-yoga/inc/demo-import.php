@@ -1024,22 +1024,31 @@ function oy_migrate_1114c() {
 
 /**
  * Olívia, 14 November, the last points of her doc, on a live site: 2018 (massage) on the About timeline, the general kit
- * list and the „charge your device” note on the prices page, the same in the FAQ answer about what to prepare. Each text
- * changes only where the old one is still there word for word, so whatever she has rewritten herself stays.
+ * list and the „charge your device” note on the prices page, the same in the FAQ answer about what to prepare; „I will
+ * get back to you soon” instead of „within a day” (pages and classes); the photo whose focus moved („ennek a képnek nagyon
+ * a teteje látszik”). Each text changes only where the old one is still there word for word, a photo's focus only where it
+ * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-14d';
+	$rev = '2026-11-14e';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
 	update_option( 'oy_1114d_rev', $rev );
 	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
 	$log  = array();
+	$targets = array();
 	foreach ( (array) ( $data['pages'] ?? array() ) as $key => $page ) {
+		$targets[] = array( $key, $page, fn() => get_page_by_path( oy_page_slug( OY_PAGE_SLUGS[ $key ] ?? $key ) ) );
+	}
+	foreach ( (array) ( $data['classes'] ?? array() ) as $key => $class ) {
+		$targets[] = array( $key, $class, fn() => get_page_by_path( $key, OBJECT, 'oy_class' ) );
+	}
+	foreach ( $targets as list( $key, $page, $find ) ) {
 		if ( empty( $page['_insert'] ) && empty( $page['_replace'] ) ) {
 			continue;
 		}
-		$post = get_page_by_path( oy_page_slug( $key ) );
+		$post = $find();
 		if ( ! $post ) {
 			continue;
 		}
@@ -1056,7 +1065,7 @@ function oy_migrate_1114d() {
 			kses_remove_filters();
 			wp_update_post( wp_slash( array( 'ID' => $post->ID, 'post_content' => $content ) ) );
 			kses_init_filters();
-			$log[] = 'page: ' . $key;
+			$log[] = ( 'oy_class' === $post->post_type ? 'class: ' : 'page: ' ) . $key;
 		}
 	}
 	foreach ( (array) ( $data['faqs'] ?? array() ) as $f ) {
@@ -1067,6 +1076,17 @@ function oy_migrate_1114d() {
 			if ( trim( wp_strip_all_tags( $faq->post_content ) ) === trim( $f['_prev']['a'] ) ) {
 				wp_update_post( wp_slash( array( 'ID' => $faq->ID, 'post_title' => $f['q'], 'post_content' => wpautop( esc_html( $f['a'] ) ) ) ) );
 				$log[] = 'FAQ: ' . $f['q'];
+			}
+		}
+	}
+	foreach ( oy_images() as $key => $img ) {
+		if ( empty( $img['pos_prev'] ) ) {
+			continue;
+		}
+		foreach ( get_posts( array( 'post_type' => 'attachment', 'post_status' => 'any', 'numberposts' => -1, 'fields' => 'ids', 'meta_key' => 'oy_key', 'meta_value' => $key ) ) as $att ) {
+			if ( get_post_meta( $att, 'oy_pos', true ) === $img['pos_prev'] ) {
+				update_post_meta( $att, 'oy_pos', $img['pos'] );
+				$log[] = 'photo focus: ' . $key;
 			}
 		}
 	}
