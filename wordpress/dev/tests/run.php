@@ -3280,6 +3280,8 @@ test( 'Olívia\'s doc of 14 November, past midnight: the home page\'s questions 
 	$home = array_values( array_map( fn( $f ) => $f['q'], array_filter( $data['faqs'], fn( $f ) => '1' === (string) ( $f['home'] ?? '' ) ) ) );
 	ok( 'Sérülésem vagy egészségügyi problémám van. Jöhetek?' === end( $home ) && ! in_array( 'Miért jó online jógázni?', $home, true ), 'a fresh site: the injury question is the last on the home page, „Miért jó online jógázni?” only on the FAQ page' );
 	ok( in_array( 'Mi van, ha késve érkezem, vagy akadozik a net?', $home, true ), '… and the late-arrival / bad-connection question on the home page too („ezt a kérdést még tedd a gyikhez a főoldalra”)' );
+	$oc = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
+	ok( str_contains( $oc, '.oys-private-box p { max-width: none; font-size: .97rem; }' ) && str_contains( $oc, '.oys-private-box p { white-space: nowrap; }' ), 'the one-to-one box under the timetable: its sentence on one line („Ezt próbáljuk meg egy sorba írni”)' );
 	ob_start();
 	load_template( get_template_directory() . '/template-parts/front-online.php', false );
 	$front = (string) ob_get_clean();
