@@ -703,6 +703,15 @@ abbr[title] { text-decoration: none; }
 	.aside-sticky .aside-list { gap: .3rem; margin-bottom: .8rem; font-size: .9rem; line-height: 1.35; }
 	.aside-sticky .aside-card .btn { padding-block: .75rem; }
 }
+/* a short laptop screen: a slimmer photo, so the whole card stays in view while it follows the page („ez legyen fix,
+   rögzített … figyelj hogy a teljes egésze maradjon meg asztalinál”) */
+@media (min-width: 1000px) and (max-height: 740px) {
+	.aside-sticky .aside-card .frame { aspect-ratio: 21 / 9; margin-bottom: .7rem; }
+	.aside-sticky .aside-card h2 { font-size: 1.4rem; }
+}
+@media (min-width: 1000px) and (max-height: 600px) {
+	.aside-sticky .aside-card .frame { display: none; }
+}
 
 .prose { max-width: 68ch; }
 .prose > * { margin-block: 0; }

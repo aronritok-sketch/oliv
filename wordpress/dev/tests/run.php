@@ -3065,6 +3065,25 @@ test( 'Olívia\'s doc of 14 November, evening: class types as tags in the kit an
 	ok( str_contains( (string) file_get_contents( OYS_DIR . 'assets/oys.js' ), '[data-oys-gift-chosen]' ), '… updated when another is chosen' );
 } );
 
+test( 'Olívia\'s doc of 14 November, late evening: forints (not dollars) when the price changes on the booking form, no „buy a single ticket” option, the contact card without „Online, live”', function () {
+	$keep = OYS_Settings::get( 'currency' );
+	OYS_Settings::update( array( 'currency' => 'huf' ) );
+	$m = new ReflectionMethod( 'OYS_Frontend', 'party_script' );
+	$m->setAccessible( true );
+	$js = $m->invoke( null );
+	OYS_Settings::update( array( 'currency' => $keep ) );
+	ok( str_contains( $js, '"\\u00a0Ft";}' ) && ! str_contains( $js, 'el.textContent="$"' ), 'booking form: the total in forints when guests are added' );
+	$src = (string) file_get_contents( OYS_DIR . 'includes/class-frontend.php' );
+	ok( str_contains( $src, "if ( \$price > 0 && (int) \$p['credits'] <= 1 && 'intro' !== \$p['kind'] ) {" ), 'no „Buy a 1-class ticket and use it” next to paying by card (the same thing)' );
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		ok( ! str_contains( oy_page_aside( 'contact' ), esc_html__( 'Online, live', 'olivia-yoga' ) ), 'contact card: no „Online, élőben”' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+	ok( str_contains( (string) file_get_contents( get_template_directory() . '/assets/site.css' ), '@media (min-width: 1000px) and (max-height: 740px)' ), 'the side card on a short screen: a slimmer photo, so all of it stays in view' );
+} );
+
 test( 'Olívia\'s doc of 14 November: the side column is never cut off while scrolling; her two training photos in one line', function () {
 	$css = (string) file_get_contents( get_template_directory() . '/assets/site.css' );
 	ok( (bool) preg_match( '/\.aside-sticky \{ position: sticky; top: calc\(var\(--header-h\) \+ 24px\); align-self: start; \}/', $css ) && ! str_contains( $css, 'scrollbar-width: none' ), 'the side column: no hidden inner scroll that cuts its bottom off' );

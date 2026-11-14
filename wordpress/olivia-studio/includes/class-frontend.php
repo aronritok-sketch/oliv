@@ -515,10 +515,14 @@ class OYS_Frontend {
 	}
 
 	private static function party_script() {
-		return '<script>(function(){document.querySelectorAll("[data-party]").forEach(function(f){var box=f.querySelector("[data-guests]");var rows=box?[].slice.call(box.querySelectorAll("[data-guest]")):[];var add=box&&box.querySelector("[data-guest-add]");var host=parseInt(f.getAttribute("data-host"),10);'
+		$cur = strtoupper( (string) OYS_Settings::get( 'currency' ) );
+		$fmt = 'HUF' === $cur
+			? 'function money(c){return String(Math.round(c/100)).replace(/\\B(?=(\\d{3})+(?!\\d))/g,"\\u00a0")+"\\u00a0Ft";}'
+			: 'function money(c){return ' . wp_json_encode( array( 'USD' => '$', 'EUR' => '€', 'GBP' => '£' )[ $cur ] ?? $cur . ' ' ) . '+(c/100).toFixed(c%100?2:0);}';
+		return '<script>(function(){' . $fmt . 'document.querySelectorAll("[data-party]").forEach(function(f){var box=f.querySelector("[data-guests]");var rows=box?[].slice.call(box.querySelectorAll("[data-guest]")):[];var add=box&&box.querySelector("[data-guest-add]");var host=parseInt(f.getAttribute("data-host"),10);'
 			. 'function count(){return rows.filter(function(r){return !r.hidden&&r.querySelector("input[type=text]").value.trim()!=="";}).length;}'
 			. 'function amount(){var r=f.querySelector("input[name=amount_pick]:checked");if(!r)return 0;if(r.value==="other"){var o=f.querySelector("input[name=amount_other]");return Math.round(parseFloat(o.value||"0")*100)||0;}return parseInt(r.value,10);}'
-			. 'function upd(){var n=count(),people=host+n;f.querySelectorAll("[data-each]").forEach(function(el){var a=el.getAttribute("data-each"),each=a==="donation"?amount():parseInt(a,10),fixed=parseInt(el.getAttribute("data-fixed")||"0",10),mult=el.getAttribute("data-guests-only")?n:people;el.textContent="$"+((fixed+each*mult)/100).toFixed((fixed+each*mult)%100?2:0);});'
+			. 'function upd(){var n=count(),people=host+n;f.querySelectorAll("[data-each]").forEach(function(el){var a=el.getAttribute("data-each"),each=a==="donation"?amount():parseInt(a,10),fixed=parseInt(el.getAttribute("data-fixed")||"0",10),mult=el.getAttribute("data-guests-only")?n:people;el.textContent=money(fixed+each*mult);});'
 			. 'f.querySelectorAll("[data-needs]").forEach(function(el){var need=el.getAttribute("data-guests-only")?n:people,have=parseInt(el.getAttribute("data-needs"),10),opt=el.closest(".oys-option"),inp=opt.querySelector("input");var ok=have>=need;opt.classList.toggle("is-disabled",!ok);inp.disabled=!ok;if(!ok&&inp.checked){var o=f.querySelector(".oys-option:not(.is-disabled) input");if(o)o.checked=true;}});'
 			. 'var ps=f.querySelector("[data-party-size]");if(ps)ps.textContent=people;if(add)add.hidden=rows.every(function(r){return !r.hidden;});}'
 			. 'if(add)add.addEventListener("click",function(){var r=rows.find(function(r){return r.hidden;});if(r){r.hidden=false;r.querySelector("input").focus();}upd();});'
@@ -536,7 +540,7 @@ class OYS_Frontend {
 			$out .= '<label class="oys-amount"><input type="radio" name="amount_pick" value="' . (int) $a . '"' . checked( $pick, $a, false ) . '><span>' . esc_html( oys_money( $a ) ) . '</span></label>';
 		}
 		$out .= '<label class="oys-amount oys-amount--other"><input type="radio" name="amount_pick" value="other"><span>' . esc_html__( 'Other', 'olivia-studio' ) . '</span></label>'
-			. '<label class="oys-amount__custom"><span class="sr-only">' . esc_html__( 'Your amount', 'olivia-studio' ) . '</span>$<input type="number" name="amount_other" id="oys-amount-other" min="' . esc_attr( $min / 100 ) . '" step="1" inputmode="decimal" placeholder="' . esc_attr( $min / 100 ) . '"></label></div>'
+			. '<label class="oys-amount__custom"><span class="sr-only">' . esc_html__( 'Your amount', 'olivia-studio' ) . '</span>' . ( 'HUF' === strtoupper( (string) OYS_Settings::get( 'currency' ) ) ? '' : '$' ) . '<input type="number" name="amount_other" id="oys-amount-other" min="' . esc_attr( $min / 100 ) . '" step="1" inputmode="decimal" placeholder="' . esc_attr( $min / 100 ) . '"></label></div>'
 			. '<p class="oys-small">' . sprintf( esc_html__( 'This class is by donation: give what feels right, from %s per person. Online by card or at the studio, whichever you prefer.', 'olivia-studio' ), esc_html( oys_money( $min ) ) ) . '</p></fieldset>';
 		return $out;
 	}
@@ -737,6 +741,10 @@ class OYS_Frontend {
 		if ( 'private' !== $s->kind && $s->credits_allowed && $ready ) {
 			foreach ( OYS_Products::purchasable() as $p ) {
 				if ( $kind !== OYS_Products::credit_kind( $p ) || ( 'intro' === $p['kind'] && ! OYS_Orders::is_new_customer( $user_id ) ) ) {
+					continue;
+				}
+				// a single-class ticket is just the card payment again (Olívia, 14 November: „Ez így ki is jöhet”)
+				if ( $price > 0 && (int) $p['credits'] <= 1 && 'intro' !== $p['kind'] ) {
 					continue;
 				}
 				$options[] = array( 'pack:' . $p['id'], sprintf( __( 'Buy %s and use it for this booking', 'olivia-studio' ), $p['name'] ), '<span class="oys-option__price" data-needs="' . (int) $p['credits'] . '">' . esc_html( oys_money( $p['price_cents'] ) ) . '</span>', '' );
