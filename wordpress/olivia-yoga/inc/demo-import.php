@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-14p';
+	$rev = '2026-11-14q';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1054,12 +1054,14 @@ function oy_migrate_1114d() {
 		}
 		$content = $post->post_content;
 		foreach ( (array) ( $page['_insert'] ?? array() ) as $pair ) {
-			if ( str_contains( $content, (string) $pair[0] ) && ! str_contains( $content, (string) $pair[1] ) ) {
-				$content = str_replace( (string) $pair[0], $pair[0] . "\n" . $pair[1], $content );
+			$pair = array_map( fn( $t ) => oy_resolve_tokens( (string) $t ), $pair ); // links as they are on the site
+			if ( str_contains( $content, $pair[0] ) && ! str_contains( $content, $pair[1] ) ) {
+				$content = str_replace( $pair[0], $pair[0] . "\n" . $pair[1], $content );
 			}
 		}
 		foreach ( (array) ( $page['_replace'] ?? array() ) as $pair ) {
-			$content = str_replace( (string) $pair[0], (string) $pair[1], $content );
+			$pair    = array_map( fn( $t ) => oy_resolve_tokens( (string) $t ), $pair );
+			$content = str_replace( $pair[0], $pair[1], $content );
 		}
 		if ( $content !== $post->post_content ) {
 			kses_remove_filters();

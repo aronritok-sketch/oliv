@@ -558,3 +558,49 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY
 .oj-more__card:hover .oj-more__stamp { transform: none; }
 .oj-more__card .way__art { width: 88px; height: 88px; margin: -12px 0 .2rem -12px; }
 .oj-more__card h3 { padding-right: 7rem; }
+
+/* „Online órák”: the classes as cards, the photo inside the card on top (not over the text), in their home page colours */
+.oj-class-cards { display: grid; gap: 1.1rem; margin: 1.8rem 0 2.4rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); }
+.oj-class-card { --bg: var(--lilac); display: flex; flex-direction: column; overflow: hidden; border-radius: 24px; background: var(--bg); color: var(--ink); text-decoration: none; box-shadow: 0 22px 40px -32px rgba(18, 35, 26, .6); transition: transform .35s ease, box-shadow .35s ease; }
+.oj-class-card--pink { --bg: var(--pink); }
+.oj-class-card--sage { --bg: var(--sage); }
+.oj-class-card--sun { --bg: var(--sun); }
+.oj-class-card:hover { transform: translateY(-5px); box-shadow: 0 32px 50px -32px rgba(18, 35, 26, .7); }
+.oj-class-card__photo { display: block; aspect-ratio: 4 / 3; overflow: hidden; }
+.oj-class-card__photo img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; }
+.oj-class-card:hover .oj-class-card__photo img { transform: scale(1.04); }
+.oj-class-card__body { display: flex; flex-direction: column; gap: .5rem; flex: 1; padding: 1.15rem 1.25rem 1.2rem; }
+.oj-class-card__name { font-family: var(--f-display); font-size: 1.55rem; line-height: 1.16; text-transform: uppercase; }
+.oj-class-card__desc { font-size: .95rem; line-height: 1.5; }
+.oj-class-card__foot { display: flex; align-items: center; justify-content: space-between; gap: .6rem; margin-top: auto; padding-top: .6rem; }
+.oj-class-card__len { display: inline-flex; align-items: center; gap: .4rem; padding: .3rem .8rem .3rem .65rem; border-radius: 999px; background: rgba(255, 255, 255, .6); font-weight: 700; font-size: .86rem; }
+.oj-class-card__len svg { width: 15px; height: 15px; }
+.oj-class-card__go { display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; background: var(--ink); color: var(--paper); flex: none; transition: transform .3s ease; }
+.oj-class-card__go svg { width: 18px; height: 18px; }
+.oj-class-card:hover .oj-class-card__go { transform: translateX(3px); }
+
+/* „Melyik órát válasszam?”: five colourful boxes, each a question, the service and a little more about it */
+.entry .oj-guide > br, .entry .oj-guide > p:empty { display: none; } /* WordPress puts a line break between the boxes */
+.entry .oj-guide { display: grid; gap: 1rem; margin: 1.4rem 0 2.6rem; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); }
+.entry .oj-guide__box { --bg: var(--lilac-soft); --edge: var(--lilac); position: relative; display: flex; flex-direction: column; gap: .45rem; padding: 1.3rem 1.35rem 1.25rem; border-radius: 22px; background: var(--bg); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--edge) 55%, transparent); color: var(--ink); text-decoration: none; overflow: hidden; isolation: isolate; transition: transform .35s ease, box-shadow .35s ease; }
+.entry .oj-guide__box::before { content: ""; position: absolute; z-index: -1; right: -46px; bottom: -46px; width: 130px; height: 130px; border-radius: 50%; background: color-mix(in srgb, var(--edge) 35%, #fff); transition: transform .5s cubic-bezier(.3, 1.4, .5, 1); }
+.entry .oj-guide__box--pink { --bg: var(--pink-soft); --edge: var(--pink); }
+.entry .oj-guide__box--sun { --bg: var(--sun-soft); --edge: var(--sun); }
+.entry .oj-guide__box--sage { --bg: var(--sage-soft); --edge: var(--sage); }
+.entry .oj-guide__box--lilac-soft { --bg: #F6F0FD; --edge: #D9C2F5; }
+.entry .oj-guide__box:hover { transform: translateY(-4px); box-shadow: inset 0 0 0 1.5px var(--edge), 0 22px 36px -28px rgba(18, 35, 26, .6); }
+.entry .oj-guide__box:hover::before { transform: scale(1.12); }
+.entry .oj-guide__box .way__art { width: 72px; height: 72px; margin: -8px 0 .2rem -8px; }
+.entry .oj-guide__q { font-weight: 700; font-size: 1.02rem; line-height: 1.4; }
+.entry .oj-guide__name { align-self: flex-start; padding: .2rem .7rem; border-radius: 999px; background: var(--orchid); color: #fff; font-weight: 700; font-size: .82rem; letter-spacing: .02em; }
+.entry .oj-guide__text { font-size: .95rem; line-height: 1.55; color: color-mix(in srgb, var(--ink) 82%, transparent); }
+.entry .oj-guide__go { margin-top: auto; padding-top: .5rem; font-weight: 700; font-size: .9rem; text-decoration: underline; text-decoration-color: var(--orchid); text-decoration-thickness: 2px; text-underline-offset: 4px; }
+
+/* lists in the page text: her logo's small wave in four colours, not a dash („a gondolatjelek bénák”) */
+.entry ul:not([class]) li:not([class]) { padding-left: 2.2rem; }
+.entry ul:not([class]) li:not([class])::before { left: 0; top: calc(.78em - 5px); width: 1.45rem; height: 10px; border-radius: 0; background: var(--wave, var(--orchid));
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 10' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M2 6.5C5.5 2 9 2 12.5 6.5S19.5 11 23 6.5 26.5 3 28 4.5'/%3E%3C/svg%3E") center / contain no-repeat;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 10' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M2 6.5C5.5 2 9 2 12.5 6.5S19.5 11 23 6.5 26.5 3 28 4.5'/%3E%3C/svg%3E") center / contain no-repeat; }
+.entry ul:not([class]) li:not([class]):nth-child(4n + 2) { --wave: var(--sun); }
+.entry ul:not([class]) li:not([class]):nth-child(4n + 3) { --wave: #9C6ADE; }
+.entry ul:not([class]) li:not([class]):nth-child(4n) { --wave: #6FA085; }

@@ -31,6 +31,9 @@ function oy_faq_tags( $html ) {
 }
 
 function oy_classes_list( $exclude = '' ) {
+	if ( oy_online_only() ) {
+		return oy_class_cards( $exclude );
+	}
 	$rows = '';
 	$n    = 0;
 	foreach ( oy_classes() as $c ) {
@@ -48,6 +51,30 @@ function oy_classes_list( $exclude = '' ) {
 			. '<span class="class-row__thumb" aria-hidden="true">' . $thumb . '</span><span class="class-row__go" aria-hidden="true">' . oy_icon( 'arrow' ) . '</span></a></li>';
 	}
 	return '<ul class="class-list">' . $rows . '</ul>';
+}
+
+/**
+ * The online site's classes as cards: the photo on top, inside the card (Olívia, 14 November: „a kép sem jó, eltakarja a
+ * szöveget és ez mobilon nem néz ki jól. legyen máshogy”), the card in the colour of its home page box.
+ */
+function oy_class_cards( $exclude = '' ) {
+	$tones = array( 'hatha-flow' => 'lilac', 'egyeni-online-joga' => 'pink', oy_prenatal_slug() => 'sage', 'stretching' => 'sun', 'relaxacio-legzes' => 'lilac' );
+	$out   = '';
+	$n     = 0;
+	foreach ( oy_classes() as $c ) {
+		if ( $c->post_name === $exclude ) {
+			continue;
+		}
+		$tone = $tones[ $c->post_name ] ?? OY_ACCENTS[ $n % 4 ];
+		$n++;
+		$len  = oy_class_meta( $c->ID, 'oy_duration' );
+		$out .= '<a class="oj-class-card oj-class-card--' . esc_attr( $tone ) . '" href="' . esc_url( oy_class_url( $c->post_name ) ) . '">'
+			. '<span class="oj-class-card__photo">' . oy_post_photo( $c->ID, '', '(min-width: 960px) 30vw, 92vw' ) . '</span>'
+			. '<span class="oj-class-card__body"><span class="oj-class-card__name">' . esc_html( get_the_title( $c ) ) . '</span>'
+			. '<span class="oj-class-card__desc">' . esc_html( get_the_excerpt( $c ) ) . '</span>'
+			. '<span class="oj-class-card__foot">' . ( $len ? '<span class="oj-class-card__len">' . oy_icon( 'clock' ) . esc_html( $len ) . '</span>' : '<span></span>' ) . '<span class="oj-class-card__go" aria-hidden="true">' . oy_icon( 'arrow' ) . '</span></span></span></a>';
+	}
+	return '<div class="oj-class-cards">' . $out . '</div>';
 }
 
 function oy_faq_list( $home_only = false ) {
@@ -231,6 +258,7 @@ add_action( 'init', function () {
 	$studio = fn( $sc, $fallback ) => shortcode_exists( $sc ) ? do_shortcode( '[' . $sc . ']' ) : $fallback;
 	add_shortcode( 'oy_classes', fn() => '<div class="block-wide">' . oy_classes_list() . '</div>' );
 	add_shortcode( 'oy_faq', fn() => oy_faq_list() );
+	add_shortcode( 'oy_art', fn( $a ) => function_exists( 'oy_way_art' ) ? oy_way_art( sanitize_key( $a['name'] ?? '' ) ) : '' );
 	add_shortcode( 'oy_areas', fn() => oy_areas_list() );
 	add_shortcode( 'oy_breath', fn() => oy_breath() );
 	add_shortcode( 'oy_contact_form', fn() => oy_contact_form() );

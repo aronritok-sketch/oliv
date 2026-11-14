@@ -3127,11 +3127,38 @@ test( 'Olívia\'s doc of 14 November, night: the service boxes get soft, feminin
 		ob_start();
 		load_template( get_template_directory() . '/template-parts/front-online.php', false );
 		$home = (string) ob_get_clean();
-		eq( 5, substr_count( $home, 'class="way__icon way__art"' ), 'home: all five boxes use it' );
+		eq( 7, substr_count( $home, 'class="way__icon way__art"' ), 'home: all five boxes use it (and the two stretching / relaxation cards)' );
 		ok( str_contains( (string) file_get_contents( get_template_directory() . '/assets/online.css' ), '.oj-modules:not(.oj-modules--why) li::before { position: absolute;' ), 'prenatal modules: a pastel circle peeking into each box\'s corner, not a dot' );
 	} finally {
 		update_option( 'oy_edition', 'fort-myers' );
 	}
+} );
+
+test( 'Olívia\'s doc of 14 November, night: „Online órák” – the two blocks out, the classes as photo cards, „Melyik órát válasszam?” as colourful boxes, a new first sentence, waves instead of dashes', function () {
+	update_option( 'oy_edition', 'hu-online' );
+	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+	update_option( 'oy_edition', 'fort-myers' );
+	$pg   = $data['pages']['classes'];
+	ok( ! str_contains( $pg['content'], 'Alapvetően minden hatha jóga óra' ) && ! str_contains( $pg['content'], 'Miért jó az online jógaóra?' ), 'the intro and „Miért jó az online jógaóra?” out („ez a 2 blokk jöjjön ki”)' );
+	ok( 5 === substr_count( $pg['content'], 'class="oj-guide__box' ) && str_contains( $pg['content'], '{{class:relaxacio-legzes}}' ), '„Melyik órát válasszam?”: five boxes, the links kept' );
+	ok( str_contains( $pg['content'], 'Egyéni órán csak rád figyelek' ) && ! str_contains( $pg['content'], 'Egyéni órán csak neked tanítok' ), 'a new first sentence for „Egyéni online órák”' );
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		$page = get_page_by_path( oy_page_slug( 'yoga-classes' ) );
+		$id   = $page ? $page->ID : wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Online jógaórák', 'post_name' => oy_page_slug( 'yoga-classes' ) ) );
+		$old  = array_values( array_filter( $pg['_replace'], fn( $r ) => str_contains( $r[0], 'Melyik órát válasszam?' ) ) )[0];
+		wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => oy_resolve_tokens( $old[0] ) . '<p>' . $pg['_replace'][ count( $pg['_replace'] ) - 1 ][0] . ' Saját mondatom.</p>' ) ) );
+		delete_option( 'oy_1114d_rev' );
+		oy_migrate_1114d();
+		$c = get_post_field( 'post_content', $id );
+		ok( str_contains( $c, 'class="oj-guide__box oj-guide__box--lilac" href="' . oy_class_url( 'hatha-flow' ) ) && str_contains( $c, 'csak rád figyelek' ) && str_contains( $c, 'Saját mondatom.' ), 'live update: the boxes in (links as on the site), the sentence changed, her own words stay' );
+		ok( str_contains( oy_classes_list(), 'class="oj-class-cards"' ) && ! str_contains( oy_classes_list(), 'class-row__thumb' ), 'the classes as cards, the photo inside the card' );
+		ok( str_contains( do_shortcode( '[oy_art name="lotus"]' ), 'way__art' ), '[oy_art]: the soft line drawing' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+	$css = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
+	ok( str_contains( $css, '.entry ul:not([class]) li:not([class])::before { left: 0; top: calc(.78em - 5px); width: 1.45rem;' ), 'lists: her small wave, not a dash („a gondolatjelek bénák”)' );
 } );
 
 test( 'Olívia\'s doc of 14 November: the side column is never cut off while scrolling; her two training photos in one line', function () {
