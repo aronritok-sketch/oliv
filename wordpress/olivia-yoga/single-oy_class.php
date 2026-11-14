@@ -20,10 +20,8 @@ while ( have_posts() ) :
 		<div class="layout layout--aside">
 			<div class="main-col entry">
 				<?php
-				ob_start();
+				oy_main_transform_set( 'opening', oy_class_tone( $slug ) ); // the opening lines in a box, after Olívia's own edits (oy_main_transform)
 				the_content();
-				$oy_body = (string) ob_get_clean();
-				echo oy_online_only() ? oy_opening( $oy_body, oy_class_tone( $slug ) ) : $oy_body; // phpcs:ignore
 				?>
 				<?php if ( shortcode_exists( 'oys_schedule' ) && ! $private ) : ?>
 					<h2><?php esc_html_e( 'Next dates', 'olivia-yoga' ); ?></h2>

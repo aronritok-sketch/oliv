@@ -3025,9 +3025,10 @@ test( 'Olívia\'s doc of 14 November: „legyen extrább, legyél nagyon kreatí
 		load_template( get_template_directory() . '/template-parts/front-online.php', false );
 		$home = (string) ob_get_clean();
 		ok( 4 === substr_count( $home, 'class="oj-fit__item oj-fit__item--' ) && str_contains( $home, 'oj-fit__item--sun' ) && ! str_contains( $home, 'class="oj-bubble' ), 'one-to-one: four of the reasons as soft boxes in her four colours, not the long bubble list („túl hosszú ez a felsorolás”)' );
-		ok( str_contains( $home, esc_url( oy_class_url( 'egyeni-online-joga' ) . '#kinek-szol' ) ), '… and a link to the whole list on the one-to-one page' );
-		ok( (bool) preg_match( '~<ul class="oj-facts">(?:<li><svg.*?</li>){3}</ul>~s', $home ), '… the length, the pair price and „from your living room” as three facts' );
-		ok( str_contains( $home, 'class="oj-voucher"' ) && str_contains( $home, 'oj-voucher__icon' ), '… the gift as a voucher' );
+		ok( str_contains( $home, esc_url( oy_class_url( 'egyeni-online-joga' ) ) . '">' . esc_html__( 'More about one-to-one yoga', 'olivia-yoga' ) ), '… and a link to the one-to-one page, where the whole list is (the extra „Kinek ajánlom még?” link went with „túl katyvaszos”)' );
+		// Olívia, 14 November: „Ez még itt túl katyvaszos, legyen letisztultabb” – one quiet line, the buttons, a small gift link
+		ok( (bool) preg_match( '~<p class="oj-private__facts">[^<]+ · [^<]+ · [^<]+</p>~u', $home ), '… the length, the pair price and „from your living room” in one quiet line' );
+		ok( ! str_contains( $home, 'class="oj-voucher"' ) && ! str_contains( $home, 'oj-fit__more' ), '… no voucher box and no extra link („túl katyvaszos”)' );
 		ok( ! str_contains( $home, 'oj-private .oj-checklist' ) && ! str_contains( $home, 'and as a gift: surprise' ), '… no plain tick list' );
 		ok( ! str_contains( $home, 'oj-more__card' ) && ! str_contains( $home, 'id="more-title"' ), 'stretching and relaxation are no longer on the home page („szedjük ki inkább a főoldalról”) – they have their own pages' );
 		ok( str_contains( $home, esc_html__( 'I guide you in real time. Afterwards the class chat stays open, and a group class can be watched again for a week: only I am on the recording, nobody else.', 'olivia-yoga' ) ), 'step 4: only a group class, only she is on the recording' );
@@ -3403,9 +3404,16 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	update_option( 'oy_edition', 'fort-myers' );
 	ok( str_contains( $pd, '<div class="oj-info"><ul class="oj-info__facts">' ) && str_contains( $pd, '<p>A gyakorlás alatt részed lesz légzésben.</p></div><div class="block-wide">' ) && ! str_contains( $pd, 'csak én látlak' ) && ! str_contains( $pd, '18:30-tól' ), 'Bejelentkezés és árak: the group facts as chips, her text under them, without what the chips repeat („ezek az infok is legyenek már kicsit megdesignolva”)' );
 	ok( str_contains( $cb, 'name="action" value="oy_callback"' ) && str_contains( $cb, 'type="tel" name="phone"' ) && 1 === substr_count( $cb, '<input type="tel"' ) && '' === oy_callback_form(), 'contact: a „Visszahívást kérek” box with only a phone field, on the online site only' );
+	update_option( 'oy_edition', 'hu-online' );
+	oy_main_transform_set( 'opening', 'pink' );
+	$mt = oy_main_transform( '<main><div class="main-col entry"><p>Egy mondat.<br>Még egy.</p><h2>X</h2></div><aside>a</aside></main>' );
+	unset( $GLOBALS['oy_main_x'] );
+	update_option( 'oy_edition', 'fort-myers' );
+	ok( str_contains( $mt, '<div class="main-col entry"><div class="oj-opening oj-opening--pink"><p class="oj-opening__tag">Egy mondat.</p><p>Még egy.</p></div><h2>X</h2></div><aside>a</aside>' ) || str_contains( $mt, '<div class="main-col entry">' . "\n" . '<div class="oj-opening oj-opening--pink">' ), 'the box is made on the finished page, after Olívia\'s own edits are in (they are keyed by the original text)' );
+	ok( has_action( 'template_redirect' ) && str_contains( (string) file_get_contents( get_template_directory() . '/inc/helpers.php' ), "ob_start( 'oy_main_transform' ); // before the page editor's buffer (1000)" ) && ! str_contains( (string) file_get_contents( get_template_directory() . '/single-oy_class.php' ), 'oy_opening(' ), '… not inside the template, where her edits are not in yet' );
 	$sj = (string) file_get_contents( get_template_directory() . '/assets/site.js' );
 	ok( str_contains( $sj, "window.matchMedia('(max-width: 699px)')" ) && str_contains( $sj, "ul.classList.add('oj-modules--fold')" ) && str_contains( $oc2, '.oj-modules--fold li > span { display: none; }' ), 'the prenatal cards fold on a phone, a tap opens one („ezek legyenek lenyithatóak mert mobilon így túl hosszú lesz”)' );
-	ok( preg_match( '/prefers-reduced-motion: no-preference\) \{[^@]*\.hatha__orb--sun \{ animation: oj-sun-glow/', $oc2 ) && str_contains( $oc2, '@keyframes oj-sun-glow' ) && str_contains( $oc2, '@keyframes oj-moon-phase' ), 'Ha–Tha: the sun glows, the moon changes phase, only for those who allow motion („legyen animálva”)' );
+	ok( preg_match( '/prefers-reduced-motion: no-preference\) \{[^@]*\.hatha__orb--sun \{[^}]*animation: oj-ha 12s/', $oc2 ) && str_contains( $oc2, '@keyframes oj-ha {' ) && str_contains( $oc2, '@keyframes oj-tha-fill {' ) && str_contains( $fr, '<span class="hatha__word" aria-hidden="true">Hatha</span>' ), 'Ha–Tha: the sun and the moon drift into one circle with HATHA across it, and part again („egyik átmegy a másikba és oda-vissza”); only with motion allowed' );
 	$ft = (string) file_get_contents( get_template_directory() . '/footer.php' );
 	ok( str_contains( $ft, '<a href="https://aronritok.com/">Ritók-Filip Áron</a>' ) && ! str_contains( $ft, '>HelloProVision</a>' ), 'online footer: made by Áron, linked to his own page („itt Áron neve legyen és Áron egyéni oldala legyen belinkelve”)' );
 	update_option( 'oy_edition', 'hu-online' );

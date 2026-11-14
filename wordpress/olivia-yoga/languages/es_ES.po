@@ -1336,3 +1336,6 @@ msgstr "Solicitud de llamada: %s"
 
 msgid "Someone asked for a call back on the website.\n\nPhone number: %s"
 msgstr "Alguien ha pedido que le llames desde la web.\n\nTeléfono: %s"
+
+msgid "You can also give it as a gift"
+msgstr "También puedes regalarla"

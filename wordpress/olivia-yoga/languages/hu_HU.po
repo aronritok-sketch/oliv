@@ -1955,3 +1955,6 @@ msgstr "Visszahívást kér: %s"
 
 msgid "Someone asked for a call back on the website.\n\nPhone number: %s"
 msgstr "Valaki visszahívást kért a weboldalon.\n\nTelefonszám: %s"
+
+msgid "You can also give it as a gift"
+msgstr "Ajándékba is adhatod"

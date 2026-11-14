@@ -312,6 +312,41 @@ function oy_pricing_design( $html ) {
 	return $html;
 }
 
+/**
+ * The designs built from the text of a page (oy_opening, oy_pricing_design) run on the finished page, after the page
+ * editor has put Olívia's own edits in (inc/page-editor.php keys them by the original text, so changing the text before
+ * would lose them): the template says which one, this buffer applies it to the main column. Not while she is editing,
+ * so she edits her paragraphs as they are.
+ */
+function oy_main_transform_set( $kind, $arg = '' ) {
+	$GLOBALS['oy_main_x'] = array( $kind, $arg );
+}
+
+function oy_main_transform( $html ) {
+	$x = $GLOBALS['oy_main_x'] ?? null;
+	if ( ! $x || ! oy_online_only() || ( function_exists( 'oye_editing' ) && oye_editing() ) ) {
+		return $html;
+	}
+	$tag = '<div class="main-col entry">';
+	$a   = strpos( $html, $tag );
+	if ( false === $a ) {
+		return $html;
+	}
+	$s    = $a + strlen( $tag );
+	$ends = array_filter( array( strpos( $html, '<aside', $s ), strpos( $html, '<footer', $s ) ), fn( $v ) => false !== $v );
+	$e    = $ends ? min( $ends ) : strlen( $html );
+	$part = substr( $html, $s, $e - $s );
+	$part = 'opening' === $x[0] ? oy_opening( $part, $x[1] ?: 'lilac' ) : ( 'pricing' === $x[0] ? oy_pricing_design( $part ) : $part );
+	return substr( $html, 0, $s ) . $part . substr( $html, $e );
+}
+
+add_action( 'template_redirect', function () {
+	if ( ! oy_online_only() || is_admin() || is_feed() || wp_doing_ajax() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+		return;
+	}
+	ob_start( 'oy_main_transform' ); // before the page editor's buffer (1000), so this one gets the page after it
+}, 999 );
+
 /** The colour of a class: the same one its card and box use everywhere. */
 function oy_class_tone( $slug ) {
 	$tones = array( 'hatha-flow' => 'lilac', 'egyeni-online-joga' => 'pink', oy_prenatal_slug() => 'sage', 'stretching' => 'sun', 'relaxacio-legzes' => 'lilac' );

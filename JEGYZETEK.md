@@ -410,6 +410,13 @@
   - „Bejelentkezés és árak”: a csoportos óra adatai kis kerek címkékben; az egyéni órák része ugyanolyan dobozsor,
     mint az „Online órák” oldalon;
   - Kapcsolat: „Visszahívást kérek” doboz, csak egy telefonszám-mezővel; a szám e-mailben megy Olíviának.
+- **3.11.54:**
+  - Javítás: a szövegből épülő dizájnok (az óraoldalak nyitódoboza, az árak oldal infói és dobozai) a kész oldalon,
+    Olívia saját szerkesztései (oldalszerkesztő) után készülnek. A 3.11.53-ban előtte készültek, ezért az árak oldalon
+    két általa törölt mondat visszajött, az óraoldalakon pedig nem jelent meg a doboz.
+  - Ha–Tha: a Nap és a Hold összeúszik egy félig narancs, félig lila körbe, rajta HATHA felirattal, aztán szétválnak
+    („egyik átmegy a másikba és oda-vissza”).
+  - Főoldal, egyéni jóga: egy halk tényezősor, a két gomb és egy kis „Ajándékba is adhatod” link („túl katyvaszos”).
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

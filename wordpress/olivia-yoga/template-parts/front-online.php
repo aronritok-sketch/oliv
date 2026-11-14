@@ -169,11 +169,10 @@ $more     = array(
 			<h2 id="private-title"><?php esc_html_e( 'One-to-one online yoga, entirely tailored to you', 'olivia-yoga' ); ?></h2>
 			<?php // Olívia, 14 November: „ezt is szedjük ki” – no line between the title and the four boxes ?>
 			<ul class="oj-fit"><?php foreach ( $fit as $i => $f ) : ?><li class="oj-fit__item oj-fit__item--<?php echo esc_attr( $tones[ $i % 4 ] ); ?>"><b><?php echo esc_html( $f[0] ); ?></b><span><?php echo esc_html( $f[1] ); ?></span></li><?php endforeach; ?></ul>
-			<p class="oj-fit__more"><a class="text-link" href="<?php echo esc_url( oy_class_url( 'egyeni-online-joga' ) . '#kinek-szol' ); ?>"><?php esc_html_e( 'Who else is it for? You will find them all on the one-to-one page', 'olivia-yoga' ); ?></a></p>
-			<ul class="oj-facts"><?php foreach ( $facts as $f ) : ?><li><?php echo oy_icon( $f[0] ); // phpcs:ignore ?><span><?php echo esc_html( $f[1] ); ?></span></li><?php endforeach; ?></ul>
-			<?php $gift_tag = $gift_url ? 'a' : 'p'; ?>
-			<<?php echo $gift_tag; // phpcs:ignore ?> class="oj-voucher"<?php echo $gift_url ? ' href="' . esc_url( $gift_url ) . '"' : ''; // phpcs:ignore ?>><span class="oj-voucher__icon"><?php echo oy_icon( 'gift' ); // phpcs:ignore ?></span><span class="oj-voucher__text"><b><?php esc_html_e( 'As a gift, too', 'olivia-yoga' ); ?></b> <?php esc_html_e( 'Surprise someone you love with a pretty gift card.', 'olivia-yoga' ); ?></span></<?php echo $gift_tag; // phpcs:ignore ?>>
+			<?php // Olívia, 14 November: „Ez még itt túl katyvaszos, legyen letisztultabb” – one quiet line of facts, the two buttons, and the gift as a small link ?>
+			<p class="oj-private__facts"><?php echo esc_html( implode( ' · ', array_map( fn( $f ) => $f[1], $facts ) ) ); ?></p>
 			<p class="btn-row oj-inline"><?php echo oy_btn( $ask( 'egyeni-joga' ), __( 'Ask for a time', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore ?><a class="text-link" href="<?php echo esc_url( oy_class_url( 'egyeni-online-joga' ) ); ?>"><?php esc_html_e( 'More about one-to-one yoga', 'olivia-yoga' ); ?></a></p>
+			<?php if ( $gift_url ) : ?><p class="oj-private__gift"><?php echo oy_icon( 'gift' ); // phpcs:ignore ?><a href="<?php echo esc_url( $gift_url ); ?>"><?php esc_html_e( 'You can also give it as a gift', 'olivia-yoga' ); ?></a></p><?php endif; ?>
 		</div>
 		<div class="oj-split__art" data-reveal><div class="oj-waved oj-waved--soft"><?php echo oy_soft_blob( 'lilac', 'right' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'private-tree-pose', '(min-width: 960px) 50vw, 100vw' ); // phpcs:ignore ?></div></div></div>
 	</div>
@@ -209,7 +208,7 @@ $more     = array(
 </div></section>
 
 <section class="section section--moss hatha" aria-labelledby="hatha-title"><div class="container hatha__grid">
-	<div data-reveal><div class="hatha__pair"><div class="hatha__orb hatha__orb--sun"><span>Ha</span></div><div class="hatha__orb hatha__orb--moon"><span>Tha</span></div></div><div class="hatha__caption"><span><?php esc_html_e( 'sun: effort, heat, strength', 'olivia-yoga' ); ?></span><span><?php esc_html_e( 'moon: ease, cool, surrender', 'olivia-yoga' ); ?></span></div></div>
+	<div data-reveal><div class="hatha__pair"><div class="hatha__orb hatha__orb--sun"><span>Ha</span></div><div class="hatha__orb hatha__orb--moon"><span>Tha</span></div><span class="hatha__word" aria-hidden="true">Hatha</span></div><div class="hatha__caption"><span><?php esc_html_e( 'sun: effort, heat, strength', 'olivia-yoga' ); ?></span><span><?php esc_html_e( 'moon: ease, cool, surrender', 'olivia-yoga' ); ?></span></div></div>
 	<div data-reveal>
 		<?php echo oy_kicker( __( 'What hatha means', 'olivia-yoga' ) ); // phpcs:ignore ?>
 		<h2 id="hatha-title"><?php esc_html_e( 'Ha is the sun. Tha is the moon.', 'olivia-yoga' ); ?></h2>
