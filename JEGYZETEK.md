@@ -318,6 +318,15 @@
   Tesztek 1093/0.
 - **3.11.14:** a Rólam képzés-kártyái (`oj-creds`, a három tanúsítvány) kikerültek („Ezt a részt szedjük ki a rólamból”);
   élesen `oy_migrate_1114d` rev o, a teljes blokk szó szerinti `_replace` párjával.
+- **3.11.15–3.11.19 (olivia-studio 1.10.8–1.10.10; Áron: „Mindet az éles oldalon módosítsd folyamatosan” – nincs
+  dev-várakozás):** a ragadós oldaldoboz csak akkor ragad, ha egészében kifér, alacsony laptopon tömörebb; a főoldali
+  ecsetvonás vége elhalványul; minden főoldali kép színes egérrel; az egyéni órák blokkja buborékok + három tény +
+  ajándék-szelvény, a stretching/relaxáció kártyák színesek, ecsetvonással és kerek hossz-pecséttel; „csak a csoportos
+  óra nézhető vissza, csak én szerepelek rajta”; GYIK: az óratípusok színes címkék, a főoldali GYIK-cím nem ragad;
+  ajándékutalvány: napfényes portré, a hosszú cím kisebb, lágy kártyák kategóriánként, a választott kiírva az űrlap
+  fölött; Jógáról: minden írás egy oldalon, a 8 ág a végén; lábléc „Rólam”; foglalás: a vendéghozásnál a JS „$”-t írt
+  forint helyett (javítva), az „1 alkalmas jegy megvétele” opció kikerült; Kapcsolat: „Online, élőben” ki. Üzenet
+  Olíviának: 9148655. Tesztek 1122/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
