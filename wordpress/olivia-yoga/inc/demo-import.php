@@ -650,7 +650,8 @@ function oy_migrate_1113() {
  * Arovia's EIN (Áron: „Nincs áfa. Mehet minden bele.” – „Igen. Megerősítem”).
  */
 function oy_migrate_legal() {
-	$rev = '2026-11-14a';
+	// b: „Olívia” with a long í in the booking plugin's texts too (the participation agreement: „szólok Oliviának”)
+	$rev = '2026-11-14b';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_legal_rev' ) === $rev ) {
 		return array();
 	}
@@ -658,6 +659,20 @@ function oy_migrate_legal() {
 	kses_remove_filters();
 	$log = oy_import_legal( (array) $data, true );
 	kses_init_filters();
+	if ( class_exists( 'OYS_Settings' ) ) {
+		$fix = array();
+		foreach ( array( 'waiver_text', 'cancel_policy', 'private_note', 'pay_later_note' ) as $k ) {
+			$v = (string) OYS_Settings::get( $k );
+			$w = preg_replace( '/Olivi(?=[aá])/u', 'Olívi', $v ); // her name only: addresses are lower case (oliviajoga, olivia.kovacs6)
+			if ( $w !== $v ) {
+				$fix[ $k ] = $w;
+			}
+		}
+		if ( $fix ) {
+			OYS_Settings::update( $fix );
+			$log[] = 'Olívia in: ' . implode( ', ', array_keys( $fix ) );
+		}
+	}
 	update_option( 'oy_legal_rev', $rev );
 	return $log;
 }

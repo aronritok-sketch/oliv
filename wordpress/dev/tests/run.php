@@ -1924,6 +1924,24 @@ test( 'online edition, first day live: English post addresses become Hungarian, 
 	}
 } );
 
+test( 'online edition, live update: the legal pages again, and „Olívia” in the booking texts (14 Nov)', function () {
+	require_once get_template_directory() . '/inc/demo-import.php';
+	$waiver = OYS_Settings::get( 'waiver_text' );
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		OYS_Settings::update( array( 'waiver_text' => 'Óra előtt szólok Oliviának. Írj: olivia.kovacs6@gmail.com' ) );
+		delete_option( 'oy_legal_rev' );
+		oy_migrate_legal();
+		eq( 'Óra előtt szólok Olíviának. Írj: olivia.kovacs6@gmail.com', OYS_Settings::get( 'waiver_text' ), 'her name with a long í, the address untouched' );
+		$aszf = get_page_by_path( 'aszf' );
+		ok( $aszf && str_contains( $aszf->post_content, 'EIN): 36-5185016' ) && str_contains( $aszf->post_content, 'semmilyen adót' ), 'the ÁSZF with the EIN and the final prices' );
+		eq( array(), oy_migrate_legal(), 'once per revision' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
+		OYS_Settings::update( array( 'waiver_text' => $waiver ) );
+	}
+} );
+
 test( 'online edition: a weekly class leaves out a date (23 December)', function () {
 	require_once get_template_directory() . '/inc/demo-import.php';
 	$day  = wp_date( 'N', time() + 9 * DAY_IN_SECONDS );

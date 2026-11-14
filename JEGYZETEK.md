@@ -224,7 +224,7 @@
   fel” (áfamentességet nem írunk ki); az Arovia EIN-je (36-5185016, a CRM `company_ein`) az ÁSZF-ben és az
   impresszumban. Élesen csak a jogi oldalak frissülnek (`oy_migrate_legal`, rev 2026-11-14a) – Olívia már maga
   szerkeszti az oldalt, a teljes tartalom nem töltődik újra. **Hiányzik:** a floridai cégjegyzékszám (Sunbiz Document
-  Number) és a GDPR 27. cikk szerinti uniós képviselő (ki legyen?) – Árontól. Két napfüggő teszt javítva. Tesztek 921/0.
+  Number) és a GDPR 27. cikk szerinti uniós képviselő (ki legyen?) – Árontól. Két napfüggő teszt javítva. 3.6.2: a részvételi nyilatkozatban is „Olíviának” (a bővítmény beállításaiban maradt rövid i). Tesztek 924/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
