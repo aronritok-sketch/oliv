@@ -36,6 +36,71 @@ function oy_alt( $alt ) {
 }
 
 /**
+ * A bundled photo's file name without the size: the online edition's build gives each photo its Hungarian name
+ * (images.json „file”), elsewhere it is the key.
+ */
+function oy_image_file( $key ) {
+	$m = oy_images()[ $key ] ?? array();
+	return (string) ( $m['file'] ?? $key );
+}
+
+/**
+ * A bundled photo's alt text. On the online edition its own Hungarian text with the keywords (images.json „hu”; Olívia,
+ * 14 Nov: „az alt textek … angolul vannak. legyen mindegyik magyar és az összes releváns kulcsszó legyen benne”),
+ * elsewhere the English text in the visitor's language.
+ */
+function oy_image_alt( $key ) {
+	$m = oy_images()[ $key ] ?? array();
+	if ( oy_online_only() && ! empty( $m['hu']['alt'] ) ) {
+		return (string) $m['hu']['alt'];
+	}
+	$alt = (string) ( $m['alt'] ?? '' );
+	return '' === $alt ? '' : oy_alt( $alt );
+}
+
+/** The name a bundled photo gets in the media library: on the online edition the Hungarian one, accents removed. */
+function oy_image_slug( $key ) {
+	$m = oy_images()[ $key ] ?? array();
+	return oy_online_only() && ! empty( $m['hu']['file'] ) ? (string) $m['hu']['file'] : (string) $key;
+}
+
+/**
+ * The page editor (inc/page-editor.php) names a web copy of a photo Olívia puts on a page after the text of the place it
+ * went to: the bundled photo's alt text (data-oyp is its key), or the media library photo's own.
+ */
+add_filter( 'oye_slot_alt', function ( $alt, $key ) {
+	$k = substr( (string) $key, 2 );
+	if ( '' !== (string) $alt ) {
+		return $alt;
+	}
+	if ( isset( oy_images()[ $k ] ) ) {
+		return oy_image_alt( $k );
+	}
+	return preg_match( '/^a(\d+)$/', $k, $m ) ? (string) get_post_meta( (int) $m[1], '_wp_attachment_image_alt', true ) : $alt;
+}, 10, 2 );
+
+/**
+ * Photos Olívia uploaded herself, described by us after looking at them (the content file's „uploads”, by the file's
+ * place in the media library: 2026/11/IMG_7309.jpg). Her own alt text or the place's text would not fit them.
+ */
+function oy_upload_entry( $id ) {
+	static $cache = array();
+	$file = oy_content_file();
+	if ( ! isset( $cache[ $file ] ) ) {
+		$data           = json_decode( (string) file_get_contents( $file ), true );
+		$cache[ $file ] = array_change_key_case( (array) ( $data['uploads'] ?? array() ), CASE_LOWER );
+	}
+	$all = $cache[ $file ];
+	if ( ! $all ) {
+		return null;
+	}
+	$rel = strtolower( (string) preg_replace( '/-scaled(\.\w+)$/', '$1', (string) get_post_meta( (int) $id, '_wp_attached_file', true ) ) );
+	return $all[ $rel ] ?? null;
+}
+add_filter( 'oye_image_alt', fn( $alt, $id ) => (string) ( oy_upload_entry( $id )['alt'] ?? $alt ), 10, 2 );
+add_filter( 'oye_image_name', fn( $name, $id ) => (string) ( oy_upload_entry( $id )['file'] ?? $name ), 10, 2 );
+
+/**
  * A photo from the theme's bundled set (by key) or the media library (attachment id).
  */
 function oy_photo( $src, $sizes = '100vw', $eager = false, $alt = null ) {
@@ -48,11 +113,12 @@ function oy_photo( $src, $sizes = '100vw', $eager = false, $alt = null ) {
 		if ( null !== $alt ) {
 			$attrs['alt'] = $alt;
 		} else {
-			// A theme photo whose alt text is still the original: show it in the visitor's language.
+			// A theme photo whose alt text is still the original (or none): show it in the visitor's language.
 			$key  = (string) get_post_meta( (int) $src, 'oy_key', true );
 			$imgs = $key ? oy_images() : array();
-			if ( ! empty( $imgs[ $key ]['alt'] ) && get_post_meta( (int) $src, '_wp_attachment_image_alt', true ) === $imgs[ $key ]['alt'] ) {
-				$attrs['alt'] = oy_alt( $imgs[ $key ]['alt'] );
+			$own  = (string) get_post_meta( (int) $src, '_wp_attachment_image_alt', true );
+			if ( isset( $imgs[ $key ] ) && ( '' === $own || $own === (string) $imgs[ $key ]['alt'] ) ) {
+				$attrs['alt'] = oy_image_alt( $key );
 			}
 		}
 		$pos = get_post_meta( (int) $src, 'oy_pos', true );
@@ -67,8 +133,8 @@ function oy_photo( $src, $sizes = '100vw', $eager = false, $alt = null ) {
 		return '';
 	}
 	$m    = $imgs[ $src ];
-	$base = get_template_directory_uri() . '/assets/img/' . $src;
-	$alt  = null === $alt ? oy_alt( $m['alt'] ) : $alt;
+	$base = get_template_directory_uri() . '/assets/img/' . oy_image_file( $src );
+	$alt  = null === $alt ? oy_image_alt( $src ) : $alt;
 	return sprintf(
 		'<img class="photo" src="%1$s-1200.jpg" srcset="%1$s-600.jpg %8$dw, %1$s-1200.jpg %2$dw" sizes="%3$s" alt="%4$s" width="%2$d" height="%5$d" style="object-position:%6$s" %7$s decoding="async" data-oyp="%9$s">',
 		esc_url( $base ), (int) $m['w'], esc_attr( $sizes ), esc_attr( $alt ), (int) $m['h'], esc_attr( $m['pos'] ),

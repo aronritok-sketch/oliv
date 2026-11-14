@@ -228,7 +228,7 @@
     btn.disabled = true; btn.textContent = 'Mentés…';
     try {
       const r = await fetch(C.rest, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json', 'X-WP-Nonce': C.nonce },
-        body: JSON.stringify({ t: Object.fromEntries(Object.entries(ch.t).map(([k, v]) => [k, { v, def: C.t[k].def }])), i: Object.fromEntries(Object.entries(ch.i).map(([k, v]) => [k, { ...v, def: C.i[k].def }])), reset: [...ch.reset], where: C.where }) });
+        body: JSON.stringify({ t: Object.fromEntries(Object.entries(ch.t).map(([k, v]) => [k, { v, def: C.t[k].def }])), i: Object.fromEntries(Object.entries(ch.i).map(([k, v]) => [k, { ...v, def: C.i[k].def, alt: C.i[k].alt || '' }])), reset: [...ch.reset], where: C.where }) });
       const j = await r.json();
       if (!r.ok || !j.ok) throw new Error(j.message || r.status);
       ch.t = {}; ch.i = {}; ch.reset.clear(); upd();

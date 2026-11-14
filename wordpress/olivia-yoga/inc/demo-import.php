@@ -78,21 +78,23 @@ function oy_import_image( $key ) {
 		return (int) $found[0];
 	}
 	$imgs = oy_images();
-	$src  = get_template_directory() . '/assets/img/' . $key . '-1200.jpg';
+	$src  = get_template_directory() . '/assets/img/' . oy_image_file( $key ) . '-1200.jpg';
 	if ( empty( $imgs[ $key ] ) || ! file_exists( $src ) ) {
 		return 0;
 	}
 	require_once ABSPATH . 'wp-admin/includes/image.php';
 	require_once ABSPATH . 'wp-admin/includes/file.php';
 	require_once ABSPATH . 'wp-admin/includes/media.php';
-	$tmp = wp_tempnam( $key . '.jpg' );
+	$name = oy_image_slug( $key );
+	$alt  = oy_online_only() && ! empty( $imgs[ $key ]['hu']['alt'] ) ? $imgs[ $key ]['hu']['alt'] : $imgs[ $key ]['alt'];
+	$tmp  = wp_tempnam( $name . '.jpg' );
 	copy( $src, $tmp );
-	$id = media_handle_sideload( array( 'name' => $key . '.jpg', 'tmp_name' => $tmp ), 0, $imgs[ $key ]['alt'] );
+	$id = media_handle_sideload( array( 'name' => $name . '.jpg', 'tmp_name' => $tmp ), 0, $alt );
 	if ( is_wp_error( $id ) ) {
 		wp_delete_file( $tmp );
 		return 0;
 	}
-	update_post_meta( $id, '_wp_attachment_image_alt', $imgs[ $key ]['alt'] );
+	update_post_meta( $id, '_wp_attachment_image_alt', $alt );
 	update_post_meta( $id, 'oy_key', $key );
 	update_post_meta( $id, 'oy_pos', $imgs[ $key ]['pos'] );
 	return (int) $id;
@@ -683,7 +685,8 @@ function oy_migrate_legal() {
  * page stays as it is (Olivia edits her pages herself now).
  */
 function oy_migrate_prices() {
-	$rev = '2026-11-14a';
+	// b: Olívia's chat of 14 November: the relaxation pass 20 000 Ft, the pair's 32 000 Ft
+	$rev = '2026-11-14b';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_prices_rev' ) === $rev ) {
 		return array();
 	}
@@ -710,6 +713,135 @@ function oy_migrate_prices() {
 	}
 	update_option( 'oy_prices_rev', $rev );
 	return $log;
+}
+
+/**
+ * Olívia, 14 November: „az alt textek és kép elnevezések angolul vannak. legyen mindegyik magyar és az összes releváns
+ * kulcsszó legyen benne. a kép elnevezések ékezet nélkül, kötőjellel legyenek” – „amiket én cserélek képek, abból
+ * csinálj egy másolatot megfelelő képmérettel … és fájlelnevezéssel”. On a live online site, once: the theme's photos in
+ * the media library get their Hungarian name and text (images.json „hu”; a text someone wrote is kept), and the photos
+ * she put on the pages herself get a web copy (the page editor's oye_web_copies()).
+ */
+function oy_migrate_images() {
+	$rev = '2026-11-14a';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_images_rev' ) === $rev ) {
+		return array();
+	}
+	global $wpdb;
+	$imgs  = oy_images();
+	$urls  = array();
+	$named = 0;
+	$texts = 0;
+	foreach ( get_posts( array( 'post_type' => 'attachment', 'post_status' => 'any', 'meta_key' => 'oy_key', 'numberposts' => -1, 'fields' => 'ids' ) ) as $att ) {
+		$key = (string) get_post_meta( $att, 'oy_key', true );
+		$hu  = $imgs[ $key ]['hu'] ?? null;
+		if ( ! $hu ) {
+			continue;
+		}
+		$own = (string) get_post_meta( $att, '_wp_attachment_image_alt', true );
+		if ( '' === $own || $own === (string) $imgs[ $key ]['alt'] ) {
+			update_post_meta( $att, '_wp_attachment_image_alt', $hu['alt'] );
+			$title = get_post_field( 'post_title', $att );
+			if ( '' === $title || $title === $imgs[ $key ]['alt'] || $title === $key ) {
+				wp_update_post( array( 'ID' => $att, 'post_title' => $hu['alt'] ) );
+			}
+			$texts++;
+		}
+		$moved = oy_rename_attachment( $att, $hu['file'] );
+		if ( $moved ) {
+			$urls += $moved;
+			$named++;
+		}
+	}
+	// the old addresses in the posts (a photo placed in a text)
+	foreach ( $urls as $old => $new ) {
+		$wpdb->query( $wpdb->prepare( "UPDATE {$wpdb->posts} SET post_content = REPLACE(post_content, %s, %s) WHERE post_content LIKE %s", $old, $new, '%' . $wpdb->esc_like( $old ) . '%' ) );
+	}
+	if ( $urls ) {
+		clean_post_cache( 0 );
+		wp_cache_flush();
+	}
+	// the page editor's list shows the original photo of each place: the theme's photos have their new names
+	$meta = get_option( 'oye_edits_meta', array() );
+	if ( is_array( $meta ) && $meta ) {
+		foreach ( $meta as $k => $m ) {
+			$def = (string) ( $m['def'] ?? '' );
+			if ( preg_match( '~/assets/img/([a-z0-9-]+)-(1200|600)\.jpg$~', $def, $x ) && isset( $imgs[ $x[1] ] ) && oy_image_file( $x[1] ) !== $x[1] ) {
+				$meta[ $k ]['def'] = str_replace( '/' . $x[1] . '-', '/' . oy_image_file( $x[1] ) . '-', $def );
+			}
+		}
+		update_option( 'oye_edits_meta', $meta, false );
+	}
+	$log = array( sprintf( 'photos: %d Hungarian names, %d Hungarian texts', $named, $texts ) );
+	if ( function_exists( 'oye_web_copies' ) ) {
+		$log = array_merge( $log, oye_web_copies() );
+	}
+	update_option( 'oy_images_rev', $rev );
+	return $log;
+}
+
+/**
+ * A media library photo under a new name, in place: the file, its sizes and the original of a scaled one move, the
+ * attachment keeps its id (so every page that shows it keeps showing it). Returns old address => new address.
+ */
+function oy_rename_attachment( $id, $slug ) {
+	$file = (string) get_attached_file( $id );
+	$meta = wp_get_attachment_metadata( $id );
+	if ( '' === $file || ! file_exists( $file ) || ! is_array( $meta ) || '' === (string) $slug ) {
+		return array();
+	}
+	$dir    = dirname( $file );
+	$ext    = (string) pathinfo( $file, PATHINFO_EXTENSION );
+	$scaled = ! empty( $meta['original_image'] );
+	$old    = (string) preg_replace( '/-scaled$/', '', pathinfo( $file, PATHINFO_FILENAME ) );
+	if ( $old === $slug || preg_match( '/^' . preg_quote( $slug, '/' ) . '-\d+$/', $old ) ) {
+		return array();
+	}
+	$base = $slug;
+	for ( $i = 2; file_exists( "$dir/$base.$ext" ) || file_exists( "$dir/$base-scaled.$ext" ); $i++ ) {
+		$base = $slug . '-' . $i;
+	}
+	$moves = array( basename( $file ) => $base . ( $scaled ? '-scaled' : '' ) . '.' . $ext );
+	if ( $scaled ) {
+		$moves[ (string) $meta['original_image'] ] = $base . '.' . $ext;
+	}
+	foreach ( (array) ( $meta['sizes'] ?? array() ) as $size => $s ) {
+		$f = (string) ( $s['file'] ?? '' );
+		if ( 0 === strpos( $f, $old . '-' ) ) {
+			$moves[ $f ] = $base . substr( $f, strlen( $old ) );
+		}
+	}
+	$done = array();
+	foreach ( $moves as $from => $to ) {
+		if ( ! file_exists( "$dir/$from" ) ) {
+			continue;
+		}
+		if ( ! @rename( "$dir/$from", "$dir/$to" ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			foreach ( $done as $a => $b ) {
+				@rename( "$dir/$b", "$dir/$a" ); // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			}
+			return array();
+		}
+		$done[ $from ] = $to;
+	}
+	$url = trailingslashit( dirname( (string) wp_get_attachment_url( $id ) ) );
+	update_attached_file( $id, "$dir/" . $moves[ basename( $file ) ] );
+	$meta['file'] = ltrim( trailingslashit( dirname( (string) $meta['file'] ) ), './' ) . $moves[ basename( $file ) ];
+	if ( $scaled ) {
+		$meta['original_image'] = $moves[ (string) $meta['original_image'] ];
+	}
+	foreach ( (array) ( $meta['sizes'] ?? array() ) as $size => $s ) {
+		if ( isset( $moves[ (string) ( $s['file'] ?? '' ) ] ) ) {
+			$meta['sizes'][ $size ]['file'] = $moves[ $s['file'] ];
+		}
+	}
+	wp_update_attachment_metadata( $id, $meta );
+	wp_update_post( array( 'ID' => $id, 'post_name' => $base ) );
+	$out = array();
+	foreach ( $done as $from => $to ) {
+		$out[ $url . $from ] = $url . $to;
+	}
+	return $out;
 }
 
 /**

@@ -9,19 +9,31 @@
   "alt": "Olivia Kovacs stretching her arms up in warm evening light",
   "pos": "50% 30%",
   "w": 1200,
-  "h": 1500
+  "h": 1500,
+  "hu": {
+   "file": "kovacs-olivia-felnyujtott-karok-esti-feny-elo-online-jogaora",
+   "alt": "Kovács Olívia felnyújtott karokkal a meleg esti fényben – élő online jógaóra"
+  }
  },
  "olivia-riverside-profile": {
   "alt": "Olivia Kovacs looking out over the river at golden hour",
   "pos": "45% 30%",
   "w": 1200,
-  "h": 1500
+  "h": 1500,
+  "hu": {
+   "file": "kovacs-olivia-jogaoktato-folyopart-aranyora",
+   "alt": "Kovács Olívia jógaoktató a folyópart fölött az aranyórában"
+  }
  },
  "olivia-sunset-smile": {
   "alt": "Portrait of yoga teacher Olivia Kovacs smiling at sunset",
   "pos": "62% 35%",
   "w": 1200,
-  "h": 900
+  "h": 900,
+  "hu": {
+   "file": "kovacs-olivia-jogaoktato-mosoly-naplemente",
+   "alt": "Kovács Olívia jógaoktató mosolyog naplementekor egy teraszon"
+  }
  },
  "olivia-sea-side-stretch": {
   "alt": "Olivia Kovacs in a side stretch by the sea",
@@ -39,13 +51,21 @@
   "alt": "Close portrait of Olivia Kovacs in soft sunlight",
   "pos": "60% 40%",
   "w": 1200,
-  "h": 900
+  "h": 900,
+  "hu": {
+   "file": "kovacs-olivia-jogaoktato-portre-napfeny",
+   "alt": "Kovács Olívia jógaoktató portréja lágy napfényben"
+  }
  },
  "olivia-garland-deck": {
   "alt": "Olivia Kovacs in a deep squat on an outdoor yoga deck",
   "pos": "50% 55%",
   "w": 1200,
-  "h": 1600
+  "h": 1600,
+  "hu": {
+   "file": "kovacs-olivia-guggolas-malaszana-jogaterasz",
+   "alt": "Kovács Olívia mély guggolásban (malászana) egy szabadtéri jógateraszon"
+  }
  },
  "olivia-side-plank-deck": {
   "alt": "Olivia Kovacs in a side plank variation on a wooden deck",
@@ -57,7 +77,11 @@
   "alt": "Olivia Kovacs in a standing forward fold",
   "pos": "50% 50%",
   "w": 1200,
-  "h": 1600
+  "h": 1600,
+  "hu": {
+   "file": "kovacs-olivia-allo-elorehajlas-uttanaszana",
+   "alt": "Kovács Olívia álló előrehajlásban (uttanászana) egy fapadlós teremben"
+  }
  },
  "olivia-meadow-warrior": {
   "alt": "Olivia Kovacs in a warrior pose in a meadow at sunset",
@@ -75,31 +99,51 @@
   "alt": "Olivia Kovacs in dancer pose in a living room",
   "pos": "40% 45%",
   "w": 1178,
-  "h": 1113
+  "h": 1113,
+  "hu": {
+   "file": "kovacs-olivia-tancos-poz-nappali-online-joga-otthon",
+   "alt": "Kovács Olívia táncos pózban otthon, a nappaliban – online jóga otthonról"
+  }
  },
  "olivia-studio-standing": {
   "alt": "Olivia Kovacs reaching up in a bright studio",
   "pos": "50% 40%",
   "w": 1200,
-  "h": 798
+  "h": 798,
+  "hu": {
+   "file": "kovacs-olivia-nyujtozas-jogaterem",
+   "alt": "Kovács Olívia felfelé nyújtózik egy világos jógateremben"
+  }
  },
  "olivia-mandala-lunge": {
   "alt": "Olivia Kovacs in a crescent lunge in front of a mandala",
   "pos": "50% 55%",
   "w": 999,
-  "h": 1600
+  "h": 1600,
+  "hu": {
+   "file": "kovacs-olivia-kitores-holdsarlo-poz-mandala",
+   "alt": "Kovács Olívia kitörésben (holdsarló póz) egy mandala előtt"
+  }
  },
  "online-yoga-living-room": {
   "alt": "Olivia Kovacs teaching online yoga from her living room",
   "pos": "50% 55%",
   "w": 1200,
-  "h": 900
+  "h": 900,
+  "hu": {
+   "file": "kovacs-olivia-harcos-poz-nappali-online-jogaora",
+   "alt": "Kovács Olívia harcos pózban a nappaliban – online jógaóra otthonról"
+  }
  },
  "olivia-childs-pose": {
   "alt": "Olivia Kovacs resting in child's pose",
   "pos": "50% 60%",
   "w": 1200,
-  "h": 1600
+  "h": 1600,
+  "hu": {
+   "file": "kovacs-olivia-gyermekpoz-relaxacio",
+   "alt": "Kovács Olívia gyermekpózban pihen a jógaszőnyegen – relaxáció"
+  }
  },
  "olivia-sunset-silhouette": {
   "alt": "Silhouette of Olivia Kovacs against an orange sunset",
@@ -111,7 +155,11 @@
   "alt": "Students in downward dog on a wooden deck",
   "pos": "50% 50%",
   "w": 1200,
-  "h": 927
+  "h": 927,
+  "hu": {
+   "file": "lefele-nezo-kutya-poz-hatha-jogaora",
+   "alt": "Jógázók lefelé néző kutya pózban egy fateraszon – hatha jógaóra"
+  }
  },
  "deck-bird-dog": {
   "alt": "Students balancing in bird dog during an outdoor class",
@@ -177,7 +225,11 @@
   "alt": "Students resting in final relaxation in a dim studio",
   "pos": "50% 55%",
   "w": 800,
-  "h": 1066
+  "h": 1066,
+  "hu": {
+   "file": "zaro-relaxacio-jogaterem",
+   "alt": "Jógázók a záró relaxációban egy félhomályos jógateremben"
+  }
  },
  "studio-childs-pose": {
   "alt": "Students resting in child's pose on a wooden floor",
@@ -189,7 +241,11 @@
   "alt": "Tibetan singing bowls lined up in a yoga studio",
   "pos": "50% 60%",
   "w": 1200,
-  "h": 1600
+  "h": 1600,
+  "hu": {
+   "file": "tibeti-hangtalak-jogaterem-relaxacio",
+   "alt": "Tibeti hangtálak sorban egy jógateremben – hangtálas relaxáció"
+  }
  },
  "gong-and-bowls": {
   "alt": "A gong and singing bowls set up for a sound yoga class",
@@ -207,7 +263,11 @@
   "alt": "A private yoga session in tree pose",
   "pos": "50% 40%",
   "w": 1067,
-  "h": 1600
+  "h": 1600,
+  "hu": {
+   "file": "egyeni-jogaora-fa-poz-kovacs-olivia",
+   "alt": "Egyéni jógaóra Kovács Olíviával: fa póz (vrikshászana) a jógateremben"
+  }
  },
  "private-side-angle": {
   "alt": "Olivia Kovacs guiding a private yoga session",
@@ -225,7 +285,11 @@
   "alt": "Olivia Kovacs coaching a pregnant client on a fitness ball",
   "pos": "50% 50%",
   "w": 500,
-  "h": 750
+  "h": 750,
+  "hu": {
+   "file": "kismamatorna-fitneszlabda-kovacs-olivia",
+   "alt": "Kovács Olívia kismamatornán segíti a vendégét egy fitneszlabdás gyakorlatban"
+  }
  },
  "team-handpan-session": {
   "alt": "A team yoga session with live handpan in an office",
@@ -297,7 +361,11 @@
   "alt": "Olivia Kovacs on a terrace at sunset, looking into the distance",
   "pos": "55% 35%",
   "w": 1200,
-  "h": 900
+  "h": 900,
+  "hu": {
+   "file": "kovacs-olivia-jogaoktato-terasz-naplemente",
+   "alt": "Kovács Olívia jógaoktató egy teraszon naplementekor, a távolba néz"
+  }
  },
  "past-event-01": {
   "alt": "",
@@ -465,162 +533,270 @@
   "alt": "",
   "pos": "50% 50%",
   "w": 900,
-  "h": 849
+  "h": 849,
+  "hu": {
+   "file": "hatha-jogaora-nyujto-gyakorlatok-forditott-harcos",
+   "alt": "Kovács Olívia fordított harcos pózban a réten – nyújtó gyakorlatok a hatha jógaórán"
+  }
  },
  "journal-02": {
   "alt": "",
   "pos": "50% 50%",
   "w": 800,
-  "h": 595
+  "h": 595,
+  "hu": {
+   "file": "hatha-jogaora-erosito-gyakorlatok-csaturanga",
+   "alt": "Kovács Olívia csaturangában (alacsony plank) – erősítő gyakorlatok a hatha jógaórán"
+  }
  },
  "journal-03": {
   "alt": "",
   "pos": "50% 50%",
   "w": 795,
-  "h": 600
+  "h": 600,
+  "hu": {
+   "file": "hatha-jogaora-vinyasza-napudvozlet-holdudvozlet",
+   "alt": "Kovács Olívia egy teraszon naplementekor – vinyászák, nap- és holdüdvözlet a hatha jógaórán"
+  }
  },
  "journal-04": {
   "alt": "",
   "pos": "50% 50%",
   "w": 800,
-  "h": 992
+  "h": 992,
+  "hu": {
+   "file": "hatha-jogaora-egyensuly-tancos-poz",
+   "alt": "Kovács Olívia táncos pózban a nappaliban – egyensúlygyakorlatok a hatha jógaórán"
+  }
  },
  "journal-05": {
   "alt": "",
   "pos": "50% 50%",
   "w": 667,
-  "h": 746
+  "h": 746,
+  "hu": {
+   "file": "hatha-jogaora-rahangolodas-relaxacio",
+   "alt": "Kovács Olívia törökülésben, imakézzel – ráhangolódás és relaxáció a hatha jógaórán"
+  }
  },
  "journal-06": {
   "alt": "",
   "pos": "50% 50%",
   "w": 791,
-  "h": 739
+  "h": 739,
+  "hu": {
+   "file": "nyujtas-hatasa-szemelyisegre-joga",
+   "alt": "Kovács Olívia mély kitörésben nyújt – a nyújtás hatása a személyiségre"
+  }
  },
  "journal-07": {
   "alt": "",
   "pos": "50% 50%",
   "w": 798,
-  "h": 600
+  "h": 600,
+  "hu": {
+   "file": "joga-pozitiv-gondolkodas",
+   "alt": "Kovács Olívia lehajtott fejjel, lágy fényben – jóga és pozitív gondolkodás"
+  }
  },
  "journal-08": {
   "alt": "",
   "pos": "50% 50%",
   "w": 798,
-  "h": 800
+  "h": 800,
+  "hu": {
+   "file": "lelki-egeszseg-vilagnapja-joga",
+   "alt": "Kovács Olívia a homokdűnén naplementekor – a lelki egészség világnapja"
+  }
  },
  "journal-09": {
   "alt": "",
   "pos": "50% 50%",
   "w": 1000,
-  "h": 966
+  "h": 966,
+  "hu": {
+   "file": "egeszseges-gondolkodas-onszeretet-joga",
+   "alt": "Kovács Olívia kitörésben, felnyújtott karokkal a kertben – egészséges gondolkodás és önszeretet"
+  }
  },
  "journal-10": {
   "alt": "",
   "pos": "50% 50%",
   "w": 603,
-  "h": 664
+  "h": 664,
+  "hu": {
+   "file": "legzes-legzogyakorlat-joga",
+   "alt": "Kovács Olívia hátrahajlásban a homokdűnén – légzőgyakorlatok a jógában"
+  }
  },
  "journal-11": {
   "alt": "",
   "pos": "50% 50%",
   "w": 800,
-  "h": 591
+  "h": 591,
+  "hu": {
+   "file": "zene-a-jogaoran",
+   "alt": "Kovács Olívia táncos pózban egy mezőn – zene a jógaórán"
+  }
  },
  "journal-12": {
   "alt": "",
   "pos": "50% 50%",
   "w": 643,
-  "h": 532
+  "h": 532,
+  "hu": {
+   "file": "allj-meg-egy-pillanatra-joga",
+   "alt": "Kovács Olívia felemelt karokkal a hegyek felé néz – állj meg egy pillanatra"
+  }
  },
  "journal-13": {
   "alt": "",
   "pos": "50% 50%",
   "w": 1069,
-  "h": 1080
+  "h": 1080,
+  "hu": {
+   "file": "pajzsmirigy-harmonizalas-jogaval-aszanak",
+   "alt": "Pajzsmirigy harmonizálás jógával: gyertyaállás, ekepóz, fejenállás, kobrapóz, felfelé néző kutya, kis jógahíd, tevepóz, napüdvözlet"
+  }
  },
  "journal-14": {
   "alt": "",
   "pos": "50% 50%",
   "w": 754,
-  "h": 557
+  "h": 557,
+  "hu": {
+   "file": "mit-ad-a-joga-kerekpoz",
+   "alt": "Kovács Olívia egylábas kerékpózban a réten – mit ad a jóga"
+  }
  },
  "journal-15": {
   "alt": "",
   "pos": "50% 50%",
   "w": 719,
-  "h": 531
+  "h": 531,
+  "hu": {
+   "file": "joga-es-munka-kovacs-olivia",
+   "alt": "Kovács Olívia előadást tart egy tárgyalóban – jóga a munka mellett"
+  }
  },
  "journal-16": {
   "alt": "",
   "pos": "50% 50%",
   "w": 583,
-  "h": 800
+  "h": 800,
+  "hu": {
+   "file": "meditacio-harcos-poz-steg",
+   "alt": "Kovács Olívia harcos pózban egy stégen a víz fölött – meditáció"
+  }
  },
  "journal-17": {
   "alt": "",
   "pos": "50% 50%",
   "w": 600,
-  "h": 671
+  "h": 671,
+  "hu": {
+   "file": "a-joga-8-aga-yama",
+   "alt": "Kovács Olívia egy teraszról nézi a szabadtéri jógaórát – a jóga 8 ága: yama"
+  }
  },
  "journal-18": {
   "alt": "",
   "pos": "50% 50%",
   "w": 600,
-  "h": 895
+  "h": 895,
+  "hu": {
+   "file": "a-joga-8-aga-niyama",
+   "alt": "Kovács Olívia mosolyogva hátranéz a folyóparton – a jóga 8 ága: niyama"
+  }
  },
  "journal-19": {
   "alt": "",
   "pos": "50% 50%",
   "w": 600,
-  "h": 769
+  "h": 769,
+  "hu": {
+   "file": "a-joga-8-aga-aszana",
+   "alt": "Kovács Olívia fordított harcos pózban egy őszi erdei úton – a jóga 8 ága: ászana"
+  }
  },
  "journal-20": {
   "alt": "",
   "pos": "50% 50%",
   "w": 600,
-  "h": 619
+  "h": 619,
+  "hu": {
+   "file": "a-joga-8-aga-pranajama-legzes",
+   "alt": "Kovács Olívia csukott szemmel, a feje fölé emelt karokkal – a jóga 8 ága: pránájáma, a légzés"
+  }
  },
  "journal-21": {
   "alt": "",
   "pos": "50% 50%",
   "w": 600,
-  "h": 799
+  "h": 799,
+  "hu": {
+   "file": "a-joga-8-aga-pratyahara",
+   "alt": "Kovács Olívia sas-karokkal, ellenfényben – a jóga 8 ága: pratyahara, visszavonulás"
+  }
  },
  "journal-22": {
   "alt": "",
   "pos": "50% 50%",
   "w": 600,
-  "h": 737
+  "h": 737,
+  "hu": {
+   "file": "a-joga-8-aga-dharana-fokusz",
+   "alt": "Kovács Olívia táncos pózban az őszi erdőben – a jóga 8 ága: dhárana, a fókusz"
+  }
  },
  "journal-23": {
   "alt": "",
   "pos": "50% 50%",
   "w": 540,
-  "h": 604
+  "h": 604,
+  "hu": {
+   "file": "a-joga-8-aga-dhjana-meditacio",
+   "alt": "Kovács Olívia meditál a Duna fölött – a jóga 8 ága: dhjána"
+  }
  },
  "journal-24": {
   "alt": "",
   "pos": "50% 50%",
   "w": 600,
-  "h": 682
+  "h": 682,
+  "hu": {
+   "file": "a-joga-8-aga-szamadhi",
+   "alt": "Kovács Olívia kitörésben az őszi erdőben, ellenfényben – a jóga 8 ága: szamádhi"
+  }
  },
  "olivia-golden-backbend": {
   "alt": "Olivia Kovacs in a side backbend at sunset, the light glowing through the trees",
   "pos": "20% 38%",
   "w": 1200,
-  "h": 675
+  "h": 675,
+  "hu": {
+   "file": "kovacs-olivia-jogaoktato-hatrahajlas-naplemente-online-hatha-joga",
+   "alt": "Kovács Olívia jógaoktató oldalsó hátrahajlásban naplementekor – online hatha jóga"
+  }
  },
  "olivia-sand-one-leg-wheel": {
   "alt": "Olivia Kovacs in a one-legged wheel pose on the sand above a valley",
   "pos": "58% 62%",
   "w": 1200,
-  "h": 675
+  "h": 675,
+  "hu": {
+   "file": "kovacs-olivia-allosparga-homok-stretching-mobilizacio",
+   "alt": "Kovács Olívia állóspárgában a homokon, a völgy fölött – stretching és mobilizáció"
+  }
  },
  "group-childs-pose-deck": {
   "alt": "Students resting in child's pose on a wooden deck during an evening class",
   "pos": "50% 50%",
   "w": 800,
-  "h": 1035
+  "h": 1035,
+  "hu": {
+   "file": "gyermekpoz-relaxacio-legzes-jogaora",
+   "alt": "Jógázók gyermekpózban pihennek egy fateraszon – relaxáció és légzés a jógaóra végén"
+  }
  }
 }

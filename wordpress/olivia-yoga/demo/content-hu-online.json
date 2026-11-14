@@ -339,7 +339,7 @@
 				"kind": "private_pack",
 				"credits": 5,
 				"validity_days": 42,
-				"price_cents": 1800000,
+				"price_cents": 2000000,
 				"description": "Öt 30 perces egyéni relaxáció és légzés, 6 hétig érvényes; ha én mondok le egy órát, egy héttel tovább érvényes.",
 				"features": "Négyszemközt\nA testedre és a céljaidra szabva\n6 hétig érvényes\nOktatói lemondás esetén 1 héttel hosszabb érvényesség\nAlkalomról alkalomra épülő terv",
 				"featured": 0,
@@ -371,7 +371,7 @@
 				"kind": "private_pack",
 				"credits": 5,
 				"validity_days": 42,
-				"price_cents": 2700000,
+				"price_cents": 3200000,
 				"description": "Öt 30 perces páros relaxáció és légzés, 6 hétig érvényes; ha én mondok le egy órát, egy héttel tovább érvényes.",
 				"features": "Kettőtöknek: a barátnőddel, a testvéreddel, a pároddal\nMindkettőtökhöz igazítva\n6 hétig érvényes\nOktatói lemondás esetén 1 héttel hosszabb érvényesség\nAlkalomról alkalomra épülő terv",
 				"featured": 0,
@@ -550,7 +550,7 @@
 			"photo": "group-childs-pose-deck",
 			"aside": "olivia-childs-pose",
 			"link": "",
-			"content": "<p>Fél óra, ami csak a megnyugvásról szól. Légzőgyakorlatokkal, néhány kíméletes nyújtással és vezetett relaxációval segítek, hogy a túlpörgött idegrendszered lecsendesedjen.</p>\n<h2>Miért a légzés?</h2>\n<p>A légzés az egyetlen olyan működésünk, ami magától is megy, de tudatosan is irányíthatjuk. Ha lelassítod, a tested is jelzést kap, hogy biztonságban van. Ezt a légzést aztán a hétköznapokban is magaddal viszed: egy nehéz megbeszélés előtt, elalvás előtt vagy akkor, amikor hangos a nap.</p>\n<h2>Kinek ajánlom</h2>\n<ul>\n<li>Ha stresszes vagy, és nehezen kapcsolsz ki</li>\n<li>Ha nehezen alszol el</li>\n<li>Ha szeretnéd megtanulni, hogyan nyugtathatod meg magad pár perc alatt</li>\n<li>Ha a mozgásnál most a pihenésre van nagyobb szükséged</li>\n</ul>\n<h2>Mit csinálunk egy órán</h2>\n<p>Néhány perc beszélgetés után légzőgyakorlatok jönnek, utána kíméletes nyújtás, végül vezetett relaxáció. Kell hozzá egy jógaszőnyeg vagy egy kényelmes hely, ahol le tudsz feküdni, egy párna és egy pléd.</p>\n<h2>Árak</h2>\n<ul>\n<li><strong>30 perc:</strong> alkalmanként 5 000 Ft, 5 alkalom 18 000 Ft</li>\n<li><strong>Párban olcsóbb:</strong> alkalmanként 7 500 Ft, 5 alkalom 27 000 Ft kettőtöknek</li>\n<li>Az 5 alkalmas bérlet 6 hétig érvényes; ha én mondok le egy órát, egy héttel tovább érvényes.</li>\n</ul>\n<h2>Hogyan működik</h2>\n<p>Kérj időpontot a fiókodban, és visszaírok egy időponttal. Az óra élő, itt az oldalon, a böngésződben.</p>\n<p>[oy_button url=\"{{private:relax}}\" label=\"Időpontot kérek\"]</p>"
+			"content": "<p>Fél óra, ami csak a megnyugvásról szól. Légzőgyakorlatokkal, néhány kíméletes nyújtással és vezetett relaxációval segítek, hogy a túlpörgött idegrendszered lecsendesedjen.</p>\n<h2>Miért a légzés?</h2>\n<p>A légzés az egyetlen olyan működésünk, ami magától is megy, de tudatosan is irányíthatjuk. Ha lelassítod, a tested is jelzést kap, hogy biztonságban van. Ezt a légzést aztán a hétköznapokban is magaddal viszed: egy nehéz megbeszélés előtt, elalvás előtt vagy akkor, amikor hangos a nap.</p>\n<h2>Kinek ajánlom</h2>\n<ul>\n<li>Ha stresszes vagy, és nehezen kapcsolsz ki</li>\n<li>Ha nehezen alszol el</li>\n<li>Ha szeretnéd megtanulni, hogyan nyugtathatod meg magad pár perc alatt</li>\n<li>Ha a mozgásnál most a pihenésre van nagyobb szükséged</li>\n</ul>\n<h2>Mit csinálunk egy órán</h2>\n<p>Néhány perc beszélgetés után légzőgyakorlatok jönnek, utána kíméletes nyújtás, végül vezetett relaxáció. Kell hozzá egy jógaszőnyeg vagy egy kényelmes hely, ahol le tudsz feküdni, egy párna és egy pléd.</p>\n<h2>Árak</h2>\n<ul>\n<li><strong>30 perc:</strong> alkalmanként 5 000 Ft, 5 alkalom 20 000 Ft</li>\n<li><strong>Párban olcsóbb:</strong> alkalmanként 7 500 Ft, 5 alkalom 32 000 Ft kettőtöknek</li>\n<li>Az 5 alkalmas bérlet 6 hétig érvényes; ha én mondok le egy órát, egy héttel tovább érvényes.</li>\n</ul>\n<h2>Hogyan működik</h2>\n<p>Kérj időpontot a fiókodban, és visszaírok egy időponttal. Az óra élő, itt az oldalon, a böngésződben.</p>\n<p>[oy_button url=\"{{private:relax}}\" label=\"Időpontot kérek\"]</p>"
 		}
 	},
 	"faqs": [
@@ -955,5 +955,24 @@
 			"seo_desc": "Az oliviajoga.online üzemeltetője: Arovia Group LLC (HelloProVision). Az órákat Kovács Olívia tartja.",
 			"content": "<h2>Üzemeltető és eladó</h2>\n<p><strong>Arovia Group LLC (HelloProVision)</strong><br>Florida állambeli korlátolt felelősségű társaság<br>Szövetségi adószám (EIN): 36-5185016<br>9813 Quinta Artesa Way, Unit 105, Fort Myers, FL 33908, USA<br>Telefon: +1 239 955 1655<br>E-mail: <a href=\"mailto:info@helloprovision.com\">info@helloprovision.com</a><br>Web: <a href=\"https://helloprovision.com\" target=\"_blank\" rel=\"noopener\">helloprovision.com</a></p>\n<h2>Az órákat tartja</h2>\n<p>Kovács Olívia jógaoktató<br>Kapcsolat: <a href=\"mailto:{email}\">{email}</a></p>\n<h2>Tárhely és szolgáltatók</h2>\n<ul>\n<li>Tárhely: a HelloProVision által üzemeltetett szerver, a GoDaddy virtuális szerverén.</li>\n<li>Kártyás fizetés: Stripe.</li>\n<li>Élő videó: LiveKit.</li>\n</ul>\n<p>Vásárlási feltételek: <a href=\"{terms}\">Általános szerződési feltételek</a>. Adatkezelés: <a href=\"{privacy}\">Adatvédelmi tájékoztató</a>.</p>"
 		}
-	]
+	],
+	"uploads": {
+		"_note": "Olívia saját feltöltött képei (a Médiatárban a helyük szerint), megnézve leírva – a szerkesztő ezekből készít webes másolatot ezzel a névvel és leírással (2026-11-14).",
+		"2026/11/instasize_250511180406.jpg": {
+			"file": "kovacs-olivia-tancos-poz-otthon-nappali-elo-online-jogaora",
+			"alt": "Kovács Olívia táncos pózban otthon, a nappaliban – élő online jógaóra otthonról"
+		},
+		"2026/11/IMG_7309.jpg": {
+			"file": "online-joga-csoportos-egyeni-privat-elo-kovacs-olivia-kitores",
+			"alt": "Kovács Olívia alacsony kitörésben a nappaliban – élő online jóga: csoportos és egyéni, privát órák"
+		},
+		"2026/11/prenatal-training.jpg": {
+			"file": "kismamatorna-online-fitneszlabda-kovacs-olivia",
+			"alt": "Kovács Olívia kismamatornán segíti a vendégét egy fitneszlabdás gyakorlatban – online kismamatorna"
+		},
+		"2026/11/27067.jpg": {
+			"file": "online-stretching-mobilizacio-allosparga-kovacs-olivia",
+			"alt": "Kovács Olívia állóspárgában a homokon, naplementekor – online stretching és mobilizáció"
+		}
+	}
 }

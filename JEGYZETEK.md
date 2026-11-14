@@ -234,6 +234,18 @@
   javaslat (×1,5: 10 500 / 45 000 és 7 500 / 27 000 Ft). Főoldal: új blokkok – egyéni órák Olívia listájával („jöhetsz
   …”), külön kismamatorna-blokk (modulok, első alkalom), stretching + relaxáció kártyák. Élesen `oy_migrate_prices`:
   csak a termékek és az óraoldalak „Árak” listája cserélődik. Tesztek 947/0.
+- **Olívia chatje 11.14 délután (olivia-yoga 3.8.0, oliviayoga 1.5.1):** a kismamatorna egyéni 8 000 Ft és a páros
+  árak maradnak; stretching és relaxáció párban a javasolt áron; **relaxáció bérlet 20 000 Ft, párban 32 000 Ft**
+  (`oy_migrate_prices` rev 2026-11-14b). **Képek:** „az alt textek és kép elnevezések angolul vannak … legyen mindegyik
+  magyar és az összes releváns kulcsszó legyen benne … ékezet nélkül, kötőjellel” → `images.json` „hu” (név + alt) az
+  online oldal 44 képének (a 24 blogkép is, megnézve leírva); a gyerektéma buildje a témafájlokat a magyar nevükön
+  szállítja („file”), élesen `oy_migrate_images()` a Médiatár témaképeit helyben átnevezi (méretekkel, a cikkekben a
+  címet is) és magyar alt/címet ad (amit valaki átírt, marad). „Amiket én cserélek képek, abból csinálj egy másolatot
+  megfelelő képmérettel … és fájlelnevezéssel” – „frissítsd folyamatosan” → a szerkesztő (`oye_web_copy`) minden cserénél
+  webes másolatot tesz a lapra (≤1920 px, 82-es JPEG, név a leírásból, az eredeti marad), a lapon srcset; a feltöltések
+  neve kisbetű/ékezet nélkül; WordPress nagykép-határ 1920 px. Olívia mai 4 képe (nyitókép = táncos póz a nappaliban,
+  IMG_7309 = kitörés a nappaliban, prenatal-training, 27067) megnézve, saját leírással (`content-hu-online.json` →
+  `uploads`). Tesztek 982/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -744,6 +744,23 @@ Olivia doksija, 2026. 11. 13. 21:35.
   (`#a-joga-8-aga`, `oy_limbs_url()`), légzés: „3 kör, majd figyeld meg az érzeteket”, a végén narancs felirattal a
   lótuszban. Élesen `oy_migrate_1113` rev d + `oy_apply_online_prices()`.
 
+### 6.13h Képek: magyar név és alt az online oldalon, webes másolat a szerkesztőből (olivia-yoga 3.8.0)
+
+- `assets/img/images.json` → `"hu": {"file", "alt"}`: az online kiadás képeinek magyar neve (kisbetű, ékezet nélkül,
+  kötőjellel) és kulcsszavas leírása. `oy_image_alt($key)` az online kiadáson ezt adja; `oy_image_file($key)` a „file”
+  mezőt, amit a `build-child-themes.py` a hu-online gyerektémában állít be, miközben a fájlokat átnevezi (a szülőtéma és a
+  többi kiadás az angol kulcsnevet használja). `oy_image_slug()` a Médiatárba importált kép neve.
+- Élesen `oy_migrate_images()` (rev 2026-11-14a): a témaképek (`oy_key`) helyben átnevezve (`oy_rename_attachment`: fő
+  fájl, méretek, a -scaled eredetije; az id marad), a cikkekben a régi cím cserélve, alt/cím magyarul, ha még az eredeti
+  angol vagy üres. A szerkesztő listájában az „eredeti” kép címe is az új név.
+- Szerkesztő (`inc/page-editor.php`): `oye_web_copy($id, $alt)` – egy lapra tett feltöltött fotóból új melléklet ≤1920 px,
+  82-es JPEG (PNG/WebP marad, GIF-hez nem nyúl), EXIF szerint elforgatva, név a leírásból (`oye_slug`), alt a saját vagy a
+  hely szövege (`oye_slot_alt` szűrő; a téma az images.json-ból adja), a témaképekhez és a másolatokhoz nem nyúl. A
+  `content-hu-online.json` → `uploads` (a Médiatár-beli útvonal szerint) felülírja a nevet/altot (`oye_image_alt`,
+  `oye_image_name` szűrő). `oye_apply` mentéskor, `oye_web_copies()` a régi cserékre. A lapon a cserélt kép srcset-tel
+  jelenik meg, ha az eredeti img-nek volt `sizes`-a. Feltöltéskor a név kisbetű, ékezet nélkül (`oye_file_name`), a
+  WordPress nagykép-határa 1920 px.
+
 ### 6.14 Mobil API és iOS app
 
 **API** – `OYS_App_API` (`includes/class-app-api.php`), útvonalak a `oys/v1/app/` alatt:

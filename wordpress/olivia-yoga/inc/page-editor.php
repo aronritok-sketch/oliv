@@ -188,14 +188,21 @@ function oye_pass( $html ) {
 			continue;
 		}
 		$def = $img->getAttribute( 'src' );
+		$alt = $img->getAttribute( 'alt' ); // the slot's own text: a web copy of a new photo is named after it
 		$e   = $E['i'][ $key ] ?? null;
 		if ( $e ) {
 			$id = (int) ( $e['id'] ?? 0 );
 			$u  = $id ? wp_get_attachment_image_url( $id, 'large' ) : '';
 			if ( $u ) {
 				$img->setAttribute( 'src', $u );
-				$img->removeAttribute( 'srcset' );
-				$img->removeAttribute( 'sizes' );
+				// the browser picks the size it needs (a phone does not load the desktop picture)
+				$set = wp_get_attachment_image_srcset( $id, 'large' );
+				if ( $set && '' !== $img->getAttribute( 'sizes' ) ) {
+					$img->setAttribute( 'srcset', $set );
+				} else {
+					$img->removeAttribute( 'srcset' );
+					$img->removeAttribute( 'sizes' );
+				}
 				$meta = wp_get_attachment_metadata( $id );
 				if ( ! empty( $meta['width'] ) ) {
 					$img->setAttribute( 'width', (string) (int) $meta['width'] );
@@ -219,7 +226,7 @@ function oye_pass( $html ) {
 		}
 		if ( $editing ) {
 			$img->setAttribute( 'data-ki', $key );
-			$reg['i'][ $key ] = array( 'def' => $def, 'url' => $img->getAttribute( 'src' ), 'id' => (int) ( $e['id'] ?? 0 ), 'fx' => $e['fx'] ?? null, 'fy' => $e['fy'] ?? null );
+			$reg['i'][ $key ] = array( 'def' => $def, 'url' => $img->getAttribute( 'src' ), 'id' => (int) ( $e['id'] ?? 0 ), 'fx' => $e['fx'] ?? null, 'fy' => $e['fy'] ?? null, 'alt' => $alt );
 		}
 	}
 	return ( $changed || $editing ) ? oye_inner( $root ) : $html;
@@ -308,6 +315,9 @@ function oye_apply( array $t, array $i, array $reset = array(), array $where = a
 		if ( $id && ! wp_attachment_is_image( $id ) ) {
 			$id = 0;
 		}
+		if ( $id ) {
+			$id = oye_web_copy( $id, oye_slot_alt( $k, (string) ( $v['alt'] ?? '' ) ) );
+		}
 		$e = array( 'id' => $id );
 		if ( isset( $v['fx'], $v['fy'] ) && '' !== $v['fx'] && '' !== $v['fy'] && null !== $v['fx'] ) {
 			$e['fx'] = max( 0, min( 100, round( (float) $v['fx'], 1 ) ) );
@@ -330,6 +340,139 @@ function oye_apply( array $t, array $i, array $reset = array(), array $where = a
 	do_action( 'oye_saved', $o );
 	return array( 'ok' => true, 'changed' => $n );
 }
+
+/* ─── Képek: a weboldalra szánt másolat ───────────────────────────────────── */
+
+/*
+ * Olívia, 2026-11-14: „amiket én cserélek képek, abból csinálj egy másolatot megfelelő képmérettel hogy gyors legyen az
+ * oldal és fájlelnevezéssel” – „frissítsd folyamatosan”. Amikor a szerkesztőben képet cserél, a választott fotóból
+ * másolat készül, és a lapon az jelenik meg: legfeljebb 1920 px, 82-es JPEG-minőség, a neve a leírásából (kisbetű,
+ * ékezet nélkül, kötőjellel: kovacs-olivia-tancos-pozban-otthon.jpg), a leírása (alt) magyar – a sajátja, ha adott neki,
+ * különben azé a képé, amelyiknek a helyére került. Az eredeti a Médiatárban marad. A böngésző a másolatnak csak a
+ * képernyőhöz illő méretét tölti le (srcset).
+ */
+const OYE_IMG_MAX  = 1920;
+const OYE_STOPWORD = array( 'a', 'az', 'egy', 'es', 's', 'is', 'meg', 'de', 'the', 'and', 'of', 'in', 'on', 'at', 'with' );
+
+/** Fájlnév egy leírásból: kisbetű, ékezet nélkül, kötőjellel, a névelők nélkül, legfeljebb 9 szó. */
+function oye_slug( $text, $words = 9 ) {
+	$s = strtolower( remove_accents( wp_strip_all_tags( html_entity_decode( (string) $text, ENT_QUOTES, 'UTF-8' ) ) ) );
+	$w = array_values( array_filter( preg_split( '/[^a-z0-9]+/', $s ), fn( $x ) => '' !== $x && ! in_array( $x, OYE_STOPWORD, true ) ) );
+	return implode( '-', array_slice( $w, 0, $words ) );
+}
+
+/** Egy képhely leírása: amit a lap mutatott, vagy amit a téma tud róla (oye_slot_alt szűrő). */
+function oye_slot_alt( $key, $alt = '' ) {
+	$alt = trim( wp_strip_all_tags( (string) $alt ) );
+	return trim( (string) apply_filters( 'oye_slot_alt', $alt, (string) $key ) );
+}
+
+/**
+ * Egy feltöltött fotó webes másolata (új melléklet; ha már van, azt adja). A téma saját fotóihoz (oy_key) és a már kész
+ * másolatokhoz nem nyúl, a GIF-hez (animáció) sem. Ha bármi nem sikerül, az eredeti marad a lapon.
+ */
+function oye_web_copy( $id, $alt = '' ) {
+	$id = (int) $id;
+	if ( ! $id || ! wp_attachment_is_image( $id ) || get_post_meta( $id, 'oye_web', true ) || get_post_meta( $id, 'oy_key', true ) ) {
+		return $id;
+	}
+	$have = (int) get_post_meta( $id, 'oye_web_copy', true );
+	if ( $have && wp_attachment_is_image( $have ) ) {
+		return $have;
+	}
+	$src = function_exists( 'wp_get_original_image_path' ) ? (string) wp_get_original_image_path( $id ) : '';
+	$src = '' !== $src && file_exists( $src ) ? $src : (string) get_attached_file( $id );
+	$ft  = wp_check_filetype( $src );
+	if ( '' === $src || ! file_exists( $src ) || 'image/gif' === $ft['type'] ) {
+		return $id;
+	}
+	$own  = trim( (string) get_post_meta( $id, '_wp_attachment_image_alt', true ) );
+	$alt  = trim( (string) apply_filters( 'oye_image_alt', '' !== $own ? $own : trim( wp_strip_all_tags( (string) $alt ) ), $id ) );
+	$name = oye_slug( (string) apply_filters( 'oye_image_name', '', $id, $alt ) );
+	$name = '' !== $name ? $name : oye_slug( '' !== $alt ? $alt : get_the_title( $id ) );
+	$name = '' !== $name ? $name : 'kep';
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+	$ed = wp_get_image_editor( $src );
+	if ( is_wp_error( $ed ) ) {
+		return $id;
+	}
+	if ( method_exists( $ed, 'maybe_exif_rotate' ) ) {
+		$ed->maybe_exif_rotate(); // a phone photo stands the right way up
+	}
+	$size = $ed->get_size();
+	if ( max( (int) $size['width'], (int) $size['height'] ) > OYE_IMG_MAX ) {
+		$ed->resize( OYE_IMG_MAX, OYE_IMG_MAX, false );
+	}
+	$ed->set_quality( 82 );
+	$keep = in_array( $ft['type'], array( 'image/png', 'image/webp' ), true ); // a photo becomes a JPEG, a graphic keeps its format
+	$mime = $keep ? $ft['type'] : 'image/jpeg';
+	$up   = wp_upload_dir();
+	$file = trailingslashit( $up['path'] ) . wp_unique_filename( $up['path'], $name . '.' . ( $keep ? $ft['ext'] : 'jpg' ) );
+	$out  = $ed->save( $file, $mime );
+	if ( is_wp_error( $out ) || empty( $out['path'] ) ) {
+		return $id;
+	}
+	$new = wp_insert_attachment(
+		array(
+			'post_mime_type' => $out['mime-type'],
+			'post_title'     => '' !== $alt ? $alt : $name,
+			'post_content'   => '',
+			'post_status'    => 'inherit',
+			'guid'           => trailingslashit( $up['url'] ) . basename( $out['path'] ),
+		),
+		$out['path'],
+		0,
+		true
+	);
+	if ( is_wp_error( $new ) || ! $new ) {
+		wp_delete_file( $out['path'] );
+		return $id;
+	}
+	wp_update_attachment_metadata( $new, wp_generate_attachment_metadata( $new, $out['path'] ) );
+	if ( '' !== $alt ) {
+		update_post_meta( $new, '_wp_attachment_image_alt', $alt );
+	}
+	update_post_meta( $new, 'oye_web', $id );
+	update_post_meta( $id, 'oye_web_copy', $new );
+	return (int) $new;
+}
+
+/** A korábbi cserék (amikor még nem készült másolat): mindegyikből webes másolat, és a lapon az jelenik meg. */
+function oye_web_copies() {
+	$o = oye_edits();
+	$n = 0;
+	foreach ( $o['i'] as $k => $e ) {
+		$id  = (int) ( $e['id'] ?? 0 );
+		$new = $id ? oye_web_copy( $id, oye_slot_alt( $k ) ) : 0;
+		if ( $new && $new !== $id ) {
+			$o['i'][ $k ]['id'] = $new;
+			$n++;
+		}
+	}
+	if ( $n ) {
+		update_option( 'oye_edits', $o, true );
+	}
+	return $n ? array( sprintf( 'web copies of %d photos on the pages', $n ) ) : array();
+}
+
+/** Feltöltéskor a kép neve kisbetű, ékezet és szóköz nélkül (IMG_7309.JPG → img-7309.jpg, Tükörpóz 2.jpg → tukorpoz-2.jpg). */
+function oye_file_name( $name ) {
+	$ext  = strtolower( (string) pathinfo( (string) $name, PATHINFO_EXTENSION ) );
+	$base = '' === $ext ? (string) $name : substr( (string) $name, 0, -strlen( $ext ) - 1 );
+	$base = trim( (string) preg_replace( '/[^a-z0-9]+/', '-', strtolower( remove_accents( $base ) ) ), '-' );
+	return ( '' === $base ? 'kep' : $base ) . ( '' === $ext ? '' : '.' . $ext );
+}
+
+foreach ( array( 'wp_handle_upload_prefilter', 'wp_handle_sideload_prefilter' ) as $oye_hook ) {
+	add_filter( $oye_hook, function ( $file ) {
+		if ( ! empty( $file['name'] ) && preg_match( '/\.(jpe?g|png|webp|avif|heic|heif)$/i', (string) $file['name'] ) ) {
+			$file['name'] = oye_file_name( $file['name'] );
+		}
+		return $file;
+	} );
+}
+// a nagy fotóból WordPress 1920 px-es változatot tesz a lapra (alapból 2560), az eredeti megmarad
+add_filter( 'big_image_size_threshold', fn() => OYE_IMG_MAX );
 
 add_action( 'rest_api_init', function () {
 	register_rest_route( 'oye/v1', '/edit', array(

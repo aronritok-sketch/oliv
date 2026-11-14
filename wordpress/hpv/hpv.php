@@ -45,6 +45,7 @@ add_action( 'hpv_child_setup', function ( $from, $to, $slug ) {
 	$log = array_merge( $log, oy_migrate_1113() ); // the online site after Olivia's notes of 13 November (once)
 	$log = array_merge( $log, oy_migrate_legal() ); // the ÁSZF and Impresszum again when they change (once per revision)
 	$log = array_merge( $log, oy_migrate_prices() ); // Olivia's prices of 14 November (once)
+	$log = array_merge( $log, oy_migrate_images() ); // Hungarian names and texts for the photos, web copies of hers (once)
 	kses_remove_filters();
 	$log = array_merge( $log, oy_import_all( false ) );
 	kses_init_filters();

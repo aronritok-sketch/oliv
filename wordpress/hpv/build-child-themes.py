@@ -121,6 +121,21 @@ def build_variant(slug, v, hlprv):
                               'Description: ' + v['desc'] + '\nVersion: ' + version + '\nRequires at least: 6.4\nRequires PHP: 8.1\nText Domain: olivia-yoga\n'
                               'License: GPL-2.0-or-later\n*/'), s, count=1, flags=re.S)
     open(css, 'w', encoding='utf-8').write(s)
+    if v['edition'] == 'hu-online':
+        # Olívia, 2026-11-14: „a kép elnevezések ékezet nélkül, kötőjellel legyenek”, magyarul – the photos with a
+        # Hungarian name (images.json „hu”) are shipped under it; the theme reads the name from „file” (oy_image_file).
+        img = os.path.join(dst, 'assets', 'img')
+        meta = json.load(open(os.path.join(img, 'images.json'), encoding='utf-8'))
+        for k, m in meta.items():
+            hu = (m.get('hu') or {}).get('file')
+            if not hu:
+                continue
+            for w in ('1200', '600'):
+                a, b = os.path.join(img, k + '-' + w + '.jpg'), os.path.join(img, hu + '-' + w + '.jpg')
+                if os.path.exists(a):
+                    os.rename(a, b)
+            m['file'] = hu
+        json.dump(meta, open(os.path.join(img, 'images.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     if slug == 'hathaflow':
         img = os.path.join(dst, 'assets', 'img')
         meta = json.load(open(os.path.join(img, 'images.json'), encoding='utf-8'))

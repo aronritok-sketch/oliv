@@ -15,7 +15,7 @@ function oy_classes_list( $exclude = '' ) {
 			continue;
 		}
 		$tone  = OY_ACCENTS[ $n++ % 4 ];
-		$thumb = oy_post_photo( $c->ID, '', '200px', false, '' );
+		$thumb = oy_post_photo( $c->ID, '', '200px' );
 		$meta  = '';
 		foreach ( array( 'clock' => oy_class_meta( $c->ID, 'oy_duration' ), 'globe' => oy_online_only() ? '' : oy_class_meta( $c->ID, 'oy_lang' ) ) as $icon => $value ) {
 			$meta .= $value ? '<span>' . oy_icon( $icon ) . esc_html( $value ) . '</span>' : '';
@@ -77,7 +77,7 @@ function oy_moments_grid( $limit = 60 ) {
 		}
 		$when  = $date ? wp_date( get_option( 'date_format' ), strtotime( $date . ' 12:00:00' ) ) : '';
 		$place = oy_tr( $m->ID, 'place' ) ?: oy_t( (string) get_post_meta( $m->ID, 'oy_place', true ) );
-		$out  .= '<li class="moment moment--' . OY_ACCENTS[ $i % 4 ] . '" data-reveal><figure class="moment__photo">' . oy_post_photo( $m->ID, '', '(min-width: 960px) 30vw, 92vw', false, '' ) . '</figure>'
+		$out  .= '<li class="moment moment--' . OY_ACCENTS[ $i % 4 ] . '" data-reveal><figure class="moment__photo">' . oy_post_photo( $m->ID, '', '(min-width: 960px) 30vw, 92vw' ) . '</figure>'
 			. '<div class="moment__body"><p class="moment__meta">' . esc_html( $when ) . ( $place ? ' · ' . esc_html( $place ) : '' ) . '</p><h4 class="moment__title">' . esc_html( get_the_title( $m ) ) . '</h4>'
 			. '<p class="moment__text">' . esc_html( get_the_excerpt( $m ) ) . '</p></div></li>';
 	}

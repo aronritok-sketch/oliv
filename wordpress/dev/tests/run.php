@@ -1827,7 +1827,8 @@ test( 'online edition: Hungarian addresses and its own copy', function () {
 	$text = wp_json_encode( $data, JSON_UNESCAPED_UNICODE );
 	ok( is_array( $data ) && ! str_contains( $text, '—' ), 'online copy: valid, no em dash' );
 	// the seller is Arovia Group LLC in Fort Myers, Florida (Áron, 11.13): its address belongs in the legal pages and the privacy notice
-	$copy = wp_json_encode( array_diff_key( $data, array_flip( array( 'legal', 'privacy' ) ) ), JSON_UNESCAPED_UNICODE );
+	// (the descriptions of Olívia's own photos say what is in them: a sand dune in Hungary is sand)
+	$copy = wp_json_encode( array_diff_key( $data, array_flip( array( 'legal', 'privacy', 'uploads' ) ) ), JSON_UNESCAPED_UNICODE );
 	ok( ! preg_match( '/Fort Myers|Florid|lanai|tenger|strand|homok|pickleball|tenisz|golf|klubház/iu', $copy ), 'online copy: written for Hungary (no Fort Myers, sea, beach, tennis, golf …)' );
 	ok( str_contains( wp_json_encode( $data['legal'], JSON_UNESCAPED_UNICODE ), 'Arovia Group LLC' ) && str_contains( $data['privacy']['content'], 'Arovia Group LLC' ), 'the seller and controller is Arovia' );
 	// Áron, 2026-11-14: „Nincs áfa. Mehet minden bele.” – the prices are final, the Arovia's EIN in the ÁSZF and Impresszum
@@ -1957,6 +1958,7 @@ test( 'online edition, live update: the prices of 14 November, only the „Árak
 		ok( $p && 1500000 === (int) $p['price_cents'] && 2 === (int) $p['people'] && 90 === (int) $p['duration_min'], 'pair yoga, 90 minutes: 15 000 Ft' );
 		eq( 0, (int) OYS_Products::get( 'kismama-5' )['validity_days'], 'the prenatal pass has no expiry' );
 		ok( (bool) OYS_Services::get( 'relax' )['duo'], 'relaxation can be booked as a pair' );
+		ok( 2000000 === (int) OYS_Products::get( 'relax-5' )['price_cents'] && 3200000 === (int) OYS_Products::get( 'relax-duo-5' )['price_cents'], 'relaxation pass 20 000 Ft, the pair\'s 32 000 Ft (Olívia, chat)' );
 		eq( array(), oy_migrate_prices(), 'once' );
 	} finally {
 		update_option( 'oy_edition', 'fort-myers' );
@@ -2598,13 +2600,154 @@ test( 'page editor: saved text and photo show to everyone, links, booking and pr
 	ok( str_contains( $out, '<h3>Csoportos online jóga</h3>' ), 'a title inside a card link is text' );
 	ok( str_contains( $out, '<mark>JÓGA!</mark>' ), 'a part of the big title' );
 	ok( str_contains( $out, '>Óra foglalása</a>' ) && str_contains( $out, '<p>Szerda 18:30</p>' ), 'button labels and the booking plugin are not edited' );
-	ok( str_contains( $out, wp_get_attachment_image_url( $img, 'large' ) ) && ! str_contains( $out, 'srcset' ) && str_contains( $out, 'object-position:30% 20%' ), 'the photo: the new one, with its crop point' );
+	$copy = (int) get_post_meta( $img, 'oye_web_copy', true );
+	ok( $copy && str_contains( $out, wp_get_attachment_image_url( $copy, 'large' ) ) && ! str_contains( $out, 'srcset' ) && str_contains( $out, 'object-position:30% 20%' ), 'the photo: a web copy of the new one, with its crop point' );
 	$page = '<html><body><header><p>Fejléc</p></header><main id="main">' . $html . '</main><footer>x</footer></body></html>';
 	$full = oye_filter_page( $page );
 	ok( str_contains( $full, '<header><p>Fejléc</p></header>' ) && str_contains( $full, 'Csoportos online jóga' ), 'only <main> goes through the editor' );
 	delete_option( 'oye_edits' );
 	delete_option( 'oye_edits_meta' );
 	delete_option( 'oye_edits_prev' );
+} );
+
+/** A real JPEG of the given size in the uploads folder (a sub-folder like „2026/11” if given), as an attachment. */
+function self_test_photo( $name, $w, $h, $sub = '', $alt = '' ) {
+	$up  = wp_upload_dir();
+	$dir = '' === $sub ? $up['path'] : $up['basedir'] . '/' . $sub;
+	wp_mkdir_p( $dir );
+	$file = $dir . '/' . $name;
+	$im   = imagecreatetruecolor( $w, $h );
+	imagefilledrectangle( $im, 0, 0, (int) ( $w / 2 ), $h, imagecolorallocate( $im, 200, 120, 160 ) );
+	imagejpeg( $im, $file, 90 );
+	imagedestroy( $im );
+	$id = wp_insert_attachment( array( 'post_mime_type' => 'image/jpeg', 'post_title' => pathinfo( $name, PATHINFO_FILENAME ), 'post_status' => 'inherit' ), $file );
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+	wp_update_attachment_metadata( $id, wp_generate_attachment_metadata( $id, $file ) );
+	if ( '' !== $alt ) {
+		update_post_meta( $id, '_wp_attachment_image_alt', $alt );
+	}
+	return $id;
+}
+
+test( 'photos on the online edition: Hungarian names and texts with the keywords (Olívia, 14 November)', function () {
+	$imgs = oy_images();
+	$data = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content-hu-online.json' ), true );
+	$used = array( 'olivia-golden-backbend', 'olivia-golden-hour-arms', 'olivia-dancer-home', 'private-tree-pose', 'prenatal-ball-training', 'olivia-terrace-profile', 'olivia-riverside-profile', 'olivia-sunset-smile', 'olivia-sunlit-portrait' );
+	array_walk_recursive( $data, function ( $v ) use ( &$used, $imgs ) {
+		if ( is_string( $v ) && isset( $imgs[ $v ] ) ) {
+			$used[] = $v;
+		}
+	} );
+	$missing = array_values( array_filter( array_unique( $used ), fn( $k ) => empty( $imgs[ $k ]['hu']['file'] ) || empty( $imgs[ $k ]['hu']['alt'] ) ) );
+	eq( array(), $missing, 'every photo of the online site has a Hungarian name and text' );
+	$bad = array();
+	$names = array();
+	foreach ( $imgs as $k => $m ) {
+		if ( empty( $m['hu'] ) ) {
+			continue;
+		}
+		if ( ! preg_match( '/^[a-z0-9]+(-[a-z0-9]+)*$/', $m['hu']['file'] ) || preg_match( '/Olivia Kovacs|\b(the|with|in a)\b/', $m['hu']['alt'] ) ) {
+			$bad[] = $k;
+		}
+		$names[] = $m['hu']['file'];
+	}
+	eq( array(), $bad, 'names: lower case, no accents, hyphens; texts: Hungarian' );
+	eq( count( $names ), count( array_unique( $names ) ), 'every name once' );
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		$html = oy_photo( 'olivia-dancer-home' );
+		ok( str_contains( $html, 'alt="Kovács Olívia táncos pózban otthon, a nappaliban – online jóga otthonról"' ), 'a theme photo: its Hungarian text' );
+		$att = self_test_photo( 'journal-test.jpg', 400, 300 );
+		update_post_meta( $att, 'oy_key', 'journal-19' );
+		ok( str_contains( oy_photo( $att ), 'alt="' . esc_attr( $imgs['journal-19']['hu']['alt'] ) . '"' ), 'a journal photo with no text of its own: the Hungarian one' );
+		update_post_meta( $att, '_wp_attachment_image_alt', 'Olívia saját leírása' );
+		ok( str_contains( oy_photo( $att ), 'alt="Olívia saját leírása"' ), 'a text someone wrote stays' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+	ok( str_contains( oy_photo( 'olivia-dancer-home' ), 'alt="Olivia Kovacs in dancer pose in a living room"' ), 'the US site keeps its own text' );
+} );
+
+test( 'page editor: a photo Olívia puts on a page gets a web copy – 1920 px at most, Hungarian name and text, the original stays', function () {
+	eq( 'img-7309.jpg', oye_file_name( 'IMG_7309.JPG' ), 'upload name: lower case' );
+	eq( 'tukorpoz-2-olivia.jpeg', oye_file_name( 'Tükörpóz 2 – Olívia.jpeg' ), 'upload name: no accents, no spaces' );
+	eq( 'kovacs-olivia-joga-elet', oye_slug( 'Kovács Olívia – a jóga és az élet' ), 'a name from a text: without the articles' );
+	$big  = self_test_photo( 'IMG_7309.jpg', 2600, 1300 );
+	$copy = oye_web_copy( $big, 'Kovács Olívia táncos pózban otthon – online jóga' );
+	$meta = wp_get_attachment_metadata( $copy );
+	ok( $copy && $copy !== $big, 'a new attachment' );
+	ok( (bool) preg_match( '/^kovacs-olivia-tancos-pozban-otthon-online-joga(-\d+)?\.jpg$/', basename( (string) get_attached_file( $copy ) ) ), 'named after the text' );
+	ok( 1920 === (int) $meta['width'] && 960 === (int) $meta['height'], '1920 px wide' );
+	eq( 'Kovács Olívia táncos pózban otthon – online jóga', get_post_meta( $copy, '_wp_attachment_image_alt', true ), 'with the text' );
+	ok( ! empty( $meta['sizes']['medium_large'] ) && ! empty( $meta['sizes']['large'] ), 'with the smaller sizes for phones' );
+	ok( wp_attachment_is_image( $big ) && file_exists( (string) get_attached_file( $big ) ), 'the original stays in the media library' );
+	eq( $copy, oye_web_copy( $big, 'más' ), 'once: the same copy next time' );
+	eq( $copy, oye_web_copy( $copy, 'más' ), 'a copy is not copied again' );
+	$own = self_test_photo( 'photo.jpg', 800, 600, '', 'online jóga csoportos egyéni' );
+	ok( (bool) preg_match( '/^online-joga-csoportos-egyeni(-\d+)?\.jpg$/', basename( (string) get_attached_file( oye_web_copy( $own, 'a hely szövege' ) ) ) ), 'her own text wins over the place\'s' );
+	$theme = self_test_photo( 'theme.jpg', 600, 400 );
+	update_post_meta( $theme, 'oy_key', 'deck-down-dog' );
+	eq( $theme, oye_web_copy( $theme, 'x' ), 'the theme\'s own photos are left as they are' );
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		$hers = self_test_photo( 'instasize_250511180406.jpg', 1178, 1113, '2026/11' );
+		$c    = oye_web_copy( $hers, 'Kovács Olívia jógaoktató oldalsó hátrahajlásban naplementekor – online hatha jóga' );
+		ok( (bool) preg_match( '/^kovacs-olivia-tancos-poz-otthon-nappali-elo-online-jogaora(-\d+)?\.jpg$/', basename( (string) get_attached_file( $c ) ) ), 'her photo of 14 November: the name we gave it after looking at it' );
+		eq( 'Kovács Olívia táncos pózban otthon, a nappaliban – élő online jógaóra otthonról', get_post_meta( $c, '_wp_attachment_image_alt', true ), '… and the text (it is not the backbend of the place)' );
+		// saved in the editor: the page shows the copy, in the size the screen needs
+		delete_option( 'oye_edits' );
+		$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0];
+		wp_set_current_user( $admin );
+		$up = self_test_photo( 'DSC_0042.jpg', 2400, 1600 );
+		oye_apply( array(), array( 'i:olivia-golden-backbend' => array( 'id' => $up, 'alt' => '' ) ) );
+		wp_set_current_user( 0 );
+		$e   = oye_edits();
+		$web = (int) $e['i']['i:olivia-golden-backbend']['id'];
+		ok( $web !== $up && (int) get_post_meta( $web, 'oye_web', true ) === $up, 'saved: the web copy is on the page' );
+		ok( (bool) preg_match( '/^kovacs-olivia-jogaoktato-oldalso-hatrahajlasban-naplementekor-online-hatha-joga(-\d+)?\.jpg$/', basename( (string) get_attached_file( $web ) ) ), 'no text of its own: named after the place\'s Hungarian text' );
+		$out = oye_pass( '<div class="frame"><img class="photo" src="/x/olivia-golden-backbend-1200.jpg" sizes="(min-width: 960px) 52vw, 92vw" data-oyp="olivia-golden-backbend" alt="régi"></div>' );
+		ok( str_contains( $out, 'srcset="' ) && str_contains( $out, '768w' ) && str_contains( $out, 'sizes="(min-width: 960px) 52vw, 92vw"' ), 'the page: srcset with the smaller sizes' );
+		delete_option( 'oye_edits' );
+		delete_option( 'oye_edits_meta' );
+		delete_option( 'oye_edits_prev' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+} );
+
+test( 'online edition, live update: the theme\'s photos get Hungarian names and texts, the photos Olívia put on the pages a web copy', function () {
+	require_once get_template_directory() . '/inc/demo-import.php';
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		$imgs = oy_images();
+		$att  = self_test_photo( 'olivia-dancer-home.jpg', 1200, 1133, '', $imgs['olivia-dancer-home']['alt'] );
+		update_post_meta( $att, 'oy_key', 'olivia-dancer-home' );
+		wp_update_post( array( 'ID' => $att, 'post_title' => $imgs['olivia-dancer-home']['alt'] ) );
+		$old_url = wp_get_attachment_image_url( $att, 'medium' );
+		$post    = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'Képes írás', 'post_content' => '<p><img src="' . $old_url . '" alt=""></p>' ) );
+		$kept = self_test_photo( 'olivia-childs-pose.jpg', 600, 800, '', 'Olívia saját szövege' );
+		update_post_meta( $kept, 'oy_key', 'olivia-childs-pose' );
+		$hers = self_test_photo( 'prenatal-training.jpg', 500, 750, '2026/11' );
+		update_option( 'oye_edits', array( 't' => array(), 'i' => array( 'i:prenatal-ball-training' => array( 'id' => $hers ) ) ) );
+		delete_option( 'oy_images_rev' );
+		$log  = oy_migrate_images();
+		$file = (string) get_attached_file( $att );
+		ok( (bool) preg_match( '/^kovacs-olivia-tancos-poz-nappali-online-joga-otthon(-\d+)?\.jpg$/', basename( $file ) ) && file_exists( $file ), 'the theme photo: its Hungarian name' );
+		$meta = wp_get_attachment_metadata( $att );
+		$base = pathinfo( $file, PATHINFO_FILENAME );
+		ok( ! empty( $meta['sizes'] ) && array() === array_filter( $meta['sizes'], fn( $s ) => ! str_starts_with( $s['file'], $base . '-' ) || ! file_exists( dirname( $file ) . '/' . $s['file'] ) ), 'its sizes too' );
+		eq( $imgs['olivia-dancer-home']['hu']['alt'], get_post_meta( $att, '_wp_attachment_image_alt', true ), 'the Hungarian text' );
+		eq( $imgs['olivia-dancer-home']['hu']['alt'], get_post_field( 'post_title', $att ), 'the Hungarian title' );
+		ok( str_contains( get_post_field( 'post_content', $post ), wp_get_attachment_image_url( $att, 'medium' ) ) && ! str_contains( get_post_field( 'post_content', $post ), $old_url ), 'a post shows it at its new address' );
+		eq( 'Olívia saját szövege', get_post_meta( $kept, '_wp_attachment_image_alt', true ), 'a text someone wrote stays' );
+		$web = (int) oye_edits()['i']['i:prenatal-ball-training']['id'];
+		ok( $web !== $hers && (bool) preg_match( '/^kismamatorna-online-fitneszlabda-kovacs-olivia(-\d+)?\.jpg$/', basename( (string) get_attached_file( $web ) ) ), 'her photo on the page: a web copy with the name we gave it' );
+		ok( str_contains( implode( ' · ', $log ), 'web copies of 1 photos' ), 'logged' );
+		eq( array(), oy_migrate_images(), 'once' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
+		delete_option( 'oye_edits' );
+	}
 } );
 
 test( 'Arovia payments through the CRM: the site registers itself, every Stripe call is signed, events come back signed', function () {
