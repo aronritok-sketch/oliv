@@ -267,6 +267,20 @@
   fölötte lévő sorba). Mobilmenü: az „Online órák” alatti szolgáltatások 48 px-es, gombszerű sorok. Rólam: számozás
   helyett hullámvonal (fejezetek) és rajzos ikonok („Hogyan tanítok”). Víziós összefoglaló Olíviának a chaten (2. változat a
   főoldalra, a kismamatorna részletesebben a posztja alapján). Tesztek 1025/0.
+- **A doksi utolsó pontjai (olivia-yoga 3.11.0, olivia-studio 1.10.3; a 3.10.1 is benne: 2015 az idővonalon):**
+  nyitókép: „ONLINE / JÓGA / KISMAMATORNA / MOBILIZÁCIÓ / ÉLŐBEN, OTTHONRÓL” – a három egy szinten, mindegyik a lenti
+  dobozának színében (lila, zsálya, narancs), egymás után „lélegeznek”. Az öt szolgáltatás-doboz egyenes sorokban (nincs
+  cikcakk; alul kettő kitölti a szélességet). Kikerült minden kis „vonal + nagybetűs” címke a címek fölül (`oy_kicker`
+  online üres) és az aloldalak morzsamenüje is (`oy_crumbs` online üres; a bővítmény kártyáin a címke marad, vonal
+  nélkül). Az egyéni órás lista saját megfogalmazásban (nem Olívia szövegének másolata), pipák helyett a logó kis
+  hulláma színenként váltakozva, az első sorhoz igazítva. Egyéni és kismamatorna blokk: a nyitókép puha hulláma a kép
+  mögött (lila / rózsaszín), a képernyő széléig fut, nem lóg a szövegbe. A kilenc kismama-modul mind más színű pöttyel.
+  „Amire szükséged lesz” általános (matrac + amit az óra kér; a GYIK-ban és az árlapon is), és „töltsd fel az eszközöd”:
+  főoldal, árlap, GYIK, a foglalási e-mail tippje, az óra előtti e-mail, az élő óra belépő képernyője. Rólam: „2018-tól
+  masszőrként is tevékenykedtem, … nyirokmasszázst és talpreflexológiát is”. Lábléc: „Készítette: HelloProVision”
+  (helloprovision.com). Élesen `oy_migrate_1114d()` (rev 2026-11-14d): `_insert` és `_replace` párok a lapokon, GYIK
+  `_prev` – csak ahol még a régi szöveg áll szó szerint. Teszt: a naptár-kapacitás teszt délelőtt ütközött a „72 óra
+  múlva” órákkal → 9:00 vagy 20:00, az órától függően. Tesztek 1047/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

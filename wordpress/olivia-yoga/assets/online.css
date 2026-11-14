@@ -136,20 +136,16 @@ h1, h2, h3, h4, .kicker { text-wrap: balance; }
 /* The name card: her title in three parts, the specialities under it */
 .oj-hero .namecard__title { line-height: 1.45; }
 
-/* Five services, each in its own box, staggered: three on top, two below shifted by half a box („akár egymás alatt
-   elcsúsztatva”) */
+/* Five services, each in its own box, in straight lines (Olívia, 14 November: „ez most össze van csúszva, legyenek egy
+   vonalban”): three on top, two below that together fill the same width, every edge lined up */
 @media (min-width: 700px) {
-	.ways--five { grid-template-columns: repeat(4, 1fr); }
-	.ways--five .way { grid-column: span 2; }
-	.ways--five .way:last-child { grid-column: 2 / span 2; }
+	.ways--five { grid-template-columns: repeat(2, 1fr); }
+	.ways--five .way:last-child { grid-column: 1 / -1; }
 }
 @media (min-width: 1100px) {
 	.ways--five { grid-template-columns: repeat(6, 1fr); }
 	.ways--five .way { grid-column: span 2; }
-	.ways--five .way:nth-child(4) { grid-column: 2 / span 2; }
-	.ways--five .way:nth-child(5) { grid-column: 4 / span 2; }
-	.ways--five { padding-bottom: 1.4rem; }
-	.ways--five .way:nth-child(2), .ways--five .way:nth-child(5) { top: 1.4rem; } /* a gentle zigzag; `top`, so the hover lift still works */
+	.ways--five .way:nth-child(n + 4) { grid-column: span 3; }
 	.ways--five .way p { max-width: 36ch; }
 }
 .way--lilac { --tone: var(--lilac); }
@@ -157,9 +153,17 @@ h1, h2, h3, h4, .kicker { text-wrap: balance; }
 /* The prenatal modules: nine small tiles (Olivia, 11.13) */
 .oj-modules { list-style: none; margin: 1.2rem 0 1.6rem; padding: 0; display: grid; gap: .6rem; grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr)); }
 .oj-modules li { margin: 0; padding: .85rem 1rem; border-radius: var(--radius); background: var(--card, #fff); box-shadow: var(--shadow); font-weight: 700; display: flex; align-items: center; gap: .6rem; line-height: 1.3; }
-.oj-modules li::before { content: ""; flex: none; width: .7rem; height: .7rem; border-radius: 50%; background: var(--orchid); }
-.oj-modules li:nth-child(3n + 2)::before { background: var(--lilac); }
-.oj-modules li:nth-child(3n)::before { background: var(--sage); }
+/* every module its own colour (Olívia, 14 November: „Ezek a pontok legyenek mind más színű”) */
+.oj-modules li::before { content: ""; flex: none; width: .75rem; height: .75rem; border-radius: 50%; background: var(--dot, var(--orchid)); }
+.oj-modules li:nth-child(1) { --dot: #D92B86; }
+.oj-modules li:nth-child(2) { --dot: #9C6ADE; }
+.oj-modules li:nth-child(3) { --dot: #6FA085; }
+.oj-modules li:nth-child(4) { --dot: #FF8C42; }
+.oj-modules li:nth-child(5) { --dot: #2B5036; }
+.oj-modules li:nth-child(6) { --dot: #F0624D; }
+.oj-modules li:nth-child(7) { --dot: #E8B523; }
+.oj-modules li:nth-child(8) { --dot: #5B8DEF; }
+.oj-modules li:nth-child(9) { --dot: #3E9FB0; }
 
 /* Olivia, 11.13 (20:17): the button and the link on one line; Tudatosság / Kontroll on the pale band as on oliviajoga.hu;
    the prenatal modules with why each one matters for the birth */
@@ -201,8 +205,15 @@ h1, h2, h3, h4, .kicker { text-wrap: balance; }
 .oj-split__meta { font-weight: 700; margin: 1.2rem 0 0; }
 .oj-checklist { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; gap: .55rem 1.5rem; }
 @media (min-width: 700px) { .oj-private .oj-checklist { grid-template-columns: 1fr 1fr; } }
-.oj-checklist li { position: relative; padding-left: 1.6rem; line-height: 1.45; }
-.oj-checklist li::before { content: ""; position: absolute; left: .1rem; top: .42em; width: 11px; height: 6px; border-left: 2px solid var(--orchid); border-bottom: 2px solid var(--orchid); transform: rotate(-45deg); }
+/* instead of the ticks (Olívia, 14 November: „elcsúsznak a pipák. Pipák helyett is találj ki mást!”) a small wave from her
+   logo, in turn pink, orange, lilac and green, centred on the first line of its item */
+.oj-checklist li { position: relative; padding-left: 2.1rem; line-height: 1.45; }
+.oj-checklist li::before { content: ""; position: absolute; left: 0; top: calc(.725em - 5px); width: 1.45rem; height: 10px; background: var(--wave, var(--orchid));
+	-webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 10' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M2 6.5C5.5 2 9 2 12.5 6.5S19.5 11 23 6.5 26.5 3 28 4.5'/%3E%3C/svg%3E") center / contain no-repeat;
+	mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 10' fill='none' stroke='%23000' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M2 6.5C5.5 2 9 2 12.5 6.5S19.5 11 23 6.5 26.5 3 28 4.5'/%3E%3C/svg%3E") center / contain no-repeat; }
+.oj-checklist li:nth-child(4n + 2) { --wave: var(--sun); }
+.oj-checklist li:nth-child(4n + 3) { --wave: #9C6ADE; }
+.oj-checklist li:nth-child(4n) { --wave: #6FA085; }
 .oj-private .oj-checklist li:last-child { grid-column: 1 / -1; font-weight: 700; }
 .oj-prenatal .oj-modules { margin: 1rem 0 1.2rem; }
 .oj-more__grid { display: grid; gap: 1.25rem; margin-top: 2rem; }
@@ -320,3 +331,39 @@ body .hero__title .hero__l3 { display: block; margin-top: .14em; }
 .drawer .sub-menu { display: grid; gap: .4rem; margin: .35rem 0 1.1rem; }
 .drawer .sub-menu a { display: flex !important; align-items: center; min-height: 48px; padding: .6rem 1rem !important; font-size: 1.08rem !important; line-height: 1.3; color: var(--paper) !important; background: rgba(255, 255, 255, .08); border-radius: 12px; }
 .drawer .sub-menu a:hover, .drawer .sub-menu a:active, .drawer .sub-menu a:focus-visible { background: rgba(255, 255, 255, .18); }
+
+/* ==========================================================================
+   Olívia, 14 November, the later points of her doc
+   ========================================================================== */
+
+/* No small line before a label anywhere (the section labels and page breadcrumbs are gone; the labels the booking pages
+   keep inside their cards lose the line too) */
+.kicker::before { display: none; }
+.kicker { gap: 0; }
+
+/* The hero: yoga, prenatal fitness and mobility on the same level, each in the colour of its box below, breathing one
+   after the other */
+.oj-hero .oj-hero__title { font-size: clamp(2.9rem, 1.2rem + 5.2vw, 5.5rem); line-height: 1.02; }
+.oj-hero .oj-hero__title .hero__l1 { margin-bottom: .1em; }
+.oj-hero .oj-trio { display: flex; flex-direction: column; align-items: flex-start; gap: .14em; margin-top: 0; }
+.oj-hero .oj-trio mark { padding: .12em .1em 0; margin-left: -.02em; line-height: 1.02; }
+.oj-hero .oj-trio .oj-breath--lilac::before { background: var(--lilac); }
+.oj-hero .oj-trio .oj-breath--sage::before { background: var(--sage); }
+.oj-hero .oj-trio .oj-breath--sun::before { background: var(--sun); }
+.oj-hero .oj-trio .oj-breath::before { transform-origin: 0 60%; }
+@media (prefers-reduced-motion: no-preference) {
+	.oj-hero .oj-trio .oj-breath--sage::before { animation-delay: -6.66s; }
+	.oj-hero .oj-trio .oj-breath--sun::before { animation-delay: -3.33s; }
+	@keyframes oj-breath-trio { 0%, 100% { transform: scale(1, 1); } 40% { transform: scale(1.04, 1.1); } }
+	.oj-hero .oj-trio .oj-breath::before { animation-name: oj-breath-trio; }
+}
+.oj-hero .oj-hero__title .hero__l3 { font-size: .5em; margin-top: .6em; }
+
+/* The pictures of the one-to-one and the prenatal blocks: the hero's soft wave behind them, running off the screen on the
+   picture's side, so no end of it shows and nothing reaches into the text („a hullám béna mert belelóg és elvágódik a széle”) */
+.oj-waved--soft > .oj-blob--left:not(.oj-brush) { left: calc(-1 * var(--oj-bleed)); width: calc(112% + var(--oj-bleed)); top: 10%; height: 96%; }
+.oj-waved--soft > .oj-blob--right:not(.oj-brush) { right: calc(-1 * var(--oj-bleed)); width: calc(112% + var(--oj-bleed)); top: 10%; height: 96%; }
+.oj-waved--soft > .frame { box-shadow: none; }
+
+/* who made the site */
+.footer__credit a { white-space: nowrap; }

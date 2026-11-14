@@ -25,15 +25,17 @@ $why    = array(
 );
 $needs  = array(
 	array( 'home', __( 'A quiet corner', 'olivia-yoga' ), __( 'Room for a mat, and a door you can close for an hour.', 'olivia-yoga' ), 'lilac' ),
-	array( 'lotus', __( 'A mat, a cushion and a blanket', 'olivia-yoga' ), __( 'The cushion and blanket are for the relaxation at the end of class.', 'olivia-yoga' ), 'pink' ),
-	array( 'online', __( 'A phone, tablet or laptop', 'olivia-yoga' ), __( 'Any device with a camera and a browser, no app to install. A bigger screen is easier to follow.', 'olivia-yoga' ), 'sage' ),
+	// Olívia, 14 November: „ezt kéne átírni általánosra, mert a kismamatornához nem ezek kellenek” – and „ahova illik, írd oda,
+	// hogy ne felejtse el feltölteni az eszközét, mielőtt becsatlakozik az órára”
+	array( 'lotus', __( 'A mat, and what your class asks for', 'olivia-yoga' ), __( 'Every class needs a mat. What else you need depends on the class: you will find it in its description.', 'olivia-yoga' ), 'pink' ),
+	array( 'online', __( 'A charged phone, tablet or laptop', 'olivia-yoga' ), __( 'A camera and a browser are enough, no app. Charge it before you join, so it does not run out during class.', 'olivia-yoga' ), 'sage' ),
 	// Olivia, 13 November: „írd bele, hogy nem kötelező, és emeld ki szépen, láthatóan, hogy a képedet csak én látom”
 	array( 'group', __( 'Camera on, if you like', 'olivia-yoga' ), __( 'It is not compulsory. If I can see you, I can help you with the poses.', 'olivia-yoga' ), 'sun', __( 'Only I see your picture.', 'olivia-yoga' ) ),
 );
 $steps  = array(
 	array( __( 'Choose a class', 'olivia-yoga' ), __( 'Book from the timetable with a drop-in or a class pass.', 'olivia-yoga' ) ),
 	array( __( 'Get the link', 'olivia-yoga' ), __( 'Your own link comes by email and is waiting in your account. It opens in the browser.', 'olivia-yoga' ) ),
-	array( __( 'Roll out your mat', 'olivia-yoga' ), __( 'Join a few minutes early so we can say hello before we start.', 'olivia-yoga' ) ),
+	array( __( 'Roll out your mat', 'olivia-yoga' ), __( 'Charge your device and join a few minutes early, so we can say hello before we start.', 'olivia-yoga' ) ),
 	array( __( 'Practice together, live', 'olivia-yoga' ), __( 'I guide you in real time. Afterwards the class chat stays open, and you can watch the class again for a week.', 'olivia-yoga' ) ),
 );
 ?>
@@ -41,7 +43,11 @@ $steps  = array(
 	<div class="container hero__grid">
 		<div class="hero__text">
 			<?php echo oy_kicker( __( 'Online yoga | Olivia Kovacs', 'olivia-yoga' ) ); // phpcs:ignore ?>
-			<h1 class="hero__title" id="hero-title"><span class="hero__l1"><?php echo esc_html_x( 'Online', 'online hero title, line 1', 'olivia-yoga' ); ?></span> <span class="hero__l2"><mark class="oj-breath"><?php echo esc_html_x( 'yoga', 'online hero title, line 2', 'olivia-yoga' ); ?></mark></span> <span class="hero__l3"><?php echo esc_html_x( 'live, from home', 'online hero title, line 3', 'olivia-yoga' ); ?></span></h1>
+			<?php
+			// Olívia, 14 November: „hierarchiában ugyanúgy helyezkedjen el a kismamatorna és a mobilizációs órák is” – the three
+			// on the same level, each in the colour of its box below, breathing one after the other
+			?>
+			<h1 class="hero__title oj-hero__title" id="hero-title"><span class="hero__l1"><?php echo esc_html_x( 'Online', 'online hero title, line 1', 'olivia-yoga' ); ?></span> <span class="hero__l2 oj-trio"><mark class="oj-breath oj-breath--lilac"><?php echo esc_html_x( 'yoga', 'online hero title, line 2', 'olivia-yoga' ); ?></mark><span class="sr-only">, </span> <mark class="oj-breath oj-breath--sage"><?php echo esc_html_x( 'prenatal fitness', 'online hero title, line 2', 'olivia-yoga' ); ?></mark><span class="sr-only">, </span> <mark class="oj-breath oj-breath--sun"><?php echo esc_html_x( 'mobility', 'online hero title, line 2', 'olivia-yoga' ); ?></mark></span> <span class="hero__l3"><?php echo esc_html_x( 'live, from home', 'online hero title, line 3', 'olivia-yoga' ); ?></span></h1>
 			<p class="hero__lead"><?php esc_html_e( 'Live group online yoga every Wednesday, and individual online yoga, prenatal fitness, stretching, relaxation and breathing tailored to you, from your living room. Beginners very welcome.', 'olivia-yoga' ); ?></p>
 			<?php // Olívia, 14 November: „A bejelentkezés és árak maradjon, az óra foglalása gomb jöjjön ki” (the header has it) ?>
 			<p class="btn-row oj-hero-cta"><?php echo oy_btn( oy_page_link( 'schedule-pricing' ), oy_schedule_label(), 'forest', 'btn--lg' ); // phpcs:ignore ?></p>
@@ -92,19 +98,21 @@ $steps  = array(
 // Olivia, 14 November: „jelenleg több blokk is a csoportos óráról szól a főoldalon. legyen kifejtve kicsit jobban a többi
 // szolgáltatás is … a kismamatornára mindenképp erősítsünk rá a főoldalon, megér egy külön blokkot”
 $ask      = fn( $topic ) => add_query_arg( 'topic', $topic, oy_private_url() );
+// Olívia, 14 November: „A pontokat, hogy mikor ajánlott, fogalmazd át egy kicsit, ne legyen copy … Pipák helyett is találj ki
+// mást!” – in our own words, with a small wave from her logo instead of the ticks
 $for_whom = array(
-	__( 'as a beginner, to learn the basics', 'olivia-yoga' ),
-	__( 'to complement your group practice', 'olivia-yoga' ),
-	__( 'as an experienced yogi, to learn advanced poses', 'olivia-yoga' ),
-	__( 'if you would rather focus on meditation and relaxation, which are rarer in group classes', 'olivia-yoga' ),
-	__( 'in an emotionally harder time, to complement your therapy with yoga', 'olivia-yoga' ),
-	__( 'as someone coming back to yoga', 'olivia-yoga' ),
-	__( 'just for fun, with your best friend, your sister or brother, your mum or dad', 'olivia-yoga' ),
-	__( 'as a date with your partner', 'olivia-yoga' ),
-	__( 'with a physical complaint, to strengthen or stretch out a part of your body', 'olivia-yoga' ),
-	__( 'if you are a yoga teacher, or training to be one, and would like to sit in and gain experience', 'olivia-yoga' ),
-	__( 'when the group timetable does not fit your day', 'olivia-yoga' ),
-	__( 'and you can give a private session as a gift: surprise someone you love with a pretty gift card!', 'olivia-yoga' ),
+	__( 'if you are just starting and want solid foundations', 'olivia-yoga' ),
+	__( 'alongside the group classes, to progress faster', 'olivia-yoga' ),
+	__( 'if you already practise and would like to learn advanced poses', 'olivia-yoga' ),
+	__( 'if meditation and relaxation draw you more, which get less time in a group', 'olivia-yoga' ),
+	__( 'in an emotionally harder period, alongside your therapy', 'olivia-yoga' ),
+	__( 'if you are coming back to yoga after a long break', 'olivia-yoga' ),
+	__( 'as time together with a friend, your sister or brother, or a parent', 'olivia-yoga' ),
+	__( 'as a special date with your partner', 'olivia-yoga' ),
+	__( 'if a part of your body aches or feels tight and you would like to strengthen or stretch it', 'olivia-yoga' ),
+	__( 'as a yoga teacher or a teacher in training, to sit in and gain experience', 'olivia-yoga' ),
+	__( 'if the Wednesday group class does not fit your week', 'olivia-yoga' ),
+	__( 'and as a gift: surprise someone you love with a pretty gift card!', 'olivia-yoga' ),
 );
 $modules  = array( __( 'Breathing exercises', 'olivia-yoga' ), __( 'Pelvic floor training', 'olivia-yoga' ), __( 'Better circulation', 'olivia-yoga' ), __( 'Cardio training', 'olivia-yoga' ), __( 'Strength and weight training', 'olivia-yoga' ), __( 'Spine training', 'olivia-yoga' ), __( 'Mobility and stretching', 'olivia-yoga' ), __( 'Yoga', 'olivia-yoga' ), __( 'Relaxation', 'olivia-yoga' ) );
 $more     = array(
@@ -117,12 +125,12 @@ $more     = array(
 		<div class="oj-split__text" data-reveal>
 			<?php echo oy_kicker( __( 'One-to-one sessions', 'olivia-yoga' ) ); // phpcs:ignore ?>
 			<h2 id="private-title"><?php esc_html_e( 'One-to-one online yoga, entirely tailored to you', 'olivia-yoga' ); ?></h2>
-			<p class="lead"><?php esc_html_e( 'Private sessions are completely personal, so you can come:', 'olivia-yoga' ); ?></p>
+			<p class="lead"><?php esc_html_e( 'A one-to-one session is shaped entirely around you. It is for you, for example:', 'olivia-yoga' ); ?></p>
 			<ul class="oj-checklist"><?php foreach ( $for_whom as $w ) : ?><li><?php echo esc_html( $w ); ?></li><?php endforeach; ?></ul>
 			<p class="oj-split__meta"><?php esc_html_e( '60 or 90 minutes, alone or as a pair (cheaper as a pair), live on video from your living room.', 'olivia-yoga' ); ?></p>
 			<p class="btn-row oj-inline"><?php echo oy_btn( $ask( 'egyeni-joga' ), __( 'Ask for a time', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore ?><a class="text-link" href="<?php echo esc_url( oy_class_url( 'egyeni-online-joga' ) ); ?>"><?php esc_html_e( 'More about one-to-one yoga', 'olivia-yoga' ); ?></a></p>
 		</div>
-		<div class="oj-split__art" data-reveal><div class="oj-waved"><?php echo oy_brush_blob( 'pink', 'right' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'private-tree-pose', '(min-width: 960px) 34vw, 92vw' ); // phpcs:ignore ?></div></div></div>
+		<div class="oj-split__art" data-reveal><div class="oj-waved oj-waved--soft"><?php echo oy_soft_blob( 'lilac', 'right' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'private-tree-pose', '(min-width: 960px) 34vw, 92vw' ); // phpcs:ignore ?></div></div></div>
 	</div>
 </div></section>
 
@@ -137,7 +145,8 @@ $more     = array(
 			<p><?php esc_html_e( 'The first session is an assessment and a conversation: we start from your sports background and how you are now, and we never begin anything more intense than you were used to before.', 'olivia-yoga' ); ?></p>
 			<p class="btn-row oj-inline"><?php echo oy_btn( $ask( 'prenatal' ), __( 'Ask for a time', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore ?><a class="text-link" href="<?php echo esc_url( oy_class_url( oy_prenatal_slug() ) ); ?>"><?php esc_html_e( 'More about prenatal fitness', 'olivia-yoga' ); ?></a></p>
 		</div>
-		<div class="oj-split__art" data-reveal><div class="oj-waved"><?php echo oy_brush_blob( 'lilac', 'left' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'prenatal-ball-training', '(min-width: 960px) 34vw, 92vw' ); // phpcs:ignore ?></div></div></div>
+		<?php // Olívia, 14 November: „a hullám a kép mögött legyen hasonló mint a legelső blokkban” – the soft wave of the hero, not a stroke that runs into the text ?>
+		<div class="oj-split__art" data-reveal><div class="oj-waved oj-waved--soft"><?php echo oy_soft_blob( 'pink', 'left' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'prenatal-ball-training', '(min-width: 960px) 34vw, 92vw' ); // phpcs:ignore ?></div></div></div>
 	</div>
 </div></section>
 

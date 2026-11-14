@@ -193,7 +193,7 @@ class OYS_Emails {
 		if ( $session->zoom_password && ! str_contains( $url, 'pwd=' ) ) {
 			$html .= '<p style="font-size:13px;color:#53635A">' . esc_html__( 'Passcode:', 'olivia-studio' ) . ' <b>' . esc_html( $session->zoom_password ) . '</b></p>';
 		}
-		return $html . ( $tip ? '<p style="font-size:13px;color:#53635A">' . esc_html__( 'Join a few minutes early, set up where the camera sees your mat (or leave it off), and keep your microphone muted.', 'olivia-studio' ) . '</p>' : '' );
+		return $html . ( $tip ? '<p style="font-size:13px;color:#53635A">' . esc_html__( 'Charge your device, join a few minutes early, set up where the camera sees your mat (or leave it off), and keep your microphone muted.', 'olivia-studio' ) . '</p>' : '' );
 	}
 
 	/** "To pay at the studio: $25" for bookings that are paid on the day. */

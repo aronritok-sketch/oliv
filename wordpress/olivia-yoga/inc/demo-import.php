@@ -1023,6 +1023,57 @@ function oy_migrate_1114c() {
 }
 
 /**
+ * Olívia, 14 November, the last points of her doc, on a live site: 2018 (massage) on the About timeline, the general kit
+ * list and the „charge your device” note on the prices page, the same in the FAQ answer about what to prepare. Each text
+ * changes only where the old one is still there word for word, so whatever she has rewritten herself stays.
+ */
+function oy_migrate_1114d() {
+	$rev = '2026-11-14d';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
+		return array();
+	}
+	update_option( 'oy_1114d_rev', $rev );
+	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+	$log  = array();
+	foreach ( (array) ( $data['pages'] ?? array() ) as $key => $page ) {
+		if ( empty( $page['_insert'] ) && empty( $page['_replace'] ) ) {
+			continue;
+		}
+		$post = get_page_by_path( oy_page_slug( $key ) );
+		if ( ! $post ) {
+			continue;
+		}
+		$content = $post->post_content;
+		foreach ( (array) ( $page['_insert'] ?? array() ) as $pair ) {
+			if ( str_contains( $content, (string) $pair[0] ) && ! str_contains( $content, (string) $pair[1] ) ) {
+				$content = str_replace( (string) $pair[0], $pair[0] . "\n" . $pair[1], $content );
+			}
+		}
+		foreach ( (array) ( $page['_replace'] ?? array() ) as $pair ) {
+			$content = str_replace( (string) $pair[0], (string) $pair[1], $content );
+		}
+		if ( $content !== $post->post_content ) {
+			kses_remove_filters();
+			wp_update_post( wp_slash( array( 'ID' => $post->ID, 'post_content' => $content ) ) );
+			kses_init_filters();
+			$log[] = 'page: ' . $key;
+		}
+	}
+	foreach ( (array) ( $data['faqs'] ?? array() ) as $f ) {
+		if ( empty( $f['_prev']['q'] ) ) {
+			continue;
+		}
+		foreach ( get_posts( array( 'post_type' => 'oy_faq', 'post_status' => 'any', 'numberposts' => -1, 'title' => $f['_prev']['q'] ) ) as $faq ) {
+			if ( trim( wp_strip_all_tags( $faq->post_content ) ) === trim( $f['_prev']['a'] ) ) {
+				wp_update_post( wp_slash( array( 'ID' => $faq->ID, 'post_title' => $f['q'], 'post_content' => wpautop( esc_html( $f['a'] ) ) ) ) );
+				$log[] = 'FAQ: ' . $f['q'];
+			}
+		}
+	}
+	return $log;
+}
+
+/**
  * The online edition's passes, one-to-one services and timetable setting from its content file, on a live site. Passes
  * someone has bought keep their own expiry; products the edition no longer has go off sale.
  */

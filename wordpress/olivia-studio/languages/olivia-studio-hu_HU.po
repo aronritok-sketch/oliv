@@ -2289,8 +2289,8 @@ msgid "Passcode:"
 msgstr "Jelkód:"
 
 #: includes/class-emails.php:195
-msgid "Join a few minutes early, set up where the camera sees your mat (or leave it off), and keep your microphone muted."
-msgstr "Lépj be pár perccel korábban, helyezkedj el úgy, hogy a kamera lássa a matracodat (vagy hagyd kikapcsolva), és némítsd le a mikrofonod."
+msgid "Charge your device, join a few minutes early, set up where the camera sees your mat (or leave it off), and keep your microphone muted."
+msgstr "Töltsd fel előtte az eszközöd, lépj be pár perccel korábban, helyezkedj el úgy, hogy a kamera lássa a matracodat (vagy hagyd kikapcsolva), és némítsd le a mikrofonod."
 
 #: includes/class-emails.php:262
 msgid "Your guest (%d)"
@@ -2899,8 +2899,8 @@ msgstr "Szia {first_name}! Az élő óra {time}-kor kezdődik. Itt a belépő li
 
 #: data
 #. Default text stored as data (email template, product or timetable).
-msgid "Set up where the camera sees your mat (or keep it off) and keep your microphone muted."
-msgstr "Helyezkedj el úgy, hogy a kamera lássa a matracodat (vagy hagyd kikapcsolva), és némítsd le a mikrofonod."
+msgid "Charge your device before you join, set up where the camera sees your mat (or keep it off) and keep your microphone muted."
+msgstr "Becsatlakozás előtt töltsd fel az eszközöd, helyezkedj el úgy, hogy a kamera lássa a matracodat (vagy hagyd kikapcsolva), és némítsd le a mikrofonod."
 
 #: data
 #. Default text stored as data (email template, product or timetable).
@@ -6034,3 +6034,6 @@ msgstr "Egy óra: %s"
 
 msgid "%1$s per session (%2$s each)"
 msgstr "Egy óra: %1$s (fejenként %2$s)"
+
+msgid "Charge your device or plug it in, so it does not run out during the class."
+msgstr "Töltsd fel az eszközöd, vagy tedd töltőre, hogy ne merüljön le óra közben."

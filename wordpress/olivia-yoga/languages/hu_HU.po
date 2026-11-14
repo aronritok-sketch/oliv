@@ -1153,14 +1153,10 @@ msgstr "Egy csendes sarok"
 msgid "Room for a mat, and a door you can close for an hour."
 msgstr "Egy jógamatracnyi hely, és egy ajtó, amit egy órára becsukhatsz."
 
-msgid "A mat, a cushion and a blanket"
-msgstr "Matrac, párna és pléd"
 
 msgid "The cushion and blanket are for the long relaxation at the end."
 msgstr "A párna és a pléd a hosszú relaxációhoz kell, az óra végén."
 
-msgid "A phone, tablet or laptop"
-msgstr "Telefon, tablet vagy laptop"
 
 msgid "Any device with a camera that runs Zoom. A bigger screen is easier to follow."
 msgstr "Bármilyen kamerás eszköz, amin fut a Zoom. Nagyobb képernyőn könnyebb követni."
@@ -1186,8 +1182,6 @@ msgstr "A Zoom-linket e-mailben kapod, és a fiókodban is megtalálod."
 msgid "Roll out your mat"
 msgstr "Leteríted a matracot"
 
-msgid "Join a few minutes early so we can say hello before we start."
-msgstr "Csatlakozz pár perccel korábban, hogy kezdés előtt köszönhessünk egymásnak."
 
 msgid "Practice together, live"
 msgstr "Együtt gyakorlunk, élőben"
@@ -1241,6 +1235,14 @@ msgstr "Online"
 msgctxt "online hero title, line 2"
 msgid "yoga"
 msgstr "jóga"
+
+msgctxt "online hero title, line 2"
+msgid "prenatal fitness"
+msgstr "kismamatorna"
+
+msgctxt "online hero title, line 2"
+msgid "mobility"
+msgstr "mobilizáció"
 
 msgctxt "online hero title, line 3"
 msgid "live, from home"
@@ -1332,8 +1334,6 @@ msgstr "Négy ok, amiért az élő online jógát választják, és maradnak is.
 msgid "Why online"
 msgstr "Miért online"
 
-msgid "Any device with a camera and a browser, no app to install. A bigger screen is easier to follow."
-msgstr "Bármilyen eszköz kamerával és böngészővel, alkalmazást nem kell telepíteni. Nagyobb képernyőn könnyebb követni."
 
 msgid "Your own link comes by email and is waiting in your account. It opens in the browser."
 msgstr "A saját linkedet e-mailben kapod, és a fiókodban is ott vár. A böngésződben nyílik meg."
@@ -1600,8 +1600,6 @@ msgstr "Egyénileg vagy a barátnőddel: légzőtorna, gátizomtorna, keringésj
 msgid "No traffic, no parking, no queue in the changing room. At home you can get ready in peace: light a candle, or create whatever helps you arrive."
 msgstr "Nincs dugó, parkolás, sorban állás az öltözőben. Otthon nyugodtan felkészülhetsz: gyújts egy gyertyát, vagy teremtsd meg azt, ami segít ráhangolódni."
 
-msgid "The cushion and blanket are for the relaxation at the end of class."
-msgstr "A párna és a pléd a relaxációhoz kell, az óra végén."
 
 msgid "It is not compulsory. If I can see you, I can help you with the poses."
 msgstr "Nem kötelező. Ha látlak, tudok segíteni a pózokban."
@@ -1642,42 +1640,17 @@ msgstr "Olivia Kovacs egylábas kerékpózban a homokon, a völgy fölött"
 msgid "Students resting in child's pose on a wooden deck during an evening class"
 msgstr "Gyakorlók gyermekpózban pihennek egy fateraszon egy esti órán"
 
-#. Olivia, 14 November: the other services on the home page
-msgid "as a beginner, to learn the basics"
-msgstr "kezdő jógásként, hogy biztos alapokat tanulj"
 
-msgid "to complement your group practice"
-msgstr "hogy kiegészítsd a csoportos gyakorlásodat"
 
-msgid "as an experienced yogi, to learn advanced poses"
-msgstr "haladó jógásként, hogy haladó pózokat tanulj"
 
-msgid "if you would rather focus on meditation and relaxation, which are rarer in group classes"
-msgstr "ha inkább a meditációra, a relaxációra fókuszálnál, ami a csoportos órákon ritkább"
 
-msgid "in an emotionally harder time, to complement your therapy with yoga"
-msgstr "ha egy lelkileg nehezebb időszakodban jógával egészítenéd ki a terápiádat"
 
-msgid "as someone coming back to yoga"
-msgstr "újrakezdő jógásként"
 
-msgid "just for fun, with your best friend, your sister or brother, your mum or dad"
-msgstr "funból, a barátnőddel, a tesóddal, anyukáddal vagy apukáddal"
 
-msgid "as a date with your partner"
-msgstr "randiként a pároddal"
 
-msgid "with a physical complaint, to strengthen or stretch out a part of your body"
-msgstr "ha egy testi probléma miatt egy-egy testrészt, testtájat erősítenél vagy nyújtanál"
 
-msgid "if you are a yoga teacher, or training to be one, and would like to sit in and gain experience"
-msgstr "ha jógaoktató vagy, vagy most tanulsz annak, és hospitálnál, tapasztalatot szereznél"
 
-msgid "when the group timetable does not fit your day"
-msgstr "ha a csoportos órák időpontja nem fér bele a napirendedbe"
 
-msgid "and you can give a private session as a gift: surprise someone you love with a pretty gift card!"
-msgstr "és ajándékba is adhatod: egy csinos utalvánnyal meglepheted a szerettedet egy ilyen órával!"
 
 msgid "Breathing exercises"
 msgstr "Légzőtorna"
@@ -1745,8 +1718,6 @@ msgstr "Egyéni órák"
 msgid "One-to-one online yoga, entirely tailored to you"
 msgstr "Egyéni online jógaóra, teljesen rád szabva"
 
-msgid "Private sessions are completely personal, so you can come:"
-msgstr "A magánórák teljesen személyre szabottak, ezért jöhetsz:"
 
 msgid "60 or 90 minutes, alone or as a pair (cheaper as a pair), live on video from your living room."
 msgstr "60 vagy 90 perc, egyedül vagy párban (párban olcsóbb), élőben, a nappalidból."
@@ -1780,3 +1751,60 @@ msgstr "Egyéni órák a merev testnek és a túlpörgött fejnek."
 
 msgid "Read more"
 msgstr "Bővebben"
+
+msgid "A mat, and what your class asks for"
+msgstr "Matrac, és amit az óra kér"
+
+msgid "Every class needs a mat. What else you need depends on the class: you will find it in its description."
+msgstr "Matrac minden órához kell. Hogy mi kell még, az az órától függ: megtalálod a leírásában."
+
+msgid "A charged phone, tablet or laptop"
+msgstr "Feltöltött telefon, tablet vagy laptop"
+
+msgid "A camera and a browser are enough, no app. Charge it before you join, so it does not run out during class."
+msgstr "Kamera és böngésző kell hozzá, alkalmazás nem. Becsatlakozás előtt töltsd fel, hogy ne merüljön le óra közben."
+
+msgid "Charge your device and join a few minutes early, so we can say hello before we start."
+msgstr "Töltsd fel az eszközöd, és csatlakozz be pár perccel korábban, hogy kezdés előtt köszönhessünk egymásnak."
+
+msgid "if you are just starting and want solid foundations"
+msgstr "ha most kezdenéd, és biztos alapokat szeretnél"
+
+msgid "alongside the group classes, to progress faster"
+msgstr "a csoportos órák mellé, hogy gyorsabban fejlődj"
+
+msgid "if you already practise and would like to learn advanced poses"
+msgstr "ha már gyakorolsz, és haladó ászanákat tanulnál"
+
+msgid "if meditation and relaxation draw you more, which get less time in a group"
+msgstr "ha a meditáció és a relaxáció vonz jobban, amire csoportban kevesebb idő jut"
+
+msgid "in an emotionally harder period, alongside your therapy"
+msgstr "egy lelkileg nehezebb időszakban, a terápiád mellé"
+
+msgid "if you are coming back to yoga after a long break"
+msgstr "ha hosszabb szünet után térnél vissza a jógához"
+
+msgid "as time together with a friend, your sister or brother, or a parent"
+msgstr "közös programnak a barátnőddel, a testvéreddel vagy a szüleiddel"
+
+msgid "as a special date with your partner"
+msgstr "különleges randinak a pároddal"
+
+msgid "if a part of your body aches or feels tight and you would like to strengthen or stretch it"
+msgstr "ha fáj vagy feszül valamelyik testrészed, és célzottan erősítenéd vagy nyújtanád"
+
+msgid "as a yoga teacher or a teacher in training, to sit in and gain experience"
+msgstr "jógaoktatóként vagy oktatójelöltként, ha hospitálnál és tapasztalatot gyűjtenél"
+
+msgid "if the Wednesday group class does not fit your week"
+msgstr "ha a szerdai csoportos óra nem fér bele a hetedbe"
+
+msgid "and as a gift: surprise someone you love with a pretty gift card!"
+msgstr "és ajándéknak is: lepj meg valakit, akit szeretsz, egy szép ajándékutalvánnyal!"
+
+msgid "A one-to-one session is shaped entirely around you. It is for you, for example:"
+msgstr "Az egyéni óra teljesen hozzád igazodik. Neked szól például:"
+
+msgid "Made by"
+msgstr "Készítette:"

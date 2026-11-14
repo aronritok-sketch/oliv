@@ -217,7 +217,9 @@ function oy_btn( $href, $label, $style = 'primary', $extra = '' ) {
 }
 
 function oy_kicker( $text ) {
-	return '<p class="kicker">' . esc_html( $text ) . '</p>';
+	// Online: no small line-and-capitals label over the headings (Olívia, 14 November: „ezt is szedjük ki … az összes
+	// ilyet minden aloldalon is”)
+	return oy_online_only() ? '' : '<p class="kicker">' . esc_html( $text ) . '</p>';
 }
 
 function oy_section_head( $title, $text = '', $kicker = '', $id = '' ) {
@@ -345,6 +347,9 @@ function oy_resolve_tokens( $text ) {
 /* ---------- Breadcrumbs and page head ---------- */
 
 function oy_crumbs( array $trail ) {
+	if ( oy_online_only() ) {
+		return ''; // the same small capitals over the page titles: out on every page (Olívia, 14 November)
+	}
 	$items = '<li><a href="' . esc_url( home_url( '/' ) ) . '">' . esc_html__( 'Home', 'olivia-yoga' ) . '</a></li>';
 	$last  = count( $trail ) - 1;
 	foreach ( $trail as $i => $t ) {

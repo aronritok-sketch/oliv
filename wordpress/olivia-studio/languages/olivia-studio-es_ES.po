@@ -2289,8 +2289,8 @@ msgid "Passcode:"
 msgstr "Código de acceso:"
 
 #: includes/class-emails.php:195
-msgid "Join a few minutes early, set up where the camera sees your mat (or leave it off), and keep your microphone muted."
-msgstr "Entra unos minutos antes, ubícate donde la cámara vea tu mat (o déjala apagada) y mantén el micrófono silenciado."
+msgid "Charge your device, join a few minutes early, set up where the camera sees your mat (or leave it off), and keep your microphone muted."
+msgstr "Carga tu dispositivo, entra unos minutos antes, ubícate donde la cámara vea tu mat (o déjala apagada) y mantén el micrófono silenciado."
 
 #: includes/class-emails.php:262
 msgid "Your guest (%d)"
@@ -2899,8 +2899,8 @@ msgstr "¡Hola, {first_name}! La clase en vivo empieza a las {time}. Aquí tiene
 
 #: data
 #. Default text stored as data (email template, product or timetable).
-msgid "Set up where the camera sees your mat (or keep it off) and keep your microphone muted."
-msgstr "Ubícate donde la cámara vea tu mat (o déjala apagada) y mantén el micrófono silenciado."
+msgid "Charge your device before you join, set up where the camera sees your mat (or keep it off) and keep your microphone muted."
+msgstr "Carga tu dispositivo antes de entrar, ubícate donde la cámara vea tu mat (o déjala apagada) y mantén el micrófono silenciado."
 
 #: data
 #. Default text stored as data (email template, product or timetable).
@@ -4033,3 +4033,6 @@ msgstr "Aún no hay nada que grabar: enciende la cámara o el micrófono."
 
 msgid "This browser can't record. Use Chrome, Edge or Safari on a computer."
 msgstr "Este navegador no puede grabar. Usa Chrome, Edge o Safari en un ordenador."
+
+msgid "Charge your device or plug it in, so it does not run out during the class."
+msgstr "Carga tu dispositivo o déjalo enchufado para que no se apague durante la clase."

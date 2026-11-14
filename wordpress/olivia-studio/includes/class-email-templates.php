@@ -50,7 +50,7 @@ class OYS_Email_Templates {
 			'reminder'          => array( __( 'Class reminder', 'olivia-studio' ), 'reminders', 'customer', __( 'Before the class, at the times set under Reminders', 'olivia-studio' ),
 				'Reminder: {class}, {day} {time}', 'See you soon', 'Hi {first_name}, a quick reminder about your class.', "Can't come? Please cancel in your account so someone on the waitlist can take your spot.", 'My bookings' ),
 			'join_reminder'     => array( __( 'Online: link before the class', 'olivia-studio' ), 'reminders', 'customer', __( 'To everyone joining online, shortly before the class starts', 'olivia-studio' ),
-				'Starting soon: {class} (live online), {time}', 'Your class starts soon', "Hi {first_name}, the live class starts at {time}. Here's your link to join.", 'Set up where the camera sees your mat (or keep it off) and keep your microphone muted.', '' ),
+				'Starting soon: {class} (live online), {time}', 'Your class starts soon', "Hi {first_name}, the live class starts at {time}. Here's your link to join.", 'Charge your device before you join, set up where the camera sees your mat (or keep it off) and keep your microphone muted.', '' ),
 			'pass_expiring'     => array( __( 'Pass about to expire', 'olivia-studio' ), 'reminders', 'customer', __( 'When unused classes on a pass are about to expire (days set under Reminders)', 'olivia-studio' ),
 				'Your {pass} expires on {expires}', 'Use your classes', "Hi {first_name}, you still have {classes_left} on your {pass}, valid until {expires}. Book a class so they don't go to waste.", '', 'Book a class', array( 'pass', 'classes_left', 'expires' ) ),
 			// Passes, gifts, account

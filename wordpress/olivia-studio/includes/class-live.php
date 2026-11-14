@@ -996,6 +996,7 @@ class OYS_Live {
 				. ( 'open' === $phase ? esc_html__( 'The room is open.', 'olivia-studio' ) : esc_html( sprintf( __( 'The room opens %d minutes before the class.', 'olivia-studio' ), max( 5, (int) OYS_Settings::get( 'live_open_minutes' ) ) ) ) ) . '</p>'
 				. '<button type="button" class="btn btn--primary" data-live-join' . ( 'open' === $phase ? '' : ' disabled' ) . '>' . esc_html( $who['owner'] ? __( 'Go live', 'olivia-studio' ) : __( 'Join the class', 'olivia-studio' ) ) . '</button>'
 				. '<ul class="oys-live__tips"><li>' . esc_html__( 'In your browser, no app needed. On a phone or tablet, open this page in Chrome or Safari.', 'olivia-studio' ) . '</li>'
+				. ( $who['owner'] ? '' : '<li>' . esc_html__( 'Charge your device or plug it in, so it does not run out during the class.', 'olivia-studio' ) . '</li>' ) // Olívia, 14 November: „ne felejtse el feltölteni az eszközét”
 				. '<li>' . esc_html( $who['owner'] || self::two_way( $session ) ? __( 'Allow the camera and the microphone when your browser asks. You can turn both off in the room.', 'olivia-studio' ) : sprintf( __( 'You see and hear %s; your camera and microphone stay off. Questions go in the chat.', 'olivia-studio' ), $teacher ) ) . '</li>'
 				. ( self::records( $session ) ? '<li>' . esc_html( sprintf( __( 'The class is recorded, but only %s is on the recording: you are not.', 'olivia-studio' ), $teacher ) ) . '</li>' : '' )
 				. '</ul></div>'

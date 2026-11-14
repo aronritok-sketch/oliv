@@ -776,6 +776,18 @@ Olivia doksija, 2026. 11. 13. 21:35.
   `oy_migrate_about()` rev 2026-11-14b: csak akkor cseréli a tartalmat, ha az md5-je a korábbi témaszövegé
   (`_content_prev_md5`), a bevezetőt/keresőleírást csak, ha még az eredeti (`_excerpt_prev`, `_seo_desc_prev`).
 
+### 6.13j Olívia doksija 11.14, utolsó pontok (olivia-yoga 3.11.0, olivia-studio 1.10.3)
+
+- Online kiadás: `oy_kicker()` és `oy_crumbs()` üres sztringet ad (nincs címke a címek fölött, nincs morzsamenü); a
+  bővítmény kártyáin a `.kicker` szöveg marad, a vonal (`::before`) nem.
+- Nyitókép: `.oj-trio` – három `mark.oj-breath--{lilac|sage|sun}`, a képernyőolvasónak vesszővel (`.sr-only`).
+- `.oj-waved--soft` + `oy_soft_blob()`: a nyitókép puha hulláma a képek mögött (egyéni, kismamatorna blokk).
+- `.oj-checklist` jele: maszkolt SVG hullám, `--wave` színnel; `.oj-modules li` `--dot` színnel, kilenc különböző.
+- `oy_migrate_1114d()` rev 2026-11-14d: a lapok `_insert` (a horgony után, ha még nincs ott) és `_replace` párjai, a
+  GYIK `_prev` alapján – mind csak a szó szerint egyező régi szövegen.
+- Bővítmény: „töltsd fel az eszközöd” a foglalási e-mail tippjében, a `join_reminder` alapszövegében és az élő óra
+  belépő képernyőjén (résztvevőknek).
+
 ### 6.14 Mobil API és iOS app
 
 **API** – `OYS_App_API` (`includes/class-app-api.php`), útvonalak a `oys/v1/app/` alatt:

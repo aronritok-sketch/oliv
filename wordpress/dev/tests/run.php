@@ -549,8 +549,10 @@ test( 'calendar: validation and capacity below bookings', function () {
 	ok( is_wp_error( $bad ), 'a class needs a class type' );
 	$past = OYS_Calendar::rest_save( cal_req( array( 'kind' => 'event', 'title' => 'Old', 'date' => wp_date( 'Y-m-d', time() - 3 * DAY_IN_SECONDS ), 'start' => '10:00' ) ) );
 	ok( is_wp_error( $past ), 'no new sessions in the past' );
-	// at 10:00 in three days: a class that starts late in the evening would run past midnight
-	$s = make_session( array( 'capacity' => 3, 'in_hours' => ( ( new DateTimeImmutable( 'today 10:00', wp_timezone() ) )->modify( '+3 days' )->getTimestamp() - time() ) / HOUR_IN_SECONDS ) );
+	// in three days, at 9:00 or 20:00 – never late enough to run past midnight, and at least six hours from the clock time
+	// of the sessions other tests make for „in 72 hours” (at 10:00 it clashed with those when the suite ran in the morning)
+	$hour = (int) wp_date( 'G' ) >= 3 && (int) wp_date( 'G' ) <= 14 ? '20:00' : '09:00';
+	$s    = make_session( array( 'capacity' => 3, 'in_hours' => ( ( new DateTimeImmutable( 'today ' . $hour, wp_timezone() ) )->modify( '+3 days' )->getTimestamp() - time() ) / HOUR_IN_SECONDS ) );
 	OYS_Bookings::book_party( make_user(), $s, array( 'method' => 'free', 'guests' => guests( 'A' ), 'notify' => false ) );
 	$d = OYS_Calendar::out( OYS_Schedule::get( $s->id ) );
 	OYS_Calendar::rest_save( cal_req( array_merge( $d, array( 'capacity' => 1 ) ), $s->id ), $s->id );
@@ -2836,7 +2838,7 @@ test( 'online edition, live update: her raw journal photos fill the frame, the p
 		update_post_meta( $post, 'oy_art', '1' );
 		$kit  = wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Online kismamatorna', 'post_name' => 'kismamatorna', 'post_content' => "<h2>Mire lesz szükséged?</h2>\n<ul>\n<li>Gumiszalag</li>\n</ul>\n<p>Ha valamelyik eszköz még nincs meg, írj, és megmutatom, mivel helyettesítheted otthon.</p>" ) );
 		$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
-		$prev = array_values( array_filter( $data['faqs'], fn( $f ) => ! empty( $f['_prev'] ) ) )[0]['_prev'];
+		$prev = array_values( array_filter( $data['faqs'], fn( $f ) => str_starts_with( (string) ( $f['_prev']['q'] ?? '' ), 'Mire lesz' ) ) )[0]['_prev'];
 		$faq  = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => $prev['q'], 'post_content' => wpautop( esc_html( $prev['a'] ) ) ) );
 		delete_option( 'oy_doc1114_rev' );
 		$log  = oy_migrate_doc_1114();
@@ -2878,6 +2880,67 @@ test( 'online edition, live update: 2015 on her timeline, the web copy of her Fi
 	} finally {
 		update_option( 'oy_edition', 'fort-myers' );
 	}
+} );
+
+test( 'online edition, live update: 2018 on her timeline, the kit list for every class, „charge your device” (Olívia, 14 November)', function () {
+	require_once get_template_directory() . '/inc/demo-import.php';
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		$data   = json_decode( (string) file_get_contents( oy_content_file() ), true );
+		$pairs  = $data['pages']['about']['_insert'];
+		$li2015 = $pairs[0][1];
+		$li2018 = $pairs[1][1];
+		ok( str_contains( $data['pages']['about']['content'], $li2015 . "\n" . $li2018 ), 'a fresh site has 2018 after 2015' );
+		$about = get_page_by_path( oy_page_slug( 'about' ) );
+		$aid   = $about ? $about->ID : wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Rólam', 'post_name' => oy_page_slug( 'about' ) ) );
+		wp_update_post( array( 'ID' => $aid, 'post_content' => "<ol>\n" . $pairs[0][0] . "\n" . $li2015 . "\n<li><b>Ma</b> élő online órák.</li>\n</ol>" ) );
+		$kit    = $data['pages']['schedule-pricing']['_replace'];
+		$prices = get_page_by_path( oy_page_slug( 'schedule-pricing' ) );
+		$pid    = $prices ? $prices->ID : wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Bejelentkezés és árak', 'post_name' => oy_page_slug( 'schedule-pricing' ) ) );
+		wp_update_post( array( 'ID' => $pid, 'post_content' => "<ul>\n" . $kit[0][0] . "\n<li>Saját mondatom</li>\n" . $kit[1][0] . "\n</ul>" ) );
+		$f    = array_values( array_filter( $data['faqs'], fn( $x ) => 'Mit kell előkészítenem az online jóga órára?' === ( $x['_prev']['q'] ?? '' ) ) )[0];
+		$faq  = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => $f['_prev']['q'], 'post_content' => wpautop( esc_html( $f['_prev']['a'] ) ) ) );
+		$mine = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => $f['_prev']['q'], 'post_content' => '<p>Ezt én írtam át.</p>' ) );
+		delete_option( 'oy_1114d_rev' );
+		$log = oy_migrate_1114d();
+		$c   = get_post_field( 'post_content', $aid );
+		ok( str_contains( $c, $li2015 . "\n" . $li2018 ) && 1 === substr_count( $c, '2018-tól' ), 'About: 2018 (massage) once, after 2015' );
+		$p = get_post_field( 'post_content', $pid );
+		ok( str_contains( $p, $kit[0][1] ) && str_contains( $p, $kit[1][1] ) && str_contains( $p, 'Saját mondatom' ), 'prices page: the kit for every class and „charge it”, her own line stays' );
+		ok( str_contains( get_post_field( 'post_content', $faq ), 'töltsd fel' ), 'the FAQ answer: charge your device' );
+		eq( '<p>Ezt én írtam át.</p>', get_post_field( 'post_content', $mine ), 'an answer she rewrote stays hers' );
+		ok( in_array( 'page: about', $log, true ) && in_array( 'page: schedule-pricing', $log, true ), 'logged' );
+		eq( array(), oy_migrate_1114d(), 'once' );
+		update_option( 'oy_edition', 'fort-myers' );
+		delete_option( 'oy_1114d_rev' );
+		eq( array(), oy_migrate_1114d(), 'only on the online edition' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+} );
+
+test( 'online edition, Olívia\'s doc of 14 November, last points: one level for yoga, prenatal and mobility; no labels or breadcrumbs; who made the site', function () {
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		eq( '', oy_kicker( 'Egyéni órák' ), 'no small label over the headings' );
+		eq( '', oy_crumbs( array( array( 'Órák', home_url( '/' ) ), array( 'Egyéni online jóga', '' ) ) ), 'no breadcrumb over the page titles' );
+		ob_start();
+		load_template( get_template_directory() . '/template-parts/front-online.php', false );
+		$home = (string) ob_get_clean();
+		ok( (bool) preg_match( '/<h1[^>]*>.*oj-breath--lilac.*oj-breath--sage.*oj-breath--sun.*<\/h1>/s', $home ), 'the hero: three equal marks' );
+		ok( ! str_contains( $home, 'class="kicker"' ), 'home: no labels' );
+		ok( 2 === substr_count( $home, 'oj-waved--soft' ) && 1 === substr_count( $home, 'oj-brush' ), 'one-to-one and prenatal: the hero\'s soft wave (the stroke stays only by the intro)' );
+		ob_start();
+		load_template( get_template_directory() . '/footer.php', false );
+		$foot = (string) ob_get_clean();
+		ok( str_contains( $foot, 'href="https://helloprovision.com/"' ), 'footer: who made the site, linked' );
+		$css = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
+		ok( ! str_contains( $css, '.ways--five .way:nth-child(2), .ways--five .way:nth-child(5) { top' ), 'the five boxes in straight lines' );
+		ok( 9 === preg_match_all( '/\.oj-modules li:nth-child\(\d\) \{ --dot: (#[0-9A-F]{6}); \}/', $css, $m ) && 9 === count( array_unique( $m[1] ) ), 'nine modules, nine colours' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+	eq( '<p class="kicker">X</p>', oy_kicker( 'X' ), 'the other editions keep their labels' );
 } );
 
 test( 'Arovia payments through the CRM: the site registers itself, every Stripe call is signed, events come back signed', function () {
