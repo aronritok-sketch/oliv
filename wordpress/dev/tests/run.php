@@ -2838,9 +2838,6 @@ test( 'online edition, live update: her raw journal photos fill the frame, the p
 		set_post_thumbnail( $post, $att );
 		update_post_meta( $post, 'oy_art', '1' );
 		$kit  = wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Online kismamatorna', 'post_name' => 'kismamatorna', 'post_content' => "<h2>Mire lesz szükséged?</h2>\n<ul>\n<li>Gumiszalag</li>\n</ul>\n<p>Ha valamelyik eszköz még nincs meg, írj, és megmutatom, mivel helyettesítheted otthon.</p>" ) );
-		$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
-		$prev = array_values( array_filter( $data['faqs'], fn( $f ) => str_starts_with( (string) ( $f['_prev']['q'] ?? '' ), 'Mire lesz' ) ) )[0]['_prev'];
-		$faq  = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => $prev['q'], 'post_content' => wpautop( esc_html( $prev['a'] ) ) ) );
 		delete_option( 'oy_doc1114_rev' );
 		$log  = oy_migrate_doc_1114();
 		$meta = wp_get_attachment_metadata( $att );
@@ -2850,7 +2847,6 @@ test( 'online edition, live update: her raw journal photos fill the frame, the p
 		eq( '', get_post_meta( $post, 'oy_art', true ), 'the post fills the frame' );
 		$c = get_post_field( 'post_content', $kit );
 		ok( str_contains( $c, 'Mire lehet szükséged?' ) && str_contains( $c, 'Nem feltétlenül kell mindegyik' ) && str_contains( $c, '<li>Gumiszalag</li>' ), 'prenatal: „may be needed”, the list stays' );
-		ok( str_starts_with( get_post_field( 'post_title', $faq ), 'Mire lehet' ) && str_contains( get_post_field( 'post_content', $faq ), 'Nem feltétlenül kell mindegyik' ), 'the FAQ too' );
 		ok( (bool) preg_match( '/journal: [1-9]\d* raw photos, [1-9]\d* posts fill the frame/', implode( ' · ', $log ) ), 'logged' );
 		eq( array(), oy_migrate_doc_1114(), 'once' );
 	} finally {
@@ -2901,11 +2897,18 @@ test( 'online edition, live update: 2018 on her timeline, the kit list for every
 		$kit    = $data['pages']['schedule-pricing']['_replace'];
 		$prices = get_page_by_path( oy_page_slug( 'schedule-pricing' ) );
 		$pid    = $prices ? $prices->ID : wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Bejelentkezés és árak', 'post_name' => oy_page_slug( 'schedule-pricing' ) ) );
-		wp_update_post( array( 'ID' => $pid, 'post_content' => "<ul>\n" . $kit[0][0] . "\n<li>Saját mondatom</li>\n" . $kit[1][0] . "\n</ul>" ) );
+		$minr   = array_values( array_filter( $kit, fn( $r ) => str_contains( $r[0], 'legalább 3 fővel' ) ) )[0];
+		wp_update_post( array( 'ID' => $pid, 'post_content' => "<ul>\n" . $kit[0][0] . "\n<li>Saját mondatom</li>\n" . $kit[1][0] . "\n</ul>\n<p>Kérlek, foglalj előre. " . $minr[0] . ' Kezdőket is várok.</p>' ) );
 		$f    = array_values( array_filter( $data['faqs'], fn( $x ) => 'Mit kell előkészítenem az online jóga órára?' === ( $x['_prev']['q'] ?? '' ) ) )[0];
 		$faq  = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => $f['_prev']['q'], 'post_content' => wpautop( esc_html( $f['_prev']['a'] ) ) ) );
 		$mine = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => $f['_prev']['q'], 'post_content' => '<p>Ezt én írtam át.</p>' ) );
 		$works = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => 'Tényleg működik a jóga online?', 'post_content' => '<p>Az ő válasza.</p>' ) );
+		$gone  = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => $data['faqs_removed'][0]['q'], 'post_content' => '<p>Gumiszalag.</p>' ) );
+		$other = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => 'Várandós vagyok. Gyakorolhatok veled?', 'post_content' => '<p>Igen.</p>' ) );
+		$gf    = array_values( array_filter( $data['faqs'], fn( $x ) => 'Ajándékozhatok jógát?' === ( $x['_prev']['q'] ?? '' ) ) )[0];
+		$gift  = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => $gf['_prev']['q'], 'post_content' => wpautop( esc_html( $gf['_prev']['a'] ) ) ) );
+		$cf    = array_values( array_filter( $data['faqs'], fn( $x ) => 'Mi a lemondási szabály?' === $x['q'] ) )[0];
+		$canc  = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => $cf['q'], 'post_content' => wpautop( esc_html( $cf['_prev']['a'] ) ) ) );
 		$soon  = $data['classes']['egyeni-online-joga']['_replace'][0];
 		$class = get_page_by_path( 'egyeni-online-joga', OBJECT, 'oy_class' );
 		$cid   = $class ? $class->ID : wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Egyéni online jóga', 'post_name' => 'egyeni-online-joga' ) );
@@ -2926,8 +2929,19 @@ test( 'online edition, live update: 2018 on her timeline, the kit list for every
 		ok( ! str_contains( $c, '2023 óta vagyok' ) && ! str_contains( $c, 'Évek személyi edzőként' ) && str_contains( $c, 'Saját bekezdésem.' ), 'About: the two parts she asked out are gone, the rest stays' );
 		$p = get_post_field( 'post_content', $pid );
 		ok( str_contains( $p, $kit[0][1] ) && str_contains( $p, $kit[1][1] ) && str_contains( $p, 'Saját mondatom' ), 'prices page: the kit for every class and „charge it”, her own line stays' );
+		ok( str_contains( $p, $minr[1] ) && str_contains( $minr[1], 'automatikusan lemondja' ), 'prices page: under three people the class is called off automatically 3 hours before' );
 		ok( str_contains( get_post_field( 'post_content', $faq ), 'töltsd fel' ), 'the FAQ answer: charge your device' );
+		eq( 'Mit kell előkészítenem az órára?', get_post_field( 'post_title', $faq ), 'the FAQ question: „Mit kell előkészítenem az órára?”' );
+		$a = get_post_field( 'post_content', $faq );
+		ok( str_contains( $a, 'Kismamatorna:' ) && str_contains( $a, 'magasabb ülőpárna' ) && str_contains( $a, 'egy könyv is pótolja' ) && str_contains( $a, 'kérdezz bátran' ), '… for each service, with her final list (yoga block or a book, a higher cushion, ask me)' );
+		eq( 'trash', get_post_status( $gone ), 'the prenatal kit question: in the bin („Ez a kérdés pedig törlődhet”)' );
+		eq( 'publish', get_post_status( $other ), '… the other questions stay' );
+		ok( str_contains( get_post_field( 'post_content', $canc ), '3 órával a kezdés előtt kevesebben vagytok, a rendszer automatikusan lemondja' ), 'the cancellation FAQ: called off automatically 3 hours before, with an email' );
+		ok( in_array( 'FAQ removed: ' . $data['faqs_removed'][0]['q'], $log, true ), '… logged' );
 		eq( '<p>Ezt én írtam át.</p>', get_post_field( 'post_content', $mine ), 'an answer she rewrote stays hers' );
+		eq( 'Mit kell előkészítenem az órára?', get_post_field( 'post_title', $mine ), '… under the question she asked for' );
+		eq( 'Ajándékozhatok jógát, kismamatornát, stretchinget és mobilizációt vagy relaxációt és légzést?', get_post_field( 'post_title', $gift ), 'the gift question: every service' );
+		ok( str_contains( get_post_field( 'post_content', $gift ), 'relaxációt és légzést is megveheted ajándékutalványként' ), '… and so the answer' );
 		eq( 'Tényleg működik a csoportos jóga online?', get_post_field( 'post_title', $works ), 'the FAQ question: „csoportos”' );
 		eq( '<p>Az ő válasza.</p>', get_post_field( 'post_content', $works ), '… its answer as it was' );
 		ok( in_array( 'page: about', $log, true ) && in_array( 'page: schedule-pricing', $log, true ), 'logged' );
@@ -2938,6 +2952,53 @@ test( 'online edition, live update: 2018 on her timeline, the kit list for every
 	} finally {
 		update_option( 'oy_edition', 'fort-myers' );
 	}
+} );
+
+test( 'online edition, Olívia\'s doc of 14 November: „az óra visszanézhető még 1 hétig” – highlighted in more places', function () {
+	update_option( 'oy_edition', 'hu-online' );
+	$keep = array( 'live_record' => OYS_Settings::get( 'live_record' ), 'live_replay_days' => OYS_Settings::get( 'live_replay_days' ) );
+	try {
+		OYS_Settings::update( array( 'live_record' => 'group', 'live_replay_days' => 7 ) );
+		eq( 7, oy_replay_days(), 'a week, from the booking settings (one place)' );
+		$note = oy_replay_note();
+		ok( str_contains( $note, 'class="oj-replay"' ) && str_contains( $note, esc_html__( 'You can watch it again for a week.', 'olivia-yoga' ) ), 'the highlighted note' );
+		ok( str_contains( do_shortcode( '[oy_schedule]' ), 'oj-replay' ), '… under the timetables (prices page)' );
+		ob_start();
+		load_template( get_template_directory() . '/template-parts/front-online.php', false );
+		$home = (string) ob_get_clean();
+		ok( 1 === substr_count( $home, 'way__len--replay' ) && str_contains( $home, esc_html( oy_replay_label() ) ), 'home: a chip on the group class box' );
+		ok( str_contains( $home, 'class="oj-replay"' ), 'home: … and the note under the timetable' );
+		ok( str_contains( (string) file_get_contents( get_template_directory() . '/single-oy_class.php' ), "oy_replay_note( 'oj-replay--aside' )" ), 'the group class page: beside its button' );
+		$group  = make_session( array( 'format' => 'online' ) );
+		$priv   = make_session( array( 'format' => 'online', 'kind' => 'private' ) );
+		$link   = make_session( array( 'format' => 'online', 'online_url' => 'https://example.com/room' ) );
+		$studio = make_session();
+		$card   = new ReflectionMethod( 'OYS_Frontend', 'session_card' );
+		$card->setAccessible( true );
+		ok( str_contains( $card->invoke( null, $group ), 'oys-replay-note' ), 'booking page: an online group class can be watched again' );
+		ok( ! str_contains( $card->invoke( null, $priv ), 'oys-replay-note' ), '… not a one-to-one (not recorded)' );
+		eq( '', OYS_Live::replay_text( $link ), '… not a class on a link typed in by hand' );
+		eq( '', OYS_Live::replay_text( $studio ), '… not one in the studio' );
+		$join = new ReflectionMethod( 'OYS_Emails', 'join_html' );
+		$join->setAccessible( true );
+		$b    = OYS_Bookings::get( OYS_Bookings::book_manual( make_user( 'Replay' ), $group, 'comp', false, false, 'online' ) );
+		ok( $b && str_contains( $join->invoke( null, $b, $group ), esc_html( OYS_Live::replay_text( $group ) ) ), 'the confirmation and reminder emails: with the join link' );
+		OYS_Settings::update( array( 'live_record' => 'none' ) );
+		eq( '', oy_replay_note(), 'not recorded: no note' );
+		eq( '', OYS_Live::replay_text( $group ), '… and nothing when booking' );
+	} finally {
+		OYS_Settings::update( $keep );
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+} );
+
+test( 'Olívia\'s doc of 14 November: the side column is never cut off while scrolling; her two training photos in one line', function () {
+	$css = (string) file_get_contents( get_template_directory() . '/assets/site.css' );
+	ok( (bool) preg_match( '/\.aside-sticky \{ position: sticky; top: calc\(var\(--header-h\) \+ 24px\); align-self: start; \}/', $css ) && ! str_contains( $css, 'scrollbar-width: none' ), 'the side column: no hidden inner scroll that cuts its bottom off' );
+	$js = (string) file_get_contents( get_template_directory() . '/assets/site.js' );
+	ok( str_contains( $js, 'function fitAsides' ) && str_contains( $js, 'window.innerHeight - el.offsetHeight - 24' ), '… taller than the window, it scrolls until its bottom shows, then stays' );
+	$on = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
+	ok( ! str_contains( $on, '.oj-duo .oj-figure:nth-child(2) { margin-top' ), 'About: the two photos in one line, no step' );
 } );
 
 test( 'online edition, Olívia\'s doc of 14 November, last points: one level for yoga, prenatal and mobility; no labels or breadcrumbs; who made the site', function () {

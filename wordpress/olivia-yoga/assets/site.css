@@ -690,8 +690,9 @@ abbr[title] { text-decoration: none; }
 .layout { display: grid; gap: 3.5rem; padding-block: clamp(56px, 8vw, 104px) clamp(72px, 10vw, 140px); }
 @media (min-width: 1000px) {
 	.layout--aside { grid-template-columns: minmax(0, 1fr) 340px; gap: 6rem; }
-	.aside-sticky { position: sticky; top: calc(var(--header-h) + 24px); align-self: start; max-height: calc(100vh - var(--header-h) - 40px); overflow-y: auto; scrollbar-width: none; }
-	.aside-sticky::-webkit-scrollbar { display: none; }
+	/* a side column taller than the window is not cut off: it scrolls with the page until its bottom shows, then stays
+	   (site.js sets a lower top; Olívia, 14 November: „levágódik a box alja, ahogy görgetek”) */
+	.aside-sticky { position: sticky; top: calc(var(--header-h) + 24px); align-self: start; }
 }
 
 .prose { max-width: 68ch; }

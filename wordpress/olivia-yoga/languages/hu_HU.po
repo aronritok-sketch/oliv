@@ -1817,3 +1817,18 @@ msgstr "Gyakorolj velem élőben"
 
 msgid "Cancellation:"
 msgstr "Lemondás:"
+
+msgid "Watch again for a week"
+msgstr "Egy hétig visszanézhető"
+
+msgid "Watch again for %d days"
+msgstr "%d napig visszanézhető"
+
+msgid "You can watch it again for a week."
+msgstr "Egy hétig visszanézheted."
+
+msgid "You can watch it again for %d days."
+msgstr "%d napig visszanézheted."
+
+msgid "The group class is recorded (only I am on it): if you missed it, or would like to do it again, it is waiting in your account."
+msgstr "A csoportos óráról felvétel készül (csak én látszom rajta): ha lemaradtál, vagy újra csinálnád, a fiókodban megtalálod."

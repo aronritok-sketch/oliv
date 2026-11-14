@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-14m';
+	$rev = '2026-11-14n';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1078,9 +1078,22 @@ function oy_migrate_1114d() {
 				$log[] = 'FAQ: ' . $f['q'];
 				continue;
 			}
-			if ( trim( wp_strip_all_tags( $faq->post_content ) ) === trim( $f['_prev']['a'] ) ) {
-				wp_update_post( wp_slash( array( 'ID' => $faq->ID, 'post_title' => $f['q'], 'post_content' => wpautop( esc_html( $f['a'] ) ) ) ) );
+			// the question as she asked for it; the answer only while it is still ours (an answer she rewrote stays hers)
+			$same = trim( wp_strip_all_tags( $faq->post_content ) ) === trim( $f['_prev']['a'] );
+			if ( $same || $faq->post_title !== $f['q'] ) {
+				wp_update_post( wp_slash( array_merge( array( 'ID' => $faq->ID, 'post_title' => $f['q'] ), $same ? array( 'post_content' => wpautop( esc_html( $f['a'] ) ) ) : array() ) ) );
 				$log[] = 'FAQ: ' . $f['q'];
+			}
+		}
+	}
+	// „Ez a kérdés pedig törlődhet”: a question she no longer wants goes to the bin (it can be restored from there)
+	foreach ( (array) ( $data['faqs_removed'] ?? array() ) as $f ) {
+		if ( '' === trim( (string) ( $f['q'] ?? '' ) ) ) {
+			continue; // an empty title would match every question
+		}
+		foreach ( get_posts( array( 'post_type' => 'oy_faq', 'post_status' => array( 'publish', 'draft', 'pending', 'private' ), 'numberposts' => -1, 'title' => $f['q'] ) ) as $faq ) {
+			if ( $faq->post_title === $f['q'] && wp_trash_post( $faq->ID ) ) {
+				$log[] = 'FAQ removed: ' . $f['q'];
 			}
 		}
 	}

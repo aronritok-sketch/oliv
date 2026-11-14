@@ -4059,3 +4059,11 @@ msgstr "(en pareja %s)"
 
 msgid "5-session pass:"
 msgstr "Bono de 5 sesiones:"
+
+msgid "You can watch this class again for a week: the recording (only the teacher is on it) waits in your account."
+msgstr "Puedes volver a ver esta clase durante una semana: la grabación (solo sale la profesora) te espera en tu cuenta."
+
+msgid "You can watch this class again for %d day: the recording (only the teacher is on it) waits in your account."
+msgid_plural "You can watch this class again for %d days: the recording (only the teacher is on it) waits in your account."
+msgstr[0] "Puedes volver a ver esta clase durante %d día: la grabación (solo sale la profesora) te espera en tu cuenta."
+msgstr[1] "Puedes volver a ver esta clase durante %d días: la grabación (solo sale la profesora) te espera en tu cuenta."

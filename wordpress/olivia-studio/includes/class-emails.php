@@ -193,6 +193,8 @@ class OYS_Emails {
 		if ( $session->zoom_password && ! str_contains( $url, 'pwd=' ) ) {
 			$html .= '<p style="font-size:13px;color:#53635A">' . esc_html__( 'Passcode:', 'olivia-studio' ) . ' <b>' . esc_html( $session->zoom_password ) . '</b></p>';
 		}
+		$replay = OYS_Live::replay_text( $session );
+		$html  .= $replay ? '<p style="margin:14px 0;padding:10px 14px;background:#FBEBDD;border-left:4px solid #C6A3EE;border-radius:8px;font-size:14px;color:#12231A"><b>' . esc_html( $replay ) . '</b></p>' : '';
 		return $html . ( $tip ? '<p style="font-size:13px;color:#53635A">' . esc_html__( 'Charge your device, join a few minutes early, set up where the camera sees your mat (or leave it off), and keep your microphone muted.', 'olivia-studio' ) . '</p>' : '' );
 	}
 

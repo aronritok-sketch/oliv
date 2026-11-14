@@ -1198,3 +1198,18 @@ msgstr "Únete a una clase en vivo en línea, pide una sesión individual o simp
 
 msgid "Online Yoga, Live in Hungarian: Flow Yoga, Prenatal & One-to-One Classes | Olivia Jóga"
 msgstr "Yoga en línea, en vivo y en húngaro: flow yoga, prenatal y clases individuales | Olivia Jóga"
+
+msgid "Watch again for a week"
+msgstr "Disponible una semana en diferido"
+
+msgid "Watch again for %d days"
+msgstr "Disponible %d días en diferido"
+
+msgid "You can watch it again for a week."
+msgstr "Puedes volver a verla durante una semana."
+
+msgid "You can watch it again for %d days."
+msgstr "Puedes volver a verla durante %d días."
+
+msgid "The group class is recorded (only I am on it): if you missed it, or would like to do it again, it is waiting in your account."
+msgstr "La clase grupal se graba (solo salgo yo): si te la perdiste o quieres repetirla, te espera en tu cuenta."

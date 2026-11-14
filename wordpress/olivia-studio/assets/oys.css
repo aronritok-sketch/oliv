@@ -194,6 +194,9 @@
 .oys-private-note .oys-icon { width: 22px; height: 22px; flex: none; margin-top: 2px; }
 .oys-min-note { display: flex; gap: .5rem; align-items: flex-start; margin: 1rem 0 0; font-size: .92rem; }
 .oys-min-note .oys-icon { width: 20px; height: 20px; flex: none; margin-top: 2px; }
+/* The class can be watched again (Olívia: „jelenjen meg több helyen is kiemelve”) */
+.oys-replay-note { display: flex; gap: .55rem; align-items: flex-start; margin: 1rem 0 0; padding: .75rem .9rem; border-radius: 10px; background: #FBEBDD; box-shadow: inset 4px 0 0 #C6A3EE; color: #12231A; font-size: .92rem; font-weight: 600; line-height: 1.45; }
+.oys-replay-note .oys-icon { width: 20px; height: 20px; flex: none; margin-top: 1px; }
 .oys-gift-code, .oys-raffle { margin: 0 0 1.25rem; }
 .oys-gift-code__code { font-family: var(--f-display, sans-serif); font-size: 1.8rem; letter-spacing: .08em; margin: .2rem 0; }
 .oys-raffle__n { font-size: 1.1rem; margin: .2rem 0; }

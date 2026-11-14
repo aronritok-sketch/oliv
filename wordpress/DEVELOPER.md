@@ -792,6 +792,12 @@ Olivia doksija, 2026. 11. 13. 21:35.
   kulcsa `OY_PAGE_SLUGS` → `oy_page_slug()`; `images.json` `pos_prev`: a Médiatár `oy_key` mellékletének `oy_pos`-a csak
   akkor változik, ha még a régi. `.oj-breath-peach`: a légzés szekció barack háttéren.
 
+- 3.11.13 / 1.10.7: `oy_migrate_1114d` rev 2026-11-14n – a tartalomfájl `faqs_removed` listájának kérdései (pontos cím,
+  üres címet kihagy) a kukába; a `_prev`-es GYIK címe mindig az új, a válasza csak a szó szerint egyező régin cserélődik.
+  `oy_replay_days()` / `oy_replay_note()` / `oy_replay_label()` (téma) és `OYS_Live::replay_days()` / `replay_text()`
+  (bővítmény): „egy hétig visszanézheted” – online, kézi link nélküli, felvett (`live_record`) órán. `.aside-sticky`: nincs
+  belső görgetés; a site.js `fitAsides()` az ablaknál magasabb oldaldoboznak negatív `top`-ot ad.
+
 ### 6.14 Mobil API és iOS app
 
 **API** – `OYS_App_API` (`includes/class-app-api.php`), útvonalak a `oys/v1/app/` alatt:

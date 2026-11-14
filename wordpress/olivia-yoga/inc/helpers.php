@@ -160,6 +160,7 @@ function oy_post_photo( $post_id, $fallback = '', $sizes = '100vw', $eager = fal
 function oy_icon( $name, $cls = 'icon' ) {
 	static $ui = array(
 		'clock'     => '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+		'play'      => '<circle cx="12" cy="12" r="8.5"/><path d="M10.2 8.6v6.8l5.3-3.4z"/>',
 		'pin'       => '<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10" r="2.3"/>',
 		'mail'      => '<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.5 7 8.5 6.3L20.5 7"/>',
 		'instagram' => '<rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r=".6" fill="currentColor"/>',
@@ -232,6 +233,34 @@ function oy_cancel_note( $cls = '' ) {
 	}
 	$text = trim( (string) OYS_Settings::get( 'cancel_policy' ) );
 	return '' === $text ? '' : '<p class="oj-policy' . ( $cls ? ' ' . esc_attr( $cls ) : '' ) . '">' . oy_icon( 'calendar' ) . '<span><b>' . esc_html__( 'Cancellation:', 'olivia-yoga' ) . '</b> ' . esc_html( $text ) . '</span></p>';
+}
+
+/**
+ * How many days a group class can be watched again (the booking plugin's setting, so the number is written in one place);
+ * 0 when classes are not recorded. Olívia, 14 November: „Az, hogy az óra visszanézhető még 1 hétig, jelenjen meg több
+ * helyen is kiemelve!”
+ */
+function oy_replay_days() {
+	if ( ! oy_online_only() || ! class_exists( 'OYS_Settings' ) || 'none' === (string) OYS_Settings::get( 'live_record' ) ) {
+		return 0;
+	}
+	return max( 0, (int) OYS_Settings::get( 'live_replay_days' ) );
+}
+
+/** The short label: „Egy hétig visszanézhető” (the group class box on the home page). */
+function oy_replay_label() {
+	$days = oy_replay_days();
+	return 7 === $days ? __( 'Watch again for a week', 'olivia-yoga' ) : sprintf( __( 'Watch again for %d days', 'olivia-yoga' ), $days );
+}
+
+/** The highlighted note under the timetables and beside the group class's button; '' when not recorded. */
+function oy_replay_note( $cls = '' ) {
+	$days = oy_replay_days();
+	if ( ! $days ) {
+		return '';
+	}
+	$head = 7 === $days ? __( 'You can watch it again for a week.', 'olivia-yoga' ) : sprintf( __( 'You can watch it again for %d days.', 'olivia-yoga' ), $days );
+	return '<p class="oj-replay' . ( $cls ? ' ' . esc_attr( $cls ) : '' ) . '">' . oy_icon( 'play' ) . '<span><b>' . esc_html( $head ) . '</b> ' . esc_html__( 'The group class is recorded (only I am on it): if you missed it, or would like to do it again, it is waiting in your account.', 'olivia-yoga' ) . '</span></p>';
 }
 
 function oy_section_head( $title, $text = '', $kicker = '', $id = '' ) {

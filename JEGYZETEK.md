@@ -305,6 +305,17 @@
   képzések negyedik kártyája („Évek személyi edzőként…”, az idővonalon már benne van); az öt terület és a három képzés
   páratlan utolsó doboza teljes szélességű. Élesen `oy_migrate_1114d` rev i (`_insert` / `_replace`, csak szó szerint
   egyező szövegen). Tesztek 1062/0.
+- **A doksi 3.11.10–3.11.13 pontjai (olivia-studio 1.10.6–1.10.7; Áron: „az élest azonnal mehet minden”):** lemondási
+  szabály több helyen (órarendek alatt, órák oldalán, egyéni kérés űrlapján); GYIK: „Tényleg működik a csoportos jóga
+  online?”, „Mit kell előkészítenem az órára?” (szolgáltatásonként, Olívia végleges listájával: jógatégla vagy könyv,
+  magasabb ülőpárna, „kérdezz bátran”), az ajándékos kérdés minden szolgáltatással; a „Mire lehet szükségem a
+  kismamatornához?” a kukába került (`faqs_removed`, visszaállítható). „3 órával előtte, minimum alatt automatikus
+  lemondás + e-mail”: a bővítményben már megvolt (online helyszín: 3 fő, 3 óra), most a GYIK és az árlap is így írja.
+  „Egy hétig visszanézheted” kiemelve: főoldali csoportos doboz, órarendek alatt, csoportos óra oldala, foglalási lap,
+  foglalási / emlékeztető e-mail (`live_replay_days`-ből; a felvételhez a LiveKit-kulcsok kellenek élesen). A ragadós
+  oldaldoboz (GYIK, Rólam) alacsony ablakban sem vágódik le (site.js negatív sticky top); a Rólam két edzéses képe egy
+  vonalban. A GYIK-kérdés átnevezése mostantól akkor is megtörténik, ha a választ Olívia átírta (a válasza marad).
+  Tesztek 1093/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

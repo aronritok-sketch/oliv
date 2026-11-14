@@ -219,7 +219,7 @@ add_action( 'init', function () {
 	add_shortcode( 'oy_breath', fn() => oy_breath() );
 	add_shortcode( 'oy_contact_form', fn() => oy_contact_form() );
 	add_shortcode( 'oy_moments', fn() => '<div class="block-wide">' . oy_moments_grid() . '</div>' );
-	add_shortcode( 'oy_schedule', fn() => '<div class="block-wide">' . $studio( 'oys_schedule', '<p>' . esc_html__( 'The timetable is coming soon.', 'olivia-yoga' ) . '</p>' ) . oy_cancel_note() . '</div>' );
+	add_shortcode( 'oy_schedule', fn() => '<div class="block-wide">' . $studio( 'oys_schedule', '<p>' . esc_html__( 'The timetable is coming soon.', 'olivia-yoga' ) . '</p>' ) . oy_replay_note() . oy_cancel_note() . '</div>' );
 	add_shortcode( 'oy_pricing', fn() => '<div class="block-wide">' . $studio( 'oys_pricing', '' ) . '</div>' );
 	add_shortcode( 'oy_events', fn() => '<div class="block-wide oy-events-dark">' . $studio( 'oys_events', '' ) . '</div>' );
 	add_shortcode( 'oy_booking_link', fn( $a ) => oy_btn_row( oy_btn( oy_book_url(), oy_t( $a['label'] ?? '' ) ?: __( 'Book a class', 'olivia-yoga' ) ) ) );

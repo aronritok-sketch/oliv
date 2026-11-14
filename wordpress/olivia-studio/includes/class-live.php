@@ -73,6 +73,28 @@ class OYS_Live {
 		return 'all' === $mode || ( 'group' === $mode && 'private' !== $session->kind );
 	}
 
+	/**
+	 * Days a booked class can be watched again (0: not recorded, or not in our live room). Olívia, 14 November: „Az, hogy az
+	 * óra visszanézhető még 1 hétig, jelenjen meg több helyen is kiemelve!” – on the booking page and in the emails.
+	 */
+	public static function replay_days( $session ) {
+		if ( ! $session || ! oys_has_online( $session ) || '' !== (string) $session->online_url || ! self::records( $session ) ) {
+			return 0;
+		}
+		return max( 0, (int) OYS_Settings::get( 'live_replay_days' ) );
+	}
+
+	/** „You can watch this class again for a week …” for people booking it; '' when it can't be watched again. */
+	public static function replay_text( $session ) {
+		$days = self::replay_days( $session );
+		if ( ! $days ) {
+			return '';
+		}
+		return 7 === $days
+			? __( 'You can watch this class again for a week: the recording (only the teacher is on it) waits in your account.', 'olivia-studio' )
+			: sprintf( _n( 'You can watch this class again for %d day: the recording (only the teacher is on it) waits in your account.', 'You can watch this class again for %d days: the recording (only the teacher is on it) waits in your account.', $days, 'olivia-studio' ), $days );
+	}
+
 	/** The opening words are summarised in group classes and events (never in private sessions). */
 	public static function summarises( $session ) {
 		return 'off' !== (string) OYS_Settings::get( 'live_summary' ) && 'private' !== $session->kind && (int) OYS_Settings::get( 'live_intro_minutes' ) > 0;

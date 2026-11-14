@@ -463,6 +463,10 @@ class OYS_Frontend {
 		if ( $s->note ) {
 			$html .= '<p class="session__note">' . esc_html( oys_t( $s->note ) ) . '</p>';
 		}
+		$replay = OYS_Live::replay_text( $s );
+		if ( $replay ) {
+			$html .= '<p class="oys-replay-note">' . oys_icon( 'video' ) . '<span>' . esc_html( $replay ) . '</span></p>';
+		}
 		$min = OYS_Locations::notice( $s );
 		if ( $min ) {
 			$html .= '<p class="oys-min-note">' . oys_icon( 'users' ) . '<span>' . esc_html( $min ) . '</span></p>';

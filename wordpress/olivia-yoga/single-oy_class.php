@@ -34,6 +34,7 @@ while ( have_posts() ) :
 				// the online site books a prenatal session through the request form (the booking plugin), the others ask by message
 				$ask = ( $service || $prenatal && oy_online_only() ) && function_exists( 'oys_account_url' ) ? add_query_arg( 'topic', $service ? $service[0] : 'prenatal', oy_private_url() ) : oy_contact_url( $prenatal ? 'prenatal' : 'massage' );
 				echo $private ? oy_btn( $ask, __( 'Ask for a session', 'olivia-yoga' ), 'orchid' ) : oy_btn( oy_book_url(), __( 'Book this class', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore
+				echo $private ? '' : oy_replay_note( 'oj-replay--aside' ); // phpcs:ignore
 				echo oy_cancel_note( 'oj-policy--aside' ); // phpcs:ignore
 				?>
 			</div></aside>

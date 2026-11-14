@@ -68,7 +68,7 @@ $steps  = array(
 		$oy_class = get_page_by_path( $w[5], OBJECT, 'oy_class' );
 		$oy_len   = $oy_class ? (string) oy_class_meta( $oy_class->ID, 'oy_duration' ) : '';
 		?>
-		<a class="way way--<?php echo esc_attr( $w[4] ); ?>" href="<?php echo esc_url( $w[2] ); ?>"><?php echo oy_icon( $w[3], 'way__icon' ); // phpcs:ignore ?><h3><?php echo esc_html( $w[0] ); ?></h3><p><?php echo esc_html( $w[1] ); ?></p><?php if ( '' !== $oy_len ) : ?><span class="way__len"><?php echo oy_icon( 'clock' ); // phpcs:ignore ?><?php echo esc_html( $oy_len ); ?></span><?php endif; ?><span class="way__go" aria-hidden="true"><?php echo oy_icon( 'arrow' ); // phpcs:ignore ?></span></a>
+		<a class="way way--<?php echo esc_attr( $w[4] ); ?>" href="<?php echo esc_url( $w[2] ); ?>"><?php echo oy_icon( $w[3], 'way__icon' ); // phpcs:ignore ?><h3><?php echo esc_html( $w[0] ); ?></h3><p><?php echo esc_html( $w[1] ); ?></p><?php if ( '' !== $oy_len ) : ?><span class="way__len"><?php echo oy_icon( 'clock' ); // phpcs:ignore ?><?php echo esc_html( $oy_len ); ?></span><?php endif; ?><?php if ( 'hatha-flow' === $w[5] && oy_replay_days() ) : ?><span class="way__len way__len--replay"><?php echo oy_icon( 'play' ); // phpcs:ignore ?><?php echo esc_html( oy_replay_label() ); ?></span><?php endif; ?><span class="way__go" aria-hidden="true"><?php echo oy_icon( 'arrow' ); // phpcs:ignore ?></span></a>
 	<?php endforeach; ?>
 </div></div></section>
 
@@ -191,7 +191,7 @@ $more     = array(
 <section class="section section--tight" id="schedule" aria-labelledby="schedule-title"><div class="container">
 	<header class="section__head section__head--row" data-reveal><div><?php echo oy_kicker( __( 'Next classes', 'olivia-yoga' ) ); // phpcs:ignore ?><h2 id="schedule-title"><?php esc_html_e( 'Weekly live classes', 'olivia-yoga' ); ?></h2><?php // Olívia, 14 November: „ezt is kiszedhetjük” – no line under the title ?></div><?php echo oy_btn( oy_page_link( 'schedule-pricing' ), oy_schedule_label(), 'ghost' ); // phpcs:ignore ?></header>
 	<?php // Olivia, 13 November: only the Wednesdays (the next ones, however far), and the one-to-one sessions in a box of their own; 14 November: „itt mindig a következő 3 óra legyen látható” ?>
-	<?php echo shortcode_exists( 'oys_schedule' ) ? do_shortcode( '[oys_schedule days="7" next="3" empty_days="no"]' ) . ( shortcode_exists( 'oys_private_box' ) ? do_shortcode( '[oys_private_box]' ) : '' ) . oy_cancel_note() : ''; // phpcs:ignore ?>
+	<?php echo shortcode_exists( 'oys_schedule' ) ? do_shortcode( '[oys_schedule days="7" next="3" empty_days="no"]' ) . oy_replay_note() . ( shortcode_exists( 'oys_private_box' ) ? do_shortcode( '[oys_private_box]' ) : '' ) . oy_cancel_note() : ''; // phpcs:ignore ?>
 </div></section>
 
 <section class="section section--moss hatha" aria-labelledby="hatha-title"><div class="container hatha__grid">

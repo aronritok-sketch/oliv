@@ -211,6 +211,28 @@
 		document.querySelectorAll('.site-footer, .oys-schedule, .oys-checkout, .cta').forEach(function (el) { fio.observe(el); });
 	}
 
+	/* A side column taller than the window: it scrolls with the page until its bottom shows, then stays there (a negative
+	   sticky top), so its button is never cut off (Olívia, 14 November: „levágódik a box alja, ahogy görgetek”) */
+	var asides = document.querySelectorAll('.aside-sticky');
+	function fitAsides() {
+		asides.forEach(function (el) {
+			el.style.top = '';
+			var cs = getComputedStyle(el);
+			if (cs.position !== 'sticky') return;
+			var room = window.innerHeight - el.offsetHeight - 24;
+			if (room < (parseFloat(cs.top) || 0)) el.style.top = room + 'px';
+		});
+	}
+	if (asides.length) {
+		fitAsides();
+		window.addEventListener('resize', fitAsides, { passive: true });
+		window.addEventListener('load', fitAsides);
+		if ('ResizeObserver' in window) {
+			var aro = new ResizeObserver(function () { fitAsides(); });
+			asides.forEach(function (el) { aro.observe(el); });
+		}
+	}
+
 	onScroll();
 
 	/* Expose for the single-file preview router */
