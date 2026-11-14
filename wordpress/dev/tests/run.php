@@ -3128,6 +3128,7 @@ test( 'Olívia\'s doc of 14 November, night: the service boxes get soft, feminin
 		load_template( get_template_directory() . '/template-parts/front-online.php', false );
 		$home = (string) ob_get_clean();
 		eq( 5, substr_count( $home, 'class="way__icon way__art"' ), 'home: all five boxes use it' );
+		ok( str_contains( (string) file_get_contents( get_template_directory() . '/assets/online.css' ), '.oj-modules:not(.oj-modules--why) li::before { position: absolute;' ), 'prenatal modules: a pastel circle peeking into each box\'s corner, not a dot' );
 	} finally {
 		update_option( 'oy_edition', 'fort-myers' );
 	}

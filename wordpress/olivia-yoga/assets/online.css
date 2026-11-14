@@ -537,3 +537,9 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY
 	.way__art-curve { stroke-dasharray: 80; stroke-dashoffset: 0; transition: stroke-dashoffset .8s ease; }
 	.way:hover .way__art-curve { stroke-dashoffset: 160; }
 }
+
+/* The prenatal modules: a pastel circle peeking into each box's top-left corner instead of the dot (Olívia, 14 November:
+   „ezek inkább legyenek pasztell színű belógó kör részletek a box bal felső sarkában”) */
+.oj-modules:not(.oj-modules--why) li { position: relative; overflow: hidden; isolation: isolate; padding: 1rem 1rem 1rem 2.35rem; }
+.oj-modules:not(.oj-modules--why) li::before { position: absolute; z-index: -1; left: -1.15rem; top: -1.15rem; width: 3.1rem; height: 3.1rem; background: color-mix(in srgb, var(--dot, var(--orchid)) 34%, #fff); }
+.oj-modules:not(.oj-modules--why) li::after { content: ""; position: absolute; z-index: -1; left: -.35rem; top: 1.25rem; width: 1rem; height: 1rem; border-radius: 50%; background: color-mix(in srgb, var(--dot, var(--orchid)) 18%, #fff); }
