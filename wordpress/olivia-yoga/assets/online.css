@@ -625,3 +625,11 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY
 
 /* the header button: „Fiókom” */
 .header-cta svg { width: 16px; height: 16px; margin-right: .45rem; flex: none; }
+
+/* lists in the page text: the same soft pastel dot as the cards' lists, in the site's four colours (no dash, no wave) */
+.entry ul:not([class]) li:not([class]) { padding-left: 1.7rem; }
+.entry ul:not([class]) li:not([class])::before { -webkit-mask: none; mask: none; left: .15rem; top: .62em; width: 9px; height: 9px; border-radius: 50%; background: color-mix(in srgb, var(--wave, var(--pink)) 80%, #fff); box-shadow: 0 0 0 4px color-mix(in srgb, var(--wave, var(--pink)) 22%, transparent); }
+.entry ul:not([class]) li:not([class]):nth-child(4n + 1) { --wave: var(--pink); }
+.entry ul:not([class]) li:not([class]):nth-child(4n + 2) { --wave: var(--sun); }
+.entry ul:not([class]) li:not([class]):nth-child(4n + 3) { --wave: var(--lilac); }
+.entry ul:not([class]) li:not([class]):nth-child(4n) { --wave: var(--sage); }

@@ -3165,7 +3165,7 @@ test( 'Olívia\'s doc of 14 November, night: „Online órák” – the two blo
 		update_option( 'oy_edition', 'fort-myers' );
 	}
 	$css = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
-	ok( str_contains( $css, '.entry ul:not([class]) li:not([class])::before { left: 0; top: calc(.78em - 5px); width: 1.45rem;' ), 'lists: her small wave, not a dash („a gondolatjelek bénák”)' );
+	ok( str_contains( $css, '.entry ul:not([class]) li:not([class])::before { -webkit-mask: none; mask: none; left: .15rem; top: .62em; width: 9px;' ), 'lists: a soft pastel dot, not a dash („a gondolatjelek bénák”) and not a wave' );
 } );
 
 test( 'Olívia\'s doc of 14 November: the side column is never cut off while scrolling; her two training photos in one line', function () {
