@@ -68,7 +68,7 @@ $steps  = array(
 		$oy_class = get_page_by_path( $w[5], OBJECT, 'oy_class' );
 		$oy_len   = $oy_class ? (string) oy_class_meta( $oy_class->ID, 'oy_duration' ) : '';
 		?>
-		<a class="way way--<?php echo esc_attr( $w[4] ); ?>" href="<?php echo esc_url( $w[2] ); ?>"><?php echo oy_icon( $w[3], 'way__icon' ); // phpcs:ignore ?><h3><?php echo esc_html( $w[0] ); ?></h3><p><?php echo esc_html( $w[1] ); ?></p><?php if ( '' !== $oy_len ) : ?><span class="way__len"><?php echo oy_icon( 'clock' ); // phpcs:ignore ?><?php echo esc_html( $oy_len ); ?></span><?php endif; ?><?php if ( 'hatha-flow' === $w[5] && oy_replay_days() ) : ?><span class="way__len way__len--replay"><?php echo oy_icon( 'play' ); // phpcs:ignore ?><?php echo esc_html( oy_replay_label() ); ?></span><?php endif; ?><span class="way__go" aria-hidden="true"><?php echo oy_icon( 'arrow' ); // phpcs:ignore ?></span></a>
+		<a class="way way--<?php echo esc_attr( $w[4] ); ?>" href="<?php echo esc_url( $w[2] ); ?>"><?php echo oy_way_art( $w[3] ); // phpcs:ignore ?><h3><?php echo esc_html( $w[0] ); ?></h3><p><?php echo esc_html( $w[1] ); ?></p><?php if ( '' !== $oy_len ) : ?><span class="way__len"><?php echo oy_icon( 'clock' ); // phpcs:ignore ?><?php echo esc_html( $oy_len ); ?></span><?php endif; ?><?php if ( 'hatha-flow' === $w[5] && oy_replay_days() ) : ?><span class="way__len way__len--replay"><?php echo oy_icon( 'play' ); // phpcs:ignore ?><?php echo esc_html( oy_replay_label() ); ?></span><?php endif; ?><span class="way__go" aria-hidden="true"><?php echo oy_icon( 'arrow' ); // phpcs:ignore ?></span></a>
 	<?php endforeach; ?>
 </div></div></section>
 

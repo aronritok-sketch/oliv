@@ -3117,6 +3117,22 @@ test( 'Olívia\'s doc of 14 November, night: a gift for two goes to two email ad
 	ok( str_contains( (string) file_get_contents( get_template_directory() . '/assets/online.css' ), 'calc(53vw - var(--oj-bleed, 20px) - 96px)' ), 'page heads: the text never runs into the photo wave' );
 } );
 
+test( 'Olívia\'s doc of 14 November, night: the service boxes get soft, feminine line art on a peach patch with a pink curve', function () {
+	foreach ( array( 'group', 'home', 'prenatal', 'mobility', 'lotus' ) as $n ) {
+		$a = oy_way_art( $n );
+		ok( str_contains( $a, 'way__art-patch' ) && str_contains( $a, 'way__art-curve' ) && str_contains( $a, 'way__art-line' ), 'service box art: ' . $n );
+	}
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		ob_start();
+		load_template( get_template_directory() . '/template-parts/front-online.php', false );
+		$home = (string) ob_get_clean();
+		eq( 5, substr_count( $home, 'class="way__icon way__art"' ), 'home: all five boxes use it' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+} );
+
 test( 'Olívia\'s doc of 14 November: the side column is never cut off while scrolling; her two training photos in one line', function () {
 	$css = (string) file_get_contents( get_template_directory() . '/assets/site.css' );
 	ok( (bool) preg_match( '/\.aside-sticky \{ position: sticky; top: calc\(var\(--header-h\) \+ 24px\); align-self: start; \}/', $css ) && ! str_contains( $css, 'scrollbar-width: none' ), 'the side column: no hidden inner scroll that cuts its bottom off' );

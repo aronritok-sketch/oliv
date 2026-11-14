@@ -524,3 +524,16 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY
 
 /* A title that is one long word („Ajándékutalvány”) stays beside the photo */
 .page-head--word h1 { max-width: none; font-size: clamp(2.4rem, 1rem + 4.2vw, 4.6rem); overflow-wrap: anywhere; }
+
+/* The service boxes' pictures: a soft line on a peach patch with a pink curve („szebb, nőiesebb a vonal … ezzel a színnel
+   fűszerezve”) */
+.way .way__art { width: 88px; height: 88px; margin: -12px 0 .9rem -12px; overflow: visible; }
+.way__art-patch { fill: #FFE2CC; opacity: .92; }
+.way--sun .way__art-patch { fill: #FFEBDD; }
+.way__art-curve { fill: none; stroke: var(--orchid); stroke-width: 2; stroke-linecap: round; }
+.way__art-line { fill: none; stroke: var(--ink); stroke-width: 1.35; stroke-linecap: round; stroke-linejoin: round; }
+.way__art-line .way__art-heart { fill: var(--orchid); stroke: none; }
+@media (prefers-reduced-motion: no-preference) {
+	.way__art-curve { stroke-dasharray: 80; stroke-dashoffset: 0; transition: stroke-dashoffset .8s ease; }
+	.way:hover .way__art-curve { stroke-dashoffset: 160; }
+}
