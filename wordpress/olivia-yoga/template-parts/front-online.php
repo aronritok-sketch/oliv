@@ -170,18 +170,18 @@ $more     = array(
 	<?php echo oy_section_head( __( 'Stretching, relaxation and breathing', 'olivia-yoga' ), __( 'One-to-one sessions for a stiff body and an overloaded mind.', 'olivia-yoga' ), '', 'more-title' ); // phpcs:ignore ?>
 	<div class="oj-more__grid">
 		<?php
-		// Olívia, 14 November: „legyen extrább, legyél nagyon kreatív, ne legyen átlagos” – each card in its colour, her
-		// logo's brush stroke across the top, the length as a round stamp (from the class's own setting), the reasons as
-		// soft rows and „cheaper as a pair” as a ribbon
+		// Olívia, 14 November: „legyen extrább, legyél nagyon kreatív, ne legyen átlagos”, then „tetszik az ötlet, a
+		// piktogramok és a hullámok nem igazán, illetve a perceknél a szaggatott vonal sem. Újíts!” – each card in its
+		// colour, a pastel circle peeking into its corner with the length in it (from the class's own setting), the soft
+		// line drawing of the service boxes, the reasons as soft rows and „cheaper as a pair” as a ribbon
 		foreach ( $more as $c ) :
 			$oy_class = get_page_by_path( $c[6], OBJECT, 'oy_class' );
 			$oy_len   = $oy_class ? trim( (string) oy_class_meta( $oy_class->ID, 'oy_duration' ) ) : '';
 			$oy_num   = preg_match( '/^(\d+)\s*(.*)$/u', $oy_len, $mm ) ? array( $mm[1], $mm[2] ) : array( $oy_len, '' );
 			?>
 		<article class="oj-more__card oj-more__card--<?php echo esc_attr( $c[1] ); ?>" data-reveal>
-			<svg class="oj-more__wave" viewBox="0 0 400 100" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="oj-more__wave-back" d="<?php echo esc_attr( oy_brush_d( 400, 100, 20, 34, 1.25, .4 ) ); ?>"/><path class="oj-more__wave-front" d="<?php echo esc_attr( oy_brush_d( 400, 100, 16, 9, 1.25, 1.1 ) ); ?>"/></svg>
 			<?php if ( '' !== $oy_len ) : ?><span class="oj-more__stamp"><b><?php echo esc_html( $oy_num[0] ); ?></b><?php if ( '' !== $oy_num[1] ) : ?><small><?php echo esc_html( $oy_num[1] ); ?></small><?php endif; ?></span><?php endif; ?>
-			<?php echo oy_pictogram( $c[0], $c[1] ); // phpcs:ignore ?>
+			<?php echo oy_way_art( $c[0] ); // phpcs:ignore ?>
 			<h3><?php echo esc_html( $c[2] ); ?></h3>
 			<p><?php echo esc_html( $c[3] ); ?></p>
 			<ul class="oj-more__list"><?php foreach ( $c[4] as $w ) : ?><li><?php echo esc_html( $w ); ?></li><?php endforeach; ?></ul>

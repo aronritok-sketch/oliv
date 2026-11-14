@@ -543,3 +543,18 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY
 .oj-modules:not(.oj-modules--why) li { position: relative; overflow: hidden; isolation: isolate; padding: 1rem 1rem 1rem 2.35rem; }
 .oj-modules:not(.oj-modules--why) li::before { position: absolute; z-index: -1; left: -1.15rem; top: -1.15rem; width: 3.1rem; height: 3.1rem; background: color-mix(in srgb, var(--dot, var(--orchid)) 34%, #fff); }
 .oj-modules:not(.oj-modules--why) li::after { content: ""; position: absolute; z-index: -1; left: -.35rem; top: 1.25rem; width: 1rem; height: 1rem; border-radius: 50%; background: color-mix(in srgb, var(--dot, var(--orchid)) 18%, #fff); }
+
+/* „Újíts!” (Olívia, 14 November, late): no brush stroke and no dashed stamp – a pastel circle peeks into the corner and
+   carries the length; the soft line drawing of the service boxes instead of the pictogram */
+.oj-more__card { padding-top: clamp(1.6rem, 3vw, 2.3rem); }
+.oj-more__card::before { content: ""; position: absolute; z-index: -1; top: -78px; right: -78px; width: 236px; height: 236px; border-radius: 50%; background: color-mix(in srgb, var(--tone) 42%, #fff); transition: transform .6s cubic-bezier(.3, 1.4, .5, 1); }
+.oj-more__card::after { content: ""; position: absolute; z-index: -1; top: 132px; right: -26px; width: 64px; height: 64px; border-radius: 50%; background: color-mix(in srgb, var(--tone) 22%, #fff); transition: transform .6s cubic-bezier(.3, 1.4, .5, 1); }
+.oj-more__card:hover::before { transform: scale(1.06); }
+.oj-more__card:hover::after { transform: translate(-6px, 4px); }
+.oj-more__card .oj-more__stamp { top: 1.5rem; right: 1.9rem; width: auto; height: auto; background: none; box-shadow: none; transform: none; text-align: center; }
+.oj-more__card .oj-more__stamp::before { display: none; }
+.oj-more__card .oj-more__stamp b { font-size: 3.3rem; }
+.oj-more__card .oj-more__stamp small { color: var(--ink); opacity: .7; }
+.oj-more__card:hover .oj-more__stamp { transform: none; }
+.oj-more__card .way__art { width: 88px; height: 88px; margin: -12px 0 .2rem -12px; }
+.oj-more__card h3 { padding-right: 7rem; }

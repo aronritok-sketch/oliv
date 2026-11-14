@@ -3021,7 +3021,7 @@ test( 'Olívia\'s doc of 14 November: „legyen extrább, legyél nagyon kreatí
 		ok( (bool) preg_match( '~<ul class="oj-facts">(?:<li><svg.*?</li>){3}</ul>~s', $home ), '… the length, the pair price and „from your living room” as three facts' );
 		ok( str_contains( $home, 'class="oj-voucher"' ) && str_contains( $home, 'oj-voucher__icon' ), '… the gift as a voucher' );
 		ok( ! str_contains( $home, 'oj-private .oj-checklist' ) && ! str_contains( $home, 'and as a gift: surprise' ), '… no plain tick list' );
-		ok( 2 === substr_count( $home, 'class="oj-more__stamp"' ) && 2 === substr_count( $home, 'class="oj-more__wave"' ), 'stretching and relaxation: her brush stroke across the top, the length as a stamp' );
+		ok( 2 === substr_count( $home, 'class="oj-more__stamp"' ) && ! str_contains( $home, 'class="oj-more__wave"' ) && 2 === substr_count( $home, 'class="oj-more__list"' ), 'stretching and relaxation: the length in a pastel corner circle, the soft line drawing, no brush stroke („Újíts!”)' );
 		ok( str_contains( $home, '<span class="oj-more__stamp"><b>60</b><small>perc</small></span>' ), '… the stamp from the class\'s own length' );
 		ok( 2 === substr_count( $home, 'class="oj-more__list"' ) && 2 === substr_count( $home, 'class="oj-more__meta"' ), '… the reasons as soft rows, „cheaper as a pair” as a ribbon' );
 		ok( str_contains( $home, esc_html__( 'I guide you in real time. Afterwards the class chat stays open, and a group class can be watched again for a week: only I am on the recording, nobody else.', 'olivia-yoga' ) ), 'step 4: only a group class, only she is on the recording' );
