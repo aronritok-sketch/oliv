@@ -122,9 +122,11 @@ function oy_faq_list( $home_only = false ) {
 		$args['meta_key']   = 'oy_home';
 		$args['meta_value'] = '1';
 	}
+	// Olívia, 14 November: „gyiknél egyszerre csak 1 legyen megnyitva, a többi csukódjon vissza” – one name for the whole list
+	// (the browser closes the others; site.js does it where the browser does not know this yet)
 	$out = '<div class="faq">';
 	foreach ( get_posts( $args ) as $i => $f ) {
-		$out .= '<details' . ( 0 === $i ? ' open' : '' ) . '><summary><span>' . esc_html( get_the_title( $f ) ) . '</span>' . oy_icon( 'plus' ) . '</summary><div class="answer">' . oy_faq_tags( wpautop( wp_kses_post( oy_post_content( $f ) ) ) ) . '</div></details>';
+		$out .= '<details name="oy-faq"' . ( 0 === $i ? ' open' : '' ) . '><summary><span>' . esc_html( get_the_title( $f ) ) . '</span>' . oy_icon( 'plus' ) . '</summary><div class="answer">' . oy_faq_tags( wpautop( wp_kses_post( oy_post_content( $f ) ) ) ) . '</div></details>';
 	}
 	return $out . '</div>';
 }

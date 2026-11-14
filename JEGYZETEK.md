@@ -383,6 +383,8 @@
   szöveg pasztell pöttyei); a foglalás visszaigazoló e-mailjében (és a vendég meghívójában) „Mire lesz szükséged az órán?” doboz
   az óra oldaláról vett eszközlistával (`oys_session_kit` szűrő → `oy_kit_items()`); a Rólam oldalon a Fitmummy-képzés kártya:
   kép balra, felirat mellette. Tesztek 1229/0.
+- **3.11.46:** a GYIK-ben egyszerre csak egy kérdés van nyitva (`<details name="oy-faq">`, régebbi böngészőn a site.js zárja
+  a többit). Tesztek 1230/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

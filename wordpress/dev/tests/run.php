@@ -3357,6 +3357,9 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	} finally {
 		wp_delete_post( $id, true );
 	}
+	$faq = oy_faq_list();
+	$js  = (string) file_get_contents( get_template_directory() . '/assets/site.js' );
+	ok( ( '' === $faq || substr_count( $faq, '<details name="oy-faq"' ) === substr_count( $faq, '<details' ) ) && str_contains( $js, "document.addEventListener('toggle'" ), 'the questions: only one open at a time („gyiknél egyszerre csak 1 legyen megnyitva”)' );
 	$src = (string) file_get_contents( WP_PLUGIN_DIR . '/olivia-studio/includes/class-emails.php' );
 	ok( str_contains( $src, '. self::kit_html( $s )' ) && substr_count( $src, 'self::kit_html( $s )' ) >= 2, '… in the confirmation and in a guest\'s invite' );
 } );

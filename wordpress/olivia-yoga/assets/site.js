@@ -243,6 +243,14 @@
 		}
 	}
 
+	/* The questions: only one open at a time (Olívia: „egyszerre csak 1 legyen megnyitva, a többi csukódjon vissza”). Newer
+	   browsers do it from the shared name; this covers the older ones. */
+	document.addEventListener('toggle', function (e) {
+		var d = e.target;
+		if (!d || d.tagName !== 'DETAILS' || !d.open || !d.parentElement || !d.parentElement.classList.contains('faq')) return;
+		Array.prototype.forEach.call(d.parentElement.children, function (o) { if (o !== d && o.tagName === 'DETAILS' && o.open) o.open = false; });
+	}, true);
+
 	onScroll();
 
 	/* Expose for the single-file preview router */
