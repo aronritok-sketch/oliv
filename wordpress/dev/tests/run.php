@@ -3357,6 +3357,22 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	} finally {
 		wp_delete_post( $id, true );
 	}
+	$id   = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Csere', 'post_name' => 'email-csere-teszt', 'post_content' => 'Írj: <a href="mailto:Regi.Cim@example.com">regi.cim@example.com</a>' ) );
+	$keep = OYS_Settings::get( 'notify_email' );
+	$rep  = OYS_Settings::get( 'email_reply_to' );
+	try {
+		OYS_Settings::update( array( 'notify_email' => 'regi.cim@example.com', 'email_reply_to' => 'regi.cim@example.com' ) );
+		oy_swap_email( 'regi.cim@example.com', 'uj@example.com', array( 'notify_email' ) );
+		ok( 'Írj: <a href="mailto:uj@example.com">uj@example.com</a>' === get_post_field( 'post_content', $id ), 'the email address: the new one in the page text, the link too („e-mail címnél mindenhol írd át az info@oliviajoga.online-ra”)' );
+		ok( 'uj@example.com' === OYS_Settings::get( 'email_reply_to' ) && 'regi.cim@example.com' === OYS_Settings::get( 'notify_email' ), '… and in the booking settings, but the booking notices still go where they went' );
+	} finally {
+		wp_delete_post( $id, true );
+		OYS_Settings::update( array( 'notify_email' => $keep, 'email_reply_to' => $rep ) );
+	}
+	update_option( 'oy_edition', 'hu-online' );
+	$ed = (string) oy_brand( 'email' );
+	update_option( 'oy_edition', 'fort-myers' );
+	ok( 'info@oliviajoga.online' === $ed, 'the online site\'s own address is info@oliviajoga.online' );
 	$faq = oy_faq_list();
 	$js  = (string) file_get_contents( get_template_directory() . '/assets/site.js' );
 	ok( ( '' === $faq || substr_count( $faq, '<details name="oy-faq"' ) === substr_count( $faq, '<details' ) ) && str_contains( $js, "document.addEventListener('toggle'" ), 'the questions: only one open at a time („gyiknél egyszerre csak 1 legyen megnyitva”)' );

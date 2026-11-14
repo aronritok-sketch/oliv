@@ -130,7 +130,7 @@ function oy_brand( $key ) {
 	}
 	$plain = array(
 		'fort-myers' => array( 'name' => 'Olivia Kovacs Yoga', 'short' => 'Olivia Kovacs', 'teacher' => 'Olivia Kovacs', 'email' => 'olivia.kovacs6@gmail.com', 'instagram' => 'https://www.instagram.com/oliivia_yoga/', 'facebook' => 'https://www.facebook.com/oliviajogaoktato', 'place' => 'Fort Myers, FL' ),
-		'hu-online'  => array( 'name' => 'Olívia Jóga – Online', 'short' => 'Olívia Jóga', 'teacher' => 'Kovács Olívia', 'email' => 'olivia.kovacs6@gmail.com', 'instagram' => 'https://www.instagram.com/oliivia_yoga/', 'facebook' => 'https://www.facebook.com/oliviajogaoktato' ), // Hungarian name order
+		'hu-online'  => array( 'name' => 'Olívia Jóga – Online', 'short' => 'Olívia Jóga', 'teacher' => 'Kovács Olívia', 'email' => 'info@oliviajoga.online', 'instagram' => 'https://www.instagram.com/oliivia_yoga/', 'facebook' => 'https://www.facebook.com/oliviajogaoktato' ), // Hungarian name order
 		'hathaflow'  => array( 'name' => 'Hathaflow', 'short' => 'Hathaflow', 'teacher' => 'Hathaflow Studio', 'email' => 'hello@example.com', 'instagram' => '', 'facebook' => '' ),
 	);
 	$edition = oy_edition();

@@ -385,6 +385,9 @@
   kép balra, felirat mellette. Tesztek 1229/0.
 - **3.11.46:** a GYIK-ben egyszerre csak egy kérdés van nyitva (`<details name="oy-faq">`, régebbi böngészőn a site.js zárja
   a többit). Tesztek 1230/0.
+- **3.11.47:** az online oldal e-mail-címe mindenhol info@oliviajoga.online (fejléc, lábléc, kapcsolat, ÁSZF, impresszum,
+  adatvédelem, válaszcím) – élesen az `email_swap` lépés cseréli a régi címet minden szövegben és beállításban; **a foglalási
+  értesítések (notify_email) továbbra is Olívia Gmailjére mennek** (ha az info@-t is nézi, át lehet állítani). Tesztek 1233/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

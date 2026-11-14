@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-15d';
+	$rev = '2026-11-15e';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1113,6 +1113,13 @@ function oy_migrate_1114d() {
 				$log[] = 'FAQ removed: ' . $f['q'];
 			}
 		}
+	}
+	// „e-mail címnél mindenhol írd át az info@oliviajoga.online-ra”: the old address gives way to the new one in every text of
+	// the site – pages, classes, questions, posts, the booking plugin's settings and email templates; the settings named in
+	// „keep” (where the booking notices go) stay
+	$swap = (array) ( $data['email_swap'] ?? array() );
+	if ( ! empty( $swap['from'] ) && ! empty( $swap['to'] ) && is_email( $swap['to'] ) ) {
+		$log = array_merge( $log, oy_swap_email( (string) $swap['from'], (string) $swap['to'], (array) ( $swap['keep'] ?? array() ) ) );
 	}
 	// „a mire lesz szükséged kerüljön minden szolgáltatás aloldalon jóval előrébb! legyen egy kicsit látványosabb”: the kit part
 	// moves up, right after the first part of each class page, as small cards; the prenatal page keeps its own list
@@ -1236,6 +1243,41 @@ function oy_h3_cards( $content, $heading ) {
 		$out .= '<li><strong>' . trim( $q[1] ) . '</strong><span>' . $text . '</span></li>' . "\n";
 	}
 	return substr( $content, 0, $start ) . $out . "</ul>\n" . substr( $content, $end );
+}
+
+/**
+ * One email address for another everywhere it is written: the content of every post type (and its excerpt), the booking
+ * plugin's settings (except the keys in $keep) and its email templates. Returns what changed, for the setup log.
+ */
+function oy_swap_email( $from, $to, array $keep = array() ) {
+	global $wpdb;
+	$log  = array();
+	$like = '%' . $wpdb->esc_like( $from ) . '%';
+	$ids  = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_status IN ('publish','draft','private','future','pending') AND post_type NOT IN ('revision','nav_menu_item') AND ( post_content LIKE %s OR post_excerpt LIKE %s )", $like, $like ) );
+	foreach ( $ids as $id ) {
+		$p = get_post( $id );
+		kses_remove_filters();
+		wp_update_post( wp_slash( array( 'ID' => $p->ID, 'post_content' => str_ireplace( $from, $to, $p->post_content ), 'post_excerpt' => str_ireplace( $from, $to, $p->post_excerpt ) ) ) );
+		kses_init_filters();
+		$log[] = 'email address: ' . $p->post_type . ' ' . $p->post_name;
+	}
+	foreach ( array( 'oys_settings', 'oys_email_templates' ) as $opt ) {
+		$val = get_option( $opt );
+		if ( ! is_array( $val ) ) {
+			continue;
+		}
+		$new = $val;
+		array_walk_recursive( $new, function ( &$v, $k ) use ( $from, $to, $keep ) {
+			if ( is_string( $v ) && ! in_array( $k, $keep, true ) ) {
+				$v = str_ireplace( $from, $to, $v );
+			}
+		} );
+		if ( $new !== $val ) {
+			update_option( $opt, $new );
+			$log[] = 'email address: ' . $opt;
+		}
+	}
+	return $log;
 }
 
 /**

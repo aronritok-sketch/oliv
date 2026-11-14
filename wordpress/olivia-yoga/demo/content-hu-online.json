@@ -21,7 +21,7 @@
 			"settle_membership_cents": 300000,
 			"email_from_name": "Olívia Jóga – Online",
 			"email_from": "info@oliviajoga.online",
-			"email_reply_to": "olivia.kovacs6@gmail.com",
+			"email_reply_to": "info@oliviajoga.online",
 			"notify_email": "olivia.kovacs6@gmail.com",
 			"birthday_on": 0,
 			"raffle_period": "off",
@@ -1262,5 +1262,13 @@
 			"file": "fitmummy-pre-es-postnatalis-trenerkepzes-kovacs-olivia",
 			"alt": "Fitmummy pre- és postnatális trénerképzés: elméleti óra az izom-fascia kontinuumról, Kovács Olívia kismama tréner képzésén"
 		}
+	},
+	"email_swap": {
+		"_note": "Olívia, 14 November: „e-mail címnél mindenhol írd át az info@oliviajoga.online-ra” – on a live site the old address becomes the new one in every page, class, question and setting text; notify_email (where the booking notices go to her) stays as it is.",
+		"from": "olivia.kovacs6@gmail.com",
+		"to": "info@oliviajoga.online",
+		"keep": [
+			"notify_email"
+		]
 	}
 }
