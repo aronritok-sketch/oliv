@@ -417,6 +417,9 @@
   - Ha–Tha: a Nap és a Hold összeúszik egy félig narancs, félig lila körbe, rajta HATHA felirattal, aztán szétválnak
     („egyik átmegy a másikba és oda-vissza”).
   - Főoldal, egyéni jóga: egy halk tényezősor, a két gomb és egy kis „Ajándékba is adhatod” link („túl katyvaszos”).
+- **3.11.55:** Rólam: a kis hullámok helyett kerek jelek („ezek a hullámok az egész rólamban bénák”). A fejezetcímek előtt
+  és a kiemelt mondat fölött-alatt két kis, egymásba érő kör áll; a fejezetcím utáni vonal elmaradt. A felsorolások
+  pontjai az egész oldalon kis színes körök.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

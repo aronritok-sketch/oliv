@@ -927,3 +927,21 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .oj-private__gift a { color: var(--ink); text-decoration: underline; text-decoration-color: color-mix(in srgb, var(--orchid) 55%, transparent); text-underline-offset: 3px; }
 .oj-private__gift a:hover { color: var(--orchid); }
 
+/* Olívia (online-jóga doksi): „ezek a hullámok az egész rólamban bénák, módosíts” – instead of the small waves, round marks
+   like the rest of the site: two small overlapping circles before each chapter title (no line after it), the same pair
+   above and below the statement, and a small circle for the points of a list */
+.entry .oj-chapter { align-items: center; }
+.entry .oj-chapter::before, .entry > .oj-chapter:nth-of-type(3n+2)::before, .entry > .oj-chapter:nth-of-type(3n)::before {
+	--a: var(--pink); --b: var(--lilac);
+	width: 1.75rem; height: 1.1rem; background: radial-gradient(circle at .55rem 50%, var(--a) 0 .5rem, transparent .52rem), radial-gradient(circle at 1.2rem 50%, color-mix(in srgb, var(--b) 75%, transparent) 0 .5rem, transparent .52rem); }
+.entry > .oj-chapter:nth-of-type(3n+2)::before { --a: var(--sun); --b: var(--pink); }
+.entry > .oj-chapter:nth-of-type(3n)::before { --a: var(--lilac); --b: var(--sage); }
+.entry .oj-chapter::after { content: none; }
+.entry .oj-statement::before, .entry .oj-statement::after { width: 1.75rem; height: 1.1rem; background: radial-gradient(circle at .55rem 50%, var(--pink) 0 .5rem, transparent .52rem), radial-gradient(circle at 1.2rem 50%, color-mix(in srgb, var(--lilac) 75%, transparent) 0 .5rem, transparent .52rem); }
+.entry .oj-statement::after { background: radial-gradient(circle at .55rem 50%, color-mix(in srgb, var(--sun) 80%, transparent) 0 .5rem, transparent .52rem), radial-gradient(circle at 1.2rem 50%, color-mix(in srgb, var(--sage) 90%, transparent) 0 .5rem, transparent .52rem); }
+.entry ul:not([class]) li:not([class]) { padding-left: 1.6rem; }
+.entry ul:not([class]) li:not([class])::before { top: calc(.78em - 5px); width: 10px; height: 10px; border-radius: 50%; background: var(--wave, var(--pink)); -webkit-mask: none; mask: none; }
+.entry ul:not([class]) li:not([class]):nth-child(4n + 1) { --wave: var(--pink); }
+.entry ul:not([class]) li:not([class]):nth-child(4n + 3) { --wave: var(--lilac); }
+.entry ul:not([class]) li:not([class]):nth-child(4n) { --wave: var(--sage); }
+
