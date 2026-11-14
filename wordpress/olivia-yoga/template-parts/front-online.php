@@ -87,6 +87,75 @@ $steps  = array(
 	</figure>
 </div></section>
 
+<?php
+// Olivia, 14 November: „jelenleg több blokk is a csoportos óráról szól a főoldalon. legyen kifejtve kicsit jobban a többi
+// szolgáltatás is … a kismamatornára mindenképp erősítsünk rá a főoldalon, megér egy külön blokkot”
+$ask      = fn( $topic ) => add_query_arg( 'topic', $topic, oy_private_url() );
+$for_whom = array(
+	__( 'as a beginner, to learn the basics', 'olivia-yoga' ),
+	__( 'to complement your group practice', 'olivia-yoga' ),
+	__( 'as an experienced yogi, to learn advanced poses', 'olivia-yoga' ),
+	__( 'if you would rather focus on meditation and relaxation, which are rarer in group classes', 'olivia-yoga' ),
+	__( 'in an emotionally harder time, to complement your therapy with yoga', 'olivia-yoga' ),
+	__( 'as someone coming back to yoga', 'olivia-yoga' ),
+	__( 'just for fun, with your best friend, your sister or brother, your mum or dad', 'olivia-yoga' ),
+	__( 'as a date with your partner', 'olivia-yoga' ),
+	__( 'with a physical complaint, to strengthen or stretch out a part of your body', 'olivia-yoga' ),
+	__( 'if you are a yoga teacher, or training to be one, and would like to sit in and gain experience', 'olivia-yoga' ),
+	__( 'when the group timetable does not fit your day', 'olivia-yoga' ),
+	__( 'and you can give a private session as a gift: surprise someone you love with a pretty gift card!', 'olivia-yoga' ),
+);
+$modules  = array( __( 'Breathing exercises', 'olivia-yoga' ), __( 'Pelvic floor training', 'olivia-yoga' ), __( 'Better circulation', 'olivia-yoga' ), __( 'Cardio training', 'olivia-yoga' ), __( 'Strength and weight training', 'olivia-yoga' ), __( 'Spine training', 'olivia-yoga' ), __( 'Mobility and stretching', 'olivia-yoga' ), __( 'Yoga', 'olivia-yoga' ), __( 'Relaxation', 'olivia-yoga' ) );
+$more     = array(
+	array( 'mobility', 'sun', __( 'Online stretching and mobility', 'olivia-yoga' ), __( 'An hour that is only about moving freely again: stretches and mobility work for the hips, shoulders and spine, at your own pace.', 'olivia-yoga' ), array( __( 'if you sit a lot and your hips, shoulders or back feel stiff', 'olivia-yoga' ), __( 'next to running, weights or another sport, for recovery', 'olivia-yoga' ), __( 'if you would like to be more flexible', 'olivia-yoga' ) ), __( '60 minutes · cheaper as a pair', 'olivia-yoga' ), 'stretching' ),
+	array( 'lotus', 'lilac', __( 'Relaxation and breathing', 'olivia-yoga' ), __( 'Half an hour that is only about calming down: breathing exercises, gentle stretches and guided relaxation for an overloaded nervous system.', 'olivia-yoga' ), array( __( 'if you are stressed and find it hard to switch off', 'olivia-yoga' ), __( 'if you find it hard to fall asleep', 'olivia-yoga' ), __( 'to learn how to calm yourself in a few minutes', 'olivia-yoga' ) ), __( '30 minutes · cheaper as a pair', 'olivia-yoga' ), 'relaxacio-legzes' ),
+);
+?>
+<section class="section oj-private" id="egyeni" aria-labelledby="private-title"><div class="container">
+	<div class="oj-split">
+		<div class="oj-split__text" data-reveal>
+			<?php echo oy_kicker( __( 'One-to-one sessions', 'olivia-yoga' ) ); // phpcs:ignore ?>
+			<h2 id="private-title"><?php esc_html_e( 'One-to-one online yoga, entirely tailored to you', 'olivia-yoga' ); ?></h2>
+			<p class="lead"><?php esc_html_e( 'Private sessions are completely personal, so you can come:', 'olivia-yoga' ); ?></p>
+			<ul class="oj-checklist"><?php foreach ( $for_whom as $w ) : ?><li><?php echo esc_html( $w ); ?></li><?php endforeach; ?></ul>
+			<p class="oj-split__meta"><?php esc_html_e( '60 or 90 minutes, alone or as a pair (cheaper as a pair), live on video from your living room.', 'olivia-yoga' ); ?></p>
+			<p class="btn-row oj-inline"><?php echo oy_btn( $ask( 'egyeni-joga' ), __( 'Ask for a time', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore ?><a class="text-link" href="<?php echo esc_url( oy_class_url( 'egyeni-online-joga' ) ); ?>"><?php esc_html_e( 'More about one-to-one yoga', 'olivia-yoga' ); ?></a></p>
+		</div>
+		<div class="oj-split__art" data-reveal><div class="oj-waved"><?php echo oy_brush_blob( 'pink', 'right' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'private-tree-pose', '(min-width: 960px) 34vw, 92vw' ); // phpcs:ignore ?></div></div></div>
+	</div>
+</div></section>
+
+<section class="section section--pale oj-prenatal" id="kismamatorna" aria-labelledby="prenatal-title"><div class="container">
+	<div class="oj-split oj-split--flip">
+		<div class="oj-split__text" data-reveal>
+			<?php echo oy_kicker( __( 'Prenatal fitness', 'olivia-yoga' ) ); // phpcs:ignore ?>
+			<h2 id="prenatal-title"><?php esc_html_e( 'Online prenatal fitness: preparing for birth, safely', 'olivia-yoga' ); ?></h2>
+			<p class="lead"><?php esc_html_e( 'A one-to-one, 60-minute class, with your friend if you like, planned for your trimester and how you feel that day.', 'olivia-yoga' ); ?></p>
+			<p><?php esc_html_e( 'These all come together in the prenatal training: not in one class, but combined, so that you are well prepared:', 'olivia-yoga' ); ?></p>
+			<ul class="oj-modules"><?php foreach ( $modules as $m ) : ?><li><?php echo esc_html( $m ); ?></li><?php endforeach; ?></ul>
+			<p><?php esc_html_e( 'The first session is an assessment and a conversation: we start from your sports background and how you are now, and we never begin anything more intense than you were used to before.', 'olivia-yoga' ); ?></p>
+			<p class="btn-row oj-inline"><?php echo oy_btn( $ask( 'prenatal' ), __( 'Ask for a time', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore ?><a class="text-link" href="<?php echo esc_url( oy_class_url( oy_prenatal_slug() ) ); ?>"><?php esc_html_e( 'More about prenatal fitness', 'olivia-yoga' ); ?></a></p>
+		</div>
+		<div class="oj-split__art" data-reveal><div class="oj-waved"><?php echo oy_brush_blob( 'lilac', 'left' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'prenatal-ball-training', '(min-width: 960px) 34vw, 92vw' ); // phpcs:ignore ?></div></div></div>
+	</div>
+</div></section>
+
+<section class="section section--tight oj-more" aria-labelledby="more-title"><div class="container">
+	<?php echo oy_section_head( __( 'Stretching, relaxation and breathing', 'olivia-yoga' ), __( 'One-to-one sessions for a stiff body and an overloaded mind.', 'olivia-yoga' ), '', 'more-title' ); // phpcs:ignore ?>
+	<div class="oj-more__grid">
+		<?php foreach ( $more as $c ) : ?>
+		<article class="oj-more__card oj-more__card--<?php echo esc_attr( $c[1] ); ?>" data-reveal>
+			<?php echo oy_pictogram( $c[0], $c[1] ); // phpcs:ignore ?>
+			<h3><?php echo esc_html( $c[2] ); ?></h3>
+			<p><?php echo esc_html( $c[3] ); ?></p>
+			<ul class="oj-checklist"><?php foreach ( $c[4] as $w ) : ?><li><?php echo esc_html( $w ); ?></li><?php endforeach; ?></ul>
+			<p class="oj-more__meta"><?php echo esc_html( $c[5] ); ?></p>
+			<p class="btn-row oj-inline"><?php echo oy_btn( $ask( 'stretching' === $c[6] ? 'stretching' : 'relax' ), __( 'Ask for a time', 'olivia-yoga' ), 'dark' ); // phpcs:ignore ?><a class="text-link" href="<?php echo esc_url( oy_class_url( $c[6] ) ); ?>"><?php esc_html_e( 'Read more', 'olivia-yoga' ); ?></a></p>
+		</article>
+		<?php endforeach; ?>
+	</div>
+</div></section>
+
 <section class="section section--tight" id="classes" aria-labelledby="classes-title"><div class="container">
 	<?php echo oy_section_head( __( 'Online classes', 'olivia-yoga' ), __( 'Breathwork, strength, stretching, balance, a real flow state and a long relaxation, live. Join the group on Wednesdays, or ask for a one-to-one session.', 'olivia-yoga' ), __( 'Classes', 'olivia-yoga' ), 'classes-title' ); // phpcs:ignore ?>
 	<?php echo oy_classes_list(); // phpcs:ignore ?>

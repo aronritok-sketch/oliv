@@ -1641,3 +1641,142 @@ msgstr "Olivia Kovacs egylábas kerékpózban a homokon, a völgy fölött"
 
 msgid "Students resting in child's pose on a wooden deck during an evening class"
 msgstr "Gyakorlók gyermekpózban pihennek egy fateraszon egy esti órán"
+
+#. Olivia, 14 November: the other services on the home page
+msgid "as a beginner, to learn the basics"
+msgstr "kezdő jógásként, hogy biztos alapokat tanulj"
+
+msgid "to complement your group practice"
+msgstr "hogy kiegészítsd a csoportos gyakorlásodat"
+
+msgid "as an experienced yogi, to learn advanced poses"
+msgstr "haladó jógásként, hogy haladó pózokat tanulj"
+
+msgid "if you would rather focus on meditation and relaxation, which are rarer in group classes"
+msgstr "ha inkább a meditációra, a relaxációra fókuszálnál, ami a csoportos órákon ritkább"
+
+msgid "in an emotionally harder time, to complement your therapy with yoga"
+msgstr "ha egy lelkileg nehezebb időszakodban jógával egészítenéd ki a terápiádat"
+
+msgid "as someone coming back to yoga"
+msgstr "újrakezdő jógásként"
+
+msgid "just for fun, with your best friend, your sister or brother, your mum or dad"
+msgstr "funból, a barátnőddel, a tesóddal, anyukáddal vagy apukáddal"
+
+msgid "as a date with your partner"
+msgstr "randiként a pároddal"
+
+msgid "with a physical complaint, to strengthen or stretch out a part of your body"
+msgstr "ha egy testi probléma miatt egy-egy testrészt, testtájat erősítenél vagy nyújtanál"
+
+msgid "if you are a yoga teacher, or training to be one, and would like to sit in and gain experience"
+msgstr "ha jógaoktató vagy, vagy most tanulsz annak, és hospitálnál, tapasztalatot szereznél"
+
+msgid "when the group timetable does not fit your day"
+msgstr "ha a csoportos órák időpontja nem fér bele a napirendedbe"
+
+msgid "and you can give a private session as a gift: surprise someone you love with a pretty gift card!"
+msgstr "és ajándékba is adhatod: egy csinos utalvánnyal meglepheted a szerettedet egy ilyen órával!"
+
+msgid "Breathing exercises"
+msgstr "Légzőtorna"
+
+msgid "Pelvic floor training"
+msgstr "Gátizomtorna"
+
+msgid "Better circulation"
+msgstr "Keringésjavítás"
+
+msgid "Cardio training"
+msgstr "Kardiótréning"
+
+msgid "Strength and weight training"
+msgstr "Izomerősítés, súlyzós edzés"
+
+msgid "Spine training"
+msgstr "Gerinctréning"
+
+msgid "Mobility and stretching"
+msgstr "Mobilizáció, stretching"
+
+msgid "Relaxation"
+msgstr "Relaxáció"
+
+msgid "Online stretching and mobility"
+msgstr "Online stretching és mobilizáció"
+
+msgid "An hour that is only about moving freely again: stretches and mobility work for the hips, shoulders and spine, at your own pace."
+msgstr "Egy óra, ami csak arról szól, hogy újra szabadon mozogj: nyújtás és mobilizáció a csípőnek, a vállnak és a gerincnek, a te tempódban."
+
+msgid "if you sit a lot and your hips, shoulders or back feel stiff"
+msgstr "ha sokat ülsz, és merev a csípőd, a vállad vagy a hátad"
+
+msgid "next to running, weights or another sport, for recovery"
+msgstr "futás, súlyzós edzés vagy más sport mellé, a regenerációhoz"
+
+msgid "if you would like to be more flexible"
+msgstr "ha hajlékonyabb szeretnél lenni"
+
+msgid "60 minutes · cheaper as a pair"
+msgstr "60 perc · párban olcsóbb"
+
+msgid "Relaxation and breathing"
+msgstr "Relaxáció és légzés"
+
+msgid "Half an hour that is only about calming down: breathing exercises, gentle stretches and guided relaxation for an overloaded nervous system."
+msgstr "Fél óra, ami csak a megnyugvásról szól: légzőgyakorlatok, kíméletes nyújtás és vezetett relaxáció a túlpörgött idegrendszernek."
+
+msgid "if you are stressed and find it hard to switch off"
+msgstr "ha stresszes vagy, és nehezen kapcsolsz ki"
+
+msgid "if you find it hard to fall asleep"
+msgstr "ha nehezen alszol el"
+
+msgid "to learn how to calm yourself in a few minutes"
+msgstr "hogy megtanuld, hogyan nyugtathatod meg magad pár perc alatt"
+
+msgid "30 minutes · cheaper as a pair"
+msgstr "30 perc · párban olcsóbb"
+
+msgid "One-to-one sessions"
+msgstr "Egyéni órák"
+
+msgid "One-to-one online yoga, entirely tailored to you"
+msgstr "Egyéni online jógaóra, teljesen rád szabva"
+
+msgid "Private sessions are completely personal, so you can come:"
+msgstr "A magánórák teljesen személyre szabottak, ezért jöhetsz:"
+
+msgid "60 or 90 minutes, alone or as a pair (cheaper as a pair), live on video from your living room."
+msgstr "60 vagy 90 perc, egyedül vagy párban (párban olcsóbb), élőben, a nappalidból."
+
+msgid "Ask for a time"
+msgstr "Időpontot kérek"
+
+msgid "More about one-to-one yoga"
+msgstr "Az egyéni óráról bővebben"
+
+msgid "Online prenatal fitness: preparing for birth, safely"
+msgstr "Online kismamatorna: felkészülés a szülésre, biztonságban"
+
+msgid "A one-to-one, 60-minute class, with your friend if you like, planned for your trimester and how you feel that day."
+msgstr "Egyéni, 60 perces óra, akár a barátnőddel: a trimeszteredhez és az aznapi állapotodhoz igazítva."
+
+msgid "These all come together in the prenatal training: not in one class, but combined, so that you are well prepared:"
+msgstr "Ezek mind beépülnek a kismamatornába: nem egyetlen órába, hanem kombinálva, hogy jól felkészülj:"
+
+msgid "The first session is an assessment and a conversation: we start from your sports background and how you are now, and we never begin anything more intense than you were used to before."
+msgstr "Az első alkalom felmérés és beszélgetés: a sportmúltadból és a mostani állapotodból indulunk ki, és sosem kezdünk bele intenzívebb mozgásba, mint amit korábban megszoktál."
+
+msgid "More about prenatal fitness"
+msgstr "A kismamatornáról bővebben"
+
+msgid "Stretching, relaxation and breathing"
+msgstr "Stretching, relaxáció és légzés"
+
+msgid "One-to-one sessions for a stiff body and an overloaded mind."
+msgstr "Egyéni órák a merev testnek és a túlpörgött fejnek."
+
+msgid "Read more"
+msgstr "Bővebben"

@@ -678,6 +678,41 @@ function oy_migrate_legal() {
 }
 
 /**
+ * Olivia's prices of 14 November on a live site: the passes and sessions (60 / 90 minutes, „Párban olcsóbb” for every
+ * one-to-one service, no expiry on the prenatal pass), and on each class page only its „Árak” list – the rest of the
+ * page stays as it is (Olivia edits her pages herself now).
+ */
+function oy_migrate_prices() {
+	$rev = '2026-11-14a';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_prices_rev' ) === $rev ) {
+		return array();
+	}
+	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+	$log  = oy_apply_online_prices();
+	$pick = fn( $html ) => preg_match( '~<h2>Árak</h2>\s*<ul>.*?</ul>~su', (string) $html, $m ) ? $m[0] : '';
+	foreach ( (array) ( $data['classes'] ?? array() ) as $slug => $c ) {
+		$post = get_page_by_path( $slug, OBJECT, 'oy_class' );
+		$new  = $pick( $c['content'] ?? '' );
+		if ( ! $post || '' === $new || '' === $pick( $post->post_content ) ) {
+			continue;
+		}
+		$content = preg_replace( '~<h2>Árak</h2>\s*<ul>.*?</ul>~su', str_replace( array( '\\', '$' ), array( '\\\\', '\\$' ), $new ), $post->post_content, 1 );
+		if ( $content !== $post->post_content ) {
+			kses_remove_filters();
+			wp_update_post( wp_slash( array( 'ID' => $post->ID, 'post_content' => $content ) ) );
+			kses_init_filters();
+			$log[] = 'prices on /' . $slug . '/';
+		}
+	}
+	$sp = get_page_by_path( oy_page_slug( 'schedule-pricing' ) );
+	if ( $sp && ! empty( $data['pages']['schedule-pricing']['seo_desc'] ) ) {
+		update_post_meta( $sp->ID, 'oy_seo_desc', $data['pages']['schedule-pricing']['seo_desc'] );
+	}
+	update_option( 'oy_prices_rev', $rev );
+	return $log;
+}
+
+/**
  * The online edition's passes, one-to-one services and timetable setting from its content file, on a live site. Passes
  * someone has bought keep their own expiry; products the edition no longer has go off sale.
  */

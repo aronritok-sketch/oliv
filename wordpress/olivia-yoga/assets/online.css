@@ -176,3 +176,26 @@ h1, h2, .page-head .page-head__title, .namecard__name, .price-group__head h3, .w
 /* price list: the switches sit under the service's name */
 .price-group__head .oys-switches { margin-top: 1.1rem; }
 @media (min-width: 1000px) { .price-group__head .oys-switches { flex-direction: column; align-items: flex-start; } }
+
+/* Olivia, 14 November: the one-to-one sessions, the prenatal class and stretching / relaxation on the home page */
+.oj-split { display: grid; gap: clamp(2rem, 5vw, 4.5rem); align-items: center; }
+@media (min-width: 960px) {
+	.oj-split { grid-template-columns: 1.15fr .85fr; }
+	.oj-split--flip { grid-template-columns: .85fr 1.15fr; }
+	.oj-split--flip .oj-split__text { order: 2; }
+}
+.oj-split__text h2 { margin-bottom: .9rem; }
+.oj-split__meta { font-weight: 700; margin: 1.2rem 0 0; }
+.oj-checklist { list-style: none; margin: 1rem 0 0; padding: 0; display: grid; gap: .55rem 1.5rem; }
+@media (min-width: 700px) { .oj-private .oj-checklist { grid-template-columns: 1fr 1fr; } }
+.oj-checklist li { position: relative; padding-left: 1.6rem; line-height: 1.45; }
+.oj-checklist li::before { content: ""; position: absolute; left: .1rem; top: .42em; width: 11px; height: 6px; border-left: 2px solid var(--orchid); border-bottom: 2px solid var(--orchid); transform: rotate(-45deg); }
+.oj-private .oj-checklist li:last-child { grid-column: 1 / -1; font-weight: 700; }
+.oj-prenatal .oj-modules { margin: 1rem 0 1.2rem; }
+.oj-more__grid { display: grid; gap: 1.25rem; margin-top: 2rem; }
+@media (min-width: 860px) { .oj-more__grid { grid-template-columns: 1fr 1fr; } }
+.oj-more__card { display: flex; flex-direction: column; gap: .4rem; padding: clamp(1.4rem, 3vw, 2rem); border-radius: var(--radius); background: var(--card, #fff); box-shadow: inset 0 0 0 1px var(--line); }
+.oj-more__card h3 { margin: .6rem 0 .2rem; }
+.oj-more__card p { margin: 0; }
+.oj-more__meta { margin-top: .9rem !important; font-weight: 700; color: var(--orchid); }
+.oj-more__card .btn-row { margin-top: auto; padding-top: 1rem; }

@@ -6021,3 +6021,10 @@ msgstr "Egyéni órák"
 
 msgid "We agree on a time that suits you: tell me when you are free, and I reply within a day."
 msgstr "Az időpontot egyénileg egyeztetjük: írd meg, mikor érnél rá, és egy napon belül visszaírok."
+
+#. Olivia, 14 November
+msgid "from %s each"
+msgstr "fejenként %s-tól"
+
+msgid "%s each"
+msgstr "fejenként %s"

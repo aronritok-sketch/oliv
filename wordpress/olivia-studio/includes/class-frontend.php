@@ -284,6 +284,7 @@ class OYS_Frontend {
 		return '<article class="price price--' . esc_attr( $c['tone'] ) . '"' . $attrs . '>'
 			. ( $c['featured'] ? apply_filters( 'oys_featured_badge', '<span class="price__tag">' . esc_html__( 'Most popular', 'olivia-studio' ) . '</span>' ) : '' )
 			. '<h4>' . esc_html( $c['title'] ) . '</h4><p class="price__amount">' . esc_html( $c['price'] ) . '</p><p class="price__unit">' . esc_html( $c['unit'] ) . '</p>'
+			. ( ! empty( $c['each'] ) ? '<p class="price__each">' . esc_html( $c['each'] ) . '</p>' : '' )
 			. '<ul>' . implode( '', array_map( fn( $f ) => '<li>' . esc_html( $f ) . '</li>', $c['features'] ) ) . $gift . '</ul>'
 			. '<a class="btn ' . ( $c['featured'] ? 'btn--orchid' : 'btn--dark' ) . '" href="' . esc_url( $c['cta'][1] ) . '">' . esc_html( $c['cta'][0] ) . '</a></article>';
 	}
@@ -314,7 +315,15 @@ class OYS_Frontend {
 			$switch .= '</div>';
 		}
 		if ( $duo ) {
-			$switch .= '<label class="oys-pair"><input type="checkbox" data-duo><span class="oys-pair__track" aria-hidden="true"></span><span><b>' . esc_html__( 'Cheaper as a pair', 'olivia-studio' ) . '</b> ' . esc_html__( 'with a friend', 'olivia-studio' ) . '</span></label>';
+			// Olivia, 14 November: „Jelöld látványosabban a párban olcsóbbat” – what it costs each of you, right on the switch
+			$each = 0;
+			foreach ( $products as $p ) {
+				if ( (int) $p['people'] > 1 && 'private_single' === $p['kind'] ) {
+					$each = $each ? min( $each, (int) round( $p['price_cents'] / 2 ) ) : (int) round( $p['price_cents'] / 2 );
+				}
+			}
+			$switch .= '<label class="oys-pair"><input type="checkbox" data-duo><span class="oys-pair__track" aria-hidden="true"></span><span class="oys-pair__text"><b>' . esc_html__( 'Cheaper as a pair', 'olivia-studio' ) . '</b>'
+				. ( $each ? '<small>' . esc_html( sprintf( __( 'from %s each', 'olivia-studio' ), oys_money( $each ) ) ) . '</small>' : '' ) . '</span></label>';
 		}
 		$tones = array( 'lilac', 'sun' );
 		$cards = '';
@@ -328,7 +337,7 @@ class OYS_Frontend {
 			$cta   = $pack
 				? array( __( 'Buy now', 'olivia-studio' ), oys_page_url( 'book', array( 'product' => $p['id'] ) ) )
 				: array( __( 'Ask for a time', 'olivia-studio' ), add_query_arg( array_filter( array( 'topic' => $key, 'length' => count( $lengths ) > 1 ? $m : 0, 'people' => $two ? 2 : 0 ) ), oys_account_url( 'private' ) ) );
-			$card  = array( 'tone' => $tones[ $pack ? 1 : 0 ], 'title' => oys_t( $svc['label'] ), 'price' => oys_money( $p['price_cents'] ), 'unit' => $unit, 'features' => array_map( 'oys_product_text', array_filter( array_map( 'trim', explode( "\n", $p['features'] ) ) ) ), 'gift' => $gift_line && ! empty( $p['giftable'] ), 'cta' => $cta, 'featured' => false );
+			$card  = array( 'tone' => $tones[ $pack ? 1 : 0 ], 'title' => oys_t( $svc['label'] ), 'price' => oys_money( $p['price_cents'] ), 'unit' => $unit, 'each' => $two ? sprintf( __( '%s each', 'olivia-studio' ), oys_money( (int) round( $p['price_cents'] / 2 ) ) ) : '', 'features' => array_map( 'oys_product_text', array_filter( array_map( 'trim', explode( "\n", $p['features'] ) ) ) ), 'gift' => $gift_line && ! empty( $p['giftable'] ), 'cta' => $cta, 'featured' => false );
 			$on    = (int) $m === (int) $lengths[0] && ! $two;
 			$cards .= self::price_card( $card, ' data-len="' . (int) $m . '" data-people="' . ( $two ? 2 : 1 ) . '"' . ( $on ? ' data-on' : '' ) );
 		}

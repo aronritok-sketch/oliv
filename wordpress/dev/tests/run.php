@@ -1090,6 +1090,7 @@ test( 'one-to-one in two lengths (60 / 90 minutes): own credits, own cards, the 
 		remove_filter( 'oys_price_gift_line', '__return_true' );
 		ok( str_contains( $html, 'data-oys-variants' ) && str_contains( $html, 'data-len="60"' ) && str_contains( $html, 'data-len="90"' ), 'a length switch for the service in two lengths' );
 		ok( 1 === substr_count( $html, 'Cheaper as a pair' ), '„Cheaper as a pair” only where there is a price for two' );
+		ok( str_contains( $html, 'each</small>' ) && str_contains( $html, 'class="price__each"' ), 'the pair switch and cards say what it costs each (Olivia, 14 Nov)' );
 		ok( str_contains( $html, '5 sessions × 90 minutes' ), 'the pass: 5 sessions × 90 minutes' );
 		ok( str_contains( $html, 'per session, 60 minutes, for the two of you' ), 'the single for two' );
 		ok( str_contains( $html, 'length=90' ), 'the 90-minute single asks for a 90-minute time' );
@@ -1939,6 +1940,26 @@ test( 'online edition, live update: the legal pages again, and „Olívia” in 
 	} finally {
 		update_option( 'oy_edition', 'fort-myers' );
 		OYS_Settings::update( array( 'waiver_text' => $waiver ) );
+	}
+} );
+
+test( 'online edition, live update: the prices of 14 November, only the „Árak” list of a class page changes', function () {
+	require_once get_template_directory() . '/inc/demo-import.php';
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		$id = wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Stretching', 'post_name' => 'stretching', 'post_content' => "<p>Olívia saját szövege.</p>\n<h2>Árak</h2>\n<ul>\n<li>régi ár</li>\n</ul>\n<p>Utána is az övé.</p>" ) );
+		delete_option( 'oy_prices_rev' );
+		oy_migrate_prices();
+		$c = get_post( $id )->post_content;
+		ok( str_contains( $c, '7 000 Ft, 5 alkalom 30 000 Ft' ) && ! str_contains( $c, 'régi ár' ), 'the new prices on the class page' );
+		ok( str_contains( $c, 'Olívia saját szövege.' ) && str_contains( $c, 'Utána is az övé.' ), 'the rest of her page is untouched' );
+		$p = OYS_Products::get( 'egyeni90-duo-1' );
+		ok( $p && 1500000 === (int) $p['price_cents'] && 2 === (int) $p['people'] && 90 === (int) $p['duration_min'], 'pair yoga, 90 minutes: 15 000 Ft' );
+		eq( 0, (int) OYS_Products::get( 'kismama-5' )['validity_days'], 'the prenatal pass has no expiry' );
+		ok( (bool) OYS_Services::get( 'relax' )['duo'], 'relaxation can be booked as a pair' );
+		eq( array(), oy_migrate_prices(), 'once' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
 	}
 } );
 

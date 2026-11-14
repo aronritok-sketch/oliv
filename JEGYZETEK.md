@@ -225,6 +225,15 @@
   impresszumban. Élesen csak a jogi oldalak frissülnek (`oy_migrate_legal`, rev 2026-11-14a) – Olívia már maga
   szerkeszti az oldalt, a teljes tartalom nem töltődik újra. **Hiányzik:** a floridai cégjegyzékszám (Sunbiz Document
   Number) és a GDPR 27. cikk szerinti uniós képviselő (ki legyen?) – Árontól. Két napfüggő teszt javítva. 3.6.2: a részvételi nyilatkozatban is „Olíviának” (a bővítmény beállításaiban maradt rövid i). Tesztek 924/0.
+- **Olivia chatüzenetei 11.14 (olivia-yoga 3.7.0, olivia-studio 1.10.1):** új árak – egyéni jóga 60 perc 8 000 /
+  35 000 Ft, 90 perc 10 000 / 43 000 Ft; páros jóga 60 perc 12 000 / 52 000 Ft, 90 perc 15 000 / 65 000 Ft;
+  kismamatorna bérlet 35 000 Ft, **lejárat nélkül** (az alkalmi 5 000 Ft-tal ez drágább lett volna öt alkalmi jegynél →
+  alkalmi 8 000 Ft, párban 12 000 / 52 000 Ft, az egyéni jóga szerint – Olíviától megerősítést kértünk); stretching
+  7 000 / 30 000 Ft; relaxáció 5 000 / 18 000 Ft. „Párban olcsóbb” minden egyéni szolgáltatásnál (a csoportoson kívül),
+  látványosabb kapcsolóval („fejenként … Ft-tól”, a kártyán „fejenként …”); a stretching és a relaxáció páros ára
+  javaslat (×1,5: 10 500 / 45 000 és 7 500 / 27 000 Ft). Főoldal: új blokkok – egyéni órák Olívia listájával („jöhetsz
+  …”), külön kismamatorna-blokk (modulok, első alkalom), stretching + relaxáció kártyák. Élesen `oy_migrate_prices`:
+  csak a termékek és az óraoldalak „Árak” listája cserélődik. Tesztek 947/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
