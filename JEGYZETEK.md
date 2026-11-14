@@ -316,6 +316,8 @@
   oldaldoboz (GYIK, Rólam) alacsony ablakban sem vágódik le (site.js negatív sticky top); a Rólam két edzéses képe egy
   vonalban. A GYIK-kérdés átnevezése mostantól akkor is megtörténik, ha a választ Olívia átírta (a válasza marad).
   Tesztek 1093/0.
+- **3.11.14:** a Rólam képzés-kártyái (`oj-creds`, a három tanúsítvány) kikerültek („Ezt a részt szedjük ki a rólamból”);
+  élesen `oy_migrate_1114d` rev o, a teljes blokk szó szerinti `_replace` párjával.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
