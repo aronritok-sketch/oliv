@@ -1959,10 +1959,12 @@ test( 'online edition, live update: the prices of 14 November, only the „Árak
 		eq( 0, (int) OYS_Products::get( 'kismama-5' )['validity_days'], 'the prenatal pass has no expiry' );
 		ok( (bool) OYS_Services::get( 'relax' )['duo'], 'relaxation can be booked as a pair' );
 		ok( 2000000 === (int) OYS_Products::get( 'relax-5' )['price_cents'] && 3200000 === (int) OYS_Products::get( 'relax-duo-5' )['price_cents'], 'relaxation pass 20 000 Ft, the pair\'s 32 000 Ft (Olívia, chat)' );
-		// (the test site counts in dollars: only the numbers and the words are checked)
-		$per = OYS_I18n::with( 'hu', fn() => array_map( fn( $id ) => (string) preg_replace( '/(&nbsp;|[\s\x{00A0}\x{202F}$]|Ft)+/u', ' ', OYS_Frontend::per_session( (array) OYS_Products::get( $id ) ) ), array( 'relax-5', 'egyeni-duo-5', 'relax-1' ) ) );
-		eq( 'Egy óra: 4 000', trim( $per[0] ), 'a pass: what one session comes to (Olívia: „milyen összegre jön ki egy óra”)' );
-		eq( 'Egy óra: 10 400 (fejenként 5 200)', trim( $per[1] ), 'a pass for two: and what it is each' );
+		// (the test site may count in dollars, and without WordPress's Hungarian language pack the thousands are „4,000”:
+		// only the digits and the words are checked)
+		$plain = fn( $t ) => trim( (string) preg_replace( array( '/(?<=\d)(?:&nbsp;|[\s,.\x{00A0}\x{202F}])(?=\d{3}\b)/u', '/(&nbsp;|[\s\x{00A0}\x{202F}$]|Ft)+/u', '/\s+\)/' ), array( '', ' ', ')' ), $t ) );
+		$per   = OYS_I18n::with( 'hu', fn() => array_map( fn( $id ) => $plain( OYS_Frontend::per_session( (array) OYS_Products::get( $id ) ) ), array( 'relax-5', 'egyeni-duo-5', 'relax-1' ) ) );
+		eq( 'Egy óra: 4000', $per[0], 'a pass: what one session comes to (Olívia: „milyen összegre jön ki egy óra”)' );
+		eq( 'Egy óra: 10400 (fejenként 5200)', $per[1], 'a pass for two: and what it is each' );
 		eq( '', $per[2], 'a single session: nothing to work out' );
 		eq( array(), oy_migrate_prices(), 'once' );
 	} finally {
