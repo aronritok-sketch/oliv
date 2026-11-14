@@ -364,6 +364,9 @@
 - **3.11.37:** a „Melyik órát válasszam?” sorok a lap teljes szélességében (kérdés + óra | leírás | gomb); az „Ajándéknak is”
   sávból kikerült a jegy-kivágás, a szaggatott keret, a dőlés és a nagybetűs cím (az átmenet maradt); a zöld kismama-blokkon
   nincs zöld sarokkör (sárga helyette); „A képedet csak én látom.”: pipa helyett sarokba belógó pasztell kör. Tesztek 1193/0.
+- **3.11.40:** főoldali GYIK: a „Miért jó online jógázni?” kikerült (a GYIK-lapon marad), bekerült a „Mi van, ha késve
+  érkezem…”, az utolsó a „Sérülésem vagy egészségügyi problémám van…” (`faqs_home` a tartalomfájlban; élesen a jelölő és a
+  sorrend). Kikerült a „Négy ok, amiért…” és az „Az egyéni óra teljesen hozzád igazodik…” sor. 1114d rev 2026-11-15a. Tesztek 1200/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

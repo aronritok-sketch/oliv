@@ -73,7 +73,7 @@ $steps  = array(
 </div></div></section>
 
 <section class="section section--pale" id="why-online" aria-labelledby="why-title"><div class="container">
-	<?php echo oy_section_head( __( 'Why practise online?', 'olivia-yoga' ), __( 'Four reasons people choose live online yoga, and stay.', 'olivia-yoga' ), __( 'Why online', 'olivia-yoga' ), 'why-title' ); // phpcs:ignore ?>
+	<?php echo oy_section_head( __( 'Why practise online?', 'olivia-yoga' ), '', __( 'Why online', 'olivia-yoga' ), 'why-title' ) /* Olívia, 14 November: „Ezt szedjük ki” – the line under the title */; // phpcs:ignore ?>
 	<ul class="places places--why" data-reveal><?php foreach ( $why as $n ) : ?><li><?php echo oy_pictogram( $n[0], $n[3] ); // phpcs:ignore ?><div><h3><?php echo esc_html( $n[1] ); ?></h3><p><?php echo esc_html( $n[2] ); ?></p></div></li><?php endforeach; ?></ul>
 </div></section>
 
@@ -148,7 +148,7 @@ $more     = array(
 		<div class="oj-split__text" data-reveal>
 			<?php echo oy_kicker( __( 'One-to-one sessions', 'olivia-yoga' ) ); // phpcs:ignore ?>
 			<h2 id="private-title"><?php esc_html_e( 'One-to-one online yoga, entirely tailored to you', 'olivia-yoga' ); ?></h2>
-			<p class="lead"><?php esc_html_e( 'A one-to-one session is shaped entirely around you. It is for you, for example:', 'olivia-yoga' ); ?></p>
+			<?php // Olívia, 14 November: „ezt is szedjük ki” – no line between the title and the four boxes ?>
 			<ul class="oj-fit"><?php foreach ( $fit as $i => $f ) : ?><li class="oj-fit__item oj-fit__item--<?php echo esc_attr( $tones[ $i % 4 ] ); ?>"><b><?php echo esc_html( $f[0] ); ?></b><span><?php echo esc_html( $f[1] ); ?></span></li><?php endforeach; ?></ul>
 			<p class="oj-fit__more"><a class="text-link" href="<?php echo esc_url( oy_class_url( 'egyeni-online-joga' ) . '#kinek-szol' ); ?>"><?php esc_html_e( 'Who else is it for? You will find them all on the one-to-one page', 'olivia-yoga' ); ?></a></p>
 			<ul class="oj-facts"><?php foreach ( $facts as $f ) : ?><li><?php echo oy_icon( $f[0] ); // phpcs:ignore ?><span><?php echo esc_html( $f[1] ); ?></span></li><?php endforeach; ?></ul>

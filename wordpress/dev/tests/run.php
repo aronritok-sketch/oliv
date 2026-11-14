@@ -3274,6 +3274,39 @@ test( 'Olívia\'s doc of 14 November, past midnight: the prenatal modules three 
 	}
 } );
 
+test( 'Olívia\'s doc of 14 November, past midnight: the home page\'s questions – „Sérülésem…” last, „Miért jó online jógázni?” off the home page', function () {
+	update_option( 'oy_edition', 'hu-online' );
+	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+	$home = array_values( array_map( fn( $f ) => $f['q'], array_filter( $data['faqs'], fn( $f ) => '1' === (string) ( $f['home'] ?? '' ) ) ) );
+	ok( 'Sérülésem vagy egészségügyi problémám van. Jöhetek?' === end( $home ) && ! in_array( 'Miért jó online jógázni?', $home, true ), 'a fresh site: the injury question is the last on the home page, „Miért jó online jógázni?” only on the FAQ page' );
+	ok( in_array( 'Mi van, ha késve érkezem, vagy akadozik a net?', $home, true ), '… and the late-arrival / bad-connection question on the home page too („ezt a kérdést még tedd a gyikhez a főoldalra”)' );
+	ob_start();
+	load_template( get_template_directory() . '/template-parts/front-online.php', false );
+	$front = (string) ob_get_clean();
+	ok( ! str_contains( $front, esc_html__( 'Four reasons people choose live online yoga, and stay.', 'olivia-yoga' ) ), 'the line under „Miért jó online jógázni?” is gone („Ezt szedjük ki”)' );
+	ok( ! str_contains( $front, esc_html__( 'A one-to-one session is shaped entirely around you. It is for you, for example:', 'olivia-yoga' ) ) && ! str_contains( $data['classes']['egyeni-online-joga']['content'], 'Neked szól például' ), '… and „Az egyéni óra teljesen hozzád igazodik. Neked szól például:” („ezt is szedjük ki”)' );
+	$made = array();
+	try {
+		$made[] = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => 'Miért jó online jógázni?', 'menu_order' => 1 ) );
+		$made[] = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => 'Utolsó a főoldalon eddig', 'menu_order' => 40 ) );
+		$made[] = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => 'Sérülésem vagy egészségügyi problémám van. Jöhetek?', 'menu_order' => 17 ) );
+		update_post_meta( $made[0], 'oy_home', '1' );
+		update_post_meta( $made[1], 'oy_home', '1' );
+		update_post_meta( $made[2], 'oy_home', '' );
+		delete_option( 'oy_1114d_rev' );
+		oy_migrate_1114d();
+		ok( '' === get_post_meta( $made[0], 'oy_home', true ) && '1' === get_post_meta( $made[2], 'oy_home', true ), 'live update: on and off the home page' );
+		ok( (int) get_post_field( 'menu_order', $made[2] ) > 40, '… and the injury question after every other home question' );
+		$list = oy_faq_list( true );
+		ok( strrpos( $list, 'Sérülésem vagy egészségügyi problémám van. Jöhetek?' ) > strrpos( $list, 'Utolsó a főoldalon eddig' ) && ! str_contains( $list, 'Miért jó online jógázni?' ), '… the home list shows it last' );
+	} finally {
+		foreach ( $made as $id ) {
+			wp_delete_post( $id, true );
+		}
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+} );
+
 test( 'Olívia\'s doc of 14 November: the side column is never cut off while scrolling; her two training photos in one line', function () {
 	$css = (string) file_get_contents( get_template_directory() . '/assets/site.css' );
 	ok( (bool) preg_match( '/\.aside-sticky \{ position: sticky; top: calc\(var\(--header-h\) \+ var\(--wp-bar, 0px\) \+ 24px\); align-self: start; \}/', $css ) && ! str_contains( $css, 'scrollbar-width: none' ), 'the side column: no hidden inner scroll that cuts its bottom off' );

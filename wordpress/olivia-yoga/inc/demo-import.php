@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-14x';
+	$rev = '2026-11-15a';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1111,6 +1111,30 @@ function oy_migrate_1114d() {
 		foreach ( get_posts( array( 'post_type' => 'oy_faq', 'post_status' => array( 'publish', 'draft', 'pending', 'private' ), 'numberposts' => -1, 'title' => $f['q'] ) ) as $faq ) {
 			if ( $faq->post_title === $f['q'] && wp_trash_post( $faq->ID ) ) {
 				$log[] = 'FAQ removed: ' . $f['q'];
+			}
+		}
+	}
+	// „főoldalon a gyiknél az utolsó kérdés ez legyen, a miért jó online jógázni kérdést vegyük ki a főoldalról”: which questions
+	// are on the home page; one that comes onto it comes after the others there
+	foreach ( (array) ( $data['faqs_home'] ?? array() ) as $q => $on ) {
+		if ( '_' === substr( (string) $q, 0, 1 ) || '' === trim( (string) $q ) ) {
+			continue;
+		}
+		foreach ( get_posts( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'numberposts' => -1, 'title' => $q ) ) as $faq ) {
+			if ( $faq->post_title !== $q ) {
+				continue;
+			}
+			$want = '1' === (string) $on ? '1' : '';
+			if ( get_post_meta( $faq->ID, 'oy_home', true ) !== $want ) {
+				update_post_meta( $faq->ID, 'oy_home', $want );
+				$log[] = 'FAQ ' . ( $want ? 'on' : 'off' ) . ' the home page: ' . $q;
+			}
+			if ( $want ) {
+				$others = get_posts( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'numberposts' => -1, 'fields' => 'ids', 'meta_key' => 'oy_home', 'meta_value' => '1', 'exclude' => array( $faq->ID ) ) );
+				$last   = max( array_merge( array( -1 ), array_map( fn( $id ) => (int) get_post_field( 'menu_order', $id ), $others ) ) );
+				if ( (int) $faq->menu_order <= $last ) {
+					wp_update_post( array( 'ID' => $faq->ID, 'menu_order' => $last + 1 ) );
+				}
 			}
 		}
 	}
