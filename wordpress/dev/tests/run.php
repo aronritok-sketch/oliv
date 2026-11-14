@@ -3226,6 +3226,37 @@ test( 'Olívia\'s doc of 14 November, late night: the group class – a short re
 	}
 } );
 
+test( 'Olívia\'s doc of 14 November, past midnight: the prenatal modules three in a row; the one-to-one page\'s questions as cards, her own words kept', function () {
+	$css = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
+	ok( str_contains( $css, '.oj-modules--why { grid-template-columns: repeat(auto-fill, minmax(max(12.5rem, calc((100% - 1.5rem) / 3)), 1fr)); }' ), 'the nine prenatal modules: at most three in a row, never a lone ninth („Legyen 3 vagy 4 egy sorban”)' );
+	ok( str_contains( $css, '.oj-modules--pairs { grid-template-columns: repeat(auto-fill, minmax(max(14rem, calc((100% - .75rem) / 2)), 1fr)); }' ), 'the one-to-one page\'s four questions two by two' );
+	$h  = 'Miben segíthet az egyéni online jóga?';
+	$in = "<p>Bevezető</p>\n<h2>$h</h2>\n<h3>Fáj a hátad?</h3>\n<p>A saját szövegem.</p>\n<h3>Fáj a derekad?</h3>\n<p>Második, <strong>vastagon</strong>.</p>\n<h2 id=\"kinek-szol\">Kinek szól</h2>\n<p>x</p>";
+	$out = oy_h3_cards( $in, $h );
+	ok( str_contains( $out, '<ul class="oj-modules oj-modules--why oj-modules--pairs">' ) && str_contains( $out, '<li><strong>Fáj a hátad?</strong><span>A saját szövegem.</span></li>' ) && str_contains( $out, '<span>Második, <strong>vastagon</strong>.</span>' ) && str_contains( $out, "<h2 id=\"kinek-szol\">Kinek szól</h2>\n<p>x</p>" ) && str_starts_with( $out, "<p>Bevezető</p>\n<h2>$h</h2>" ), 'the questions become cards from whatever is on the page, so the words she changed herself stay („legyen szebben összeszedve”)' );
+	$odd = "<h2>$h</h2>\n<p>Bevezető</p>\n<h3>A</h3>\n<p>x</p>\n<h3>B</h3>\n<p>y</p>\n<h2>Z</h2>";
+	$two = "<h2>$h</h2>\n<h3>A</h3>\n<p>x</p>\n<p>x2</p>\n<h3>B</h3>\n<p>y</p>\n<h2>Z</h2>";
+	ok( oy_h3_cards( $odd, $h ) === $odd && oy_h3_cards( $two, $h ) === $two && oy_h3_cards( '<p>semmi</p>', $h ) === '<p>semmi</p>', '… a part that looks different is left as it is' );
+	update_option( 'oy_edition', 'hu-online' );
+	$post = get_page_by_path( 'egyeni-online-joga', OBJECT, 'oy_class' );
+	$made = ! $post;
+	$id   = $post ? $post->ID : wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Egyéni online jóga', 'post_name' => 'egyeni-online-joga' ) );
+	$keep = $post ? $post->post_content : '';
+	try {
+		wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => $in ) ) );
+		delete_option( 'oy_1114d_rev' );
+		oy_migrate_1114d();
+		ok( str_contains( get_post_field( 'post_content', $id ), '<li><strong>Fáj a hátad?</strong><span>A saját szövegem.</span></li>' ), 'live update: the one-to-one page\'s questions as cards' );
+	} finally {
+		if ( $made ) {
+			wp_delete_post( $id, true );
+		} else {
+			wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => $keep ) ) );
+		}
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+} );
+
 test( 'Olívia\'s doc of 14 November: the side column is never cut off while scrolling; her two training photos in one line', function () {
 	$css = (string) file_get_contents( get_template_directory() . '/assets/site.css' );
 	ok( (bool) preg_match( '/\.aside-sticky \{ position: sticky; top: calc\(var\(--header-h\) \+ 24px\); align-self: start; \}/', $css ) && ! str_contains( $css, 'scrollbar-width: none' ), 'the side column: no hidden inner scroll that cuts its bottom off' );

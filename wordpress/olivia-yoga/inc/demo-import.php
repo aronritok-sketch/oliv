@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-14u';
+	$rev = '2026-11-14v';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1105,6 +1105,18 @@ function oy_migrate_1114d() {
 			}
 		}
 	}
+	// „ez egy picit legyen szebben összeszedve az egyéni online jóga aloldalon”: the „Miben segíthet…?” questions become cards
+	// like the prenatal modules – rebuilt from whatever is on the page, so the words she has changed herself stay
+	$one = get_page_by_path( 'egyeni-online-joga', OBJECT, 'oy_class' );
+	if ( $one && ! str_contains( $one->post_content, 'oj-modules--pairs' ) ) {
+		$cards = oy_h3_cards( $one->post_content, 'Miben segíthet az egyéni online jóga?' );
+		if ( $cards !== $one->post_content ) {
+			kses_remove_filters();
+			wp_update_post( wp_slash( array( 'ID' => $one->ID, 'post_content' => $cards ) ) );
+			kses_init_filters();
+			$log[] = 'class: egyeni-online-joga – the questions as cards';
+		}
+	}
 	// the gift card page („a kép is legyen más”): her photo instead of the singing bowls, only while the bowls are still there
 	$gift_photo = (string) ( $data['studio_pages']['gifts']['photo'] ?? '' );
 	$gift_page  = get_post( (int) get_option( 'oys_page_gifts' ) );
@@ -1136,6 +1148,31 @@ function oy_migrate_1114d() {
 		}
 	}
 	return $log;
+}
+
+/**
+ * The questions under a heading (each an h3 with its paragraph) as module cards, two by two; the texts stay as they are.
+ * Anything that does not look like that is left alone.
+ */
+function oy_h3_cards( $content, $heading ) {
+	if ( ! preg_match( '~<h2[^>]*>\s*' . preg_quote( $heading, '~' ) . '\s*</h2>\s*~u', $content, $h, PREG_OFFSET_CAPTURE ) ) {
+		return $content;
+	}
+	$start = $h[0][1] + strlen( $h[0][0] );
+	$end   = preg_match( '~<h2[\s>]~', $content, $n, PREG_OFFSET_CAPTURE, $start ) ? $n[0][1] : strlen( $content );
+	$part  = substr( $content, $start, $end - $start );
+	if ( ! preg_match_all( '~<h3[^>]*>(.*?)</h3>\s*(.*?)\s*(?=<h3[\s>]|$)~su', $part, $m, PREG_SET_ORDER ) || count( $m ) < 2 || '' !== trim( (string) preg_replace( '~<h3[^>]*>.*?</h3>\s*.*?(?=<h3[\s>]|$)~su', '', $part ) ) ) {
+		return $content;
+	}
+	$out = '<ul class="oj-modules oj-modules--why oj-modules--pairs">' . "\n";
+	foreach ( $m as $q ) {
+		$text = trim( (string) preg_replace( '~^<p[^>]*>(.*)</p>$~su', '$1', trim( $q[2] ) ) );
+		if ( str_contains( $text, '<p' ) || str_contains( $text, '<h' ) || str_contains( $text, '<ul' ) ) {
+			return $content; // more than one paragraph: better left as it is
+		}
+		$out .= '<li><strong>' . trim( $q[1] ) . '</strong><span>' . $text . '</span></li>' . "\n";
+	}
+	return substr( $content, 0, $start ) . $out . "</ul>\n" . substr( $content, $end );
 }
 
 /**

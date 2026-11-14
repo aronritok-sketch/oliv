@@ -688,3 +688,12 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY
 .entry .oj-group ul:not([class]) li:not([class]):nth-child(n) { --wave: var(--dot); }
 .entry .oj-group > br, .entry .oj-groups > br, .entry .oj-groups > p:empty { display: none; }
 @media (max-width: 640px) { .entry .oj-groups { grid-template-columns: 1fr; } }
+
+/* „ezek nagyon jók a kismamatornánál. Legyen 3 vagy 4 egy sorban, ahogy elfér.”: the nine modules three in a row (3 × 3,
+   never a lone ninth), the dot beside the name and the text under both, so the narrower card still reads well */
+.oj-modules--why { grid-template-columns: repeat(auto-fill, minmax(max(12.5rem, calc((100% - 1.5rem) / 3)), 1fr)); }
+.oj-modules--why li { grid-template-columns: .7rem minmax(0, 1fr); column-gap: .6rem; row-gap: .35rem; padding: 1rem 1.05rem 1.1rem; }
+.oj-modules--why li::before { grid-row: 1; margin-top: .4rem; }
+.oj-modules--why li > span { grid-column: 1 / -1; font-size: .9rem; line-height: 1.5; }
+/* the one-to-one page's „Miben segíthet…?” four questions the same way, two by two („legyen szebben összeszedve”) */
+.oj-modules--pairs { grid-template-columns: repeat(auto-fill, minmax(max(14rem, calc((100% - .75rem) / 2)), 1fr)); }
