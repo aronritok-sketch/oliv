@@ -388,3 +388,12 @@ body .hero__title .hero__l3 { display: block; margin-top: .14em; }
 .ways--five .way { grid-template-rows: auto auto 1fr auto; }
 .way__len { grid-column: 1 / -1; justify-self: start; align-self: end; display: inline-flex; align-items: center; gap: .4rem; margin-top: 1rem; padding: .35rem .85rem .35rem .7rem; border-radius: 999px; background: rgba(255, 255, 255, .6); color: var(--ink); font-weight: 700; font-size: .88rem; line-height: 1.2; }
 .way__len svg { width: 16px; height: 16px; flex: none; }
+
+/* About (Olívia, 14 November: „Rólamnál ez az 5 legyen szebben elosztva”): an odd last box (the fifth area, the third
+   training) takes the whole row, its picture beside the text, so no box stands alone in half a row */
+@media (min-width: 600px) {
+	.oj-areas .oj-area:last-child:nth-child(odd) { grid-column: 1 / -1; grid-template-columns: auto minmax(0, 1fr); column-gap: 1.2rem; align-items: start; }
+	.oj-areas .oj-area:last-child:nth-child(odd) > .picto { grid-row: 1 / span 3; }
+	.oj-areas .oj-area:last-child:nth-child(odd) > :not(.picto) { grid-column: 2; }
+}
+@media (min-width: 700px) { .entry .oj-creds li:last-child:nth-child(odd) { grid-column: 1 / -1; } }

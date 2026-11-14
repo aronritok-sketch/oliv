@@ -2798,8 +2798,10 @@ test( 'online edition, live update: the About page broken up – only while its 
 		$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
 		$new  = $data['pages']['about']['content'];
 		preg_match_all( '~<(?:p|li)>(.*?)</(?:p|li)>~s', $old, $m );
-		$missing = array_filter( $m[1], fn( $x ) => ! str_contains( $new, $x ) );
-		eq( array(), array_values( $missing ), 'every paragraph of the old page is in the new one, word for word (her page-editor changes keep applying)' );
+		// except what she later asked to take out (Olívia's doc, 14 November: the „_replace” pairs with nothing in their place)
+		$out     = array_map( fn( $r ) => (string) preg_replace( '~^<(?:p|li)>|</(?:p|li)>\s*$~', '', $r[0] ), array_filter( $data['pages']['about']['_replace'] ?? array(), fn( $r ) => '' === $r[1] ) );
+		$missing = array_filter( $m[1], fn( $x ) => ! str_contains( $new, $x ) && ! in_array( $x, $out, true ) );
+		eq( array(), array_values( $missing ), 'every paragraph of the old page is in the new one, word for word, but those she asked out (her page-editor changes keep applying)' );
 		foreach ( array( 'oj-chapter', 'oj-float', 'oj-note', 'oj-statement', 'oj-path', 'oj-areas', 'oj-creds', 'oj-places', 'oj-ways', 'oj-secret' ) as $c ) {
 			ok( str_contains( $new, $c ), 'the new page has: ' . $c );
 		}
@@ -2893,7 +2895,9 @@ test( 'online edition, live update: 2018 on her timeline, the kit list for every
 		$about = get_page_by_path( oy_page_slug( 'about' ) );
 		$aid   = $about ? $about->ID : wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Rólam', 'post_name' => oy_page_slug( 'about' ) ) );
 		$home   = '<li><b>Otthon, online</b> a négy fal között kezdtem jógázni, és nem telt el nap gyakorlás nélkül.</li>';
-		wp_update_post( array( 'ID' => $aid, 'post_content' => "<ol>\n" . $pairs[0][0] . "\n" . $li2015 . "\n" . $home . "\n<li><b>Ma</b> élő online órák.</li>\n</ol>" ) );
+		$li2023 = '<li><b>2023</b> hatha jógaoktató lettem (Yoga Alliance International), utána tibeti hangtál- és hangmasszázs-terapeuta.</li>';
+		$gone   = array_column( array_filter( $data['pages']['about']['_replace'], fn( $r ) => '' === $r[1] ), 0 );
+		wp_update_post( array( 'ID' => $aid, 'post_content' => "<ol>\n" . $pairs[0][0] . "\n" . $li2015 . "\n" . $home . "\n" . $li2023 . "\n<li><b>Ma</b> élő online órák.</li>\n</ol>\n" . implode( '', array_slice( $gone, 1 ) ) . '<p>Saját bekezdésem.</p>' ) );
 		$kit    = $data['pages']['schedule-pricing']['_replace'];
 		$prices = get_page_by_path( oy_page_slug( 'schedule-pricing' ) );
 		$pid    = $prices ? $prices->ID : wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Bejelentkezés és árak', 'post_name' => oy_page_slug( 'schedule-pricing' ) ) );
@@ -2917,6 +2921,8 @@ test( 'online edition, live update: 2018 on her timeline, the kit list for every
 		ok( 1 === substr_count( $c, '2018-tól' ), 'About: 2018 (massage) once' );
 		ok( ! str_contains( $c, '19 évesen' ), 'About: „19 évesen” out of the timeline („ezt szedjük ki rólamnál”)' );
 		ok( str_contains( $c, $li2015 . "\n" . $home . "\n" . $li2018 ), 'About: „Otthon, online” between 2015 and 2018, word for word (her edit of it stays)' );
+		ok( str_contains( $c, $li2023 . "\n<li><b>2023–2026</b>" ), 'About: 2023–2026 (her events) after 2023' );
+		ok( ! str_contains( $c, '2023 óta vagyok' ) && ! str_contains( $c, 'Évek személyi edzőként' ) && str_contains( $c, 'Saját bekezdésem.' ), 'About: the two parts she asked out are gone, the rest stays' );
 		$p = get_post_field( 'post_content', $pid );
 		ok( str_contains( $p, $kit[0][1] ) && str_contains( $p, $kit[1][1] ) && str_contains( $p, 'Saját mondatom' ), 'prices page: the kit for every class and „charge it”, her own line stays' );
 		ok( str_contains( get_post_field( 'post_content', $faq ), 'töltsd fel' ), 'the FAQ answer: charge your device' );

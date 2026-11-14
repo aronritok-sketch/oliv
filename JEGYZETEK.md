@@ -299,6 +299,12 @@
   árlistája időtartamonként külön sorban, az 5 alkalmas bérletekkel, jógánál „párban”, kismamatornánál „a barátnőddel”
   (`OYS_Services::pack_price`). Percenkénti figyelés: `scratchpad/watch/watch.sh` (Monitor) a nyilvános doksikat és a
   chatet nézi. Tesztek 1058/0.
+- **Rólam, a doksi 16:40 utáni pontjai (olivia-yoga 3.11.4–3.11.6):** az idővonalról kikerült a „19 évesen”; az
+  „Otthon, online” a 2015 és a 2018 közé került (szó szerint, így a szerkesztős átírása érvényes marad); új pont: „2023–2026
+  megvalósítottam az álmaimat, … jógás eseményt szerveztem …”; kikerült a „2023 óta vagyok jógaoktató…” bekezdés és a
+  képzések negyedik kártyája („Évek személyi edzőként…”, az idővonalon már benne van); az öt terület és a három képzés
+  páratlan utolsó doboza teljes szélességű. Élesen `oy_migrate_1114d` rev i (`_insert` / `_replace`, csak szó szerint
+  egyező szövegen). Tesztek 1062/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
