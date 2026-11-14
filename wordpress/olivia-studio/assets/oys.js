@@ -48,4 +48,19 @@
 		topic.addEventListener('change', sync);
 		sync();
 	});
+
+	/* Gift cards: the chosen one is written above the form, and brought into view (Olívia, 14 November) */
+	document.querySelectorAll('[data-oys-gift-form]').forEach(function (form) {
+		var box = form.querySelector('[data-oys-gift-chosen]');
+		if (!box) return;
+		form.addEventListener('change', function (e) {
+			var r = e.target;
+			if (!r || r.name !== 'product' || !r.checked) return;
+			box.querySelector('[data-gift-name]').textContent = r.getAttribute('data-name') || '';
+			box.querySelector('[data-gift-price]').textContent = r.getAttribute('data-price') || '';
+			box.classList.remove('is-new'); void box.offsetWidth; box.classList.add('is-new');
+			var rect = box.getBoundingClientRect();
+			if (rect.top < 0 || rect.bottom > window.innerHeight) box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+		});
+	});
 })();

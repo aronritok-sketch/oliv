@@ -3032,6 +3032,39 @@ test( 'Olívia\'s doc of 14 November: „legyen extrább, legyél nagyon kreatí
 	}
 } );
 
+test( 'Olívia\'s doc of 14 November, evening: class types as tags in the kit answer, the gift cards soft and in groups with the chosen one shown, a long title beside its photo, „Rólam” in the footer, every article on one page', function () {
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		$html = oy_faq_tags( "<p>Jóga: jógaszőnyeg.</p>\n<p>Kismamatorna: labda.</p>\n<p>Ha: Nap ☼</p>" );
+		ok( str_contains( $html, '<span class="oj-faq-tag oj-faq-tag--lilac">Jóga</span>jógaszőnyeg.' ) && str_contains( $html, 'oj-faq-tag--sage">Kismamatorna</span>' ), 'the kit answer: each class type as a tag in its colour' );
+		ok( str_contains( $html, '<p>Ha: Nap' ), '… other answers untouched' );
+		ok( str_contains( oy_page_head( 'Ajándékutalvány', '', array(), 'gifts' ), 'page-head--word' ) && ! str_contains( oy_page_head( 'Rólam', '', array(), 'about' ), 'page-head--word' ), 'one long word in a title: smaller, beside the photo' );
+		eq( 'About me', oy_brand( 'about' ), 'footer: „Rólam”' );
+		$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+		eq( 'olivia-sunlit-portrait', $data['studio_pages']['gifts']['photo'], 'the gift card page: her photo, not the singing bowls' );
+		$fn = (string) file_get_contents( get_template_directory() . '/functions.php' );
+		ok( str_contains( $fn, "\$q->set( 'nopaging', true );" ), 'Jógáról: every article on one page' );
+		ok( str_contains( (string) file_get_contents( get_template_directory() . '/home.php' ), 'array_merge( array_values( array_filter( $all' ), '… the eight limbs at the end' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+	$keep_s = get_option( 'oys_services' );
+	update_option( 'oys_services', array( 'prenatal' => array( 'label' => 'Online kismamatorna', 'class' => 'kismamatorna' ) ) );
+	$groups = OYS_Frontend::gift_groups( array(
+		array( 'id' => 'a', 'name' => 'Jegy', 'kind' => 'online_pack', 'price_cents' => 300000 ),
+		array( 'id' => 'b', 'name' => 'Kismama', 'kind' => 'private_single', 'service' => 'prenatal', 'price_cents' => 800000 ),
+		array( 'id' => 'c', 'name' => 'Valami', 'kind' => 'membership', 'price_cents' => 100 ),
+		array( 'id' => 'd', 'name' => 'Bérlet', 'kind' => 'online_pack', 'price_cents' => 1300000 ),
+	) );
+	false === $keep_s ? delete_option( 'oys_services' ) : update_option( 'oys_services', $keep_s );
+	eq( array( 'group', 'prenatal', 'other' ), array_keys( $groups ), 'gift cards: in groups by what they are for, the rest last' );
+	eq( 'Online kismamatorna', $groups['prenatal']['label'], '… each one-to-one service under its own name' );
+	eq( 2, count( $groups['group']['items'] ), '… the group yoga ones together' );
+	$css = (string) file_get_contents( OYS_DIR . 'assets/oys.css' );
+	ok( ! str_contains( $css, 'box-shadow: 6px 6px 0 var(--oys-ink)' ) && str_contains( $css, '.oys-gift-chosen {' ), '… softer, and the chosen one is shown above the form' );
+	ok( str_contains( (string) file_get_contents( OYS_DIR . 'assets/oys.js' ), '[data-oys-gift-chosen]' ), '… updated when another is chosen' );
+} );
+
 test( 'Olívia\'s doc of 14 November: the side column is never cut off while scrolling; her two training photos in one line', function () {
 	$css = (string) file_get_contents( get_template_directory() . '/assets/site.css' );
 	ok( (bool) preg_match( '/\.aside-sticky \{ position: sticky; top: calc\(var\(--header-h\) \+ 24px\); align-self: start; \}/', $css ) && ! str_contains( $css, 'scrollbar-width: none' ), 'the side column: no hidden inner scroll that cuts its bottom off' );

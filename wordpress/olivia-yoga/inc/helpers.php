@@ -403,6 +403,8 @@ function oy_crumbs( array $trail ) {
 function oy_page_head( $h1, $lead, array $trail, $seed, $meta = '', $photo = '' ) {
 	$tone = oy_accent_for( $seed );
 	$size = mb_strlen( $h1 ) > 34 ? ' page-head--long' : '';
+	// one long word („Ajándékutalvány”) cannot break: smaller, so it never runs into the photo (Olívia, 14 November)
+	$size .= max( array_map( 'mb_strlen', preg_split( '/\s+/u', $h1 ) ?: array( '' ) ) ) >= 13 ? ' page-head--word' : '';
 	$lead = $lead ? '<p class="lead">' . esc_html( $lead ) . '</p>' : '';
 	$text = '<div class="page-head__text">' . oy_crumbs( $trail ) . '<h1>' . esc_html( $h1 ) . '</h1>' . $lead . $meta . '</div>';
 	if ( $photo ) {

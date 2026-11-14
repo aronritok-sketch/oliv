@@ -1856,3 +1856,6 @@ msgstr "Valós időben vezetlek. Az óra után a chat nyitva marad, és a csopor
 
 msgid "Only the group class can be watched again, and only I am on the recording, nobody else: if you missed it, or would like to do it again, it is waiting in your account."
 msgstr "Csak a csoportos óra nézhető vissza, és a felvételen csak én szerepelek, más nem: ha lemaradtál, vagy újra csinálnád, a fiókodban megtalálod."
+
+msgid "About me"
+msgstr "Rólam"

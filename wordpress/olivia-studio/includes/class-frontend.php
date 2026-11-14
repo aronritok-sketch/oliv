@@ -1581,28 +1581,72 @@ class OYS_Frontend {
 	   Gift cards and private request (standalone shortcodes)
 	   ====================================================================== */
 
+	/**
+	 * The gift cards by what they are for, softer and alike (Olívia, 14 November: „ezek nagyon erősek … legyen lágyabb,
+	 * egységesebb és ne ömlesztve legyen hanem kategorizálva”): group yoga, then each one-to-one service.
+	 */
+	public static function gift_groups( array $gifts ) {
+		$groups = array();
+		foreach ( $gifts as $p ) {
+			$service = ! empty( $p['service'] ) ? OYS_Services::get( $p['service'] ) : null;
+			if ( 'online_pack' === ( $p['kind'] ?? '' ) || 'class_pack' === ( $p['kind'] ?? '' ) ) {
+				$key   = 'group';
+				$label = __( 'Group yoga', 'olivia-studio' );
+			} elseif ( $service ) {
+				$key   = $service['key'];
+				$label = oys_t( $service['label'] );
+			} else {
+				$key   = 'other';
+				$label = __( 'More gifts', 'olivia-studio' );
+			}
+			$groups[ $key ]['label']   = $label;
+			$groups[ $key ]['items'][] = $p;
+		}
+		if ( isset( $groups['other'] ) ) { // the ones without a group last
+			$other = $groups['other'];
+			unset( $groups['other'] );
+			$groups['other'] = $other;
+		}
+		return $groups;
+	}
+
+	private static function gift_grid( array $gifts, $choose ) {
+		$tones = array( 'lilac', 'pink', 'sage', 'sun' );
+		$out   = '<div class="oys-gift-groups">';
+		$n     = 0;
+		$first = true;
+		foreach ( self::gift_groups( $gifts ) as $g ) {
+			$out .= '<section class="oys-gift-group oys-gift-group--' . $tones[ $n++ % 4 ] . '"><h3 class="oys-gift-group__title">' . esc_html( $g['label'] ) . '</h3><div class="oys-gifts' . ( $choose ? '' : ' oys-gifts--preview' ) . '">';
+			foreach ( $g['items'] as $p ) {
+				$card = '<span class="oys-gift__card"><span class="oys-gift__name">' . esc_html( $p['name'] ) . '</span><span class="oys-gift__price">' . esc_html( oys_money( $p['price_cents'] ) ) . '</span>'
+					. ( $choose ? '<span class="oys-gift__tick" aria-hidden="true">' . oys_icon( 'check' ) . '</span>' : '' ) . '</span>';
+				$out .= $choose
+					? '<label class="oys-gift"><input type="radio" name="product" value="' . esc_attr( $p['id'] ) . '" data-name="' . esc_attr( $p['name'] ) . '" data-price="' . esc_attr( oys_money( $p['price_cents'] ) ) . '"' . checked( $first, true, false ) . '>' . $card . '</label>'
+					: '<div class="oys-gift">' . $card . '</div>';
+				$first = false;
+			}
+			$out .= '</div></section>';
+		}
+		return $out . '</div>';
+	}
+
 	public static function sc_gift_cards() {
 		$flash = oys_render_flash();
-		$gifts = OYS_Products::giftable();
+		$gifts = array_values( OYS_Products::giftable() );
 		if ( ! $gifts ) {
 			return $flash;
 		}
-		$cards = '<div class="oys-gifts">';
-		$first = true;
-		foreach ( $gifts as $p ) {
-			$cards .= '<label class="oys-gift"><input type="radio" name="product" value="' . esc_attr( $p['id'] ) . '"' . checked( $first, true, false ) . '><span class="oys-gift__card"><span class="kicker">' . esc_html__( 'Gift card', 'olivia-studio' ) . '</span><b>' . esc_html( $p['name'] ) . '</b><span class="oys-gift__price">' . esc_html( oys_money( $p['price_cents'] ) ) . '</span></span></label>';
-			$first  = false;
-		}
-		$cards .= '</div>';
 		if ( ! is_user_logged_in() ) {
-			return $flash . '<div class="oys-gifts oys-gifts--preview">' . implode( '', array_map( fn( $p ) => '<div class="oys-gift"><span class="oys-gift__card"><span class="kicker">' . esc_html__( 'Gift card', 'olivia-studio' ) . '</span><b>' . esc_html( $p['name'] ) . '</b><span class="oys-gift__price">' . esc_html( oys_money( $p['price_cents'] ) ) . '</span></span></div>', $gifts ) ) . '</div>'
+			return $flash . self::gift_grid( $gifts, false )
 				. self::auth_block( oys_page_url( 'gifts' ), __( 'Log in or create an account to buy a gift card. Your receipt and the gift code are kept there.', 'olivia-studio' ) );
 		}
 		if ( ! OYS_Settings::payments_ready() ) {
-			return $flash . $cards . '<p class="oys-notice">' . esc_html__( 'Online gift cards are coming soon. Send a message to order one now.', 'olivia-studio' ) . '</p>';
+			return $flash . self::gift_grid( $gifts, false ) . '<p class="oys-notice">' . esc_html__( 'Online gift cards are coming soon. Send a message to order one now.', 'olivia-studio' ) . '</p>';
 		}
-		return $flash . self::form_open( 'oys_gift_buy', 'class="oys-form"' ) . '<fieldset><legend class="kicker">' . esc_html__( 'Choose a gift', 'olivia-studio' ) . '</legend>' . $cards . '</fieldset>'
-			. '<div class="oys-card"><div class="form__row"><label class="field"><span>' . esc_html__( 'Recipient\'s name', 'olivia-studio' ) . '</span><input type="text" name="recipient_name" id="oys-g-name" required></label>'
+		// „ha rányomok, hogy melyiket választottam, utána jelenjen meg itt, hogy lássa”: the chosen one above the form
+		$chosen = '<div class="oys-gift-chosen" data-oys-gift-chosen aria-live="polite">' . oys_icon( 'gift' ) . '<span><span class="oys-gift-chosen__label">' . esc_html__( 'Your gift:', 'olivia-studio' ) . '</span> <b data-gift-name>' . esc_html( $gifts[0]['name'] ) . '</b> <span class="oys-gift-chosen__price" data-gift-price>' . esc_html( oys_money( $gifts[0]['price_cents'] ) ) . '</span></span></div>';
+		return $flash . self::form_open( 'oys_gift_buy', 'class="oys-form" data-oys-gift-form' ) . '<fieldset><legend class="kicker">' . esc_html__( 'Choose a gift', 'olivia-studio' ) . '</legend>' . self::gift_grid( $gifts, true ) . '</fieldset>'
+			. '<div class="oys-card">' . $chosen . '<div class="form__row"><label class="field"><span>' . esc_html__( 'Recipient\'s name', 'olivia-studio' ) . '</span><input type="text" name="recipient_name" id="oys-g-name" required></label>'
 			. '<label class="field"><span>' . esc_html__( 'Recipient\'s email', 'olivia-studio' ) . '</span><input type="email" name="recipient_email" id="oys-g-email" required></label></div>'
 			. '<label class="field"><span>' . esc_html__( 'Personal message (optional)', 'olivia-studio' ) . '</span><textarea name="message" id="oys-g-msg" rows="3"></textarea></label>'
 			. '<button class="btn btn--primary" type="submit">' . esc_html__( 'Continue to payment', 'olivia-studio' ) . '</button>' . self::terms_note()

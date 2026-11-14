@@ -6068,3 +6068,12 @@ msgid "You can watch this class again for %d day: the recording (only the teache
 msgid_plural "You can watch this class again for %d days: the recording (only the teacher is on it) waits in your account."
 msgstr[0] "Ezt a csoportos órát %d napig visszanézheted a fiókodban. A felvételen csak az oktató szerepel, más résztvevő nem."
 msgstr[1] "Ezt a csoportos órát %d napig visszanézheted a fiókodban. A felvételen csak az oktató szerepel, más résztvevő nem."
+
+msgid "Group yoga"
+msgstr "Csoportos jóga"
+
+msgid "More gifts"
+msgstr "További ajándékok"
+
+msgid "Your gift:"
+msgstr "A választott ajándék:"

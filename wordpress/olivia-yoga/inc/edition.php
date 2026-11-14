@@ -151,8 +151,9 @@ function oy_brand( $key ) {
 		case 'hathaflow/about':
 			return __( 'About the studio', 'olivia-yoga' );
 		case 'fort-myers/about':
-		case 'hu-online/about':
 			return __( 'About Olivia', 'olivia-yoga' );
+		case 'hu-online/about':
+			return __( 'About me', 'olivia-yoga' ); // Olívia, 14 November: „footerben ez legyen inkább Rólam”
 	}
 	return '';
 }

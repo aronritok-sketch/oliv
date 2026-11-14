@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OY_VERSION', '3.11.17' );
+define( 'OY_VERSION', '3.11.18' );
 
 require_once get_template_directory() . '/inc/edition.php';
 
@@ -50,8 +50,15 @@ add_filter( 'oys_pricing_groups', function ( $g ) {
 	return $g;
 } );
 // „Jógáról”: the eight limbs of yoga stand together at the top of the first page, so the list below leaves them out
+// Olívia, 14 November (online): „összes írásnál … a 8 ág legyen a végén és ne lapozós legyen, hanem a jelenlegi összes cikk
+// jelenjen meg egy oldalon” – there every article is on one page, the eight limbs last (home.php puts them in order)
 add_action( 'pre_get_posts', function ( $q ) {
 	if ( ! is_admin() && $q->is_main_query() && $q->is_home() ) {
+		if ( oy_online_only() ) {
+			$q->set( 'posts_per_page', -1 );
+			$q->set( 'nopaging', true );
+			return;
+		}
 		$term = get_term_by( 'slug', OY_LIMBS_CATEGORY, 'category' );
 		if ( $term ) {
 			$q->set( 'category__not_in', array( (int) $term->term_id ) );

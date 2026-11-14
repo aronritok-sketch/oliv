@@ -1237,3 +1237,6 @@ msgstr "Te guío en tiempo real. Después, el chat de la clase sigue abierto, y 
 
 msgid "Only the group class can be watched again, and only I am on the recording, nobody else: if you missed it, or would like to do it again, it is waiting in your account."
 msgstr "Solo la clase grupal se puede volver a ver, y en la grabación solo salgo yo, nadie más: si te la perdiste o quieres repetirla, te espera en tu cuenta."
+
+msgid "About me"
+msgstr "Sobre mí"

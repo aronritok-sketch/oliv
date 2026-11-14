@@ -249,7 +249,7 @@ function oy_import_all( $refresh = false ) {
 			wp_update_post( wp_slash( array_filter( array( 'ID' => $pg->ID, 'post_title' => $own['title'] ?? '', 'post_name' => $own['slug'] ?? '', 'post_content' => $own['content'] ?? '' ) ) ) );
 		}
 		if ( $refresh || ! has_post_thumbnail( $pg ) ) {
-			set_post_thumbnail( $pg, oy_import_image( OY_PAGE_PHOTO[ $slug ] ) );
+			set_post_thumbnail( $pg, oy_import_image( $own['photo'] ?? OY_PAGE_PHOTO[ $slug ] ) );
 		}
 	}
 	update_option( 'show_on_front', 'page' );
@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-14o';
+	$rev = '2026-11-14p';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1094,6 +1094,18 @@ function oy_migrate_1114d() {
 		foreach ( get_posts( array( 'post_type' => 'oy_faq', 'post_status' => array( 'publish', 'draft', 'pending', 'private' ), 'numberposts' => -1, 'title' => $f['q'] ) ) as $faq ) {
 			if ( $faq->post_title === $f['q'] && wp_trash_post( $faq->ID ) ) {
 				$log[] = 'FAQ removed: ' . $f['q'];
+			}
+		}
+	}
+	// the gift card page („a kép is legyen más”): her photo instead of the singing bowls, only while the bowls are still there
+	$gift_photo = (string) ( $data['studio_pages']['gifts']['photo'] ?? '' );
+	$gift_page  = get_post( (int) get_option( 'oys_page_gifts' ) );
+	if ( '' !== $gift_photo && $gift_page ) {
+		$thumb = (int) get_post_thumbnail_id( $gift_page );
+		if ( ! $thumb || 'singing-bowls-studio' === get_post_meta( $thumb, 'oy_key', true ) ) {
+			$att = oy_import_image( $gift_photo );
+			if ( $att && set_post_thumbnail( $gift_page, $att ) ) {
+				$log[] = 'gift card page: new photo';
 			}
 		}
 	}

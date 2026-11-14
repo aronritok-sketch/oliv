@@ -437,7 +437,8 @@
 		"gifts": {
 			"title": "Ajándékutalvány",
 			"slug": "ajandekutalvany",
-			"content": "<p>Ajándékozz online jóga bérletet, egyéni órát vagy online kismamatornát. Az ajándékutalványt e-mailben kapja meg az, akinek szánod, egy kóddal, amit a fiókjában vált be.</p>\n[oys_gift_cards]"
+			"content": "<p>Ajándékozz online jóga bérletet, egyéni órát vagy online kismamatornát. Az ajándékutalványt e-mailben kapja meg az, akinek szánod, egy kóddal, amit a fiókjában vált be.</p>\n[oys_gift_cards]",
+			"photo": "olivia-sunlit-portrait"
 		}
 	},
 	"pages": {

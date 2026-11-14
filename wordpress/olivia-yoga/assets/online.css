@@ -512,3 +512,15 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY
 .oj-more__list li:hover { transform: translateX(5px); background: #fff; }
 .oj-more__card .oj-more__meta { align-self: flex-start; display: inline-flex; align-items: center; gap: .45rem; margin-top: 1.2rem !important; padding: .5rem 1.05rem .5rem .85rem; border-radius: 999px; background: var(--orchid); color: #fff; font-size: .9rem; transform: rotate(-1.5deg); }
 .oj-more__meta svg { width: 16px; height: 16px; }
+
+/* The kit answer: each class type as a small tag in its colour („Itt az óratípusok legyenek valahogy kiemelve”) */
+.oj-faq-tag { display: inline-block; margin: 0 .55rem .2rem 0; padding: .18rem .75rem .2rem; border-radius: 999px; background: var(--lilac-soft); color: var(--ink); font-weight: 700; font-size: .86rem; letter-spacing: .02em; line-height: 1.5; vertical-align: .08em; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--lilac) 70%, transparent); }
+.oj-faq-tag--sage { background: var(--sage-soft); box-shadow: inset 0 0 0 1px var(--sage); }
+.oj-faq-tag--sun { background: var(--sun-soft); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--sun) 55%, transparent); }
+.oj-faq-tag--pink { background: var(--pink-soft); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--pink) 55%, transparent); }
+
+/* Home FAQ: the heading scrolls with its questions, never left half under the header („levágódik a teteje”) */
+.faq-grid .section__head { position: static !important; }
+
+/* A title that is one long word („Ajándékutalvány”) stays beside the photo */
+.page-head--word h1 { max-width: none; font-size: clamp(2.4rem, 1rem + 4.2vw, 4.6rem); overflow-wrap: anywhere; }

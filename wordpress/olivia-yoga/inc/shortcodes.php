@@ -14,6 +14,22 @@ function oy_figure( $key, $cls = '' ) {
 	return '' === $img ? '' : '<figure class="oj-figure ' . esc_attr( $cls ) . '"><div class="frame">' . $img . '</div></figure>';
 }
 
+/**
+ * A paragraph of an answer that starts with a class type („Jóga: …”, „Kismamatorna: …”) gets that type as a small tag in
+ * its colour (Olívia, 14 November: „Itt az óratípusok legyenek valahogy kiemelve”). Online edition only.
+ */
+function oy_faq_tags( $html ) {
+	if ( ! oy_online_only() ) {
+		return $html;
+	}
+	$tones = array( 'Jóga' => 'lilac', 'Kismamatorna' => 'sage', 'Stretching és mobilizáció' => 'sun', 'Relaxáció és légzés' => 'pink' );
+	return (string) preg_replace_callback(
+		'~<p>(' . implode( '|', array_map( fn( $k ) => preg_quote( $k, '~' ), array_keys( $tones ) ) ) . '):\s*~u',
+		fn( $m ) => '<p class="oj-typed"><span class="oj-faq-tag oj-faq-tag--' . $tones[ $m[1] ] . '">' . esc_html( $m[1] ) . '</span>',
+		$html
+	);
+}
+
 function oy_classes_list( $exclude = '' ) {
 	$rows = '';
 	$n    = 0;
@@ -42,7 +58,7 @@ function oy_faq_list( $home_only = false ) {
 	}
 	$out = '<div class="faq">';
 	foreach ( get_posts( $args ) as $i => $f ) {
-		$out .= '<details' . ( 0 === $i ? ' open' : '' ) . '><summary><span>' . esc_html( get_the_title( $f ) ) . '</span>' . oy_icon( 'plus' ) . '</summary><div class="answer">' . wpautop( wp_kses_post( oy_post_content( $f ) ) ) . '</div></details>';
+		$out .= '<details' . ( 0 === $i ? ' open' : '' ) . '><summary><span>' . esc_html( get_the_title( $f ) ) . '</span>' . oy_icon( 'plus' ) . '</summary><div class="answer">' . oy_faq_tags( wpautop( wp_kses_post( oy_post_content( $f ) ) ) ) . '</div></details>';
 	}
 	return $out . '</div>';
 }

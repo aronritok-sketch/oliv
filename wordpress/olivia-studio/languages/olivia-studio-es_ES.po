@@ -4067,3 +4067,12 @@ msgid "You can watch this class again for %d day: the recording (only the teache
 msgid_plural "You can watch this class again for %d days: the recording (only the teacher is on it) waits in your account."
 msgstr[0] "Puedes volver a ver esta clase durante %d día: la grabación (solo sale la profesora) te espera en tu cuenta."
 msgstr[1] "Puedes volver a ver esta clase durante %d días: la grabación (solo sale la profesora) te espera en tu cuenta."
+
+msgid "Group yoga"
+msgstr "Yoga en grupo"
+
+msgid "More gifts"
+msgstr "Más regalos"
+
+msgid "Your gift:"
+msgstr "Tu regalo:"

@@ -117,17 +117,6 @@
 /* Gift cards */
 .oys-form fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
 .oys-form fieldset > legend { padding: 0; }
-.oys-gifts { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); margin: .8rem 0 1.5rem; }
-.oys-gift { position: relative; display: block; cursor: pointer; }
-.oys-gift input { position: absolute; opacity: 0; }
-.oys-gift__card { display: grid; gap: .4rem; min-height: 170px; align-content: space-between; padding: 1.2rem; border: 2px solid var(--oys-ink); border-radius: 10px; background: var(--oys-pink); color: var(--oys-ink); transition: transform .2s, box-shadow .2s; }
-.oys-gift:nth-child(3n+2) .oys-gift__card { background: var(--oys-lilac); }
-.oys-gift:nth-child(3n+3) .oys-gift__card { background: var(--oys-sun); }
-.oys-gift__card b { font-size: 1.15rem; }
-.oys-gift__price { font-family: var(--f-display, sans-serif); font-size: 2.6rem; line-height: 1; }
-.oys-gift input:checked + .oys-gift__card { box-shadow: 6px 6px 0 var(--oys-ink); transform: translate(-3px, -3px); }
-.oys-gift input:focus-visible + .oys-gift__card { outline: 3px solid var(--oys-orchid); outline-offset: 3px; }
-.oys-gifts--preview .oys-gift { cursor: default; }
 
 /* Guests */
 .oys-guests { border: 1.5px dashed var(--oys-ink); border-radius: 6px; padding: .9rem 1rem 1rem; margin: 1rem 0; display: grid; gap: .7rem; }
@@ -367,3 +356,31 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 .oys-private-box__list a { color: inherit; text-decoration: none; }
 .oys-private-box__list a:hover { text-decoration: underline; }
 .oys-private-box .btn { flex: none; }
+
+/* Gift cards: soft and alike, in groups by what they are for; the chosen one above the form (Olívia, 14 November) */
+.oys-gift-groups { display: grid; gap: 1.7rem; margin: .7rem 0 1.6rem; }
+.oys-gift-group { --g-bg: #F7F1FE; --g-line: #E3D4F7; --g-dot: var(--oys-lilac); }
+.oys-gift-group--pink { --g-bg: #FFF2F8; --g-line: #FAD3E5; --g-dot: var(--oys-pink); }
+.oys-gift-group--sage { --g-bg: #F2F6EF; --g-line: #D6E2CF; --g-dot: #8FB088; }
+.oys-gift-group--sun { --g-bg: #FFF4EB; --g-line: #FADBC3; --g-dot: var(--oys-sun); }
+.oys-gift-group__title { display: flex; align-items: center; gap: .6rem; margin: 0 0 .75rem; font-size: 1.1rem; line-height: 1.3; }
+.oys-gift-group__title::before { content: ""; flex: none; width: 12px; height: 12px; border-radius: 50%; background: var(--g-dot); box-shadow: 0 0 0 4px var(--g-bg); }
+.oys-gifts { display: grid; gap: .8rem; grid-template-columns: repeat(auto-fill, minmax(205px, 1fr)); margin: 0; }
+.oys-gift { position: relative; display: block; cursor: pointer; }
+.oys-gift input { position: absolute; opacity: 0; }
+.oys-gift__card { position: relative; display: grid; gap: .55rem; align-content: space-between; height: 100%; padding: 1rem 1.1rem 1.05rem; border: 1px solid var(--g-line); border-radius: 16px; background: var(--g-bg); color: var(--oys-ink); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease, background .2s ease; }
+.oys-gift__name { font-weight: 600; font-size: .98rem; line-height: 1.35; padding-right: 1.8rem; }
+.oys-gift__price { font-family: var(--f-display, sans-serif); font-size: 1.75rem; line-height: 1; }
+.oys-gift__tick { position: absolute; top: .75rem; right: .75rem; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--g-line); background: #fff; color: #fff; }
+.oys-gift__tick .oys-icon { width: 14px; height: 14px; }
+.oys-gift:hover .oys-gift__card { transform: translateY(-2px); box-shadow: 0 12px 22px -18px rgba(18, 35, 26, .55); }
+.oys-gift input:checked + .oys-gift__card { border-color: var(--oys-orchid); background: #fff; box-shadow: 0 0 0 1.5px var(--oys-orchid), 0 14px 26px -20px rgba(217, 43, 134, .9); transform: none; }
+.oys-gift input:checked + .oys-gift__card .oys-gift__tick { background: var(--oys-orchid); border-color: var(--oys-orchid); }
+.oys-gift input:focus-visible + .oys-gift__card { outline: 3px solid var(--oys-orchid); outline-offset: 3px; }
+.oys-gifts--preview .oys-gift { cursor: default; }
+.oys-gift-chosen { display: flex; align-items: center; gap: .7rem; margin: 0 0 1.2rem; padding: .85rem 1.1rem; border-radius: 12px; background: #FFF2F8; box-shadow: inset 4px 0 0 var(--oys-orchid); line-height: 1.4; }
+.oys-gift-chosen .oys-icon { width: 22px; height: 22px; flex: none; color: var(--oys-orchid); }
+.oys-gift-chosen__label { color: var(--oys-muted); }
+.oys-gift-chosen__price { font-weight: 700; color: var(--oys-orchid); white-space: nowrap; }
+.oys-gift-chosen.is-new { animation: oys-chosen .7s ease; }
+@keyframes oys-chosen { 0% { background: #FCD3E6; } 100% { background: #FFF2F8; } }
