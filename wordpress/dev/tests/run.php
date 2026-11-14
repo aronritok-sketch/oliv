@@ -3381,6 +3381,14 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	update_option( 'oy_edition', 'fort-myers' );
 	ok( ! str_contains( $fr, esc_html__( 'One-to-one sessions for a stiff body and an overloaded mind.', 'olivia-yoga' ) ), 'the line under „Stretching, relaxáció és légzés” is gone („Ezt szedjük ki”)' );
 	ok( ! str_contains( $fr, 'oj-only-me' ), 'the home page: no „A képedet csak én látom” badge („szedjük ki mindenhonnan”)' );
+	$p_pren = strpos( $fr, 'id="kismamatorna"' );
+	$p_priv = strpos( $fr, 'id="egyeni"' );
+	ok( false !== $p_pren && false !== $p_priv && $p_pren < $p_priv, 'home: the prenatal block comes before the one-to-one block („az egyéni online jógaórát és a kismamatornát a főoldalon cseréljük meg”)' );
+	ok( str_contains( $fr, '<section class="section section--pale oj-prenatal"' ) && str_contains( $fr, '<section class="section oj-private"' ), '… each block keeps its own background (the green card of the one-to-one block stays on the light one)' );
+	$w_pren = strpos( $fr, esc_html__( 'Prenatal fitness online', 'olivia-yoga' ) . '</h3>' );
+	$w_priv = strpos( $fr, esc_html__( 'Individual online yoga', 'olivia-yoga' ) . '</h3>' );
+	ok( false !== $w_pren && false !== $w_priv && $w_pren < $w_priv, '… and the boxes at the top in the same order' );
+	ok( preg_match( '/prefers-reduced-motion: no-preference\) \{[^@]*\.hatha__orb--sun \{ animation: oj-sun-glow/', $oc2 ) && str_contains( $oc2, '@keyframes oj-sun-glow' ) && str_contains( $oc2, '@keyframes oj-moon-phase' ), 'Ha–Tha: the sun glows, the moon changes phase, only for those who allow motion („legyen animálva”)' );
 	$ft = (string) file_get_contents( get_template_directory() . '/footer.php' );
 	ok( str_contains( $ft, '<a href="https://aronritok.com/">Ritók-Filip Áron</a>' ) && ! str_contains( $ft, '>HelloProVision</a>' ), 'online footer: made by Áron, linked to his own page („itt Áron neve legyen és Áron egyéni oldala legyen belinkelve”)' );
 	update_option( 'oy_edition', 'hu-online' );

@@ -814,3 +814,26 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 	#intro .prose > p:not(.btn-row):nth-of-type(3) { transition-delay: 0s, 0s, .24s; }
 	#intro .prose > p:not(.btn-row):nth-of-type(4) { transition-delay: 0s, 0s, .36s; }
 }
+
+/* „legyen animálva” (Ha – Tha): the sun rises into place and glows, the moon slides in and its crescent slowly waxes and
+   wanes – calm, like a breath; nothing moves for those who asked their device for less motion */
+@media (prefers-reduced-motion: no-preference) {
+	.hatha__orb--sun { animation: oj-sun-glow 5.5s ease-in-out infinite; }
+	.hatha__orb--moon::before { animation: oj-moon-phase 11s ease-in-out infinite; }
+	.hatha [data-reveal] .hatha__orb { transition: transform 1.1s cubic-bezier(.2, .8, .2, 1), opacity 1.1s ease; }
+	.hatha [data-reveal]:not(.is-in):not(.is-visible) .hatha__orb--sun { opacity: 0; transform: translateY(48px) scale(.9); }
+	.hatha [data-reveal]:not(.is-in):not(.is-visible) .hatha__orb--moon { opacity: 0; transform: translateX(40px); }
+	.hatha [data-reveal] .hatha__orb--moon { transition-delay: .25s; }
+	.hatha__orb span { transition: opacity .9s ease .5s, letter-spacing .9s ease .5s; }
+	.hatha [data-reveal]:not(.is-in):not(.is-visible) .hatha__orb span { opacity: 0; letter-spacing: .12em; }
+	.hatha__pair:hover .hatha__orb--sun { animation-duration: 2.6s; }
+	.hatha__pair:hover .hatha__orb--moon::before { animation-duration: 5s; }
+}
+@keyframes oj-sun-glow {
+	0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--sun) 40%, transparent), 0 0 40px 0 color-mix(in srgb, var(--sun) 35%, transparent); }
+	50% { box-shadow: 0 0 0 14px color-mix(in srgb, var(--sun) 16%, transparent), 0 0 70px 10px color-mix(in srgb, var(--sun) 30%, transparent); }
+}
+@keyframes oj-moon-phase {
+	0%, 100% { clip-path: circle(50% at 22% 50%); }
+	50% { clip-path: circle(50% at 12% 50%); }
+}

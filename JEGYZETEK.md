@@ -397,6 +397,9 @@
   mindenki látja mindenkit (live.js `seesEveryone()`), nagy órán csak az oktató. A felvételen továbbra is csak Olívia. Tesztek 1239/0.
 - **3.11.51:** a lábléc készítő-sora „Készítette: Ritók-Filip Áron”, az aronritok.com-ra linkelve (Olívia kérése; Áron 11.15-én
   engedélyezte: „Csinálj meg mindent az élesbe”; a tudásbázisban kivételként rögzítve). Tesztek 1240/0.
+- **3.11.52:** a főoldali Ha–Tha kép mozog: a Nap lassan izzik, a Hold fázist vált, és görgetéskor beúsznak (Olívia:
+  „legyen animálva”; aki a rendszerében kikapcsolta a mozgást, annak áll). A főoldalon a kismamatorna került az egyéni
+  jóga elé, a blokkokban és a felső dobozokban is („az egyéni online jógaórát és a kismamatornát a főoldalon cseréljük meg”).
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

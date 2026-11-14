@@ -10,10 +10,11 @@
 defined( 'ABSPATH' ) || exit;
 
 $studio = fn( $sc ) => shortcode_exists( $sc ) ? do_shortcode( '[' . $sc . ']' ) : '';
+// Olívia, 14 November: „az egyéni online jógaórát és a kismamatornát a főoldalon cseréljük meg” – prenatal before one-to-one, here and in the blocks below
 $ways   = array(
 	array( __( 'Group online flow yoga', 'olivia-yoga' ), __( 'Every Wednesday, 18:30 to 20:00, live. Beginners welcome.', 'olivia-yoga' ), oy_class_url( 'hatha-flow' ), 'group', 'lilac', 'hatha-flow' ),
-	array( __( 'Individual online yoga', 'olivia-yoga' ), __( 'One-to-one on video: for a sore back, for stress, or to learn yoga from the basics.', 'olivia-yoga' ), oy_class_url( 'egyeni-online-joga' ), 'home', 'pink', 'egyeni-online-joga' ),
 	array( __( 'Prenatal fitness online', 'olivia-yoga' ), __( 'One-to-one or with a friend: breathing, pelvic floor, circulation, cardio, strength, spine, mobility, yoga and relaxation, combined for your trimester.', 'olivia-yoga' ), oy_class_url( oy_prenatal_slug() ), 'prenatal', 'sage', oy_prenatal_slug() ),
+	array( __( 'Individual online yoga', 'olivia-yoga' ), __( 'One-to-one on video: for a sore back, for stress, or to learn yoga from the basics.', 'olivia-yoga' ), oy_class_url( 'egyeni-online-joga' ), 'home', 'pink', 'egyeni-online-joga' ),
 	array( __( 'Stretching & mobility', 'olivia-yoga' ), __( 'One-to-one stretching and mobility work for a stiff hip, shoulder and spine, at your own pace.', 'olivia-yoga' ), oy_class_url( 'stretching' ), 'mobility', 'sun', 'stretching' ),
 	array( __( 'Relaxation & breathing', 'olivia-yoga' ), __( 'Half an hour of breathing and guided relaxation for an overloaded nervous system, even at the end of a long day.', 'olivia-yoga' ), oy_class_url( 'relaxacio-legzes' ), 'lotus', 'lilac', 'relaxacio-legzes' ),
 );
@@ -144,6 +145,23 @@ $more     = array(
 	array( 'lotus', 'lilac', __( 'Relaxation and breathing', 'olivia-yoga' ), __( 'Half an hour that is only about calming down: breathing exercises, gentle stretches and guided relaxation for an overloaded nervous system.', 'olivia-yoga' ), array( __( 'if you are stressed and find it hard to switch off', 'olivia-yoga' ), __( 'if you find it hard to fall asleep', 'olivia-yoga' ), __( 'to learn how to calm yourself in a few minutes', 'olivia-yoga' ) ), __( 'Cheaper as a pair', 'olivia-yoga' ), 'relaxacio-legzes' ),
 );
 ?>
+<?php // Olívia, 14 November: „az egyéni online jógaórát és a kismamatornát a főoldalon cseréljük meg” – the prenatal block first, the one-to-one block under it, each with its own background as before (the green card would melt into the pale green) ?>
+<section class="section section--pale oj-prenatal" id="kismamatorna" aria-labelledby="prenatal-title"><div class="container">
+	<div class="oj-split oj-split--flip">
+		<div class="oj-split__text" data-reveal>
+			<?php echo oy_kicker( __( 'Prenatal fitness', 'olivia-yoga' ) ); // phpcs:ignore ?>
+			<h2 id="prenatal-title"><?php esc_html_e( 'Online prenatal fitness: preparing for birth, safely', 'olivia-yoga' ); ?></h2>
+			<p class="lead"><?php esc_html_e( 'A one-to-one, 60-minute class, with your friend if you like, planned for your trimester and how you feel that day.', 'olivia-yoga' ); ?></p>
+			<p><?php esc_html_e( 'These all come together in the prenatal training: not in one class, but combined, so that you are well prepared:', 'olivia-yoga' ); ?></p>
+			<ul class="oj-modules"><?php foreach ( $modules as $m ) : ?><li><?php echo esc_html( $m ); ?></li><?php endforeach; ?></ul>
+			<p><?php esc_html_e( 'The first session is an assessment and a conversation: we start from your sports background and how you are now, and we never begin anything more intense than you were used to before.', 'olivia-yoga' ); ?></p>
+			<p class="btn-row oj-inline"><?php echo oy_btn( $ask( 'prenatal' ), __( 'Ask for a time', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore ?><a class="text-link" href="<?php echo esc_url( oy_class_url( oy_prenatal_slug() ) ); ?>"><?php esc_html_e( 'More about prenatal fitness', 'olivia-yoga' ); ?></a></p>
+		</div>
+		<?php // Olívia, 14 November: „a hullám a kép mögött legyen hasonló mint a legelső blokkban” – the soft wave of the hero, not a stroke that runs into the text ?>
+		<div class="oj-split__art" data-reveal><div class="oj-waved oj-waved--soft"><?php echo oy_soft_blob( 'pink', 'left' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'prenatal-ball-training', '(min-width: 960px) 50vw, 100vw' ); // phpcs:ignore ?></div></div></div>
+	</div>
+</div></section>
+
 <section class="section oj-private" id="egyeni" aria-labelledby="private-title"><div class="container">
 	<div class="oj-split">
 		<div class="oj-split__text" data-reveal>
@@ -158,22 +176,6 @@ $more     = array(
 			<p class="btn-row oj-inline"><?php echo oy_btn( $ask( 'egyeni-joga' ), __( 'Ask for a time', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore ?><a class="text-link" href="<?php echo esc_url( oy_class_url( 'egyeni-online-joga' ) ); ?>"><?php esc_html_e( 'More about one-to-one yoga', 'olivia-yoga' ); ?></a></p>
 		</div>
 		<div class="oj-split__art" data-reveal><div class="oj-waved oj-waved--soft"><?php echo oy_soft_blob( 'lilac', 'right' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'private-tree-pose', '(min-width: 960px) 50vw, 100vw' ); // phpcs:ignore ?></div></div></div>
-	</div>
-</div></section>
-
-<section class="section section--pale oj-prenatal" id="kismamatorna" aria-labelledby="prenatal-title"><div class="container">
-	<div class="oj-split oj-split--flip">
-		<div class="oj-split__text" data-reveal>
-			<?php echo oy_kicker( __( 'Prenatal fitness', 'olivia-yoga' ) ); // phpcs:ignore ?>
-			<h2 id="prenatal-title"><?php esc_html_e( 'Online prenatal fitness: preparing for birth, safely', 'olivia-yoga' ); ?></h2>
-			<p class="lead"><?php esc_html_e( 'A one-to-one, 60-minute class, with your friend if you like, planned for your trimester and how you feel that day.', 'olivia-yoga' ); ?></p>
-			<p><?php esc_html_e( 'These all come together in the prenatal training: not in one class, but combined, so that you are well prepared:', 'olivia-yoga' ); ?></p>
-			<ul class="oj-modules"><?php foreach ( $modules as $m ) : ?><li><?php echo esc_html( $m ); ?></li><?php endforeach; ?></ul>
-			<p><?php esc_html_e( 'The first session is an assessment and a conversation: we start from your sports background and how you are now, and we never begin anything more intense than you were used to before.', 'olivia-yoga' ); ?></p>
-			<p class="btn-row oj-inline"><?php echo oy_btn( $ask( 'prenatal' ), __( 'Ask for a time', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore ?><a class="text-link" href="<?php echo esc_url( oy_class_url( oy_prenatal_slug() ) ); ?>"><?php esc_html_e( 'More about prenatal fitness', 'olivia-yoga' ); ?></a></p>
-		</div>
-		<?php // Olívia, 14 November: „a hullám a kép mögött legyen hasonló mint a legelső blokkban” – the soft wave of the hero, not a stroke that runs into the text ?>
-		<div class="oj-split__art" data-reveal><div class="oj-waved oj-waved--soft"><?php echo oy_soft_blob( 'pink', 'left' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'prenatal-ball-training', '(min-width: 960px) 50vw, 100vw' ); // phpcs:ignore ?></div></div></div>
 	</div>
 </div></section>
 
