@@ -762,3 +762,14 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 /* „itt egy kicsit belelóg az é betű ékezete a vesszőbe”: more room between the lines of the big titles, so the accents of
    the capitals (É, Á, Ó) do not touch the line above */
 .section__head h2, .entry > h2, .oj-split__text h2 { line-height: 1.26; }
+
+/* „a mire lesz szükséged kerüljön … jóval előrébb! legyen egy kicsit látványosabb”: the kit as small cards with a pastel
+   circle peeking into their corner (like the prenatal modules), at most three in a row; the device as a soft strip under them */
+.entry ul.oj-kit { list-style: none; margin: 1.2rem 0 1rem; padding: 0; display: grid; gap: .7rem; grid-template-columns: repeat(auto-fill, minmax(max(9.5rem, calc((100% - 1.4rem) / 3)), 1fr)); }
+.entry ul.oj-kit li { --dot: var(--lilac); position: relative; overflow: hidden; isolation: isolate; display: flex; flex-direction: column; gap: .25rem; margin: 0; padding: 1rem 1.1rem 1rem 1.15rem; border-radius: 18px; background: var(--card, #fff); box-shadow: var(--shadow); font-weight: 700; line-height: 1.3; }
+.entry ul.oj-kit li::before { content: ""; position: absolute; z-index: -1; right: -1.15rem; top: -1.15rem; width: 3.3rem; height: 3.3rem; border-radius: 50%; background: color-mix(in srgb, var(--dot) 40%, #fff); }
+.entry ul.oj-kit li:nth-child(4n + 2) { --dot: var(--pink); }
+.entry ul.oj-kit li:nth-child(4n + 3) { --dot: var(--sun); }
+.entry ul.oj-kit li:nth-child(4n) { --dot: var(--sage); }
+.entry ul.oj-kit li span { font-weight: 400; font-size: .86rem; color: color-mix(in srgb, var(--ink) 70%, transparent); }
+.entry .oj-kit-device { margin: 0 0 2rem; padding: .85rem 1.1rem; border-radius: 14px; background: var(--sun-soft); font-size: .93rem; }

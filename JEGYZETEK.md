@@ -373,6 +373,9 @@
   „Fájdalomra, feszülésre”, „kettőtöknek összesen, fejenként olcsóbb”); Olívia pontjai: az egyéni blokk tényei sötét körök
   nélkül, az ajándéksáv nyila ki, a nagy címek sortávja nagyobb (ékezet ≠ vessző), a főoldali GYIK-ből a „Mennyire nehezek…”
   ki. 1114d rev 2026-11-15c. Tesztek 1210/0.
+- **3.11.43:** a „Mire lesz szükséged?” minden óra oldalán előre került (az első rész után), kártyákon (eszköz + rövid megjegyzés,
+  sarokkör), a kamerás eszköz külön sávban; a kismamánál Olívia saját listája csak átkerült és kártyás lett (`oy_kit_up()`,
+  `_kit` a tartalomfájlban). 1114d rev 2026-11-15d. Tesztek 1219/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

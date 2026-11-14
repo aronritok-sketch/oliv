@@ -3189,7 +3189,7 @@ test( 'Olívia\'s doc of 14 November, late night: the group class – a short re
 	ok( ! str_contains( $data['pages']['classes']['content'], 'hosszú relaxáció' ) && ! str_contains( $data['pages']['about']['content'], 'hosszú relaxáció' ), '… nor on the classes page and the About page' );
 	ok( str_contains( $hf['content'], 'a vállra, a csípőre vagy a gerincre' ), '… every class focuses on one part of the body („pl. váll, csípő, gerinc”)' );
 	ok( ! str_contains( $hf['content'], 'december 16' ), '… the start dates out („ez a rész nem kell”)' );
-	ok( str_contains( $hf['content'], 'jógaheveder' ) && str_contains( $hf['content'], 'jógatégl' ) && str_contains( $hf['content'], 'pléd' ), '… the kit on the page („ide belefogalmazhatjuk az eszközöket”)' );
+	ok( false !== mb_stripos( $hf['content'], 'jógaheveder' ) && false !== mb_stripos( $hf['content'], 'jógatégl' ) && false !== mb_stripos( $hf['content'], 'pléd' ), '… the kit on the page („ide belefogalmazhatjuk az eszközöket”)' );
 	foreach ( array( 'hatha-flow', 'egyeni-online-joga', 'stretching', 'relaxacio-legzes' ) as $k ) {
 		$kc = $data['classes'][ $k ]['content'];
 		ok( 1 === substr_count( $kc, '<h2>Mire lesz szükséged?</h2>' ) && str_contains( $kc, 'töltsd fel' ) && ! str_contains( $kc, 'Kell hozzá egy jógaszőnyeg' ), $k . ': what to have ready, in its own part („Minden szolgáltatás aloldalon külön bekezdésbe írd, hogy milyen eszköz szükséges”)' );
@@ -3231,7 +3231,7 @@ test( 'Olívia\'s doc of 14 November, late night: the group class – a short re
 		oy_migrate_1114d();
 		$c = get_post_field( 'post_content', $id );
 		ok( str_contains( $c, 'rövid relaxáció' ) && str_contains( $c, 'a csípőre vagy a gerincre' ) && ! str_contains( $c, 'december 16' ) && str_contains( $c, 'Saját mondatom.' ), 'live update: the group class\'s text changed, her own words stay' );
-		ok( 1 === substr_count( $c, '<h2>Mire lesz szükséged?</h2>' ) && str_contains( $c, 'jógatégl' ) && strpos( $c, 'Mire lesz szükséged?' ) < strpos( $c, '[oy_booking_link]' ), 'live update: the kit in its own part, before the booking button' );
+		ok( 1 === substr_count( $c, '<h2>Mire lesz szükséged?</h2>' ) && false !== mb_stripos( $c, 'jógatégl' ) && strpos( $c, 'Mire lesz szükséged?' ) < strpos( $c, '[oy_booking_link]' ), 'live update: the kit in its own part, before the booking button' );
 		delete_option( 'oy_1114d_rev' );
 		oy_migrate_1114d();
 		ok( 1 === substr_count( get_post_field( 'post_content', $id ), '<h2>Mire lesz szükséged?</h2>' ), '… only once, however often the update runs' );
@@ -3318,6 +3318,27 @@ test( 'Olívia\'s doc of 14 November, past midnight: the home page\'s questions 
 		}
 		update_option( 'oy_edition', 'fort-myers' );
 	}
+} );
+
+test( 'Olívia\'s doc of 14 November, past midnight: „Mire lesz szükséged?” up front on every class page, as cards', function () {
+	update_option( 'oy_edition', 'hu-online' );
+	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+	update_option( 'oy_edition', 'fort-myers' );
+	foreach ( array( 'hatha-flow', 'egyeni-online-joga', 'stretching', 'relaxacio-legzes', 'kismamatorna' ) as $k ) {
+		$c = $data['classes'][ $k ]['content'];
+		preg_match_all( '~<h2[^>]*>(.*?)</h2>~', $c, $h );
+		ok( isset( $h[1][1] ) && str_starts_with( $h[1][1], 'Mire le' ) && str_contains( $c, '<ul class="oj-kit">' ), $k . ': the kit is the second part of the page, as cards („kerüljön jóval előrébb! legyen egy kicsit látványosabb”)' );
+	}
+	$kit   = '<h2>Mire lesz szükséged?</h2><ul class="oj-kit"><li><b>Új</b></li></ul>';
+	$page  = "<h2>Első</h2>\n<p>a</p>\n<h2>Második</h2>\n<p>b</p>\n<h2>Mire lesz szükséged?</h2>\n<p>régi</p>\n<h2>Árak</h2>\n<p>c</p>";
+	$out   = oy_kit_up( $page, $kit );
+	ok( ! str_contains( $out, 'régi' ) && strpos( $out, 'oj-kit' ) < strpos( $out, 'Második' ) && strpos( $out, 'oj-kit' ) > strpos( $out, 'Első' ) && 1 === substr_count( $out, 'Mire lesz szükséged?' ), 'live update: the old part goes, the cards come after the first part' );
+	$her   = "<h2>Első</h2>\n<p>a</p>\n<h2>Más</h2>\n<h2>Mire lehet szükséged?</h2>\n<ul>\n<li>Saját eszközöm</li>\n</ul>\n<p>Saját mondatom.</p>\n<h2>Árak</h2>";
+	$out   = oy_kit_up( $her, null );
+	ok( str_contains( $out, "<ul class=\"oj-kit\">\n<li>Saját eszközöm</li>" ) && str_contains( $out, 'Saját mondatom.' ) && strpos( $out, 'Mire lehet' ) < strpos( $out, '<h2>Más</h2>' ), '… the prenatal page keeps her own list, only moved and in the card style' );
+	ok( oy_kit_up( '<h2>A</h2><p>x</p>', null ) === '<h2>A</h2><p>x</p>', '… a page without that part and without new cards is left alone' );
+	$css = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
+	ok( str_contains( $css, '.entry ul.oj-kit { list-style: none;' ) && str_contains( $css, '.entry ul.oj-kit li::before {' ), 'the kit cards with the peeking pastel circles' );
 } );
 
 test( 'Olívia\'s doc of 14 November: the side column is never cut off while scrolling; her two training photos in one line', function () {

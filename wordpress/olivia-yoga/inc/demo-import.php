@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-15c';
+	$rev = '2026-11-15d';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1112,6 +1112,21 @@ function oy_migrate_1114d() {
 			if ( $faq->post_title === $f['q'] && wp_trash_post( $faq->ID ) ) {
 				$log[] = 'FAQ removed: ' . $f['q'];
 			}
+		}
+	}
+	// „a mire lesz szükséged kerüljön minden szolgáltatás aloldalon jóval előrébb! legyen egy kicsit látványosabb”: the kit part
+	// moves up, right after the first part of each class page, as small cards; the prenatal page keeps its own list
+	foreach ( (array) ( $data['classes'] ?? array() ) as $key => $class ) {
+		$post = get_page_by_path( $key, OBJECT, 'oy_class' );
+		if ( ! $post || str_contains( $post->post_content, 'class="oj-kit"' ) ) {
+			continue;
+		}
+		$moved = oy_kit_up( $post->post_content, isset( $class['_kit'] ) ? (string) $class['_kit'] : null );
+		if ( $moved !== $post->post_content ) {
+			kses_remove_filters();
+			wp_update_post( wp_slash( array( 'ID' => $post->ID, 'post_content' => $moved ) ) );
+			kses_init_filters();
+			$log[] = 'class: ' . $key . ' – the kit up front, as cards';
 		}
 	}
 	// „főoldalon a gyiknél az utolsó kérdés ez legyen, a miért jó online jógázni kérdést vegyük ki a főoldalról”: which questions
@@ -1221,6 +1236,27 @@ function oy_h3_cards( $content, $heading ) {
 		$out .= '<li><strong>' . trim( $q[1] ) . '</strong><span>' . $text . '</span></li>' . "\n";
 	}
 	return substr( $content, 0, $start ) . $out . "</ul>\n" . substr( $content, $end );
+}
+
+/**
+ * The „Mire lesz/lehet szükséged?” part moved to after the first part of a class page, as cards: with $kit the new cards
+ * replace it, without (the prenatal page, her own list) its list only gets the card style. A page without that part gets
+ * $kit only when one is given.
+ */
+function oy_kit_up( $content, $kit = null ) {
+	$found = preg_match( '~<h2[^>]*>\s*Mire (?:lesz|lehet) szükséged\?\s*</h2>.*?(?=<h2[\s>]|\[oy_booking_link\]|$)~su', $content, $m, PREG_OFFSET_CAPTURE );
+	if ( ! $found && null === $kit ) {
+		return $content;
+	}
+	if ( $found ) {
+		$new     = null !== $kit ? $kit : preg_replace( '~<ul>~', '<ul class="oj-kit">', rtrim( $m[0][0] ), 1 );
+		$content = substr( $content, 0, $m[0][1] ) . substr( $content, $m[0][1] + strlen( $m[0][0] ) );
+	} else {
+		$new = $kit;
+	}
+	preg_match_all( '~<h2[\s>]~', $content, $h, PREG_OFFSET_CAPTURE );
+	$at = isset( $h[0][1] ) ? $h[0][1][1] : ( false !== strpos( $content, '[oy_booking_link]' ) ? strpos( $content, '[oy_booking_link]' ) : strlen( $content ) );
+	return substr( $content, 0, $at ) . rtrim( (string) $new ) . "\n" . substr( $content, $at );
 }
 
 /**
