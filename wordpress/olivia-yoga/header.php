@@ -23,8 +23,12 @@ if ( oy_online_only() ) { // the oliviajoga.hu logo with „online” (Olivia, 1
 		<?php echo $brand; // phpcs:ignore ?>
 		<nav class="nav" aria-label="<?php esc_attr_e( 'Main', 'olivia-yoga' ); ?>"><?php echo oy_menu(); // phpcs:ignore ?></nav>
 		<?php echo oy_lang_switcher( 'langs langs--header' ); // phpcs:ignore ?>
+		<?php if ( oy_online_only() ) : // Olívia, 14 November: „ez fiókom gomb legyen” – the button is the account ?>
+		<a class="btn btn--orchid btn--sm header-cta" href="<?php echo esc_url( oy_account_url() ); ?>"><?php echo oy_icon( 'user' ); // phpcs:ignore ?><?php esc_html_e( 'My account', 'olivia-yoga' ); ?></a>
+		<?php else : ?>
 		<a class="header-account" href="<?php echo esc_url( oy_account_url() ); ?>"><?php echo oy_icon( 'user' ); // phpcs:ignore ?><span><?php echo esc_html( $account_label ); ?></span></a>
 		<a class="btn btn--orchid btn--sm header-cta" href="<?php echo esc_url( oy_book_url() ); ?>"><?php esc_html_e( 'Book a class', 'olivia-yoga' ); ?></a>
+		<?php endif; ?>
 		<button class="nav-toggle" type="button" aria-expanded="false" aria-controls="drawer" data-nav-toggle>
 			<span class="i-open"><?php echo oy_icon( 'menu' ); // phpcs:ignore ?></span><span class="i-close"><?php echo oy_icon( 'close' ); // phpcs:ignore ?></span><span class="sr-only"><?php esc_html_e( 'Menu', 'olivia-yoga' ); ?></span>
 		</button>

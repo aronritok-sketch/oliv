@@ -528,15 +528,21 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY
 /* The service boxes' pictures: a soft line on a peach patch with a pink curve („szebb, nőiesebb a vonal … ezzel a színnel
    fűszerezve”) */
 .way .way__art { width: 88px; height: 88px; margin: -12px 0 .9rem -12px; overflow: visible; }
-.way__art-patch { fill: #FFE2CC; opacity: .92; }
-.way--sun .way__art-patch { fill: #FFEBDD; }
-.way__art-curve { fill: none; stroke: var(--orchid); stroke-width: 2; stroke-linecap: round; }
-.way__art-line { fill: none; stroke: var(--ink); stroke-width: 1.35; stroke-linecap: round; stroke-linejoin: round; }
-.way__art-line .way__art-heart { fill: var(--orchid); stroke: none; }
+/* soft pastel circles, breathing slowly: white and peach on the coloured boxes, her tones on the pale cards */
+.way__art .wa-1 { fill: #fff; opacity: .55; }
+.way__art .wa-2 { fill: #fff; opacity: .32; }
+.way__art .wa-3 { fill: #FFE2CC; opacity: .95; }
+.oj-more__card .way__art .wa-1, .oj-guide__box .way__art .wa-1 { fill: var(--tone, var(--edge, var(--lilac))); opacity: .45; }
+.oj-guide__box .way__art .wa-1 { fill: var(--edge); }
+.oj-more__card .way__art .wa-2, .oj-guide__box .way__art .wa-2 { fill: var(--tone, var(--edge, var(--lilac))); opacity: .22; }
+.oj-guide__box .way__art .wa-2 { fill: var(--edge); }
+.oj-more__card .way__art .wa-3, .oj-guide__box .way__art .wa-3 { fill: var(--orchid); opacity: .55; }
+.way__art .wa-breathe { transform-box: fill-box; transform-origin: center; }
 @media (prefers-reduced-motion: no-preference) {
-	.way__art-curve { stroke-dasharray: 80; stroke-dashoffset: 0; transition: stroke-dashoffset .8s ease; }
-	.way:hover .way__art-curve { stroke-dashoffset: 160; }
+	.way__art .wa-breathe { animation: oj-wa-breathe 6s ease-in-out infinite; }
+	.way:hover .way__art .wa-breathe, .oj-guide__box:hover .way__art .wa-breathe { animation-duration: 2.4s; }
 }
+@keyframes oj-wa-breathe { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.14); } }
 
 /* The prenatal modules: a pastel circle peeking into each box's top-left corner instead of the dot (Olívia, 14 November:
    „ezek inkább legyenek pasztell színű belógó kör részletek a box bal felső sarkában”) */
@@ -604,3 +610,18 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY
 .entry ul:not([class]) li:not([class]):nth-child(4n + 2) { --wave: var(--sun); }
 .entry ul:not([class]) li:not([class]):nth-child(4n + 3) { --wave: #9C6ADE; }
 .entry ul:not([class]) li:not([class]):nth-child(4n) { --wave: #6FA085; }
+
+/* the prenatal modules: the site's own four colours, one circle each, like the cards' corners („igazítsd jobban a többi
+   elemhez az oldalon”) */
+.oj-modules:not(.oj-modules--why) li:nth-child(4n + 1) { --dot: var(--lilac); }
+.oj-modules:not(.oj-modules--why) li:nth-child(4n + 2) { --dot: var(--pink); }
+.oj-modules:not(.oj-modules--why) li:nth-child(4n + 3) { --dot: var(--sage); }
+.oj-modules:not(.oj-modules--why) li:nth-child(4n) { --dot: var(--sun); }
+.oj-modules:not(.oj-modules--why) li::before { background: color-mix(in srgb, var(--dot) 45%, #fff); }
+.oj-modules:not(.oj-modules--why) li::after { display: none; }
+
+/* the stretching / relaxation reasons: a small pastel dot, not the wave („a felsorolás hullám …”) */
+.oj-more__list li::before { -webkit-mask: none; mask: none; width: 9px; height: 9px; margin-top: .5em; border-radius: 50%; background: color-mix(in srgb, var(--tone) 75%, #fff); box-shadow: 0 0 0 4px color-mix(in srgb, var(--tone) 22%, transparent); }
+
+/* the header button: „Fiókom” */
+.header-cta svg { width: 16px; height: 16px; margin-right: .45rem; flex: none; }

@@ -249,31 +249,28 @@ function oy_replay_days() {
 }
 
 /**
- * The pictures on the home page's service boxes: a soft, flowing line in place of the plain pictograms, on a peach patch
- * with a pink curve, like the wave of the page heads (Olívia, 14 November: „A piktogramok helyett legyen szebb, nőiesebb
- * a vonal akár ezzel a színnel fűszerezve … ebben a stílusban”).
+ * The pictures on the service boxes: soft, overlapping pastel circles, like the circles that peek into the cards' corners,
+ * breathing slowly – not drawings (Olívia, 14 November: „gyerekes ez a rajzos piktogram. Elemezd az oldal stílusát …
+ * Legyen lágyabb, letisztultabb”; „Tetszik, hogy animált”).
  */
 function oy_way_art( $name ) {
 	static $art = array(
-		// together: three soft circles that overlap, a ribbon flowing under them
-		'group'    => '<circle cx="25" cy="29" r="10"/><circle cx="37" cy="24" r="10"/><circle cx="49" cy="29" r="10"/><path d="M12 49c6.6-5 13-6 19.2-3 6.4 3 12.4 3.4 18.6-.4 3.4-2 6.8-2.6 10.2-1.8"/>',
-		// home: an arched doorway with a heart in it
-		'home'     => '<path d="M20 58V35c0-12 7.2-20.6 16-22.6 8.8 2 16 10.6 16 22.6v23"/><path d="M14 58.4h44"/><path class="way__art-heart" d="M36 45.6c-5.6-3.6-8.4-7-6.8-9.8 1.4-2.4 4.6-2.2 6.8.6 2.2-2.8 5.4-3 6.8-.6 1.6 2.8-1.2 6.2-6.8 9.8z"/>',
-		// her profile in one line, a heart on the belly
-		'prenatal' => '<circle cx="35" cy="14.6" r="4.6"/><path d="M33.4 20.6c-4.6 3.8-6.6 9-5.4 14.4.8 3.6 3.4 5.6 7 6.2 7.6 1.2 11.8 6.4 10.6 12.6-1 5-5.6 7.6-12 7.6"/><path d="M28.6 37.8c-2 6.6-1.8 13.4.6 20.4"/><path class="way__art-heart" d="M39 50.2c-3.6-2.4-5.4-4.6-4.4-6.4.9-1.6 3-1.4 4.4.4 1.4-1.8 3.5-2 4.4-.4 1 1.8-.8 4-4.4 6.4z"/>',
-		// a long, curving stretch
-		'mobility' => '<circle cx="47" cy="16.4" r="4.2"/><path d="M44.4 21.2C36.4 28 31.6 37.4 30.8 49.4"/><path d="M45.6 13.2C40 7.6 31 7.8 24 13.4"/><path d="M30.8 49.4c-3.8 2.8-7.2 6-10 9.6M30.8 49.4c4.6 2.4 8.8 5.6 12.4 9.6"/>',
-		// a lotus, opening
-		'lotus'    => '<path d="M36 50c-5.8-5-8.4-11.2-8-18 .4-5 3-9.8 8-14.4 5 4.6 7.6 9.4 8 14.4.4 6.8-2.2 13-8 18z"/><path d="M34.6 49.6c-8-.2-14.6-3.4-19-9.4-1.4-2-2.4-4.2-3-6.6 5.2.2 9.6 1.8 13.2 4.8"/><path d="M37.4 49.6c8-.2 14.6-3.4 19-9.4 1.4-2 2.4-4.2 3-6.6-5.2.2-9.6 1.8-13.2 4.8"/><path d="M15 55.6c7.2-3.4 14.2-5 21-5s13.8 1.6 21 5"/>',
+		// together: three circles overlapping
+		'group'    => '<circle class="wa-1" cx="24" cy="42" r="15"/><circle class="wa-2" cx="48" cy="42" r="15"/><circle class="wa-3 wa-breathe" cx="36" cy="26" r="13"/>',
+		// one-to-one: a circle held in a larger one
+		'home'     => '<circle class="wa-1" cx="36" cy="36" r="25"/><circle class="wa-3 wa-breathe" cx="36" cy="36" r="11"/>',
+		// prenatal: a small circle carried inside a large one
+		'prenatal' => '<circle class="wa-1" cx="33" cy="34" r="24"/><circle class="wa-3 wa-breathe" cx="42" cy="44" r="10"/>',
+		// stretching: a long, leaning oval and a circle reaching on
+		'mobility' => '<ellipse class="wa-1" cx="32" cy="40" rx="27" ry="12" transform="rotate(-28 32 40)"/><circle class="wa-3 wa-breathe" cx="54" cy="18" r="9"/>',
+		// relaxation: calm ripples
+		'lotus'    => '<circle class="wa-2" cx="36" cy="36" r="27"/><circle class="wa-1" cx="36" cy="36" r="18"/><circle class="wa-3 wa-breathe" cx="36" cy="36" r="9"/>',
 	);
 	$draw = $art[ $name ] ?? '';
 	if ( '' === $draw ) {
 		return oy_icon( $name, 'way__icon' );
 	}
-	return '<svg class="way__icon way__art" viewBox="0 0 72 72" aria-hidden="true" focusable="false">'
-		. '<path class="way__art-patch" d="M9 38C7 22 18 9 34 8.4 51 7.8 64 19 63.4 35.6 62.8 52 50 63.4 33.6 63.2 19.4 63 10.6 52.6 9 38z"/>'
-		. '<path class="way__art-curve" d="M60 4c7 10.6 1.4 20.4 3.6 31.4 2 10.4 4.4 19.6-4.6 31.6"/>'
-		. '<g class="way__art-line">' . $draw . '</g></svg>';
+	return '<svg class="way__icon way__art" viewBox="0 0 72 72" aria-hidden="true" focusable="false">' . $draw . '</svg>';
 }
 
 /** The short label: „Egy hétig visszanézhető” (the group class box on the home page). */

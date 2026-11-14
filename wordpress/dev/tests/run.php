@@ -3120,7 +3120,7 @@ test( 'Olívia\'s doc of 14 November, night: a gift for two goes to two email ad
 test( 'Olívia\'s doc of 14 November, night: the service boxes get soft, feminine line art on a peach patch with a pink curve', function () {
 	foreach ( array( 'group', 'home', 'prenatal', 'mobility', 'lotus' ) as $n ) {
 		$a = oy_way_art( $n );
-		ok( str_contains( $a, 'way__art-patch' ) && str_contains( $a, 'way__art-curve' ) && str_contains( $a, 'way__art-line' ), 'service box art: ' . $n );
+		ok( str_contains( $a, 'class="wa-1"' ) && str_contains( $a, 'wa-breathe' ) && ! str_contains( $a, '<path' ), 'service box art: soft pastel circles, no drawing („gyerekes ez a rajzos piktogram”): ' . $n );
 	}
 	update_option( 'oy_edition', 'hu-online' );
 	try {
@@ -3129,6 +3129,13 @@ test( 'Olívia\'s doc of 14 November, night: the service boxes get soft, feminin
 		$home = (string) ob_get_clean();
 		eq( 7, substr_count( $home, 'class="way__icon way__art"' ), 'home: all five boxes use it (and the two stretching / relaxation cards)' );
 		ok( str_contains( (string) file_get_contents( get_template_directory() . '/assets/online.css' ), '.oj-modules:not(.oj-modules--why) li::before { position: absolute;' ), 'prenatal modules: a pastel circle peeking into each box\'s corner, not a dot' );
+		$css = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
+		ok( str_contains( $css, '.oj-modules:not(.oj-modules--why) li:nth-child(4n + 2) { --dot: var(--pink); }' ) && str_contains( $css, '.oj-modules:not(.oj-modules--why) li::after { display: none; }' ), '… in the site\'s own four colours, one circle each' );
+		ok( str_contains( $css, '.oj-more__list li::before { -webkit-mask: none; mask: none;' ), 'the stretching / relaxation reasons: a pastel dot, not the wave' );
+		ob_start();
+		load_template( get_template_directory() . '/header.php', false );
+		$head = (string) ob_get_clean();
+		ok( (bool) preg_match( '~<a class="btn btn--orchid btn--sm header-cta" href="[^"]*">.*?' . preg_quote( esc_html__( 'My account', 'olivia-yoga' ), '~' ) . '</a>~s', $head ), 'the header button: „Fiókom”' );
 	} finally {
 		update_option( 'oy_edition', 'fort-myers' );
 	}
