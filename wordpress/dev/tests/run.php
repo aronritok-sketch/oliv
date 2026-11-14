@@ -2905,6 +2905,7 @@ test( 'online edition, live update: 2018 on her timeline, the kit list for every
 		$f    = array_values( array_filter( $data['faqs'], fn( $x ) => 'Mit kell előkészítenem az online jóga órára?' === ( $x['_prev']['q'] ?? '' ) ) )[0];
 		$faq  = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => $f['_prev']['q'], 'post_content' => wpautop( esc_html( $f['_prev']['a'] ) ) ) );
 		$mine = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => $f['_prev']['q'], 'post_content' => '<p>Ezt én írtam át.</p>' ) );
+		$works = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => 'Tényleg működik a jóga online?', 'post_content' => '<p>Az ő válasza.</p>' ) );
 		$soon  = $data['classes']['egyeni-online-joga']['_replace'][0];
 		$class = get_page_by_path( 'egyeni-online-joga', OBJECT, 'oy_class' );
 		$cid   = $class ? $class->ID : wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Egyéni online jóga', 'post_name' => 'egyeni-online-joga' ) );
@@ -2927,6 +2928,8 @@ test( 'online edition, live update: 2018 on her timeline, the kit list for every
 		ok( str_contains( $p, $kit[0][1] ) && str_contains( $p, $kit[1][1] ) && str_contains( $p, 'Saját mondatom' ), 'prices page: the kit for every class and „charge it”, her own line stays' );
 		ok( str_contains( get_post_field( 'post_content', $faq ), 'töltsd fel' ), 'the FAQ answer: charge your device' );
 		eq( '<p>Ezt én írtam át.</p>', get_post_field( 'post_content', $mine ), 'an answer she rewrote stays hers' );
+		eq( 'Tényleg működik a csoportos jóga online?', get_post_field( 'post_title', $works ), 'the FAQ question: „csoportos”' );
+		eq( '<p>Az ő válasza.</p>', get_post_field( 'post_content', $works ), '… its answer as it was' );
 		ok( in_array( 'page: about', $log, true ) && in_array( 'page: schedule-pricing', $log, true ), 'logged' );
 		eq( array(), oy_migrate_1114d(), 'once' );
 		update_option( 'oy_edition', 'fort-myers' );

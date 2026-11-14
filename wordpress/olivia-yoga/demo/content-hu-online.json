@@ -645,8 +645,11 @@
 	"faqs": [
 		{
 			"home": "1",
-			"q": "Tényleg működik a jóga online?",
-			"a": "Igen, ha élő az óra. Nem egy videót követsz: ugyanabban az időben gyakorolunk, én pedig figyelek, vezetlek, és az órát a résztvevőkhöz igazítom. Ha bekapcsolod a kamerádat, látom, hogyan mozogsz, és szólok, ha valamin érdemes változtatni.\n\nAhogy sokan, én is a négy fal között, online kezdtem jógázni. És a jóga után nem kell sehová hazautazni: maradhatsz a relaxációban egy kicsit tovább."
+			"q": "Tényleg működik a csoportos jóga online?",
+			"a": "Igen, ha élő az óra. Nem egy videót követsz: ugyanabban az időben gyakorolunk, én pedig figyelek, vezetlek, és az órát a résztvevőkhöz igazítom. Ha bekapcsolod a kamerádat, látom, hogyan mozogsz, és szólok, ha valamin érdemes változtatni.\n\nAhogy sokan, én is a négy fal között, online kezdtem jógázni. És a jóga után nem kell sehová hazautazni: maradhatsz a relaxációban egy kicsit tovább.",
+			"_prev": {
+				"q": "Tényleg működik a jóga online?"
+			}
 		},
 		{
 			"home": "1",

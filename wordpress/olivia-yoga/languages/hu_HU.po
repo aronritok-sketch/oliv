@@ -1223,7 +1223,7 @@ msgid "Prices in forints"
 msgstr "Árak forintban"
 
 msgid "Can yoga really work online?"
-msgstr "Tényleg működik a jóga online?"
+msgstr "Tényleg működik a csoportos jóga online?"
 
 msgid "Join a live online class, request a private session, or just send a question. Beginners very welcome."
 msgstr "Gyere el egy élő online órára, kérj magánórát, vagy csak küldd el a kérdésed. Kezdőket is szeretettel várok."

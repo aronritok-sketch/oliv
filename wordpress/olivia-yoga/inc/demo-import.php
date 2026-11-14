@@ -964,7 +964,7 @@ function oy_migrate_doc_1114() {
 		}
 	}
 	foreach ( (array) ( $data['faqs'] ?? array() ) as $f ) {
-		if ( empty( $f['_prev']['q'] ) ) {
+		if ( empty( $f['_prev']['q'] ) || ! isset( $f['_prev']['a'] ) ) {
 			continue;
 		}
 		foreach ( get_posts( array( 'post_type' => 'oy_faq', 'post_status' => 'any', 'numberposts' => -1, 'title' => $f['_prev']['q'] ) ) as $faq ) {
@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-14k';
+	$rev = '2026-11-14l';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1073,6 +1073,11 @@ function oy_migrate_1114d() {
 			continue;
 		}
 		foreach ( get_posts( array( 'post_type' => 'oy_faq', 'post_status' => 'any', 'numberposts' => -1, 'title' => $f['_prev']['q'] ) ) as $faq ) {
+			if ( ! isset( $f['_prev']['a'] ) ) { // only the question changes („Tényleg működik a csoportos jóga online?”); the answer stays as it is
+				wp_update_post( wp_slash( array( 'ID' => $faq->ID, 'post_title' => $f['q'] ) ) );
+				$log[] = 'FAQ: ' . $f['q'];
+				continue;
+			}
 			if ( trim( wp_strip_all_tags( $faq->post_content ) ) === trim( $f['_prev']['a'] ) ) {
 				wp_update_post( wp_slash( array( 'ID' => $faq->ID, 'post_title' => $f['q'], 'post_content' => wpautop( esc_html( $f['a'] ) ) ) ) );
 				$log[] = 'FAQ: ' . $f['q'];
