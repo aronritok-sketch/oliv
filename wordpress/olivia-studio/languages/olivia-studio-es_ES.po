@@ -3686,8 +3686,8 @@ msgstr "Los alumnos pueden encender la cámara hasta"
 msgid "online places"
 msgstr "plazas online"
 
-msgid "In smaller classes the teacher sees the students in a grid; in bigger ones only the teacher is on screen. Private sessions are always two-way."
-msgstr "En las clases pequeñas la profesora ve a los alumnos en una cuadrícula; en las grandes solo se ve a la profesora. Las sesiones privadas son siempre en ambos sentidos."
+msgid "In smaller classes everyone who turns their camera on is seen by all, in a grid; in bigger ones only the teacher is on screen. Private sessions are always two-way."
+msgstr "En las clases pequeñas, a quien enciende su cámara lo ven todos, en cuadrícula; en las grandes solo se ve a la profesora. Las sesiones privadas siempre son en ambos sentidos."
 
 msgid "Recording"
 msgstr "Grabación"

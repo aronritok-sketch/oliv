@@ -390,6 +390,11 @@
   értesítések (notify_email) továbbra is Olívia Gmailjére mennek** (ha az info@-t is nézi, át lehet állítani). Tesztek 1233/0.
 - **3.11.48:** az online oldalon nincs piktogram (`oy_pictogram()` üres, így az `[oy_picto]` is); a pontokba szedett listák
   sima szövegek, a címek fölött rövid színes vonal. Tesztek 1235/0.
+- **3.11.49–50 (olivia-studio 1.10.13):** főoldal: „Az egyéni jógáról bővebben” link; kikerült a „Stretching, relaxáció és légzés”
+  blokk és alóla az „Egyéni órák a merev testnek…” sor; a „Dinamikus, mégis gyengéd” bemutatkozás bekezdései kártyák, egymás után
+  úsznak be, egérre kicsit megemelkednek. „A képedet csak én látom” mindenhonnan ki (a GYIK-válasz élesen `text_swap`-pel):
+  élőben a résztvevők is látják egymást, ha bekapcsolják a kamerát – **az élő teremben is így lett**: kis órán és egyéni órán
+  mindenki látja mindenkit (live.js `seesEveryone()`), nagy órán csak az oktató. A felvételen továbbra is csak Olívia. Tesztek 1239/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

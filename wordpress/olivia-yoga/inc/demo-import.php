@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-15e';
+	$rev = '2026-11-15f';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1117,6 +1117,12 @@ function oy_migrate_1114d() {
 	// „e-mail címnél mindenhol írd át az info@oliviajoga.online-ra”: the old address gives way to the new one in every text of
 	// the site – pages, classes, questions, posts, the booking plugin's settings and email templates; the settings named in
 	// „keep” (where the booking notices go) stay
+	// „szedjük ki mindenhonnan azt, hogy a képét csak én látom”: such sentences change wherever they are written
+	foreach ( (array) ( $data['text_swap']['pairs'] ?? array() ) as $pair ) {
+		if ( ! empty( $pair[0] ) && isset( $pair[1] ) ) {
+			$log = array_merge( $log, oy_swap_text( (string) $pair[0], (string) $pair[1] ) );
+		}
+	}
 	$swap = (array) ( $data['email_swap'] ?? array() );
 	if ( ! empty( $swap['from'] ) && ! empty( $swap['to'] ) && is_email( $swap['to'] ) ) {
 		$log = array_merge( $log, oy_swap_email( (string) $swap['from'], (string) $swap['to'], (array) ( $swap['keep'] ?? array() ) ) );
@@ -1243,6 +1249,23 @@ function oy_h3_cards( $content, $heading ) {
 		$out .= '<li><strong>' . trim( $q[1] ) . '</strong><span>' . $text . '</span></li>' . "\n";
 	}
 	return substr( $content, 0, $start ) . $out . "</ul>\n" . substr( $content, $end );
+}
+
+/**
+ * A sentence for another in the content of every post (pages, classes, questions, posts), as it is written there.
+ */
+function oy_swap_text( $from, $to ) {
+	global $wpdb;
+	$log = array();
+	$like = '%' . $wpdb->esc_like( $from ) . '%';
+	foreach ( $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_status IN ('publish','draft','private','future','pending') AND post_type NOT IN ('revision','nav_menu_item') AND post_content LIKE %s", $like ) ) as $id ) {
+		$p = get_post( $id );
+		kses_remove_filters();
+		wp_update_post( wp_slash( array( 'ID' => $p->ID, 'post_content' => str_replace( $from, $to, $p->post_content ) ) ) );
+		kses_init_filters();
+		$log[] = 'text: ' . $p->post_type . ' ' . $p->post_name;
+	}
+	return $log;
 }
 
 /**

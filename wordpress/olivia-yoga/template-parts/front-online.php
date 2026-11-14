@@ -29,8 +29,9 @@ $needs  = array(
 	// hogy ne felejtse el feltölteni az eszközét, mielőtt becsatlakozik az órára”
 	array( 'lotus', __( 'A mat, and what your class asks for', 'olivia-yoga' ), __( 'Every class needs a mat. What else you need depends on the class: you will find it in its description.', 'olivia-yoga' ), 'pink' ),
 	array( 'online', __( 'A charged phone, tablet or laptop', 'olivia-yoga' ), __( 'A camera and a browser are enough, no app. Charge it before you join, so it does not run out during class.', 'olivia-yoga' ), 'sage' ),
-	// Olivia, 13 November: „írd bele, hogy nem kötelező, és emeld ki szépen, láthatóan, hogy a képedet csak én látom”
-	array( 'group', __( 'Camera on, if you like', 'olivia-yoga' ), __( 'It is not compulsory. If I can see you, I can help you with the poses.', 'olivia-yoga' ), 'sun', __( 'Only I see your picture.', 'olivia-yoga' ) ),
+	// Olívia, 14 November: „szedjük ki mindenhonnan azt, hogy a képét csak én látom. a későbbi felvételen csak én látom, de
+	// élőben láthassuk egymást, ha valaki bekapcsolja a kameráját”
+	array( 'group', __( 'Camera on, if you like', 'olivia-yoga' ), __( 'It is not compulsory. If you turn it on, we can see each other live, and I can help you with the poses. Only I am on the recording.', 'olivia-yoga' ), 'sun' ),
 );
 $steps  = array(
 	array( __( 'Choose a class', 'olivia-yoga' ), __( 'Book from the timetable with a drop-in or a class pass.', 'olivia-yoga' ) ),
@@ -176,31 +177,7 @@ $more     = array(
 	</div>
 </div></section>
 
-<section class="section section--tight oj-more" aria-labelledby="more-title"><div class="container">
-	<?php echo oy_section_head( __( 'Stretching, relaxation and breathing', 'olivia-yoga' ), __( 'One-to-one sessions for a stiff body and an overloaded mind.', 'olivia-yoga' ), '', 'more-title' ); // phpcs:ignore ?>
-	<div class="oj-more__grid">
-		<?php
-		// Olívia, 14 November: „legyen extrább, legyél nagyon kreatív, ne legyen átlagos”, then „tetszik az ötlet, a
-		// piktogramok és a hullámok nem igazán, illetve a perceknél a szaggatott vonal sem. Újíts!” – each card in its
-		// colour, a pastel circle peeking into its corner with the length in it (from the class's own setting), the soft
-		// line drawing of the service boxes, the reasons as soft rows and „cheaper as a pair” as a ribbon
-		foreach ( $more as $c ) :
-			$oy_class = get_page_by_path( $c[6], OBJECT, 'oy_class' );
-			$oy_len   = $oy_class ? trim( (string) oy_class_meta( $oy_class->ID, 'oy_duration' ) ) : '';
-			$oy_num   = preg_match( '/^(\d+)\s*(.*)$/u', $oy_len, $mm ) ? array( $mm[1], $mm[2] ) : array( $oy_len, '' );
-			?>
-		<article class="oj-more__card oj-more__card--<?php echo esc_attr( $c[1] ); ?>" data-reveal>
-			<?php if ( '' !== $oy_len ) : ?><span class="oj-more__stamp"><b><?php echo esc_html( $oy_num[0] ); ?></b><?php if ( '' !== $oy_num[1] ) : ?><small><?php echo esc_html( $oy_num[1] ); ?></small><?php endif; ?></span><?php endif; ?>
-			<?php echo oy_way_art( $c[0] ); // phpcs:ignore ?>
-			<h3><?php echo esc_html( $c[2] ); ?></h3>
-			<p><?php echo esc_html( $c[3] ); ?></p>
-			<ul class="oj-more__list"><?php foreach ( $c[4] as $w ) : ?><li><?php echo esc_html( $w ); ?></li><?php endforeach; ?></ul>
-			<p class="oj-more__meta"><?php echo oy_icon( 'user' ); // phpcs:ignore ?><?php echo esc_html( $c[5] ); ?></p>
-			<p class="btn-row oj-inline"><?php echo oy_btn( $ask( 'stretching' === $c[6] ? 'stretching' : 'relax' ), __( 'Ask for a time', 'olivia-yoga' ), 'dark' ); // phpcs:ignore ?><a class="text-link" href="<?php echo esc_url( oy_class_url( $c[6] ) ); ?>"><?php esc_html_e( 'Read more', 'olivia-yoga' ); ?></a></p>
-		</article>
-		<?php endforeach; ?>
-	</div>
-</div></section>
+<?php // Olívia, 14 November: „a stretching, relaxáció és légzést szedjük ki inkább a főoldalról” – they have their own pages ?>
 
 <?php // Olívia, 14 November: „ezt az egész blokkot szedjük ki a szolgáltatásokkal” – the „Online órák” list is gone; the lengths are on the boxes at the top ?>
 

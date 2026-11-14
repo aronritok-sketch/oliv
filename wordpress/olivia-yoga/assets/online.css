@@ -761,7 +761,7 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 
 /* „itt egy kicsit belelóg az é betű ékezete a vesszőbe”: more room between the lines of the big titles, so the accents of
    the capitals (É, Á, Ó) do not touch the line above */
-.section__head h2, .entry > h2, .oj-split__text h2 { line-height: 1.26; }
+.section__head h2, .entry > h2, .oj-split__text h2, .prose > h2 { line-height: 1.26; }
 
 /* „a mire lesz szükséged kerüljön … jóval előrébb! legyen egy kicsit látványosabb”: the kit as small cards with a pastel
    circle peeking into their corner (like the prenatal modules), at most three in a row; the device as a soft strip under them */
@@ -797,3 +797,20 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .places li:nth-child(4n) > div::before { background: var(--sun); }
 .places h3 { margin-top: 0; }
 .entry .oj-area > p:empty, .entry .oj-area > br:first-child { display: none; }
+
+/* „Ez a szekció is legyen kicsit interaktívabb” (home, „Dinamikus, mégis gyengéd…”): her paragraphs as soft cards with a
+   pastel circle peeking into the corner, coming in one after the other as the part scrolls into view, lifting a little
+   under the mouse – her text stays as she wrote it */
+#intro .prose > p:not(.btn-row) { position: relative; overflow: hidden; isolation: isolate; margin: 0 0 .8rem; padding: 1.05rem 1.3rem 1.1rem; border-radius: 20px; background: var(--card, #fff); box-shadow: var(--shadow); transition: transform .45s ease, box-shadow .45s ease, opacity .7s ease; }
+#intro .prose > p:not(.btn-row)::before { content: ""; position: absolute; z-index: -1; right: -34px; top: -34px; width: 86px; height: 86px; border-radius: 50%; background: color-mix(in srgb, var(--tone, var(--lilac)) 38%, #fff); transition: transform .6s cubic-bezier(.3, 1.4, .5, 1); }
+#intro .prose > p:not(.btn-row):nth-of-type(3n + 2) { --tone: var(--pink); }
+#intro .prose > p:not(.btn-row):nth-of-type(3n) { --tone: var(--sage); }
+#intro .prose > p:not(.btn-row):hover { transform: translateY(-3px); box-shadow: 0 22px 36px -26px rgba(18, 35, 26, .55); }
+#intro .prose > p:not(.btn-row):hover::before { transform: scale(1.18); }
+#intro .prose > .btn-row { margin-top: 1.2rem; }
+@media (prefers-reduced-motion: no-preference) {
+	#intro .prose[data-reveal]:not(.is-visible):not(.is-in) > p:not(.btn-row) { opacity: 0; transform: translateY(14px); }
+	#intro .prose > p:not(.btn-row):nth-of-type(2) { transition-delay: 0s, 0s, .12s; }
+	#intro .prose > p:not(.btn-row):nth-of-type(3) { transition-delay: 0s, 0s, .24s; }
+	#intro .prose > p:not(.btn-row):nth-of-type(4) { transition-delay: 0s, 0s, .36s; }
+}

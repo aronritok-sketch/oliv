@@ -9,8 +9,9 @@
  *    Keys: OYS_LIVEKIT_URL (wss://…), OYS_LIVEKIT_API_KEY, OYS_LIVEKIT_API_SECRET (or Settings → Live online).
  *  - Only those who booked get in: their own signed link (account or email), nothing to download, the room opens
  *    `live_open_minutes` (10) before the class. The teacher (or the studio) presses one button: „Go live”.
- *  - Small classes (online seats up to `live_grid_max`) and private sessions: students may turn their camera on and the
- *    teacher sees them in a grid. Bigger classes: only the teacher is on screen. Chat, raise hand, one-tap mute; the
+ *  - Small classes (online seats up to `live_grid_max`) and private sessions: students may turn their camera on, and
+ *    everyone sees everyone in a grid (Olívia, 14 November: „élőben láthassuk egymást”). Bigger classes: only the
+ *    teacher is on screen. Chat, raise hand, one-tap mute; the
  *    teacher can mute everyone.
  *  - Chat: ours (table oys_live_chat), it stays after class (`live_chat_days`).
  *  - Recording: the teacher only, recorded in her own browser from her own camera and microphone (nobody else is on

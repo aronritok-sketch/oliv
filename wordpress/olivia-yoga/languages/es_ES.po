@@ -1282,3 +1282,6 @@ msgstr "%d minutos"
 
 msgid "for the two of you"
 msgstr "para los dos"
+
+msgid "It is not compulsory. If you turn it on, we can see each other live, and I can help you with the poses. Only I am on the recording."
+msgstr "No es obligatoria. Si la enciendes, en directo nos vemos, y puedo ayudarte con las posturas. En la grabación solo salgo yo."

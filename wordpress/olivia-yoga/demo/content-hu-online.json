@@ -850,7 +850,7 @@
 		{
 			"home": "",
 			"q": "Látsz engem az óra alatt?",
-			"a": "Ha bekapcsolod a kamerádat, igen, és így tudok segíteni a pózokban. A képedet csak én látom, a többiek nem. Ha egy nap inkább kamera nélkül gyakorolnál, az is rendben van."
+			"a": "Ha bekapcsolod a kamerádat, igen, és így tudok segíteni a pózokban. Élőben a többiek is láthatnak, ha bekapcsolod a kamerádat, a felvételen viszont csak én látszom. Ha egy nap inkább kamera nélkül gyakorolnál, az is rendben van."
 		},
 		{
 			"home": "",
@@ -1269,6 +1269,19 @@
 		"to": "info@oliviajoga.online",
 		"keep": [
 			"notify_email"
+		]
+	},
+	"text_swap": {
+		"_note": "Olívia, 14 November: „szedjük ki mindenhonnan azt, hogy a képét csak én látom … élőben láthassuk egymást, ha valaki bekapcsolja a kameráját” – on a live site these sentences change wherever they are written.",
+		"pairs": [
+			[
+				"A képedet csak én látom, a többiek nem.",
+				"Élőben a többiek is láthatnak, ha bekapcsolod a kamerádat, a felvételen viszont csak én látszom."
+			],
+			[
+				"A képedet csak én látom.",
+				"A felvételen csak én látszom."
+			]
 		]
 	}
 }

@@ -302,7 +302,8 @@
 		return b;
 	}
 
-	/* Tiles: the teacher big for the students (and her own picture for her); the students in a grid for the teacher. */
+	/* Tiles: the teacher big for the students (and her own picture for her); the students in a grid – for the teacher, and in a
+	   class where cameras may be on, for each other too. */
 
 	function tileFor(p, local) {
 		var id = 'oys-tile-' + p.identity.replace(/[^a-z0-9_-]/gi, '');
@@ -784,9 +785,15 @@
 		refresh();
 	}
 
+	/* Olívia, 14 November: „élőben láthassuk egymást, ha valaki bekapcsolja a kameráját” – in a class where the students may
+	   turn their camera on (small classes, private sessions) everyone sees everyone; in a big class the students take only
+	   the teacher's picture and sound. */
+	function seesEveryone() {
+		return !!(cfg.owner || (join && join.twoWay));
+	}
+
 	function subscribeTeacher(p) {
-		// the students only take the teacher's picture and sound (big classes: nobody else's)
-		if (!cfg.owner && isTeacher(p)) {
+		if (!cfg.owner && (isTeacher(p) || seesEveryone())) {
 			p.trackPublications.forEach(function (pub) {
 				pub.setSubscribed(true);
 			});
@@ -820,7 +827,7 @@
 					subscribeTeacher(p);
 				})
 				.on(LK.RoomEvent.ParticipantConnected, function (p) {
-					if (cfg.owner || isTeacher(p)) {
+					if (seesEveryone() || isTeacher(p)) {
 						ensureTile(p, false);
 					}
 					subscribeTeacher(p);
@@ -847,13 +854,13 @@
 						showLobby(t.left);
 					}
 				});
-			return room.connect(join.url, join.token, { autoSubscribe: !!cfg.owner }).then(function () {
+			return room.connect(join.url, join.token, { autoSubscribe: seesEveryone() }).then(function () {
 				lobby.hidden = true;
 				stage.hidden = false;
 				stageMode(true);
 				room.startAudio().catch(function () {});
 				room.remoteParticipants.forEach(function (p) {
-					if (cfg.owner || isTeacher(p)) {
+					if (seesEveryone() || isTeacher(p)) {
 						ensureTile(p, false);
 					}
 					subscribeTeacher(p);

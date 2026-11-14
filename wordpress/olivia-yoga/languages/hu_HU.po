@@ -1165,7 +1165,7 @@ msgid "Camera on, if you like"
 msgstr "Kamera, ha szeretnéd"
 
 msgid "If I can see you, I can help you with the poses. Only I see your picture."
-msgstr "Ha látlak, tudok segíteni a pózokban. A képedet csak én látom."
+msgstr "Ha bekapcsolod a kamerádat, élőben láthatjuk egymást, és tudok segíteni a pózokban."
 
 msgid "Choose a class"
 msgstr "Válassz órát"
@@ -1605,7 +1605,7 @@ msgid "It is not compulsory. If I can see you, I can help you with the poses."
 msgstr "Nem kötelező. Ha látlak, tudok segíteni a pózokban."
 
 msgid "Only I see your picture."
-msgstr "A képedet csak én látom."
+msgstr "A felvételen csak én látszom."
 
 msgid "This is not a video to follow. We practice together, at the same time: I guide you, and you can ask anything before and after class."
 msgstr "Ez nem egy videó, amit követsz. Együtt gyakorlunk, ugyanabban az időben: vezetlek, és óra előtt és után bármit kérdezhetsz."
@@ -1726,7 +1726,7 @@ msgid "Ask for a time"
 msgstr "Időpontot kérek"
 
 msgid "More about one-to-one yoga"
-msgstr "Az egyéni óráról bővebben"
+msgstr "Az egyéni jógáról bővebben"
 
 msgid "Online prenatal fitness: preparing for birth, safely"
 msgstr "Online kismamatorna: felkészülés a szülésre, biztonságban"
@@ -1901,3 +1901,6 @@ msgstr "%d perc"
 
 msgid "for the two of you"
 msgstr "kettőtöknek összesen, fejenként olcsóbb"
+
+msgid "It is not compulsory. If you turn it on, we can see each other live, and I can help you with the poses. Only I am on the recording."
+msgstr "Nem kötelező. Ha bekapcsolod, élőben láthatjuk egymást, és tudok segíteni a pózokban. A felvételen csak én látszom."
