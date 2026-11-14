@@ -1261,3 +1261,24 @@ msgstr "con una amiga, tu hermana o hermano, o como cita con tu pareja: en parej
 
 msgid "Who else is it for? You will find them all on the one-to-one page"
 msgstr "¿Para quién más? Los encontrarás todos en la página de la clase individual"
+
+msgid "1 session"
+msgstr "1 clase"
+
+msgid "%d sessions"
+msgstr "%d clases"
+
+msgid "%s per session"
+msgstr "%s por clase"
+
+msgid "As a pair"
+msgstr "En pareja"
+
+msgid "Alone"
+msgstr "Individual"
+
+msgid "%d minutes"
+msgstr "%d minutos"
+
+msgid "for the two of you"
+msgstr "para los dos"

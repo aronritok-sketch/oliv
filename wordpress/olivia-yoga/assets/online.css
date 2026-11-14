@@ -697,3 +697,23 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY
 .oj-modules--why li > span { grid-column: 1 / -1; font-size: .9rem; line-height: 1.5; }
 /* the one-to-one page's „Miben segíthet…?” four questions the same way, two by two („legyen szebben összeszedve”) */
 .oj-modules--pairs { grid-template-columns: repeat(auto-fill, minmax(max(14rem, calc((100% - .75rem) / 2)), 1fr)); }
+
+/* „Az összes szolgáltatásnál legyenek szebben kategorizálva az árak”: alone and as a pair, by length, each a soft card with
+   one session and the pass (and what a session costs in it) */
+.oj-prices { display: grid; grid-template-columns: repeat(auto-fill, minmax(max(14rem, calc((100% - 1rem) / 2)), 1fr)); gap: 1rem; margin: 1.2rem 0 1rem; }
+.oj-price { --bg: var(--lilac-soft); --edge: var(--lilac); position: relative; padding: 1.15rem 1.3rem 1.1rem; border-radius: 22px; background: var(--bg); box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--edge) 45%, transparent); overflow: hidden; isolation: isolate; }
+.oj-price::before { content: ""; position: absolute; z-index: -1; right: -38px; top: -38px; width: 100px; height: 100px; border-radius: 50%; background: color-mix(in srgb, var(--edge) 38%, #fff); }
+.oj-price--pair { --bg: var(--pink-soft); --edge: var(--pink); }
+.entry .oj-price__head { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin: 0 0 .8rem; }
+.oj-price__who { padding: .2rem .75rem; border-radius: 999px; background: var(--orchid); color: #fff; font-weight: 700; font-size: .82rem; letter-spacing: .02em; }
+.oj-price--solo .oj-price__who { background: var(--ink); }
+.oj-price__len { display: inline-flex; align-items: center; gap: .35rem; font-weight: 700; font-size: .9rem; }
+.oj-price__len svg { width: 15px; height: 15px; }
+.entry .oj-price__rows { margin: 0; display: grid; gap: .55rem; }
+.oj-price__rows > div { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; padding-top: .55rem; border-top: 1px solid color-mix(in srgb, var(--edge) 55%, transparent); }
+.oj-price__rows > div:first-child { padding-top: 0; border-top: 0; }
+.entry .oj-price__rows dt { margin: 0; font-size: .95rem; }
+.oj-price__rows dt small { display: block; font-size: .8rem; color: color-mix(in srgb, var(--ink) 65%, transparent); }
+.entry .oj-price__rows dd { margin: 0; font-weight: 800; font-size: 1.12rem; white-space: nowrap; }
+.entry .oj-price__for { margin: .55rem 0 0; font-size: .82rem; color: color-mix(in srgb, var(--ink) 65%, transparent); }
+.entry .oj-price-note { margin: 0 0 2rem; font-size: .9rem; color: color-mix(in srgb, var(--ink) 75%, transparent); }

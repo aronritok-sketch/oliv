@@ -1880,3 +1880,24 @@ msgstr "a barátnőddel, a testvéreddel, vagy randiként a pároddal – párba
 
 msgid "Who else is it for? You will find them all on the one-to-one page"
 msgstr "Kinek szól még? Az egyéni óra oldalán mindet megtalálod"
+
+msgid "1 session"
+msgstr "1 alkalom"
+
+msgid "%d sessions"
+msgstr "%d alkalom"
+
+msgid "%s per session"
+msgstr "alkalmanként %s"
+
+msgid "As a pair"
+msgstr "Párban"
+
+msgid "Alone"
+msgstr "Egyedül"
+
+msgid "%d minutes"
+msgstr "%d perc"
+
+msgid "for the two of you"
+msgstr "kettőtöknek együtt, így olcsóbb"

@@ -800,6 +800,10 @@ Olivia doksija, 2026. 11. 13. 21:35.
 - 3.11.31: `oy_migrate_1114d` rev 2026-11-14t – a tartalomfájl lapjainak/óráinak `_excerpt_prev` mezője: ha az élő
   kivonat szó szerint ez, az `excerpt` váltja. `oy_class_cards()`: öt órával `oj-class-cards--lead` (az első széles, fotó a
   szöveg mellett, nagyobb `sizes`), alatta négy oszlop (1080 px fölött).
+- 3.11.34–35: `oy_h3_cards( $content, $h2 )` – egy h2 alatti h3+bekezdés párok `oj-modules--pairs` kártyákká (a lapon lévő
+  szövegből; ha a rész másképp néz ki, érintetlen). `oy_price_cards( $service )` / `[oy_prices service="…"]` – a szolgáltatás
+  aktív `private_single`/`private_pack` termékei (fő × perc csoportokban); `oy_price_section()` az „Árak” lista „Ft”-os sorait
+  cseréli rá, a többi sor `oj-price-note` bekezdés lesz. A régi `oy_migrate_prices()` már nem talál listát a tartalomfájlban.
 
 ### 6.14 Mobil API és iOS app
 

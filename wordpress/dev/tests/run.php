@@ -1949,11 +1949,15 @@ test( 'online edition, live update: the prices of 14 November, only the „Árak
 	require_once get_template_directory() . '/inc/demo-import.php';
 	update_option( 'oy_edition', 'hu-online' );
 	try {
-		$id = wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Stretching', 'post_name' => 'stretching', 'post_content' => "<p>Olívia saját szövege.</p>\n<h2>Árak</h2>\n<ul>\n<li>régi ár</li>\n</ul>\n<p>Utána is az övé.</p>" ) );
+		$id = wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Stretching', 'post_name' => 'stretching', 'post_content' => "<p>Olívia saját szövege.</p>\n<h2>Árak</h2>\n<ul>\n<li><strong>60 perc:</strong> régi ár, 6 000 Ft</li>\n<li>A bérlet 6 hétig érvényes.</li>\n</ul>\n<p>Utána is az övé.</p>" ) );
 		delete_option( 'oy_prices_rev' );
 		oy_migrate_prices();
-		$c = get_post( $id )->post_content;
-		ok( str_contains( $c, '7 000 Ft, 5 alkalom 30 000 Ft' ) && ! str_contains( $c, 'régi ár' ), 'the new prices on the class page' );
+		// since 3.11.35 a class page's prices are cards from the booking products („legyenek szebben kategorizálva az árak”)
+		$c = oy_price_section( get_post( $id )->post_content, 'stretching' );
+		ok( str_contains( $c, '<h2>Árak</h2>' . "\n" . '[oy_prices service="stretching"]' ) && ! str_contains( $c, 'régi ár' ) && str_contains( $c, '<p class="oj-price-note">A bérlet 6 hétig érvényes.</p>' ), 'the prices on the class page: the cards from the booking products, her note under them' );
+		$cards = oy_price_cards( 'stretching' );
+		ok( 1 === substr_count( $cards, 'class="oj-price oj-price--solo"' ) && 1 === substr_count( $cards, 'class="oj-price oj-price--pair"' ) && 2 === substr_count( $cards, '<dt>' . esc_html__( '1 session', 'olivia-yoga' ) . '</dt>' ), '… alone and as a pair, one session and the pass in each' );
+		ok( 4 === substr_count( oy_price_cards( 'egyeni-joga' ), 'class="oj-price oj-price--' ) && '' === oy_price_cards( 'nincs-ilyen' ), '… one-to-one yoga: 60 and 90 minutes, alone and as a pair; nothing for a service without products' );
 		ok( str_contains( $c, 'Olívia saját szövege.' ) && str_contains( $c, 'Utána is az övé.' ), 'the rest of her page is untouched' );
 		$p = OYS_Products::get( 'egyeni90-duo-1' );
 		ok( $p && 1500000 === (int) $p['price_cents'] && 2 === (int) $p['people'] && 90 === (int) $p['duration_min'], 'pair yoga, 90 minutes: 15 000 Ft' );

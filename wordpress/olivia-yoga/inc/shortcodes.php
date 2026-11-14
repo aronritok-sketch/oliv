@@ -57,6 +57,43 @@ function oy_classes_list( $exclude = '' ) {
  * The online site's classes as cards: the photo on top, inside the card (Olívia, 14 November: „a kép sem jó, eltakarja a
  * szöveget és ez mobilon nem néz ki jól. legyen máshogy”), the card in the colour of its home page box.
  */
+/**
+ * A service's prices as cards – alone and as a pair, by length – straight from the booking products, so the page always
+ * shows what the checkout charges. Olívia, 14 November: „Az összes szolgáltatásnál legyenek szebben kategorizálva az árak”.
+ */
+function oy_price_cards( $service ) {
+	if ( '' === (string) $service || ! class_exists( 'OYS_Products' ) || ! function_exists( 'oys_money' ) ) {
+		return '';
+	}
+	$groups = array();
+	foreach ( OYS_Products::all( true ) as $p ) {
+		if ( $p['service'] !== $service || ! in_array( $p['kind'], array( 'private_single', 'private_pack' ), true ) ) {
+			continue;
+		}
+		$key = sprintf( '%d-%03d', (int) $p['people'], (int) $p['duration_min'] );
+		$groups[ $key ][ 'private_single' === $p['kind'] ? 'single' : 'pack' ] = $p;
+	}
+	ksort( $groups );
+	$out = '';
+	foreach ( $groups as $g ) {
+		$any  = $g['single'] ?? $g['pack'];
+		$pair = 2 === (int) $any['people'];
+		$len  = (int) $any['duration_min'];
+		$rows = '';
+		if ( ! empty( $g['single'] ) ) {
+			$rows .= '<div><dt>' . esc_html__( '1 session', 'olivia-yoga' ) . '</dt><dd>' . esc_html( oys_money( (int) $g['single']['price_cents'] ) ) . '</dd></div>';
+		}
+		if ( ! empty( $g['pack'] ) ) {
+			$n     = max( 1, (int) $g['pack']['credits'] );
+			$rows .= '<div><dt>' . esc_html( sprintf( __( '%d sessions', 'olivia-yoga' ), $n ) ) . '<small>' . esc_html( sprintf( __( '%s per session', 'olivia-yoga' ), oys_money( (int) round( (int) $g['pack']['price_cents'] / $n ) ) ) ) . '</small></dt><dd>' . esc_html( oys_money( (int) $g['pack']['price_cents'] ) ) . '</dd></div>';
+		}
+		$out .= '<div class="oj-price oj-price--' . ( $pair ? 'pair' : 'solo' ) . '"><p class="oj-price__head"><span class="oj-price__who">' . ( $pair ? esc_html__( 'As a pair', 'olivia-yoga' ) : esc_html__( 'Alone', 'olivia-yoga' ) ) . '</span>'
+			. ( $len ? '<span class="oj-price__len">' . oy_icon( 'clock' ) . esc_html( sprintf( __( '%d minutes', 'olivia-yoga' ), $len ) ) . '</span>' : '' ) . '</p>'
+			. '<dl class="oj-price__rows">' . $rows . '</dl>' . ( $pair ? '<p class="oj-price__for">' . esc_html__( 'for the two of you', 'olivia-yoga' ) . '</p>' : '' ) . '</div>';
+	}
+	return '' === $out ? '' : '<div class="oj-prices">' . $out . '</div>';
+}
+
 function oy_class_cards( $exclude = '' ) {
 	$tones = array( 'hatha-flow' => 'lilac', 'egyeni-online-joga' => 'pink', oy_prenatal_slug() => 'sage', 'stretching' => 'sun', 'relaxacio-legzes' => 'lilac' );
 	$out   = '';
@@ -261,6 +298,7 @@ add_action( 'init', function () {
 	add_shortcode( 'oy_classes', fn() => '<div class="block-wide">' . oy_classes_list() . '</div>' );
 	add_shortcode( 'oy_faq', fn() => oy_faq_list() );
 	add_shortcode( 'oy_art', fn( $a ) => function_exists( 'oy_way_art' ) ? oy_way_art( sanitize_key( $a['name'] ?? '' ) ) : '' );
+	add_shortcode( 'oy_prices', fn( $a ) => oy_price_cards( sanitize_key( $a['service'] ?? '' ) ) );
 	add_shortcode( 'oy_areas', fn() => oy_areas_list() );
 	add_shortcode( 'oy_breath', fn() => oy_breath() );
 	add_shortcode( 'oy_contact_form', fn() => oy_contact_form() );

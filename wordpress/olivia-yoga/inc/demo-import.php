@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-14v';
+	$rev = '2026-11-14w';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1117,6 +1117,21 @@ function oy_migrate_1114d() {
 			$log[] = 'class: egyeni-online-joga – the questions as cards';
 		}
 	}
+	// „Az összes szolgáltatásnál legyenek szebben kategorizálva az árak”: each one-to-one class's price lines become the price
+	// cards (from the booking products); her notes under them (how long a pass lasts) stay as she wrote them
+	foreach ( (array) ( $data['setup']['services'] ?? array() ) as $service => $svc ) {
+		$cls = get_page_by_path( (string) ( $svc['class'] ?? '' ), OBJECT, 'oy_class' );
+		if ( ! $cls || str_contains( $cls->post_content, '[oy_prices' ) ) {
+			continue;
+		}
+		$priced = oy_price_section( $cls->post_content, $service );
+		if ( $priced !== $cls->post_content ) {
+			kses_remove_filters();
+			wp_update_post( wp_slash( array( 'ID' => $cls->ID, 'post_content' => $priced ) ) );
+			kses_init_filters();
+			$log[] = 'class: ' . $cls->post_name . ' – prices as cards';
+		}
+	}
 	// the gift card page („a kép is legyen más”): her photo instead of the singing bowls, only while the bowls are still there
 	$gift_photo = (string) ( $data['studio_pages']['gifts']['photo'] ?? '' );
 	$gift_page  = get_post( (int) get_option( 'oys_page_gifts' ) );
@@ -1173,6 +1188,24 @@ function oy_h3_cards( $content, $heading ) {
 		$out .= '<li><strong>' . trim( $q[1] ) . '</strong><span>' . $text . '</span></li>' . "\n";
 	}
 	return substr( $content, 0, $start ) . $out . "</ul>\n" . substr( $content, $end );
+}
+
+/**
+ * The list under „Árak”: its price lines (the ones with „Ft”) give way to the price cards, the other lines stay as a note.
+ * Left alone when the service has no products to show or the part looks different.
+ */
+function oy_price_section( $content, $service ) {
+	if ( ! preg_match( '~(<h2[^>]*>\s*Árak\s*</h2>\s*)<ul[^>]*>(.*?)</ul>~su', $content, $m, PREG_OFFSET_CAPTURE ) || '' === oy_price_cards( $service ) ) {
+		return $content;
+	}
+	preg_match_all( '~<li[^>]*>(.*?)</li>~su', $m[2][0], $li );
+	$prices = array_filter( $li[1], fn( $t ) => str_contains( $t, 'Ft' ) );
+	if ( ! $prices ) {
+		return $content;
+	}
+	$notes = array_values( array_filter( array_map( 'trim', array_diff_key( $li[1], $prices ) ) ) );
+	$new   = $m[1][0] . '[oy_prices service="' . esc_attr( $service ) . '"]' . ( $notes ? "\n" . '<p class="oj-price-note">' . implode( ' ', $notes ) . '</p>' : '' );
+	return substr( $content, 0, $m[0][1] ) . $new . substr( $content, $m[0][1] + strlen( $m[0][0] ) );
 }
 
 /**

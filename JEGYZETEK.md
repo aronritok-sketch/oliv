@@ -354,6 +354,9 @@
 - **3.11.34:** a kismamatorna kilenc modulja hármasával (3×3, nincs árva kilencedik); az egyéni óra „Miben segíthet…?”
   kérdései kártyákon, kettesével – élesen a lapon lévő szövegből épül újra (`oy_h3_cards()`), mert Olívia maga is átírta. 1114d rev v.
   Tesztek 1182/0.
+- **3.11.35:** az egyéni órák (egyéni jóga, kismama, stretching, relaxáció) árai kártyákon: Egyedül / Párban × hossz, 1 alkalom
+  és a bérlet (alkalmankénti árral) – `[oy_prices service=…]`, a foglalórendszer termékeiből, így mindig a pénztár szerinti ár
+  látszik; Olívia megjegyzései (bérlet érvényessége) alatta maradnak (`oy_price_section()`). 1114d rev w. Tesztek 1184/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
