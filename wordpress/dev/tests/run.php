@@ -2889,10 +2889,11 @@ test( 'online edition, live update: 2018 on her timeline, the kit list for every
 		$pairs  = $data['pages']['about']['_insert'];
 		$li2015 = $pairs[0][1];
 		$li2018 = $pairs[1][1];
-		ok( str_contains( $data['pages']['about']['content'], $li2015 . "\n" . $li2018 ), 'a fresh site has 2018 after 2015' );
+		ok( (bool) preg_match( '/2015-től.*\n<li><b>Otthon, online<\/b>[^\n]*\n' . preg_quote( $li2018, '/' ) . '/', $data['pages']['about']['content'] ), 'a fresh site: 2015, home practice, 2018' );
 		$about = get_page_by_path( oy_page_slug( 'about' ) );
 		$aid   = $about ? $about->ID : wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Rólam', 'post_name' => oy_page_slug( 'about' ) ) );
-		wp_update_post( array( 'ID' => $aid, 'post_content' => "<ol>\n" . $pairs[0][0] . "\n" . $li2015 . "\n<li><b>Ma</b> élő online órák.</li>\n</ol>" ) );
+		$home   = '<li><b>Otthon, online</b> a négy fal között kezdtem jógázni, és nem telt el nap gyakorlás nélkül.</li>';
+		wp_update_post( array( 'ID' => $aid, 'post_content' => "<ol>\n" . $pairs[0][0] . "\n" . $li2015 . "\n" . $home . "\n<li><b>Ma</b> élő online órák.</li>\n</ol>" ) );
 		$kit    = $data['pages']['schedule-pricing']['_replace'];
 		$prices = get_page_by_path( oy_page_slug( 'schedule-pricing' ) );
 		$pid    = $prices ? $prices->ID : wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Bejelentkezés és árak', 'post_name' => oy_page_slug( 'schedule-pricing' ) ) );
@@ -2913,8 +2914,9 @@ test( 'online edition, live update: 2018 on her timeline, the kit list for every
 		ok( str_contains( get_post_field( 'post_content', $cid ), 'Hamarosan visszaírok' ), 'one-to-one class: „soon”, not „within a day”' );
 		eq( $img['pos'], get_post_meta( $att, 'oy_pos', true ), 'the journal photo: the focus lower, she is in the frame' );
 		$c   = get_post_field( 'post_content', $aid );
-		ok( str_contains( $c, $li2015 . "\n" . $li2018 ) && 1 === substr_count( $c, '2018-tól' ), 'About: 2018 (massage) once, after 2015' );
+		ok( 1 === substr_count( $c, '2018-tól' ), 'About: 2018 (massage) once' );
 		ok( ! str_contains( $c, '19 évesen' ), 'About: „19 évesen” out of the timeline („ezt szedjük ki rólamnál”)' );
+		ok( str_contains( $c, $li2015 . "\n" . $home . "\n" . $li2018 ), 'About: „Otthon, online” between 2015 and 2018, word for word (her edit of it stays)' );
 		$p = get_post_field( 'post_content', $pid );
 		ok( str_contains( $p, $kit[0][1] ) && str_contains( $p, $kit[1][1] ) && str_contains( $p, 'Saját mondatom' ), 'prices page: the kit for every class and „charge it”, her own line stays' );
 		ok( str_contains( get_post_field( 'post_content', $faq ), 'töltsd fel' ), 'the FAQ answer: charge your device' );
