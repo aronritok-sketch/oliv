@@ -382,3 +382,9 @@ body .hero__title .hero__l3 { display: block; margin-top: .14em; }
 .oj-breath-peach .breath__glow { background: radial-gradient(circle, rgba(255, 114, 182, .42), rgba(198, 163, 238, .2) 55%, transparent 72%); }
 .oj-breath-peach .btn--light { background: var(--forest); color: var(--paper); }
 .oj-breath-peach .btn--light:hover { background: var(--moss); color: var(--paper); }
+
+/* the length of each service on its box (Olívia, 14 November: „Az időtartamos jelzéseket az adott szolgáltatás blokkjához
+   illesszük be a főoldalon”), at the bottom, so the boxes in a row line up */
+.ways--five .way { grid-template-rows: auto auto 1fr auto; }
+.way__len { grid-column: 1 / -1; justify-self: start; align-self: end; display: inline-flex; align-items: center; gap: .4rem; margin-top: 1rem; padding: .35rem .85rem .35rem .7rem; border-radius: 999px; background: rgba(255, 255, 255, .6); color: var(--ink); font-weight: 700; font-size: .88rem; line-height: 1.2; }
+.way__len svg { width: 16px; height: 16px; flex: none; }

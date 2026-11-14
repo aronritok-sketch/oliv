@@ -2947,10 +2947,39 @@ test( 'online edition, Olívia\'s doc of 14 November, last points: one level for
 		ok( ! str_contains( $css, '.ways--five .way:nth-child(2), .ways--five .way:nth-child(5) { top' ), 'the five boxes in straight lines' );
 		ok( 9 === preg_match_all( '/\.oj-modules li:nth-child\(\d\) \{ --dot: (#[0-9A-F]{6}); \}/', $css, $m ) && 9 === count( array_unique( $m[1] ) ), 'nine modules, nine colours' );
 		ok( str_contains( $home, 'section--breath oj-breath-peach' ) && ! str_contains( $home, 'Egy perc a foglalás' ), 'the breathing lotus on peach; no line under „Heti élő órák”' );
+		ok( ! str_contains( $home, 'id="classes"' ), 'no „Online órák” list on the home page' );
+		ok( (bool) preg_match( '/\[oys_schedule[^\]]*next="3"/', (string) file_get_contents( get_template_directory() . '/template-parts/front-online.php' ) ), 'the timetable: the next three classes' );
+		$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+		eq( 10, (int) $data['setup']['studio']['weeks_ahead'], 'weekly classes made 10 weeks ahead' );
 	} finally {
 		update_option( 'oy_edition', 'fort-myers' );
 	}
 	eq( '<p class="kicker">X</p>', oy_kicker( 'X' ), 'the other editions keep their labels' );
+} );
+
+test( 'one-to-one request: every length on its own line, the 5-session passes, „a pair” and „with a friend” (Olívia, 14 November)', function () {
+	$products = get_option( OYS_Products::OPTION );
+	$services = get_option( OYS_Services::OPTION );
+	try {
+		update_option( OYS_Services::OPTION, array( 'egyeni-joga' => array( 'label' => 'Private yoga', 'class' => 'private-yoga', 'duration' => 60, 'duo' => 1, 'sort' => 10 ), 'prenatal' => array( 'label' => 'Prenatal', 'class' => 'prenatal', 'duration' => 60, 'duo' => 1, 'sort' => 20 ) ) );
+		$mk = fn( $kind, $svc, $people, $min, $credits, $price ) => array( 'name' => "$svc $people $min $credits", 'kind' => $kind, 'credits' => $credits, 'validity_days' => 42, 'price_cents' => $price, 'service' => $svc, 'people' => $people, 'duration_min' => $min, 'active' => 1 );
+		update_option( OYS_Products::OPTION, array(
+			'a' => $mk( 'private_single', 'egyeni-joga', 1, 60, 1, 800000 ), 'b' => $mk( 'private_single', 'egyeni-joga', 2, 60, 1, 1200000 ),
+			'c' => $mk( 'private_single', 'egyeni-joga', 1, 90, 1, 1000000 ), 'd' => $mk( 'private_pack', 'egyeni-joga', 1, 90, 5, 4300000 ),
+			'e' => $mk( 'private_single', 'prenatal', 1, 60, 1, 800000 ), 'f' => $mk( 'private_single', 'prenatal', 2, 60, 1, 1200000 ),
+		) );
+		eq( 4300000, OYS_Services::pack_price( 'egyeni-joga', 1, 90 ), 'pass price by service, people and length' );
+		eq( 0, OYS_Services::pack_price( 'egyeni-joga', 2, 90 ), '… 0 when not sold' );
+		$m    = new ReflectionMethod( 'OYS_Frontend', 'private_form' );
+		$m->setAccessible( true );
+		$html = (string) $m->invoke( null );
+		ok( (bool) preg_match( '/<li>90 minutes: [^<]+<\/li>/', $html ), 'the 90 minutes on a line of their own' );
+		ok( str_contains( $html, '5-session pass:' ), 'the passes listed' );
+		ok( str_contains( $html, 'as a pair' ) && str_contains( $html, 'with a friend' ), 'yoga: as a pair; prenatal: with a friend' );
+	} finally {
+		update_option( OYS_Products::OPTION, $products );
+		update_option( OYS_Services::OPTION, $services );
+	}
 } );
 
 test( 'Arovia payments through the CRM: the site registers itself, every Stripe call is signed, events come back signed', function () {

@@ -1471,15 +1471,32 @@ class OYS_Frontend {
 				$lens = isset( $offered[ $k ] ) ? OYS_Services::lengths( $k ) : array();
 				$opt .= '<option value="' . esc_attr( $k ) . '"' . selected( $want, $k, false ) . ' data-lengths="' . esc_attr( implode( ',', $lens ) ) . '" data-duo="' . ( ! empty( $offered[ $k ]['duo'] ) ? 1 : 0 ) . '">' . esc_html( $v ) . '</option>';
 			}
+			// every length on a line of its own, then the 5-session passes (Olívia, 14 November: „frissítsd az árakat, nézd
+			// át újra, pl. az egyéni jógánál nincs ott a 90 perc” – it was there, lost in one long line); two people are
+			// „a pair”, for the prenatal class „with a friend”
 			$info = '';
 			foreach ( $offered as $k => $sv ) {
-				$bits = array();
+				$friend = 'prenatal' === $k;
+				$rows   = array();
+				$packs  = array();
 				foreach ( OYS_Services::lengths( $k ) ?: array( $sv['duration'] ) as $m ) {
-					$one    = OYS_Services::price( $k, 1, $m );
-					$two    = $sv['duo'] ? OYS_Services::price( $k, 2, $m ) : 0;
-					$bits[] = esc_html( sprintf( __( '%d minutes', 'olivia-studio' ), $m ) ) . ( $one ? ', ' . esc_html( oys_money( $one ) ) : '' ) . ( $two ? ' · ' . esc_html( sprintf( __( 'with a friend: %s for the two of you', 'olivia-studio' ), oys_money( $two ) ) ) : '' );
+					$one = OYS_Services::price( $k, 1, $m );
+					$two = $sv['duo'] ? OYS_Services::price( $k, 2, $m ) : 0;
+					if ( $one || $two ) {
+						$rows[] = esc_html( sprintf( __( '%1$d minutes: %2$s', 'olivia-studio' ), $m, $one ? oys_money( $one ) : '' ) )
+							. ( $two ? esc_html( ', ' . sprintf( $friend ? __( 'with a friend %s for the two of you', 'olivia-studio' ) : __( 'as a pair %s for the two of you', 'olivia-studio' ), oys_money( $two ) ) ) : '' );
+					}
+					$p1 = OYS_Services::pack_price( $k, 1, $m );
+					$p2 = $sv['duo'] ? OYS_Services::pack_price( $k, 2, $m ) : 0;
+					if ( $p1 || $p2 ) {
+						$packs[] = esc_html( sprintf( __( '%1$d minutes %2$s', 'olivia-studio' ), $m, $p1 ? oys_money( $p1 ) : '' ) )
+							. ( $p2 ? esc_html( ' ' . sprintf( $friend ? __( '(with a friend %s)', 'olivia-studio' ) : __( '(as a pair %s)', 'olivia-studio' ), oys_money( $p2 ) ) ) : '' );
+					}
 				}
-				$info .= '<li><b>' . esc_html( OYS_Services::label( $k ) ) . ':</b> ' . implode( '; ', $bits ) . '</li>';
+				if ( $packs ) {
+					$rows[] = esc_html( __( '5-session pass:', 'olivia-studio' ) ) . ' ' . implode( ', ', $packs );
+				}
+				$info .= '<li><b>' . esc_html( OYS_Services::label( $k ) ) . '</b><ul>' . implode( '', array_map( fn( $r ) => '<li>' . $r . '</li>', $rows ) ) . '</ul></li>';
 			}
 			$topic = '<label class="field"><span>' . esc_html__( 'What would you like?', 'olivia-studio' ) . '</span><select name="topic" id="oys-pr-topic">' . $opt . '</select></label>'
 				. '<ul class="oys-small oys-pr-services">' . $info . '</ul>';

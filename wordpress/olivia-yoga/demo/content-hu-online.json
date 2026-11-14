@@ -31,7 +31,8 @@
 			"private_note": "Az első egyéni óránk elején kb. 15 perccel tovább beszélgetünk a céljaidról, ezért számolj egy kicsivel több idővel. Később is szánhatunk erre néhány percet.",
 			"pay_later_note": "",
 			"cancel_extend_days": 7,
-			"schedule_empty_days": "no"
+			"schedule_empty_days": "no",
+			"weeks_ahead": 10
 		},
 		"products": {
 			"online-1": {

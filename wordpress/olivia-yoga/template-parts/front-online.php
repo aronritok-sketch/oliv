@@ -11,11 +11,11 @@ defined( 'ABSPATH' ) || exit;
 
 $studio = fn( $sc ) => shortcode_exists( $sc ) ? do_shortcode( '[' . $sc . ']' ) : '';
 $ways   = array(
-	array( __( 'Group online flow yoga', 'olivia-yoga' ), __( 'Every Wednesday, 18:30 to 20:00, live. Beginners welcome.', 'olivia-yoga' ), oy_class_url( 'hatha-flow' ), 'group', 'lilac' ),
-	array( __( 'Individual online yoga', 'olivia-yoga' ), __( 'One-to-one on video: for a sore back, for stress, or to learn yoga from the basics.', 'olivia-yoga' ), oy_class_url( 'egyeni-online-joga' ), 'home', 'pink' ),
-	array( __( 'Prenatal fitness online', 'olivia-yoga' ), __( 'One-to-one or with a friend: breathing, pelvic floor, circulation, cardio, strength, spine, mobility, yoga and relaxation, combined for your trimester.', 'olivia-yoga' ), oy_class_url( oy_prenatal_slug() ), 'prenatal', 'sage' ),
-	array( __( 'Stretching & mobility', 'olivia-yoga' ), __( 'One-to-one stretching and mobility work for a stiff hip, shoulder and spine, at your own pace.', 'olivia-yoga' ), oy_class_url( 'stretching' ), 'mobility', 'sun' ),
-	array( __( 'Relaxation & breathing', 'olivia-yoga' ), __( 'Half an hour of breathing and guided relaxation for an overloaded nervous system, even at the end of a long day.', 'olivia-yoga' ), oy_class_url( 'relaxacio-legzes' ), 'lotus', 'lilac' ),
+	array( __( 'Group online flow yoga', 'olivia-yoga' ), __( 'Every Wednesday, 18:30 to 20:00, live. Beginners welcome.', 'olivia-yoga' ), oy_class_url( 'hatha-flow' ), 'group', 'lilac', 'hatha-flow' ),
+	array( __( 'Individual online yoga', 'olivia-yoga' ), __( 'One-to-one on video: for a sore back, for stress, or to learn yoga from the basics.', 'olivia-yoga' ), oy_class_url( 'egyeni-online-joga' ), 'home', 'pink', 'egyeni-online-joga' ),
+	array( __( 'Prenatal fitness online', 'olivia-yoga' ), __( 'One-to-one or with a friend: breathing, pelvic floor, circulation, cardio, strength, spine, mobility, yoga and relaxation, combined for your trimester.', 'olivia-yoga' ), oy_class_url( oy_prenatal_slug() ), 'prenatal', 'sage', oy_prenatal_slug() ),
+	array( __( 'Stretching & mobility', 'olivia-yoga' ), __( 'One-to-one stretching and mobility work for a stiff hip, shoulder and spine, at your own pace.', 'olivia-yoga' ), oy_class_url( 'stretching' ), 'mobility', 'sun', 'stretching' ),
+	array( __( 'Relaxation & breathing', 'olivia-yoga' ), __( 'Half an hour of breathing and guided relaxation for an overloaded nervous system, even at the end of a long day.', 'olivia-yoga' ), oy_class_url( 'relaxacio-legzes' ), 'lotus', 'lilac', 'relaxacio-legzes' ),
 );
 $why    = array(
 	array( 'home', __( 'No courage needed for the first class', 'olivia-yoga' ), __( 'Nervous about your first yoga class? Try it at home, on your own mat. Nobody is watching, and your camera can stay off if you like.', 'olivia-yoga' ), 'lilac' ),
@@ -62,7 +62,13 @@ $steps  = array(
 
 <section class="section section--tight" aria-label="<?php esc_attr_e( 'Ways to practice', 'olivia-yoga' ); ?>"><div class="container"><div class="ways ways--five" data-reveal>
 	<?php foreach ( $ways as $w ) : ?>
-		<a class="way way--<?php echo esc_attr( $w[4] ); ?>" href="<?php echo esc_url( $w[2] ); ?>"><?php echo oy_icon( $w[3], 'way__icon' ); // phpcs:ignore ?><h3><?php echo esc_html( $w[0] ); ?></h3><p><?php echo esc_html( $w[1] ); ?></p><span class="way__go" aria-hidden="true"><?php echo oy_icon( 'arrow' ); // phpcs:ignore ?></span></a>
+		<?php
+		// Olívia, 14 November: „Az időtartamos jelzéseket az adott szolgáltatás blokkjához illesszük be a főoldalon” – the
+		// length from the class's own setting (Classes › Length), so it changes with it
+		$oy_class = get_page_by_path( $w[5], OBJECT, 'oy_class' );
+		$oy_len   = $oy_class ? (string) oy_class_meta( $oy_class->ID, 'oy_duration' ) : '';
+		?>
+		<a class="way way--<?php echo esc_attr( $w[4] ); ?>" href="<?php echo esc_url( $w[2] ); ?>"><?php echo oy_icon( $w[3], 'way__icon' ); // phpcs:ignore ?><h3><?php echo esc_html( $w[0] ); ?></h3><p><?php echo esc_html( $w[1] ); ?></p><?php if ( '' !== $oy_len ) : ?><span class="way__len"><?php echo oy_icon( 'clock' ); // phpcs:ignore ?><?php echo esc_html( $oy_len ); ?></span><?php endif; ?><span class="way__go" aria-hidden="true"><?php echo oy_icon( 'arrow' ); // phpcs:ignore ?></span></a>
 	<?php endforeach; ?>
 </div></div></section>
 
@@ -166,10 +172,7 @@ $more     = array(
 	</div>
 </div></section>
 
-<section class="section section--tight" id="classes" aria-labelledby="classes-title"><div class="container">
-	<?php echo oy_section_head( __( 'Online classes', 'olivia-yoga' ), __( 'Breathwork, strength, stretching, balance, a real flow state and a long relaxation, live. Join the group on Wednesdays, or ask for a one-to-one session.', 'olivia-yoga' ), __( 'Classes', 'olivia-yoga' ), 'classes-title' ); // phpcs:ignore ?>
-	<?php echo oy_classes_list(); // phpcs:ignore ?>
-</div></section>
+<?php // Olívia, 14 November: „ezt az egész blokkot szedjük ki a szolgáltatásokkal” – the „Online órák” list is gone; the lengths are on the boxes at the top ?>
 
 <section class="section section--pale" id="how" aria-labelledby="how-title"><div class="container private__grid">
 	<div data-reveal>
@@ -187,8 +190,8 @@ $more     = array(
 
 <section class="section section--tight" id="schedule" aria-labelledby="schedule-title"><div class="container">
 	<header class="section__head section__head--row" data-reveal><div><?php echo oy_kicker( __( 'Next classes', 'olivia-yoga' ) ); // phpcs:ignore ?><h2 id="schedule-title"><?php esc_html_e( 'Weekly live classes', 'olivia-yoga' ); ?></h2><?php // Olívia, 14 November: „ezt is kiszedhetjük” – no line under the title ?></div><?php echo oy_btn( oy_page_link( 'schedule-pricing' ), oy_schedule_label(), 'ghost' ); // phpcs:ignore ?></header>
-	<?php // Olivia, 13 November: only the Wednesdays (the next ones, however far), and the one-to-one sessions in a box of their own ?>
-	<?php echo shortcode_exists( 'oys_schedule' ) ? do_shortcode( '[oys_schedule days="7" next="4"]' ) . ( shortcode_exists( 'oys_private_box' ) ? do_shortcode( '[oys_private_box]' ) : '' ) : ''; // phpcs:ignore ?>
+	<?php // Olivia, 13 November: only the Wednesdays (the next ones, however far), and the one-to-one sessions in a box of their own; 14 November: „itt mindig a következő 3 óra legyen látható” ?>
+	<?php echo shortcode_exists( 'oys_schedule' ) ? do_shortcode( '[oys_schedule days="7" next="3" empty_days="no"]' ) . ( shortcode_exists( 'oys_private_box' ) ? do_shortcode( '[oys_private_box]' ) : '' ) : ''; // phpcs:ignore ?>
 </div></section>
 
 <section class="section section--moss hatha" aria-labelledby="hatha-title"><div class="container hatha__grid">

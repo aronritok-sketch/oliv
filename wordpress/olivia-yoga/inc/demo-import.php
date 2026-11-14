@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-14e';
+	$rev = '2026-11-14f';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1078,6 +1078,13 @@ function oy_migrate_1114d() {
 				$log[] = 'FAQ: ' . $f['q'];
 			}
 		}
+	}
+	// „itt mindig a következő 3 óra legyen látható”: the weekly classes are made 10 weeks ahead (not 6), so with a missed
+	// week (23 December) the timetable still has its next three
+	$weeks = (int) ( $data['setup']['studio']['weeks_ahead'] ?? 0 );
+	if ( $weeks && class_exists( 'OYS_Settings' ) && (int) OYS_Settings::get( 'weeks_ahead' ) < $weeks ) {
+		OYS_Settings::update( array( 'weeks_ahead' => $weeks ) );
+		$log[] = 'weekly classes ' . $weeks . ' weeks ahead: ' . (int) OYS_Schedule::generate( $weeks ) . ' new dates';
 	}
 	foreach ( oy_images() as $key => $img ) {
 		if ( empty( $img['pos_prev'] ) ) {

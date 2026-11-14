@@ -292,6 +292,13 @@
 - **3.11.2 (élesítés, Áron: „Csinald es minden mehet”):** a 3.11.0/3.11.1 témába a régi bővítmény-zip (1.10.2) került új
   verziószámmal, mert kimaradt a `dist/*.zip` újraépítése – élesen és a deven is 1.10.2 maradt. A zipek újraépítve; a
   `build-child-themes.py` mostantól leáll, ha a `dist/olivia-studio.zip` verziója nem egyezik a forráséval.
+- **A doksi 16:20-as pontjai (olivia-yoga 3.11.3, olivia-studio 1.10.5; Áron: „az élest azonnal mehet minden”):** a
+  főoldal órarendje mindig a következő 3 órát mutatja (`next="3"`; a heti órák 10 hétre előre készülnek, élesen
+  `oy_migrate_1114d` rev f emeli a `weeks_ahead`-et és legenerálja az új dátumokat); a főoldal „Online órák” listája
+  kikerült, az időtartam az öt szolgáltatás-dobozon van (az óra saját „Hossz” mezőjéből); a Fiókom › Egyéni órák
+  árlistája időtartamonként külön sorban, az 5 alkalmas bérletekkel, jógánál „párban”, kismamatornánál „a barátnőddel”
+  (`OYS_Services::pack_price`). Percenkénti figyelés: `scratchpad/watch/watch.sh` (Monitor) a nyilvános doksikat és a
+  chatet nézi. Tesztek 1058/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

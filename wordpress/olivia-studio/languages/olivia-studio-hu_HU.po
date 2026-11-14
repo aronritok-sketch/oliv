@@ -6037,3 +6037,26 @@ msgstr "Egy óra: %1$s (fejenként %2$s)"
 
 msgid "Charge your device or plug it in, so it does not run out during the class."
 msgstr "Töltsd fel az eszközöd, vagy tedd töltőre, hogy ne merüljön le óra közben."
+
+#, php-format
+msgid "with a friend %s for the two of you"
+msgstr "a barátnőddel %s kettőtöknek"
+
+#, php-format
+msgid "as a pair %s for the two of you"
+msgstr "párban %s kettőtöknek"
+
+#, php-format
+msgid "%1$d minutes %2$s"
+msgstr "%1$d perc %2$s"
+
+#, php-format
+msgid "(with a friend %s)"
+msgstr "(a barátnőddel %s)"
+
+#, php-format
+msgid "(as a pair %s)"
+msgstr "(párban %s)"
+
+msgid "5-session pass:"
+msgstr "5 alkalmas bérlet:"

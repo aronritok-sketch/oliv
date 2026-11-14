@@ -4036,3 +4036,26 @@ msgstr "Este navegador no puede grabar. Usa Chrome, Edge o Safari en un ordenado
 
 msgid "Charge your device or plug it in, so it does not run out during the class."
 msgstr "Carga tu dispositivo o déjalo enchufado para que no se apague durante la clase."
+
+#, php-format
+msgid "with a friend %s for the two of you"
+msgstr "con una amiga %s para las dos"
+
+#, php-format
+msgid "as a pair %s for the two of you"
+msgstr "en pareja %s para los dos"
+
+#, php-format
+msgid "%1$d minutes %2$s"
+msgstr "%1$d minutos %2$s"
+
+#, php-format
+msgid "(with a friend %s)"
+msgstr "(con una amiga %s)"
+
+#, php-format
+msgid "(as a pair %s)"
+msgstr "(en pareja %s)"
+
+msgid "5-session pass:"
+msgstr "Bono de 5 sesiones:"

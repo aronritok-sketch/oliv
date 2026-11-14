@@ -103,6 +103,19 @@ class OYS_Services {
 		return 0;
 	}
 
+	/** Price of a pass (private_pack) of a service: people, length and number of sessions; 0 if not sold. */
+	public static function pack_price( $key, $people = 1, $minutes = 0, $credits = 5 ) {
+		$people  = (int) $people > 1 ? 2 : 1;
+		$s       = self::get( $key );
+		$minutes = (int) $minutes ?: ( $s ? (int) $s['duration'] : 0 );
+		foreach ( OYS_Products::all( true ) as $p ) {
+			if ( 'private_pack' === $p['kind'] && $key === $p['service'] && (int) $p['people'] === $people && (int) $p['credits'] === (int) $credits && self::product_minutes( $p ) === $minutes ) {
+				return (int) $p['price_cents'];
+			}
+		}
+		return 0;
+	}
+
 	/** A service product's length: its own, or the service's. */
 	public static function product_minutes( array $p ) {
 		$s = ! empty( $p['service'] ) ? self::get( $p['service'] ) : null;
