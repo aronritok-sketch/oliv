@@ -787,3 +787,13 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .entry .credential:not(.credential--aside) img { width: 100%; height: auto; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 14px; }
 .entry .credential:not(.credential--aside) figcaption { font-size: 1rem; font-weight: 700; color: var(--ink); line-height: 1.45; }
 .entry .credential:not(.credential--aside) img[src$=".svg"] { aspect-ratio: auto; object-fit: contain; border-radius: 0; }
+
+/* „Piktogramokat szedjük ki mindenhonnan. Legyen letisztultabb”: the lists that had a pictogram beside each point are plain
+   text now – a short line in the site's colours above each title keeps them in order */
+.places li { grid-template-columns: 1fr; gap: 0; }
+.places li > div::before { content: ""; display: block; width: 28px; height: 4px; margin: 0 0 .7rem; border-radius: 4px; background: var(--lilac); }
+.places li:nth-child(4n + 2) > div::before { background: var(--pink); }
+.places li:nth-child(4n + 3) > div::before { background: var(--sage); }
+.places li:nth-child(4n) > div::before { background: var(--sun); }
+.places h3 { margin-top: 0; }
+.entry .oj-area > p:empty, .entry .oj-area > br:first-child { display: none; }

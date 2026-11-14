@@ -211,6 +211,11 @@ function oy_icon( $name, $cls = 'icon' ) {
 
 /** A pictogram on a soft, hand-painted wash (no box). */
 function oy_pictogram( $icon, $tone = 'lilac' ) {
+	// Olívia, 14 November: „Piktogramokat szedjük ki mindenhonnan. Legyen letisztultabb” – none on the online site, in the
+	// templates and in the page texts ([oy_picto]) alike
+	if ( function_exists( 'oy_online_only' ) && oy_online_only() ) {
+		return '';
+	}
 	return '<span class="picto picto--' . esc_attr( $tone ) . '" aria-hidden="true">' . oy_icon( $icon, 'picto__icon' ) . '</span>';
 }
 

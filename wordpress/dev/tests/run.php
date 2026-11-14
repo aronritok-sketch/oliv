@@ -3370,8 +3370,10 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 		OYS_Settings::update( array( 'notify_email' => $keep, 'email_reply_to' => $rep ) );
 	}
 	update_option( 'oy_edition', 'hu-online' );
+	ok( '' === oy_pictogram( 'home', 'lilac' ) && '' === do_shortcode( '[oy_picto icon="group" tone="sage"]' ), 'online: no pictograms anywhere, in the templates nor in the page texts („Piktogramokat szedjük ki mindenhonnan”)' );
 	$ed = (string) oy_brand( 'email' );
 	update_option( 'oy_edition', 'fort-myers' );
+	ok( str_contains( oy_pictogram( 'home', 'lilac' ), 'class="picto' ), '… the other sites keep theirs' );
 	ok( 'info@oliviajoga.online' === $ed, 'the online site\'s own address is info@oliviajoga.online' );
 	$faq = oy_faq_list();
 	$js  = (string) file_get_contents( get_template_directory() . '/assets/site.js' );

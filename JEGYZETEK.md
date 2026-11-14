@@ -388,6 +388,8 @@
 - **3.11.47:** az online oldal e-mail-címe mindenhol info@oliviajoga.online (fejléc, lábléc, kapcsolat, ÁSZF, impresszum,
   adatvédelem, válaszcím) – élesen az `email_swap` lépés cseréli a régi címet minden szövegben és beállításban; **a foglalási
   értesítések (notify_email) továbbra is Olívia Gmailjére mennek** (ha az info@-t is nézi, át lehet állítani). Tesztek 1233/0.
+- **3.11.48:** az online oldalon nincs piktogram (`oy_pictogram()` üres, így az `[oy_picto]` is); a pontokba szedett listák
+  sima szövegek, a címek fölött rövid színes vonal. Tesztek 1235/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
