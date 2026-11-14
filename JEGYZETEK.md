@@ -367,6 +367,7 @@
 - **3.11.40:** főoldali GYIK: a „Miért jó online jógázni?” kikerült (a GYIK-lapon marad), bekerült a „Mi van, ha késve
   érkezem…”, az utolsó a „Sérülésem vagy egészségügyi problémám van…” (`faqs_home` a tartalomfájlban; élesen a jelölő és a
   sorrend). Kikerült a „Négy ok, amiért…” és az „Az egyéni óra teljesen hozzád igazodik…” sor. 1114d rev 2026-11-15a. Tesztek 1200/0.
+- **3.11.41:** az órarend alatti „Egyéni órák” doboz mondata egy sorban (asztali nézetben). Tesztek 1201/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

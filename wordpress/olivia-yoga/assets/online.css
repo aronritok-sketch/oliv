@@ -747,3 +747,8 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .oj-only-me { position: relative; overflow: hidden; isolation: isolate; padding: .6rem 1rem .6rem 1.75rem; border-radius: 14px; background: var(--card, #fff); color: var(--orchid) !important; box-shadow: var(--shadow); }
 .oj-only-me::before { content: ""; position: absolute; z-index: -1; left: -1.05rem; top: -1.05rem; width: 2.6rem; height: 2.6rem; border-radius: 50%; background: color-mix(in srgb, var(--pink) 45%, #fff); }
 .oj-only-me::after { content: ""; position: absolute; z-index: -1; left: -.3rem; top: 1.05rem; width: .85rem; height: .85rem; border-radius: 50%; background: color-mix(in srgb, var(--pink) 22%, #fff); }
+
+/* „Ezt próbáljuk meg egy sorba írni”: the one-to-one box's sentence on one line where there is room (it stopped at 56
+   characters), a touch smaller */
+.oys-private-box p { max-width: none; font-size: .97rem; }
+@media (min-width: 1000px) { .oys-private-box > div { flex-basis: 0; min-width: 0; } .oys-private-box p { white-space: nowrap; } }
