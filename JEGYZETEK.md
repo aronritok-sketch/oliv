@@ -331,6 +331,14 @@
   megnevezi; rendelés-meta `recipient_name2/email2`); a Jógáról „Összes írás” végre minden cikket mutat (a
   `template-parts/cards.php` `$posts` változója a fő lekérdezés listáját írta felül – referenciával kötött globális!);
   a fejlécszöveg nem ér a fotó hullámába. Minta ajándékutalvány-e-mail képként Olíviának (chat 9148656). Tesztek 1128/0.
+- **3.11.21–3.11.26:** a szolgáltatás-dobozok képei végül lágy, egymásba olvadó pasztell körök (lassan „lélegeznek”;
+  a rajzos változatot Olívia gyerekesnek találta), `oy_way_art()`; a kismama-modulok sarkába belógó pasztell kör az oldal
+  négy színével; a stretching/relaxáció kártyákon nincs ecsetvonás és szaggatott pecsét, a perc a sarokkörben; az
+  „Online órák” lapról kikerült a bevezető és a „Miért jó…” blokk, az órák fotós kártyák (`oy_class_cards()`), a
+  „Melyik órát válasszam?” öt színes doboz (`[oy_art]`), új első mondat az egyéni óráknál; a szöveges listákban pasztell
+  pötty; a fejléc gombja „Fiókom”. Az 1114d `_insert`/`_replace` párok mostantól feloldják a `{{class:…}}` linkeket.
+  **Nyitott (Áron dönt):** Olívia a lábléc készítő-sorába Áron nevét és egyéni oldalát kérte a „Készítette:
+  HelloProVision” helyett – márkaszabály-ütközés, nem változtattam. Üzenet Olíviának: 9148658. Tesztek 1155/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
