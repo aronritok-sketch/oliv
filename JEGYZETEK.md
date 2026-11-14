@@ -289,6 +289,9 @@
   képe (journal-01) lejjebb fókuszál (50% 62%), hogy Olívia látsszon, ne a fák teteje. Élesen `oy_migrate_1114d` rev
   2026-11-14e: a lapok mellett az órák (`classes`) `_replace` párjai is, és a fotó fókusza, ha még a régi (`pos_prev`).
   Teszt: a naptár-kapacitás teszt saját tanárt kap (az időponttól nem függ többé). Tesztek 1050/0.
+- **3.11.2 (élesítés, Áron: „Csinald es minden mehet”):** a 3.11.0/3.11.1 témába a régi bővítmény-zip (1.10.2) került új
+  verziószámmal, mert kimaradt a `dist/*.zip` újraépítése – élesen és a deven is 1.10.2 maradt. A zipek újraépítve; a
+  `build-child-themes.py` mostantól leáll, ha a `dist/olivia-studio.zip` verziója nem egyezik a forráséval.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

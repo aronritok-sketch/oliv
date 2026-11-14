@@ -22,6 +22,7 @@ import re
 import shutil
 import subprocess
 import sys
+import zipfile
 
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter, ImageFont
@@ -109,8 +110,15 @@ def build_variant(slug, v, hlprv):
         # The booking plugin rides along (Áron, 2026-11-13: „tedd fel te az élesre”): a live site updates only its
         # theme (iu_theme, pinned in deploy/sites.json); the theme's setup installs this zip when it is newer.
         os.makedirs(os.path.join(dst, 'plugin'), exist_ok=True)
-        shutil.copy(PLUGIN_ZIP, os.path.join(dst, 'plugin', 'olivia-studio.zip'))
         pv = re.search(r'Version:\s*([0-9.]+)', open(PLUGIN_MAIN, encoding='utf-8').read()).group(1)
+        # the zip must be the plugin as it is now: an old zip under a new version number would be installed again and
+        # again, and the live site would never get the new plugin (3.11.1: the zip was still 1.10.2)
+        with zipfile.ZipFile(PLUGIN_ZIP) as z:
+            zv = re.search(r'Version:\s*([0-9.]+)', z.read('olivia-studio/olivia-studio.php').decode('utf-8')).group(1)
+        if zv != pv:
+            sys.exit('wordpress/dist/olivia-studio.zip is ' + zv + ', the plugin is ' + pv + ': rebuild the zip first '
+                     '(cd wordpress && rm -f dist/olivia-studio.zip && zip -qr dist/olivia-studio.zip olivia-studio)')
+        shutil.copy(PLUGIN_ZIP, os.path.join(dst, 'plugin', 'olivia-studio.zip'))
         open(os.path.join(dst, 'plugin', 'olivia-studio.version'), 'w', encoding='utf-8').write(pv + '\n')
     for f in CONTENT_FILES:  # only this edition's copy
         if f != v['content']:
