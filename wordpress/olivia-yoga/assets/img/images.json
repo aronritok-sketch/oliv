@@ -531,9 +531,9 @@
  },
  "journal-01": {
   "alt": "",
-  "pos": "50% 50%",
-  "w": 900,
-  "h": 849,
+  "pos": "50% 22%",
+  "w": 1200,
+  "h": 1800,
   "hu": {
    "file": "hatha-jogaora-nyujto-gyakorlatok-forditott-harcos",
    "alt": "Kovács Olívia fordított harcos pózban a réten – nyújtó gyakorlatok a hatha jógaórán"
@@ -542,8 +542,8 @@
  "journal-02": {
   "alt": "",
   "pos": "50% 50%",
-  "w": 800,
-  "h": 595,
+  "w": 1200,
+  "h": 900,
   "hu": {
    "file": "hatha-jogaora-erosito-gyakorlatok-csaturanga",
    "alt": "Kovács Olívia csaturangában (alacsony plank) – erősítő gyakorlatok a hatha jógaórán"
@@ -552,8 +552,8 @@
  "journal-03": {
   "alt": "",
   "pos": "50% 50%",
-  "w": 795,
-  "h": 600,
+  "w": 1200,
+  "h": 900,
   "hu": {
    "file": "hatha-jogaora-vinyasza-napudvozlet-holdudvozlet",
    "alt": "Kovács Olívia egy teraszon naplementekor – vinyászák, nap- és holdüdvözlet a hatha jógaórán"
@@ -561,9 +561,9 @@
  },
  "journal-04": {
   "alt": "",
-  "pos": "50% 50%",
-  "w": 800,
-  "h": 992,
+  "pos": "50% 22%",
+  "w": 1200,
+  "h": 1800,
   "hu": {
    "file": "hatha-jogaora-egyensuly-tancos-poz",
    "alt": "Kovács Olívia táncos pózban a nappaliban – egyensúlygyakorlatok a hatha jógaórán"
@@ -571,9 +571,9 @@
  },
  "journal-05": {
   "alt": "",
-  "pos": "50% 50%",
-  "w": 667,
-  "h": 746,
+  "pos": "50% 22%",
+  "w": 1200,
+  "h": 1600,
   "hu": {
    "file": "hatha-jogaora-rahangolodas-relaxacio",
    "alt": "Kovács Olívia törökülésben, imakézzel – ráhangolódás és relaxáció a hatha jógaórán"
@@ -582,18 +582,19 @@
  "journal-06": {
   "alt": "",
   "pos": "50% 50%",
-  "w": 791,
-  "h": 739,
+  "w": 1200,
+  "h": 800,
   "hu": {
    "file": "nyujtas-hatasa-szemelyisegre-joga",
-   "alt": "Kovács Olívia mély kitörésben nyújt – a nyújtás hatása a személyiségre"
+   "alt": "Kovács Olívia térdelő hátrahajlásban, a lábfejét fogva egy stégen naplementekor – a nyújtás hatása a személyiségre",
+   "alt_prev": "Kovács Olívia mély kitörésben nyújt – a nyújtás hatása a személyiségre"
   }
  },
  "journal-07": {
   "alt": "",
   "pos": "50% 50%",
-  "w": 798,
-  "h": 600,
+  "w": 1200,
+  "h": 900,
   "hu": {
    "file": "joga-pozitiv-gondolkodas",
    "alt": "Kovács Olívia lehajtott fejjel, lágy fényben – jóga és pozitív gondolkodás"
@@ -602,8 +603,8 @@
  "journal-08": {
   "alt": "",
   "pos": "50% 50%",
-  "w": 798,
-  "h": 800,
+  "w": 1200,
+  "h": 1200,
   "hu": {
    "file": "lelki-egeszseg-vilagnapja-joga",
    "alt": "Kovács Olívia a homokdűnén naplementekor – a lelki egészség világnapja"
@@ -611,19 +612,20 @@
  },
  "journal-09": {
   "alt": "",
-  "pos": "50% 50%",
-  "w": 1000,
-  "h": 966,
+  "pos": "50% 22%",
+  "w": 1200,
+  "h": 1500,
   "hu": {
    "file": "egeszseges-gondolkodas-onszeretet-joga",
-   "alt": "Kovács Olívia kitörésben, felnyújtott karokkal a kertben – egészséges gondolkodás és önszeretet"
+   "alt": "Jógázók felnyújtott karokkal egy szabadtéri jógateraszon – egészséges gondolkodás és önszeretet",
+   "alt_prev": "Kovács Olívia kitörésben, felnyújtott karokkal a kertben – egészséges gondolkodás és önszeretet"
   }
  },
  "journal-10": {
   "alt": "",
-  "pos": "50% 50%",
-  "w": 603,
-  "h": 664,
+  "pos": "50% 22%",
+  "w": 1200,
+  "h": 1319,
   "hu": {
    "file": "legzes-legzogyakorlat-joga",
    "alt": "Kovács Olívia hátrahajlásban a homokdűnén – légzőgyakorlatok a jógában"
@@ -632,38 +634,41 @@
  "journal-11": {
   "alt": "",
   "pos": "50% 50%",
-  "w": 800,
-  "h": 591,
+  "w": 1200,
+  "h": 900,
   "hu": {
    "file": "zene-a-jogaoran",
-   "alt": "Kovács Olívia táncos pózban egy mezőn – zene a jógaórán"
+   "alt": "Kovács Olívia szabadtéri csoportos jógaórát tart – zene a jógaórán",
+   "alt_prev": "Kovács Olívia táncos pózban egy mezőn – zene a jógaórán"
   }
  },
  "journal-12": {
   "alt": "",
   "pos": "50% 50%",
-  "w": 643,
-  "h": 532,
+  "w": 1200,
+  "h": 798,
   "hu": {
    "file": "allj-meg-egy-pillanatra-joga",
-   "alt": "Kovács Olívia felemelt karokkal a hegyek felé néz – állj meg egy pillanatra"
+   "alt": "Kovács Olívia táncos pózban a réten, a hegyek előtt – állj meg egy pillanatra",
+   "alt_prev": "Kovács Olívia felemelt karokkal a hegyek felé néz – állj meg egy pillanatra"
   }
  },
  "journal-13": {
   "alt": "",
   "pos": "50% 50%",
-  "w": 1069,
-  "h": 1080,
+  "w": 1200,
+  "h": 794,
   "hu": {
    "file": "pajzsmirigy-harmonizalas-jogaval-aszanak",
-   "alt": "Pajzsmirigy harmonizálás jógával: gyertyaállás, ekepóz, fejenállás, kobrapóz, felfelé néző kutya, kis jógahíd, tevepóz, napüdvözlet"
+   "alt": "Kovács Olívia kobrapózban otthon, jógaszőnyegen – pajzsmirigy harmonizálás jógával",
+   "alt_prev": "Pajzsmirigy harmonizálás jógával: gyertyaállás, ekepóz, fejenállás, kobrapóz, felfelé néző kutya, kis jógahíd, tevepóz, napüdvözlet"
   }
  },
  "journal-14": {
   "alt": "",
   "pos": "50% 50%",
-  "w": 754,
-  "h": 557,
+  "w": 1200,
+  "h": 797,
   "hu": {
    "file": "mit-ad-a-joga-kerekpoz",
    "alt": "Kovács Olívia egylábas kerékpózban a réten – mit ad a jóga"
@@ -672,8 +677,8 @@
  "journal-15": {
   "alt": "",
   "pos": "50% 50%",
-  "w": 719,
-  "h": 531,
+  "w": 1200,
+  "h": 797,
   "hu": {
    "file": "joga-es-munka-kovacs-olivia",
    "alt": "Kovács Olívia előadást tart egy tárgyalóban – jóga a munka mellett"
@@ -681,9 +686,9 @@
  },
  "journal-16": {
   "alt": "",
-  "pos": "50% 50%",
-  "w": 583,
-  "h": 800,
+  "pos": "50% 22%",
+  "w": 1200,
+  "h": 1600,
   "hu": {
    "file": "meditacio-harcos-poz-steg",
    "alt": "Kovács Olívia harcos pózban egy stégen a víz fölött – meditáció"
@@ -692,8 +697,8 @@
  "journal-17": {
   "alt": "",
   "pos": "50% 50%",
-  "w": 600,
-  "h": 671,
+  "w": 1200,
+  "h": 900,
   "hu": {
    "file": "a-joga-8-aga-yama",
    "alt": "Kovács Olívia egy teraszról nézi a szabadtéri jógaórát – a jóga 8 ága: yama"
@@ -701,9 +706,9 @@
  },
  "journal-18": {
   "alt": "",
-  "pos": "50% 50%",
-  "w": 600,
-  "h": 895,
+  "pos": "50% 22%",
+  "w": 1200,
+  "h": 1502,
   "hu": {
    "file": "a-joga-8-aga-niyama",
    "alt": "Kovács Olívia mosolyogva hátranéz a folyóparton – a jóga 8 ága: niyama"
@@ -711,9 +716,9 @@
  },
  "journal-19": {
   "alt": "",
-  "pos": "50% 50%",
-  "w": 600,
-  "h": 769,
+  "pos": "50% 22%",
+  "w": 1200,
+  "h": 1602,
   "hu": {
    "file": "a-joga-8-aga-aszana",
    "alt": "Kovács Olívia fordított harcos pózban egy őszi erdei úton – a jóga 8 ága: ászana"
@@ -721,9 +726,9 @@
  },
  "journal-20": {
   "alt": "",
-  "pos": "50% 50%",
-  "w": 600,
-  "h": 619,
+  "pos": "50% 22%",
+  "w": 1200,
+  "h": 1502,
   "hu": {
    "file": "a-joga-8-aga-pranajama-legzes",
    "alt": "Kovács Olívia csukott szemmel, a feje fölé emelt karokkal – a jóga 8 ága: pránájáma, a légzés"
@@ -731,9 +736,9 @@
  },
  "journal-21": {
   "alt": "",
-  "pos": "50% 50%",
-  "w": 600,
-  "h": 799,
+  "pos": "50% 22%",
+  "w": 1200,
+  "h": 1500,
   "hu": {
    "file": "a-joga-8-aga-pratyahara",
    "alt": "Kovács Olívia sas-karokkal, ellenfényben – a jóga 8 ága: pratyahara, visszavonulás"
@@ -741,9 +746,9 @@
  },
  "journal-22": {
   "alt": "",
-  "pos": "50% 50%",
-  "w": 600,
-  "h": 737,
+  "pos": "50% 22%",
+  "w": 1200,
+  "h": 1770,
   "hu": {
    "file": "a-joga-8-aga-dharana-fokusz",
    "alt": "Kovács Olívia táncos pózban az őszi erdőben – a jóga 8 ága: dhárana, a fókusz"
@@ -752,8 +757,8 @@
  "journal-23": {
   "alt": "",
   "pos": "50% 50%",
-  "w": 540,
-  "h": 604,
+  "w": 1200,
+  "h": 960,
   "hu": {
    "file": "a-joga-8-aga-dhjana-meditacio",
    "alt": "Kovács Olívia meditál a Duna fölött – a jóga 8 ága: dhjána"
@@ -761,9 +766,9 @@
  },
  "journal-24": {
   "alt": "",
-  "pos": "50% 50%",
-  "w": 600,
-  "h": 682,
+  "pos": "50% 22%",
+  "w": 1200,
+  "h": 1548,
   "hu": {
    "file": "a-joga-8-aga-szamadhi",
    "alt": "Kovács Olívia kitörésben az őszi erdőben, ellenfényben – a jóga 8 ága: szamádhi"

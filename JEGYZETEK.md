@@ -259,6 +259,14 @@
   „fejenként” is), egységes dobozok (a szolgáltatás az ár fölött, `oys_price_card_title`), hangsúlyosabb „alkalom ×
   perc”, az ajándéksor felirata hoverre nem tűnik el, belépve (admin sáv) a ragadós szolgáltatásnév teteje látszik.
   Olívia kérte: „mehet minden módosítás egyből az élesre” – élesre Áron engedélyével. Tesztek 1016/0.
+- **A doksi későbbi pontjai (olivia-yoga 3.10.0):** a cikkek képei Olívia nyers fotói (az oliviajoga.hu buildjéből,
+  `oliviajoga-hu/assets/img/new/cikk-*`), kitöltik a keretet (nincs többé „art” jelzés); élesen `oy_migrate_doc_1114`
+  a Médiatárban helyben cseréli őket (ugyanaz a melléklet és név, új méretek), az öt eltérő fotó új magyar altot kap
+  (06, 09, 11, 12, 13). A főoldalon a fekete-fehér fotó egérrel színes. A kismamatorna eszközei „kellhetnek”, nem
+  kötelezők (oldal + GYIK, csak ahol még az eredeti szöveg áll). A nagy címek sortávja 1,16 (az ékezet nem lóg bele a
+  fölötte lévő sorba). Mobilmenü: az „Online órák” alatti szolgáltatások 48 px-es, gombszerű sorok. Rólam: számozás
+  helyett hullámvonal (fejezetek) és rajzos ikonok („Hogyan tanítok”). Víziós összefoglaló Olíviának a chaten (2. változat a
+  főoldalra, a kismamatorna részletesebben a posztja alapján). Tesztek 1025/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

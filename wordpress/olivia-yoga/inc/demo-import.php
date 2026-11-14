@@ -889,6 +889,95 @@ function oy_migrate_about() {
 }
 
 /**
+ * Olívia's doc of 14 November, the later points, on a live online site (once):
+ * - „Minden cikk képet cserélj ki az eredeti képre … Legyenek beigazítva, hogy kitöltse a teljes képet” – the journal
+ *   photos in the media library get her raw photo in place of the graphic (same attachment, same name, new sizes), the
+ *   posts lose the „art” flag (the card and the post's head fill the frame), the five photos that show something else now
+ *   get their own text;
+ * - „A kismamatornánál csak kellhetnek ezek az eszközök, nem feltétlen kellenek” – on the prenatal page only those two
+ *   sentences change, and the question in the FAQ – where they are still the theme's.
+ */
+function oy_migrate_doc_1114() {
+	$rev = '2026-11-14a';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_doc1114_rev' ) === $rev ) {
+		return array();
+	}
+	update_option( 'oy_doc1114_rev', $rev );
+	require_once ABSPATH . 'wp-admin/includes/image.php';
+	$imgs   = oy_images();
+	$photos = 0;
+	$journal = array();
+	foreach ( get_posts( array( 'post_type' => 'attachment', 'post_status' => 'any', 'meta_key' => 'oy_key', 'numberposts' => -1, 'fields' => 'ids' ) ) as $att ) {
+		$key = (string) get_post_meta( $att, 'oy_key', true );
+		if ( ! preg_match( '/^journal-\d+$/', $key ) || empty( $imgs[ $key ] ) ) {
+			continue;
+		}
+		$journal[] = $att;
+		$src  = get_template_directory() . '/assets/img/' . oy_image_file( $key ) . '-1200.jpg';
+		$file = (string) get_attached_file( $att );
+		if ( ! file_exists( $src ) || '' === $file ) {
+			continue;
+		}
+		$dir  = dirname( $file );
+		$base = (string) preg_replace( '/-scaled$/', '', pathinfo( $file, PATHINFO_FILENAME ) );
+		$meta = wp_get_attachment_metadata( $att );
+		wp_delete_attachment_files( $att, is_array( $meta ) ? $meta : array(), array(), $file );
+		$to = $dir . '/' . $base . '.jpg';
+		if ( ! @copy( $src, $to ) ) { // phpcs:ignore WordPress.PHP.NoSilencedErrors
+			continue;
+		}
+		update_attached_file( $att, $to );
+		wp_update_post( array( 'ID' => $att, 'post_mime_type' => 'image/jpeg' ) );
+		wp_update_attachment_metadata( $att, wp_generate_attachment_metadata( $att, $to ) );
+		update_post_meta( $att, 'oy_pos', $imgs[ $key ]['pos'] );
+		$hu  = $imgs[ $key ]['hu'] ?? array();
+		$own = (string) get_post_meta( $att, '_wp_attachment_image_alt', true );
+		if ( ! empty( $hu['alt'] ) && ( '' === $own || $own === (string) $imgs[ $key ]['alt'] || $own === (string) ( $hu['alt_prev'] ?? '' ) ) ) {
+			update_post_meta( $att, '_wp_attachment_image_alt', $hu['alt'] );
+			wp_update_post( array( 'ID' => $att, 'post_title' => $hu['alt'] ) );
+		}
+		$photos++;
+	}
+	$art = 0;
+	if ( $journal ) {
+		foreach ( get_posts( array( 'post_type' => 'post', 'post_status' => 'any', 'numberposts' => -1, 'fields' => 'ids', 'meta_key' => 'oy_art' ) ) as $post ) {
+			if ( in_array( (int) get_post_thumbnail_id( $post ), $journal, true ) ) {
+				delete_post_meta( $post, 'oy_art' );
+				$art++;
+			}
+		}
+	}
+	$log  = array( sprintf( 'journal: %d raw photos, %d posts fill the frame', $photos, $art ) );
+	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+	$kit  = $data['classes']['kismamatorna'] ?? array();
+	$post = get_page_by_path( 'kismamatorna', OBJECT, 'oy_class' );
+	if ( $post && ! empty( $kit['_replace'] ) ) {
+		$content = $post->post_content;
+		foreach ( (array) $kit['_replace'] as $pair ) {
+			$content = str_replace( (string) $pair[0], (string) $pair[1], $content );
+		}
+		if ( $content !== $post->post_content ) {
+			kses_remove_filters();
+			wp_update_post( wp_slash( array( 'ID' => $post->ID, 'post_content' => $content ) ) );
+			kses_init_filters();
+			$log[] = 'prenatal: what you may need';
+		}
+	}
+	foreach ( (array) ( $data['faqs'] ?? array() ) as $f ) {
+		if ( empty( $f['_prev']['q'] ) ) {
+			continue;
+		}
+		foreach ( get_posts( array( 'post_type' => 'oy_faq', 'post_status' => 'any', 'numberposts' => -1, 'title' => $f['_prev']['q'] ) ) as $faq ) {
+			if ( trim( wp_strip_all_tags( $faq->post_content ) ) === trim( $f['_prev']['a'] ) ) {
+				wp_update_post( wp_slash( array( 'ID' => $faq->ID, 'post_title' => $f['q'], 'post_content' => wpautop( esc_html( $f['a'] ) ) ) ) );
+				$log[] = 'FAQ: ' . $f['q'];
+			}
+		}
+	}
+	return $log;
+}
+
+/**
  * The online edition's passes, one-to-one services and timetable setting from its content file, on a live site. Passes
  * someone has bought keep their own expiry; products the edition no longer has go off sale.
  */

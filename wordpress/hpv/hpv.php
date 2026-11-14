@@ -47,6 +47,7 @@ add_action( 'hpv_child_setup', function ( $from, $to, $slug ) {
 	$log = array_merge( $log, oy_migrate_prices() ); // Olivia's prices of 14 November (once)
 	$log = array_merge( $log, oy_migrate_images() ); // Hungarian names and texts for the photos, web copies of hers (once)
 	$log = array_merge( $log, oy_migrate_about() ); // the About page broken up (once, only if its text is still the theme's)
+	$log = array_merge( $log, oy_migrate_doc_1114() ); // her raw journal photos, the prenatal kit „may be needed” (once)
 	kses_remove_filters();
 	$log = array_merge( $log, oy_import_all( false ) );
 	kses_init_filters();

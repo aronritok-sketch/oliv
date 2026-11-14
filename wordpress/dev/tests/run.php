@@ -2821,6 +2821,38 @@ test( 'online edition, live update: the About page broken up – only while its 
 	}
 } );
 
+test( 'online edition, live update: her raw journal photos fill the frame, the prenatal kit „may be needed”', function () {
+	require_once get_template_directory() . '/inc/demo-import.php';
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		$imgs = oy_images();
+		ok( 1800 === (int) $imgs['journal-01']['h'] && file_exists( get_template_directory() . '/assets/img/' . oy_image_file( 'journal-01' ) . '-1200.jpg' ), 'the theme ships the raw photo' );
+		$att = self_test_photo( 'hatha-jogaora-nyujto-gyakorlatok-forditott-harcos.jpg', 900, 849, '', $imgs['journal-06']['hu']['alt_prev'] );
+		update_post_meta( $att, 'oy_key', 'journal-06' );
+		$post = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'A nyújtás hatása' ) );
+		set_post_thumbnail( $post, $att );
+		update_post_meta( $post, 'oy_art', '1' );
+		$kit  = wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Online kismamatorna', 'post_name' => 'kismamatorna', 'post_content' => "<h2>Mire lesz szükséged?</h2>\n<ul>\n<li>Gumiszalag</li>\n</ul>\n<p>Ha valamelyik eszköz még nincs meg, írj, és megmutatom, mivel helyettesítheted otthon.</p>" ) );
+		$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+		$prev = array_values( array_filter( $data['faqs'], fn( $f ) => ! empty( $f['_prev'] ) ) )[0]['_prev'];
+		$faq  = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => $prev['q'], 'post_content' => wpautop( esc_html( $prev['a'] ) ) ) );
+		delete_option( 'oy_doc1114_rev' );
+		$log  = oy_migrate_doc_1114();
+		$meta = wp_get_attachment_metadata( $att );
+		ok( 1200 === (int) $meta['width'] && 800 === (int) $meta['height'], 'the journal photo: her raw one (1200 × 800)' );
+		eq( 'hatha-jogaora-nyujto-gyakorlatok-forditott-harcos.jpg', basename( (string) get_attached_file( $att ) ), '… under its Hungarian name' );
+		eq( $imgs['journal-06']['hu']['alt'], get_post_meta( $att, '_wp_attachment_image_alt', true ), '… with the text of the new photo' );
+		eq( '', get_post_meta( $post, 'oy_art', true ), 'the post fills the frame' );
+		$c = get_post_field( 'post_content', $kit );
+		ok( str_contains( $c, 'Mire lehet szükséged?' ) && str_contains( $c, 'Nem feltétlenül kell mindegyik' ) && str_contains( $c, '<li>Gumiszalag</li>' ), 'prenatal: „may be needed”, the list stays' );
+		ok( str_starts_with( get_post_field( 'post_title', $faq ), 'Mire lehet' ) && str_contains( get_post_field( 'post_content', $faq ), 'Nem feltétlenül kell mindegyik' ), 'the FAQ too' );
+		ok( (bool) preg_match( '/journal: [1-9]\d* raw photos, [1-9]\d* posts fill the frame/', implode( ' · ', $log ) ), 'logged' );
+		eq( array(), oy_migrate_doc_1114(), 'once' );
+	} finally {
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+} );
+
 test( 'Arovia payments through the CRM: the site registers itself, every Stripe call is signed, events come back signed', function () {
 	$calls = array();
 	$fake  = function ( $pre, $args, $url ) use ( &$calls ) {
