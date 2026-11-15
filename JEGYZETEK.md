@@ -514,6 +514,14 @@
     mondataiból.
   - Javított elírások: immunrendszer, Crohn, Hashimoto, YouTube, szív- és érrendszeri, anyagcserezavarok.
   - Migráció: 2026-11-15o, csak ha még a régi szöveg van ott. Tesztek: 1302/0.
+- **3.11.71:** „ez nem az a kék mint a színpalettában”:
+  - Ahol a menta felületet tölt ki (kártyák, a hero szava, dobozok, fejlécek, szekcióhátterek), ott pontosan a Frozen Water
+    `#DAFFEF` van.
+  - Az apró jelek (pöttyök, körök, szélek, lépésszámok) a mélyebb `--lilac-mark` `#8FD9BC`-t kapják, hogy a világos
+    háttéren is látsszanak.
+  - „a bal oldali zöld szín megmaradhat dominánsnak”: az Evergreen marad a meghatározó szín, nincs teendő (a „két szélső
+    barna” mondatot Olívia átírta erre).
+  - Tesztek: 1302/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

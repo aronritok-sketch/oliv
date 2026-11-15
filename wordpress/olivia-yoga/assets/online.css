@@ -1197,3 +1197,23 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .book-fab { box-shadow: 0 14px 30px -12px rgba(135, 57, 47, .65); }
 /* the prenatal tiles on the mint section: the peach she likes (pale sage would melt into the mint) */
 .section--pale.oj-prenatal .oj-modules li { background: color-mix(in srgb, var(--pink-soft) 75%, #fff); }
+
+/* „ez nem az a kék mint a színpalettában”: wherever the mint fills (cards, the hero word, boxes, section backgrounds) it is the
+   palette's Frozen Water itself; the small marks (dots, rings, edges, step numbers) take a deeper shade of it, so they still
+   show on the light backgrounds */
+:root { --lilac: #DAFFEF; --lilac-soft: #DAFFEF; --lilac-mark: #8FD9BC; }
+.entry .oj-opening, .entry .oj-poses { --edge: var(--lilac-mark); }
+.oj-area--lilac, .oj-more__card--lilac { --tone: var(--lilac-mark); }
+.entry .oj-keynote--lilac { --c: var(--lilac-mark); }
+.oj-fit__item--lilac { --edge: var(--lilac-mark); }
+.oj-price--solo { --edge: var(--lilac-mark); }
+.entry ol.oj-flow > li:nth-child(4n + 1) { --c: var(--lilac-mark); }
+.oj-modules:not(.oj-modules--why) li:nth-child(4n + 1) { --dot: var(--lilac-mark); }
+.entry ul.oj-kit li:nth-child(4n + 1) { --dot: var(--lilac-mark); }
+.entry ul:not([class]) li:not([class]):nth-child(4n + 3) { --wave: var(--lilac-mark); }
+.answer ul.oj-dashes li:nth-child(4n + 3)::before, .oj-faq-answer ul.oj-dashes li:nth-child(4n + 3)::before { background: var(--lilac-mark); }
+.entry > .oj-chapter::before { --b: var(--lilac-mark); }
+.entry > .oj-chapter:nth-of-type(3n)::before { --a: var(--lilac-mark); }
+.steps li:nth-child(4n + 1)::before { background: color-mix(in srgb, var(--lilac-mark) 70%, #fff); }
+.places li:nth-child(4n + 1)::before { background: color-mix(in srgb, var(--lilac-mark) 70%, #fff); }
+.entry .oj-lines--lilac { --tone: var(--lilac-mark); }
