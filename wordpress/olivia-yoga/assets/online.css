@@ -348,14 +348,15 @@ body .hero__title .hero__l3 { display: block; margin-top: .14em; }
 .oj-hero .oj-hero__title .hero__l1 { margin-bottom: .1em; }
 .oj-hero .oj-trio { display: flex; flex-direction: column; align-items: flex-start; gap: .14em; margin-top: 0; }
 .oj-hero .oj-trio mark { padding: .12em .1em 0; margin-left: -.02em; line-height: 1.02; }
-/* „ez a 3 szín legyen a főcímben a jóga, kismamatorna, mobilizáció”: Bright Gold, Sandy Brown, Tangerine Dream */
-.oj-hero .oj-trio .oj-breath--gold::before { background: var(--sun); }
-.oj-hero .oj-trio .oj-breath--sandy::before { background: var(--sandy); }
-.oj-hero .oj-trio .oj-breath--tangerine::before { background: var(--tangerine); }
+/* The three words of the hero, each in its own colour. Olívia, 15 November, with the new palette: „jóga legyen ffac81 színű,
+   kismamatorna e63462 és a mobilizáció ffdf22” (before: Bright Gold, Sandy Brown, Tangerine Dream) */
+.oj-hero .oj-trio .oj-breath--w1::before { background: var(--tangerine); }
+.oj-hero .oj-trio .oj-breath--w2::before { background: var(--pink); }
+.oj-hero .oj-trio .oj-breath--w3::before { background: var(--sun); }
 .oj-hero .oj-trio .oj-breath::before { transform-origin: 0 60%; }
 @media (prefers-reduced-motion: no-preference) {
-	.oj-hero .oj-trio .oj-breath--sandy::before { animation-delay: -6.66s; }
-	.oj-hero .oj-trio .oj-breath--tangerine::before { animation-delay: -3.33s; }
+	.oj-hero .oj-trio .oj-breath--w2::before { animation-delay: -6.66s; }
+	.oj-hero .oj-trio .oj-breath--w3::before { animation-delay: -3.33s; }
 	@keyframes oj-breath-trio { 0%, 100% { transform: scale(1, 1); } 40% { transform: scale(1.04, 1.1); } }
 	.oj-hero .oj-trio .oj-breath::before { animation-name: oj-breath-trio; }
 }

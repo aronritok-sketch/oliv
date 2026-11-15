@@ -3557,7 +3557,7 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	$hdr = (string) file_get_contents( get_template_directory() . '/header.php' );
 	ok( str_contains( $hdr, "oy_online_only() ? '002E2C' : '2B5036'" ) && str_contains( $hdr, "oy_online_only() ? 'FFAC81' : 'EE3F9A'" ), 'the favicon: Evergreen with a Tangerine Dream circle on the online site, the studio site keeps its own („favicont is cseréld a megfelelő színűre”)' );
 	$ocss2 = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
-	ok( str_contains( $ocss2, ':root { --sandy: #F7934C; --tangerine: #FFAC81; }' ) && str_contains( $ocss2, '.oj-hero .oj-trio .oj-breath--gold::before { background: var(--sun); }' ) && str_contains( $ocss2, '.oj-hero .oj-trio .oj-breath--sandy::before { background: var(--sandy); }' ) && str_contains( $ocss2, '.oj-hero .oj-trio .oj-breath--tangerine::before { background: var(--tangerine); }' ), 'the hero words: Bright Gold, Sandy Brown, Tangerine Dream („ez a 3 szín legyen a főcímben”)' );
+	ok( str_contains( $ocss2, ':root { --sandy: #F7934C; --tangerine: #FFAC81; }' ) && str_contains( $ocss2, '.oj-hero .oj-trio .oj-breath--w1::before { background: var(--tangerine); }' ) && str_contains( $ocss2, '.oj-hero .oj-trio .oj-breath--w2::before { background: var(--pink); }' ) && str_contains( $ocss2, '.oj-hero .oj-trio .oj-breath--w3::before { background: var(--sun); }' ), 'the hero words: yoga Tangerine Dream, prenatal Magenta Bloom, mobility Bright Gold („jóga legyen ffac81 színű, kismamatorna e63462 és a mobilizáció ffdf22”)' );
 	update_option( 'oy_edition', 'hu-online' );
 	$heads = array();
 	foreach ( array( 'relaxacio-legzes', 'egyeni-online-joga', 'hatha-flow', 'kismamatorna' ) as $hs ) {
@@ -3636,7 +3636,7 @@ test( 'online edition, Olívia\'s doc of 14 November, last points: one level for
 		ob_start();
 		load_template( get_template_directory() . '/template-parts/front-online.php', false );
 		$home = (string) ob_get_clean();
-		ok( (bool) preg_match( '/<h1[^>]*>.*oj-breath--gold.*oj-breath--sandy.*oj-breath--tangerine.*<\/h1>/s', $home ), 'the hero: three equal marks' );
+		ok( (bool) preg_match( '/<h1[^>]*>.*oj-breath--w1.*oj-breath--w2.*oj-breath--w3.*<\/h1>/s', $home ), 'the hero: three equal marks' );
 		ok( ! str_contains( $home, 'class="kicker"' ), 'home: no labels' );
 		ok( 2 === substr_count( $home, 'oj-waved--soft' ) && 1 === substr_count( $home, 'oj-brush' ), 'one-to-one and prenatal: the hero\'s soft wave (the stroke stays only by the intro)' );
 		ob_start();
