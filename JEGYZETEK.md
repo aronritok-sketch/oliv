@@ -496,6 +496,16 @@
   - A sortöréses doboz nem lehet rózsaszín közvetlenül a rózsaszín „titok” cetli előtt, ilyenkor zöld („ez legyen más
     színű”).
   - Tesztek: 1299/0.
+- **3.11.69 – új színpaletta** (Olívia, 11.15: „meggondoltam magam és szeretnék módosítani a színpalettán!!! ez alapján legyen
+  minden!!! ha kell, akkor még azokat a világosakat, amit szeretek hozzárakhatod!”):
+  - Paletta: Evergreen #013220, Frozen Water #DAFFEF, Bright Gold #FFDF22, Sweet Salmon #EB9486, Reddish Brown #A44A3F;
+    a két világos, amit szeret, megmaradt: halvány zsálya #DEE5D3, barack #FFE2CC.
+  - Csak az online kiadásban (`online.css` végén `:root`): a tokenek neve marad, a téma és a bővítmény is ezeket olvassa.
+    `forest`/`ink` → Evergreen, `lilac` → menta (Frozen Water), `pink` → Sweet Salmon (`pink-soft` → barack),
+    `sun` → Bright Gold, `orchid` (a fehér feliratú gombok) → Reddish Brown (fehér rajta 5,8:1).
+  - A beégetett színek (pöttyök, árnyékok, SVG-k, logó, böngészőszín) is átkerültek. A kismama-csempék barackszínűek a
+    menta háttéren. A közepes zsálya #A9BFA0 maradt, átvezet a zöldek között.
+  - Tesztek: 1301/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
