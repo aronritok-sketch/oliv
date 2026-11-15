@@ -7,8 +7,17 @@ defined( 'ABSPATH' ) || exit;
 $oy_cards = $args['posts'] ?? array();
 ?>
 <div class="cards">
-	<?php foreach ( $oy_cards as $i => $p ) : $cat = get_the_category( $p->ID ); ?>
-	<article class="card card--<?php echo esc_attr( OY_ACCENTS[ $i % 4 ] ); ?><?php echo get_post_meta( $p->ID, 'oy_art', true ) ? ' card--art' : ''; ?>"><a href="<?php echo esc_url( get_permalink( $p ) ); ?>">
+	<?php
+	foreach ( $oy_cards as $i => $p ) :
+		$cat  = get_the_category( $p->ID );
+		$tone = OY_ACCENTS[ $i % 4 ];
+		// the online site, Olívia, 15 November: „az azonos témák legyenek azonos színűek. A főoldalon is ugyanúgy” – the colour
+		// follows the topic (category), so every „A jóga 8 ága” card wears the same one, in the palette's three colours
+		if ( oy_online_only() && $cat ) {
+			$tone = array( 'lilac', 'pink', 'sun' )[ absint( crc32( $cat[0]->slug ) ) % 3 ];
+		}
+		?>
+	<article class="card card--<?php echo esc_attr( $tone ); ?><?php echo get_post_meta( $p->ID, 'oy_art', true ) ? ' card--art' : ''; ?>"><a href="<?php echo esc_url( get_permalink( $p ) ); ?>">
 		<div class="card__media"><?php echo oy_post_photo( $p->ID, 'olivia-terrace-profile', '(min-width: 960px) 30vw, 92vw' ); // phpcs:ignore ?></div>
 		<div class="card__body">
 			<?php if ( $cat ) : ?><span class="card__cat"><?php echo esc_html( $cat[0]->name ); ?></span><?php endif; ?>

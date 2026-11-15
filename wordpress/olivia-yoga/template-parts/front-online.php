@@ -71,7 +71,14 @@ $steps  = array(
 		$oy_class = get_page_by_path( $w[5], OBJECT, 'oy_class' );
 		$oy_len   = $oy_class ? (string) oy_class_meta( $oy_class->ID, 'oy_duration' ) : '';
 		?>
-		<a class="way way--<?php echo esc_attr( $w[4] ); ?>" href="<?php echo esc_url( $w[2] ); ?>"><?php echo oy_way_art( $w[3] ); // phpcs:ignore ?><h3><?php echo esc_html( $w[0] ); ?></h3><p><?php echo esc_html( $w[1] ); ?></p><?php if ( '' !== $oy_len ) : ?><span class="way__len"><?php echo oy_icon( 'clock' ); // phpcs:ignore ?><?php echo esc_html( $oy_len ); ?></span><?php endif; ?><?php if ( 'hatha-flow' === $w[5] && oy_replay_days() ) : ?><span class="way__len way__len--replay"><?php echo oy_icon( 'play' ); // phpcs:ignore ?><?php echo esc_html( oy_replay_label() ); ?></span><?php endif; ?><span class="way__go" aria-hidden="true"><?php echo oy_icon( 'arrow' ); // phpcs:ignore ?></span></a>
+		<?php
+		// Olívia, 15 November: „ezeket a boxokat csináld meg olyasmi stílusban mint ezek. ezek nagyon tetszenek” (the class
+		// page heads) – the class's photo on top with the heads' wavy edge and line, the card in the class's own colour
+		$oy_hue = oy_class_hue( $w[5] ) ?: $w[4];
+		$oy_pic = $oy_class ? oy_post_photo( $oy_class->ID, '', '(min-width: 960px) 34vw, 92vw' ) : '';
+		$oy_top = $oy_pic ? '<span class="way__pic">' . $oy_pic . '<svg class="way__wave" viewBox="0 0 100 24" preserveAspectRatio="none" aria-hidden="true" focusable="false"><path class="way__wave-band" d="M0 9C18 1 34 1 50 9S82 17 100 7V24H0Z"/><path class="way__wave-fill" d="M0 15C18 7 34 7 50 15S82 23 100 13V24H0Z"/><path class="way__wave-line" d="M0 9C18 1 34 1 50 9S82 17 100 7"/></svg></span>' : oy_way_art( $w[3] );
+		?>
+		<a class="way way--<?php echo esc_attr( $oy_hue ); ?><?php echo $oy_pic ? ' way--photo' : ''; ?>" href="<?php echo esc_url( $w[2] ); ?>"><?php echo $oy_top; // phpcs:ignore ?><h3><?php echo esc_html( $w[0] ); ?></h3><p><?php echo esc_html( $w[1] ); ?></p><?php if ( '' !== $oy_len ) : ?><span class="way__len"><?php echo oy_icon( 'clock' ); // phpcs:ignore ?><?php echo esc_html( $oy_len ); ?></span><?php endif; ?><?php if ( 'hatha-flow' === $w[5] && oy_replay_days() ) : ?><span class="way__len way__len--replay"><?php echo oy_icon( 'play' ); // phpcs:ignore ?><?php echo esc_html( oy_replay_label() ); ?></span><?php endif; ?><span class="way__go" aria-hidden="true"><?php echo oy_icon( 'arrow' ); // phpcs:ignore ?></span></a>
 	<?php endforeach; ?>
 </div></div></section>
 

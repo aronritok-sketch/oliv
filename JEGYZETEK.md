@@ -597,6 +597,48 @@
   - A kezdőlapi hero fotója mögötti hátsó hullám Evergreen lett, az elülső magenta maradt.
   - „favicont is igazítsd a jelenlegi színekhez”: Evergreen kör, benne Magenta Bloom pötty, mint a logó hulláma.
   - Tesztek: 1315/0.
+- **3.11.78:** Olívia 11.15-i esti hosszú listája.
+  - **Egy szín minden órához, mindenhol** (`oy_class_hue()`, „az azonos témák legyenek azonos színűek. A főoldalon is
+    ugyanúgy”).
+    - A színek:
+      - csoportos flow: Evergreen, fehér betűvel;
+      - kismamatorna: Magenta Bloom, fehér betűvel;
+      - egyéni: Tangerine Dream;
+      - stretching: sötétzöld (`--fern`), fehér betűvel;
+      - relaxáció: a kezdőlapi kártyán a kért zsálya, a fejlécen és az óra-kártyán halványsárga.
+    - Hol jelenik meg:
+      - a kezdőlapi kártyákon;
+      - az óra-kártyákon (`oj-class-card`);
+      - az óraoldalak fejlécén;
+      - a „Melyik órát válasszam?” dobozokon (a link alapján).
+  - **Kezdőlapi kártyák** („ezeket a boxokat csináld meg olyasmi stílusban mint ezek”): felül az óra fotója, alatta az
+    oldalfejlécek hullámos széle (világosabb sáv, magenta vonal, a magenta kártyán sárga).
+  - **Fejlécek:** a Kapcsolat fejléce Bright Gold, a GYIK-é halványsárga.
+  - **Paletta mindenhol:** zsálya helyett Tangerine, Magenta, Bright Gold és Evergreen. Érintett elemek:
+    - a „kinek szól” kártyák és csoportok;
+    - a „miben segíthet” pöttyök;
+    - az eszközlista;
+    - a kismama-csempék;
+    - a Rólam dobozainak sarkai (és a szöveg nem lóg bele a körbe);
+    - az árkártyák.
+  - **Hullámok a kezdőlapon:**
+    - a bemutatkozó fotó ecsetvonása magenta és sárga;
+    - a kismama és az egyéni blokk fotója mögött sárga és zöld;
+    - a hero elülső hulláma Platinum.
+  - **Egyéb:**
+    - az órarend időpont-dobozai sárgák;
+    - a naplókártyák címkéje témánként azonos színű (a kezdőlapon is);
+    - mobilon a menüben sárga a kiválasztott/megérintett óra;
+    - mobilon csak egy foglalás-gomb van (az alsó sáv mellett nincs lebegő gomb).
+  - **„Itt folyamatábra helyett legyen valami kreatív hullám”** (a flow óra „Mi történik…” része): egy hullám fut a
+    lépések fölött, ahogy az óra halad. Csendes érkezés, emelkedés a bemelegítésen és a flow-n át, a figyelem a tetőn,
+    lecsendesedés a végén. A számok a hullámon ülnek, telefonon a hullám oldalt fut lefelé.
+  - **Nyitott (következő kör):** „aloldal urleket ellenőrizd mindenhol hogy átírtad-e arra ami az oldalcím/h1”.
+    - Eltérők élesben: `gyik`, `aszf`, `adatvedelem`, és az óraoldalak (`hatha-flow`, `kismamatorna`, `stretching`,
+      `relaxacio-legzes`).
+    - Az óraoldalak címét a kód sok helyen kulcsként használja (a bővítmény szolgáltatásai is), ezért ezt külön, óvatos
+      körben kell átírni, a régi címekről 301-gyel.
+  - Tesztek: 1320/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

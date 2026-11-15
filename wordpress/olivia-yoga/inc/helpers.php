@@ -6,10 +6,26 @@
 defined( 'ABSPATH' ) || exit;
 
 const OY_ACCENTS = array( 'lilac', 'pink', 'sun', 'sage' );
+/**
+ * Olívia, 15 November (evening): „csoportos óra legyen a zöldünk fehér betűvel, kismamatorna magenta, egyéni online jóga
+ * tangerine, stretching és mobilizáció olyan sötétzöld …” and „az azonos témák legyenek azonos színűek. A főoldalon is
+ * ugyanúgy” – one colour per class on the online site, the same on the home cards, the class cards and the class heads:
+ * flow Evergreen, prenatal Magenta Bloom, one-to-one Tangerine Dream, stretching a dark green, relaxation the light one.
+ */
+function oy_class_hue( $slug ) {
+	$hues = array( 'hatha-flow' => 'flow', 'kismamatorna' => 'pre', 'egyeni-online-joga' => 'one', 'stretching' => 'mob', 'relaxacio-legzes' => 'rel' );
+	return oy_online_only() ? ( $hues[ $slug ] ?? '' ) : '';
+}
+
 // The online class pages whose head colour Olívia chose herself (15 November: „Ez maradjon meg a frozen water színűnek” –
 // the relaxation page; „az egyéni online jógánál legyen ez a szín: sandy brown”; „csoportos flow: evergreen” – with white
 // text; „kismamatorna: tangerine dream”); the rest by seed.
-const OY_ONLINE_HEAD_TONES = array( 'crelaxacio-legzes' => 'lilac', 'cegyeni-online-joga' => 'sandy', 'chatha-flow' => 'forest', 'ckismamatorna' => 'tangerine' );
+const OY_ONLINE_HEAD_TONES = array(
+	// the classes: their own colour (oy_class_hue); relaxation „itt legyen halvány sárga vagy krémszínű”
+	'chatha-flow' => 'flow', 'ckismamatorna' => 'pre', 'cegyeni-online-joga' => 'one', 'cstretching' => 'mob', 'crelaxacio-legzes' => 'cream',
+	// „ez a szín nem tetszik, itt is legyen a sárgánk” (contact), „ez is legyen krémszínű vagy halvány sárga” (FAQ)
+	'contact' => 'sun', 'kapcsolat' => 'sun', 'faq' => 'cream', 'gyik' => 'cream',
+);
 
 function oy_accent_for( $seed ) {
 	$sum = 0;
@@ -459,7 +475,11 @@ function oy_flows( $html ) {
 			foreach ( $st[0] as $i => $l ) {
 				$li .= '<li><span class="oj-flow__n" aria-hidden="true">' . ( $i + 1 ) . '</span><p>' . $l . '</p></li>';
 			}
-			return $m[1] . '<ol class="oj-flow oj-flow--n' . min( 5, count( $st[0] ) ) . '">' . $li . '</ol>' . ( '' !== $st[1] ? '<p class="oj-flow__note">' . $st[1] . '</p>' : '' ) . $after;
+			// Olívia, 15 November, on the flow class: „itt folyamatábra helyett legyen valami kreatív hullám a leírás alapján ami
+			// illik az oldal designjához” – the class as a wave: calm arrival, rising through the warm-up and the flow, the
+			// focus at the top, and down into the slow end (online.css .oj-flow--wave)
+			$wave = str_starts_with( trim( $m[2] ), 'Mi történik' ) && in_array( count( $st[0] ), array( 4, 5 ), true ) ? ' oj-flow--wave' : '';
+			return $m[1] . '<ol class="oj-flow oj-flow--n' . min( 5, count( $st[0] ) ) . $wave . '">' . $li . '</ol>' . ( '' !== $st[1] ? '<p class="oj-flow__note">' . $st[1] . '</p>' : '' ) . $after;
 		},
 		$html
 	);

@@ -111,7 +111,7 @@ function oy_class_cards( $exclude = '' ) {
 	// is every week) opens the row wide, and the four one-to-one sessions sit in one row under it
 	$lead  = 5 === count( $all );
 	foreach ( $all as $c ) {
-		$tone = $tones[ $c->post_name ] ?? OY_ACCENTS[ $n % 4 ];
+		$tone = oy_class_hue( $c->post_name ) ?: ( $tones[ $c->post_name ] ?? OY_ACCENTS[ $n % 4 ] );
 		$wide = $lead && 0 === $n;
 		$n++;
 		$len  = oy_class_meta( $c->ID, 'oy_duration' );

@@ -1290,10 +1290,10 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .page-head--tangerine { --tone: var(--tangerine); } /* „kismamatorna: tangerine dream” */
 .page-head--orchid h1, .page-head--orchid .lead, .page-head--forest h1, .page-head--forest .lead { color: #fff; }
 @media (min-width: 960px) {
-	.page-head--orchid:not(.has-art-photo) .page-head__photo::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath fill='%23FFAC81' d='M15.91 0.00 L15.37 0.85 L14.89 1.70 L14.44 2.54 L14.04 3.39 L13.69 4.23 L13.37 5.07 L13.09 5.91 L12.85 6.75 L12.65 7.59 L12.48 8.43 L12.35 9.26 L12.24 10.10 L12.17 10.93 L12.12 11.76 L12.10 12.59 L12.10 13.42 L12.12 14.25 L12.17 15.08 L12.23 15.91 L12.32 16.74 L12.41 17.57 L12.53 18.40 L12.65 19.22 L12.78 20.05 L12.93 20.87 L13.08 21.70 L13.23 22.52 L13.39 23.35 L13.55 24.17 L13.72 25.00 L13.88 25.83 L14.04 26.65 L14.19 27.48 L14.33 28.30 L14.47 29.13 L14.60 29.95 L14.72 30.78 L14.82 31.60 L14.91 32.43 L14.98 33.26 L15.03 34.09 L15.07 34.92 L15.08 35.75 L15.06 36.58 L15.03 37.41 L14.96 38.24 L14.87 39.07 L14.74 39.90 L14.59 40.74 L14.40 41.57 L14.17 42.41 L13.91 43.25 L13.60 44.09 L13.26 44.93 L12.88 45.77 L12.45 46.61 L11.97 47.46 L11.45 48.30 L10.87 49.15 L10.25 50.00 L9.62 50.85 L9.01 51.70 L8.44 52.54 L7.89 53.39 L7.37 54.23 L6.89 55.07 L6.43 55.91 L6.00 56.75 L5.60 57.59 L5.22 58.43 L4.87 59.26 L4.55 60.10 L4.26 60.93 L3.99 61.76 L3.74 62.59 L3.53 63.42 L3.34 64.25 L3.17 65.08 L3.03 65.91 L2.91 66.74 L2.81 67.57 L2.74 68.40 L2.69 69.22 L2.66 70.05 L2.66 70.87 L2.68 71.70 L2.72 72.52 L2.78 73.35 L2.86 74.17 L2.97 75.00 L3.09 75.83 L3.23 76.65 L3.40 77.48 L3.58 78.30 L3.78 79.13 L4.00 79.95 L4.24 80.78 L4.49 81.60 L4.77 82.43 L5.06 83.26 L5.36 84.09 L5.69 84.92 L6.03 85.75 L6.38 86.58 L6.75 87.41 L7.14 88.24 L7.54 89.07 L7.95 89.90 L8.38 90.74 L8.83 91.57 L9.28 92.41 L9.75 93.25 L10.23 94.09 L10.72 94.93 L11.23 95.77 L11.74 96.61 L12.27 97.46 L12.81 98.30 L13.36 99.15 L13.91 100.00 L14.09 100.00 L13.56 99.15 L13.03 98.30 L12.52 97.46 L12.02 96.61 L11.54 95.77 L11.06 94.93 L10.60 94.09 L10.15 93.25 L9.71 92.41 L9.29 91.57 L8.87 90.74 L8.48 89.90 L8.09 89.07 L7.73 88.24 L7.37 87.41 L7.03 86.58 L6.71 85.75 L6.40 84.92 L6.11 84.09 L5.83 83.26 L5.57 82.43 L5.33 81.60 L5.10 80.78 L4.90 79.95 L4.71 79.13 L4.53 78.30 L4.38 77.48 L4.25 76.65 L4.13 75.83 L4.03 75.00 L3.96 74.17 L3.90 73.35 L3.86 72.52 L3.85 71.70 L3.85 70.87 L3.88 70.05 L3.93 69.22 L4.00 68.40 L4.09 67.57 L4.20 66.74 L4.34 65.91 L4.50 65.08 L4.69 64.25 L4.90 63.42 L5.13 62.59 L5.39 61.76 L5.67 60.93 L5.98 60.10 L6.31 59.26 L6.67 58.43 L7.05 57.59 L7.46 56.75 L7.90 55.91 L8.37 55.07 L8.86 54.23 L9.38 53.39 L9.93 52.54 L10.51 51.70 L11.11 50.85 L11.75 50.00 L12.37 49.15 L12.94 48.30 L13.47 47.46 L13.94 46.61 L14.36 45.77 L14.74 44.93 L15.08 44.09 L15.37 43.25 L15.63 42.41 L15.84 41.57 L16.02 40.74 L16.17 39.90 L16.28 39.07 L16.36 38.24 L16.41 37.41 L16.43 36.58 L16.43 35.75 L16.40 34.92 L16.35 34.09 L16.28 33.26 L16.19 32.43 L16.08 31.60 L15.95 30.78 L15.82 29.95 L15.66 29.13 L15.50 28.30 L15.33 27.48 L15.15 26.65 L14.97 25.83 L14.78 25.00 L14.59 24.17 L14.40 23.35 L14.22 22.52 L14.03 21.70 L13.85 20.87 L13.68 20.05 L13.52 19.22 L13.36 18.40 L13.22 17.57 L13.09 16.74 L12.98 15.91 L12.88 15.08 L12.81 14.25 L12.75 13.42 L12.71 12.59 L12.71 11.76 L12.72 10.93 L12.77 10.10 L12.84 9.26 L12.94 8.43 L13.08 7.59 L13.25 6.75 L13.46 5.91 L13.71 5.07 L13.99 4.23 L14.32 3.39 L14.69 2.54 L15.11 1.70 L15.57 0.85 L16.09 0.00Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; }
+	.page-head--orchid:not(.has-art-photo) .page-head__photo::after, .page-head--pre:not(.has-art-photo) .page-head__photo::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath fill='%23FFAC81' d='M15.91 0.00 L15.37 0.85 L14.89 1.70 L14.44 2.54 L14.04 3.39 L13.69 4.23 L13.37 5.07 L13.09 5.91 L12.85 6.75 L12.65 7.59 L12.48 8.43 L12.35 9.26 L12.24 10.10 L12.17 10.93 L12.12 11.76 L12.10 12.59 L12.10 13.42 L12.12 14.25 L12.17 15.08 L12.23 15.91 L12.32 16.74 L12.41 17.57 L12.53 18.40 L12.65 19.22 L12.78 20.05 L12.93 20.87 L13.08 21.70 L13.23 22.52 L13.39 23.35 L13.55 24.17 L13.72 25.00 L13.88 25.83 L14.04 26.65 L14.19 27.48 L14.33 28.30 L14.47 29.13 L14.60 29.95 L14.72 30.78 L14.82 31.60 L14.91 32.43 L14.98 33.26 L15.03 34.09 L15.07 34.92 L15.08 35.75 L15.06 36.58 L15.03 37.41 L14.96 38.24 L14.87 39.07 L14.74 39.90 L14.59 40.74 L14.40 41.57 L14.17 42.41 L13.91 43.25 L13.60 44.09 L13.26 44.93 L12.88 45.77 L12.45 46.61 L11.97 47.46 L11.45 48.30 L10.87 49.15 L10.25 50.00 L9.62 50.85 L9.01 51.70 L8.44 52.54 L7.89 53.39 L7.37 54.23 L6.89 55.07 L6.43 55.91 L6.00 56.75 L5.60 57.59 L5.22 58.43 L4.87 59.26 L4.55 60.10 L4.26 60.93 L3.99 61.76 L3.74 62.59 L3.53 63.42 L3.34 64.25 L3.17 65.08 L3.03 65.91 L2.91 66.74 L2.81 67.57 L2.74 68.40 L2.69 69.22 L2.66 70.05 L2.66 70.87 L2.68 71.70 L2.72 72.52 L2.78 73.35 L2.86 74.17 L2.97 75.00 L3.09 75.83 L3.23 76.65 L3.40 77.48 L3.58 78.30 L3.78 79.13 L4.00 79.95 L4.24 80.78 L4.49 81.60 L4.77 82.43 L5.06 83.26 L5.36 84.09 L5.69 84.92 L6.03 85.75 L6.38 86.58 L6.75 87.41 L7.14 88.24 L7.54 89.07 L7.95 89.90 L8.38 90.74 L8.83 91.57 L9.28 92.41 L9.75 93.25 L10.23 94.09 L10.72 94.93 L11.23 95.77 L11.74 96.61 L12.27 97.46 L12.81 98.30 L13.36 99.15 L13.91 100.00 L14.09 100.00 L13.56 99.15 L13.03 98.30 L12.52 97.46 L12.02 96.61 L11.54 95.77 L11.06 94.93 L10.60 94.09 L10.15 93.25 L9.71 92.41 L9.29 91.57 L8.87 90.74 L8.48 89.90 L8.09 89.07 L7.73 88.24 L7.37 87.41 L7.03 86.58 L6.71 85.75 L6.40 84.92 L6.11 84.09 L5.83 83.26 L5.57 82.43 L5.33 81.60 L5.10 80.78 L4.90 79.95 L4.71 79.13 L4.53 78.30 L4.38 77.48 L4.25 76.65 L4.13 75.83 L4.03 75.00 L3.96 74.17 L3.90 73.35 L3.86 72.52 L3.85 71.70 L3.85 70.87 L3.88 70.05 L3.93 69.22 L4.00 68.40 L4.09 67.57 L4.20 66.74 L4.34 65.91 L4.50 65.08 L4.69 64.25 L4.90 63.42 L5.13 62.59 L5.39 61.76 L5.67 60.93 L5.98 60.10 L6.31 59.26 L6.67 58.43 L7.05 57.59 L7.46 56.75 L7.90 55.91 L8.37 55.07 L8.86 54.23 L9.38 53.39 L9.93 52.54 L10.51 51.70 L11.11 50.85 L11.75 50.00 L12.37 49.15 L12.94 48.30 L13.47 47.46 L13.94 46.61 L14.36 45.77 L14.74 44.93 L15.08 44.09 L15.37 43.25 L15.63 42.41 L15.84 41.57 L16.02 40.74 L16.17 39.90 L16.28 39.07 L16.36 38.24 L16.41 37.41 L16.43 36.58 L16.43 35.75 L16.40 34.92 L16.35 34.09 L16.28 33.26 L16.19 32.43 L16.08 31.60 L15.95 30.78 L15.82 29.95 L15.66 29.13 L15.50 28.30 L15.33 27.48 L15.15 26.65 L14.97 25.83 L14.78 25.00 L14.59 24.17 L14.40 23.35 L14.22 22.52 L14.03 21.70 L13.85 20.87 L13.68 20.05 L13.52 19.22 L13.36 18.40 L13.22 17.57 L13.09 16.74 L12.98 15.91 L12.88 15.08 L12.81 14.25 L12.75 13.42 L12.71 12.59 L12.71 11.76 L12.72 10.93 L12.77 10.10 L12.84 9.26 L12.94 8.43 L13.08 7.59 L13.25 6.75 L13.46 5.91 L13.71 5.07 L13.99 4.23 L14.32 3.39 L14.69 2.54 L15.11 1.70 L15.57 0.85 L16.09 0.00Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; }
 }
 @media (max-width: 959px) {
-	.page-head--orchid:not(.has-art-photo) .page-head__photo::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath fill='%23FFAC81' d='M0.00 15.84 L0.85 15.30 L1.70 14.80 L2.54 14.35 L3.39 13.94 L4.23 13.57 L5.07 13.25 L5.91 12.96 L6.75 12.71 L7.59 12.50 L8.43 12.32 L9.26 12.17 L10.10 12.05 L10.93 11.96 L11.76 11.90 L12.59 11.87 L13.42 11.86 L14.25 11.87 L15.08 11.91 L15.91 11.96 L16.74 12.03 L17.57 12.12 L18.40 12.22 L19.22 12.33 L20.05 12.46 L20.87 12.59 L21.70 12.73 L22.52 12.87 L23.35 13.02 L24.17 13.17 L25.00 13.33 L25.83 13.48 L26.65 13.63 L27.48 13.77 L28.30 13.91 L29.13 14.04 L29.95 14.16 L30.78 14.26 L31.60 14.36 L32.43 14.44 L33.26 14.50 L34.09 14.55 L34.92 14.58 L35.75 14.58 L36.58 14.56 L37.41 14.52 L38.24 14.45 L39.07 14.35 L39.90 14.22 L40.74 14.06 L41.57 13.87 L42.41 13.64 L43.25 13.37 L44.09 13.06 L44.93 12.72 L45.77 12.33 L46.61 11.90 L47.46 11.42 L48.30 10.90 L49.15 10.32 L50.00 9.70 L50.85 9.07 L51.70 8.46 L52.54 7.89 L53.39 7.34 L54.23 6.83 L55.07 6.34 L55.91 5.89 L56.75 5.46 L57.59 5.06 L58.43 4.69 L59.26 4.35 L60.10 4.03 L60.93 3.74 L61.76 3.47 L62.59 3.24 L63.42 3.03 L64.25 2.84 L65.08 2.68 L65.91 2.54 L66.74 2.43 L67.57 2.34 L68.40 2.28 L69.22 2.24 L70.05 2.22 L70.87 2.22 L71.70 2.25 L72.52 2.30 L73.35 2.37 L74.17 2.46 L75.00 2.58 L75.83 2.71 L76.65 2.86 L77.48 3.04 L78.30 3.23 L79.13 3.44 L79.95 3.67 L80.78 3.92 L81.60 4.19 L82.43 4.47 L83.26 4.77 L84.09 5.09 L84.92 5.43 L85.75 5.78 L86.58 6.14 L87.41 6.53 L88.24 6.92 L89.07 7.34 L89.90 7.76 L90.74 8.20 L91.57 8.66 L92.41 9.12 L93.25 9.60 L94.09 10.10 L94.93 10.60 L95.77 11.12 L96.61 11.64 L97.46 12.18 L98.30 12.73 L99.15 13.28 L100.00 13.84 L100.00 14.16 L99.15 13.63 L98.30 13.11 L97.46 12.61 L96.61 12.12 L95.77 11.65 L94.93 11.18 L94.09 10.73 L93.25 10.29 L92.41 9.87 L91.57 9.45 L90.74 9.05 L89.90 8.67 L89.07 8.30 L88.24 7.94 L87.41 7.60 L86.58 7.27 L85.75 6.96 L84.92 6.66 L84.09 6.38 L83.26 6.12 L82.43 5.87 L81.60 5.64 L80.78 5.42 L79.95 5.22 L79.13 5.05 L78.30 4.88 L77.48 4.74 L76.65 4.62 L75.83 4.51 L75.00 4.42 L74.17 4.36 L73.35 4.31 L72.52 4.28 L71.70 4.28 L70.87 4.29 L70.05 4.32 L69.22 4.38 L68.40 4.46 L67.57 4.56 L66.74 4.68 L65.91 4.83 L65.08 4.99 L64.25 5.18 L63.42 5.40 L62.59 5.64 L61.76 5.90 L60.93 6.19 L60.10 6.50 L59.26 6.84 L58.43 7.20 L57.59 7.59 L56.75 8.00 L55.91 8.44 L55.07 8.91 L54.23 9.41 L53.39 9.93 L52.54 10.48 L51.70 11.06 L50.85 11.66 L50.00 12.30 L49.15 12.92 L48.30 13.49 L47.46 14.01 L46.61 14.48 L45.77 14.91 L44.93 15.29 L44.09 15.62 L43.25 15.91 L42.41 16.16 L41.57 16.38 L40.74 16.55 L39.90 16.69 L39.07 16.80 L38.24 16.87 L37.41 16.92 L36.58 16.94 L35.75 16.93 L34.92 16.89 L34.09 16.83 L33.26 16.76 L32.43 16.66 L31.60 16.54 L30.78 16.41 L29.95 16.26 L29.13 16.10 L28.30 15.93 L27.48 15.75 L26.65 15.56 L25.83 15.37 L25.00 15.17 L24.17 14.98 L23.35 14.78 L22.52 14.58 L21.70 14.38 L20.87 14.19 L20.05 14.01 L19.22 13.83 L18.40 13.67 L17.57 13.52 L16.74 13.38 L15.91 13.25 L15.08 13.14 L14.25 13.05 L13.42 12.99 L12.59 12.94 L11.76 12.92 L10.93 12.92 L10.10 12.96 L9.26 13.02 L8.43 13.11 L7.59 13.24 L6.75 13.40 L5.91 13.59 L5.07 13.83 L4.23 14.11 L3.39 14.42 L2.54 14.78 L1.70 15.19 L0.85 15.65 L0.00 16.16Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; }
+	.page-head--orchid:not(.has-art-photo) .page-head__photo::after, .page-head--pre:not(.has-art-photo) .page-head__photo::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath fill='%23FFAC81' d='M0.00 15.84 L0.85 15.30 L1.70 14.80 L2.54 14.35 L3.39 13.94 L4.23 13.57 L5.07 13.25 L5.91 12.96 L6.75 12.71 L7.59 12.50 L8.43 12.32 L9.26 12.17 L10.10 12.05 L10.93 11.96 L11.76 11.90 L12.59 11.87 L13.42 11.86 L14.25 11.87 L15.08 11.91 L15.91 11.96 L16.74 12.03 L17.57 12.12 L18.40 12.22 L19.22 12.33 L20.05 12.46 L20.87 12.59 L21.70 12.73 L22.52 12.87 L23.35 13.02 L24.17 13.17 L25.00 13.33 L25.83 13.48 L26.65 13.63 L27.48 13.77 L28.30 13.91 L29.13 14.04 L29.95 14.16 L30.78 14.26 L31.60 14.36 L32.43 14.44 L33.26 14.50 L34.09 14.55 L34.92 14.58 L35.75 14.58 L36.58 14.56 L37.41 14.52 L38.24 14.45 L39.07 14.35 L39.90 14.22 L40.74 14.06 L41.57 13.87 L42.41 13.64 L43.25 13.37 L44.09 13.06 L44.93 12.72 L45.77 12.33 L46.61 11.90 L47.46 11.42 L48.30 10.90 L49.15 10.32 L50.00 9.70 L50.85 9.07 L51.70 8.46 L52.54 7.89 L53.39 7.34 L54.23 6.83 L55.07 6.34 L55.91 5.89 L56.75 5.46 L57.59 5.06 L58.43 4.69 L59.26 4.35 L60.10 4.03 L60.93 3.74 L61.76 3.47 L62.59 3.24 L63.42 3.03 L64.25 2.84 L65.08 2.68 L65.91 2.54 L66.74 2.43 L67.57 2.34 L68.40 2.28 L69.22 2.24 L70.05 2.22 L70.87 2.22 L71.70 2.25 L72.52 2.30 L73.35 2.37 L74.17 2.46 L75.00 2.58 L75.83 2.71 L76.65 2.86 L77.48 3.04 L78.30 3.23 L79.13 3.44 L79.95 3.67 L80.78 3.92 L81.60 4.19 L82.43 4.47 L83.26 4.77 L84.09 5.09 L84.92 5.43 L85.75 5.78 L86.58 6.14 L87.41 6.53 L88.24 6.92 L89.07 7.34 L89.90 7.76 L90.74 8.20 L91.57 8.66 L92.41 9.12 L93.25 9.60 L94.09 10.10 L94.93 10.60 L95.77 11.12 L96.61 11.64 L97.46 12.18 L98.30 12.73 L99.15 13.28 L100.00 13.84 L100.00 14.16 L99.15 13.63 L98.30 13.11 L97.46 12.61 L96.61 12.12 L95.77 11.65 L94.93 11.18 L94.09 10.73 L93.25 10.29 L92.41 9.87 L91.57 9.45 L90.74 9.05 L89.90 8.67 L89.07 8.30 L88.24 7.94 L87.41 7.60 L86.58 7.27 L85.75 6.96 L84.92 6.66 L84.09 6.38 L83.26 6.12 L82.43 5.87 L81.60 5.64 L80.78 5.42 L79.95 5.22 L79.13 5.05 L78.30 4.88 L77.48 4.74 L76.65 4.62 L75.83 4.51 L75.00 4.42 L74.17 4.36 L73.35 4.31 L72.52 4.28 L71.70 4.28 L70.87 4.29 L70.05 4.32 L69.22 4.38 L68.40 4.46 L67.57 4.56 L66.74 4.68 L65.91 4.83 L65.08 4.99 L64.25 5.18 L63.42 5.40 L62.59 5.64 L61.76 5.90 L60.93 6.19 L60.10 6.50 L59.26 6.84 L58.43 7.20 L57.59 7.59 L56.75 8.00 L55.91 8.44 L55.07 8.91 L54.23 9.41 L53.39 9.93 L52.54 10.48 L51.70 11.06 L50.85 11.66 L50.00 12.30 L49.15 12.92 L48.30 13.49 L47.46 14.01 L46.61 14.48 L45.77 14.91 L44.93 15.29 L44.09 15.62 L43.25 15.91 L42.41 16.16 L41.57 16.38 L40.74 16.55 L39.90 16.69 L39.07 16.80 L38.24 16.87 L37.41 16.92 L36.58 16.94 L35.75 16.93 L34.92 16.89 L34.09 16.83 L33.26 16.76 L32.43 16.66 L31.60 16.54 L30.78 16.41 L29.95 16.26 L29.13 16.10 L28.30 15.93 L27.48 15.75 L26.65 15.56 L25.83 15.37 L25.00 15.17 L24.17 14.98 L23.35 14.78 L22.52 14.58 L21.70 14.38 L20.87 14.19 L20.05 14.01 L19.22 13.83 L18.40 13.67 L17.57 13.52 L16.74 13.38 L15.91 13.25 L15.08 13.14 L14.25 13.05 L13.42 12.99 L12.59 12.94 L11.76 12.92 L10.93 12.92 L10.10 12.96 L9.26 13.02 L8.43 13.11 L7.59 13.24 L6.75 13.40 L5.91 13.59 L5.07 13.83 L4.23 14.11 L3.39 14.42 L2.54 14.78 L1.70 15.19 L0.85 15.65 L0.00 16.16Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; }
 }
 /* The „Online órák” dropdown: the line under the cursor. First „legyen a tangerine dream szín”, then with the new palette
    „itt ha ráviszem a kurzort legyen ugyanaz a sárga szín mint amit most küldtem a palettán” – Bright Gold */
@@ -1325,3 +1325,141 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 /* „hallod így nagyon jól néz ki, itt a hátsó hullám még legyen a zöld szín” – the hero of the home page: the back wave behind
    the photo in Evergreen, the front one stays Magenta */
 .oj-hero .hero__visual > .oj-blob:not(.oj-brush) .oj-blob__back { fill: var(--forest); }
+
+/* ===================================================================================================================
+   Olívia, 15 November (evening): one colour per class, everywhere („az azonos témák legyenek azonos színűek. A főoldalon
+   is ugyanúgy”): flow Evergreen with white text, prenatal Magenta Bloom, one-to-one Tangerine Dream, stretching and
+   mobility a dark green, relaxation the light one (on the home card the light sage she asked for, on its head and card
+   „halvány sárga vagy krémszínű”). inc/helpers.php oy_class_hue() names them flow / pre / one / mob / rel.
+   =================================================================================================================== */
+:root { --hue-flow: var(--forest); --hue-pre: var(--orchid); --hue-one: var(--tangerine); --hue-mob: var(--fern); --hue-rel: var(--sun-soft); }
+.way--flow { --tone: var(--hue-flow); }
+.way--pre { --tone: var(--hue-pre); }
+.way--one { --tone: var(--hue-one); }
+.way--mob { --tone: var(--hue-mob); }
+.way--rel { --tone: #A9BFA0; }
+.way--flow, .way--pre, .way--mob, .way--flow:hover, .way--pre:hover, .way--mob:hover { color: #fff; }
+.way--flow h3, .way--flow p, .way--pre h3, .way--pre p, .way--mob h3, .way--mob p { color: #fff; }
+/* „ezeket a boxokat csináld meg olyasmi stílusban mint ezek” – the class's photo on top, with the wavy edge of the page heads:
+   a lighter band and a Magenta line (Bright Gold on the Magenta card) */
+.way--photo { overflow: hidden; padding-top: 0; grid-template-rows: auto auto auto 1fr auto; }
+.ways--five .way--photo { grid-template-rows: auto auto auto 1fr auto; }
+.way__pic { grid-column: 1 / -1; grid-row: 1; position: relative; display: block; height: clamp(150px, 13vw, 200px); margin: 0 -1.6rem .4rem; }
+.way__pic img, .way__pic .photo { display: block; width: 100%; height: 100%; object-fit: cover; }
+.way__wave { position: absolute; left: 0; right: 0; bottom: -1px; width: 100%; height: 34px; }
+.way__wave-band { fill: color-mix(in srgb, var(--tone) 55%, #fff); }
+.way__wave-fill { fill: var(--tone); }
+.way__wave-line { fill: none; stroke: var(--orchid); stroke-width: 3; vector-effect: non-scaling-stroke; }
+.way--pre .way__wave-line { stroke: var(--sun); }
+.way--photo .way__go { position: absolute; top: .9rem; right: .9rem; z-index: 2; }
+.way--photo h3 { grid-row: 2; }
+.way--photo .way__len { color: var(--ink); }
+/* the class cards (Online órák page, „more classes” under a class) */
+.oj-class-card--flow { --bg: var(--hue-flow); color: #fff; }
+.oj-class-card--pre { --bg: var(--hue-pre); color: #fff; }
+.oj-class-card--one { --bg: var(--hue-one); }
+.oj-class-card--mob { --bg: var(--hue-mob); color: #fff; }
+.oj-class-card--rel { --bg: var(--hue-rel); }
+.oj-class-card--flow .oj-class-card__len, .oj-class-card--pre .oj-class-card__len, .oj-class-card--mob .oj-class-card__len { color: var(--ink); background: rgba(255, 255, 255, .85); }
+.oj-class-card--flow .oj-class-card__go, .oj-class-card--pre .oj-class-card__go, .oj-class-card--mob .oj-class-card__go { background: var(--paper); color: var(--ink); }
+/* the class page heads, and contact („itt is legyen a sárgánk”) and FAQ („krémszínű vagy halvány sárga”) */
+.page-head--flow { --tone: var(--hue-flow); }
+.page-head--pre { --tone: var(--hue-pre); }
+.page-head--one { --tone: var(--hue-one); }
+.page-head--mob { --tone: var(--hue-mob); }
+.page-head--cream { --tone: var(--sun-soft); }
+.page-head--flow h1, .page-head--flow .lead, .page-head--pre h1, .page-head--pre .lead, .page-head--mob h1, .page-head--mob .lead { color: #fff; }
+
+/* „ezekkel is igazodjunk az új színeinkhez” – the „which class” boxes (prices page, classes page): each class in its colour */
+.entry .oj-guide__box[href*="/hatha-flow/"] { --bg: #fff; --edge: var(--hue-flow); }
+.entry .oj-guide__box[href*="/kismamatorna/"] { --bg: var(--pink-soft); --edge: var(--hue-pre); }
+.entry .oj-guide__box[href*="/egyeni-online-joga/"] { --bg: var(--lilac-soft); --edge: var(--hue-one); }
+.entry .oj-guide__box[href*="/stretching/"] { --bg: color-mix(in srgb, var(--hue-mob) 12%, #fff); --edge: var(--hue-mob); }
+.entry .oj-guide__box[href*="/relaxacio-legzes/"] { --bg: var(--sun-soft); --edge: var(--sun); }
+/* „itt is használd a színpalettánkat”, „igazodjunk a színekhez mindenhol!!!” – the small sets (who it is for, why, the kit, the
+   prenatal tiles, About's boxes): Tangerine Dream, Magenta Bloom, Bright Gold and Evergreen instead of the light sage */
+.oj-fit__item--sage { --bg: color-mix(in srgb, var(--forest) 6%, #fff); --edge: color-mix(in srgb, var(--forest) 45%, #fff); --dot: var(--forest); }
+.entry .oj-group--lilac { --dot: #F7934C; }
+.entry .oj-group--sage { --bg: color-mix(in srgb, var(--forest) 6%, #fff); --edge: color-mix(in srgb, var(--forest) 40%, #fff); --dot: var(--forest); }
+.entry ul.oj-kit li:nth-child(3n + 1) { --dot: var(--tangerine); }
+.entry ul.oj-kit li:nth-child(3n + 2) { --dot: var(--pink); }
+.entry ul.oj-kit li:nth-child(3n) { --dot: var(--sun); }
+.oj-modules:not(.oj-modules--why) li:nth-child(3n + 1), .oj-prenatal .oj-modules:not(.oj-modules--why) li:nth-child(3n + 1) { --dot: var(--tangerine); }
+.oj-modules:not(.oj-modules--why) li:nth-child(3n + 2), .oj-prenatal .oj-modules:not(.oj-modules--why) li:nth-child(3n + 2) { --dot: var(--pink); }
+.oj-modules:not(.oj-modules--why) li:nth-child(3n), .oj-prenatal .oj-modules:not(.oj-modules--why) li:nth-child(3n) { --dot: var(--sun); }
+.oj-modules.oj-modules--why li:nth-child(4n + 1) { --dot: var(--tangerine); }
+.oj-modules.oj-modules--why li:nth-child(4n + 2) { --dot: var(--orchid); }
+.oj-modules.oj-modules--why li:nth-child(4n + 3) { --dot: var(--forest); }
+.oj-modules.oj-modules--why li:nth-child(4n) { --dot: var(--sun); }
+/* About's opening boxes: the corner circles in the palette, and the text keeps clear of them („az Azt szó belelóg a színes körbe”) */
+#intro .prose > p:not(.btn-row) { padding-right: 3.6rem; }
+#intro .prose > p:not(.btn-row):nth-of-type(3n + 1) { --tone: var(--tangerine); }
+#intro .prose > p:not(.btn-row):nth-of-type(3n + 2) { --tone: var(--pink); }
+#intro .prose > p:not(.btn-row):nth-of-type(3n) { --tone: var(--sun); }
+/* the price cards: their corners and edges in the palette's own Tangerine Dream and Magenta Bloom */
+.oj-price--solo { --bg: color-mix(in srgb, var(--tangerine) 18%, #fff); --edge: var(--tangerine); }
+.oj-price--pair { --bg: color-mix(in srgb, var(--pink) 8%, #fff); --edge: var(--pink); }
+/* the waves of the home page: „megante és sárga legyen a hullám” (the brush under the intro photo), „sárga és zöld legyen a
+   háttérben a hullám amit használunk” (behind the prenatal and the one-to-one photos), „itt a rózsaszín szín legyen ez”
+   (the hero's front wave: Platinum) */
+.oj-brush .oj-blob__back { fill: var(--sun); }
+.oj-brush .oj-blob__front { fill: var(--orchid); }
+.oj-waved--soft > .oj-blob:not(.oj-brush) .oj-blob__back { fill: var(--sun); }
+.oj-waved--soft > .oj-blob:not(.oj-brush) .oj-blob__front { fill: var(--forest); }
+.oj-hero .hero__visual > .oj-blob:not(.oj-brush) .oj-blob__front { fill: var(--paper); }
+/* „ezek legyenek sárgák” – the time box of each class in the timetable */
+.session__time { background: var(--sun); }
+/* „mobilon is legyen a menüben sárga a szolgáltatás amikor rákattintok” – the classes in the phone menu: Bright Gold under the
+   finger and on the class you are on */
+.drawer .sub-menu a:hover, .drawer .sub-menu a:active, .drawer .sub-menu a:focus-visible, .drawer .sub-menu .current-menu-item > a { background: var(--sun); color: var(--ink) !important; }
+/* „mobilon ha legörgetek a főoldalon, összecsúszik a foglalás, főoldal és óra foglalása gomb. elég egyszer a foglalás” – on a
+   phone the bottom bar already has „Foglalás”, so the floating „Óra foglalása” button stays away wherever the bar is */
+@media (max-width: 759px) { body:has([data-action-bar]) .book-fab { display: none; } }
+
+/* „itt folyamatábra helyett legyen valami kreatív hullám a leírás alapján ami illik az oldal designjához” (the group flow
+   class: „Mi történik egy online flow jógaórán?”) – one wave runs over the four steps the way the class goes: a quiet
+   arrival low, rising through the warm-up and the flow, the focus at the crest, and down into the slow end; each number
+   sits on the wave in the palette's colours. On a phone the wave runs down the side. Colours of the steps everywhere: the
+   palette's (no light sage) */
+.entry ol.oj-flow > li:nth-child(4n + 1) { --c: var(--tangerine); --s: var(--lilac-soft); }
+.entry ol.oj-flow > li:nth-child(4n + 2) { --c: var(--pink); --s: var(--pink-soft); }
+.entry ol.oj-flow > li:nth-child(4n + 3) { --c: var(--sun); --s: var(--sun-soft); }
+.entry ol.oj-flow > li:nth-child(4n) { --c: var(--forest); --s: color-mix(in srgb, var(--forest) 8%, #fff); }
+.entry ol.oj-flow--wave > li:nth-child(4n) .oj-flow__n { color: #fff; }
+.entry ol.oj-flow--wave > li::after { content: none !important; }
+.entry ol.oj-flow--wave > li > p { background: color-mix(in srgb, var(--s) 80%, #fff); }
+@media (min-width: 760px) {
+	.entry ol.oj-flow--wave.oj-flow--n4 { position: relative; padding-top: 118px; }
+	.entry ol.oj-flow--wave.oj-flow--n4::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 118px; pointer-events: none;
+		background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 118' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1'%3E%3Cstop offset='0' stop-color='%23FFAC81'/%3E%3Cstop offset='.38' stop-color='%23E63462'/%3E%3Cstop offset='.66' stop-color='%23FFDF22'/%3E%3Cstop offset='1' stop-color='%23002E2C'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0 100C25 100 30 84 50 84C85 84 115 52 150 52C185 52 215 26 250 26C290 26 310 78 350 78C375 78 385 90 400 94' fill='none' stroke='%23F0EDEE' stroke-width='14' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3Cpath d='M0 100C25 100 30 84 50 84C85 84 115 52 150 52C185 52 215 26 250 26C290 26 310 78 350 78C375 78 385 90 400 94' fill='none' stroke='url(%23g)' stroke-width='4' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+	.entry ol.oj-flow--wave.oj-flow--n4 > li { grid-template-rows: 1fr; }
+	.entry ol.oj-flow--wave.oj-flow--n4 > li > .oj-flow__n { position: absolute; left: 50%; top: calc(var(--y) - 118px - 1.35rem); transform: translateX(-50%); box-shadow: 0 0 0 5px var(--paper); }
+	.entry ol.oj-flow--wave.oj-flow--n4 > li:nth-child(1) { --y: 84px; }
+	.entry ol.oj-flow--wave.oj-flow--n4 > li:nth-child(2) { --y: 52px; }
+	.entry ol.oj-flow--wave.oj-flow--n4 > li:nth-child(3) { --y: 26px; }
+	.entry ol.oj-flow--wave.oj-flow--n4 > li:nth-child(4) { --y: 78px; }
+}
+@media (max-width: 759px) {
+	.entry ol.oj-flow--wave > li { position: relative; }
+	.entry ol.oj-flow--wave > li:not(:last-child)::before { content: "" !important; position: absolute; left: .85rem; top: 2.8rem; bottom: -1rem; width: 1rem;
+		background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 40' preserveAspectRatio='none'%3E%3Cpath d='M8 0C16 10 0 30 8 40' fill='none' stroke='%23E63462' stroke-width='2.5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 40px repeat-y; }
+}
+/* the same wave over five steps (arrival, warm-up and flow, the breath, the focus, the slow end), on a wide enough screen */
+@media (min-width: 1000px) {
+	.entry ol.oj-flow--wave.oj-flow--n5 { position: relative; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 1.1rem; padding-top: 118px; }
+	.entry ol.oj-flow--wave.oj-flow--n5::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 118px; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 118' preserveAspectRatio='none'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1'%3E%3Cstop offset='0' stop-color='%23FFAC81'/%3E%3Cstop offset='.38' stop-color='%23E63462'/%3E%3Cstop offset='.66' stop-color='%23FFDF22'/%3E%3Cstop offset='1' stop-color='%23002E2C'/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath d='M0 104C20 104 25 88 40 88C70 88 95 60 120 60C150 60 175 30 200 30C225 30 255 38 280 38C310 38 335 82 360 82C380 82 390 94 400 98' fill='none' stroke='%23F0EDEE' stroke-width='14' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3Cpath d='M0 104C20 104 25 88 40 88C70 88 95 60 120 60C150 60 175 30 200 30C225 30 255 38 280 38C310 38 335 82 360 82C380 82 390 94 400 98' fill='none' stroke='url(%23g)' stroke-width='4' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat; }
+	.entry ol.oj-flow--wave.oj-flow--n5 > li { grid-template-columns: minmax(0, 1fr); grid-template-rows: 1fr; }
+	.entry ol.oj-flow--wave.oj-flow--n5 > li > p { align-self: stretch; }
+	.entry ol.oj-flow--wave.oj-flow--n5 > li > .oj-flow__n { position: absolute; left: 50%; top: calc(var(--y) - 118px - 1.35rem); transform: translateX(-50%); box-shadow: 0 0 0 5px var(--paper); }
+	.entry ol.oj-flow--wave.oj-flow--n5 > li:nth-child(1) { --y: 88px; }
+	.entry ol.oj-flow--wave.oj-flow--n5 > li:nth-child(2) { --y: 60px; }
+	.entry ol.oj-flow--wave.oj-flow--n5 > li:nth-child(3) { --y: 30px; }
+	.entry ol.oj-flow--wave.oj-flow--n5 > li:nth-child(4) { --y: 38px; }
+	.entry ol.oj-flow--wave.oj-flow--n5 > li:nth-child(5) { --y: 82px; }
+}
+@media (max-width: 999px) {
+	.entry ol.oj-flow--wave.oj-flow--n5 > li { position: relative; }
+	.entry ol.oj-flow--wave.oj-flow--n5 > li:not(:last-child)::before { content: "" !important; position: absolute; left: .85rem; top: 2.8rem; bottom: -1rem; width: 1rem;
+		background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 40' preserveAspectRatio='none'%3E%3Cpath d='M8 0C16 10 0 30 8 40' fill='none' stroke='%23E63462' stroke-width='2.5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 40px repeat-y; }
+}
+.entry ol.oj-flow--wave > li:nth-child(5n) { --c: var(--tangerine); --s: var(--lilac-soft); }
