@@ -1322,3 +1322,6 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .way--lilac { --tone: var(--lilac-soft); }
 .page-head--lilac { --tone: var(--lilac-soft); }
 .oj-fit__item--lilac { --dot: #F7934C; }
+/* „hallod így nagyon jól néz ki, itt a hátsó hullám még legyen a zöld szín” – the hero of the home page: the back wave behind
+   the photo in Evergreen, the front one stays Magenta */
+.oj-hero .hero__visual > .oj-blob:not(.oj-brush) .oj-blob__back { fill: var(--forest); }

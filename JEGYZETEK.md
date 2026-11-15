@@ -593,6 +593,10 @@
   - Olívia a doksiban közben leírta, majd kitörölte, hogy az egyéni jóga mandarin, a flow Evergreen legyen. Ezekhez nem
     nyúltam.
   - Tesztek: 1314/0.
+- **3.11.77:** „hallod így nagyon jól néz ki, itt a hátsó hullám még legyen a zöld szín”:
+  - A kezdőlapi hero fotója mögötti hátsó hullám Evergreen lett, az elülső magenta maradt.
+  - „favicont is igazítsd a jelenlegi színekhez”: Evergreen kör, benne Magenta Bloom pötty, mint a logó hulláma.
+  - Tesztek: 1315/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
