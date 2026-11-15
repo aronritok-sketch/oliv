@@ -60,10 +60,10 @@
 .oj-photos > .oj-band.oj-brush { bottom: 0; height: 52%; }
 .oj-brush .oj-blob__front { fill: var(--orchid); }
 @media (min-width: 960px) {
-	.page-head:not(.has-art-photo) .page-head__photo::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath fill='%23A44A3F' d='M15.91 0.00 L15.37 0.85 L14.89 1.70 L14.44 2.54 L14.04 3.39 L13.69 4.23 L13.37 5.07 L13.09 5.91 L12.85 6.75 L12.65 7.59 L12.48 8.43 L12.35 9.26 L12.24 10.10 L12.17 10.93 L12.12 11.76 L12.10 12.59 L12.10 13.42 L12.12 14.25 L12.17 15.08 L12.23 15.91 L12.32 16.74 L12.41 17.57 L12.53 18.40 L12.65 19.22 L12.78 20.05 L12.93 20.87 L13.08 21.70 L13.23 22.52 L13.39 23.35 L13.55 24.17 L13.72 25.00 L13.88 25.83 L14.04 26.65 L14.19 27.48 L14.33 28.30 L14.47 29.13 L14.60 29.95 L14.72 30.78 L14.82 31.60 L14.91 32.43 L14.98 33.26 L15.03 34.09 L15.07 34.92 L15.08 35.75 L15.06 36.58 L15.03 37.41 L14.96 38.24 L14.87 39.07 L14.74 39.90 L14.59 40.74 L14.40 41.57 L14.17 42.41 L13.91 43.25 L13.60 44.09 L13.26 44.93 L12.88 45.77 L12.45 46.61 L11.97 47.46 L11.45 48.30 L10.87 49.15 L10.25 50.00 L9.62 50.85 L9.01 51.70 L8.44 52.54 L7.89 53.39 L7.37 54.23 L6.89 55.07 L6.43 55.91 L6.00 56.75 L5.60 57.59 L5.22 58.43 L4.87 59.26 L4.55 60.10 L4.26 60.93 L3.99 61.76 L3.74 62.59 L3.53 63.42 L3.34 64.25 L3.17 65.08 L3.03 65.91 L2.91 66.74 L2.81 67.57 L2.74 68.40 L2.69 69.22 L2.66 70.05 L2.66 70.87 L2.68 71.70 L2.72 72.52 L2.78 73.35 L2.86 74.17 L2.97 75.00 L3.09 75.83 L3.23 76.65 L3.40 77.48 L3.58 78.30 L3.78 79.13 L4.00 79.95 L4.24 80.78 L4.49 81.60 L4.77 82.43 L5.06 83.26 L5.36 84.09 L5.69 84.92 L6.03 85.75 L6.38 86.58 L6.75 87.41 L7.14 88.24 L7.54 89.07 L7.95 89.90 L8.38 90.74 L8.83 91.57 L9.28 92.41 L9.75 93.25 L10.23 94.09 L10.72 94.93 L11.23 95.77 L11.74 96.61 L12.27 97.46 L12.81 98.30 L13.36 99.15 L13.91 100.00 L14.09 100.00 L13.56 99.15 L13.03 98.30 L12.52 97.46 L12.02 96.61 L11.54 95.77 L11.06 94.93 L10.60 94.09 L10.15 93.25 L9.71 92.41 L9.29 91.57 L8.87 90.74 L8.48 89.90 L8.09 89.07 L7.73 88.24 L7.37 87.41 L7.03 86.58 L6.71 85.75 L6.40 84.92 L6.11 84.09 L5.83 83.26 L5.57 82.43 L5.33 81.60 L5.10 80.78 L4.90 79.95 L4.71 79.13 L4.53 78.30 L4.38 77.48 L4.25 76.65 L4.13 75.83 L4.03 75.00 L3.96 74.17 L3.90 73.35 L3.86 72.52 L3.85 71.70 L3.85 70.87 L3.88 70.05 L3.93 69.22 L4.00 68.40 L4.09 67.57 L4.20 66.74 L4.34 65.91 L4.50 65.08 L4.69 64.25 L4.90 63.42 L5.13 62.59 L5.39 61.76 L5.67 60.93 L5.98 60.10 L6.31 59.26 L6.67 58.43 L7.05 57.59 L7.46 56.75 L7.90 55.91 L8.37 55.07 L8.86 54.23 L9.38 53.39 L9.93 52.54 L10.51 51.70 L11.11 50.85 L11.75 50.00 L12.37 49.15 L12.94 48.30 L13.47 47.46 L13.94 46.61 L14.36 45.77 L14.74 44.93 L15.08 44.09 L15.37 43.25 L15.63 42.41 L15.84 41.57 L16.02 40.74 L16.17 39.90 L16.28 39.07 L16.36 38.24 L16.41 37.41 L16.43 36.58 L16.43 35.75 L16.40 34.92 L16.35 34.09 L16.28 33.26 L16.19 32.43 L16.08 31.60 L15.95 30.78 L15.82 29.95 L15.66 29.13 L15.50 28.30 L15.33 27.48 L15.15 26.65 L14.97 25.83 L14.78 25.00 L14.59 24.17 L14.40 23.35 L14.22 22.52 L14.03 21.70 L13.85 20.87 L13.68 20.05 L13.52 19.22 L13.36 18.40 L13.22 17.57 L13.09 16.74 L12.98 15.91 L12.88 15.08 L12.81 14.25 L12.75 13.42 L12.71 12.59 L12.71 11.76 L12.72 10.93 L12.77 10.10 L12.84 9.26 L12.94 8.43 L13.08 7.59 L13.25 6.75 L13.46 5.91 L13.71 5.07 L13.99 4.23 L14.32 3.39 L14.69 2.54 L15.11 1.70 L15.57 0.85 L16.09 0.00Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; }
+	.page-head:not(.has-art-photo) .page-head__photo::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath fill='%23DB2E5C' d='M15.91 0.00 L15.37 0.85 L14.89 1.70 L14.44 2.54 L14.04 3.39 L13.69 4.23 L13.37 5.07 L13.09 5.91 L12.85 6.75 L12.65 7.59 L12.48 8.43 L12.35 9.26 L12.24 10.10 L12.17 10.93 L12.12 11.76 L12.10 12.59 L12.10 13.42 L12.12 14.25 L12.17 15.08 L12.23 15.91 L12.32 16.74 L12.41 17.57 L12.53 18.40 L12.65 19.22 L12.78 20.05 L12.93 20.87 L13.08 21.70 L13.23 22.52 L13.39 23.35 L13.55 24.17 L13.72 25.00 L13.88 25.83 L14.04 26.65 L14.19 27.48 L14.33 28.30 L14.47 29.13 L14.60 29.95 L14.72 30.78 L14.82 31.60 L14.91 32.43 L14.98 33.26 L15.03 34.09 L15.07 34.92 L15.08 35.75 L15.06 36.58 L15.03 37.41 L14.96 38.24 L14.87 39.07 L14.74 39.90 L14.59 40.74 L14.40 41.57 L14.17 42.41 L13.91 43.25 L13.60 44.09 L13.26 44.93 L12.88 45.77 L12.45 46.61 L11.97 47.46 L11.45 48.30 L10.87 49.15 L10.25 50.00 L9.62 50.85 L9.01 51.70 L8.44 52.54 L7.89 53.39 L7.37 54.23 L6.89 55.07 L6.43 55.91 L6.00 56.75 L5.60 57.59 L5.22 58.43 L4.87 59.26 L4.55 60.10 L4.26 60.93 L3.99 61.76 L3.74 62.59 L3.53 63.42 L3.34 64.25 L3.17 65.08 L3.03 65.91 L2.91 66.74 L2.81 67.57 L2.74 68.40 L2.69 69.22 L2.66 70.05 L2.66 70.87 L2.68 71.70 L2.72 72.52 L2.78 73.35 L2.86 74.17 L2.97 75.00 L3.09 75.83 L3.23 76.65 L3.40 77.48 L3.58 78.30 L3.78 79.13 L4.00 79.95 L4.24 80.78 L4.49 81.60 L4.77 82.43 L5.06 83.26 L5.36 84.09 L5.69 84.92 L6.03 85.75 L6.38 86.58 L6.75 87.41 L7.14 88.24 L7.54 89.07 L7.95 89.90 L8.38 90.74 L8.83 91.57 L9.28 92.41 L9.75 93.25 L10.23 94.09 L10.72 94.93 L11.23 95.77 L11.74 96.61 L12.27 97.46 L12.81 98.30 L13.36 99.15 L13.91 100.00 L14.09 100.00 L13.56 99.15 L13.03 98.30 L12.52 97.46 L12.02 96.61 L11.54 95.77 L11.06 94.93 L10.60 94.09 L10.15 93.25 L9.71 92.41 L9.29 91.57 L8.87 90.74 L8.48 89.90 L8.09 89.07 L7.73 88.24 L7.37 87.41 L7.03 86.58 L6.71 85.75 L6.40 84.92 L6.11 84.09 L5.83 83.26 L5.57 82.43 L5.33 81.60 L5.10 80.78 L4.90 79.95 L4.71 79.13 L4.53 78.30 L4.38 77.48 L4.25 76.65 L4.13 75.83 L4.03 75.00 L3.96 74.17 L3.90 73.35 L3.86 72.52 L3.85 71.70 L3.85 70.87 L3.88 70.05 L3.93 69.22 L4.00 68.40 L4.09 67.57 L4.20 66.74 L4.34 65.91 L4.50 65.08 L4.69 64.25 L4.90 63.42 L5.13 62.59 L5.39 61.76 L5.67 60.93 L5.98 60.10 L6.31 59.26 L6.67 58.43 L7.05 57.59 L7.46 56.75 L7.90 55.91 L8.37 55.07 L8.86 54.23 L9.38 53.39 L9.93 52.54 L10.51 51.70 L11.11 50.85 L11.75 50.00 L12.37 49.15 L12.94 48.30 L13.47 47.46 L13.94 46.61 L14.36 45.77 L14.74 44.93 L15.08 44.09 L15.37 43.25 L15.63 42.41 L15.84 41.57 L16.02 40.74 L16.17 39.90 L16.28 39.07 L16.36 38.24 L16.41 37.41 L16.43 36.58 L16.43 35.75 L16.40 34.92 L16.35 34.09 L16.28 33.26 L16.19 32.43 L16.08 31.60 L15.95 30.78 L15.82 29.95 L15.66 29.13 L15.50 28.30 L15.33 27.48 L15.15 26.65 L14.97 25.83 L14.78 25.00 L14.59 24.17 L14.40 23.35 L14.22 22.52 L14.03 21.70 L13.85 20.87 L13.68 20.05 L13.52 19.22 L13.36 18.40 L13.22 17.57 L13.09 16.74 L12.98 15.91 L12.88 15.08 L12.81 14.25 L12.75 13.42 L12.71 12.59 L12.71 11.76 L12.72 10.93 L12.77 10.10 L12.84 9.26 L12.94 8.43 L13.08 7.59 L13.25 6.75 L13.46 5.91 L13.71 5.07 L13.99 4.23 L14.32 3.39 L14.69 2.54 L15.11 1.70 L15.57 0.85 L16.09 0.00Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; }
 }
 @media (max-width: 959px) {
-	.page-head:not(.has-art-photo) .page-head__photo::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath fill='%23A44A3F' d='M0.00 15.84 L0.85 15.30 L1.70 14.80 L2.54 14.35 L3.39 13.94 L4.23 13.57 L5.07 13.25 L5.91 12.96 L6.75 12.71 L7.59 12.50 L8.43 12.32 L9.26 12.17 L10.10 12.05 L10.93 11.96 L11.76 11.90 L12.59 11.87 L13.42 11.86 L14.25 11.87 L15.08 11.91 L15.91 11.96 L16.74 12.03 L17.57 12.12 L18.40 12.22 L19.22 12.33 L20.05 12.46 L20.87 12.59 L21.70 12.73 L22.52 12.87 L23.35 13.02 L24.17 13.17 L25.00 13.33 L25.83 13.48 L26.65 13.63 L27.48 13.77 L28.30 13.91 L29.13 14.04 L29.95 14.16 L30.78 14.26 L31.60 14.36 L32.43 14.44 L33.26 14.50 L34.09 14.55 L34.92 14.58 L35.75 14.58 L36.58 14.56 L37.41 14.52 L38.24 14.45 L39.07 14.35 L39.90 14.22 L40.74 14.06 L41.57 13.87 L42.41 13.64 L43.25 13.37 L44.09 13.06 L44.93 12.72 L45.77 12.33 L46.61 11.90 L47.46 11.42 L48.30 10.90 L49.15 10.32 L50.00 9.70 L50.85 9.07 L51.70 8.46 L52.54 7.89 L53.39 7.34 L54.23 6.83 L55.07 6.34 L55.91 5.89 L56.75 5.46 L57.59 5.06 L58.43 4.69 L59.26 4.35 L60.10 4.03 L60.93 3.74 L61.76 3.47 L62.59 3.24 L63.42 3.03 L64.25 2.84 L65.08 2.68 L65.91 2.54 L66.74 2.43 L67.57 2.34 L68.40 2.28 L69.22 2.24 L70.05 2.22 L70.87 2.22 L71.70 2.25 L72.52 2.30 L73.35 2.37 L74.17 2.46 L75.00 2.58 L75.83 2.71 L76.65 2.86 L77.48 3.04 L78.30 3.23 L79.13 3.44 L79.95 3.67 L80.78 3.92 L81.60 4.19 L82.43 4.47 L83.26 4.77 L84.09 5.09 L84.92 5.43 L85.75 5.78 L86.58 6.14 L87.41 6.53 L88.24 6.92 L89.07 7.34 L89.90 7.76 L90.74 8.20 L91.57 8.66 L92.41 9.12 L93.25 9.60 L94.09 10.10 L94.93 10.60 L95.77 11.12 L96.61 11.64 L97.46 12.18 L98.30 12.73 L99.15 13.28 L100.00 13.84 L100.00 14.16 L99.15 13.63 L98.30 13.11 L97.46 12.61 L96.61 12.12 L95.77 11.65 L94.93 11.18 L94.09 10.73 L93.25 10.29 L92.41 9.87 L91.57 9.45 L90.74 9.05 L89.90 8.67 L89.07 8.30 L88.24 7.94 L87.41 7.60 L86.58 7.27 L85.75 6.96 L84.92 6.66 L84.09 6.38 L83.26 6.12 L82.43 5.87 L81.60 5.64 L80.78 5.42 L79.95 5.22 L79.13 5.05 L78.30 4.88 L77.48 4.74 L76.65 4.62 L75.83 4.51 L75.00 4.42 L74.17 4.36 L73.35 4.31 L72.52 4.28 L71.70 4.28 L70.87 4.29 L70.05 4.32 L69.22 4.38 L68.40 4.46 L67.57 4.56 L66.74 4.68 L65.91 4.83 L65.08 4.99 L64.25 5.18 L63.42 5.40 L62.59 5.64 L61.76 5.90 L60.93 6.19 L60.10 6.50 L59.26 6.84 L58.43 7.20 L57.59 7.59 L56.75 8.00 L55.91 8.44 L55.07 8.91 L54.23 9.41 L53.39 9.93 L52.54 10.48 L51.70 11.06 L50.85 11.66 L50.00 12.30 L49.15 12.92 L48.30 13.49 L47.46 14.01 L46.61 14.48 L45.77 14.91 L44.93 15.29 L44.09 15.62 L43.25 15.91 L42.41 16.16 L41.57 16.38 L40.74 16.55 L39.90 16.69 L39.07 16.80 L38.24 16.87 L37.41 16.92 L36.58 16.94 L35.75 16.93 L34.92 16.89 L34.09 16.83 L33.26 16.76 L32.43 16.66 L31.60 16.54 L30.78 16.41 L29.95 16.26 L29.13 16.10 L28.30 15.93 L27.48 15.75 L26.65 15.56 L25.83 15.37 L25.00 15.17 L24.17 14.98 L23.35 14.78 L22.52 14.58 L21.70 14.38 L20.87 14.19 L20.05 14.01 L19.22 13.83 L18.40 13.67 L17.57 13.52 L16.74 13.38 L15.91 13.25 L15.08 13.14 L14.25 13.05 L13.42 12.99 L12.59 12.94 L11.76 12.92 L10.93 12.92 L10.10 12.96 L9.26 13.02 L8.43 13.11 L7.59 13.24 L6.75 13.40 L5.91 13.59 L5.07 13.83 L4.23 14.11 L3.39 14.42 L2.54 14.78 L1.70 15.19 L0.85 15.65 L0.00 16.16Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; }
+	.page-head:not(.has-art-photo) .page-head__photo::after { content: ""; position: absolute; inset: 0; z-index: 2; pointer-events: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100' preserveAspectRatio='none'%3E%3Cpath fill='%23DB2E5C' d='M0.00 15.84 L0.85 15.30 L1.70 14.80 L2.54 14.35 L3.39 13.94 L4.23 13.57 L5.07 13.25 L5.91 12.96 L6.75 12.71 L7.59 12.50 L8.43 12.32 L9.26 12.17 L10.10 12.05 L10.93 11.96 L11.76 11.90 L12.59 11.87 L13.42 11.86 L14.25 11.87 L15.08 11.91 L15.91 11.96 L16.74 12.03 L17.57 12.12 L18.40 12.22 L19.22 12.33 L20.05 12.46 L20.87 12.59 L21.70 12.73 L22.52 12.87 L23.35 13.02 L24.17 13.17 L25.00 13.33 L25.83 13.48 L26.65 13.63 L27.48 13.77 L28.30 13.91 L29.13 14.04 L29.95 14.16 L30.78 14.26 L31.60 14.36 L32.43 14.44 L33.26 14.50 L34.09 14.55 L34.92 14.58 L35.75 14.58 L36.58 14.56 L37.41 14.52 L38.24 14.45 L39.07 14.35 L39.90 14.22 L40.74 14.06 L41.57 13.87 L42.41 13.64 L43.25 13.37 L44.09 13.06 L44.93 12.72 L45.77 12.33 L46.61 11.90 L47.46 11.42 L48.30 10.90 L49.15 10.32 L50.00 9.70 L50.85 9.07 L51.70 8.46 L52.54 7.89 L53.39 7.34 L54.23 6.83 L55.07 6.34 L55.91 5.89 L56.75 5.46 L57.59 5.06 L58.43 4.69 L59.26 4.35 L60.10 4.03 L60.93 3.74 L61.76 3.47 L62.59 3.24 L63.42 3.03 L64.25 2.84 L65.08 2.68 L65.91 2.54 L66.74 2.43 L67.57 2.34 L68.40 2.28 L69.22 2.24 L70.05 2.22 L70.87 2.22 L71.70 2.25 L72.52 2.30 L73.35 2.37 L74.17 2.46 L75.00 2.58 L75.83 2.71 L76.65 2.86 L77.48 3.04 L78.30 3.23 L79.13 3.44 L79.95 3.67 L80.78 3.92 L81.60 4.19 L82.43 4.47 L83.26 4.77 L84.09 5.09 L84.92 5.43 L85.75 5.78 L86.58 6.14 L87.41 6.53 L88.24 6.92 L89.07 7.34 L89.90 7.76 L90.74 8.20 L91.57 8.66 L92.41 9.12 L93.25 9.60 L94.09 10.10 L94.93 10.60 L95.77 11.12 L96.61 11.64 L97.46 12.18 L98.30 12.73 L99.15 13.28 L100.00 13.84 L100.00 14.16 L99.15 13.63 L98.30 13.11 L97.46 12.61 L96.61 12.12 L95.77 11.65 L94.93 11.18 L94.09 10.73 L93.25 10.29 L92.41 9.87 L91.57 9.45 L90.74 9.05 L89.90 8.67 L89.07 8.30 L88.24 7.94 L87.41 7.60 L86.58 7.27 L85.75 6.96 L84.92 6.66 L84.09 6.38 L83.26 6.12 L82.43 5.87 L81.60 5.64 L80.78 5.42 L79.95 5.22 L79.13 5.05 L78.30 4.88 L77.48 4.74 L76.65 4.62 L75.83 4.51 L75.00 4.42 L74.17 4.36 L73.35 4.31 L72.52 4.28 L71.70 4.28 L70.87 4.29 L70.05 4.32 L69.22 4.38 L68.40 4.46 L67.57 4.56 L66.74 4.68 L65.91 4.83 L65.08 4.99 L64.25 5.18 L63.42 5.40 L62.59 5.64 L61.76 5.90 L60.93 6.19 L60.10 6.50 L59.26 6.84 L58.43 7.20 L57.59 7.59 L56.75 8.00 L55.91 8.44 L55.07 8.91 L54.23 9.41 L53.39 9.93 L52.54 10.48 L51.70 11.06 L50.85 11.66 L50.00 12.30 L49.15 12.92 L48.30 13.49 L47.46 14.01 L46.61 14.48 L45.77 14.91 L44.93 15.29 L44.09 15.62 L43.25 15.91 L42.41 16.16 L41.57 16.38 L40.74 16.55 L39.90 16.69 L39.07 16.80 L38.24 16.87 L37.41 16.92 L36.58 16.94 L35.75 16.93 L34.92 16.89 L34.09 16.83 L33.26 16.76 L32.43 16.66 L31.60 16.54 L30.78 16.41 L29.95 16.26 L29.13 16.10 L28.30 15.93 L27.48 15.75 L26.65 15.56 L25.83 15.37 L25.00 15.17 L24.17 14.98 L23.35 14.78 L22.52 14.58 L21.70 14.38 L20.87 14.19 L20.05 14.01 L19.22 13.83 L18.40 13.67 L17.57 13.52 L16.74 13.38 L15.91 13.25 L15.08 13.14 L14.25 13.05 L13.42 12.99 L12.59 12.94 L11.76 12.92 L10.93 12.92 L10.10 12.96 L9.26 13.02 L8.43 13.11 L7.59 13.24 L6.75 13.40 L5.91 13.59 L5.07 13.83 L4.23 14.11 L3.39 14.42 L2.54 14.78 L1.70 15.19 L0.85 15.65 L0.00 16.16Z'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat; }
 }
 @media (min-width: 900px) { .oj-pricing .price-group--text { grid-template-columns: minmax(300px, 1fr) 1.45fr; gap: 3rem; } }
 .price-group--text .price-group__head { position: static; }
@@ -156,15 +156,15 @@ h1, h2, h3, h4, .kicker { text-wrap: balance; }
 .oj-modules li { margin: 0; padding: .85rem 1rem; border-radius: var(--radius); background: var(--card, #fff); box-shadow: var(--shadow); font-weight: 700; display: flex; align-items: center; gap: .6rem; line-height: 1.3; }
 /* every module its own colour (Olívia, 14 November: „Ezek a pontok legyenek mind más színű”) */
 .oj-modules li::before { content: ""; flex: none; width: .75rem; height: .75rem; border-radius: 50%; background: var(--dot, var(--orchid)); }
-.oj-modules li:nth-child(1) { --dot: #A44A3F; }
+.oj-modules li:nth-child(1) { --dot: #DB2E5C; }
 .oj-modules li:nth-child(2) { --dot: #2E9E74; }
 .oj-modules li:nth-child(3) { --dot: #6FA085; }
 .oj-modules li:nth-child(4) { --dot: #C9A400; }
-.oj-modules li:nth-child(5) { --dot: #013220; }
-.oj-modules li:nth-child(6) { --dot: #E07A6A; }
+.oj-modules li:nth-child(5) { --dot: #002E2C; }
+.oj-modules li:nth-child(6) { --dot: #FFAC81; }
 .oj-modules li:nth-child(7) { --dot: #EBC400; }
 .oj-modules li:nth-child(8) { --dot: #3E7C64; }
-.oj-modules li:nth-child(9) { --dot: #EB9486; }
+.oj-modules li:nth-child(9) { --dot: #E63462; }
 
 /* Olivia, 11.13 (20:17): the button and the link on one line; Tudatosság / Kontroll on the pale band as on oliviajoga.hu;
    the prenatal modules with why each one matters for the birth */
@@ -228,7 +228,7 @@ h1, h2, h3, h4, .kicker { text-wrap: balance; }
 /* ---------- The About page, broken up (Olívia, 14 Nov: „törjük meg a folyószöveget kreatív megjelenítésekkel”) ---------- */
 .entry .oj-chapter { display: flex; align-items: baseline; gap: .85rem; margin: 2.6rem 0 .9rem; font-size: clamp(1.35rem, 1.15rem + .8vw, 1.75rem); color: var(--forest); }
 /* Olívia, 14 Nov: „Rólamnál a számozást hagyjuk el, találj ki mást” – a small wave in the logo's manner instead of 01, 02, 03 */
-.entry .oj-chapter::before { content: ""; flex: none; width: 2.6rem; height: .8rem; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 14' fill='none' stroke='%23A44A3F' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 9C7 3 12 3 17 9S27 15 32 9 42 3 46 9'/%3E%3C/svg%3E") center / contain no-repeat; }
+.entry .oj-chapter::before { content: ""; flex: none; width: 2.6rem; height: .8rem; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 14' fill='none' stroke='%23DB2E5C' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 9C7 3 12 3 17 9S27 15 32 9 42 3 46 9'/%3E%3C/svg%3E") center / contain no-repeat; }
 .entry > .oj-chapter:nth-of-type(3n+2)::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 14' fill='none' stroke='%23C9A400' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 9C7 3 12 3 17 9S27 15 32 9 42 3 46 9'/%3E%3C/svg%3E"); }
 .entry > .oj-chapter:nth-of-type(3n)::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 14' fill='none' stroke='%232E9E74' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M2 9C7 3 12 3 17 9S27 15 32 9 42 3 46 9'/%3E%3C/svg%3E"); }
 .entry .oj-chapter::after { content: ""; flex: 1; height: 1.5px; background: var(--line); align-self: center; }
@@ -381,7 +381,7 @@ body .hero__title .hero__l3 { display: block; margin-top: .14em; }
 .oj-breath-peach .breath__track { stroke: rgba(18, 35, 26, .16); }
 .oj-breath-peach .breath__progress { stroke: var(--orchid); }
 .oj-breath-peach .breath__dots li { border-color: rgba(18, 35, 26, .4); }
-.oj-breath-peach .breath__glow { background: radial-gradient(circle, rgba(235, 148, 134, .42), rgba(166, 235, 205, .2) 55%, transparent 72%); }
+.oj-breath-peach .breath__glow { background: radial-gradient(circle, rgba(230, 52, 98, .42), rgba(166, 235, 205, .2) 55%, transparent 72%); }
 .oj-breath-peach .btn--light { background: var(--forest); color: var(--paper); }
 .oj-breath-peach .btn--light:hover { background: var(--moss); color: var(--paper); }
 
@@ -424,7 +424,7 @@ body .hero__title .hero__l3 { display: block; margin-top: .14em; }
    tetszik”) – a centred line between two small waves from her logo */
 .entry .oj-statement { text-decoration: none; position: relative; max-width: 36ch; margin: 2.8rem auto 2.4rem; padding: 1.7rem 0; text-align: center; font-size: clamp(1.25rem, 1.08rem + .8vw, 1.6rem); line-height: 1.45; }
 .entry .oj-statement::before, .entry .oj-statement::after { content: ""; position: absolute; left: 50%; width: 3rem; height: .9rem; transform: translateX(-50%); background: center / contain no-repeat; }
-.entry .oj-statement::before { top: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 14' fill='none' stroke='%23A44A3F' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M2 9C7 3 12 3 17 9S27 15 32 9 42 3 46 9'/%3E%3C/svg%3E"); }
+.entry .oj-statement::before { top: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 14' fill='none' stroke='%23DB2E5C' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M2 9C7 3 12 3 17 9S27 15 32 9 42 3 46 9'/%3E%3C/svg%3E"); }
 .entry .oj-statement::after { bottom: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 14' fill='none' stroke='%232E9E74' stroke-width='2.6' stroke-linecap='round'%3E%3Cpath d='M2 9C7 3 12 3 17 9S27 15 32 9 42 3 46 9'/%3E%3C/svg%3E"); }
 
 /* a floating photo keeps its distance from the text („nagyon belelóg a szöveg a képbe”): `.entry figure { margin-inline: 0 }`
@@ -492,11 +492,11 @@ body .hero__title .hero__l3 { display: block; margin-top: .14em; }
 .oj-facts li { display: inline-flex; align-items: center; gap: .55rem; font-weight: 700; font-size: .95rem; line-height: 1.3; }
 .oj-facts svg { width: 36px; height: 36px; padding: 8px; flex: none; border-radius: 50%; background: var(--forest); color: var(--paper); }
 
-.oj-voucher { position: relative; display: flex; align-items: center; gap: 1rem; margin: 1.6rem 0 0; padding: 1.05rem 1.5rem 1.05rem 1.3rem; border-radius: 16px; background: linear-gradient(115deg, var(--pink-soft), var(--lilac-soft) 70%, var(--sun-soft)); color: var(--ink); text-decoration: none; line-height: 1.4; transform: rotate(-.8deg); box-shadow: 0 18px 32px -22px rgba(164, 74, 63, .75); transition: transform .4s ease, box-shadow .4s ease;
+.oj-voucher { position: relative; display: flex; align-items: center; gap: 1rem; margin: 1.6rem 0 0; padding: 1.05rem 1.5rem 1.05rem 1.3rem; border-radius: 16px; background: linear-gradient(115deg, var(--pink-soft), var(--lilac-soft) 70%, var(--sun-soft)); color: var(--ink); text-decoration: none; line-height: 1.4; transform: rotate(-.8deg); box-shadow: 0 18px 32px -22px rgba(219, 46, 92, .75); transition: transform .4s ease, box-shadow .4s ease;
 	-webkit-mask: radial-gradient(circle 11px at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat, radial-gradient(circle 11px at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat;
 	mask: radial-gradient(circle 11px at 0 50%, transparent 98%, #000) left / 51% 100% no-repeat, radial-gradient(circle 11px at 100% 50%, transparent 98%, #000) right / 51% 100% no-repeat; }
-.oj-voucher::after { content: ""; position: absolute; inset: 7px 20px; border: 1.5px dashed rgba(164, 74, 63, .45); border-radius: 10px; pointer-events: none; }
-a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY(-2px); box-shadow: 0 24px 36px -22px rgba(164, 74, 63, .9); }
+.oj-voucher::after { content: ""; position: absolute; inset: 7px 20px; border: 1.5px dashed rgba(219, 46, 92, .45); border-radius: 10px; pointer-events: none; }
+a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY(-2px); box-shadow: 0 24px 36px -22px rgba(219, 46, 92, .9); }
 .oj-voucher__icon { display: grid; place-items: center; flex: none; width: 46px; height: 46px; border-radius: 50%; background: var(--orchid); color: #fff; transform: rotate(-8deg); }
 .oj-voucher__icon svg { width: 24px; height: 24px; }
 .oj-voucher__text b { display: block; font-family: var(--f-display); font-weight: 400; font-size: 1.3rem; letter-spacing: .02em; text-transform: uppercase; color: var(--orchid); }
@@ -745,7 +745,7 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY
    dashed frame, the tilt and the big capitals */
 .oj-voucher { transform: none; -webkit-mask: none; mask: none; border-radius: 20px; padding: 1rem 1.35rem 1rem 1.1rem; box-shadow: none; }
 .oj-voucher::after { content: none; }
-a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); box-shadow: 0 18px 30px -24px rgba(164, 74, 63, .7); }
+a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); box-shadow: 0 18px 30px -24px rgba(219, 46, 92, .7); }
 .oj-voucher__icon { width: 40px; height: 40px; background: #fff; color: var(--orchid); transform: none; }
 .oj-voucher__icon svg { width: 20px; height: 20px; }
 .oj-voucher__text b { display: block; font-family: inherit; font-weight: 700; font-size: 1rem; letter-spacing: 0; text-transform: none; color: var(--ink); }
@@ -1070,14 +1070,14 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .entry .price ul li:not([class])::before { content: ""; position: absolute; left: 0; top: .5em; width: 10px; height: 6px; border-radius: 0; border-left: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; background: none; box-shadow: none; -webkit-mask: none; mask: none; transform: rotate(-45deg); }
 
 /* „Bejelentkezés és árak”: the gift vouchers as a card (Olívia: „ajándékutalványok … legyen szebben feltüntetve”) */
-.entry .oj-gift { position: relative; overflow: hidden; isolation: isolate; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 1.4rem; margin: 1.2rem 0 2.4rem; padding: 1.7rem 1.9rem; border-radius: 24px; background: linear-gradient(115deg, var(--pink-soft), var(--lilac-soft) 68%, var(--sun-soft)); box-shadow: 0 20px 34px -28px rgba(164, 74, 63, .7); }
-.entry .oj-gift::after { content: ""; position: absolute; inset: 9px; border: 1.5px dashed rgba(164, 74, 63, .4); border-radius: 17px; pointer-events: none; }
-.entry .oj-gift__icon { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: var(--orchid); color: #fff; transform: rotate(-8deg); box-shadow: 0 12px 22px -12px rgba(164, 74, 63, .9); }
+.entry .oj-gift { position: relative; overflow: hidden; isolation: isolate; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 1.4rem; margin: 1.2rem 0 2.4rem; padding: 1.7rem 1.9rem; border-radius: 24px; background: linear-gradient(115deg, var(--pink-soft), var(--lilac-soft) 68%, var(--sun-soft)); box-shadow: 0 20px 34px -28px rgba(219, 46, 92, .7); }
+.entry .oj-gift::after { content: ""; position: absolute; inset: 9px; border: 1.5px dashed rgba(219, 46, 92, .4); border-radius: 17px; pointer-events: none; }
+.entry .oj-gift__icon { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: var(--orchid); color: #fff; transform: rotate(-8deg); box-shadow: 0 12px 22px -12px rgba(219, 46, 92, .9); }
 .entry .oj-gift__icon .icon { width: 30px; height: 30px; }
 .entry .oj-gift__body > p { margin: 0 0 .9rem; }
 .entry .oj-gift__body > p:last-child { margin: 0; }
 .entry .oj-gift .btn { position: relative; z-index: 1; background: var(--orchid); border-color: var(--orchid); color: #fff; }
-.entry .oj-gift .btn:hover { background: var(--orchid-dark, #87392F); border-color: var(--orchid-dark, #87392F); }
+.entry .oj-gift .btn:hover { background: var(--orchid-dark, #B5214A); border-color: var(--orchid-dark, #B5214A); }
 @media (max-width: 599px) { .entry .oj-gift { grid-template-columns: minmax(0, 1fr); gap: 1rem; padding: 1.4rem 1.3rem; } .entry .oj-gift__icon { width: 54px; height: 54px; } }
 
 /* Her sentences on lines of their own („nagyon sok helyen új sorba írtam mondatokat … Szépítsd ezeket, akár új boxxal”): a soft
@@ -1159,43 +1159,53 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 /* ===================================================================================================================
    Olívia, 15 November: „meggondoltam magam és szeretnék módosítani a színpalettán!!! ez alapján legyen minden!!! ha kell,
    akkor még azokat a világosakat, amit szeretek hozzárakhatod!” – Evergreen #013220, Frozen Water #DAFFEF, Bright Gold
-   #FFDF22, Sweet Salmon #EB9486, Reddish Brown #A44A3F; the light ones she likes stay: pale sage and peach.
+   #FFDF22, Sweet Salmon #E63462, Reddish Brown #DB2E5C; the light ones she likes stay: pale sage and peach.
    The tokens keep their names (the whole site and the booking plugin read them):
      forest/ink → Evergreen · lilac → Frozen Water (mint) · pink → Sweet Salmon, its soft one the peach · sun → Bright Gold ·
      orchid (the colour that carries white text: buttons, tags) → Reddish Brown (white on it 5.8:1)
    =================================================================================================================== */
+/* Olívia, 15 November, later: „legyen ez az új paletta, ez alapján cserélj, de figyelj az előző szabályokra, amiket mondtam”
+   – Evergreen #002E2C, Platinum #F0EDEE, Bright Gold #FFDF22, Magenta Bloom #E63462, Tangerine Dream #FFAC81. The new
+   values below: forest/ink → the new Evergreen · paper (the page) → Platinum · pink → Magenta Bloom, its soft one a blush
+   of it · orchid (the colour that carries white text: buttons, tags, the logo's wave) → Magenta Bloom a touch deeper,
+   #DB2E5C, so white text on it reads 4.6:1. Her earlier rules stay: the hero's three colours, the Frozen Water of the
+   relaxation, the class page heads, Tangerine Dream for the small circles and the hovered menu line, the natural greens
+   of the prenatal tiles, the light sage of the prenatal section. */
 :root {
-	--forest: #013220;
-	--moss: #01261A;
+	--forest: #002E2C;
+	--moss: #002220;
 	--fern: #3E7C64;
-	--ink: #0B261B;
-	--text: #20352B;
-	--muted: #4F6158;
-	--line: rgba(1, 50, 32, .14);
-	--rule: rgba(1, 50, 32, .55);
+	--ink: #072624;
+	--text: #1E3432;
+	--muted: #4D5F5D;
+	--line: rgba(0, 46, 44, .14);
+	--rule: rgba(0, 46, 44, .55);
 	--lilac: #A6EBCD;
 	--lilac-soft: #DAFFEF;
-	--pink: #EB9486;
-	--pink-soft: #FFE2CC;
-	--orchid: #A44A3F;
-	--orchid-dark: #87392F;
+	--pink: #E63462;
+	--pink-soft: #FCE4EA;
+	--orchid: #DB2E5C;
+	--orchid-dark: #B5214A;
 	--sun: #FFDF22;
 	--sun-soft: #FFF4C2;
 	--sage-soft: #DEE5D3;
-	--shadow: 0 18px 40px -24px rgba(1, 50, 32, .35);
+	--paper: #F0EDEE;
+	--card: #FAF8F9;
+	--line-light: rgba(240, 237, 238, .2);
+	--shadow: 0 18px 40px -24px rgba(0, 46, 44, .35);
 }
 /* the hard-coded colours of the shared stylesheet, in the new palette */
-.btn--orchid { box-shadow: 0 12px 28px -16px rgba(164, 74, 63, .9); }
-.btn--orchid:hover { box-shadow: 0 16px 30px -14px rgba(164, 74, 63, .9); }
-.field input:focus, .field select:focus, .field textarea:focus { box-shadow: 0 0 0 4px rgba(164, 74, 63, .12); }
-.breath__glow { background: radial-gradient(circle, rgba(235, 148, 134, .5), rgba(166, 235, 205, .18) 55%, transparent 72%); }
+.btn--orchid { box-shadow: 0 12px 28px -16px rgba(219, 46, 92, .9); }
+.btn--orchid:hover { box-shadow: 0 16px 30px -14px rgba(219, 46, 92, .9); }
+.field input:focus, .field select:focus, .field textarea:focus { box-shadow: 0 0 0 4px rgba(219, 46, 92, .12); }
+.breath__glow { background: radial-gradient(circle, rgba(230, 52, 98, .5), rgba(166, 235, 205, .18) 55%, transparent 72%); }
 .breath__petal { background: linear-gradient(to top, rgba(255, 223, 34, .15), rgba(166, 235, 205, .95)); }
-.breath__petal:nth-child(even) { background: linear-gradient(to top, rgba(255, 223, 34, .15), rgba(235, 148, 134, .95)); }
+.breath__petal:nth-child(even) { background: linear-gradient(to top, rgba(255, 223, 34, .15), rgba(230, 52, 98, .95)); }
 .oys-notice--error { background: var(--pink-soft); }
 /* her logo: the wave and „online” in the new accent */
 .oj-logo [fill="#D92B86"] { fill: var(--orchid); }
-.session__book { box-shadow: 0 10px 22px -14px rgba(164, 74, 63, .9); }
-.book-fab { box-shadow: 0 14px 30px -12px rgba(135, 57, 47, .65); }
+.session__book { box-shadow: 0 10px 22px -14px rgba(219, 46, 92, .9); }
+.book-fab { box-shadow: 0 14px 30px -12px rgba(181, 33, 74, .65); }
 /* the prenatal tiles on the mint section: the peach she likes (pale sage would melt into the mint) */
 .section--pale.oj-prenatal .oj-modules li { background: color-mix(in srgb, var(--pink-soft) 75%, #fff); }
 
@@ -1235,7 +1245,7 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .oj-prenatal .oj-modules:not(.oj-modules--why) li:nth-child(3n) { --dot: var(--fern); }
 /* „ez is kicsit túl gyerekes, legyen letisztultabb de az irány tetszik” – the four „who is it for” cards keep their colour, but
    only as a hint: a near-white card with a fine edge of its tone and the small dot by the title, no circles in the corners */
-.oj-fit__item { background: color-mix(in srgb, var(--bg) 30%, #fff); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--edge) 70%, transparent), 0 14px 28px -26px rgba(1, 50, 32, .4); }
+.oj-fit__item { background: color-mix(in srgb, var(--bg) 30%, #fff); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--edge) 70%, transparent), 0 14px 28px -26px rgba(0, 46, 44, .4); }
 .oj-fit__item::before, .oj-fit__item::after { display: none; }
 .oj-fit__item b::before { width: 9px; height: 9px; box-shadow: none; }
 .oj-fit__item--lilac { --dot: #3E9C78; }
@@ -1246,7 +1256,7 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
    from the lightest green to Evergreen, joined by the same arrow (in a column on a phone). */
 :root { --oj-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4.5 10.9h12.3l-4.1-4.1 1.55-1.55L21 12l-6.75 6.75-1.55-1.55 4.1-4.1H4.5z'/%3E%3C/svg%3E"); }
 .entry ul.oj-causes { list-style: none; margin: 1.5rem 0 1.9rem; padding: 0; display: grid; gap: .75rem; }
-.entry ul.oj-causes > li { display: flex; flex-direction: column; gap: .45rem; margin: 0; padding: 1.05rem 1.25rem 1.15rem; border-radius: 18px; background: #fff; box-shadow: inset 0 0 0 1px rgba(1, 50, 32, .08), 0 14px 28px -26px rgba(1, 50, 32, .45); line-height: 1.5; }
+.entry ul.oj-causes > li { display: flex; flex-direction: column; gap: .45rem; margin: 0; padding: 1.05rem 1.25rem 1.15rem; border-radius: 18px; background: #fff; box-shadow: inset 0 0 0 1px rgba(0, 46, 44, .08), 0 14px 28px -26px rgba(0, 46, 44, .45); line-height: 1.5; }
 .entry ul.oj-causes > li::before { content: none; }
 .oj-causes__name { color: var(--ink); font-size: .98rem; }
 .oj-causes__name strong { font-weight: 700; }
@@ -1294,3 +1304,10 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 /* „nem látszik a felirat” (THA on the moon of the home page): since the moon's lit part is Frozen Water, the white word
    disappeared on it – the word is dark like HA on the sun, and sits on the lit part, clear of the shadow */
 .hatha__orb--moon span { color: var(--ink); transform: translateX(-8%); }
+/* the new palette: where Magenta Bloom fills a large surface (the one-to-one card of the home page, a pink page head) the
+   text on it is white, on the deeper Magenta that reads 4.6:1 */
+.way--pink { --tone: var(--orchid); color: #fff; }
+.way--pink:hover { color: #fff; }
+.way--pink h3, .way--pink p { color: #fff; }
+.page-head--pink { --tone: var(--orchid); }
+.page-head--pink h1, .page-head--pink .lead { color: #fff; }

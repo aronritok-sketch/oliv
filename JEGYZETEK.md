@@ -559,6 +559,26 @@
   - „nem látszik a felirat”: a Nap–Hold blokkban a hold világos része Frozen Water lett, és rajta eltűnt a fehér
     „THA”. Most sötét, mint a „HA”, és a hold világos részére került.
   - Tesztek: 1313/0.
+- **3.11.75:** „legyen ez az új paletta, ez alapján cserélj, de figyelj az előző szabályokra, amiket mondtam”.
+  - Az új paletta: Evergreen `#002E2C`, Platinum `#F0EDEE`, Bright Gold `#FFDF22`, Magenta Bloom `#E63462`, Tangerine
+    Dream `#FFAC81`.
+  - Hova került:
+    - az Evergreen a sötét felületekre, a szövegre és a vonalakra;
+    - a Platinum az oldal hátterére;
+    - a Magenta Bloom a régi Sweet Salmon helyére (pöttyök, szélek, a hero hulláma);
+    - a régi Reddish Brown helyére is Magenta került, kicsit mélyebben (`#DB2E5C`, fehér szöveg 4,6:1): gombok, címkék,
+      a logó hulláma, a fejlécek fotójának vonala;
+    - a kezdőlap egyéni jóga kártyája Magenta, fehér betűvel.
+  - A korábbi szabályai maradtak:
+    - a főcím három színe;
+    - a relaxáció Frozen Waterje és a menta;
+    - az óraoldalak fejlécszínei;
+    - a mandarin körök és menü-kiemelés;
+    - a természetes zöld kismama-csempék;
+    - a kismama-szekció zsályazöldje;
+    - a letisztult „kinek” kártyák.
+  - A favicon és a böngésző színe az új Evergreen.
+  - Tesztek: 1313/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
