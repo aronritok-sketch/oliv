@@ -87,9 +87,13 @@ function oy_price_cards( $service ) {
 			$n     = max( 1, (int) $g['pack']['credits'] );
 			$rows .= '<div><dt>' . esc_html( sprintf( __( '%d sessions', 'olivia-yoga' ), $n ) ) . '<small>' . esc_html( sprintf( __( '%s per session', 'olivia-yoga' ), oys_money( (int) round( (int) $g['pack']['price_cents'] / $n ) ) ) ) . '</small></dt><dd>' . esc_html( oys_money( (int) $g['pack']['price_cents'] ) ) . '</dd></div>';
 		}
-		$out .= '<div class="oj-price oj-price--' . ( $pair ? 'pair' : 'solo' ) . '"><p class="oj-price__head"><span class="oj-price__who">' . ( $pair ? esc_html__( 'As a pair', 'olivia-yoga' ) : esc_html__( 'Alone', 'olivia-yoga' ) ) . '</span>'
-			. ( $len ? '<span class="oj-price__len">' . oy_icon( 'clock' ) . esc_html( sprintf( __( '%d minutes', 'olivia-yoga' ), $len ) ) . '</span>' : '' ) . '</p>'
-			. '<dl class="oj-price__rows">' . $rows . '</dl>' . ( $pair ? '<p class="oj-price__for">' . esc_html__( 'for the two of you', 'olivia-yoga' ) . '</p>' : '' ) . '</div>';
+		// Olívia, 15 November: „az ilyen árak is legyenek inkább lenyithatók” – each card folds under its head (alone or as a
+		// pair, the length, from what price); the first is open, one at a time (the shared name; site.js where it is not known)
+		$from  = (int) ( $g['single'] ?? $g['pack'] )['price_cents']; // one session, or the pass where there is no single
+		$out  .= '<details class="oj-price oj-price--' . ( $pair ? 'pair' : 'solo' ) . '" name="oj-prices-' . esc_attr( sanitize_key( $service ) ) . '"' . ( '' === $out ? ' open' : '' ) . '><summary class="oj-price__head"><span class="oj-price__who">' . ( $pair ? esc_html__( 'As a pair', 'olivia-yoga' ) : esc_html__( 'Alone', 'olivia-yoga' ) ) . '</span>'
+			. ( $len ? '<span class="oj-price__len">' . oy_icon( 'clock' ) . esc_html( sprintf( __( '%d minutes', 'olivia-yoga' ), $len ) ) . '</span>' : '' )
+			. '<span class="oj-price__from">' . esc_html( sprintf( __( 'from %s', 'olivia-yoga' ), oys_money( $from ) ) ) . '</span><span class="oj-fold__icon" aria-hidden="true"></span></summary>'
+			. '<dl class="oj-price__rows">' . $rows . '</dl>' . ( $pair ? '<p class="oj-price__for">' . esc_html__( 'for the two of you', 'olivia-yoga' ) . '</p>' : '' ) . '</details>';
 	}
 	return '' === $out ? '' : '<div class="oj-prices">' . $out . '</div>';
 }
@@ -352,6 +356,7 @@ add_action( 'init', function () {
 	add_shortcode( 'oy_faq', fn() => oy_faq_list() );
 	add_shortcode( 'oy_art', fn( $a ) => function_exists( 'oy_way_art' ) ? oy_way_art( sanitize_key( $a['name'] ?? '' ) ) : '' );
 	add_shortcode( 'oy_prices', fn( $a ) => oy_price_cards( sanitize_key( $a['service'] ?? '' ) ) );
+	add_shortcode( 'oy_poses', fn( $a ) => oy_poses( sanitize_key( $a['set'] ?? '' ) ) );
 	add_shortcode( 'oy_areas', fn() => oy_areas_list() );
 	add_shortcode( 'oy_breath', fn() => oy_breath() );
 	add_shortcode( 'oy_contact_form', fn() => oy_contact_form() );
@@ -371,6 +376,60 @@ add_action( 'init', function () {
 	add_shortcode( 'oy_figures', fn( $a ) => '<div class="oj-duo">' . implode( '', array_map( fn( $k ) => oy_figure( sanitize_key( $k ) ), array_filter( array_map( 'trim', explode( ',', (string) ( $a['photos'] ?? '' ) ) ) ) ) ) . '</div>' );
 	add_shortcode( 'oy_picto', fn( $a ) => oy_pictogram( sanitize_key( $a['icon'] ?? 'lotus' ), sanitize_key( $a['tone'] ?? 'lilac' ) ) );
 } );
+
+/**
+ * The poses of an article, as cards with Olívia's own photos (Olívia, 15 November, on „Pajzsmirigy harmonizálás jógával”:
+ * „Ebből a cikkből hiányzik a lényeg, a kép … szerkessz egyet a weboldal stílusához illeszkedve”). Her photos had the
+ * names written on them; that lettering is retouched out and the names are set in the site's own type under each photo.
+ */
+function oy_pose_sets() {
+	return array(
+		'tul'  => array(
+			'title' => 'Ha túlműködik a pajzsmirigy',
+			'lead'  => 'Nyugodt, lassú légzőgyakorlatok és gyakorlatsorok, nyugtató és stresszoldó ászanák.',
+			'tone'  => 'lilac',
+			'poses' => array(
+				array( 'halpoz', 'Halpóz', 'Matszjászana' ),
+				array( 'alacsony-kobra', 'Alacsony kobra póz', 'Budzsangászana' ),
+				array( 'macskapoz', 'Macskapóz', 'Mardzsari' ),
+				array( 'babapoz', 'Babapóz', 'Sasankászana' ),
+				array( 'hullapoz', 'Hullapóz', 'Savászana' ),
+				array( 'napudvozlet-lassan', 'Napüdvözlet, lassan', 'Szúrjanamaszkár' ),
+			),
+		),
+		'alul' => array(
+			'title' => 'Ha alulműködik a pajzsmirigy',
+			'lead'  => 'Dinamikusabb, élénkítő, keringést fokozó ászanák és gyakorlatsorok, fordított testhelyzetek.',
+			'tone'  => 'sun',
+			'poses' => array(
+				array( 'gyertyaallas', 'Gyertyaállás', 'Szarvangászana' ),
+				array( 'ekepoz', 'Ekepóz', 'Halászana' ),
+				array( 'fejenallas', 'Fejenállás', 'Sirsászana' ),
+				array( 'kobra', 'Kobra póz', 'Budzsangászana' ),
+				array( 'felfele-nezo-kutya', 'Felfelé néző kutya', 'Úrdhva-mukha-svanászana' ),
+				array( 'kis-jogahid', 'Kis jógahíd', 'Kandarászana' ),
+				array( 'tevepoz', 'Tevepóz', 'Ustrászana' ),
+				array( 'napudvozlet-gyorsan', 'Napüdvözlet, gyorsabban', 'Szúrjanamaszkár' ),
+			),
+		),
+	);
+}
+
+function oy_poses( $set ) {
+	$sets = oy_pose_sets();
+	if ( ! isset( $sets[ $set ] ) ) {
+		return '';
+	}
+	$s    = $sets[ $set ];
+	$base = get_template_directory_uri() . '/assets/img/poses/';
+	$out  = '<section class="oj-poses oj-poses--' . esc_attr( $s['tone'] ) . '"><h2 class="oj-poses__title">' . esc_html( $s['title'] ) . '</h2><p class="oj-poses__lead">' . esc_html( $s['lead'] ) . '</p><ul class="oj-poses__list">';
+	foreach ( $s['poses'] as $p ) {
+		$alt  = sprintf( 'Kovács Olívia: %1$s (%2$s)', mb_strtolower( $p[1] ), $p[2] );
+		$out .= '<li class="oj-pose"><img src="' . esc_url( $base . $p[0] . '-600.jpg' ) . '" srcset="' . esc_url( $base . $p[0] . '-600.jpg' ) . ' 600w, ' . esc_url( $base . $p[0] . '-900.jpg' ) . ' 900w" sizes="(min-width: 960px) 260px, (min-width: 600px) 45vw, 92vw" width="900" height="598" alt="' . esc_attr( $alt ) . '" loading="lazy" decoding="async">'
+			. '<span class="oj-pose__name">' . esc_html( $p[1] ) . '</span><span class="oj-pose__sanskrit">' . esc_html( $p[2] ) . '</span></li>';
+	}
+	return $out . '</ul></section>';
+}
 
 /** The Fitmummy prenatal & postnatal trainer mark, as a small credential card. */
 function oy_fitmummy( $cls = '' ) {

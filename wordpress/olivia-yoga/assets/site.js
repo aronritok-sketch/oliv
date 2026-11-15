@@ -247,8 +247,11 @@
 	   browsers do it from the shared name; this covers the older ones. */
 	document.addEventListener('toggle', function (e) {
 		var d = e.target;
-		if (!d || d.tagName !== 'DETAILS' || !d.open || !d.parentElement || !d.parentElement.classList.contains('faq')) return;
-		Array.prototype.forEach.call(d.parentElement.children, function (o) { if (o !== d && o.tagName === 'DETAILS' && o.open) o.open = false; });
+		if (!d || d.tagName !== 'DETAILS' || !d.open || !d.parentElement) return;
+		var name = d.getAttribute('name');
+		if (!d.parentElement.classList.contains('faq') && !name) return;
+		// the questions, and anything else that shares a name (the price cards of a class page)
+		Array.prototype.forEach.call(d.parentElement.children, function (o) { if (o !== d && o.tagName === 'DETAILS' && o.open && o.getAttribute('name') === name) o.open = false; });
 	}, true);
 
 	/* Olívia, 14 November: „ezek legyenek lenyithatóak mert mobilon így túl hosszú lesz” – on a phone the cards with a

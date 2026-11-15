@@ -441,6 +441,13 @@
 - **3.11.62:** Jógáról: hét cikk-kártya képén lejjebb került a kivágás, hogy Olívia látsszon („ezeket a képeket is csúsztassuk
   feljebb”): Egyensúly 55%, Légzés 85%, Meditáció 65%, Ászana 42%, Pránájáma 55%, Dhárana 58%, Szamádhi 60%. Csak ott változik,
   ahol a kivágás még a régi (50% 22%); migráció 2026-11-15h.
+- **3.11.63:** Olívia 11.15-i doksija:
+  - „Pajzsmirigy harmonizálás jógával”: bekerült a lényeg, két pózblokk az oldal stílusában (túlműködésre 6 nyugtató,
+    alulműködésre 8 élénkítő ászana). Olívia saját fotóiról kiretusáltam a ráégetett feliratokat, a nevek az oldal betűjével
+    állnak alattuk. Képek: `assets/img/poses/` (600/900 px); shortcode: `[oy_poses set="tul|alul"]`; migráció: 2026-11-15i,
+    egyszer szúrja be.
+  - Az óraoldalak árkártyái lenyithatók (a fejlécben: egyedül/párban, hossz, „…-tól” ár), egyszerre egy van nyitva.
+  - Asztali nézetben nagyobb a menü betűje (1100 px felett 1,02rem).
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

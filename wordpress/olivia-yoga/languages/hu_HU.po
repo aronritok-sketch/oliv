@@ -1958,3 +1958,6 @@ msgstr "Valaki visszahívást kért a weboldalon.\n\nTelefonszám: %s"
 
 msgid "You can also give it as a gift"
 msgstr "Ajándékba is adhatod"
+
+msgid "from %s"
+msgstr "%s-tól"

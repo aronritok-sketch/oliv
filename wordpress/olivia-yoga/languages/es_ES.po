@@ -1339,3 +1339,6 @@ msgstr "Alguien ha pedido que le llames desde la web.\n\nTeléfono: %s"
 
 msgid "You can also give it as a gift"
 msgstr "También puedes regalarla"
+
+msgid "from %s"
+msgstr "desde %s"

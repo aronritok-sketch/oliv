@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-15h';
+	$rev = '2026-11-15i';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1211,6 +1211,33 @@ function oy_migrate_1114d() {
 	if ( $weeks && class_exists( 'OYS_Settings' ) && (int) OYS_Settings::get( 'weeks_ahead' ) < $weeks ) {
 		OYS_Settings::update( array( 'weeks_ahead' => $weeks ) );
 		$log[] = 'weekly classes ' . $weeks . ' weeks ahead: ' . (int) OYS_Schedule::generate( $weeks ) . ' new dates';
+	}
+	// Olívia, 15 November, on „Pajzsmirigy harmonizálás jógával”: „Ebből a cikkből hiányzik a lényeg, a kép” – the poses for
+	// an over- and an underactive thyroid, as cards with her photos, after the paragraph that says which poses help; added
+	// once, her own words around them stay as they are
+	$thy = get_page_by_path( 'pajzsmirigy-harmonizalas-jogaval', OBJECT, 'post' );
+	if ( $thy && ! str_contains( $thy->post_content, '[oy_poses' ) ) {
+		$c      = $thy->post_content;
+		$blocks = str_contains( $c, '<!-- wp:' );
+		$sc     = fn( $set ) => $blocks ? "<!-- wp:shortcode -->\n[oy_poses set=\"" . $set . "\"]\n<!-- /wp:shortcode -->" : '[oy_poses set="' . $set . '"]';
+		$ins    = "\n\n" . $sc( 'tul' ) . "\n\n" . $sc( 'alul' ) . "\n\n";
+		$at     = false;
+		foreach ( array( 'Ezek az ászanák akkor is', 'Minden esetben végezz bemelegítést' ) as $needle ) {
+			$pos = mb_strpos( $c, $needle );
+			if ( false !== $pos ) {
+				$pos = strpos( $c, $needle );
+				// the start of the paragraph (or block) the sentence is in
+				$p1  = strrpos( substr( $c, 0, $pos ), $blocks ? '<!-- wp:' : '<p' );
+				$p2  = strrpos( substr( $c, 0, $pos ), "\n\n" );
+				$at  = false !== $p1 ? $p1 : ( false !== $p2 ? $p2 : $pos );
+				break;
+			}
+		}
+		$c = false === $at ? rtrim( $c ) . $ins : substr( $c, 0, $at ) . ltrim( $ins, "\n" ) . substr( $c, $at );
+		kses_remove_filters();
+		wp_update_post( wp_slash( array( 'ID' => $thy->ID, 'post_content' => $c ) ) );
+		kses_init_filters();
+		$log[] = 'thyroid article: the poses for an over- and an underactive thyroid';
 	}
 	foreach ( oy_images() as $key => $img ) {
 		if ( empty( $img['pos_prev'] ) ) {
