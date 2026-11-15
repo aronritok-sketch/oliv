@@ -551,6 +551,14 @@
     Tangerine Dream.
   - Tesztek: 1311/0, tiszta teszt-adatbázison. A helyi teszt-adatbázisban korábbi futásokból maradt órák az üdvözlő
     e-mail tesztjét elbuktatták, ezért újratelepítettem, ahogy a CI is teszi.
+- **3.11.74:** Olívia 11.15-i doksija, kezdőlap:
+  - „ez is legyen a tangerine dream színű a főoldalon”: a Csoportos online flow jóga kártyája Tangerine Dream lett (eddig
+    menta volt, mint a relaxációé). A kis lélegző köre Sandy Brown, hogy látsszon a mandarinon.
+  - „itt legyen valami semlegesebb, szebb színű háttér”: a kismamatorna-szekció háttere a paletta világos zsályazöldje
+    (`--sage-soft`) a menta helyett. A fehér csempék maradtak.
+  - „nem látszik a felirat”: a Nap–Hold blokkban a hold világos része Frozen Water lett, és rajta eltűnt a fehér
+    „THA”. Most sötét, mint a „HA”, és a hold világos részére került.
+  - Tesztek: 1313/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

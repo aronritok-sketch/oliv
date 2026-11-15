@@ -1291,3 +1291,6 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 /* „itt legyen valami semlegesebb, szebb színű háttér” – the prenatal section of the home page: the light sage of the palette
    instead of the mint, the white tiles on it */
 .section--pale.oj-prenatal { background: var(--sage-soft); }
+/* „nem látszik a felirat” (THA on the moon of the home page): since the moon's lit part is Frozen Water, the white word
+   disappeared on it – the word is dark like HA on the sun, and sits on the lit part, clear of the shadow */
+.hatha__orb--moon span { color: var(--ink); transform: translateX(-8%); }
