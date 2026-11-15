@@ -436,6 +436,8 @@
     2026-11-15g).
 - **3.11.60:** a főoldali kismamatorna-blokk háttere az oldal pasztell lilája (`--lilac-soft`) („lehet az a pasztell lila,
   amit használunk”).
+- **3.11.61:** az árlistán a csoportos órák alatt csak „90 perces órák szerdánként 18:30-tól 20:00-ig.”, a „Gyere alkalmi
+  jeggyel, vagy spórolj bérlettel” kikerült („kiszedhetjük”).
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

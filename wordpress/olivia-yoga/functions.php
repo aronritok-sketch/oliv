@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OY_VERSION', '3.11.60' );
+define( 'OY_VERSION', '3.11.61' );
 
 require_once get_template_directory() . '/inc/edition.php';
 
@@ -45,7 +45,8 @@ add_filter( 'oys_price_gift_line', fn( $on ) => $on || oy_online_only() );
 add_filter( 'oys_dropin_features', fn( $f ) => oy_online_only() ? array() : $f );
 add_filter( 'oys_pricing_groups', function ( $g ) {
 	if ( oy_online_only() ) {
-		$g['classes'] = array( __( 'Group live online flow yoga classes', 'olivia-yoga' ), __( '90 minutes, every Wednesday from 18:30 to 20:00. Come with a drop-in ticket, or save with a pass.', 'olivia-yoga' ) );
+		// Olívia, 15 November: „a gyere alkalmi jeggyel mondatot kiszedhetjük”
+		$g['classes'] = array( __( 'Group live online flow yoga classes', 'olivia-yoga' ), __( '90 minutes, every Wednesday from 18:30 to 20:00.', 'olivia-yoga' ) );
 	}
 	return $g;
 } );

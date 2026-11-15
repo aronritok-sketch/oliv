@@ -1619,8 +1619,8 @@ msgstr "Árak"
 msgid "Group live online flow yoga classes"
 msgstr "Csoportos, élő online flow jóga órák"
 
-msgid "90 minutes, every Wednesday from 18:30 to 20:00. Come with a drop-in ticket, or save with a pass."
-msgstr "90 perces órák szerdánként 18:30-tól 20:00-ig. Gyere alkalmi jeggyel, vagy spórolj bérlettel."
+msgid "90 minutes, every Wednesday from 18:30 to 20:00."
+msgstr "90 perces órák szerdánként 18:30-tól 20:00-ig."
 
 msgid "Notice the sensations"
 msgstr "Figyeld meg az érzeteket"

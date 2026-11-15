@@ -3433,6 +3433,10 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	$cj = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content-hu-online.json' ), true );
 	ok( '' === ( $cj['faqs_home']['Tényleg működik a csoportos jóga online?'] ?? null ) && '' === $cj['faqs'][0]['home'], 'home FAQ: „Tényleg működik a csoportos jóga online?” is off the home page, on the live site too („ezt a kérdést szedjük ki a főoldalról”)' );
 	ok( str_contains( $oc2, '.section--pale.oj-prenatal { background: var(--lilac-soft); }' ), 'home: the prenatal block on the pastel lilac of the site („a háttere a főoldalon lehet az a pasztell lila, amit használunk”)' );
+	update_option( 'oy_edition', 'hu-online' );
+	$pg = apply_filters( 'oys_pricing_groups', array() );
+	update_option( 'oy_edition', 'fort-myers' );
+	ok( isset( $pg['classes'][1] ) && ! str_contains( $pg['classes'][1], 'drop-in' ) && ! str_contains( $pg['classes'][1], 'alkalmi jeggyel' ), 'prices: the group classes without „Gyere alkalmi jeggyel, vagy spórolj bérlettel” („kiszedhetjük”)' );
 	$sj = (string) file_get_contents( get_template_directory() . '/assets/site.js' );
 	ok( str_contains( $sj, "window.matchMedia('(max-width: 699px)')" ) && str_contains( $sj, "ul.classList.add('oj-modules--fold')" ) && str_contains( $oc2, '.oj-modules--fold li > span { display: none; }' ), 'the prenatal cards fold on a phone, a tap opens one („ezek legyenek lenyithatóak mert mobilon így túl hosszú lesz”)' );
 	ok( preg_match( '/prefers-reduced-motion: no-preference\) \{[^@]*\.hatha__orb--sun \{[^}]*animation: oj-ha 12s/', $oc2 ) && str_contains( $oc2, '@keyframes oj-ha {' ) && str_contains( $oc2, '@keyframes oj-tha-fill {' ) && str_contains( $fr, '<span class="hatha__word" aria-hidden="true">Hatha</span>' ), 'Ha–Tha: the sun and the moon drift into one circle with HATHA across it, and part again („egyik átmegy a másikba és oda-vissza”); only with motion allowed' );
