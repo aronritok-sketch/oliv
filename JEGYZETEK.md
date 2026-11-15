@@ -438,6 +438,9 @@
   amit használunk”).
 - **3.11.61:** az árlistán a csoportos órák alatt csak „90 perces órák szerdánként 18:30-tól 20:00-ig.”, a „Gyere alkalmi
   jeggyel, vagy spórolj bérlettel” kikerült („kiszedhetjük”).
+- **3.11.62:** Jógáról: hét cikk-kártya képén lejjebb került a kivágás, hogy Olívia látsszon („ezeket a képeket is csúsztassuk
+  feljebb”): Egyensúly 55%, Légzés 85%, Meditáció 65%, Ászana 42%, Pránájáma 55%, Dhárana 58%, Szamádhi 60%. Csak ott változik,
+  ahol a kivágás még a régi (50% 22%); migráció 2026-11-15h.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
