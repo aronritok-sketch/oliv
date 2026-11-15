@@ -87,13 +87,17 @@ function oy_price_cards( $service ) {
 			$n     = max( 1, (int) $g['pack']['credits'] );
 			$rows .= '<div><dt>' . esc_html( sprintf( __( '%d sessions', 'olivia-yoga' ), $n ) ) . '<small>' . esc_html( sprintf( __( '%s per session', 'olivia-yoga' ), oys_money( (int) round( (int) $g['pack']['price_cents'] / $n ) ) ) ) . '</small></dt><dd>' . esc_html( oys_money( (int) $g['pack']['price_cents'] ) ) . '</dd></div>';
 		}
-		// Olívia, 15 November: „az ilyen árak is legyenek inkább lenyithatók” – each card folds under its head (alone or as a
-		// pair, the length, from what price); the first is open, one at a time (the shared name; site.js where it is not known)
-		$from  = (int) ( $g['single'] ?? $g['pack'] )['price_cents']; // one session, or the pass where there is no single
-		$out  .= '<details class="oj-price oj-price--' . ( $pair ? 'pair' : 'solo' ) . '" name="oj-prices-' . esc_attr( sanitize_key( $service ) ) . '"' . ( '' === $out ? ' open' : '' ) . '><summary class="oj-price__head"><span class="oj-price__who">' . ( $pair ? esc_html__( 'As a pair', 'olivia-yoga' ) : esc_html__( 'Alone', 'olivia-yoga' ) ) . '</span>'
+		// Olívia, 15 November: „az ilyen árak is legyenek inkább lenyithatók”, then „a két egyedüli maradhat kinyitva, a párosok
+		// maradjanak csak lenyithatóak és csak mobilon kell, asztalin látszódhat minden” – the cards alone are always open; the
+		// pair cards fold under their head on a phone (site.js opens them on a wider screen)
+		$from = (int) ( $g['single'] ?? $g['pack'] )['price_cents']; // one session, or the pass where there is no single
+		$head = '<span class="oj-price__who">' . ( $pair ? esc_html__( 'As a pair', 'olivia-yoga' ) : esc_html__( 'Alone', 'olivia-yoga' ) ) . '</span>'
 			. ( $len ? '<span class="oj-price__len">' . oy_icon( 'clock' ) . esc_html( sprintf( __( '%d minutes', 'olivia-yoga' ), $len ) ) . '</span>' : '' )
-			. '<span class="oj-price__from">' . esc_html( sprintf( __( 'from %s', 'olivia-yoga' ), oys_money( $from ) ) ) . '</span><span class="oj-fold__icon" aria-hidden="true"></span></summary>'
-			. '<dl class="oj-price__rows">' . $rows . '</dl>' . ( $pair ? '<p class="oj-price__for">' . esc_html__( 'for the two of you', 'olivia-yoga' ) . '</p>' : '' ) . '</details>';
+			. '<span class="oj-price__from">' . esc_html( sprintf( __( 'from %s', 'olivia-yoga' ), oys_money( $from ) ) ) . '</span>';
+		$body = '<dl class="oj-price__rows">' . $rows . '</dl>' . ( $pair ? '<p class="oj-price__for">' . esc_html__( 'for the two of you', 'olivia-yoga' ) . '</p>' : '' );
+		$out .= $pair
+			? '<details class="oj-price oj-price--pair"><summary class="oj-price__head">' . $head . '<span class="oj-fold__icon" aria-hidden="true"></span></summary>' . $body . '</details>'
+			: '<div class="oj-price oj-price--solo"><div class="oj-price__head">' . $head . '</div>' . $body . '</div>';
 	}
 	return '' === $out ? '' : '<div class="oj-prices">' . $out . '</div>';
 }
@@ -133,6 +137,23 @@ function oy_faq_list( $home_only = false ) {
 		$out .= '<details name="oy-faq"' . ( 0 === $i ? ' open' : '' ) . '><summary><span>' . esc_html( get_the_title( $f ) ) . '</span>' . oy_icon( 'plus' ) . '</summary><div class="answer">' . oy_faq_tags( wpautop( wp_kses_post( oy_post_content( $f ) ) ) ) . '</div></details>';
 	}
 	return $out . '</div>';
+}
+
+/**
+ * One answer of the FAQ, exactly as the FAQ page shows it (Olívia, 15 November, on the prices page: „az mire szükséges lesz
+ * résznél pedig tegyük be pontosan ugyanazt, amit a gyiknél, külön szedve”) – read from the FAQ itself, so it stays the same.
+ */
+function oy_faq_answer( $q ) {
+	$q = trim( (string) $q );
+	if ( '' === $q ) {
+		return '';
+	}
+	foreach ( get_posts( array( 'post_type' => 'oy_faq', 'numberposts' => 50, 'orderby' => 'menu_order', 'order' => 'ASC' ) ) as $f ) {
+		if ( str_starts_with( get_the_title( $f ), $q ) ) {
+			return '<div class="oj-faq-answer">' . oy_faq_tags( wpautop( wp_kses_post( oy_post_content( $f ) ) ) ) . '</div>';
+		}
+	}
+	return '';
 }
 
 function oy_areas_list() {
@@ -354,6 +375,7 @@ add_action( 'init', function () {
 	$studio = fn( $sc, $fallback ) => shortcode_exists( $sc ) ? do_shortcode( '[' . $sc . ']' ) : $fallback;
 	add_shortcode( 'oy_classes', fn() => '<div class="block-wide">' . oy_classes_list() . '</div>' );
 	add_shortcode( 'oy_faq', fn() => oy_faq_list() );
+	add_shortcode( 'oy_faq_answer', fn( $a ) => oy_faq_answer( $a['q'] ?? '' ) );
 	add_shortcode( 'oy_art', fn( $a ) => function_exists( 'oy_way_art' ) ? oy_way_art( sanitize_key( $a['name'] ?? '' ) ) : '' );
 	add_shortcode( 'oy_prices', fn( $a ) => oy_price_cards( sanitize_key( $a['service'] ?? '' ) ) );
 	add_shortcode( 'oy_poses', fn( $a ) => oy_poses( sanitize_key( $a['set'] ?? '' ) ) );
@@ -375,7 +397,11 @@ add_action( 'init', function () {
 	// elején nagyon belelóg a szöveg a képbe, legyen inkább ez a 2 kép valahogy elosztva”)
 	// photos side by side; class="oj-duo--row" makes a row of smaller ones (Olívia, 15 November, „A matracon túl”: „a szöveg
 	// végére meg kisebben ezek a képek jöhetnek”)
-	add_shortcode( 'oy_figures', fn( $a ) => '<div class="' . esc_attr( trim( 'oj-duo ' . implode( ' ', array_map( 'sanitize_html_class', preg_split( '/\s+/', trim( (string) ( $a['class'] ?? '' ) ) ) ) ) ) ) . '">' . implode( '', array_map( fn( $k ) => oy_figure( sanitize_key( $k ) ), array_filter( array_map( 'trim', explode( ',', (string) ( $a['photos'] ?? '' ) ) ) ) ) ) . '</div>' );
+	add_shortcode( 'oy_figures', function ( $a ) {
+		$figs = array_filter( array_map( fn( $k ) => oy_figure( sanitize_key( $k ) ), array_filter( array_map( 'trim', explode( ',', (string) ( $a['photos'] ?? '' ) ) ) ) ) );
+		$cls  = trim( 'oj-duo ' . implode( ' ', array_map( 'sanitize_html_class', preg_split( '/\s+/', trim( (string) ( $a['class'] ?? '' ) ) ) ) ) );
+		return '<div class="' . esc_attr( $cls . ' oj-duo--n' . count( $figs ) ) . '">' . implode( '', $figs ) . '</div>';
+	} );
 	add_shortcode( 'oy_picto', fn( $a ) => oy_pictogram( sanitize_key( $a['icon'] ?? 'lotus' ), sanitize_key( $a['tone'] ?? 'lilac' ) ) );
 } );
 

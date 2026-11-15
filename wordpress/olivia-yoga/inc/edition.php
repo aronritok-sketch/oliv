@@ -5,7 +5,7 @@
  *  - fort-myers (default): Olivia Kovacs Yoga, the Fort Myers site in English, Hungarian and Spanish,
  *    with studio, beach, private and online classes.
  *  - hu-online: Olivia Jóga – Online, in Hungarian only, for live online classes from Hungary. Hungarian
- *    addresses (/orarend-es-arak/ …), prices in forints, Budapest time, no Fort Myers content.
+ *    addresses (/bejelentkezes-es-arak/ …), prices in forints, Budapest time, no Fort Myers content.
  *  - hathaflow: Hathaflow, the booking system as a product demo – a made-up studio in English with sample
  *    classes, timetable and prices, no Olivia content and none of her photos (the hathaflow child theme
  *    ships neutral pictures). A bar on every page says it is a demo.
@@ -27,9 +27,11 @@ const OY_EDITIONS = array(
 /** Page addresses of the online edition, by the theme's own page slug. */
 const OY_ONLINE_SLUGS = array(
 	'about'            => 'rolam',
-	'yoga-classes'     => 'online-jogaorak',
-	'private-yoga'     => 'online-jogaorak', // Olivia, 11.12: the private sessions page went into the classes page
-	'schedule-pricing' => 'orarend-es-arak',
+	// Olívia, 15 November: „maradt az aloldal neve … de már online órák”, „… de már bejelentkezés és árak” – the addresses
+	// follow the pages' names (the old ones lead here, see OY_ONLINE_MOVED)
+	'yoga-classes'     => 'online-orak',
+	'private-yoga'     => 'online-orak', // Olivia, 11.12: the private sessions page went into the classes page
+	'schedule-pricing' => 'bejelentkezes-es-arak',
 	'faq'              => 'gyik',
 	'contact'          => 'kapcsolat',
 	'journal'          => 'jogarol', // „Jógáról” (Olivia, 11.12; was „Napló”)
@@ -45,6 +47,8 @@ const OY_ONLINE_MOVED = array(
 	'online-jogaorak/slow-flow'     => array( 'page', 'yoga-classes' ),
 	'online-jogaorak/private-yoga'  => array( 'class', 'egyeni-online-joga' ),
 	'hatha-flow-vs-slow-flow'       => array( 'page', 'journal' ),
+	'orarend-es-arak'               => array( 'page', 'schedule-pricing' ),
+	'online-jogaorak'               => array( 'page', 'yoga-classes' ),
 );
 
 // The journal posts of the online edition first had their English addresses (2026-11-12, first day live): the
@@ -89,9 +93,13 @@ add_action( 'template_redirect', function () {
 	if ( ! $to && str_starts_with( $path, 'naplo/' ) ) {
 		$to = array( 'path', 'jogarol/' . substr( $path, 6 ) );
 	}
+	if ( ! $to && str_starts_with( $path, 'online-jogaorak/' ) ) { // the class pages: /online-jogaorak/{class}/ → /online-orak/{class}/
+		$to = array( 'path', 'online-orak/' . substr( $path, 16 ) );
+	}
 	if ( $to ) {
 		$url = 'class' === $to[0] ? oy_class_url( $to[1] ) : ( 'anchor' === $to[0] ? oy_page_link( 'yoga-classes', $to[1] ) : ( 'path' === $to[0] ? home_url( '/' . $to[1] . '/' ) : oy_page_link( $to[1] ) ) );
-		wp_safe_redirect( $url, 301 );
+		$qs = (string) wp_parse_url( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_QUERY );
+		wp_safe_redirect( '' === $qs || str_contains( $url, '?' ) ? $url : $url . '?' . $qs, 301 );
 		exit;
 	}
 } );

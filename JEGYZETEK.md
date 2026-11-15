@@ -459,6 +459,34 @@
   (mobilon 2×2) a titok-doboz után, a gomb előtt: Olívia három festménye és egy naplementés fotója. Shortcode:
   `[oy_figures photos="…" class="oj-duo--row"]`; képek: `about-painting-embrace`, `about-painting-birds`,
   `about-painting-mask`, `about-sunset-river`; migráció: 2026-11-15k, egyszer szúrja be.
+- **3.11.66:** Olívia 11.15-i doksija, délutáni pontok:
+  - Új címek: `/orarend-es-arak/` → `/bejelentkezes-es-arak/`, `/online-jogaorak/` → `/online-orak/` (az órák is:
+    `/online-orak/{óra}/`). A régiek 301-gyel átirányítanak, a paraméterekkel együtt. A tartalomban lévő linkeket a
+    migráció átírja. Az oldalszerkesztő a szövegeket link nélkül kulcsolja, így Olívia átírásai megmaradnak.
+  - **Sortöréses bekezdések:** amit Olívia új sorokba tördelt, az a szöveg hasábjában pasztell doboz lesz (`oy_lines`).
+    A „Hogyan működik? / Mi történik…? / Mit csinálunk egy órán?” alatt számozott lépés-ábra (`oy_flows`). A GYIK-ben a
+    gondolatjeles sorokból lista lesz. Mind a kész oldalon fut, az ő szerkesztései után.
+  - **Bejelentkezés és árak oldal:**
+    - a csoportos doboz címkéi kiegészültek: foglalj előre, legalább 3 fővel indul, kezdők is (az órarend alatti
+      bekezdés kikerült);
+    - az ajándékutalvány saját kártyát kapott;
+    - a bérletes bekezdés kikerült;
+    - az „Amire szükséged lesz” a GYIK válasza (`[oy_faq_answer]`);
+    - az árkártyákon pipák vannak, nem színes pöttyök.
+  - **Óraoldalak:**
+    - az egyedüli árkártyák mindig nyitva vannak, a párosak mobilon lenyithatók, asztalon nyitva;
+    - az egyéni óra nyitó dobozában az „Egyéni órán neked…” a kiemelt sor;
+    - a kártyaszövegek Olívia kérése szerint változtak (jógafilozófia, „Kezdőket is szeretettel várok” az egyénihez,
+      dinamikus nyújtás, „kíméletes nyújtás” ki, „sokaknak” ki, „Persze, ha erre van szükséged.”);
+    - „jobban tudlak korrigálni és segíteni”;
+    - a relaxáció „Miért a légzés?” része oda-vissza hatásról szól.
+  - **Rólam:**
+    - a képzések két oszlopban (fotó + 2023, Fitmummy + 2026);
+    - az „Ahol eddig tanítottam” dobozban széles fotó (`park-class-seated`);
+    - az „Amiben ma segítek” új kártyákat kapott (pasztell, sarokkör, nyíl);
+    - „A matracon túl” végén ötödik kép is van (henna).
+  - **Főoldal:** a kismama-csempék pasztellzöldek, az egyéni blokk négy kártyája szebb, a lábléc „Bejelentkezés és árak”.
+  - Migráció: 2026-11-15n. Tesztek: 1297/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

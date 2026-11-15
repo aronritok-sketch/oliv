@@ -254,6 +254,27 @@
 		Array.prototype.forEach.call(d.parentElement.children, function (o) { if (o !== d && o.tagName === 'DETAILS' && o.open && o.getAttribute('name') === name) o.open = false; });
 	}, true);
 
+	/* Olívia, 15 November, the price cards of a class page: „a két egyedüli maradhat kinyitva, a párosok maradjanak csak
+	   lenyithatóak és csak mobilon kell, asztalin látszódhat minden” – on a wider screen the pair cards are open and stay
+	   open; on a phone they fold (closed at first). */
+	(function () {
+		var pairs = document.querySelectorAll('details.oj-price--pair');
+		if (!pairs.length || !window.matchMedia) return;
+		var wide = window.matchMedia('(min-width: 700px)');
+		function apply() {
+			Array.prototype.forEach.call(pairs, function (d) {
+				if (wide.matches) { d.open = true; d.classList.add('is-static'); }
+				else if (d.classList.contains('is-static')) { d.open = false; d.classList.remove('is-static'); }
+			});
+		}
+		apply();
+		if (wide.addEventListener) wide.addEventListener('change', apply); else if (wide.addListener) wide.addListener(apply);
+		document.addEventListener('click', function (e) {
+			var s = e.target.closest && e.target.closest('details.oj-price.is-static > summary');
+			if (s) e.preventDefault();
+		});
+	})();
+
 	/* Olívia, 14 November: „ezek legyenek lenyithatóak mert mobilon így túl hosszú lesz” – on a phone the cards with a
 	   longer text under the title (the prenatal modules, who one-to-one is for) show only their titles, a tap opens one.
 	   On a wider screen they stay as they are, open. */

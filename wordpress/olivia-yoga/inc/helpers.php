@@ -253,6 +253,11 @@ function oy_pricing_design( $html ) {
 				array( 'clock', $len ),
 				array( 'globe', __( 'live, in your browser', 'olivia-yoga' ) ),
 				array( 'user', __( 'camera optional', 'olivia-yoga' ) ),
+				// Olívia, 15 November: „ezek az infók is jöhetnek ide … a kamera nem kötelező mellé még fér” – what the note under
+				// the timetable said, as chips
+				array( 'check', __( 'book ahead', 'olivia-yoga' ) ),
+				array( 'group', __( 'starts with at least 3 people', 'olivia-yoga' ) ),
+				array( 'leaf', __( 'beginners welcome', 'olivia-yoga' ) ),
 			),
 			fn( $f ) => '' !== $f[1]
 		);
@@ -280,6 +285,14 @@ function oy_pricing_design( $html ) {
 		}
 		$html = $m[1] . '<div class="oj-info">' . $chips . $paras . '</div>' . substr( $html, strlen( $m[0] ) );
 	}
+	// 1b. the gift vouchers as a card of their own (Olívia, 15 November: „ajándékutalványok a bejelentkezés és árak aloldalon
+	// legyen szebben feltüntetve”) – her words and the button inside it
+	$html = (string) preg_replace_callback(
+		'#(<h2 id="gift-cards"[^>]*>.*?</h2>)((?:\s*<p(?:\s[^>]*)?>.*?</p>)+)#s',
+		fn( $g ) => $g[1] . '<div class="oj-gift"><span class="oj-gift__icon" aria-hidden="true">' . oy_icon( 'gift' ) . '</span><div class="oj-gift__body">' . trim( $g[2] ) . '</div></div>',
+		$html,
+		1
+	);
 	// 2. the one-to-one classes as boxes
 	$private = array_filter( array( 'egyeni-online-joga', oy_prenatal_slug(), 'stretching', 'relaxacio-legzes' ), fn( $s ) => (bool) get_page_by_path( $s, OBJECT, 'oy_class' ) );
 	$classes = get_page_by_path( oy_page_slug( 'yoga-classes' ) );
@@ -323,12 +336,13 @@ function oy_main_transform_set( $kind, $arg = '' ) {
 }
 
 function oy_main_transform( $html ) {
-	$x = $GLOBALS['oy_main_x'] ?? null;
-	if ( ! $x || ! oy_online_only() || ( function_exists( 'oye_editing' ) && oye_editing() ) ) {
+	$x = $GLOBALS['oy_main_x'] ?? array( '', '' );
+	if ( ! oy_online_only() || ( function_exists( 'oye_editing' ) && oye_editing() ) ) {
 		return $html;
 	}
-	$tag = '<div class="main-col entry">';
-	$a   = strpos( $html, $tag );
+	$html = oy_answer_lines( $html );
+	$tag  = '<div class="main-col entry">';
+	$a    = strpos( $html, $tag );
 	if ( false === $a ) {
 		return $html;
 	}
@@ -337,7 +351,127 @@ function oy_main_transform( $html ) {
 	$e    = $ends ? min( $ends ) : strlen( $html );
 	$part = substr( $html, $s, $e - $s );
 	$part = 'opening' === $x[0] ? oy_opening( $part, $x[1] ?: 'lilac' ) : ( 'pricing' === $x[0] ? oy_pricing_design( $part ) : $part );
+	$part = oy_lines( $part );
 	return substr( $html, 0, $s ) . $part . substr( $html, $e );
+}
+
+/**
+ * Olívia, 15 November: „nagyon sok helyen új sorba írtam mondatokat, hogy jobban átlátható legyen. Szépítsd ezeket, akár
+ * új boxxal vagy bármi. Asztalin és mobilon is jól nézzen ki.” A paragraph of the text column whose sentences she put on
+ * lines of their own (line breaks) becomes a soft box with one line under the other, the colour changing from box to box.
+ * Only paragraphs of the column itself – inside an already designed box (opening, note, gift card…) her lines stay as
+ * they are. Runs on the finished page, after her edits.
+ */
+function oy_lines( $html ) {
+	$html  = oy_flows( $html );
+	$tones = array( 'lilac', 'pink', 'sage', 'sun' );
+	$n     = 0;
+	$out   = '';
+	$at    = 0;
+	if ( ! preg_match_all( '#<p(\s[^>]*)?>((?:(?!</p>).)*?<br\s*/?>(?:(?!</p>).)*?)</p>#s', $html, $ms, PREG_SET_ORDER | PREG_OFFSET_CAPTURE ) ) {
+		return $html;
+	}
+	foreach ( $ms as $m ) {
+		$pos   = $m[0][1];
+		$attrs = (string) ( $m[1][0] ?? '' );
+		if ( preg_match( '#class="[^"]*\b(oj-|btn)#', $attrs ) ) {
+			continue;
+		}
+		$before = substr( $html, 0, $pos );
+		$depth  = preg_match_all( '#<(div|details|blockquote|section|figure|li|ul|ol)\b#', $before ) - preg_match_all( '#</(div|details|blockquote|section|figure|li|ul|ol)>#', $before );
+		if ( $depth > 0 ) {
+			continue;
+		}
+		$lines = array_values( array_filter( array_map( 'trim', preg_split( '#<br\s*/?>#', $m[2][0] ) ), fn( $l ) => '' !== trim( wp_strip_all_tags( $l ) ) ) );
+		if ( count( $lines ) < 2 ) {
+			continue;
+		}
+		$box  = '<div class="oj-lines oj-lines--' . $tones[ $n % 4 ] . '">' . implode( '', array_map( fn( $l ) => '<p>' . $l . '</p>', $lines ) ) . '</div>';
+		$out .= substr( $html, $at, $pos - $at ) . $box;
+		$at   = $pos + strlen( $m[0][0] );
+		++$n;
+	}
+	return $out . substr( $html, $at );
+}
+
+/**
+ * Olívia, 15 November: „Az ilyen leírásokból jöhet egy folyamatábra vagy lépésről lépésre ábra az összes aloldalra” – the
+ * paragraph under „Hogyan működik?”, „Mi történik …?” or „Mit csinálunk egy órán?” becomes numbered steps: her lines (line
+ * breaks) are the steps; a one-sentence description is cut at its „, utána” / „, majd” / „, végül”, keeping her words. What
+ * follows the first sentence stays under the steps. Fewer than two steps: as it is.
+ */
+function oy_flow_steps( $inner, $heading = '' ) {
+	$lines = array_values( array_filter( array_map( 'trim', preg_split( '#<br\s*/?>#', $inner ) ), fn( $l ) => '' !== trim( wp_strip_all_tags( $l ) ) ) );
+	$note  = '';
+	if ( 1 === count( $lines ) && ! str_starts_with( $heading, 'Mit csinálunk' ) ) {
+		// „Hogyan működik?”, „Mi történik…?”: each sentence a step
+		$lines = array_values( array_filter( array_map( 'trim', preg_split( '#(?<=[.!?])\s+(?=\p{Lu})#u', $lines[0] ) ) ) );
+	} elseif ( 1 === count( $lines ) ) {
+		$sent  = preg_split( '#(?<=[.!?])\s+(?=\p{Lu})#u', $lines[0], 2 );
+		$note  = trim( $sent[1] ?? '' );
+		$lines = preg_split( '#,\s+(?=(?:utána|majd|aztán|végül)\s)#u', trim( $sent[0] ) );
+		$lines = array_map( fn( $l ) => mb_strtoupper( mb_substr( $l, 0, 1 ) ) . mb_substr( $l, 1 ), array_map( 'trim', $lines ) );
+	}
+	return count( $lines ) < 2 ? null : array( $lines, $note );
+}
+
+function oy_flows( $html ) {
+	return (string) preg_replace_callback(
+		'#(<h2[^>]*>\s*((?:Hogyan működik|Mi történik|Mit csinálunk)[^<]*)</h2>\s*)<p>((?:(?!</p>).)+)</p>((?:\s*<p>(?:(?!</p>).)+</p>)*)#su',
+		function ( $m ) {
+			$st = oy_flow_steps( $m[3], trim( $m[2] ) );
+			if ( ! $st ) {
+				return $m[0];
+			}
+			$after = $m[4];
+			// „Mi történik …?”: the paragraphs right after it go on with the class (the slow end), so they are steps too
+			if ( str_starts_with( trim( $m[2] ), 'Mi történik' ) && preg_match_all( '#<p>((?:(?!</p>).)+)</p>#s', $after, $more ) ) {
+				$st[0] = array_merge( $st[0], array_map( 'trim', $more[1] ) );
+				$after = '';
+			}
+			$li = '';
+			foreach ( $st[0] as $i => $l ) {
+				$li .= '<li><span class="oj-flow__n" aria-hidden="true">' . ( $i + 1 ) . '</span><p>' . $l . '</p></li>';
+			}
+			return $m[1] . '<ol class="oj-flow oj-flow--n' . min( 4, count( $st[0] ) ) . '">' . $li . '</ol>' . ( '' !== $st[1] ? '<p class="oj-flow__note">' . $st[1] . '</p>' : '' ) . $after;
+		},
+		$html
+	);
+}
+
+/**
+ * The same in the answers of the FAQ (on the FAQ page, the home page, „Amire szükséged lesz”): lines that start with a
+ * dash become a list, the other lines paragraphs of their own.
+ */
+function oy_answer_lines( $html ) {
+	return (string) preg_replace_callback(
+		'#(<div class="(?:answer|oj-faq-answer)">)(.*?)(</div>)#s',
+		function ( $a ) {
+			$inner = preg_replace_callback(
+				'#<p>((?:(?!</p>).)*?<br\s*/?>(?:(?!</p>).)*?)</p>#s',
+				function ( $p ) {
+					$lines = array_values( array_filter( array_map( 'trim', preg_split( '#<br\s*/?>#', $p[1] ) ), fn( $l ) => '' !== trim( wp_strip_all_tags( $l ) ) ) );
+					$out   = '';
+					$list  = array();
+					foreach ( $lines as $l ) {
+						if ( preg_match( '#^[–-]\s*(.+)$#us', $l, $d ) ) {
+							$list[] = '<li>' . $d[1] . '</li>';
+							continue;
+						}
+						if ( $list ) {
+							$out .= '<ul class="oj-dashes">' . implode( '', $list ) . '</ul>';
+							$list = array();
+						}
+						$out .= '<p>' . $l . '</p>';
+					}
+					return $out . ( $list ? '<ul class="oj-dashes">' . implode( '', $list ) . '</ul>' : '' );
+				},
+				$a[2]
+			);
+			return $a[1] . $inner . $a[3];
+		},
+		$html
+	);
 }
 
 add_action( 'template_redirect', function () {
@@ -363,13 +497,28 @@ function oy_opening( $html, $tone = 'lilac' ) {
 	if ( ! preg_match( '#^\s*<p(?:\s[^>]*)?>(.*?)</p>#s', $html, $m ) ) {
 		return $html;
 	}
+	// „tone:2” – the second line is the one in large (Olívia, 15 November, one-to-one yoga: „ez jó de pont az egyéni legyen
+	// kiemelve”); the first stays above it, small
+	$pre  = '';
+	$lead = 1;
+	if ( preg_match( '#^([a-z]+):(\d)$#', (string) $tone, $t ) ) {
+		$tone = $t[1];
+		$lead = (int) $t[2];
+	}
+	if ( 2 === $lead ) {
+		$two = preg_split( '#<br\s*/?>#i', $m[1], 2 );
+		if ( 2 === count( $two ) && '' !== trim( wp_strip_all_tags( $two[0] ) ) ) {
+			$pre  = '<p class="oj-opening__pre">' . trim( $two[0] ) . '</p>';
+			$m[1] = ltrim( preg_replace( '#^(\s*<br\s*/?>)+#i', '', $two[1] ) );
+		}
+	}
 	$parts = preg_split( '#<br\s*/?>#i', $m[1], 2 );
 	if ( 2 !== count( $parts ) || '' === trim( wp_strip_all_tags( $parts[0] ) ) || '' === trim( wp_strip_all_tags( $parts[1] ) ) ) {
 		return $html;
 	}
 	$rest  = preg_replace( '#^(\s*<br\s*/?>)+\s*#i', '', trim( $parts[1] ) );
 	$paras = array_filter( array_map( 'trim', preg_split( '#(?:<br\s*/?>\s*){2,}#i', $rest ) ), fn( $x ) => '' !== $x );
-	$box   = '<div class="oj-opening oj-opening--' . esc_attr( $tone ) . '"><p class="oj-opening__tag">' . trim( $parts[0] ) . '</p>';
+	$box   = '<div class="oj-opening oj-opening--' . esc_attr( $tone ) . '">' . $pre . '<p class="oj-opening__tag">' . trim( $parts[0] ) . '</p>';
 	foreach ( $paras as $para ) {
 		$box .= '<p>' . $para . '</p>';
 	}
@@ -533,7 +682,7 @@ function oy_book_url() {
 	return function_exists( 'oys_page_url' ) ? oys_page_url( 'book' ) : oy_page_link( 'contact', 'book' );
 }
 
-/** The prenatal class's address (slug): /online-jogaorak/kismamatorna/ on the Hungarian online site (Olivia, 11.12). */
+/** The prenatal class's address (slug): /online-orak/kismamatorna/ on the Hungarian online site (Olivia, 11.12). */
 function oy_prenatal_slug() {
 	return 'hu-online' === oy_edition() ? 'kismamatorna' : 'prenatal-fitness';
 }

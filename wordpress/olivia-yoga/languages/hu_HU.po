@@ -1961,3 +1961,12 @@ msgstr "Ajándékba is adhatod"
 
 msgid "from %s"
 msgstr "%s-tól"
+
+msgid "book ahead"
+msgstr "foglalj előre"
+
+msgid "starts with at least 3 people"
+msgstr "legalább 3 fővel indul"
+
+msgid "beginners welcome"
+msgstr "kezdőket is szeretettel várok"

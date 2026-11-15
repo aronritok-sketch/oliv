@@ -355,7 +355,11 @@
   "alt": "Olivia Kovacs teaching a seated class in a park",
   "pos": "55% 55%",
   "w": 1200,
-  "h": 626
+  "h": 626,
+  "hu": {
+   "file": "kovacs-olivia-szabadteri-csoportos-jogaorat-vezet",
+   "alt": "Kovács Olívia háttal ülve vezet egy szabadtéri csoportos jógaórát"
+  }
  },
  "olivia-terrace-profile": {
   "alt": "Olivia Kovacs on a terrace at sunset, looking into the distance",
@@ -920,6 +924,16 @@
   "hu": {
    "file": "kovacs-olivia-naplementeben-a-folyoparton",
    "alt": "Kovács Olívia mosolyog naplementében a folyóparton"
+  }
+ },
+ "about-henna-arm": {
+  "alt": "A henna design by Olivia Kovacs on a forearm and the back of a hand",
+  "pos": "45% 50%",
+  "w": 1200,
+  "h": 1600,
+  "hu": {
+   "file": "kovacs-olivia-hennafestese-alkaron",
+   "alt": "Kovács Olívia hennafestése egy alkaron és kézfejen"
   }
  }
 }

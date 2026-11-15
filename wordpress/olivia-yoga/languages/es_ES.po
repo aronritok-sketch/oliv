@@ -1342,3 +1342,12 @@ msgstr "También puedes regalarla"
 
 msgid "from %s"
 msgstr "desde %s"
+
+msgid "book ahead"
+msgstr "reserva con antelación"
+
+msgid "starts with at least 3 people"
+msgstr "empieza con al menos 3 personas"
+
+msgid "beginners welcome"
+msgstr "principiantes bienvenidos"

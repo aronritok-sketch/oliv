@@ -451,7 +451,7 @@ function oy_import_all( $refresh = false ) {
 /**
  * The online site (hu-online) after Olivia's notes of 12 November 2026, on a site set up before:
  *  - rev 1 (her oliviajoga.hu doc): the new prices, Wednesday 18:30–20:00 as the only weekly class, the prenatal class
- *    at /online-jogaorak/kismamatorna/;
+ *    at /online-orak/kismamatorna/;
  *  - rev 2 (her doc „Módosítások online jóga”): the one-to-one services (individual online yoga, prenatal, stretching,
  *    relaxation and breathing) with their passes, no slow flow, no private sessions page (in the classes page now),
  *    „Jógáról” instead of „Napló” (/jogarol/), the Wednesday class from 16 December without 23 December, own streaming.
@@ -1030,13 +1030,43 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-15k';
+	$rev = '2026-11-15n';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
 	update_option( 'oy_1114d_rev', $rev );
+	// Olívia, 15 November: „maradt az aloldal neve, de már bejelentkezés és árak” / „… de már online órák” – the two pages
+	// get the addresses of their names, and every link to them (and to the class pages under the classes page) on the site
+	// follows; the old addresses redirect (inc/edition.php). The page editor keys her edits by their text without the links,
+	// so they stay.
+	$log   = array();
+	$moved = array( 'orarend-es-arak' => 'bejelentkezes-es-arak', 'online-jogaorak' => 'online-orak' );
+	foreach ( $moved as $from => $to ) {
+		$pg = get_page_by_path( $from );
+		if ( $pg && ! get_page_by_path( $to ) ) {
+			wp_update_post( array( 'ID' => $pg->ID, 'post_name' => $to ) );
+			$log[] = 'address: /' . $from . '/ → /' . $to . '/';
+		}
+	}
+	global $wpdb;
+	$links = 0;
+	foreach ( $moved as $from => $to ) {
+		$ids = $wpdb->get_col( $wpdb->prepare( "SELECT ID FROM {$wpdb->posts} WHERE post_type NOT IN ( 'revision', 'nav_menu_item' ) AND post_content LIKE %s", '%/' . $wpdb->esc_like( $from ) . '/%' ) );
+		foreach ( $ids as $id ) {
+			$c = (string) get_post_field( 'post_content', (int) $id );
+			$n = (string) preg_replace( '~(href=["\'](?:' . preg_quote( untrailingslashit( home_url() ), '~' ) . ')?)/' . preg_quote( $from, '~' ) . '/~', '$1/' . $to . '/', $c );
+			if ( $n !== $c ) {
+				kses_remove_filters();
+				wp_update_post( wp_slash( array( 'ID' => (int) $id, 'post_content' => $n ) ) );
+				kses_init_filters();
+				++$links;
+			}
+		}
+	}
+	if ( $links ) {
+		$log[] = 'links to the moved pages updated in ' . $links . ' posts';
+	}
 	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
-	$log  = array();
 	$targets = array();
 	foreach ( (array) ( $data['pages'] ?? array() ) as $key => $page ) {
 		$targets[] = array( $key, $page, fn() => get_page_by_path( oy_page_slug( OY_PAGE_SLUGS[ $key ] ?? $key ) ) );
@@ -1234,9 +1264,11 @@ function oy_migrate_1114d() {
 		if ( ! str_contains( $c, 'photo="journal-15"' ) && preg_match( '~<h2>A matracon túl</h2>\n?~u', $c, $h ) ) {
 			$c = str_replace( $h[0], rtrim( $h[0] ) . "\n" . '[oy_figure photo="journal-15" class="oj-figure--wide"]' . "\n", $c );
 		}
-		// „a szöveg végére meg kisebben ezek a képek jöhetnek”: a row of four smaller photos (three of her paintings and
-		// one at sunset) at the end of the chapter's text – after the little secret, before the button
-		$row = '[oy_figures photos="about-painting-embrace,about-painting-birds,about-painting-mask,about-sunset-river" class="oj-duo--row"]';
+		// „a szöveg végére meg kisebben ezek a képek jöhetnek”: a row of smaller photos (three of her paintings, one at
+		// sunset, her henna) at the end of the chapter's text – after the little secret, before the button
+		$row = '[oy_figures photos="about-painting-embrace,about-painting-mask,about-painting-birds,about-sunset-river,about-henna-arm" class="oj-duo--row"]';
+		// a fifth one came later (her henna), and her order: the row that went out with four becomes the row of five
+		$c = str_replace( '[oy_figures photos="about-painting-embrace,about-painting-birds,about-painting-mask,about-sunset-river" class="oj-duo--row"]', $row, $c );
 		$h2  = strpos( $c, '<h2>A matracon túl</h2>' );
 		if ( false !== $h2 && ! str_contains( $c, 'about-sunset-river' ) ) {
 			$next = strpos( $c, '<h2', $h2 + 5 );
@@ -1251,12 +1283,49 @@ function oy_migrate_1114d() {
 			$sec = false === $at ? rtrim( $sec ) . "\n" . $row . "\n" : substr( $sec, 0, $at ) . ( "\n" === substr( $sec, $at - 1, 1 ) ? '' : "\n" ) . $row . "\n" . substr( $sec, $at );
 			$c   = substr( $c, 0, $h2 ) . $sec . substr( $c, $end );
 		}
+		// „a 2026-os szöveg legyen a képzéses kép mellett vagy alatt, ne legyenek üres helyek, legyen szépen eloszlatva”: the
+		// trainings in two columns – her photo over the 2023 one, the Fitmummy card over the 2026 one (blank lines between,
+		// so each shortcode stays on its own)
+		if ( ! str_contains( $c, 'oj-trainings' ) && preg_match( '~\[oy_figure photo="olivia-side-plank-festival"[^\]]*\]\s*(<p>(?:(?!</p>).)*?</p>)\s*(<p>2026(?:(?!</p>).)*?</p>)\s*\[oy_fitmummy\]~su', $c, $m ) ) {
+			$c = str_replace( $m[0], "<div class=\"oj-trainings\">\n\n[oy_figure photo=\"olivia-side-plank-festival\"]\n\n[oy_fitmummy]\n\n" . $m[1] . "\n\n" . $m[2] . "\n\n</div>", $c );
+		}
+		// „Ahol eddig tanítottam: jöhet szélesen hozzá ez a kép” – her festival class, wide, under the box's title
+		if ( ! str_contains( $c, 'photo="park-class-seated"' ) && preg_match( '~<h3>Ahol eddig tanítottam</h3>\n?~u', $c, $h ) ) {
+			$c = str_replace( $h[0], rtrim( $h[0] ) . "\n" . '[oy_figure photo="park-class-seated" class="oj-figure--wide"]' . "\n", $c );
+		}
 		if ( $c !== $orig ) {
 			kses_remove_filters();
 			wp_update_post( wp_slash( array( 'ID' => $about->ID, 'post_content' => $c ) ) );
 			kses_init_filters();
-			$log[] = 'about: the timeline first, photos under „A kezdetek”, „Amikor jött a jóga” and „A matracon túl”, a row of four at its end';
+			$log[] = 'about: the timeline first, photos under „A kezdetek”, „Amikor jött a jóga” and „A matracon túl”, a row of photos at its end, the trainings in two columns, the festival photo in „Ahol eddig tanítottam”';
 		}
+	}
+	// Olívia, 15 November, the prices page: the note under the timetable went into the chips at the top („ezek az infók is
+	// jöhetnek ide”); „a bérletes rész nem kell”; „az mire szükséges lesz résznél pedig tegyük be pontosan ugyanazt, amit a
+	// gyiknél, külön szedve” – the FAQ's answer itself, by class. Only what is still there, once.
+	$pr = get_page_by_path( 'bejelentkezes-es-arak' ) ?: get_page_by_path( 'orarend-es-arak' );
+	if ( $pr ) {
+		$c    = $pr->post_content;
+		$orig = $c;
+		$c    = (string) preg_replace( '~\s*<p>Kérlek, foglalj előre, hogy időben megkapd a linket\..*?</p>~su', '', $c, 1 );
+		$c    = (string) preg_replace( '~\s*<p><strong>Bérlet:</strong>.*?</p>~su', '', $c, 1 );
+		if ( ! str_contains( $c, '[oy_faq_answer' ) ) {
+			$c = (string) preg_replace( '~(<h3>Amire szükséged lesz</h3>)\s*<ul>.*?</ul>~su', "$1\n[oy_faq_answer q=\"Mit kell előkészítenem\"]", $c, 1 );
+		}
+		if ( $c !== $orig ) {
+			kses_remove_filters();
+			wp_update_post( wp_slash( array( 'ID' => $pr->ID, 'post_content' => $c ) ) );
+			kses_init_filters();
+			$log[] = 'prices page: the timetable note as chips, no pass paragraph, the kit as in the FAQ';
+		}
+	}
+	// „Itt az legyen: … Egy hosszú nap végén vagy a terápiádhoz kiegészítésként.” – the relaxation box of the classes guide
+	$cl = get_page_by_path( 'online-orak' ) ?: get_page_by_path( 'online-jogaorak' );
+	if ( $cl && str_contains( $cl->post_content, 'Egy hosszú nap végén is belefér.' ) ) {
+		kses_remove_filters();
+		wp_update_post( wp_slash( array( 'ID' => $cl->ID, 'post_content' => str_replace( 'Egy hosszú nap végén is belefér.', 'Egy hosszú nap végén vagy a terápiádhoz kiegészítésként.', $cl->post_content ) ) ) );
+		kses_init_filters();
+		$log[] = 'classes guide: relaxation „vagy a terápiádhoz kiegészítésként”';
 	}
 	// Olívia, 15 November, on „Pajzsmirigy harmonizálás jógával”: „Ebből a cikkből hiányzik a lényeg, a kép” – the poses for
 	// an over- and an underactive thyroid, as cards with her photos, after the paragraph that says which poses help; added

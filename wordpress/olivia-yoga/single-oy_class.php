@@ -20,7 +20,7 @@ while ( have_posts() ) :
 		<div class="layout layout--aside">
 			<div class="main-col entry">
 				<?php
-				oy_main_transform_set( 'opening', oy_class_tone( $slug ) ); // the opening lines in a box, after Olívia's own edits (oy_main_transform)
+				oy_main_transform_set( 'opening', oy_class_tone( $slug ) . ( 'egyeni-online-joga' === $slug ? ':2' : '' ) ); // the opening lines in a box, after Olívia's own edits (oy_main_transform)
 				the_content();
 				?>
 				<?php if ( shortcode_exists( 'oys_schedule' ) && ! $private ) : ?>

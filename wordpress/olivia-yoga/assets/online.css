@@ -411,6 +411,13 @@ body .hero__title .hero__l3 { display: block; margin-top: .14em; }
 .entry .oj-duo--row { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .75rem; margin: 1.6rem 0 1.8rem; }
 @media (min-width: 700px) { .entry .oj-duo--row { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
 @media (max-width: 519px) { .entry .oj-duo--row .frame { aspect-ratio: 4 / 5; } }
+/* five in the row: five across; on a phone three small ones, then two larger ones */
+@media (min-width: 700px) { .entry .oj-duo--row.oj-duo--n5 { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+@media (max-width: 699px) {
+	.entry .oj-duo--row.oj-duo--n5 { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+	.entry .oj-duo--row.oj-duo--n5 > * { grid-column: span 2; }
+	.entry .oj-duo--row.oj-duo--n5 > :nth-child(n + 4) { grid-column: span 3; }
+}
 
 /* the statement („Az edzések megszerettették velem a mozgást…”): not the pink underline („ez a megoldás nem annyira
    tetszik”) – a centred line between two small waves from her logo */
@@ -975,6 +982,8 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 
 /* Olívia, 15 November: „az online kismamatorna szekciójának háttere a főoldalon lehet az a pasztell lila, amit használunk” */
 .section--pale.oj-prenatal { background: var(--lilac-soft); }
+/* „Ezeknél lehet az a pasztell zöld szín, most hogy kicseréltük a hátteret lilára” – the module tiles on the lilac section */
+.section--pale.oj-prenatal .oj-modules li { background: var(--sage-soft); }
 
 /* The poses of an article (Pajzsmirigy harmonizálás jógával: „hiányzik a lényeg, a kép”): her photos as soft cards, the
    name in the site's type under each, a box per group in the colour of the site */
@@ -1016,3 +1025,116 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .entry .credential:not(.credential--aside) figcaption { padding: 0 .2rem; }
 @media (max-width: 699px) { .entry .credential:not(.credential--aside) { width: auto; } }
 
+/* Rólam, „Képzések és tanítás”: two columns, no gaps – her photo over the 2023 training, the Fitmummy card over the 2026 one
+   („a 2026-os szöveg legyen a képzéses kép mellett vagy alatt, ne legyenek üres helyek”); on a phone each text under its picture */
+.entry .oj-trainings { clear: both; display: grid; grid-template-columns: minmax(0, 1fr); gap: 1.1rem; margin: 1.4rem 0 2rem; }
+.entry .oj-trainings > p { margin: 0; }
+.entry .oj-trainings .oj-figure, .entry .oj-trainings .credential:not(.credential--aside) { float: none; clear: none; width: auto; max-width: none; margin: 0; }
+@media (max-width: 699px) {
+	.entry .oj-trainings .oj-figure { order: 1; margin-right: 10px; }
+	.entry .oj-trainings > p:first-of-type { order: 2; }
+	.entry .oj-trainings .credential { order: 3; margin-top: .8rem; }
+	.entry .oj-trainings > p:last-of-type { order: 4; }
+}
+@media (min-width: 700px) {
+	.entry .oj-trainings { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 2rem; row-gap: 1.3rem; }
+	.entry .oj-trainings .oj-figure .frame { position: relative; height: 100%; min-height: 20rem; aspect-ratio: auto; }
+	.entry .oj-trainings .oj-figure .frame > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+}
+/* „Ahol eddig tanítottam”: the wide photo inside the box, under its title */
+.entry .oj-places .oj-figure--wide { margin: .5rem 14px 1.2rem 0; }
+.entry .oj-places .oj-figure--wide .frame { aspect-ratio: 1200 / 626; }
+
+/* Rólam, „Amiben ma segítek” (Olívia, 15 November: „az elosztás jó, de a design legyen más”): the same layout, new cards –
+   each in its class's pastel, a soft circle in the corner, the whole card a link with a round arrow, lifted on hover */
+.oj-area { --soft: var(--lilac-soft); position: relative; overflow: hidden; isolation: isolate; gap: .6rem; padding: 1.5rem 4.4rem 1.6rem 1.5rem; background: var(--soft); border-top: 0; border-radius: 24px; box-shadow: none; transition: transform .35s ease, box-shadow .35s ease; }
+.oj-area--pink { --soft: var(--pink-soft); }
+.oj-area--sun { --soft: var(--sun-soft); }
+.oj-area--sage { --soft: var(--sage-soft); }
+.oj-area::before { content: ""; position: absolute; z-index: -1; right: -48px; top: -48px; width: 136px; height: 136px; border-radius: 50%; background: color-mix(in srgb, var(--tone) 38%, var(--soft)); }
+.oj-area::after { content: "→"; position: absolute; right: 1.1rem; bottom: 1.1rem; width: 2.4rem; height: 2.4rem; display: grid; place-items: center; border-radius: 50%; background: #fff; color: var(--forest); font-size: 1.05rem; font-weight: 700; line-height: 1; transition: background .3s ease, color .3s ease, transform .3s ease; }
+.entry .oj-area h3 { font-size: 1.22rem; }
+.entry .oj-area h3 a::after { content: ""; position: absolute; inset: 0; z-index: 1; }
+.oj-area p { font-size: .97rem; }
+.oj-area:hover { transform: translateY(-3px); box-shadow: 0 20px 32px -26px rgba(18, 35, 26, .6); }
+.oj-area:hover::after { background: var(--forest); color: #fff; transform: translateX(3px); }
+.oj-area:focus-within { outline: 2px solid var(--orchid); outline-offset: 3px; }
+.oj-areas .oj-area:last-child:nth-child(odd) { grid-template-columns: minmax(0, 1fr); }
+.oj-areas .oj-area:last-child:nth-child(odd) > :not(.picto) { grid-column: 1; }
+@media (prefers-reduced-motion: reduce) { .oj-area, .oj-area::after { transition: none; } .oj-area:hover { transform: none; } }
+
+/* The price cards look the same on every page („ezek a színes pontok nem kellenek. nézzen ki teljesen ugyanúgy az árak, mint a
+   főoldalon”): inside the text column the dotted list style must not reach their ticks */
+.entry .price ul li:not([class]) { margin: 0; padding-left: 1.4rem; }
+.entry .price ul li:not([class])::before { content: ""; position: absolute; left: 0; top: .5em; width: 10px; height: 6px; border-radius: 0; border-left: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; background: none; box-shadow: none; -webkit-mask: none; mask: none; transform: rotate(-45deg); }
+
+/* „Bejelentkezés és árak”: the gift vouchers as a card (Olívia: „ajándékutalványok … legyen szebben feltüntetve”) */
+.entry .oj-gift { position: relative; overflow: hidden; isolation: isolate; display: grid; grid-template-columns: auto minmax(0, 1fr); align-items: center; gap: 1.4rem; margin: 1.2rem 0 2.4rem; padding: 1.7rem 1.9rem; border-radius: 24px; background: linear-gradient(115deg, var(--pink-soft), var(--lilac-soft) 68%, var(--sun-soft)); box-shadow: 0 20px 34px -28px rgba(217, 43, 134, .7); }
+.entry .oj-gift::after { content: ""; position: absolute; inset: 9px; border: 1.5px dashed rgba(217, 43, 134, .4); border-radius: 17px; pointer-events: none; }
+.entry .oj-gift__icon { display: grid; place-items: center; width: 64px; height: 64px; border-radius: 50%; background: var(--orchid); color: #fff; transform: rotate(-8deg); box-shadow: 0 12px 22px -12px rgba(217, 43, 134, .9); }
+.entry .oj-gift__icon .icon { width: 30px; height: 30px; }
+.entry .oj-gift__body > p { margin: 0 0 .9rem; }
+.entry .oj-gift__body > p:last-child { margin: 0; }
+.entry .oj-gift .btn { position: relative; z-index: 1; background: var(--orchid); border-color: var(--orchid); color: #fff; }
+.entry .oj-gift .btn:hover { background: var(--orchid-dark, #b81f6f); border-color: var(--orchid-dark, #b81f6f); }
+@media (max-width: 599px) { .entry .oj-gift { grid-template-columns: minmax(0, 1fr); gap: 1rem; padding: 1.4rem 1.3rem; } .entry .oj-gift__icon { width: 54px; height: 54px; } }
+
+/* Her sentences on lines of their own („nagyon sok helyen új sorba írtam mondatokat … Szépítsd ezeket, akár új boxxal”): a soft
+   box, one line under the other with a fine dashed line between, a colour mark on the left; the colour changes box by box.
+   Beside a floated photo it stays beside it (flow-root). */
+.entry .oj-lines { --tone: var(--lilac); --soft: var(--lilac-soft); display: flow-root; position: relative; margin: 1.2rem 0 1.5rem; padding: .55rem 1.4rem .55rem 1.6rem; border-radius: 20px; background: color-mix(in srgb, var(--soft) 75%, #fff); }
+.entry .oj-lines::before { content: ""; position: absolute; left: .65rem; top: 1.1rem; bottom: 1.1rem; width: 4px; border-radius: 4px; background: color-mix(in srgb, var(--tone) 70%, #fff); }
+.entry .oj-lines--pink { --tone: var(--pink); --soft: var(--pink-soft); }
+.entry .oj-lines--sage { --tone: var(--sage); --soft: var(--sage-soft); }
+.entry .oj-lines--sun { --tone: var(--sun); --soft: var(--sun-soft); }
+.entry .oj-lines > p { margin: 0; padding: .6rem 0 .6rem .55rem; }
+.entry .oj-lines > p + p { border-top: 1px dashed color-mix(in srgb, var(--tone) 50%, transparent); }
+@media (max-width: 599px) { .entry .oj-lines { padding: .4rem 1rem .4rem 1.25rem; border-radius: 16px; } .entry .oj-lines::before { left: .5rem; } .entry .oj-lines > p { padding-left: .4rem; } }
+/* in the FAQ answers: dashed lines as a list, other lines as paragraphs */
+.answer ul.oj-dashes, .oj-faq-answer ul.oj-dashes { list-style: none; display: grid; gap: .35rem; margin: .2rem 0 .9rem; padding: 0; }
+.answer ul.oj-dashes li, .oj-faq-answer ul.oj-dashes li { position: relative; margin: 0; padding-left: 1.3rem; }
+.answer ul.oj-dashes li::before, .oj-faq-answer ul.oj-dashes li::before { content: ""; position: absolute; left: .1rem; top: .62em; width: 8px; height: 8px; border-radius: 50%; background: color-mix(in srgb, var(--pink) 75%, #fff); }
+.answer ul.oj-dashes li:nth-child(4n + 2)::before, .oj-faq-answer ul.oj-dashes li:nth-child(4n + 2)::before { background: color-mix(in srgb, var(--sun) 75%, #fff); }
+.answer ul.oj-dashes li:nth-child(4n + 3)::before, .oj-faq-answer ul.oj-dashes li:nth-child(4n + 3)::before { background: var(--lilac); }
+.answer ul.oj-dashes li:nth-child(4n)::before, .oj-faq-answer ul.oj-dashes li:nth-child(4n)::before { background: var(--sage); }
+.answer > p + p, .oj-faq-answer > p + p { margin-top: .6rem; }
+
+/* the price cards alone: always open, no fold button; the pair cards: open and still on a wider screen */
+.entry .oj-price--solo > .oj-price__head { margin: 0 0 .8rem; }
+.entry details.oj-price.is-static > summary.oj-price__head { cursor: default; }
+.oj-price.is-static .oj-fold__icon { display: none; }
+/* one-to-one yoga's opening: the line before the highlighted one, small („pont az egyéni legyen kiemelve”) */
+.entry .oj-opening__pre { margin: 0 0 .35rem; font-weight: 700; font-size: 1rem; color: color-mix(in srgb, var(--ink) 72%, transparent); }
+
+/* „Az ilyen leírásokból jöhet egy folyamatábra vagy lépésről lépésre ábra az összes aloldalra”: numbered steps – on a phone one
+   under the other with a dashed line between the numbers, on a wider screen side by side with the line running across */
+.entry ol.oj-flow { list-style: none; display: grid; gap: 1rem; margin: 1.3rem 0 1.6rem; padding: 0; }
+.entry ol.oj-flow > li { --c: var(--lilac); --s: var(--lilac-soft); position: relative; display: grid; grid-template-columns: 2.7rem minmax(0, 1fr); gap: .9rem; align-items: start; margin: 0; padding: 0; }
+.entry ol.oj-flow > li:nth-child(4n + 2) { --c: var(--pink); --s: var(--pink-soft); }
+.entry ol.oj-flow > li:nth-child(4n + 3) { --c: var(--sage); --s: var(--sage-soft); }
+.entry ol.oj-flow > li:nth-child(4n) { --c: var(--sun); --s: var(--sun-soft); }
+.entry ol.oj-flow > li::before { content: none; }
+.entry ol.oj-flow > li:not(:last-child)::after { content: ""; position: absolute; left: 1.35rem; top: 2.9rem; bottom: -1rem; border-left: 2px dashed color-mix(in srgb, var(--c) 70%, transparent); }
+.entry .oj-flow__n { position: relative; z-index: 1; display: grid; place-items: center; width: 2.7rem; height: 2.7rem; border-radius: 50%; background: color-mix(in srgb, var(--c) 60%, #fff); color: var(--ink); font-family: var(--f-display); font-size: 1.3rem; line-height: 1; }
+.entry ol.oj-flow > li > p { margin: 0; padding: .8rem 1rem; border-radius: 16px; background: color-mix(in srgb, var(--s) 75%, #fff); font-size: .97rem; line-height: 1.55; }
+.entry .oj-flow__note { margin: -.4rem 0 1.6rem; }
+@media (min-width: 760px) {
+	.entry ol.oj-flow { gap: 1.4rem; }
+	.entry ol.oj-flow--n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+	.entry ol.oj-flow--n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+	.entry ol.oj-flow--n4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+	.entry ol.oj-flow > li { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-content: stretch; gap: .75rem; }
+	.entry ol.oj-flow > li:not(:last-child)::after { left: 3.1rem; right: -1.1rem; top: 1.35rem; bottom: auto; border-left: 0; border-top: 2px dashed color-mix(in srgb, var(--c) 70%, transparent); }
+	.entry ol.oj-flow > li > p { align-self: stretch; }
+}
+
+/* Home, the one-to-one block's four cards (Olívia, 15 November: „ezek legyenek kicsit szebbek”): no edge line, a soft fade
+   from the card's colour to white, two circles, a larger title with a halo round its dot, lifted on hover */
+.oj-fit { gap: 1rem; }
+.oj-fit__item { padding: 1.3rem 1.4rem 1.35rem; border-radius: 24px; background: linear-gradient(150deg, var(--bg) 0%, color-mix(in srgb, var(--bg) 50%, #fff) 100%); box-shadow: 0 16px 30px -26px rgba(18, 35, 26, .55); font-size: .95rem; line-height: 1.5; transition: transform .35s ease, box-shadow .35s ease; }
+.oj-fit__item::before { right: -42px; top: -42px; width: 116px; height: 116px; background: color-mix(in srgb, var(--edge) 34%, var(--bg)); }
+.oj-fit__item::after { content: ""; position: absolute; z-index: -1; left: -24px; bottom: -30px; width: 70px; height: 70px; border-radius: 50%; background: color-mix(in srgb, var(--edge) 16%, transparent); }
+.oj-fit__item b { gap: .6rem; font-size: 1.12rem; }
+.oj-fit__item b::before { width: 11px; height: 11px; box-shadow: 0 0 0 4px color-mix(in srgb, var(--dot) 22%, transparent); }
+.oj-fit__item:hover { transform: translateY(-3px); box-shadow: 0 24px 36px -28px rgba(18, 35, 26, .6); }
+@media (prefers-reduced-motion: reduce) { .oj-fit__item { transition: none; } .oj-fit__item:hover { transform: none; } }

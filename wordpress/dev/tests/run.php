@@ -1822,7 +1822,7 @@ test( 'online edition: Hungarian addresses and its own copy', function () {
 	update_option( 'oy_edition', 'hu-online' );
 	try {
 		eq( 'rolam', oy_page_slug( 'about' ), 'online edition: Hungarian address' );
-		eq( 'schedule-pricing', oy_page_key( 'orarend-es-arak' ), 'and back to the theme\'s own slug' );
+		eq( 'schedule-pricing', oy_page_key( 'bejelentkezes-es-arak' ), 'and back to the theme\'s own slug' );
 		eq( 'Olívia Jóga – Online', oy_site_name(), 'site name: Olívia with a long í (Olivia, 11.13)' );
 		ok( '' === oy_areas_list(), 'no Fort Myers areas' );
 		ok( str_starts_with( oy_alt( 'Olivia Kovacs in dancer pose in a living room' ), 'Kovács Olívia' ), 'photo alt texts: Hungarian name order' );
@@ -2815,7 +2815,7 @@ test( 'online edition, live update: the About page broken up – only while its 
 		}
 		$missing = array_filter( $m[1], fn( $x ) => ! str_contains( $new, $x ) && ! in_array( $x, $out, true ) );
 		eq( array(), array_values( $missing ), 'every paragraph of the old page is in the new one, word for word, but those she asked out (her page-editor changes keep applying)' );
-		foreach ( array( 'oj-chapter', 'oj-float', 'oj-note', 'oj-statement', 'oj-path', 'oj-areas', 'oj-places', 'oj-ways', 'oj-secret' ) as $c ) {
+		foreach ( array( 'oj-chapter', 'oj-trainings', 'oj-note', 'oj-statement', 'oj-path', 'oj-areas', 'oj-places', 'oj-ways', 'oj-secret' ) as $c ) {
 			ok( str_contains( $new, $c ), 'the new page has: ' . $c );
 		}
 		$page = get_page_by_path( oy_page_slug( 'about' ) );
@@ -3399,12 +3399,28 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	ok( str_starts_with( $op, '<div class="oj-opening oj-opening--lilac"><p class="oj-opening__tag">Fél óra, ami csak a megnyugvásról szól.</p><p>Légzőgyakorlatokkal segítek.</p></div><h2>' ), 'class page: the opening lines in a soft box, the first sentence large („ezek az alcímek is legyenek egy kicsit megdesignolva”)' );
 	$op2 = oy_opening( '<p class="iu-text_1">Egyéni óra.<br><br>Ez a 60 perc.<br><br>Minden órát felmérés előz meg.</p>', 'sage' );
 	ok( 3 === substr_count( $op2, '<p' ) && str_contains( $op2, '<p>Minden órát felmérés előz meg.</p></div>' ), '… an empty line in her text starts a new paragraph in the box' );
+	$op3 = oy_opening( '<p>Csoportos órán a csoportnak tanítok.<br>Egyéni órán neked: a te testedre.<br>Videón látlak.</p>', 'pink:2' );
+	ok( str_starts_with( $op3, '<div class="oj-opening oj-opening--pink"><p class="oj-opening__pre">Csoportos órán a csoportnak tanítok.</p><p class="oj-opening__tag">Egyéni órán neked: a te testedre.</p><p>Videón látlak.</p></div>' ), '… one-to-one yoga: the „Egyéni órán neked” line is the large one, the line before it small above it („pont az egyéni legyen kiemelve”)' );
 	ok( '<h2>Mi történik?</h2><p>Szöveg.</p>' === oy_opening( '<h2>Mi történik?</h2><p>Szöveg.</p>' ) && '<p>Egy mondat.</p>' === oy_opening( '<p>Egy mondat.</p>' ), '… a page that starts otherwise stays as it is' );
 	update_option( 'oy_edition', 'hu-online' );
 	$pd = oy_pricing_design( '<h2>Csoportos online flow jóga szerdánként</h2><p>Szerdánként 18:30-tól 20:00-ig, 90 percben. A gyakorlás alatt részed lesz légzésben.</p><p>Minden óra élő, itt az oldalon, a böngésződben. Nem kötelező kamerát kapcsolnod, de ha kapcsolsz, csak én látlak.</p><div class="block-wide">x</div>' );
+	$pd2 = oy_pricing_design( '<h2>Csoportos</h2><p>A gyakorlás.</p><h2 id="gift-cards">Ajándékutalványok</h2><p>Ajándékozz jógát.</p><p class="btn-row"><a class="btn btn--primary" href="/ajandekutalvany/">Ajándékutalvány vásárlása</a></p><h2>Jó tudni</h2>' );
+	$fa  = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => 'Mit kell előkészítenem az órára? (teszt)', 'post_content' => "Jóga: szőnyeg.\n\nKismamatorna: párna." ) );
+	$fah = do_shortcode( '[oy_faq_answer q="Mit kell előkészítenem az órára? (teszt)"]' );
+	wp_delete_post( $fa, true );
+	$ln  = oy_lines( '<p>Egy.<br>Kettő.</p><div class="oj-note"><p>A.<br>B.</p></div><p class="btn-row">x<br>y</p><p>Csak egy.</p><p>Három.<br>Négy.<br></p>' );
+	$fl  = oy_lines( '<h2>Hogyan működik?</h2><p>Kérj időpontot. Visszaírok. Az óra élő.</p><p class="btn-row">gomb</p><h2>Mit csinálunk egy órán?</h2><p>Átmelegítéssel kezdünk, utána nyújtunk, végül relaxáció. Minden alkalom az előzőre épít.</p><h2>Mi történik egy online flow jógaórán?</h2><p>Megérkezünk.<br>Bemelegítünk.</p><p>Lelassulunk.</p><h2>Mire lesz szükséged?</h2>' );
+	$an  = oy_answer_lines( '<div class="answer"><p>A tapasztalataim alapján is:<br>– alvászavarok<br>– túlgondolás</p></div><div class="answer"><p>Előbb az orvos.<br>Aztán szólj.</p></div>' );
 	$cb = oy_callback_form();
 	update_option( 'oy_edition', 'fort-myers' );
 	ok( str_contains( $pd, '<div class="oj-info"><ul class="oj-info__facts">' ) && str_contains( $pd, '<p>A gyakorlás alatt részed lesz légzésben.</p></div><div class="block-wide">' ) && ! str_contains( $pd, 'csak én látlak' ) && ! str_contains( $pd, '18:30-tól' ), 'Bejelentkezés és árak: the group facts as chips, her text under them, without what the chips repeat („ezek az infok is legyenek már kicsit megdesignolva”)' );
+	$hupo = (string) file_get_contents( get_template_directory() . '/languages/hu_HU.po' );
+	ok( str_contains( $pd2, '<span>book ahead</span>' ) && str_contains( $pd2, '<span>starts with at least 3 people</span>' ) && str_contains( $pd2, '<span>beginners welcome</span>' ) && str_contains( $hupo, "msgid \"book ahead\"\nmsgstr \"foglalj előre\"" ) && str_contains( $hupo, "msgstr \"legalább 3 fővel indul\"" ) && str_contains( $hupo, "msgstr \"kezdőket is szeretettel várok\"" ), 'prices page: the note under the timetable as chips next to „a kamera nem kötelező” („ezek az infók is jöhetnek ide”)' );
+	ok( str_contains( $pd2, '</h2><div class="oj-gift"><span class="oj-gift__icon" aria-hidden="true">' ) && str_contains( $pd2, '<p>Ajándékozz jógát.</p><p class="btn-row">' ) && str_contains( $pd2, '</a></p></div></div><h2>Jó tudni</h2>' ), '… the gift vouchers as a card of their own, her words and the button inside („szebben feltüntetve”)' );
+	ok( str_starts_with( $fah, '<div class="oj-faq-answer">' ) && str_contains( $fah, 'oj-faq-tag--lilac">Jóga</span>' ) && str_contains( $fah, 'oj-faq-tag--sage">Kismamatorna</span>' ), '… „Amire szükséged lesz”: the FAQ answer itself, by class, as on the FAQ page („pontosan ugyanazt, amit a gyiknél, külön szedve”)' );
+	ok( str_starts_with( $ln, '<div class="oj-lines oj-lines--lilac"><p>Egy.</p><p>Kettő.</p></div><div class="oj-note"><p>A.<br>B.</p></div><p class="btn-row">x<br>y</p><p>Csak egy.</p><div class="oj-lines oj-lines--pink"><p>Három.</p><p>Négy.</p></div>' ), 'her sentences on lines of their own: a soft box per paragraph, the colour changing; inside a designed box or a button row they stay („Szépítsd ezeket, akár új boxxal”)' );
+	ok( str_contains( $fl, '<h2>Hogyan működik?</h2><ol class="oj-flow oj-flow--n3"><li><span class="oj-flow__n" aria-hidden="true">1</span><p>Kérj időpontot.</p></li>' ) && str_contains( $fl, '<p>Az óra élő.</p></li></ol><p class="btn-row">gomb</p>' ) && str_contains( $fl, '<p>Átmelegítéssel kezdünk</p></li><li><span class="oj-flow__n" aria-hidden="true">2</span><p>Utána nyújtunk</p></li><li><span class="oj-flow__n" aria-hidden="true">3</span><p>Végül relaxáció.</p></li></ol><p class="oj-flow__note">Minden alkalom az előzőre épít.</p>' ) && str_contains( $fl, 'oj-flow--n3"><li><span class="oj-flow__n" aria-hidden="true">1</span><p>Megérkezünk.</p>' ) && str_contains( $fl, '<p>Lelassulunk.</p></li></ol><h2>Mire lesz szükséged?</h2>' ), '… „Hogyan működik?”, „Mit csinálunk…”, „Mi történik…”: numbered steps from her lines or sentences („folyamatábra vagy lépésről lépésre ábra az összes aloldalra”)' );
+	ok( str_contains( $an, '<p>A tapasztalataim alapján is:</p><ul class="oj-dashes"><li>alvászavarok</li><li>túlgondolás</li></ul>' ) && str_contains( $an, '<p>Előbb az orvos.</p><p>Aztán szólj.</p>' ), '… in the FAQ answers the dashed lines are a list, the other lines paragraphs' );
 	ok( str_contains( $cb, 'name="action" value="oy_callback"' ) && str_contains( $cb, 'type="tel" name="phone"' ) && 1 === substr_count( $cb, '<input type="tel"' ) && '' === oy_callback_form(), 'contact: a „Visszahívást kérek” box with only a phone field, on the online site only' );
 	update_option( 'oy_edition', 'hu-online' );
 	oy_main_transform_set( 'opening', 'pink' );
@@ -3452,9 +3468,11 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	$tc = (string) get_post_field( 'post_content', $tp2 );
 	ok( 1 === substr_count( $tc, '[oy_poses set="tul"]' ) && strpos( $tc, '[oy_poses set="alul"]' ) < strpos( $tc, 'Ezek az ászanák akkor is' ) && strpos( $tc, 'kiváló eszköz' ) < strpos( $tc, '[oy_poses' ), '… on the live site the two blocks go in once, before „Ezek az ászanák akkor is…”, her words stay' );
 	wp_delete_post( $tp2, true );
-	ok( str_contains( (string) file_get_contents( get_template_directory() . '/inc/shortcodes.php' ), "'<details class=\"oj-price oj-price--' . ( \$pair ? 'pair' : 'solo' ) . '\" name=\"oj-prices-'" ) && str_contains( $oc2, '.entry details.oj-price > summary.oj-price__head { list-style: none; cursor: pointer; margin: 0; }' ), 'class pages: the price cards fold under their head, one open at a time („az ilyen árak is legyenek inkább lenyithatók”)' );
+	$scp = (string) file_get_contents( get_template_directory() . '/inc/shortcodes.php' );
+	$sjs = (string) file_get_contents( get_template_directory() . '/assets/site.js' );
+	ok( str_contains( $scp, "'<details class=\"oj-price oj-price--pair\"><summary class=\"oj-price__head\">'" ) && str_contains( $scp, "'<div class=\"oj-price oj-price--solo\"><div class=\"oj-price__head\">'" ) && ! str_contains( $scp, 'name="oj-prices-' ) && str_contains( $sjs, "window.matchMedia('(min-width: 700px)')" ) && str_contains( $sjs, "d.open = true; d.classList.add('is-static');" ) && str_contains( $oc2, '.entry details.oj-price > summary.oj-price__head { list-style: none; cursor: pointer; margin: 0; }' ), 'class pages: the price cards alone stay open, the pair cards fold on a phone and are open on a wider screen („a két egyedüli maradhat kinyitva, a párosok maradjanak csak lenyithatóak”)' );
 	ok( str_contains( $oc2, '@media (min-width: 1100px) { .nav a { font-size: 1.02rem; } }' ), 'the menu a little larger on desktop („egy picit mehet nagyobb betűméretre a navigációs menü”)' );
-	$ab_old = "<h2>Miért lettem jógaoktató?</h2>\n<h3 class=\"oj-chapter\">A kezdetek</h3>\n<p>Gyerekkor.</p>\n[oy_figures photos=\"korall-stretching-circuit,outdoor-group-bands\"]\n<p>Mellette.</p>\n<h3 class=\"oj-chapter\">Amikor jött a jóga</h3>\n<p>Stressz.</p>\n<div class=\"oj-path\">\n<h3>Az utam</h3>\n<ol>\n<li>Gyerekként</li>\n</ol>\n</div>\n<h2>A matracon túl</h2>\n<p>Marketing.</p>\n<div class=\"oj-secret\"><p>Titok.</p></div>\n<p>[oy_booking_link label=\"Gyakorolj velem\"]</p>\n<h2>Gyakorolj velem élőben</h2>";
+	$ab_old = "<h2>Miért lettem jógaoktató?</h2>\n<h3 class=\"oj-chapter\">A kezdetek</h3>\n<p>Gyerekkor.</p>\n[oy_figures photos=\"korall-stretching-circuit,outdoor-group-bands\"]\n<p>Mellette.</p>\n<h3 class=\"oj-chapter\">Amikor jött a jóga</h3>\n<p>Stressz.</p>\n<div class=\"oj-path\">\n<h3>Az utam</h3>\n<ol>\n<li>Gyerekként</li>\n</ol>\n</div>\n<h2>Képzések és tanítás</h2>\n[oy_figure photo=\"olivia-side-plank-festival\" class=\"oj-float oj-float--left\"]\n<p>A 2023-as képzés.</p>\n<p>2026-ban pedig kismamák.</p>\n[oy_fitmummy]\n<div class=\"oj-places\">\n<h3>Ahol eddig tanítottam</h3>\n<p>Helyek.</p>\n</div>\n<h2>A matracon túl</h2>\n<p>Marketing.</p>\n<div class=\"oj-secret\"><p>Titok.</p></div>\n<p>[oy_booking_link label=\"Gyakorolj velem\"]</p>\n<h2>Gyakorolj velem élőben</h2>";
 	$abp    = get_page_by_path( 'rolam' );
 	$abid   = $abp ? $abp->ID : wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Rólam', 'post_name' => 'rolam' ) );
 	$ab_was = (string) get_post_field( 'post_content', $abid );
@@ -3467,15 +3485,62 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	update_option( 'oy_edition', 'fort-myers' );
 	$ab = (string) get_post_field( 'post_content', $abid );
 	ok( str_starts_with( $ab, '<div class="oj-path">' ) && 1 === substr_count( $ab, 'oj-path' ) && str_contains( $ab, "A kezdetek</h3>\n[oy_figures photos=\"about-gym-class,outdoor-group-bands\"]\n<p>Gyerekkor.</p>" ) && str_contains( $ab, "Amikor jött a jóga</h3>\n[oy_figures photos=\"about-rock-warrior,about-meadow-stretch\"]" ) && str_contains( $ab, "<h2>A matracon túl</h2>\n[oy_figure photo=\"journal-15\" class=\"oj-figure--wide\"]" ) && ! str_contains( $ab, 'korall-stretching-circuit' ) && 3 === substr_count( $ab, '[oy_figures' ), 'About: the timeline first, the photos under „A kezdetek”, „Amikor jött a jóga” and „A matracon túl”, once („rólamot még kicsit módosítsuk sorrendben”)' );
-	$row = '[oy_figures photos="about-painting-embrace,about-painting-birds,about-painting-mask,about-sunset-river" class="oj-duo--row"]';
-	ok( 1 === substr_count( $ab, $row ) && str_contains( $ab, "<p>Titok.</p></div>\n" . $row . "\n<p>[oy_booking_link" ), '… and „A matracon túl” ends with a row of four smaller photos, after the little secret, before the button, once („a szöveg végére meg kisebben ezek a képek jöhetnek”)' );
+	ok( 1 === substr_count( $ab, 'oj-trainings' ) && str_contains( $ab, "<div class=\"oj-trainings\">\n\n[oy_figure photo=\"olivia-side-plank-festival\"]\n\n[oy_fitmummy]\n\n<p>A 2023-as képzés.</p>\n\n<p>2026-ban pedig kismamák.</p>\n\n</div>" ) && ! str_contains( $ab, 'oj-float--left' ), '… the trainings in two columns: her photo over the 2023 training, the Fitmummy card over the 2026 one („ne legyenek üres helyek, legyen szépen eloszlatva”)' );
+	ok( str_contains( $ab, "<h3>Ahol eddig tanítottam</h3>\n[oy_figure photo=\"park-class-seated\" class=\"oj-figure--wide\"]\n<p>Helyek.</p>" ) && 1 === substr_count( $ab, 'park-class-seated' ), '… „Ahol eddig tanítottam” gets her festival photo, wide, once' );
+	$prid = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Bejelentkezés és árak', 'post_name' => 'orarend-es-arak', 'post_content' => "<h2>Csoportos</h2>\n[oy_schedule]\n<p>Kérlek, foglalj előre, hogy időben megkapd a linket. Az órák legalább 3 fővel indulnak.</p>\n<h2>Jó tudni</h2>\n<h3>Amire szükséged lesz</h3>\n<ul>\n<li>Szőnyeg</li>\n</ul>\n<p><strong>Bérlet:</strong> 8 hétig.</p>\n<p><strong>Lemondás:</strong> 12 óra.</p>" ) );
+	$clid = get_page_by_path( 'online-jogaorak' ) ? 0 : wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Online órák', 'post_name' => 'online-jogaorak', 'post_content' => '<span class="oj-guide__text">Fél óra. Egy hosszú nap végén is belefér.</span>' ) );
+	$lnid = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'Link teszt', 'post_content' => '<p><a href="' . home_url( '/orarend-es-arak/' ) . '">árak</a>, <a href="' . home_url( '/online-jogaorak/hatha-flow/' ) . '">óra</a>, <a href="/online-jogaorak/">órák</a>, a szóban: online-jogaorak/</p>' ) );
+	update_option( 'oy_edition', 'hu-online' );
+	delete_option( 'oy_1114d_rev' );
+	oy_migrate_1114d();
+	delete_option( 'oy_1114d_rev' );
+	oy_migrate_1114d();
+	update_option( 'oy_edition', 'fort-myers' );
+	$prc = (string) get_post_field( 'post_content', $prid );
+	ok( 'bejelentkezes-es-arak' === get_post_field( 'post_name', $prid ) && ( ! $clid || 'online-orak' === get_post_field( 'post_name', $clid ) ), 'addresses: /orarend-es-arak/ → /bejelentkezes-es-arak/, /online-jogaorak/ → /online-orak/ („maradt az aloldal neve”)' );
+	ok( ! str_contains( $prc, 'foglalj előre' ) && ! str_contains( $prc, 'Bérlet:' ) && str_contains( $prc, "<h3>Amire szükséged lesz</h3>\n[oy_faq_answer q=\"Mit kell előkészítenem\"]\n<p><strong>Lemondás:</strong>" ) && 1 === substr_count( $prc, 'oy_faq_answer' ), '… on the prices page: the note under the timetable out (it is in the chips), no pass paragraph, the kit as the FAQ answer, once' );
+	ok( ! $clid || str_contains( (string) get_post_field( 'post_content', $clid ), 'Egy hosszú nap végén vagy a terápiádhoz kiegészítésként.' ), '… the relaxation box: „Egy hosszú nap végén vagy a terápiádhoz kiegészítésként.”' );
+	$lnc = (string) get_post_field( 'post_content', $lnid );
+	ok( str_contains( $lnc, home_url( '/bejelentkezes-es-arak/' ) ) && str_contains( $lnc, home_url( '/online-orak/hatha-flow/' ) ) && str_contains( $lnc, 'href="/online-orak/"' ) && str_contains( $lnc, 'a szóban: online-jogaorak/' ), '… the links to them on the site follow (only links, not the words)' );
+	wp_delete_post( $prid, true );
+	wp_delete_post( $lnid, true );
+	if ( $clid ) {
+		wp_delete_post( $clid, true );
+	}
+	update_option( 'oy_edition', 'hu-online' );
+	ok( 'bejelentkezes-es-arak' === oy_page_slug( 'schedule-pricing' ) && 'online-orak' === oy_page_slug( 'yoga-classes' ) && array( 'page', 'schedule-pricing' ) === OY_ONLINE_MOVED['orarend-es-arak'] && array( 'page', 'yoga-classes' ) === OY_ONLINE_MOVED['online-jogaorak'], '… the theme uses the new addresses, the old ones redirect' );
+	update_option( 'oy_edition', 'fort-myers' );
+	update_option( 'oy_edition', 'hu-online' );
+	$tr = apply_filters( 'the_content', "<div class=\"oj-trainings\">\n\n[oy_figure photo=\"olivia-side-plank-festival\"]\n\n[oy_fitmummy]\n\n<p>A.</p>\n\n<p>B.</p>\n\n</div>" );
+	update_option( 'oy_edition', 'fort-myers' );
+	ok( str_contains( $tr, '<figure class="oj-figure ' ) && str_contains( $tr, '<figure class="credential' ) && ! preg_match( '~<p>\s*<figure|<br\s*/?>\s*<figure|</figure>\s*<br~', $tr ), '… the two pictures render as figures, not inside paragraphs' );
+	$row = '[oy_figures photos="about-painting-embrace,about-painting-mask,about-painting-birds,about-sunset-river,about-henna-arm" class="oj-duo--row"]';
+	ok( 1 === substr_count( $ab, $row ) && str_contains( $ab, "<p>Titok.</p></div>\n" . $row . "\n<p>[oy_booking_link" ), '… and „A matracon túl” ends with a row of five smaller photos in her order, after the little secret, before the button, once („a szöveg végére meg kisebben ezek a képek jöhetnek”)' );
+	$row4 = '[oy_figures photos="about-painting-embrace,about-painting-birds,about-painting-mask,about-sunset-river" class="oj-duo--row"]';
+	wp_update_post( array( 'ID' => $abid, 'post_content' => str_replace( $row, $row4, $ab ) ) );
+	update_option( 'oy_edition', 'hu-online' );
+	delete_option( 'oy_1114d_rev' );
+	oy_migrate_1114d();
+	update_option( 'oy_edition', 'fort-myers' );
+	$ab4 = (string) get_post_field( 'post_content', $abid );
+	ok( 1 === substr_count( $ab4, $row ) && ! str_contains( $ab4, $row4 ), '… the row that went out with four photos gets her henna as the fifth, in her order' );
 	update_option( 'oy_edition', 'hu-online' );
 	$rh = do_shortcode( $row );
 	update_option( 'oy_edition', 'fort-myers' );
-	ok( str_contains( $rh, '<div class="oj-duo oj-duo--row">' ) && 4 === substr_count( $rh, '<figure' ) && str_contains( $rh, 'naplementében' ), '… the row is the photo grid with its own class, with Hungarian alt texts' );
+	ok( str_contains( $rh, '<div class="oj-duo oj-duo--row oj-duo--n5">' ) && 5 === substr_count( $rh, '<figure' ) && str_contains( $rh, 'naplementében' ), '… the row is the photo grid with its own class, with Hungarian alt texts' );
 	wp_update_post( array( 'ID' => $abid, 'post_content' => $ab_was ) );
 	$ij2 = json_decode( (string) file_get_contents( get_template_directory() . '/assets/img/images.json' ), true );
-	ok( 8 === count( array_filter( array( 'about-gym-class', 'about-rock-warrior', 'about-meadow-stretch', 'article-fish-pose', 'about-painting-embrace', 'about-painting-birds', 'about-painting-mask', 'about-sunset-river' ), fn( $k ) => isset( $ij2[ $k ]['hu']['alt'] ) && is_file( get_template_directory() . '/assets/img/' . $k . '-600.jpg' ) && is_file( get_template_directory() . '/assets/img/' . $k . '-1200.jpg' ) ) ), '… her new photos ship with the theme, with Hungarian alt texts' );
+	ok( 9 === count( array_filter( array( 'about-gym-class', 'about-rock-warrior', 'about-meadow-stretch', 'article-fish-pose', 'about-painting-embrace', 'about-painting-birds', 'about-painting-mask', 'about-sunset-river', 'about-henna-arm' ), fn( $k ) => isset( $ij2[ $k ]['hu']['alt'] ) && is_file( get_template_directory() . '/assets/img/' . $k . '-600.jpg' ) && is_file( get_template_directory() . '/assets/img/' . $k . '-1200.jpg' ) ) ), '… her new photos ship with the theme, with Hungarian alt texts' );
+	$hcj = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content-hu-online.json' ), true );
+	$exc = array_map( fn( $c ) => (string) ( $c['excerpt'] ?? '' ), $hcj['classes'] );
+	ok( str_ends_with( $exc['hatha-flow'], 'egy kis jógafilozófiával fűszerezve.' ) && ! str_contains( $exc['hatha-flow'], 'Kezdőket' ) && str_contains( $exc['egyeni-online-joga'], 'kezdőként tanulnál, gyorsabban fejlődnél vagy a stresszből keresel kiutat. Kezdőket is szeretettel várok.' ) && str_contains( $exc['kismamatorna'], 'jóga és relaxáció kombinációja a trimeszteredhez' ) && str_contains( $exc['stretching'], 'online dinamikus nyújtás és mobilizáció' ) && ! str_contains( $exc['relaxacio-legzes'], 'kíméletes' ) && 5 === count( array_filter( $hcj['classes'], fn( $c ) => ! empty( $c['_excerpt_prev'] ) ) ), 'class cards: her new short texts (philosophy, beginners to one-to-one, dynamic stretching, no gentle stretching), only where the old text is still there' );
+	ok( ! str_contains( (string) wp_json_encode( array( $hcj['pages']['classes']['content'], $hcj['classes']['hatha-flow']['content'] ), JSON_UNESCAPED_UNICODE ), 'tudok segíteni a pózokban' ) && in_array( array( 'látlak, és tudok segíteni a pózokban.', 'látlak, és jobban tudlak korrigálni és segíteni.' ), $hcj['pages']['classes']['_replace'], true ), '… „jobban tudlak korrigálni és segíteni” instead of „tudok segíteni a pózokban”' );
+	ok( str_contains( (string) $hcj['classes']['relaxacio-legzes']['content'], 'És oda-vissza működik: az idegrendszered állapota meglátszik a légzéseden' ) && str_contains( (string) $hcj['classes']['relaxacio-legzes']['content'], 'a hőérzetedre, a hangulatodra, a tempódra és a kitartásodra' ) && 1 === count( array_filter( (array) $hcj['classes']['relaxacio-legzes']['_replace'], fn( $r ) => str_starts_with( (string) $r[0], '<p>A légzés az egyetlen' ) ) ), 'relaxation: „Miért a légzés?” says it works both ways – calm or energy, warmth, mood, pace, stamina („írd bele szépen megfogalmazva”)' );
+	ok( str_contains( (string) file_get_contents( get_template_directory() . '/footer.php' ), "\$link( 'schedule-pricing', oy_schedule_label() )" ), '… the footer link says „Bejelentkezés és árak” too („ezt is írjuk át bejelentkezés és árakra”)' );
+	$ocss = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
+	ok( str_contains( $ocss, '.oj-fit__item { padding: 1.3rem 1.4rem 1.35rem; border-radius: 24px; background: linear-gradient(' ), 'home: the one-to-one block\'s four cards a little nicer („ezek legyenek kicsit szebbek”)' );
+	ok( str_contains( $ocss, '.oj-area { --soft: var(--lilac-soft);' ) && str_contains( $ocss, '.entry .oj-area h3 a::after { content: ""; position: absolute; inset: 0;' ), 'About, „Amiben ma segítek”: new cards – pastel, a circle in the corner, the whole card a link („az elosztás jó, de a design legyen más”)' );
+	ok( str_contains( $ocss, '.section--pale.oj-prenatal .oj-modules li { background: var(--sage-soft); }' ), 'Home: the prenatal module tiles are pastel green on the lilac section („Ezeknél lehet az a pasztell zöld szín”)' );
 	$sj = (string) file_get_contents( get_template_directory() . '/assets/site.js' );
 	ok( str_contains( $sj, "window.matchMedia('(max-width: 699px)')" ) && str_contains( $sj, "ul.classList.add('oj-modules--fold')" ) && str_contains( $oc2, '.oj-modules--fold li > span { display: none; }' ), 'the prenatal cards fold on a phone, a tap opens one („ezek legyenek lenyithatóak mert mobilon így túl hosszú lesz”)' );
 	ok( preg_match( '/prefers-reduced-motion: no-preference\) \{[^@]*\.hatha__orb--sun \{[^}]*animation: oj-ha 12s/', $oc2 ) && str_contains( $oc2, '@keyframes oj-ha {' ) && str_contains( $oc2, '@keyframes oj-tha-fill {' ) && str_contains( $fr, '<span class="hatha__word" aria-hidden="true">Hatha</span>' ), 'Ha–Tha: the sun and the moon drift into one circle with HATHA across it, and part again („egyik átmegy a másikba és oda-vissza”); only with motion allowed' );
@@ -3552,7 +3617,7 @@ test( 'online edition, Olívia\'s doc of 14 November, last points: one level for
 		$side = oy_page_aside( 'about' );
 		ok( str_contains( $side, 'aside-card--practice' ) && ! str_contains( $side, 'aside-list"><li>' . oy_icon( 'check' ) ), 'About side column: the next class and the services, not the trainings again' );
 		$duo = do_shortcode( '[oy_figures photos="korall-stretching-circuit,outdoor-group-bands"]' );
-		ok( str_contains( $duo, 'class="oj-duo"' ) && 2 === substr_count( $duo, '<figure' ) && str_contains( $duo, 'gumiszalaggal' ), 'About: her two training photos side by side, with Hungarian text' );
+		ok( str_contains( $duo, 'class="oj-duo oj-duo--n2"' ) && 2 === substr_count( $duo, '<figure' ) && str_contains( $duo, 'gumiszalaggal' ), 'About: her two training photos side by side, with Hungarian text' );
 		ok( (bool) preg_match( '/\[oys_schedule[^\]]*next="3"/', (string) file_get_contents( get_template_directory() . '/template-parts/front-online.php' ) ), 'the timetable: the next three classes' );
 		$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
 		eq( 10, (int) $data['setup']['studio']['weeks_ahead'], 'weekly classes made 10 weeks ahead' );

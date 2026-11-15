@@ -1,7 +1,7 @@
 <?php
 /**
  * Class types (oy_class), FAQs (oy_faq) and past events (oy_moment), editable in wp-admin.
- * Class pages live at /yoga-classes/{slug}/ (on the online edition /online-jogaorak/{slug}/); the "Classes"
+ * Class pages live at /yoga-classes/{slug}/ (on the online edition /online-orak/{slug}/); the "Classes"
  * overview is a normal page.
  */
 
