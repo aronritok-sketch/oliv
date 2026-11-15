@@ -7,8 +7,9 @@ defined( 'ABSPATH' ) || exit;
 
 const OY_ACCENTS = array( 'lilac', 'pink', 'sun', 'sage' );
 // The online class pages whose head colour Olívia chose herself (15 November: „Ez maradjon meg a frozen water színűnek” –
-// the relaxation page; „csoportos flow: evergreen” – with white text; „kismamatorna: tangerine dream”); the rest by seed.
-const OY_ONLINE_HEAD_TONES = array( 'crelaxacio-legzes' => 'lilac', 'chatha-flow' => 'forest', 'ckismamatorna' => 'tangerine' );
+// the relaxation page; „az egyéni online jógánál legyen ez a szín: sandy brown”; „csoportos flow: evergreen” – with white
+// text; „kismamatorna: tangerine dream”); the rest by seed.
+const OY_ONLINE_HEAD_TONES = array( 'crelaxacio-legzes' => 'lilac', 'cegyeni-online-joga' => 'sandy', 'chatha-flow' => 'forest', 'ckismamatorna' => 'tangerine' );
 
 function oy_accent_for( $seed ) {
 	$sum = 0;

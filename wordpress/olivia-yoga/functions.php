@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OY_VERSION', '3.11.72' );
+define( 'OY_VERSION', '3.11.73' );
 
 require_once get_template_directory() . '/inc/edition.php';
 

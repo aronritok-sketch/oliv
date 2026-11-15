@@ -538,6 +538,19 @@
   - „ez is kicsit túl gyerekes, legyen letisztultabb de az irány tetszik”: a „Kezdőknek / Haladóknak / …” kártyák
     majdnem fehérek, a színük csak finom keretben és a kis pöttyben maradt, a sarokkörök eltűntek.
   - Migráció: 2026-11-15p. Tesztek: 1308/0.
+- **3.11.73:** Olívia 11.15-i doksija, az óraoldalak fejlécszínei (`OY_ONLINE_HEAD_TONES`, eddig a cím
+  alapján véletlenszerűen jött a szín):
+  - „Ez maradjon meg a frozen water színűnek”: Relaxáció és légzés – Frozen Water (eddig sárga volt).
+  - „az egyéni online jógánál legyen ez a szín: sandy brown”: Egyéni online jóga – Sandy Brown `#F7934C`. Előbb egy
+    Reddish Brown színmintát tett be, aztán kivette. A `page-head--orchid` tónus (fehér betű, mandarin vonal a kép
+    hullámán) megmaradt a témában, de most nem használja oldal.
+  - „csoportos flow: evergreen”: Csoportos online flow jóga – Evergreen, fehér címmel és szöveggel.
+  - „kismamatorna: tangerine dream”: Online kismamatorna – Tangerine Dream.
+  - A Stretching oldalról nem írt, az maradt sárga.
+  - „itt ha ráviszem a kurzort legyen a tangerine dream szín”: az „Online órák” lenyíló menüben a kurzor alatti sor
+    Tangerine Dream.
+  - Tesztek: 1311/0, tiszta teszt-adatbázison. A helyi teszt-adatbázisban korábbi futásokból maradt órák az üdvözlő
+    e-mail tesztjét elbuktatták, ezért újratelepítettem, ahogy a CI is teszi.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
