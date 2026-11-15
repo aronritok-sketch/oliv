@@ -579,6 +579,20 @@
     - a letisztult „kinek” kártyák.
   - A favicon és a böngésző színe az új Evergreen.
   - Tesztek: 1313/0.
+- **3.11.76:** Olívia doksija, az új palettához:
+  - „háttér egésze legyen ffdf22 színű, jóga legyen f0edee színű hátterű, kismamatorna e63462 és a mobilizáció ffac81”:
+    a kezdőlap hero része Bright Gold, a három szó Platinum, Magenta Bloom és Tangerine Dream.
+  - „itt ha ráviszem a kurzort legyen ugyanaz a sárga szín mint amit most küldtem a palettán”: a lenyíló menü kiemelése
+    Bright Gold (eddig mandarin volt).
+  - „ezeket a kék háttereket hagyjuk el mindenhol”, „az ilyen kékeseket hagyjuk el” (az ajándékutalvány színátmenete és
+    a GYIK címkéi):
+    - a menta tónus Tangerine Dream lett, a halvány változata a barack `#FFE2CC`;
+    - ahol egész kártyát vagy fejlécet töltött ki (a relaxáció kártyája és oldala, a kapcsolat, a GYIK), ott a halvány
+      barack;
+    - böngészőben átvizsgáltam a fő oldalakat, menta háttér sehol nem maradt.
+  - Olívia a doksiban közben leírta, majd kitörölte, hogy az egyéni jóga mandarin, a flow Evergreen legyen. Ezekhez nem
+    nyúltam.
+  - Tesztek: 1314/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

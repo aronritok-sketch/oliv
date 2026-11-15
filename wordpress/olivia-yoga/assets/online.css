@@ -384,7 +384,7 @@ body .hero__title .hero__l3 { display: block; margin-top: .14em; }
 .oj-breath-peach .breath__track { stroke: rgba(18, 35, 26, .16); }
 .oj-breath-peach .breath__progress { stroke: var(--orchid); }
 .oj-breath-peach .breath__dots li { border-color: rgba(18, 35, 26, .4); }
-.oj-breath-peach .breath__glow { background: radial-gradient(circle, rgba(230, 52, 98, .42), rgba(166, 235, 205, .2) 55%, transparent 72%); }
+.oj-breath-peach .breath__glow { background: radial-gradient(circle, rgba(230, 52, 98, .42), rgba(255, 172, 129, .2) 55%, transparent 72%); }
 .oj-breath-peach .btn--light { background: var(--forest); color: var(--paper); }
 .oj-breath-peach .btn--light:hover { background: var(--moss); color: var(--paper); }
 
@@ -608,7 +608,7 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: rotate(0) translateY
 .entry .oj-guide__box--pink { --bg: var(--pink-soft); --edge: var(--pink); }
 .entry .oj-guide__box--sun { --bg: var(--sun-soft); --edge: var(--sun); }
 .entry .oj-guide__box--sage { --bg: var(--sage-soft); --edge: var(--sage); }
-.entry .oj-guide__box--lilac-soft { --bg: #EFFFF8; --edge: #B9F0D8; }
+.entry .oj-guide__box--lilac-soft { --bg: #FFF3EA; --edge: #FFD2B8; } /* was mint: „ezeket a kék háttereket hagyjuk el” */
 .entry .oj-guide__box:hover { transform: translateY(-4px); box-shadow: inset 0 0 0 1.5px var(--edge), 0 22px 36px -28px rgba(18, 35, 26, .6); }
 .entry .oj-guide__box:hover::before { transform: scale(1.12); }
 .entry .oj-guide__box .way__art { width: 72px; height: 72px; margin: -8px 0 .2rem -8px; }
@@ -1183,8 +1183,8 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 	--muted: #4D5F5D;
 	--line: rgba(0, 46, 44, .14);
 	--rule: rgba(0, 46, 44, .55);
-	--lilac: #A6EBCD;
-	--lilac-soft: #DAFFEF;
+	--lilac: #FFAC81;
+	--lilac-soft: #FFE2CC;
 	--pink: #E63462;
 	--pink-soft: #FCE4EA;
 	--orchid: #DB2E5C;
@@ -1201,8 +1201,8 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .btn--orchid { box-shadow: 0 12px 28px -16px rgba(219, 46, 92, .9); }
 .btn--orchid:hover { box-shadow: 0 16px 30px -14px rgba(219, 46, 92, .9); }
 .field input:focus, .field select:focus, .field textarea:focus { box-shadow: 0 0 0 4px rgba(219, 46, 92, .12); }
-.breath__glow { background: radial-gradient(circle, rgba(230, 52, 98, .5), rgba(166, 235, 205, .18) 55%, transparent 72%); }
-.breath__petal { background: linear-gradient(to top, rgba(255, 223, 34, .15), rgba(166, 235, 205, .95)); }
+.breath__glow { background: radial-gradient(circle, rgba(230, 52, 98, .5), rgba(255, 172, 129, .18) 55%, transparent 72%); }
+.breath__petal { background: linear-gradient(to top, rgba(255, 223, 34, .15), rgba(255, 172, 129, .95)); }
 .breath__petal:nth-child(even) { background: linear-gradient(to top, rgba(255, 223, 34, .15), rgba(230, 52, 98, .95)); }
 .oys-notice--error { background: var(--pink-soft); }
 /* her logo: the wave and „online” in the new accent */
@@ -1215,7 +1215,7 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 /* „ez nem az a kék mint a színpalettában”: wherever the mint fills (cards, the hero word, boxes, section backgrounds) it is the
    palette's Frozen Water itself; the small marks (dots, rings, edges, step numbers) take a deeper shade of it, so they still
    show on the light backgrounds */
-:root { --lilac: #DAFFEF; --lilac-soft: #DAFFEF; --lilac-mark: #8FD9BC; }
+:root { --lilac: #FFAC81; --lilac-soft: #FFE2CC; --lilac-mark: #FFAC81; }
 :root { --sandy: #F7934C; --tangerine: #FFAC81; }
 .entry .oj-opening, .entry .oj-poses { --edge: var(--lilac-mark); }
 .oj-area--lilac, .oj-more__card--lilac { --tone: var(--lilac-mark); }
@@ -1315,3 +1315,10 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .way--pink h3, .way--pink p { color: #fff; }
 .page-head--pink { --tone: var(--orchid); }
 .page-head--pink h1, .page-head--pink .lead { color: #fff; }
+/* „ezeket a kék háttereket hagyjuk el mindenhol, figyelj az új színekre” – no Frozen Water anywhere any more: the tone that was
+   the mint („lilac”) is Tangerine Dream, its soft one the light peach of it. Where it filled a whole card or page head (the
+   relaxation card and page, contact, FAQ) it is the light peach, so the full Tangerine Dream stays for the prenatal head,
+   the group flow card and the hero word */
+.way--lilac { --tone: var(--lilac-soft); }
+.page-head--lilac { --tone: var(--lilac-soft); }
+.oj-fit__item--lilac { --dot: #F7934C; }
