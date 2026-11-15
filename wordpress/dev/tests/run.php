@@ -3540,6 +3540,16 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	ok( ! str_contains( (string) wp_json_encode( array( $hcj['pages']['classes']['content'], $hcj['classes']['hatha-flow']['content'] ), JSON_UNESCAPED_UNICODE ), 'tudok segíteni a pózokban' ) && in_array( array( 'látlak, és tudok segíteni a pózokban.', 'látlak, és jobban tudlak korrigálni és segíteni.' ), $hcj['pages']['classes']['_replace'], true ), '… „jobban tudlak korrigálni és segíteni” instead of „tudok segíteni a pózokban”' );
 	ok( str_contains( (string) $hcj['classes']['relaxacio-legzes']['content'], 'És oda-vissza működik: az idegrendszered állapota meglátszik a légzéseden' ) && str_contains( (string) $hcj['classes']['relaxacio-legzes']['content'], 'a hőérzetedre, a hangulatodra, a tempódra és a kitartásodra' ) && 1 === count( array_filter( (array) $hcj['classes']['relaxacio-legzes']['_replace'], fn( $r ) => str_starts_with( (string) $r[0], '<p>A légzés az egyetlen' ) ) ), 'relaxation: „Miért a légzés?” says it works both ways – calm or energy, warmth, mood, pace, stamina („írd bele szépen megfogalmazva”)' );
 	ok( str_contains( (string) file_get_contents( get_template_directory() . '/footer.php' ), "\$link( 'schedule-pricing', oy_schedule_label() )" ), '… the footer link says „Bejelentkezés és árak” too („ezt is írjuk át bejelentkezés és árakra”)' );
+	$fmid = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => '„Te foglalkozol mással is, vagy csak a jógával?”', 'post_name' => 'foglalkozol-massal-is', 'post_content' => '<p>Legnagyobb meglepetésemre…</p>' ) );
+	update_option( 'oy_edition', 'hu-online' );
+	delete_option( 'oy_1114d_rev' );
+	oy_migrate_1114d();
+	delete_option( 'oy_1114d_rev' );
+	oy_migrate_1114d();
+	update_option( 'oy_edition', 'fort-myers' );
+	$fmp = get_post( $fmid );
+	ok( 'Törődni magaddal nem luxus, hanem példamutatás' === $fmp->post_title && str_contains( $fmp->post_content, 'A legtöbb mai népbetegség nem ott kezdődik, ahol fáj' ) && str_ends_with( trim( $fmp->post_content ), '<p><strong>Legyen több olyan gondolat, amiben jó lakni!</strong></p>' ) && ! str_contains( $fmp->post_content, 'boldog új évet' ) && 'foglalkozol-massal-is' === $fmp->post_name && has_post_thumbnail( $fmid ), 'journal: „Foglalkozol mással is?” becomes her post – her title, „Legyen több olyan gondolat…” at the end, the fish pose photo, the same address' );
+	wp_delete_post( $fmid, true );
 	$ocss = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
 	$pal = substr( $ocss, (int) strrpos( $ocss, ':root {' ) );
 	ok( str_contains( $pal, '--forest: #013220;' ) && str_contains( $pal, '--lilac-soft: #DAFFEF;' ) && str_contains( $pal, '--sun: #FFDF22;' ) && str_contains( $pal, '--pink: #EB9486;' ) && str_contains( $pal, '--orchid: #A44A3F;' ) && str_contains( $pal, '--pink-soft: #FFE2CC;' ) && str_contains( $pal, '--sage-soft: #DEE5D3;' ) && ! preg_match( '/#D92B86|#9C6ADE|rgba\(217, 43, 134/i', substr( $ocss, 0, (int) strrpos( $ocss, ':root {' ) ) ), 'online site: her new palette everywhere – Evergreen, Frozen Water, Bright Gold, Sweet Salmon, Reddish Brown, with the light sage and peach she likes („ez alapján legyen minden”)' );

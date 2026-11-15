@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-15n';
+	$rev = '2026-11-15o';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1326,6 +1326,21 @@ function oy_migrate_1114d() {
 		wp_update_post( wp_slash( array( 'ID' => $cl->ID, 'post_content' => str_replace( 'Egy hosszú nap végén is belefér.', 'Egy hosszú nap végén vagy a terápiádhoz kiegészítésként.', $cl->post_content ) ) ) );
 		kses_init_filters();
 		$log[] = 'classes guide: relaxation „vagy a terápiádhoz kiegészítésként”';
+	}
+	// Olívia, 15 November: „Ehelyett a cikk helyett: …/foglalkozol-massal-is/ Legyen ez a szöveg: [her Facebook post] … a végén
+	// csak: Legyen több olyan gondolat, amiben jó lakni! … Ez a kép legyen hozzá” – the article gets her post (sent in the
+	// chat), a title from her own sentence and the fish pose photo; the address stays. Once, only while the old text is there.
+	$fm = get_page_by_path( 'foglalkozol-massal-is', OBJECT, 'post' );
+	$fd = $data['posts']['foglalkozol-massal-is'] ?? null;
+	if ( $fm && $fd && ! str_contains( $fm->post_content, 'népbetegség' ) ) {
+		kses_remove_filters();
+		wp_update_post( wp_slash( array( 'ID' => $fm->ID, 'post_title' => $fd['title'], 'post_excerpt' => $fd['excerpt'], 'post_content' => $fd['content'] ) ) );
+		kses_init_filters();
+		$att = oy_import_image( (string) $fd['photo'] );
+		if ( $att ) {
+			set_post_thumbnail( $fm->ID, $att );
+		}
+		$log[] = 'article: „Foglalkozol mással is?” → her post, „' . $fd['title'] . '”, the fish pose photo';
 	}
 	// Olívia, 15 November, on „Pajzsmirigy harmonizálás jógával”: „Ebből a cikkből hiányzik a lényeg, a kép” – the poses for
 	// an over- and an underactive thyroid, as cards with her photos, after the paragraph that says which poses help; added

@@ -506,6 +506,14 @@
   - A beégetett színek (pöttyök, árnyékok, SVG-k, logó, böngészőszín) is átkerültek. A kismama-csempék barackszínűek a
     menta háttéren. A közepes zsálya #A9BFA0 maradt, átvezet a zöldek között.
   - Tesztek: 1301/0.
+- **3.11.70:** A „Foglalkozol mással is?” cikk helyére Olívia Facebook-bejegyzése került (chaten küldte el):
+  - A cím az ő mondatából: „Törődni magaddal nem luxus, hanem példamutatás”. A cikk címe (URL) marad:
+    `/foglalkozol-massal-is/`.
+  - A végére bekerült a „Legyen több olyan gondolat, amiben jó lakni!” mondat. A kép a halpóz (`article-fish-pose`).
+  - A betegségek rendes lista lettek, a „Gondolat ➡️ idegrendszer ➡️ …” sor kiemelt idézet, és két alcímet kapott az ő
+    mondataiból.
+  - Javított elírások: immunrendszer, Crohn, Hashimoto, YouTube, szív- és érrendszeri, anyagcserezavarok.
+  - Migráció: 2026-11-15o, csak ha még a régi szöveg van ott. Tesztek: 1302/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
