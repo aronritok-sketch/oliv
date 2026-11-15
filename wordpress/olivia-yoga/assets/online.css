@@ -968,3 +968,6 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .oys-pricing--fold .price-group.is-open .price-group__head > :not(h3) { margin: 0 1.3rem .9rem; }
 .oys-pricing--fold .price-group.is-open .price-group__cards { padding: 0 1.3rem 1.3rem; }
 
+
+/* Olívia, 15 November: „az online kismamatorna szekciójának háttere a főoldalon lehet az a pasztell lila, amit használunk” */
+.section--pale.oj-prenatal { background: var(--lilac-soft); }

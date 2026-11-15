@@ -434,6 +434,8 @@
   - a „Megkapod a linket” lépés: „…a böngésződben nyílik meg, nem kell semmit letöltened”;
   - a „Tényleg működik a csoportos jóga online?” kérdés lekerült a főoldalról (a GYIK-oldalon megmarad; migráció
     2026-11-15g).
+- **3.11.60:** a főoldali kismamatorna-blokk háttere az oldal pasztell lilája (`--lilac-soft`) („lehet az a pasztell lila,
+  amit használunk”).
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
