@@ -1463,3 +1463,12 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 		background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 40' preserveAspectRatio='none'%3E%3Cpath d='M8 0C16 10 0 30 8 40' fill='none' stroke='%23E63462' stroke-width='2.5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 40px repeat-y; }
 }
 .entry ol.oj-flow--wave > li:nth-child(5n) { --c: var(--tangerine); --s: var(--lilac-soft); }
+/* „itt legyen benne a fejem” – the stretching card on the home page: her head (at the bottom of the photo, upside down in the
+   wheel) sits above the wave; the photo is lifted, the card's own colour fills under it */
+.way--mob .way__pic { height: clamp(185px, 16vw, 240px); }
+.way--mob .way__pic img, .way--mob .way__pic .photo { object-position: 55% 116% !important; background: color-mix(in srgb, var(--tone) 55%, #fff); } /* over the photo's own focus point (inline) */
+/* „ezek legyenek ugyanakkora betűméretek bal oldalt, mint a jobb oldalt” – the price per person on the pair cards the same size
+   as the „Egy óra: …” tag of the passes */
+.price__each { font-size: .92rem; }
+.way--mob .way__pic { background: color-mix(in srgb, var(--tone) 55%, #fff); overflow: hidden; }
+@media (max-width: 640px) { .way--mob .way__pic img, .way--mob .way__pic .photo { object-position: 55% 100% !important; transform: translateY(-30px); } }

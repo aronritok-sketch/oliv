@@ -652,6 +652,17 @@
   - Az `aszf` és az `adatvedelem` maradt: rövid, bevett jogi címek, és e-mailek, valamint a fizetés hivatkozik rájuk.
   - A naplóbejegyzések rövidített címei maradtak.
   - Tesztek: 1321/0.
+- **3.11.80:** Olívia doksija.
+  - „ide tehessek külön képet és ne ugyanaz legyen mint amit a csoportos órához teszek be”: a kezdőlapi hero fotója
+    saját kulcsot kapott az oldalszerkesztőben (`data-oyp="home-hero"`), így már nincs összekötve a csoportos óra
+    képével.
+  - „csoportos flow jóga szolgáltatáshoz mindenhova ezt a képet tedd be”: az ő tóparti teraszos fotója
+    (`flow-group-lakeside-deck`) lett a csoportos flow óra képe. A migráció egyszer beállítja (`oy_flow_photo_set`),
+    így a kártyákon, a fejlécen és a kezdőlapon is ez látszik.
+  - „itt legyen benne a fejem”: a kezdőlapi stretching kártyán a fotó feljebb kerül, a feje a hullám fölött látszik,
+    telefonon is.
+  - „ugyanakkora betűméretek”: a „fejenként” ár akkora, mint az „Egy óra: …” címke.
+  - Tesztek: 1323/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

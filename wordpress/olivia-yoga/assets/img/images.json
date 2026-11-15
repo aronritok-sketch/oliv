@@ -935,5 +935,15 @@
    "file": "kovacs-olivia-hennafestese-alkaron",
    "alt": "Kovács Olívia hennafestése egy alkaron és kézfejen"
   }
+ },
+ "flow-group-lakeside-deck": {
+  "alt": "A group flow yoga class on a lakeside deck, led by Olivia Kovacs",
+  "pos": "50% 55%",
+  "w": 800,
+  "h": 618,
+  "hu": {
+   "file": "kovacs-olivia-csoportos-flow-jogaora-to-parti-teraszon",
+   "alt": "Csoportos flow jógaóra egy tóparti teraszon Kovács Olívia vezetésével"
+  }
  }
 }

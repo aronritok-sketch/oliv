@@ -1063,7 +1063,7 @@ function oy_arrow_marks( $html ) {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-15q';
+	$rev = '2026-11-15r';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1372,6 +1372,17 @@ function oy_migrate_1114d() {
 	// Olívia, 15 November: „Ehelyett a cikk helyett: …/foglalkozol-massal-is/ Legyen ez a szöveg: [her Facebook post] … a végén
 	// csak: Legyen több olyan gondolat, amiben jó lakni! … Ez a kép legyen hozzá” – the article gets her post (sent in the
 	// chat), a title from her own sentence and the fish pose photo; the address stays. Once, only while the old text is there.
+	// „csoportos flow jóga szolgáltatáshoz mindenhova ezt a képet tedd be” – the group class's photo (the cards, its head, the
+	// home page); once, so a photo she sets later in the admin stays
+	$flow = get_page_by_path( 'hatha-flow', OBJECT, 'oy_class' );
+	if ( $flow && ! get_option( 'oy_flow_photo_set' ) ) {
+		$att = oy_import_image( 'flow-group-lakeside-deck' );
+		if ( $att ) {
+			set_post_thumbnail( $flow->ID, $att );
+			update_option( 'oy_flow_photo_set', 1 );
+			$log[] = 'group flow class: her lakeside deck photo';
+		}
+	}
 	$fm = get_page_by_path( 'torodni-magaddal-nem-luxus', OBJECT, 'post' ) ?: get_page_by_path( 'foglalkozol-massal-is', OBJECT, 'post' );
 	$fd = $data['posts']['torodni-magaddal-nem-luxus'] ?? null;
 	if ( $fm && $fd && ! str_contains( $fm->post_content, 'népbetegség' ) ) {

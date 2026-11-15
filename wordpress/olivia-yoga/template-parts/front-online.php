@@ -57,7 +57,8 @@ $steps  = array(
 		</div>
 		<div class="hero__visual">
 			<?php echo oy_soft_blob( 'pink', 'right' ); // phpcs:ignore ?>
-			<div class="frame hero__photo"><?php echo oy_photo( 'olivia-golden-backbend', '(min-width: 960px) 52vw, 92vw', true ); // phpcs:ignore ?></div>
+			<?php // Olívia, 15 November: „ide tehessek külön képet és ne ugyanaz legyen mint amit a csoportos órához teszek be” – the hero photo has its own key in the page editor, so changing the group class's photo no longer changes it (and back) ?>
+			<div class="frame hero__photo"><?php echo str_replace( 'data-oyp="olivia-golden-backbend"', 'data-oyp="home-hero"', oy_photo( 'olivia-golden-backbend', '(min-width: 960px) 52vw, 92vw', true ) ); // phpcs:ignore ?></div>
 			<?php echo oy_name_card( 'hero__card' ); // phpcs:ignore ?>
 		</div>
 	</div>
