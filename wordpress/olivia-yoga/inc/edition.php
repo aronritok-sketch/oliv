@@ -68,7 +68,7 @@ const OY_ONLINE_POST_SLUGS = array(
 	'stop-for-a-moment' => 'allj-meg-egy-pillanatra',
 	'yoga-for-thyroid-balance' => 'pajzsmirigy-harmonizalas-jogaval',
 	'what-yoga-gives' => 'mit-ad-a-joga',
-	'do-you-do-anything-besides-yoga' => 'foglalkozol-massal-is',
+	'do-you-do-anything-besides-yoga' => 'torodni-magaddal-nem-luxus',
 	'meditation' => 'meditacio',
 	'eight-limbs-yama' => 'a-joga-8-aga-yama',
 	'eight-limbs-niyama' => 'a-joga-8-aga-niyama',
@@ -80,6 +80,12 @@ const OY_ONLINE_POST_SLUGS = array(
 	'eight-limbs-samadhi' => 'a-joga-8-aga-szamadhi',
 );
 
+// Later moves of the online journal posts, from their Hungarian address to a new one (the old one redirects). Olívia, 15
+// November: „itt is javítsd az url slugot” – the article got her own title, its address follows it.
+const OY_ONLINE_POST_MOVED = array(
+	'foglalkozol-massal-is' => 'torodni-magaddal-nem-luxus',
+);
+
 add_action( 'template_redirect', function () {
 	if ( ! is_404() || ! oy_online_only() ) {
 		return;
@@ -89,6 +95,9 @@ add_action( 'template_redirect', function () {
 	$to   = OY_ONLINE_MOVED[ $path ] ?? null;
 	if ( ! $to && isset( OY_ONLINE_POST_SLUGS[ $path ] ) ) {
 		$to = array( 'path', OY_ONLINE_POST_SLUGS[ $path ] );
+	}
+	if ( ! $to && isset( OY_ONLINE_POST_MOVED[ $path ] ) ) {
+		$to = array( 'path', OY_ONLINE_POST_MOVED[ $path ] );
 	}
 	if ( ! $to && str_starts_with( $path, 'naplo/' ) ) {
 		$to = array( 'path', 'jogarol/' . substr( $path, 6 ) );

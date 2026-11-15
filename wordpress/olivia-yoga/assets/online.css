@@ -348,13 +348,14 @@ body .hero__title .hero__l3 { display: block; margin-top: .14em; }
 .oj-hero .oj-hero__title .hero__l1 { margin-bottom: .1em; }
 .oj-hero .oj-trio { display: flex; flex-direction: column; align-items: flex-start; gap: .14em; margin-top: 0; }
 .oj-hero .oj-trio mark { padding: .12em .1em 0; margin-left: -.02em; line-height: 1.02; }
-.oj-hero .oj-trio .oj-breath--lilac::before { background: var(--lilac); }
-.oj-hero .oj-trio .oj-breath--sage::before { background: var(--sage); }
-.oj-hero .oj-trio .oj-breath--sun::before { background: var(--sun); }
+/* „ez a 3 szín legyen a főcímben a jóga, kismamatorna, mobilizáció”: Bright Gold, Sandy Brown, Tangerine Dream */
+.oj-hero .oj-trio .oj-breath--gold::before { background: var(--sun); }
+.oj-hero .oj-trio .oj-breath--sandy::before { background: var(--sandy); }
+.oj-hero .oj-trio .oj-breath--tangerine::before { background: var(--tangerine); }
 .oj-hero .oj-trio .oj-breath::before { transform-origin: 0 60%; }
 @media (prefers-reduced-motion: no-preference) {
-	.oj-hero .oj-trio .oj-breath--sage::before { animation-delay: -6.66s; }
-	.oj-hero .oj-trio .oj-breath--sun::before { animation-delay: -3.33s; }
+	.oj-hero .oj-trio .oj-breath--sandy::before { animation-delay: -6.66s; }
+	.oj-hero .oj-trio .oj-breath--tangerine::before { animation-delay: -3.33s; }
 	@keyframes oj-breath-trio { 0%, 100% { transform: scale(1, 1); } 40% { transform: scale(1.04, 1.1); } }
 	.oj-hero .oj-trio .oj-breath::before { animation-name: oj-breath-trio; }
 }
@@ -1202,6 +1203,7 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
    palette's Frozen Water itself; the small marks (dots, rings, edges, step numbers) take a deeper shade of it, so they still
    show on the light backgrounds */
 :root { --lilac: #DAFFEF; --lilac-soft: #DAFFEF; --lilac-mark: #8FD9BC; }
+:root { --sandy: #F7934C; --tangerine: #FFAC81; }
 .entry .oj-opening, .entry .oj-poses { --edge: var(--lilac-mark); }
 .oj-area--lilac, .oj-more__card--lilac { --tone: var(--lilac-mark); }
 .entry .oj-keynote--lilac { --c: var(--lilac-mark); }
@@ -1217,3 +1219,51 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .steps li:nth-child(4n + 1)::before { background: color-mix(in srgb, var(--lilac-mark) 70%, #fff); }
 .places li:nth-child(4n + 1)::before { background: color-mix(in srgb, var(--lilac-mark) 70%, #fff); }
 .entry .oj-lines--lilac { --tone: var(--lilac-mark); }
+
+/* Olívia, 15 November: „ez a szín legyen: [Tangerine Dream] [the relaxation card]” – the small breathing circle of the class
+   cards is Tangerine Dream (the pale peach hardly showed on the mint) */
+.way__art .wa-3 { fill: var(--tangerine); opacity: 1; }
+/* „ez túl színes, legyenek a színek naturálisabbak” – the prenatal tiles: white on the mint section, the corner circles in the
+   palette's greens only (sage, fern, mint), softened, so the nine read as one calm set */
+.section--pale.oj-prenatal .oj-modules li, .oj-modules:not(.oj-modules--why) li { background: #fff; }
+.oj-modules:not(.oj-modules--why) li:nth-child(3n + 1) { --dot: var(--sage); }
+.oj-modules:not(.oj-modules--why) li:nth-child(3n + 2) { --dot: var(--lilac-mark); }
+.oj-modules:not(.oj-modules--why) li:nth-child(3n) { --dot: var(--fern); }
+.oj-modules:not(.oj-modules--why) li::before { background: color-mix(in srgb, var(--dot) 38%, #fff); }
+.oj-prenatal .oj-modules:not(.oj-modules--why) li:nth-child(3n + 1) { --dot: var(--sage); }
+.oj-prenatal .oj-modules:not(.oj-modules--why) li:nth-child(3n + 2) { --dot: var(--lilac-mark); }
+.oj-prenatal .oj-modules:not(.oj-modules--why) li:nth-child(3n) { --dot: var(--fern); }
+/* „ez is kicsit túl gyerekes, legyen letisztultabb de az irány tetszik” – the four „who is it for” cards keep their colour, but
+   only as a hint: a near-white card with a fine edge of its tone and the small dot by the title, no circles in the corners */
+.oj-fit__item { background: color-mix(in srgb, var(--bg) 30%, #fff); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--edge) 70%, transparent), 0 14px 28px -26px rgba(1, 50, 32, .4); }
+.oj-fit__item::before, .oj-fit__item::after { display: none; }
+.oj-fit__item b::before { width: 9px; height: 9px; box-shadow: none; }
+.oj-fit__item--lilac { --dot: #3E9C78; }
+
+/* „az emojik helyett legyen az oldal stílusához illeszkedő design” (the article „Törődni magaddal nem luxus…”): the arrows
+   of her post in the site's forms. The illnesses are clean white cards – the illness in bold, under it what is behind it
+   after the site's own arrow in Reddish Brown; „Gondolat → idegrendszer → hormonrendszer → immunválasz” is a chain of pills
+   from the lightest green to Evergreen, joined by the same arrow (in a column on a phone). */
+:root { --oj-arrow: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4.5 10.9h12.3l-4.1-4.1 1.55-1.55L21 12l-6.75 6.75-1.55-1.55 4.1-4.1H4.5z'/%3E%3C/svg%3E"); }
+.entry ul.oj-causes { list-style: none; margin: 1.5rem 0 1.9rem; padding: 0; display: grid; gap: .75rem; }
+.entry ul.oj-causes > li { display: flex; flex-direction: column; gap: .45rem; margin: 0; padding: 1.05rem 1.25rem 1.15rem; border-radius: 18px; background: #fff; box-shadow: inset 0 0 0 1px rgba(1, 50, 32, .08), 0 14px 28px -26px rgba(1, 50, 32, .45); line-height: 1.5; }
+.entry ul.oj-causes > li::before { content: none; }
+.oj-causes__name { color: var(--ink); font-size: .98rem; }
+.oj-causes__name strong { font-weight: 700; }
+.oj-causes__why { position: relative; padding-left: 1.75rem; color: var(--text); font-size: .95rem; }
+.oj-causes__why::before { content: ""; position: absolute; left: 0; top: .2em; width: 1.15rem; height: 1.15rem; background: var(--orchid); -webkit-mask: var(--oj-arrow) center / contain no-repeat; mask: var(--oj-arrow) center / contain no-repeat; }
+@media (min-width: 760px) { .entry ul.oj-causes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.entry ol.oj-chain { list-style: none; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .6rem 0; margin: 1.8rem 0 2rem; padding: 1.4rem 1rem; border-radius: 22px; background: color-mix(in srgb, var(--sage-soft) 45%, #fff); }
+.entry ol.oj-chain > li { display: flex; align-items: center; margin: 0; padding: 0; }
+.entry ol.oj-chain > li + li::before { content: ""; flex: none; position: static; width: 1.35rem; height: 1.35rem; margin: 0 .55rem; border-radius: 0; background: var(--fern); -webkit-mask: var(--oj-arrow) center / contain no-repeat; mask: var(--oj-arrow) center / contain no-repeat; }
+.entry ol.oj-chain > li:first-child::before { content: none; }
+.entry ol.oj-chain > li > span { padding: .55rem 1.05rem; border-radius: 999px; background: var(--c, var(--lilac)); color: var(--ink); font-weight: 700; font-size: .98rem; line-height: 1.2; white-space: nowrap; }
+.entry ol.oj-chain > li:nth-child(2) { --c: var(--sage-soft); }
+.entry ol.oj-chain > li:nth-child(3) { --c: var(--sage); }
+.entry ol.oj-chain > li:nth-child(4) > span { --c: var(--forest); color: #fff; }
+@media (max-width: 640px) {
+	.entry ol.oj-chain { flex-direction: column; gap: 0; }
+	.entry ol.oj-chain > li { flex-direction: column; }
+	.entry ol.oj-chain > li + li::before { margin: .35rem 0; transform: rotate(90deg); }
+}

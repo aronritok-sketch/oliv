@@ -464,7 +464,7 @@ function oy_online_post_slugs() {
 		return array();
 	}
 	$n = 0;
-	foreach ( OY_ONLINE_POST_SLUGS as $en => $hu ) {
+	foreach ( OY_ONLINE_POST_SLUGS + OY_ONLINE_POST_MOVED as $en => $hu ) {
 		$post = get_page_by_path( $en, OBJECT, 'post' );
 		if ( $post && ! get_page_by_path( $hu, OBJECT, 'post' ) ) {
 			wp_update_post( array( 'ID' => $post->ID, 'post_name' => $hu ) );
@@ -1023,6 +1023,39 @@ function oy_migrate_1114c() {
 }
 
 /**
+ * Olívia, 15 November: „az emojik helyett legyen az oldal stílusához illeszkedő design” – the arrow emoji of her post in the
+ * site's own forms: a list whose items read „<b>illness</b> ➡️ what is behind it” becomes cards (oj-causes: the illness,
+ * under it the reason after the site's arrow), a line of „a ➡️ b ➡️ c” a chain of pills (oj-chain), the folded hands go.
+ */
+function oy_arrow_marks( $html ) {
+	$arrow = '\x{27A1}\x{FE0F}?';
+	$html  = (string) preg_replace_callback(
+		'#<ul>((?:(?!</ul>).)*' . $arrow . '(?:(?!</ul>).)*)</ul>#su',
+		function ( $m ) use ( $arrow ) {
+			$items = preg_replace_callback(
+				'#<li>((?:(?!</li>).)*?)\s*' . $arrow . '\s*((?:(?!</li>).)*)</li>#su',
+				fn( $l ) => '<li><span class="oj-causes__name">' . trim( $l[1] ) . '</span><span class="oj-causes__why">' . trim( $l[2] ) . '</span></li>',
+				$m[1]
+			);
+			return '<ul class="oj-causes">' . $items . '</ul>';
+		},
+		$html
+	);
+	$html = (string) preg_replace_callback(
+		'#(?:<blockquote>\s*)?<p>([^<]*?' . $arrow . '[^<]*?' . $arrow . '[^<]*)</p>(?:\s*</blockquote>)?#su',
+		function ( $m ) use ( $arrow ) {
+			$li = array();
+			foreach ( preg_split( '#\s*' . $arrow . '\s*#u', trim( $m[1] ) ) as $part ) {
+				$li[] = '<li><span>' . mb_strtoupper( mb_substr( $part, 0, 1 ) ) . mb_substr( $part, 1 ) . '</span></li>';
+			}
+			return '<ol class="oj-chain">' . implode( '', $li ) . '</ol>';
+		},
+		$html
+	);
+	return (string) preg_replace( '#\s*\x{1F64F}(?:\x{1F3FB}|\x{1F3FC}|\x{1F3FD}|\x{1F3FE}|\x{1F3FF})?\s*\)#u', '.)', $html );
+}
+
+/**
  * Olívia, 14 November, the last points of her doc, on a live site: 2018 (massage) on the About timeline, the general kit
  * list and the „charge your device” note on the prices page, the same in the FAQ answer about what to prepare; „I will
  * get back to you soon” instead of „within a day” (pages and classes); the photo whose focus moved („ennek a képnek nagyon
@@ -1030,7 +1063,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-15o';
+	$rev = '2026-11-15p';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1048,6 +1081,15 @@ function oy_migrate_1114d() {
 			$log[] = 'address: /' . $from . '/ → /' . $to . '/';
 		}
 	}
+	// „itt is javítsd az url slugot” – the article's address follows its title (the old one redirects, inc/edition.php)
+	foreach ( OY_ONLINE_POST_MOVED as $from => $to ) {
+		$po = get_page_by_path( $from, OBJECT, 'post' );
+		if ( $po && ! get_page_by_path( $to, OBJECT, 'post' ) ) {
+			wp_update_post( array( 'ID' => $po->ID, 'post_name' => $to ) );
+			$log[] = 'address: /' . $from . '/ → /' . $to . '/';
+		}
+	}
+	$moved += OY_ONLINE_POST_MOVED;
 	global $wpdb;
 	$links = 0;
 	foreach ( $moved as $from => $to ) {
@@ -1330,8 +1372,8 @@ function oy_migrate_1114d() {
 	// Olívia, 15 November: „Ehelyett a cikk helyett: …/foglalkozol-massal-is/ Legyen ez a szöveg: [her Facebook post] … a végén
 	// csak: Legyen több olyan gondolat, amiben jó lakni! … Ez a kép legyen hozzá” – the article gets her post (sent in the
 	// chat), a title from her own sentence and the fish pose photo; the address stays. Once, only while the old text is there.
-	$fm = get_page_by_path( 'foglalkozol-massal-is', OBJECT, 'post' );
-	$fd = $data['posts']['foglalkozol-massal-is'] ?? null;
+	$fm = get_page_by_path( 'torodni-magaddal-nem-luxus', OBJECT, 'post' ) ?: get_page_by_path( 'foglalkozol-massal-is', OBJECT, 'post' );
+	$fd = $data['posts']['torodni-magaddal-nem-luxus'] ?? null;
 	if ( $fm && $fd && ! str_contains( $fm->post_content, 'népbetegség' ) ) {
 		kses_remove_filters();
 		wp_update_post( wp_slash( array( 'ID' => $fm->ID, 'post_title' => $fd['title'], 'post_excerpt' => $fd['excerpt'], 'post_content' => $fd['content'] ) ) );
@@ -1341,6 +1383,14 @@ function oy_migrate_1114d() {
 			set_post_thumbnail( $fm->ID, $att );
 		}
 		$log[] = 'article: „Foglalkozol mással is?” → her post, „' . $fd['title'] . '”, the fish pose photo';
+		$fm = get_post( $fm->ID );
+	}
+	// „az emojik helyett legyen az oldal stílusához illeszkedő design” – the arrows of her post become the site's cards and chain
+	if ( $fm && preg_match( '#\x{27A1}|\x{1F64F}#u', $fm->post_content ) ) {
+		kses_remove_filters();
+		wp_update_post( wp_slash( array( 'ID' => $fm->ID, 'post_content' => oy_arrow_marks( $fm->post_content ) ) ) );
+		kses_init_filters();
+		$log[] = 'article: the arrow emoji → cards and a chain in the site\'s style';
 	}
 	// Olívia, 15 November, on „Pajzsmirigy harmonizálás jógával”: „Ebből a cikkből hiányzik a lényeg, a kép” – the poses for
 	// an over- and an underactive thyroid, as cards with her photos, after the paragraph that says which poses help; added

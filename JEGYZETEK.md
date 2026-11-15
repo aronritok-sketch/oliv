@@ -522,6 +522,22 @@
   - „a bal oldali zöld szín megmaradhat dominánsnak”: az Evergreen marad a meghatározó szín, nincs teendő (a „két szélső
     barna” mondatot Olívia átírta erre).
   - Tesztek: 1302/0.
+- **3.11.72:** Olívia 11.15-i késő esti doksipontjai:
+  - „itt is javítsd az url slugot és az emojik helyett legyen az oldal stílusához illeszkedő design”: a cikk címe
+    `/torodni-magaddal-nem-luxus/` lett, a régi `/foglalkozol-massal-is/` és az angol cím is egy lépésben 301-gyel ide
+    visz (`OY_ONLINE_POST_MOVED`). A betegséglista fehér kártyák lettek (a betegség félkövéren, alatta az oldal saját
+    nyila után a magyarázat), a „Gondolat → idegrendszer → hormonrendszer → immunválasz” sor zöldülő pirulák lánca
+    (telefonon oszlopban). A 🙏 helyére pont került. A migráció a meglévő szöveget alakítja (`oy_arrow_marks()`), nem
+    írja felül.
+  - „favicont is cseréld a megfelelő színűre”: Evergreen kör, Tangerine Dream pötty (csak az online oldalon).
+  - „ez a 3 szín legyen a főcímben”: jóga – Bright Gold, kismamatorna – Sandy Brown `#F7934C`, mobilizáció –
+    Tangerine Dream `#FFAC81`.
+  - „ez a szín legyen”: az órakártyák kis lélegző köre Tangerine Dream.
+  - „ez túl színes, legyenek a színek naturálisabbak”: a kismama-modulok fehér csempék, a sarokkörök csak zsályazöld,
+    menta és páfrányzöld.
+  - „ez is kicsit túl gyerekes, legyen letisztultabb de az irány tetszik”: a „Kezdőknek / Haladóknak / …” kártyák
+    majdnem fehérek, a színük csak finom keretben és a kis pöttyben maradt, a sarokkörök eltűntek.
+  - Migráció: 2026-11-15p. Tesztek: 1308/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
