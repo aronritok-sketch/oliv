@@ -448,6 +448,13 @@
     egyszer szúrja be.
   - Az óraoldalak árkártyái lenyithatók (a fejlécben: egyedül/párban, hossz, „…-tól” ár), egyszerre egy van nyitva.
   - Asztali nézetben nagyobb a menü betűje (1100 px felett 1,02rem).
+- **3.11.64:** Olívia 11.15-i doksija, Rólam („rólamot még kicsit módosítsuk sorrendben és egy-két képet hozzácsatolva”):
+  - Az „Az utam” idővonal került a lap elejére.
+  - „A kezdetek” alatt az új tornatermi kép és a szabadtéri csoport, „Amikor jött a jóga” alatt a sziklás harcos és a réti
+    nyújtás, „A matracon túl” elején egy széles kép (journal-15).
+  - A Fitmummy-oklevél kártyája nagyobb (42% széles, 4:5-ös kép).
+  - Új képek: `about-gym-class`, `about-rock-warrior`, `about-meadow-stretch`, `article-fish-pose` (a halpóz a következő
+    cikkhez); migráció: 2026-11-15j, egyszer rendez át.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

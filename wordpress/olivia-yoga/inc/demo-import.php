@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-15i';
+	$rev = '2026-11-15j';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1211,6 +1211,35 @@ function oy_migrate_1114d() {
 	if ( $weeks && class_exists( 'OYS_Settings' ) && (int) OYS_Settings::get( 'weeks_ahead' ) < $weeks ) {
 		OYS_Settings::update( array( 'weeks_ahead' => $weeks ) );
 		$log[] = 'weekly classes ' . $weeks . ' weeks ahead: ' . (int) OYS_Schedule::generate( $weeks ) . ' new dates';
+	}
+	// Olívia, 15 November: „rólamot még kicsit módosítsuk sorrendben és egy-két képet hozzácsatolva” – the timeline first;
+	// under „A kezdetek” the two trainer photos straight after the title (the first one her new photo), then the text;
+	// „Amikor jött a jóga” opens with two photos; „A matracon túl” opens with the photo of „Te foglalkozol mással is…”.
+	// Each step only once and only where the page still has what it moves, so her own words stay as they are.
+	$about = get_page_by_path( oy_page_slug( 'about' ) );
+	if ( $about ) {
+		$c    = $about->post_content;
+		$orig = $c;
+		if ( preg_match( '~<div class="oj-path">\s*<h3>.*?</ol>\s*</div>~su', $c, $m, PREG_OFFSET_CAPTURE ) && $m[0][1] > 0 && '' !== trim( substr( $c, 0, $m[0][1] ) ) ) {
+			$c = $m[0][0] . "\n" . ltrim( substr( $c, 0, $m[0][1] ) ) . substr( $c, $m[0][1] + strlen( $m[0][0] ) );
+		}
+		$old_duo = '[oy_figures photos="korall-stretching-circuit,outdoor-group-bands"]';
+		if ( str_contains( $c, $old_duo ) && preg_match( '~<h3 class="oj-chapter">A kezdetek</h3>\n?~u', $c, $h ) ) {
+			$c = str_replace( array( $old_duo . "\n", $old_duo ), '', $c );
+			$c = str_replace( $h[0], rtrim( $h[0] ) . "\n" . '[oy_figures photos="about-gym-class,outdoor-group-bands"]' . "\n", $c );
+		}
+		if ( ! str_contains( $c, 'about-rock-warrior' ) && preg_match( '~<h3 class="oj-chapter">Amikor jött a jóga</h3>\n?~u', $c, $h ) ) {
+			$c = str_replace( $h[0], rtrim( $h[0] ) . "\n" . '[oy_figures photos="about-rock-warrior,about-meadow-stretch"]' . "\n", $c );
+		}
+		if ( ! str_contains( $c, 'photo="journal-15"' ) && preg_match( '~<h2>A matracon túl</h2>\n?~u', $c, $h ) ) {
+			$c = str_replace( $h[0], rtrim( $h[0] ) . "\n" . '[oy_figure photo="journal-15" class="oj-figure--wide"]' . "\n", $c );
+		}
+		if ( $c !== $orig ) {
+			kses_remove_filters();
+			wp_update_post( wp_slash( array( 'ID' => $about->ID, 'post_content' => $c ) ) );
+			kses_init_filters();
+			$log[] = 'about: the timeline first, photos under „A kezdetek”, „Amikor jött a jóga” and „A matracon túl”';
+		}
 	}
 	// Olívia, 15 November, on „Pajzsmirigy harmonizálás jógával”: „Ebből a cikkből hiányzik a lényeg, a kép” – the poses for
 	// an over- and an underactive thyroid, as cards with her photos, after the paragraph that says which poses help; added

@@ -841,5 +841,45 @@
    "file": "kovacs-olivia-oldalso-plank-fesztival-jogaora",
    "alt": "Kovács Olívia oldalsó plankban, emelt lábbal egy fesztivál szabadtéri jógaóráján"
   }
+ },
+ "about-gym-class": {
+  "alt": "Olivia Kovacs leading a group workout for women in a gym",
+  "pos": "50% 40%",
+  "w": 1200,
+  "h": 1600,
+  "hu": {
+   "file": "kovacs-olivia-edzokent-csoportos-ora-noi-edzoteremben",
+   "alt": "Kovács Olívia edzőként csoportos órát tart egy női edzőteremben"
+  }
+ },
+ "about-rock-warrior": {
+  "alt": "Olivia Kovacs in warrior III on a rock above a sandy valley",
+  "pos": "50% 45%",
+  "w": 1200,
+  "h": 900,
+  "hu": {
+   "file": "kovacs-olivia-harcos-3-poz-sziklan-joga",
+   "alt": "Kovács Olívia harcos III pózban egy sziklán, a jóga kezdetén"
+  }
+ },
+ "about-meadow-stretch": {
+  "alt": "Olivia Kovacs in a side stretch on a meadow",
+  "pos": "50% 50%",
+  "w": 800,
+  "h": 600,
+  "hu": {
+   "file": "kovacs-olivia-oldalnyujtas-reten-joga",
+   "alt": "Kovács Olívia oldalnyújtásban egy réten"
+  }
+ },
+ "article-fish-pose": {
+  "alt": "Olivia Kovacs in fish pose on a mat by an orange wall",
+  "pos": "50% 55%",
+  "w": 1200,
+  "h": 900,
+  "hu": {
+   "file": "kovacs-olivia-halpoz-joga",
+   "alt": "Kovács Olívia halpózban a jógamatracon"
+  }
  }
 }

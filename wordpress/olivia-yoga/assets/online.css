@@ -1003,3 +1003,12 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 /* „ha lehet akkor asztali nézetben egy picit mehet nagyobb betűméretre a navigációs menü” */
 @media (min-width: 1100px) { .nav a { font-size: 1.02rem; } }
 
+/* Rólam, 15 November: „A matracon túl: jöhet ez a kép a szöveg elé” – a wide photo before the text; „ez legyen nagyobb,
+   ugyanakkora mint a felette lévő kép” – the training card's photo as large as the photo above it, the caption under it */
+.entry .oj-figure--wide { clear: both; margin: .6rem 0 1.6rem; }
+.entry .oj-figure--wide .frame { aspect-ratio: 3 / 2; }
+.entry .credential:not(.credential--aside) { clear: both; display: block; width: 42%; max-width: none; padding: 1rem 1rem 1.1rem; }
+.entry .credential:not(.credential--aside) img { aspect-ratio: 4 / 5; margin: 0 0 .85rem; }
+.entry .credential:not(.credential--aside) figcaption { padding: 0 .2rem; }
+@media (max-width: 699px) { .entry .credential:not(.credential--aside) { width: auto; } }
+
