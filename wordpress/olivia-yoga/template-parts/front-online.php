@@ -12,7 +12,7 @@ defined( 'ABSPATH' ) || exit;
 $studio = fn( $sc ) => shortcode_exists( $sc ) ? do_shortcode( '[' . $sc . ']' ) : '';
 // Olívia, 14 November: „az egyéni online jógaórát és a kismamatornát a főoldalon cseréljük meg” – prenatal before one-to-one, here and in the blocks below
 $ways   = array(
-	array( __( 'Group online flow yoga', 'olivia-yoga' ), __( 'Every Wednesday, 18:30 to 20:00, live. Beginners welcome.', 'olivia-yoga' ), oy_class_url( 'hatha-flow' ), 'group', 'lilac', 'hatha-flow' ),
+	array( __( 'Group online flow yoga', 'olivia-yoga' ), __( 'Every Wednesday, 18:30 to 20:00, live. Beginners welcome.', 'olivia-yoga' ), oy_class_url( 'hatha-flow' ), 'group', 'tangerine', 'hatha-flow' ),
 	array( __( 'Prenatal fitness online', 'olivia-yoga' ), __( 'One-to-one or with a friend: breathing, pelvic floor, circulation, cardio, strength, spine, mobility, yoga and relaxation, combined for your trimester.', 'olivia-yoga' ), oy_class_url( oy_prenatal_slug() ), 'prenatal', 'sage', oy_prenatal_slug() ),
 	array( __( 'Individual online yoga', 'olivia-yoga' ), __( 'One-to-one on video: for a sore back, for stress, or to learn yoga from the basics.', 'olivia-yoga' ), oy_class_url( 'egyeni-online-joga' ), 'home', 'pink', 'egyeni-online-joga' ),
 	array( __( 'Stretching & mobility', 'olivia-yoga' ), __( 'One-to-one stretching and mobility work for a stiff hip, shoulder and spine, at your own pace.', 'olivia-yoga' ), oy_class_url( 'stretching' ), 'mobility', 'sun', 'stretching' ),

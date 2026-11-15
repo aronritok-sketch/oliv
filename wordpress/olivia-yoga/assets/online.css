@@ -1284,3 +1284,10 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 }
 /* „itt ha ráviszem a kurzort legyen a tangerine dream szín” – the „Online órák” dropdown: the line under the cursor */
 .nav .sub-menu a:hover, .nav .sub-menu a:focus-visible { background: var(--tangerine); }
+/* „ez is legyen a tangerine dream színű a főoldalon” – the group flow card of the home page (until now mint, like the
+   relaxation card); its small breathing circle Sandy Brown, so it shows on the tangerine */
+.way--tangerine { --tone: var(--tangerine); }
+.way--tangerine .way__art .wa-3 { fill: var(--sandy); }
+/* „itt legyen valami semlegesebb, szebb színű háttér” – the prenatal section of the home page: the light sage of the palette
+   instead of the mint, the white tiles on it */
+.section--pale.oj-prenatal { background: var(--sage-soft); }
