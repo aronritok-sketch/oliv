@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OY_VERSION', '3.11.57' );
+define( 'OY_VERSION', '3.11.58' );
 
 require_once get_template_directory() . '/inc/edition.php';
 
@@ -82,7 +82,9 @@ add_action( 'after_setup_theme', function () {
 } );
 
 add_action( 'wp_enqueue_scripts', function () {
-	wp_enqueue_style( 'oy-fonts', 'https://fonts.googleapis.com/css2?family=Anton&family=Quicksand:wght@400..700&display=swap', array(), null );
+	// Olívia, 15 November: „az egész oldalon, mindenhol ahol quicksand betűtípus van, Cabint szeretnék helyette!” – the online site
+	$oy_text_font = oy_online_only() ? 'Cabin:ital,wght@0,400..700;1,400..700' : 'Quicksand:wght@400..700';
+	wp_enqueue_style( 'oy-fonts', 'https://fonts.googleapis.com/css2?family=Anton&family=' . $oy_text_font . '&display=swap', array(), null );
 	wp_enqueue_style( 'oy-site', get_template_directory_uri() . '/assets/site.css', array(), OY_VERSION );
 	wp_enqueue_style( 'oy-wp', get_template_directory_uri() . '/assets/wp.css', array( 'oy-site' ), OY_VERSION );
 	if ( oy_online_only() ) { // the look of oliviajoga.hu (Olivia, 11.12)

@@ -948,3 +948,6 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .entry ul:not([class]) li:not([class]):nth-child(4n + 3) { --wave: var(--lilac); }
 .entry ul:not([class]) li:not([class]):nth-child(4n) { --wave: var(--sage); }
 
+/* Olívia, 15 November: „az egész oldalon, mindenhol ahol quicksand betűtípus van, Cabint szeretnék helyette!” */
+:root { --f-text: "Cabin", "Quicksand", "Nunito", "Segoe UI", system-ui, sans-serif; }
+

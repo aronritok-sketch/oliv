@@ -3425,6 +3425,8 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	if ( ! $old ) {
 		wp_delete_post( $tp, true );
 	}
+	$fn = (string) file_get_contents( get_template_directory() . '/functions.php' );
+	ok( str_contains( $fn, "oy_online_only() ? 'Cabin:ital,wght@0,400..700;1,400..700' : 'Quicksand:wght@400..700'" ) && str_contains( $oc2, ':root { --f-text: "Cabin",' ), 'the online site\'s text in Cabin instead of Quicksand („mindenhol ahol quicksand betűtípus van, Cabint szeretnék helyette”); the other sites keep Quicksand' );
 	$sj = (string) file_get_contents( get_template_directory() . '/assets/site.js' );
 	ok( str_contains( $sj, "window.matchMedia('(max-width: 699px)')" ) && str_contains( $sj, "ul.classList.add('oj-modules--fold')" ) && str_contains( $oc2, '.oj-modules--fold li > span { display: none; }' ), 'the prenatal cards fold on a phone, a tap opens one („ezek legyenek lenyithatóak mert mobilon így túl hosszú lesz”)' );
 	ok( preg_match( '/prefers-reduced-motion: no-preference\) \{[^@]*\.hatha__orb--sun \{[^}]*animation: oj-ha 12s/', $oc2 ) && str_contains( $oc2, '@keyframes oj-ha {' ) && str_contains( $oc2, '@keyframes oj-tha-fill {' ) && str_contains( $fr, '<span class="hatha__word" aria-hidden="true">Hatha</span>' ), 'Ha–Tha: the sun and the moon drift into one circle with HATHA across it, and part again („egyik átmegy a másikba és oda-vissza”); only with motion allowed' );

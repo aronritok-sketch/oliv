@@ -426,6 +426,8 @@
 - **3.11.57:** Olívia 11.15-i doksija: a pontok előtti kerek jel nem lóg bele a cím szövegébe, a cím előtt áll külön
   („az irány jó, de nem tetszik, hogy belelóg a szövegbe a kör, telón se néz ki jól”). A főoldal „Miért jó online” és
   „Így működik” listáján is így van.
+- **3.11.58:** az online oldal szövegbetűje Cabin a Quicksand helyett, mindenhol („mindenhol ahol quicksand betűtípus van,
+  Cabint szeretnék helyette”). A címek Anton betűje maradt, a többi oldal Quicksandje is.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
