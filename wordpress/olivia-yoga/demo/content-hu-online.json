@@ -816,7 +816,7 @@
 	},
 	"faqs": [
 		{
-			"home": "1",
+			"home": "",
 			"q": "Tényleg működik a csoportos jóga online?",
 			"a": "Igen, ha élő az óra. Nem egy videót követsz: ugyanabban az időben gyakorolunk, én pedig figyelek, vezetlek, és az órát a résztvevőkhöz igazítom. Ha bekapcsolod a kamerádat, látom, hogyan mozogsz, és szólok, ha valamin érdemes változtatni.\n\nAhogy sokan, én is a négy fal között, online kezdtem jógázni. És a jóga után nem kell sehová hazautazni: maradhatsz a relaxációban egy kicsit tovább.",
 			"_prev": {
@@ -928,7 +928,8 @@
 		}
 	],
 	"faqs_home": {
-		"_note": "Olívia, 14 November: „főoldalon a gyiknél az utolsó kérdés ez legyen, a miért jó online jógázni kérdést vegyük ki a főoldalról” – on a live site: on the home page or not, and a question that comes onto it comes last there; „ezt a kérdést még tedd a gyikhez a főoldalra” (late arrival / net), before the injury question; „ezt a kérdést szedjük ki a főoldalon a gyikből mert így túl hosszú” (how hard the group classes are).",
+		"_note": "Olívia, 14 November: „főoldalon a gyiknél az utolsó kérdés ez legyen, a miért jó online jógázni kérdést vegyük ki a főoldalról” – on a live site: on the home page or not, and a question that comes onto it comes last there; „ezt a kérdést még tedd a gyikhez a főoldalra” (late arrival / net), before the injury question; „ezt a kérdést szedjük ki a főoldalon a gyikből mert így túl hosszú” (how hard the group classes are).; 15 November: „ezt a kérdést szedjük ki a főoldalról” (does group yoga really work online).",
+    "Tényleg működik a csoportos jóga online?": "",
 		"Mennyire nehezek a csoportos jóga órák?": "",
 		"Miért jó online jógázni?": "",
 		"Mi van, ha késve érkezem, vagy akadozik a net?": "1",

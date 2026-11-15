@@ -254,6 +254,46 @@
 	/* Olívia, 14 November: „ezek legyenek lenyithatóak mert mobilon így túl hosszú lesz” – on a phone the cards with a
 	   longer text under the title (the prenatal modules, who one-to-one is for) show only their titles, a tap opens one.
 	   On a wider screen they stay as they are, open. */
+	/* Olívia, 15 November: „az árak iszonyat hosszú mobilon, úgyhogy asztalin és mobilon is legyen lenyitható, külön
+	   szolgáltatásokra. Egyszerre csak 1 legyen itt is lenyitva” – on the online site each service of the price list folds
+	   under its title; the first one is open, opening another closes it. */
+	(function foldPrices() {
+		if (!document.getElementById('oy-online-css')) return;
+		Array.prototype.forEach.call(document.querySelectorAll('.oys-pricing'), function (list, li) {
+			var groups = Array.prototype.filter.call(list.children, function (g) { return g.classList.contains('price-group'); });
+			if (groups.length < 2) return;
+			var all = [];
+			groups.forEach(function (g, gi) {
+				var h = g.querySelector('.price-group__head h3');
+				if (!h) return;
+				var id = 'oj-prices-' + li + '-' + gi;
+				g.id = g.id || id;
+				var b = document.createElement('button');
+				b.type = 'button';
+				b.className = 'price-group__toggle';
+				b.setAttribute('aria-controls', g.id);
+				while (h.firstChild) b.appendChild(h.firstChild);
+				var ic = document.createElement('span');
+				ic.className = 'oj-fold__icon';
+				ic.setAttribute('aria-hidden', 'true');
+				b.appendChild(ic);
+				h.appendChild(b);
+				all.push([g, b]);
+				b.addEventListener('click', function () {
+					var open = !g.classList.contains('is-open');
+					var top = b.getBoundingClientRect().top; // the one tapped stays where it was when the open one above closes
+					all.forEach(function (x) { x[0].classList.remove('is-open'); x[1].setAttribute('aria-expanded', 'false'); });
+					if (open) { g.classList.add('is-open'); b.setAttribute('aria-expanded', 'true'); }
+					var moved = b.getBoundingClientRect().top - top;
+					if (Math.abs(moved) > 1) window.scrollBy(0, moved);
+				});
+			});
+			if (!all.length) return;
+			all.forEach(function (x, i) { x[0].classList.toggle('is-open', 0 === i); x[1].setAttribute('aria-expanded', 0 === i ? 'true' : 'false'); });
+			list.classList.add('oys-pricing--fold');
+		});
+	})();
+
 	(function foldCards() {
 		var lists = document.querySelectorAll('.oj-modules--why');
 		if (!lists.length || !window.matchMedia) return;

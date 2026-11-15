@@ -1178,8 +1178,8 @@ msgstr "Por qué en línea"
 msgid "Any device with a camera and a browser, no app to install. A bigger screen is easier to follow."
 msgstr "Cualquier dispositivo con cámara y navegador, sin instalar ninguna aplicación. En una pantalla más grande es más fácil seguir la clase."
 
-msgid "Your own link comes by email and is waiting in your account. It opens in the browser."
-msgstr "Tu propio enlace llega por correo y te espera en tu cuenta. Se abre en el navegador."
+msgid "Your own link comes by email and is waiting in your account. It opens in your browser, there is nothing to download."
+msgstr "Tu propio enlace llega por correo y te espera en tu cuenta. Se abre en tu navegador, no tienes que descargar nada."
 
 msgid "I guide you in real time. Afterwards the class chat stays open, and you can watch the class again for a week."
 msgstr "Te guío en tiempo real. Después, el chat de la clase sigue abierto y puedes volver a ver la clase durante una semana."

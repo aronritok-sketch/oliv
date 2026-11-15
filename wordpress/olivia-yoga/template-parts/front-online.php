@@ -36,7 +36,8 @@ $needs  = array(
 );
 $steps  = array(
 	array( __( 'Choose a class', 'olivia-yoga' ), __( 'Book from the timetable with a drop-in or a class pass.', 'olivia-yoga' ) ),
-	array( __( 'Get the link', 'olivia-yoga' ), __( 'Your own link comes by email and is waiting in your account. It opens in the browser.', 'olivia-yoga' ) ),
+	// Olívia, 15 November: „írjuk oda, hogy nem kell semmit letöltenie”
+	array( __( 'Get the link', 'olivia-yoga' ), __( 'Your own link comes by email and is waiting in your account. It opens in your browser, there is nothing to download.', 'olivia-yoga' ) ),
 	array( __( 'Roll out your mat', 'olivia-yoga' ), __( 'Charge your device and join a few minutes early, so we can say hello before we start.', 'olivia-yoga' ) ),
 	array( __( 'Practice together, live', 'olivia-yoga' ), __( 'I guide you in real time. Afterwards the class chat stays open, and a group class can be watched again for a week: only I am on the recording, nobody else.', 'olivia-yoga' ) ),
 );

@@ -951,3 +951,20 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 /* Olívia, 15 November: „az egész oldalon, mindenhol ahol quicksand betűtípus van, Cabint szeretnék helyette!” */
 :root { --f-text: "Cabin", "Quicksand", "Nunito", "Segoe UI", system-ui, sans-serif; }
 
+/* „az árak … asztalin és mobilon is legyen lenyitható, külön szolgáltatásokra. Egyszerre csak 1 legyen itt is lenyitva”:
+   site.js turns each service's title into a button; a closed service shows only its title row, with the round plus */
+.oys-pricing--fold { display: grid; gap: .75rem; }
+.oys-pricing--fold .price-group { display: block; margin: 0; padding: 0; border: 0; border-radius: 22px; background: var(--card, #fff); box-shadow: var(--shadow); overflow: hidden; }
+.oys-pricing--fold .price-group__head { position: static; display: block; padding: 0; }
+.oys-pricing--fold .price-group__head h3 { margin: 0; font-size: clamp(1.25rem, 1.05rem + .9vw, 1.7rem); }
+.oys-pricing--fold .price-group__toggle { display: flex; align-items: center; justify-content: space-between; gap: 1rem; width: 100%; margin: 0; padding: 1.1rem 1.3rem; border: 0; background: none; font: inherit; color: inherit; text-transform: inherit; letter-spacing: inherit; text-align: left; cursor: pointer; }
+.oys-pricing--fold .price-group__toggle:hover { color: var(--orchid); }
+.oys-pricing--fold .price-group__toggle:focus-visible { outline: 2px solid var(--orchid); outline-offset: -4px; border-radius: 22px; }
+.oys-pricing--fold .price-group__toggle .oj-fold__icon { position: relative; display: block; flex: none; width: 34px; height: 34px; border-radius: 50%; background: var(--lilac-soft); transition: transform .3s var(--ease), background-color .2s; }
+.oys-pricing--fold .price-group__toggle .oj-fold__icon::before, .oys-pricing--fold .price-group__toggle .oj-fold__icon::after { content: ""; position: absolute; left: 50%; top: 50%; width: 13px; height: 1.6px; margin: -.8px 0 0 -6.5px; border-radius: 2px; background: var(--ink); }
+.oys-pricing--fold .price-group__toggle .oj-fold__icon::after { transform: rotate(90deg); }
+.oys-pricing--fold .price-group.is-open .oj-fold__icon { transform: rotate(45deg); background: var(--pink); }
+.oys-pricing--fold .price-group:not(.is-open) .price-group__head > :not(h3), .oys-pricing--fold .price-group:not(.is-open) > :not(.price-group__head) { display: none; }
+.oys-pricing--fold .price-group.is-open .price-group__head > :not(h3) { margin: 0 1.3rem .9rem; }
+.oys-pricing--fold .price-group.is-open .price-group__cards { padding: 0 1.3rem 1.3rem; }
+

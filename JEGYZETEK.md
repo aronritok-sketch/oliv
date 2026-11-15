@@ -428,6 +428,12 @@
   „Így működik” listáján is így van.
 - **3.11.58:** az online oldal szövegbetűje Cabin a Quicksand helyett, mindenhol („mindenhol ahol quicksand betűtípus van,
   Cabint szeretnék helyette”). A címek Anton betűje maradt, a többi oldal Quicksandje is.
+- **3.11.59:** Olívia 11.15-i doksija:
+  - az árlista (főoldal és Bejelentkezés és árak) szolgáltatásonként lenyitható, asztalin és mobilon is; egyszerre egy
+    van nyitva, az első alapból; a megérintett cím a helyén marad, ha a fölötte lévő bezárul;
+  - a „Megkapod a linket” lépés: „…a böngésződben nyílik meg, nem kell semmit letöltened”;
+  - a „Tényleg működik a csoportos jóga online?” kérdés lekerült a főoldalról (a GYIK-oldalon megmarad; migráció
+    2026-11-15g).
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
