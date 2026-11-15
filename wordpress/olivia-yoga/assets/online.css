@@ -792,11 +792,14 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
    text now. „A vonalak helyett itt is legyen valami kerek, körös, letisztult megoldás”: instead of a short line, a soft circle
    in the site's colours peeks out from behind the start of each title, like the circles in the corners of the boxes */
 .places li { grid-template-columns: 1fr; gap: 0; }
-.places li > div { position: relative; isolation: isolate; padding-top: .35rem; }
-.places li > div::before { content: ""; position: absolute; z-index: -1; left: -.65rem; top: -.2rem; width: 2.6rem; height: 2.6rem; border-radius: 50%; background: color-mix(in srgb, var(--lilac) 55%, #fff); }
-.places li:nth-child(4n + 2) > div::before { background: color-mix(in srgb, var(--pink) 42%, #fff); }
-.places li:nth-child(4n + 3) > div::before { background: var(--sage); }
-.places li:nth-child(4n) > div::before { background: color-mix(in srgb, var(--sun) 48%, #fff); }
+.places li { grid-template-columns: 1.15rem minmax(0, 1fr); column-gap: .85rem; }
+/* Olívia, 15 November: „az irány jó, de nem tetszik, hogy belelóg a szövegbe a kör, telón se néz ki jól” – the circle stands
+   before the title, level with its first line, and never under the letters */
+.places li::before { content: ""; grid-column: 1; grid-row: 1; align-self: start; width: 1.15rem; height: 1.15rem; margin-top: .2rem; border-radius: 50%; background: color-mix(in srgb, var(--lilac) 70%, #fff); }
+.places li:nth-child(4n + 2)::before { background: color-mix(in srgb, var(--pink) 55%, #fff); }
+.places li:nth-child(4n + 3)::before { background: var(--sage); }
+.places li:nth-child(4n)::before { background: color-mix(in srgb, var(--sun) 60%, #fff); }
+.places li > div { grid-column: 2; }
 .places h3 { margin-top: 0; }
 .entry .oj-area > p:empty, .entry .oj-area > br:first-child { display: none; }
 

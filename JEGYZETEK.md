@@ -423,6 +423,9 @@
 - **3.11.56:** sitemap a Search Console-hoz (Áron, 11.15.). A „noindex” oldalak kimaradnak a `wp-sitemap.xml`-ből
   (Foglalás, Fiókom), különben a GSC hibát jelez. Az online oldalon a bővítmény angol „Teachers” oldala is noindex lett,
   és kikerült a sitemapből. Két dátumfüggő teszt (egy vasárnap éjjeli átfedés) 9 nappal előre foglal.
+- **3.11.57:** Olívia 11.15-i doksija: a pontok előtti kerek jel nem lóg bele a cím szövegébe, a cím előtt áll külön
+  („az irány jó, de nem tetszik, hogy belelóg a szövegbe a kör, telón se néz ki jól”). A főoldal „Miért jó online” és
+  „Így működik” listáján is így van.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
