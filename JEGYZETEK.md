@@ -633,12 +633,25 @@
   - **„Itt folyamatábra helyett legyen valami kreatív hullám”** (a flow óra „Mi történik…” része): egy hullám fut a
     lépések fölött, ahogy az óra halad. Csendes érkezés, emelkedés a bemelegítésen és a flow-n át, a figyelem a tetőn,
     lecsendesedés a végén. A számok a hullámon ülnek, telefonon a hullám oldalt fut lefelé.
-  - **Nyitott (következő kör):** „aloldal urleket ellenőrizd mindenhol hogy átírtad-e arra ami az oldalcím/h1”.
+  - **Következő kör (3.11.79):** „aloldal urleket ellenőrizd mindenhol hogy átírtad-e arra ami az oldalcím/h1”.
     - Eltérők élesben: `gyik`, `aszf`, `adatvedelem`, és az óraoldalak (`hatha-flow`, `kismamatorna`, `stretching`,
       `relaxacio-legzes`).
     - Az óraoldalak címét a kód sok helyen kulcsként használja (a bővítmény szolgáltatásai is), ezért ezt külön, óvatos
       körben kell átírni, a régi címekről 301-gyel.
   - Tesztek: 1320/0.
+- **3.11.79:** „aloldal urleket ellenőrizd mindenhol hogy átírtad-e arra ami az oldalcím/h1”.
+  - GYIK: `/gyik/` → `/gyakori-kerdesek/` (a migráció átnevezi és a linkeket is átírja, rev `2026-11-15q`).
+  - Óraoldalak, nyilvános címek (`OY_ONLINE_CLASS_PATHS`):
+    - `/online-orak/csoportos-online-flow-joga/`
+    - `/online-orak/online-kismamatorna/`
+    - `/online-orak/online-stretching-es-mobilizacio/`
+    - `/online-orak/relaxacio-es-legzes/`
+  - Az órák belső neve (post_name) nem változott: a foglalások és a bővítmény ezen ismerik őket (`class_slug` az
+    adatbázisban). Csak a permalink (`post_type_link`) és a kérés-feldolgozás (`request`) fordít.
+  - A régi címek 301-gyel átirányítanak, a régi `/online-jogaorak/{óra}/` is egy lépésben.
+  - Az `aszf` és az `adatvedelem` maradt: rövid, bevett jogi címek, és e-mailek, valamint a fizetés hivatkozik rájuk.
+  - A naplóbejegyzések rövidített címei maradtak.
+  - Tesztek: 1321/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

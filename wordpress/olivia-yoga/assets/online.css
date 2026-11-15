@@ -1371,11 +1371,11 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .page-head--flow h1, .page-head--flow .lead, .page-head--pre h1, .page-head--pre .lead, .page-head--mob h1, .page-head--mob .lead { color: #fff; }
 
 /* „ezekkel is igazodjunk az új színeinkhez” – the „which class” boxes (prices page, classes page): each class in its colour */
-.entry .oj-guide__box[href*="/hatha-flow/"] { --bg: #fff; --edge: var(--hue-flow); }
-.entry .oj-guide__box[href*="/kismamatorna/"] { --bg: var(--pink-soft); --edge: var(--hue-pre); }
+.entry .oj-guide__box[href*="/hatha-flow/"], .entry .oj-guide__box[href*="/csoportos-online-flow-joga/"] { --bg: #fff; --edge: var(--hue-flow); }
+.entry .oj-guide__box[href*="/kismamatorna/"], .entry .oj-guide__box[href*="/online-kismamatorna/"] { --bg: var(--pink-soft); --edge: var(--hue-pre); }
 .entry .oj-guide__box[href*="/egyeni-online-joga/"] { --bg: var(--lilac-soft); --edge: var(--hue-one); }
-.entry .oj-guide__box[href*="/stretching/"] { --bg: color-mix(in srgb, var(--hue-mob) 12%, #fff); --edge: var(--hue-mob); }
-.entry .oj-guide__box[href*="/relaxacio-legzes/"] { --bg: var(--sun-soft); --edge: var(--sun); }
+.entry .oj-guide__box[href*="/stretching/"], .entry .oj-guide__box[href*="/online-stretching-es-mobilizacio/"] { --bg: color-mix(in srgb, var(--hue-mob) 12%, #fff); --edge: var(--hue-mob); }
+.entry .oj-guide__box[href*="/relaxacio-legzes/"], .entry .oj-guide__box[href*="/relaxacio-es-legzes/"] { --bg: var(--sun-soft); --edge: var(--sun); }
 /* „itt is használd a színpalettánkat”, „igazodjunk a színekhez mindenhol!!!” – the small sets (who it is for, why, the kit, the
    prenatal tiles, About's boxes): Tangerine Dream, Magenta Bloom, Bright Gold and Evergreen instead of the light sage */
 .oj-fit__item--sage { --bg: color-mix(in srgb, var(--forest) 6%, #fff); --edge: color-mix(in srgb, var(--forest) 45%, #fff); --dot: var(--forest); }

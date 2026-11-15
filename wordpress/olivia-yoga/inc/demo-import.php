@@ -1063,7 +1063,7 @@ function oy_arrow_marks( $html ) {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-15p';
+	$rev = '2026-11-15q';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1073,7 +1073,7 @@ function oy_migrate_1114d() {
 	// follows; the old addresses redirect (inc/edition.php). The page editor keys her edits by their text without the links,
 	// so they stay.
 	$log   = array();
-	$moved = array( 'orarend-es-arak' => 'bejelentkezes-es-arak', 'online-jogaorak' => 'online-orak' );
+	$moved = array( 'orarend-es-arak' => 'bejelentkezes-es-arak', 'online-jogaorak' => 'online-orak', 'gyik' => 'gyakori-kerdesek' );
 	foreach ( $moved as $from => $to ) {
 		$pg = get_page_by_path( $from );
 		if ( $pg && ! get_page_by_path( $to ) ) {

@@ -32,7 +32,7 @@ const OY_ONLINE_SLUGS = array(
 	'yoga-classes'     => 'online-orak',
 	'private-yoga'     => 'online-orak', // Olivia, 11.12: the private sessions page went into the classes page
 	'schedule-pricing' => 'bejelentkezes-es-arak',
-	'faq'              => 'gyik',
+	'faq'              => 'gyakori-kerdesek', // Olívia, 15 November: „aloldal urleket ellenőrizd mindenhol” – after its title
 	'contact'          => 'kapcsolat',
 	'journal'          => 'jogarol', // „Jógáról” (Olivia, 11.12; was „Napló”)
 );
@@ -49,7 +49,51 @@ const OY_ONLINE_MOVED = array(
 	'hatha-flow-vs-slow-flow'       => array( 'page', 'journal' ),
 	'orarend-es-arak'               => array( 'page', 'schedule-pricing' ),
 	'online-jogaorak'               => array( 'page', 'yoga-classes' ),
+	'gyik'                          => array( 'page', 'faq' ),
 );
+
+/**
+ * Olívia, 15 November: „aloldal urleket ellenőrizd mindenhol hogy átírtad-e arra ami az oldalcím/h1” – the public addresses
+ * of the class pages follow their titles. The class keeps its own name inside (the bookings and the booking plugin know the
+ * classes by it), only the address it is shown at changes; the old address leads to the new one.
+ */
+const OY_ONLINE_CLASS_PATHS = array(
+	'hatha-flow'       => 'csoportos-online-flow-joga',
+	'kismamatorna'     => 'online-kismamatorna',
+	'stretching'       => 'online-stretching-es-mobilizacio',
+	'relaxacio-legzes' => 'relaxacio-es-legzes',
+);
+
+add_filter( 'post_type_link', function ( $link, $post ) {
+	if ( 'oy_class' === $post->post_type && oy_online_only() && isset( OY_ONLINE_CLASS_PATHS[ $post->post_name ] ) ) {
+		$link = str_replace( '/' . $post->post_name . '/', '/' . OY_ONLINE_CLASS_PATHS[ $post->post_name ] . '/', $link );
+	}
+	return $link;
+}, 10, 2 );
+
+add_filter( 'request', function ( $vars ) {
+	if ( ! empty( $vars['oy_class'] ) && is_string( $vars['oy_class'] ) && oy_online_only() ) {
+		$key = array_search( $vars['oy_class'], OY_ONLINE_CLASS_PATHS, true );
+		if ( false !== $key ) {
+			$vars['oy_class'] = $key;
+			$vars['name']     = $key;
+		}
+	}
+	return $vars;
+} );
+
+add_action( 'template_redirect', function () {
+	if ( ! is_singular( 'oy_class' ) || ! oy_online_only() ) {
+		return;
+	}
+	$name = (string) get_post_field( 'post_name', get_queried_object_id() );
+	$path = (string) wp_parse_url( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_PATH );
+	if ( isset( OY_ONLINE_CLASS_PATHS[ $name ] ) && str_contains( $path, '/' . $name . '/' ) ) {
+		$query = (string) wp_parse_url( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_QUERY );
+		wp_safe_redirect( get_permalink() . ( '' !== $query ? '?' . $query : '' ), 301 );
+		exit;
+	}
+}, 1 );
 
 // The journal posts of the online edition first had their English addresses (2026-11-12, first day live): the
 // Hungarian ones are better for search, the old ones redirect.
@@ -103,7 +147,8 @@ add_action( 'template_redirect', function () {
 		$to = array( 'path', 'jogarol/' . substr( $path, 6 ) );
 	}
 	if ( ! $to && str_starts_with( $path, 'online-jogaorak/' ) ) { // the class pages: /online-jogaorak/{class}/ → /online-orak/{class}/
-		$to = array( 'path', 'online-orak/' . substr( $path, 16 ) );
+		$cls = substr( $path, 16 );
+		$to  = array( 'path', 'online-orak/' . ( OY_ONLINE_CLASS_PATHS[ $cls ] ?? $cls ) );
 	}
 	if ( $to ) {
 		$url = 'class' === $to[0] ? oy_class_url( $to[1] ) : ( 'anchor' === $to[0] ? oy_page_link( 'yoga-classes', $to[1] ) : ( 'path' === $to[0] ? home_url( '/' . $to[1] . '/' ) : oy_page_link( $to[1] ) ) );
