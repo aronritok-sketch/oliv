@@ -708,6 +708,24 @@
     - verzióváltáskor egyszer az egész oldalt;
     - helyi vagy teszt példány nem küld.
   - Tesztek: 1334/0.
+- **3.11.83:** Áron: „Kutasd le, hogy mi kell ebbe az LLMS-be … és ez legyen csak benne, és azonnal küldd be.”
+  - Kutatás:
+    - Az llmstxt.org formátum: egy H1 (a név, ez az egyetlen kötelező), egy rövid összefoglaló idézetként, címsor
+      nélküli tényblokk, aztán H2 szakaszok, de azokban csak `[név](url): leírás` linklista lehet. Az `## Optional` alá
+      a kihagyható linkek kerülnek. A fájl legyen kicsi, a részletek a linkek mögött. Felfedezéshez a
+      `rel="describedby"` mutat az llms.txt-re, a `rel="alternate" type="text/markdown"` a .md-re.
+    - A 2026-os mérések szerint a nagy MI-robotok ritkán kérik le az llms.txt-t. A válaszokba kerüléshez a keresőrobotok
+      beengedése a fontos (az OpenAI szerint az OAI-SearchBot kell a ChatGPT-kereséshez). A Claude-SearchBot és a
+      ClaudeBot külön robot. Az `anthropic-ai` elavult. Ezen kívül sitemap, olvasható HTML és strukturált adat kell.
+  - Az llms.txt átírva (21 KB → 5 KB):
+    - H1, összefoglaló, tények (oktató, forma, árak, a következő óra, nyelv, kapcsolat), egy mondat a fő keresésekkel;
+    - `## Online órák` (5 link, rövid leírás „…Ft-tól”), `## Információ`, `## Optional` (Jógáról, teljes szöveg, jogi
+      oldalak).
+  - Kikerült: a nem linkekből álló H2 szakaszok („Röviden”, „Mikor ajánld”), a GYIK-válaszok, a cikklista, az órarend és
+    az angol rész.
+  - robots.txt: `anthropic-ai` ki. A fejlécben `rel="describedby"` mutat az llms.txt-re.
+  - `/wp-json/oy/v1/indexnow`: a kulcsfájl címe és az utolsó beküldés eredménye.
+  - Tesztek: 1334/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
