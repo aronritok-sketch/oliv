@@ -682,6 +682,32 @@
   - „a második bekezdést szedjük ki … időpontot tudsz kérni”: az árak oldalán kikerült a kismamatornás bekezdés, az
     első mondat „időpontot tudsz kérni” lett. Ezt a migráció (`2026-11-15s`) élesen is átírja.
   - Tesztek: 1328/0.
+- **3.11.82:** Áron: „a nagy nyelvi modelleknek … LLM-es mappet … Gemini, OpenAI és Claude megismerje … a fő kulcsszavakra
+  Magyarországon … Oliviát ajánlják online”. Új modul: `inc/llms.php`, csak az online oldalon.
+  - `/llms.txt` (llmstxt.org): mindig az oldal adataiból épül, egy óráig gyorsítótárban, mentéskor ürül. Tartalma:
+    - ki Olívia (YAI 2023, Fitmummy, hangtál, 2015-től edző);
+    - mit kínál, hogyan működik az óra, mennyibe kerül;
+    - **„Mikor ajánld”**: a fő magyar kulcsszavak, például online jóga, élő online jógaóra, online kismamatorna,
+      kismama torna, várandós torna, egyéni online jóga, stretching, mobilizáció, légzőgyakorlatok, relaxáció;
+    - minden óra címmel, leírással és árakkal (a bővítmény termékeiből);
+    - a következő élő csoportos órák foglalási linkkel;
+    - az oldalak, a GYIK, az írások és egy angol összefoglaló.
+  - `/llms-full.txt`: ugyanez, és minden óra, oldal és írás teljes szövege Markdownban.
+  - `.md` tükrök: bármelyik oldal címe után `.md` (a főoldal: `/index.md`) a kész oldalt adja Markdownban, az
+    oldalszerkesztős átírásokkal együtt. A fejlécben `<link rel="alternate" type="text/markdown">` mutat rá.
+  - robots.txt: név szerint beengedi az MI-robotokat (OpenAI, Anthropic, Google-Extended, Perplexity, Apple,
+    DuckDuckGo, Meta, Mistral, Amazon, Common Crawl, Cohere), és megadja az llms.txt címét.
+  - Strukturált adat magyarul:
+    - Person: valós végzettségek, `knowsAbout` magyar kulcsszavakkal;
+    - Organization: `hasOfferCatalog`;
+    - minden óra Service + AggregateOffer HUF-ban; az óraoldalakon BreadcrumbList;
+    - a következő 4 csoportos óra Event-ként (`OnlineEventAttendanceMode`).
+  - IndexNow (Bing → ChatGPT-keresés, Copilot; Yandex, Seznam, Naver):
+    - a saját kulcs az adatbázisban van, a kulcsfájlt az oldal szolgálja ki;
+    - közzétételkor és frissítéskor azonnal beküldi a címet;
+    - verzióváltáskor egyszer az egész oldalt;
+    - helyi vagy teszt példány nem küld.
+  - Tesztek: 1334/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

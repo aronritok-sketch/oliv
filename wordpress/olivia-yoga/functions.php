@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OY_VERSION', '3.11.81' );
+define( 'OY_VERSION', '3.11.82' );
 
 require_once get_template_directory() . '/inc/edition.php';
 
@@ -19,6 +19,7 @@ require_once get_template_directory() . '/inc/content-types.php';
 require_once get_template_directory() . '/inc/shortcodes.php';
 require_once get_template_directory() . '/inc/seo.php';
 require_once get_template_directory() . '/inc/login.php';
+require_once get_template_directory() . '/inc/llms.php';
 // Szerkesztés a weboldalon (Olivia, 11.13): only on her Hungarian sites, not the US one or the Hathaflow demo
 add_filter( 'oye_enabled', fn( $on ) => $on && ( oy_online_only() || 'hu' === oy_default_lang() ) && ! oy_is_demo() );
 require_once get_template_directory() . '/inc/page-editor.php';
