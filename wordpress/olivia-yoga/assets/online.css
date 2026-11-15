@@ -1118,14 +1118,16 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .entry .oj-flow__n { position: relative; z-index: 1; display: grid; place-items: center; width: 2.7rem; height: 2.7rem; border-radius: 50%; background: color-mix(in srgb, var(--c) 60%, #fff); color: var(--ink); font-family: var(--f-display); font-size: 1.3rem; line-height: 1; }
 .entry ol.oj-flow > li > p { margin: 0; padding: .8rem 1rem; border-radius: 16px; background: color-mix(in srgb, var(--s) 75%, #fff); font-size: .97rem; line-height: 1.55; }
 .entry .oj-flow__note { margin: -.4rem 0 1.6rem; }
+/* up to four steps side by side on a wider screen; five or more stay one under the other (a timeline), they would be too narrow */
 @media (min-width: 760px) {
-	.entry ol.oj-flow { gap: 1.4rem; }
+	.entry ol.oj-flow:not(.oj-flow--n5) { gap: 1.4rem; }
 	.entry ol.oj-flow--n2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 	.entry ol.oj-flow--n3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 	.entry ol.oj-flow--n4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-	.entry ol.oj-flow > li { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-content: stretch; gap: .75rem; }
-	.entry ol.oj-flow > li:not(:last-child)::after { left: 3.1rem; right: -1.1rem; top: 1.35rem; bottom: auto; border-left: 0; border-top: 2px dashed color-mix(in srgb, var(--c) 70%, transparent); }
-	.entry ol.oj-flow > li > p { align-self: stretch; }
+	.entry ol.oj-flow:not(.oj-flow--n5) > li { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto 1fr; align-content: stretch; gap: .75rem; }
+	.entry ol.oj-flow:not(.oj-flow--n5) > li:not(:last-child)::after { left: 3.1rem; right: -1.1rem; top: 1.35rem; bottom: auto; border-left: 0; border-top: 2px dashed color-mix(in srgb, var(--c) 70%, transparent); }
+	.entry ol.oj-flow:not(.oj-flow--n5) > li > p { align-self: stretch; }
+	.entry ol.oj-flow--n5 > li > p { align-self: center; }
 }
 
 /* Home, the one-to-one block's four cards (Olívia, 15 November: „ezek legyenek kicsit szebbek”): no edge line, a soft fade

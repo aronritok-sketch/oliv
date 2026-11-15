@@ -396,7 +396,7 @@ function oy_lines( $html ) {
 
 /**
  * Olívia, 15 November: „Az ilyen leírásokból jöhet egy folyamatábra vagy lépésről lépésre ábra az összes aloldalra” – the
- * paragraph under „Hogyan működik?”, „Mi történik …?” or „Mit csinálunk egy órán?” becomes numbered steps: her lines (line
+ * paragraph under „Hogyan működik?”, „Hogyan zajlik…?”, „Mi történik …?” or „Mit csinálunk egy órán?” becomes numbered steps: her lines (line
  * breaks) are the steps; a one-sentence description is cut at its „, utána” / „, majd” / „, végül”, keeping her words. What
  * follows the first sentence stays under the steps. Fewer than two steps: as it is.
  */
@@ -417,7 +417,7 @@ function oy_flow_steps( $inner, $heading = '' ) {
 
 function oy_flows( $html ) {
 	return (string) preg_replace_callback(
-		'#(<h2[^>]*>\s*((?:Hogyan működik|Mi történik|Mit csinálunk)[^<]*)</h2>\s*)<p>((?:(?!</p>).)+)</p>((?:\s*<p>(?:(?!</p>).)+</p>)*)#su',
+		'#(<h2[^>]*>\s*((?:Hogyan működik|Hogyan zajlik|Mi történik|Mit csinálunk)[^<]*)</h2>\s*)<p>((?:(?!</p>).)+)</p>((?:\s*<p>(?:(?!</p>).)+</p>)*)#su',
 		function ( $m ) {
 			$st = oy_flow_steps( $m[3], trim( $m[2] ) );
 			if ( ! $st ) {
@@ -433,7 +433,7 @@ function oy_flows( $html ) {
 			foreach ( $st[0] as $i => $l ) {
 				$li .= '<li><span class="oj-flow__n" aria-hidden="true">' . ( $i + 1 ) . '</span><p>' . $l . '</p></li>';
 			}
-			return $m[1] . '<ol class="oj-flow oj-flow--n' . min( 4, count( $st[0] ) ) . '">' . $li . '</ol>' . ( '' !== $st[1] ? '<p class="oj-flow__note">' . $st[1] . '</p>' : '' ) . $after;
+			return $m[1] . '<ol class="oj-flow oj-flow--n' . min( 5, count( $st[0] ) ) . '">' . $li . '</ol>' . ( '' !== $st[1] ? '<p class="oj-flow__note">' . $st[1] . '</p>' : '' ) . $after;
 		},
 		$html
 	);

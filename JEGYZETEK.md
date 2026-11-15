@@ -487,6 +487,9 @@
     - „A matracon túl” végén ötödik kép is van (henna).
   - **Főoldal:** a kismama-csempék pasztellzöldek, az egyéni blokk négy kártyája szebb, a lábléc „Bejelentkezés és árak”.
   - Migráció: 2026-11-15n. Tesztek: 1297/0.
+- **3.11.67:** Online órák, „Hogyan zajlik egy élő online óra?” („itt is legyen meg a szokásos folyamatábra, az jó lett”):
+  ez is lépés-ábra lett. Négynél több lépésnél asztalon is egymás alatt marad, idővonalként, mert egymás mellett túl keskeny
+  lenne. Tesztek: 1297/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
