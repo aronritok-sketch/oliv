@@ -490,6 +490,12 @@
 - **3.11.67:** Online órák, „Hogyan zajlik egy élő online óra?” („itt is legyen meg a szokásos folyamatábra, az jó lett”):
   ez is lépés-ábra lett. Négynél több lépésnél asztalon is egymás alatt marad, idővonalként, mert egymás mellett túl keskeny
   lenne. Tesztek: 1297/0.
+- **3.11.68:**
+  - Bejelentkezés és árak, „Jó tudni”: a „Lemondás:” és az „Új vagy a jógában?” bekezdés saját kártyát kapott
+    (ikon, címke, szöveg), asztalon egymás mellett („ezek is külön legyenek szebben kiemelve”).
+  - A sortöréses doboz nem lehet rózsaszín közvetlenül a rózsaszín „titok” cetli előtt, ilyenkor zöld („ez legyen más
+    színű”).
+  - Tesztek: 1299/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

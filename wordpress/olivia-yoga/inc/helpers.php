@@ -293,6 +293,23 @@ function oy_pricing_design( $html ) {
 		$html,
 		1
 	);
+	// 1c. „Lemondás: …”, „Új vagy a jógában? …” – paragraphs that start with a bold label become cards of their own, side by
+	// side (Olívia, 15 November: „ezek is külön legyenek szebben kiemelve”)
+	$html = (string) preg_replace_callback(
+		'#(?:\s*<p><strong>[^<]{2,40}</strong>(?:(?!</p>).)+</p>)+#s',
+		function ( $g ) {
+			preg_match_all( '#<p><strong>([^<]{2,40})</strong>\s*((?:(?!</p>).)+)</p>#s', $g[0], $ps, PREG_SET_ORDER );
+			$tones = array( 'sun', 'lilac', 'sage', 'pink' );
+			$out   = '';
+			foreach ( $ps as $i => $p ) {
+				$label = rtrim( trim( $p[1] ), ':' );
+				$icon  = preg_match( '#lemond|bérlet#iu', $label ) ? 'calendar' : ( preg_match( '#\?$#u', $label ) ? 'leaf' : 'check' );
+				$out  .= '<div class="oj-keynote oj-keynote--' . $tones[ $i % 4 ] . '"><span class="oj-keynote__icon" aria-hidden="true">' . oy_icon( $icon ) . '</span><div><p class="oj-keynote__label">' . $label . '</p><p>' . trim( $p[2] ) . '</p></div></div>';
+			}
+			return "\n" . '<div class="oj-keynotes">' . $out . '</div>';
+		},
+		$html
+	);
 	// 2. the one-to-one classes as boxes
 	$private = array_filter( array( 'egyeni-online-joga', oy_prenatal_slug(), 'stretching', 'relaxacio-legzes' ), fn( $s ) => (bool) get_page_by_path( $s, OBJECT, 'oy_class' ) );
 	$classes = get_page_by_path( oy_page_slug( 'yoga-classes' ) );
@@ -386,7 +403,12 @@ function oy_lines( $html ) {
 		if ( count( $lines ) < 2 ) {
 			continue;
 		}
-		$box  = '<div class="oj-lines oj-lines--' . $tones[ $n % 4 ] . '">' . implode( '', array_map( fn( $l ) => '<p>' . $l . '</p>', $lines ) ) . '</div>';
+		$tone = $tones[ $n % 4 ];
+		// not pink right before the pink note („És egy kis titok”) – Olívia: „tetszik így minden de ez legyen más színű”
+		if ( 'pink' === $tone && preg_match( '#^\s*<div class="oj-secret#', substr( $html, $pos + strlen( $m[0][0] ), 80 ) ) ) {
+			$tone = 'sage';
+		}
+		$box  = '<div class="oj-lines oj-lines--' . $tone . '">' . implode( '', array_map( fn( $l ) => '<p>' . $l . '</p>', $lines ) ) . '</div>';
 		$out .= substr( $html, $at, $pos - $at ) . $box;
 		$at   = $pos + strlen( $m[0][0] );
 		++$n;
