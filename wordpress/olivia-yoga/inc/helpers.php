@@ -6,6 +6,9 @@
 defined( 'ABSPATH' ) || exit;
 
 const OY_ACCENTS = array( 'lilac', 'pink', 'sun', 'sage' );
+// The online class pages whose head colour Olívia chose herself (15 November: „Ez maradjon meg a frozen water színűnek” –
+// the relaxation page; „csoportos flow: evergreen” – with white text; „kismamatorna: tangerine dream”); the rest by seed.
+const OY_ONLINE_HEAD_TONES = array( 'crelaxacio-legzes' => 'lilac', 'chatha-flow' => 'forest', 'ckismamatorna' => 'tangerine' );
 
 function oy_accent_for( $seed ) {
 	$sum = 0;
@@ -753,7 +756,7 @@ function oy_crumbs( array $trail ) {
 }
 
 function oy_page_head( $h1, $lead, array $trail, $seed, $meta = '', $photo = '' ) {
-	$tone = oy_accent_for( $seed );
+	$tone = oy_online_only() && isset( OY_ONLINE_HEAD_TONES[ $seed ] ) ? OY_ONLINE_HEAD_TONES[ $seed ] : oy_accent_for( $seed );
 	$size = mb_strlen( $h1 ) > 34 ? ' page-head--long' : '';
 	// one long word („Ajándékutalvány”) cannot break: smaller, so it never runs into the photo (Olívia, 14 November)
 	$size .= max( array_map( 'mb_strlen', preg_split( '/\s+/u', $h1 ) ?: array( '' ) ) ) >= 13 ? ' page-head--word' : '';
