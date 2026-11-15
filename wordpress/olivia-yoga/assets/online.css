@@ -1472,3 +1472,50 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .price__each { font-size: .92rem; }
 .way--mob .way__pic { background: color-mix(in srgb, var(--tone) 55%, #fff); overflow: hidden; }
 @media (max-width: 640px) { .way--mob .way__pic img, .way--mob .way__pic .photo { object-position: 55% 100% !important; transform: translateY(-30px); } }
+
+/* „jó hullám csak ne legyen ennyire színes” – the wave of the group class keeps its shape, in two colours only: an evergreen
+   line, Bright Gold numbers, the steps on one light card colour */
+.entry ol.oj-flow--wave > li:nth-child(n) { --c: var(--sun); --s: var(--card); }
+.entry ol.oj-flow--wave > li:nth-child(n) .oj-flow__n { color: var(--forest); }
+.entry ol.oj-flow--wave > li > p { background: #fff; box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--forest) 10%, transparent); }
+@media (min-width: 760px) {
+	.entry ol.oj-flow--wave.oj-flow--n4::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 118' preserveAspectRatio='none'%3E%3Cpath d='M0 100C25 100 30 84 50 84C85 84 115 52 150 52C185 52 215 26 250 26C290 26 310 78 350 78C375 78 385 90 400 94' fill='none' stroke='%23002E2C' stroke-opacity='.55' stroke-width='3' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E"); }
+}
+@media (min-width: 1000px) {
+	.entry ol.oj-flow--wave.oj-flow--n5::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 118' preserveAspectRatio='none'%3E%3Cpath d='M0 104C20 104 25 88 40 88C70 88 95 60 120 60C150 60 175 30 200 30C225 30 255 38 280 38C310 38 335 82 360 82C380 82 390 94 400 98' fill='none' stroke='%23002E2C' stroke-opacity='.55' stroke-width='3' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E"); }
+}
+@media (max-width: 999px) {
+	.entry ol.oj-flow--wave > li:not(:last-child)::before { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 40' preserveAspectRatio='none'%3E%3Cpath d='M8 0C16 10 0 30 8 40' fill='none' stroke='%23002E2C' stroke-opacity='.45' stroke-width='2.5' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E"); }
+}
+
+/* „ez legyen sárga” – the breath box on the relaxation page (and every box of lines in that tone) */
+.entry .oj-lines--lilac { --tone: var(--sun); --soft: var(--sun-soft); }
+
+/* „minden aloldalon az árak legyenek sárgák és ez a szín vagy magenta” – on the class pages the price for one is Bright Gold,
+   the price for two keeps its magenta; on the prices page every card is yellow (the one-off price light, the passes full),
+   the group pass stays evergreen */
+.oj-price--solo { --bg: var(--sun-soft); --edge: var(--sun); }
+.oj-price--solo::before { background: color-mix(in srgb, var(--sun) 70%, #fff); }
+.price--lilac, .price--paper { --tone: var(--sun-soft); --sub: #4A3A0A; box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--sun) 60%, transparent); }
+
+/* the old sage page heads (Online órák, Rólam, Jógáról, Impresszum, some posts) get the palette's magenta instead */
+.page-head--sage { --tone: var(--orchid); }
+.page-head--sage h1, .page-head--sage .lead, .page-head--sage .page-head__text, .page-head--sage .eyebrow { color: #fff; }
+
+/* „optimalizálj mindent mobilra … nézd meg az összes gombot” – on a phone every link and button outside running text is at
+   least 44px tall, so a thumb hits it the first time */
+@media (max-width: 759px) {
+	.btn-row .text-link, .section__head .text-link, .oj-private__gift a, .session__class a, .oj-area h3 a, .aside-list a,
+	.footer__contact a, .site-footer nav li a, .footer__bottom a { display: inline-flex; align-items: center; min-height: 44px; }
+	.site-footer nav li, .footer__contact li { margin-block: 0; }
+	.site-footer nav ul, .footer__contact { gap: 0; row-gap: 0; }
+	.aside-list { gap: .1rem; }
+	.oys-private-box__list li { padding: 0; }
+	.oys-private-box__list a { display: flex; align-items: center; min-height: 44px; padding: 0 .9rem; }
+	.oj-modules .oj-fold, .oj-price > summary.oj-price__head, .price .btn, .oys-tabs__nav button, .oys-waiver > summary { min-height: 44px; }
+	.oys-waiver > summary { display: flex; align-items: center; }
+}
+/* five steps side by side leave narrow cards: a little smaller text, long words break instead of running out */
+@media (min-width: 1000px) {
+	.entry ol.oj-flow--wave.oj-flow--n5 > li > p { font-size: .94rem; padding-inline: .8rem; hyphens: auto; overflow-wrap: break-word; }
+}

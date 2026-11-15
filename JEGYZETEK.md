@@ -663,6 +663,25 @@
     telefonon is.
   - „ugyanakkora betűméretek”: a „fejenként” ár akkora, mint az „Egy óra: …” címke.
   - Tesztek: 1323/0.
+- **3.11.81:** Olívia chatje („tesztelj mindent … kérj elfelejtett jelszót”) és a doksi újabb pontjai.
+  - Felhasználói teszt (telefon, tablet, gép): regisztráció → fiók → kilépés → belépés → elfelejtett jelszó végig
+    működik. Új `inc/login.php`: a jelszóképernyők (`wp-login.php`) az oldal kinézetét kapják (logó, paletta, Cabin).
+    Az online oldalon tegezve szólnak, a „Vissza” a Fiókomra visz, nincs nyelvválasztó. A kérés után a „Nézd meg a
+    postafiókod” oldal jön (`lostpassword_redirect` üres), nem némán a Fiókom. Maga a levél is a stúdió levélkinézetét
+    kapja (`retrieve_password_notification_email`).
+  - Mobil: a szövegen kívüli linkek és gombok legalább 44 px magasak (lábléc, „Összes óra”, Rólam kártyák,
+    Kapcsolat linkek, fülek, összecsukók).
+  - „jó hullám csak ne legyen ennyire színes”: a flow óra hulláma két színű lett: zöld vonal, sárga pöttyök, fehér
+    kártyák. Öt lépésnél a szöveg kisebb, és a hosszú szavak törnek.
+  - „ez legyen sárga”: a relaxációs oldal légzéses doboza (`oj-lines--lilac`) sárga.
+  - „minden aloldalon az árak legyenek sárgák és ez a szín vagy magenta”:
+    - az óraoldalakon az egyéni ár sárga, a páros magenta maradt;
+    - a „Bejelentkezés és árak” oldalon minden ár sárga, a csoportos bérlet zöld maradt;
+    - a régi zsályazöld fejlécek (Online órák, Rólam, Jógáról, Impresszum, néhány cikk) magentát kaptak, fehér
+      betűvel.
+  - „a második bekezdést szedjük ki … időpontot tudsz kérni”: az árak oldalán kikerült a kismamatornás bekezdés, az
+    első mondat „időpontot tudsz kérni” lett. Ezt a migráció (`2026-11-15s`) élesen is átírja.
+  - Tesztek: 1328/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

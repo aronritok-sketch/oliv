@@ -559,7 +559,7 @@
 			"seo_title": "Online jóga: bejelentkezés és árak | Élő órák otthonról",
 			"seo_desc": "Csoportos online flow jóga szerdánként 18:30-tól 20:00-ig, magyar idő szerint. Alkalmi jegy 3 000 Ft, 5 alkalmas bérlet 13 000 Ft. Egyéni online jóga 8 000 Ft-tól, kismamatorna 8 000 Ft, stretching 7 000 Ft, relaxáció és légzés 5 000 Ft; párban olcsóbb.",
 			"photo": "olivia-dancer-home",
-			"content": "<h2>Csoportos online flow jóga szerdánként</h2>\n<p>Szerdánként 18:30-tól 20:00-ig, 90 percben. Az első óra 2026. december 16-án lesz; december 23-án nincs óra, utána december 30-án folytatjuk. A gyakorlás alatt részed lesz légzőgyakorlatban, erősítésben, nyújtásban, egyensúlyozásban, flow élményben és relaxációban egyaránt, közben pedig hétköznapi példákon keresztül, elméleti és gyakorlati síkon is jobban megismerkedhetsz a jógikus életvitellel.</p>\n<p>Az időpontok magyar idő szerint értendők. Minden óra élő, itt az oldalon, a böngésződben.</p>\n[oy_schedule]\n<h2>Egyéni online órák</h2>\n<p>Az <a href=\"{{class:egyeni-online-joga}}\">egyéni online jógára</a>, az <a href=\"{{class:kismamatorna}}\">online kismamatornára</a>, a <a href=\"{{class:stretching}}\">stretchingre</a> és a <a href=\"{{class:relaxacio-legzes}}\">relaxációra és légzésre</a> időpontot kérsz, és hamarosan visszaírok. Az árakat lent találod.</p>\n<p>Az online kismamatornába beépül a légzőtorna, gátizomtorna, keringésjavítás, kardiótréning, izomerősítés és súlyzós edzés, gerinctréning, mobilizáció és stretching, jóga és relaxáció. Természetesen nem mind egyetlen órába: ezek kombinációja ad megfelelő felkészülést a szülésre.</p>\n<h2>Árak</h2>\n[oy_pricing]\n<h2 id=\"gift-cards\">Ajándékutalványok</h2>\n<p>Ajándékozz online jóga bérletet, egyéni órát vagy online kismamatornát. Az ajándékutalványt e-mailben kapja meg az, akinek szánod, egy kóddal, amit a fiókjában vált be.</p>\n<p>[oy_gift_link]</p>\n<h2>Jó tudni</h2>\n<h3>Amire szükséged lesz</h3>\n[oy_faq_answer q=\"Mit kell előkészítenem\"]\n<p><strong>Lemondás:</strong> a csoportos órát 12 órával előtte még ingyen lemondhatod, és az alkalom visszakerül a bérletedre. Ha 3 főnél kevesebben jelentkeznek, szólok, és visszakapod az alkalmat. Az egyéni órát 24 órával előtte lehet áttenni vagy lemondani.</p>\n<p><strong>Új vagy a jógában?</strong> Olvasd el a <a href=\"{{page:faq}}\">leggyakoribb kérdéseket</a>, vagy <a href=\"{{page:contact}}\">írj nekem</a> az első órád előtt.</p>",
+			"content": "<h2>Csoportos online flow jóga szerdánként</h2>\n<p>Szerdánként 18:30-tól 20:00-ig, 90 percben. Az első óra 2026. december 16-án lesz; december 23-án nincs óra, utána december 30-án folytatjuk. A gyakorlás alatt részed lesz légzőgyakorlatban, erősítésben, nyújtásban, egyensúlyozásban, flow élményben és relaxációban egyaránt, közben pedig hétköznapi példákon keresztül, elméleti és gyakorlati síkon is jobban megismerkedhetsz a jógikus életvitellel.</p>\n<p>Az időpontok magyar idő szerint értendők. Minden óra élő, itt az oldalon, a böngésződben.</p>\n[oy_schedule]\n<h2>Egyéni online órák</h2>\n<p>Az <a href=\"{{class:egyeni-online-joga}}\">egyéni online jógára</a>, az <a href=\"{{class:kismamatorna}}\">online kismamatornára</a>, a <a href=\"{{class:stretching}}\">stretchingre</a> és a <a href=\"{{class:relaxacio-legzes}}\">relaxációra és légzésre</a> időpontot tudsz kérni, és hamarosan visszaírok. Az árakat lent találod.</p>\n<h2>Árak</h2>\n[oy_pricing]\n<h2 id=\"gift-cards\">Ajándékutalványok</h2>\n<p>Ajándékozz online jóga bérletet, egyéni órát vagy online kismamatornát. Az ajándékutalványt e-mailben kapja meg az, akinek szánod, egy kóddal, amit a fiókjában vált be.</p>\n<p>[oy_gift_link]</p>\n<h2>Jó tudni</h2>\n<h3>Amire szükséged lesz</h3>\n[oy_faq_answer q=\"Mit kell előkészítenem\"]\n<p><strong>Lemondás:</strong> a csoportos órát 12 órával előtte még ingyen lemondhatod, és az alkalom visszakerül a bérletedre. Ha 3 főnél kevesebben jelentkeznek, szólok, és visszakapod az alkalmat. Az egyéni órát 24 órával előtte lehet áttenni vagy lemondani.</p>\n<p><strong>Új vagy a jógában?</strong> Olvasd el a <a href=\"{{page:faq}}\">leggyakoribb kérdéseket</a>, vagy <a href=\"{{page:contact}}\">írj nekem</a> az első órád előtt.</p>",
 			"_replace": [
 				[
 					"<li>Jógaszőnyeg, egy ülőpárna és egy pléd a relaxációhoz</li>",
@@ -572,6 +572,18 @@
 				[
 					"időpontot kérsz, és egy napon belül visszaírok.",
 					"időpontot kérsz, és hamarosan visszaírok."
+				],
+				[
+					"időpontot kérsz, és hamarosan visszaírok. Az árakat lent találod.",
+					"időpontot tudsz kérni, és hamarosan visszaírok. Az árakat lent találod."
+				],
+				[
+					"\n<p>Az online kismamatornába beépül a légzőtorna, gátizomtorna, keringésjavítás, kardiótréning, izomerősítés és súlyzós edzés, gerinctréning, mobilizáció és stretching, jóga és relaxáció. Természetesen nem mind egyetlen órába: ezek kombinációja ad megfelelő felkészülést a szülésre.</p>",
+					""
+				],
+				[
+					"<p>Az online kismamatornába beépül a légzőtorna, gátizomtorna, keringésjavítás, kardiótréning, izomerősítés és súlyzós edzés, gerinctréning, mobilizáció és stretching, jóga és relaxáció. Természetesen nem mind egyetlen órába: ezek kombinációja ad megfelelő felkészülést a szülésre.</p>",
+					""
 				],
 				[
 					"Az órák legalább 3 fővel indulnak.",
