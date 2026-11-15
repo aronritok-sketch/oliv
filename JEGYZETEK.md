@@ -420,6 +420,9 @@
 - **3.11.55:** Rólam: a kis hullámok helyett kerek jelek („ezek a hullámok az egész rólamban bénák”). A fejezetcímek előtt
   és a kiemelt mondat fölött-alatt két kis, egymásba érő kör áll; a fejezetcím utáni vonal elmaradt. A felsorolások
   pontjai az egész oldalon kis színes körök.
+- **3.11.56:** sitemap a Search Console-hoz (Áron, 11.15.). A „noindex” oldalak kimaradnak a `wp-sitemap.xml`-ből
+  (Foglalás, Fiókom), különben a GSC hibát jelez. Az online oldalon a bővítmény angol „Teachers” oldala is noindex lett,
+  és kikerült a sitemapből. Két dátumfüggő teszt (egy vasárnap éjjeli átfedés) 9 nappal előre foglal.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -140,10 +140,33 @@ add_action( 'template_redirect', function () {
 	}
 } );
 
-// Account, booking and checkout-return pages don't belong in search results.
+/**
+ * Pages that don't belong in search results: account, booking and checkout-return; on the online site also the booking
+ * plugin's „Teachers” page (only Olívia teaches there). Áron, 15 November, before adding the sitemap to Search Console:
+ * a page marked noindex must not be in the sitemap either (Search Console reports it as an error).
+ */
+function oy_noindex_page_ids() {
+	$ids = array();
+	foreach ( array( 'book', 'account' ) as $k ) {
+		$ids[] = (int) get_option( 'oys_page_' . $k );
+	}
+	if ( oy_online_only() ) {
+		$t     = get_page_by_path( 'teachers' );
+		$ids[] = $t ? (int) $t->ID : 0;
+	}
+	return array_values( array_filter( $ids ) );
+}
+
 add_filter( 'wp_robots', function ( $robots ) {
-	if ( function_exists( 'oy_is_studio_page' ) && in_array( oy_is_studio_page(), array( 'book', 'account' ), true ) ) {
+	if ( is_page() && in_array( (int) get_queried_object_id(), oy_noindex_page_ids(), true ) ) {
 		$robots['noindex'] = true;
 	}
 	return $robots;
 } );
+
+add_filter( 'wp_sitemaps_posts_query_args', function ( $args, $post_type ) {
+	if ( 'page' === $post_type && oy_noindex_page_ids() ) {
+		$args['post__not_in'] = array_merge( (array) ( $args['post__not_in'] ?? array() ), oy_noindex_page_ids() );
+	}
+	return $args;
+}, 10, 2 );

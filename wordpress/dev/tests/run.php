@@ -1166,7 +1166,9 @@ test( 'upgrade: no dollar-priced default passes on a site in forints', function 
 
 test( 'calendar and weekly classes keep donation and pay-at-the-studio settings', function () {
 	wp_set_current_user( 1 );
-	$date = wp_date( 'Y-m-d', time() + 2 * DAY_IN_SECONDS );
+	// nine days ahead: clear of the sessions other tests create in the next few days (on a Sunday night one landed at 04:52
+	// two days ahead and overlapped)
+	$date = wp_date( 'Y-m-d', time() + 9 * DAY_IN_SECONDS );
 	$req  = new WP_REST_Request( 'POST', '/oys/v1/admin/sessions' );
 	// 05:00: clear of the sample timetable (Thursday and Saturday 07:30), whatever day the tests run on.
 	$req->set_body_params( array( 'kind' => 'group', 'class_slug' => 'hatha-flow', 'date' => $date, 'start' => '05:00', 'duration' => 60, 'capacity' => 10, 'price' => 1000, 'pricing' => 'donation', 'pay_later' => 0, 'repeat' => 'weekly' ) );
@@ -1269,7 +1271,7 @@ test( 'minimum: bring-a-friend email before the decision, once', function () {
 test( 'minimum: set in the calendar, kept by weekly classes', function () {
 	wp_set_current_user( 1 );
 	$req = new WP_REST_Request( 'POST', '/oys/v1/admin/sessions' );
-	$req->set_body_params( array( 'kind' => 'group', 'class_slug' => 'hatha-flow', 'date' => wp_date( 'Y-m-d', time() + 2 * DAY_IN_SECONDS ), 'start' => '06:30', 'duration' => 60, 'capacity' => 10, 'price' => 2500, 'min_people' => 4, 'decide_hours' => 12, 'repeat' => 'weekly' ) );
+	$req->set_body_params( array( 'kind' => 'group', 'class_slug' => 'hatha-flow', 'date' => wp_date( 'Y-m-d', time() + 9 * DAY_IN_SECONDS ), 'start' => '06:30', 'duration' => 60, 'capacity' => 10, 'price' => 2500, 'min_people' => 4, 'decide_hours' => 12, 'repeat' => 'weekly' ) );
 	$res = rest_do_request( $req )->get_data();
 	eq( 4, $res['session']['min_people'], 'minimum saved' );
 	eq( 12, $res['session']['minimum']['hours'], 'decision 12 hours before' );
@@ -3413,6 +3415,16 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	ok( has_action( 'template_redirect' ) && str_contains( (string) file_get_contents( get_template_directory() . '/inc/helpers.php' ), "ob_start( 'oy_main_transform' ); // before the page editor's buffer (1000)" ) && ! str_contains( (string) file_get_contents( get_template_directory() . '/single-oy_class.php' ), 'oy_opening(' ), '… not inside the template, where her edits are not in yet' );
 	$tail = substr( $oc2, (int) strpos( $oc2, '„ezek a hullámok az egész rólamban bénák, módosíts”' ) );
 	ok( str_contains( $tail, '.entry .oj-chapter::after { content: none; }' ) && str_contains( $tail, '-webkit-mask: none; mask: none; }' ) && ! preg_match( '/stroke=|M2 9C7 3/', $tail ), 'About: round marks instead of the small waves – before the chapters, around the statement, in the lists („ezek a hullámok az egész rólamban bénák”)' );
+	$old = get_page_by_path( 'teachers' );
+	$tp  = $old ? (int) $old->ID : wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Teachers', 'post_name' => 'teachers' ) );
+	update_option( 'oy_edition', 'hu-online' );
+	$nix = oy_noindex_page_ids();
+	$sq  = apply_filters( 'wp_sitemaps_posts_query_args', array(), 'page' );
+	update_option( 'oy_edition', 'fort-myers' );
+	ok( in_array( $tp, $nix, true ) && in_array( $tp, (array) ( $sq['post__not_in'] ?? array() ), true ) && ! in_array( $tp, oy_noindex_page_ids(), true ), 'sitemap: the noindex pages (booking, account, and the „Teachers” page on the online site) are not in it' );
+	if ( ! $old ) {
+		wp_delete_post( $tp, true );
+	}
 	$sj = (string) file_get_contents( get_template_directory() . '/assets/site.js' );
 	ok( str_contains( $sj, "window.matchMedia('(max-width: 699px)')" ) && str_contains( $sj, "ul.classList.add('oj-modules--fold')" ) && str_contains( $oc2, '.oj-modules--fold li > span { display: none; }' ), 'the prenatal cards fold on a phone, a tap opens one („ezek legyenek lenyithatóak mert mobilon így túl hosszú lesz”)' );
 	ok( preg_match( '/prefers-reduced-motion: no-preference\) \{[^@]*\.hatha__orb--sun \{[^}]*animation: oj-ha 12s/', $oc2 ) && str_contains( $oc2, '@keyframes oj-ha {' ) && str_contains( $oc2, '@keyframes oj-tha-fill {' ) && str_contains( $fr, '<span class="hatha__word" aria-hidden="true">Hatha</span>' ), 'Ha–Tha: the sun and the moon drift into one circle with HATHA across it, and part again („egyik átmegy a másikba és oda-vissza”); only with motion allowed' );
