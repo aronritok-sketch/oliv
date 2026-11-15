@@ -455,6 +455,10 @@
   - A Fitmummy-oklevél kártyája nagyobb (42% széles, 4:5-ös kép).
   - Új képek: `about-gym-class`, `about-rock-warrior`, `about-meadow-stretch`, `article-fish-pose` (a halpóz a következő
     cikkhez); migráció: 2026-11-15j, egyszer rendez át.
+- **3.11.65:** Rólam, „A matracon túl”: „a szöveg végére meg kisebben ezek a képek jöhetnek” – négy kisebb kép egy sorban
+  (mobilon 2×2) a titok-doboz után, a gomb előtt: Olívia három festménye és egy naplementés fotója. Shortcode:
+  `[oy_figures photos="…" class="oj-duo--row"]`; képek: `about-painting-embrace`, `about-painting-birds`,
+  `about-painting-mask`, `about-sunset-river`; migráció: 2026-11-15k, egyszer szúrja be.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

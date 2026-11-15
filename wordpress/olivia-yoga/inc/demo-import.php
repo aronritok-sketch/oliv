@@ -1030,7 +1030,7 @@ function oy_migrate_1114c() {
  * is still the old one, so whatever she has changed herself stays. Rev e: runs again where rev d already did (idempotent).
  */
 function oy_migrate_1114d() {
-	$rev = '2026-11-15j';
+	$rev = '2026-11-15k';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1114d_rev' ) === $rev ) {
 		return array();
 	}
@@ -1234,11 +1234,28 @@ function oy_migrate_1114d() {
 		if ( ! str_contains( $c, 'photo="journal-15"' ) && preg_match( '~<h2>A matracon túl</h2>\n?~u', $c, $h ) ) {
 			$c = str_replace( $h[0], rtrim( $h[0] ) . "\n" . '[oy_figure photo="journal-15" class="oj-figure--wide"]' . "\n", $c );
 		}
+		// „a szöveg végére meg kisebben ezek a képek jöhetnek”: a row of four smaller photos (three of her paintings and
+		// one at sunset) at the end of the chapter's text – after the little secret, before the button
+		$row = '[oy_figures photos="about-painting-embrace,about-painting-birds,about-painting-mask,about-sunset-river" class="oj-duo--row"]';
+		$h2  = strpos( $c, '<h2>A matracon túl</h2>' );
+		if ( false !== $h2 && ! str_contains( $c, 'about-sunset-river' ) ) {
+			$next = strpos( $c, '<h2', $h2 + 5 );
+			$end  = false === $next ? strlen( $c ) : $next;
+			$sec  = substr( $c, $h2, $end - $h2 );
+			$at   = false;
+			if ( preg_match( '~<div class="oj-secret">.*?</div>\n?~su', $sec, $m, PREG_OFFSET_CAPTURE ) ) {
+				$at = $m[0][1] + strlen( $m[0][0] );
+			} elseif ( preg_match( '~<p>\[oy_booking_link~u', $sec, $m, PREG_OFFSET_CAPTURE ) ) {
+				$at = $m[0][1];
+			}
+			$sec = false === $at ? rtrim( $sec ) . "\n" . $row . "\n" : substr( $sec, 0, $at ) . ( "\n" === substr( $sec, $at - 1, 1 ) ? '' : "\n" ) . $row . "\n" . substr( $sec, $at );
+			$c   = substr( $c, 0, $h2 ) . $sec . substr( $c, $end );
+		}
 		if ( $c !== $orig ) {
 			kses_remove_filters();
 			wp_update_post( wp_slash( array( 'ID' => $about->ID, 'post_content' => $c ) ) );
 			kses_init_filters();
-			$log[] = 'about: the timeline first, photos under „A kezdetek”, „Amikor jött a jóga” and „A matracon túl”';
+			$log[] = 'about: the timeline first, photos under „A kezdetek”, „Amikor jött a jóga” and „A matracon túl”, a row of four at its end';
 		}
 	}
 	// Olívia, 15 November, on „Pajzsmirigy harmonizálás jógával”: „Ebből a cikkből hiányzik a lényeg, a kép” – the poses for

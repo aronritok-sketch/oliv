@@ -881,5 +881,45 @@
    "file": "kovacs-olivia-halpoz-joga",
    "alt": "Kovács Olívia halpózban a jógamatracon"
   }
+ },
+ "about-painting-embrace": {
+  "alt": "Olivia Kovacs' painting: a couple embracing in blue sheets against gold",
+  "pos": "50% 50%",
+  "w": 1200,
+  "h": 1200,
+  "hu": {
+   "file": "kovacs-olivia-festmenye-olelkezo-par-kek-lepedoben",
+   "alt": "Kovács Olívia festménye: összebújó pár kék lepedőben, arany háttér előtt"
+  }
+ },
+ "about-painting-birds": {
+  "alt": "Olivia Kovacs' painting: a woman with white feathers and two small birds",
+  "pos": "50% 40%",
+  "w": 1200,
+  "h": 1408,
+  "hu": {
+   "file": "kovacs-olivia-festmenye-no-feher-tollakkal-es-madarakkal",
+   "alt": "Kovács Olívia festménye: nő fehér tollakkal és két kismadárral"
+  }
+ },
+ "about-painting-mask": {
+  "alt": "Olivia Kovacs' painting in progress: a blue face, a blue hand and bright shapes",
+  "pos": "50% 50%",
+  "w": 1200,
+  "h": 1178,
+  "hu": {
+   "file": "kovacs-olivia-keszulo-festmenye-kek-arc-es-szines-formak",
+   "alt": "Kovács Olívia készülő festménye: kék arc, kék kéz és élénk színű formák"
+  }
+ },
+ "about-sunset-river": {
+  "alt": "Olivia Kovacs smiling at sunset by the river",
+  "pos": "60% 60%",
+  "w": 1200,
+  "h": 1523,
+  "hu": {
+   "file": "kovacs-olivia-naplementeben-a-folyoparton",
+   "alt": "Kovács Olívia mosolyog naplementében a folyóparton"
+  }
  }
 }

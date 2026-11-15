@@ -373,7 +373,9 @@ add_action( 'init', function () {
 	add_shortcode( 'oy_figure', fn( $a ) => oy_figure( sanitize_key( $a['photo'] ?? '' ), (string) ( $a['class'] ?? '' ) ) );
 	// two (or more) photos side by side, between paragraphs – nothing floats beside the text (Olívia, 14 November: „az
 	// elején nagyon belelóg a szöveg a képbe, legyen inkább ez a 2 kép valahogy elosztva”)
-	add_shortcode( 'oy_figures', fn( $a ) => '<div class="oj-duo">' . implode( '', array_map( fn( $k ) => oy_figure( sanitize_key( $k ) ), array_filter( array_map( 'trim', explode( ',', (string) ( $a['photos'] ?? '' ) ) ) ) ) ) . '</div>' );
+	// photos side by side; class="oj-duo--row" makes a row of smaller ones (Olívia, 15 November, „A matracon túl”: „a szöveg
+	// végére meg kisebben ezek a képek jöhetnek”)
+	add_shortcode( 'oy_figures', fn( $a ) => '<div class="' . esc_attr( trim( 'oj-duo ' . implode( ' ', array_map( 'sanitize_html_class', preg_split( '/\s+/', trim( (string) ( $a['class'] ?? '' ) ) ) ) ) ) ) . '">' . implode( '', array_map( fn( $k ) => oy_figure( sanitize_key( $k ) ), array_filter( array_map( 'trim', explode( ',', (string) ( $a['photos'] ?? '' ) ) ) ) ) ) . '</div>' );
 	add_shortcode( 'oy_picto', fn( $a ) => oy_pictogram( sanitize_key( $a['icon'] ?? 'lotus' ), sanitize_key( $a['tone'] ?? 'lilac' ) ) );
 } );
 
