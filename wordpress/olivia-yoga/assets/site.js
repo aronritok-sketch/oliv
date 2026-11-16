@@ -316,8 +316,19 @@
 					var top = b.getBoundingClientRect().top; // the one tapped stays where it was when the open one above closes
 					all.forEach(function (x) { x[0].classList.remove('is-open'); x[1].setAttribute('aria-expanded', 'false'); });
 					if (open) { g.classList.add('is-open'); b.setAttribute('aria-expanded', 'true'); }
+					// Áron, 16 November (video): „így ugrál össze-vissza, szar helyre ugrik” – the page scrolls smoothly, so the
+					// correction used to slide past the prices. Now it happens at once, unseen …
+					var root = document.documentElement, was = root.style.scrollBehavior;
 					var moved = b.getBoundingClientRect().top - top;
-					if (Math.abs(moved) > 1) window.scrollBy(0, moved);
+					root.style.scrollBehavior = 'auto';
+					if (Math.abs(moved) > 1) window.scrollTo(0, window.scrollY + moved);
+					root.style.scrollBehavior = was;
+					// … and when the title is low on the screen, one calm move brings the opened service up under the header.
+					if (open) {
+						var head = Math.max(0, header ? header.getBoundingClientRect().bottom : 0) + 12; // only a header that is on the screen
+						var t = b.getBoundingClientRect().top;
+						if (t > window.innerHeight * 0.42 || t < head) window.scrollTo(0, window.scrollY + t - head);
+					}
 				});
 			});
 			if (!all.length) return;

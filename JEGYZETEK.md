@@ -1220,6 +1220,23 @@
     - Színes és fekete-fehér változat is készült (a főoldali képek is fekete-fehérek).
     - Sztori: a logó kártya nélkül, 150 px, 78% átlátszóság; „Első óra” kikerült; a térközök kiegyenlítve.
     - Elküldve: 9148782 (sztori), 9148783 (előnézet), 9148784 (zip).
+- **olivia-studio 1.21.0 + téma 3.11.110 – lapozható naptár, nem ugráló árak, nem széteső órakártya** (Áron, 2026-11-16
+  17:29, képekkel és videóval: „A naptár csúnya legyen lapozható, az áraknál … így ugrál össze-vissza, szar helyre ugrik,
+  az legyen jó, meg ott van egy másik, ami szarul néz ki, szétesik a frontend.”).
+  - **Naptár hónaponként** (`[oys_calendar]`): fejléc a hónap nevével (Anton, „2026. DECEMBER”), két kerek nyíl lapoz
+    (az első előtt és az utolsó után letiltva).
+    - Egész hetek hétfőtől vasárnapig; a más hónaphoz tartozó napok halványak.
+    - A következő óra hónapján nyílik (élesen: december).
+    - Alatta, telefonon, a hónap órái.
+    - Egy órás napra koppintva kiemeli az órát a listában, és csak akkor görget (finoman), ha nem látszik.
+    - JS nélkül minden hónap egymás alatt látszik.
+  - **Az órakártya telefonon:** rácsban a napdoboz és a név egymás mellett, a Foglalás gomb alatta teljes szélességben.
+    Eddig egy sorban voltak, a gomb összenyomta a nevet és rácsúszott az időre.
+  - **Az árak lenyílói:** az oldal sima görgetésű (`scroll-behavior: smooth`), ezért a korrekció átcsúszott az árakon.
+    - Most a korrekció azonnali, a megérintett cím helyben marad.
+    - Ha a cím a képernyő alsó részén van, egyetlen nyugodt mozdulattal felkerül a tetejére. Csak a képernyőn lévő fejlécet
+      veszi figyelembe; telefonon a fejléc elgördül, ez okozta a túlgörgetést.
+  - Tesztek: 1572/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -55,18 +55,18 @@ class OYS_Frontend {
 	   ====================================================================== */
 
 	/**
-	 * [oys_calendar] – the classes as a real calendar, week rows from this Monday to the end of the booking window
-	 * (setting `booking_window_days`; Áron, 16 November: „6 héttel előre foglalható, és csak annyira látszódjon a naptár
-	 * is”). Every class is a link to its booking; on a phone the days show dots and the list under the grid has the classes.
+	 * [oys_calendar] – the classes as a real calendar, by month, paged with arrows (Áron, 16 November: „A naptár csúnya,
+	 * legyen lapozható”); only the bookable weeks have classes (setting `booking_window_days`; „6 héttel előre
+	 * foglalható, és csak annyira látszódjon a naptár is”). It opens on the month of the next class. Every class is a link
+	 * to its booking; on a phone the days show dots and the month's classes are listed under it. Without JavaScript every
+	 * month shows, one under the other.
 	 */
 	public static function sc_calendar( $atts ) {
 		$atts   = shortcode_atts( array( 'kind' => 'group,event', 'class' => '' ), $atts );
 		$window = max( 7, (int) OYS_Settings::get( 'booking_window_days' ) );
 		$tz     = wp_timezone();
 		$today  = new DateTimeImmutable( 'today', $tz );
-		$start  = $today->modify( '-' . ( (int) $today->format( 'N' ) - 1 ) . ' days' ); // Monday of this week
 		$last   = $today->modify( '+' . ( $window - 1 ) . ' days' );
-		$end    = $last->modify( '+' . ( 7 - (int) $last->format( 'N' ) ) . ' days' ); // Sunday of the last week
 		$items  = OYS_Schedule::query( array(
 			'kind'       => array_filter( array_map( 'trim', explode( ',', $atts['kind'] ) ) ),
 			'from'       => oys_now(),
@@ -90,36 +90,56 @@ class OYS_Frontend {
 			}
 			return $left < 1 ? array( 'is-full', __( 'Full, waitlist open', 'olivia-studio' ) ) : array( '', sprintf( _n( '%d spot left', '%d spots left', min( $left, 99 ), 'olivia-studio' ), min( $left, 99 ) ) );
 		};
-		$heads = '';
-		for ( $i = 0; $i < 7; $i++ ) {
-			$heads .= '<span class="oys-cal__dow" aria-hidden="true">' . esc_html( wp_date( 'D', $start->modify( "+$i days" )->getTimestamp() ) ) . '</span>';
+		$monday = fn( $d ) => $d->modify( '-' . ( (int) $d->format( 'N' ) - 1 ) . ' days' );
+		$heads  = '';
+		for ( $i = 0, $m0 = $monday( $today ); $i < 7; $i++ ) {
+			$heads .= '<span class="oys-cal__dow" aria-hidden="true">' . esc_html( wp_date( 'D', $m0->modify( "+$i days" )->getTimestamp() ) ) . '</span>';
 		}
-		$grid = '';
-		$list = '';
-		for ( $day = $start; $day <= $end; $day = $day->modify( '+1 day' ) ) {
-			$key   = $day->format( 'Y-m-d' );
-			$ts    = $day->getTimestamp();
-			$state = $day < $today ? ' is-past' : ( $day > $last ? ' is-after' : '' );
-			$state .= $key === $today->format( 'Y-m-d' ) ? ' is-today' : '';
-			$day_s = $by_day[ $key ] ?? array();
-			$num   = '<span class="oys-cal__num">' . esc_html( (int) $day->format( 'j' ) === 1 || $key === $start->format( 'Y-m-d' ) ? wp_date( oys_date_format( 'M j' ), $ts ) : $day->format( 'j' ) ) . '</span>';
-			$chips = '';
-			foreach ( $day_s as $s ) {
-				list( $cls, $note ) = $link( $s );
-				$title  = (string) apply_filters( 'oys_card_title', oys_session_title( $s ), $s );
-				$chips .= '<a class="oys-cal__chip ' . esc_attr( $cls ) . '" href="' . esc_url( oys_book_url( $s->id ) ) . '"><b>' . esc_html( oys_time( $s->starts_at ) ) . '</b> <span>' . esc_html( $title ) . '</span></a>';
-				$list  .= '<li class="oys-cal__item ' . esc_attr( $cls ) . '" id="oys-cal-' . esc_attr( $key ) . '"><span class="oys-cal__when"><b>' . esc_html( wp_date( 'D', $ts ) ) . '</b>' . esc_html( wp_date( oys_date_format( 'M j' ), $ts ) ) . '</span>'
-					. '<span class="oys-cal__what"><b>' . esc_html( $title ) . '</b><small>' . esc_html( oys_time( $s->starts_at ) . '–' . oys_time( $s->ends_at ) . ' · ' . $note ) . '</small></span>'
-					. ( in_array( $cls, array( '', 'is-full' ), true ) ? '<a class="session__book' . ( 'is-full' === $cls ? ' session__book--wait' : '' ) . '" href="' . esc_url( oys_book_url( $s->id ) ) . '">' . esc_html( 'is-full' === $cls ? __( 'Join the waitlist', 'olivia-studio' ) : __( 'Book', 'olivia-studio' ) ) . oys_icon( 'arrow' ) . '</a>' : '<span class="session__status">' . esc_html( $note ) . '</span>' ) . '</li>';
+		$months = array();
+		for ( $m = $today->modify( 'first day of this month' ); $m <= $last; $m = $m->modify( 'first day of next month' ) ) {
+			$months[] = $m;
+		}
+		$first_class = $items ? wp_date( 'Y-m', oys_ts( $items[0]->starts_at ) ) : $today->format( 'Y-m' );
+		$panels      = '';
+		foreach ( $months as $mi => $m ) {
+			$from = $monday( $m );
+			$end  = $m->modify( 'last day of this month' );
+			$to   = $end->modify( '+' . ( 7 - (int) $end->format( 'N' ) ) . ' days' );
+			$grid = '';
+			$list = '';
+			for ( $day = $from; $day <= $to; $day = $day->modify( '+1 day' ) ) {
+				$key   = $day->format( 'Y-m-d' );
+				$ts    = $day->getTimestamp();
+				$other = $day->format( 'Y-m' ) !== $m->format( 'Y-m' );
+				$state = $other ? ' is-other' : ( $day < $today ? ' is-past' : ( $day > $last ? ' is-after' : '' ) );
+				$state .= ! $other && $key === $today->format( 'Y-m-d' ) ? ' is-today' : '';
+				$day_s = $other ? array() : ( $by_day[ $key ] ?? array() );
+				$chips = '';
+				foreach ( $day_s as $s ) {
+					list( $cls, $note ) = $link( $s );
+					$title  = (string) apply_filters( 'oys_card_title', oys_session_title( $s ), $s );
+					$chips .= '<a class="oys-cal__chip ' . esc_attr( $cls ) . '" href="' . esc_url( oys_book_url( $s->id ) ) . '"><b>' . esc_html( oys_time( $s->starts_at ) ) . '</b> <span>' . esc_html( $title ) . '</span></a>';
+					$list  .= '<li class="oys-cal__item ' . esc_attr( $cls ) . '" data-day="' . esc_attr( $key ) . '"><span class="oys-cal__when"><b>' . esc_html( wp_date( 'D', $ts ) ) . '</b>' . esc_html( wp_date( oys_date_format( 'M j' ), $ts ) ) . '</span>'
+						. '<span class="oys-cal__what"><b>' . esc_html( $title ) . '</b><small>' . esc_html( oys_time( $s->starts_at ) . '–' . oys_time( $s->ends_at ) ) . '</small><small class="oys-cal__left">' . esc_html( $note ) . '</small></span>'
+						. ( in_array( $cls, array( '', 'is-full' ), true ) ? '<a class="session__book oys-cal__go' . ( 'is-full' === $cls ? ' session__book--wait' : '' ) . '" href="' . esc_url( oys_book_url( $s->id ) ) . '">' . esc_html( 'is-full' === $cls ? __( 'Join the waitlist', 'olivia-studio' ) : __( 'Book', 'olivia-studio' ) ) . oys_icon( 'arrow' ) . '</a>' : '<span class="session__status oys-cal__go">' . esc_html( $note ) . '</span>' ) . '</li>';
+				}
+				$label = wp_date( oys_date_format( 'l, F j' ), $ts ) . ( $day_s ? ': ' . implode( ', ', array_map( fn( $s ) => oys_time( $s->starts_at ) . ' ' . apply_filters( 'oys_card_title', oys_session_title( $s ), $s ), $day_s ) ) : '' );
+				$grid .= '<div class="oys-cal__day' . esc_attr( $state ) . ( $day_s ? ' has-class' : '' ) . '" role="listitem"' . ( $other ? ' aria-hidden="true"' : ' aria-label="' . esc_attr( $label ) . '"' ) . ( $day_s ? ' data-day="' . esc_attr( $key ) . '"' : '' ) . '>'
+					. '<span class="oys-cal__num">' . esc_html( $day->format( 'j' ) ) . '</span>'
+					. ( $day_s ? '<span class="oys-cal__dots" aria-hidden="true">' . str_repeat( '<i></i>', min( 3, count( $day_s ) ) ) . '</span><div class="oys-cal__chips">' . $chips . '</div>' : '' ) . '</div>';
 			}
-			$label = wp_date( oys_date_format( 'l, F j' ), $ts ) . ( $day_s ? ': ' . implode( ', ', array_map( fn( $s ) => oys_time( $s->starts_at ) . ' ' . apply_filters( 'oys_card_title', oys_session_title( $s ), $s ), $day_s ) ) : '' );
-			$grid .= '<div class="oys-cal__day' . esc_attr( $state ) . ( $day_s ? ' has-class' : '' ) . '" role="listitem" aria-label="' . esc_attr( $label ) . '">' . $num
-				. ( $day_s ? '<span class="oys-cal__dots" aria-hidden="true">' . str_repeat( '<i></i>', min( 3, count( $day_s ) ) ) . '</span><div class="oys-cal__chips">' . $chips . '</div>' : '' ) . '</div>';
+			$name    = wp_date( _x( 'F Y', 'calendar month', 'olivia-studio' ), $m->getTimestamp() );
+			$prev    = $mi > 0 ? sprintf( __( 'Previous month: %s', 'olivia-studio' ), wp_date( _x( 'F Y', 'calendar month', 'olivia-studio' ), $months[ $mi - 1 ]->getTimestamp() ) ) : '';
+			$next    = isset( $months[ $mi + 1 ] ) ? sprintf( __( 'Next month: %s', 'olivia-studio' ), wp_date( _x( 'F Y', 'calendar month', 'olivia-studio' ), $months[ $mi + 1 ]->getTimestamp() ) ) : '';
+			$arrow   = fn( $dir, $label, $to ) => '<button type="button" class="oys-cal__arrow oys-cal__arrow--' . $dir . '" data-cal-go="' . $to . '"' . ( '' === $label ? ' disabled aria-hidden="true"' : ' aria-label="' . esc_attr( $label ) . '"' ) . '><svg viewBox="0 0 24 24" aria-hidden="true"><path d="' . ( 'prev' === $dir ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7' ) . '"/></svg></button>';
+			$panels .= '<section class="oys-cal__month" data-month="' . esc_attr( $m->format( 'Y-m' ) ) . '"' . ( $m->format( 'Y-m' ) === $first_class ? ' data-start' : '' ) . ' aria-label="' . esc_attr( $name ) . '">'
+				. '<header class="oys-cal__bar">' . $arrow( 'prev', $prev, $mi - 1 ) . '<h3 class="oys-cal__title">' . esc_html( $name ) . '</h3>' . $arrow( 'next', $next, $mi + 1 ) . '</header>'
+				. '<div class="oys-cal__grid" role="list">' . $heads . $grid . '</div>'
+				. ( $list ? '<ol class="oys-cal__list">' . $list . '</ol>' : '<p class="oys-cal__empty">' . esc_html__( 'No group classes this month.', 'olivia-studio' ) . '</p>' )
+				. '</section>';
 		}
 		$note = sprintf( _n( 'You can book up to %d week ahead.', 'You can book up to %d weeks ahead.', (int) round( $window / 7 ), 'olivia-studio' ), (int) round( $window / 7 ) );
-		return '<div class="oys-cal" data-oys-cal><div class="oys-cal__grid" role="list">' . $heads . $grid . '</div>'
-			. ( $list ? '<ol class="oys-cal__list">' . $list . '</ol>' : '<p class="oys-cal__empty">' . esc_html__( 'No group classes in these weeks yet.', 'olivia-studio' ) . '</p>' )
-			. '<p class="oys-cal__note">' . esc_html( $note ) . '</p></div>';
+		return '<div class="oys-cal" data-oys-cal>' . $panels . '<p class="oys-cal__note">' . esc_html( $note ) . '</p></div>';
 	}
 
 	public static function sc_schedule( $atts ) {

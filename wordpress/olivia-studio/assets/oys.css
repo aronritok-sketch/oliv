@@ -433,15 +433,31 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 .oys-msgs__photo.has-file { background: #FFF4C2; }
 
 /* ---------- [oys_calendar]: the bookable weeks as a calendar (Áron, 16 November) ---------- */
-.oys-cal { --cal-line: rgba(0, 46, 44, .1); --cal-accent: #DB2E5C; --cal-soft: #FFF4C2; }
+/* The calendar by month (Áron, 16 November: „A naptár csúnya, legyen lapozható … szétesik”). */
+.oys-cal { --cal-line: rgba(0, 46, 44, .1); --cal-accent: #DB2E5C; --cal-soft: #FFF4C2; --cal-ink: #072624; }
+.oys-cal.is-paged .oys-cal__month[hidden] { display: none; }
+.oys-cal__month + .oys-cal__month { margin-top: 2.2rem; }
+.oys-cal.is-paged .oys-cal__month + .oys-cal__month { margin-top: 0; }
+.oys-cal__bar { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin: 0 0 1rem; }
+.oys-cal__title { margin: 0; font-size: clamp(1.35rem, 1.1rem + .9vw, 1.9rem); line-height: 1.1; text-align: center; }
+.oys-cal__arrow { display: grid; place-items: center; flex: none; width: 46px; height: 46px; padding: 0; border: 0; border-radius: 50%; background: #fff; color: var(--cal-ink); box-shadow: inset 0 0 0 1px var(--cal-line), 0 6px 16px -10px rgba(0, 46, 44, .4); cursor: pointer; transition: background-color .2s, transform .2s; }
+.oys-cal__arrow svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.oys-cal__arrow:hover { background: var(--cal-soft); transform: translateY(-1px); }
+.oys-cal__arrow:focus-visible { outline: 2px solid var(--cal-accent); outline-offset: 2px; }
+.oys-cal__arrow[disabled] { opacity: .2; cursor: default; box-shadow: inset 0 0 0 1px var(--cal-line); transform: none; background: transparent; }
+.oys-cal:not(.is-paged) .oys-cal__arrow { visibility: hidden; }
 .oys-cal__grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
-.oys-cal__dow { padding: 0 0 4px; font-size: .72rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; text-align: center; opacity: .65; }
-.oys-cal__day { position: relative; min-height: 104px; padding: 8px; border-radius: 14px; background: #fff; box-shadow: inset 0 0 0 1px var(--cal-line); display: flex; flex-direction: column; gap: 6px; }
-.oys-cal__day.is-past, .oys-cal__day.is-after { background: transparent; box-shadow: inset 0 0 0 1px rgba(0, 46, 44, .05); opacity: .5; }
+.oys-cal__dow { padding: 0 0 6px; font-size: .72rem; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; text-align: center; opacity: .6; }
+.oys-cal__day { position: relative; min-height: 104px; padding: 10px; border-radius: 16px; background: #fff; box-shadow: inset 0 0 0 1px var(--cal-line); display: flex; flex-direction: column; gap: 6px; }
+.oys-cal__day.is-other { background: transparent; box-shadow: none; }
+.oys-cal__day.is-other .oys-cal__num { opacity: .25; }
+.oys-cal__day.is-past, .oys-cal__day.is-after { background: transparent; box-shadow: inset 0 0 0 1px rgba(0, 46, 44, .05); }
+.oys-cal__day.is-past .oys-cal__num, .oys-cal__day.is-after .oys-cal__num { opacity: .4; }
 .oys-cal__day.is-today { box-shadow: inset 0 0 0 2px var(--cal-accent); }
-.oys-cal__day.has-class { background: var(--cal-soft); }
-.oys-cal__num { font-weight: 800; font-size: .95rem; line-height: 1; }
 .oys-cal__day.is-today .oys-cal__num { color: var(--cal-accent); }
+.oys-cal__day.has-class { background: var(--cal-soft); }
+.oys-cal__day.is-hl { box-shadow: inset 0 0 0 2px var(--cal-ink); }
+.oys-cal__num { font-weight: 800; font-size: .95rem; line-height: 1; }
 .oys-cal__dots { display: none; }
 .oys-cal__chips { display: grid; gap: 4px; }
 .oys-cal__chip { display: block; padding: 6px 8px; border-radius: 10px; background: #002E2C; color: #fff !important; font-size: .8rem; line-height: 1.25; text-decoration: none !important; overflow-wrap: anywhere; transition: transform .15s; }
@@ -452,21 +468,32 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 .oys-cal__chip.is-mine b { color: #fff; }
 .oys-cal__chip.is-closed { background: rgba(0, 46, 44, .35); }
 .oys-cal__list { display: none; margin: 1rem 0 0; padding: 0; list-style: none; }
-.oys-cal__item { display: flex; align-items: center; gap: .9rem; margin: 0 0 .5rem; padding: .7rem .9rem; border-radius: 14px; background: #fff; box-shadow: inset 0 0 0 1px var(--cal-line); scroll-margin-top: 90px; }
-.oys-cal__when { display: grid; min-width: 3.6rem; font-size: .78rem; text-transform: uppercase; letter-spacing: .06em; }
-.oys-cal__when b { font-size: 1.15rem; letter-spacing: 0; }
-.oys-cal__what { flex: 1; min-width: 0; }
-.oys-cal__what b { display: block; }
-.oys-cal__what small { display: block; opacity: .75; }
-.oys-cal__note, .oys-cal__empty { margin: .8rem 0 0; font-size: .9rem; opacity: .8; }
+.oys-cal__item { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: .6rem 1rem; margin: 0 0 .6rem; padding: .8rem; border-radius: 18px; background: #fff; box-shadow: inset 0 0 0 1px var(--cal-line); transition: box-shadow .2s; }
+.oys-cal__item.is-hl { box-shadow: inset 0 0 0 2px var(--cal-accent); }
+.oys-cal__when { display: grid; place-content: center; width: 4rem; height: 4rem; border-radius: 14px; background: var(--cal-soft); font-size: .72rem; line-height: 1.2; text-align: center; text-transform: uppercase; letter-spacing: .06em; }
+.oys-cal__when b { font-size: 1.1rem; letter-spacing: .02em; }
+.oys-cal__what { min-width: 0; }
+.oys-cal__what b { display: block; line-height: 1.25; }
+.oys-cal__what small { display: block; margin-top: .15rem; font-size: .9rem; }
+.oys-cal__what .oys-cal__left { margin-top: .05rem; font-size: .82rem; opacity: .7; }
+.oys-cal__item .oys-cal__go { white-space: nowrap; }
+.oys-cal__note, .oys-cal__empty { margin: .9rem 0 0; font-size: .9rem; opacity: .8; }
 @media (max-width: 720px) {
 	.oys-cal__grid { gap: 4px; }
-	.oys-cal__day { min-height: 48px; padding: 6px 2px; align-items: center; border-radius: 10px; }
-	.oys-cal__num { font-size: .85rem; }
+	.oys-cal__day { min-height: 0; aspect-ratio: 1 / .9; padding: 6px 2px; align-items: center; justify-content: center; gap: 4px; border-radius: 12px; }
+	.oys-cal__day.has-class { cursor: pointer; }
+	.oys-cal__num { font-size: .9rem; }
 	.oys-cal__chips { display: none; }
 	.oys-cal__dots { display: flex; gap: 3px; }
 	.oys-cal__dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--cal-accent); }
 	.oys-cal__list { display: block; }
+	.oys-cal__arrow { width: 44px; height: 44px; }
+}
+@media (max-width: 560px) {
+	/* the line of a class: the day and the name side by side, the button under them, full width – nothing squeezed */
+	.oys-cal__item { grid-template-columns: auto minmax(0, 1fr); padding: .75rem; }
+	.oys-cal__item .oys-cal__go { grid-column: 1 / -1; width: 100%; justify-content: center; text-align: center; }
+	.oys-cal__item .session__status { display: block; padding: .55rem; border-radius: 999px; background: rgba(0, 46, 44, .06); font-size: .78rem; }
 }
 
 /* ---------- The waiting room (Áron, 16 November: „a váró … szarul néz ki, az is kapjon egy új dizájnt”) ---------- */

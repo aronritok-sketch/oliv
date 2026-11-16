@@ -5626,3 +5626,22 @@ msgstr "Quedan %1$s sesiones · valor %2$s"
 #: Motibro passes held (OYS_Held)
 msgid "Redeem or make bookable online"
 msgstr "Canjear o hacer reservable online"
+
+#: the calendar by month
+msgid "No group classes this month."
+msgstr "No hay clases de grupo este mes."
+
+#: the calendar by month
+#, php-format
+msgid "Previous month: %s"
+msgstr "Mes anterior: %s"
+
+#: the calendar by month
+#, php-format
+msgid "Next month: %s"
+msgstr "Mes siguiente: %s"
+
+#: the calendar by month
+msgctxt "calendar month"
+msgid "F Y"
+msgstr "F \\d\\e Y"

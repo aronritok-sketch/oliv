@@ -4257,8 +4257,13 @@ test( 'Áron, 16 November: the price cards ask for a time or sell the pass; the 
 	ok( str_contains( $html, 'class="oys-cal"' ) && str_contains( $html, esc_url( oys_book_url( $in->id ) ) ), 'the calendar: a class in 10 days links to its booking' );
 	ok( ! str_contains( $html, esc_url( oys_book_url( $out->id ) ) ), 'nothing beyond the 6 weeks' );
 	ok( ! str_contains( $html, esc_url( oys_book_url( $priv->id ) ) ), 'no private sessions' );
-	$weeks = substr_count( $html, 'class="oys-cal__day' ) / 7;
-	ok( $weeks >= 6 && $weeks <= 7 && is_int( substr_count( $html, 'class="oys-cal__day' ) / 7 ), 'whole weeks, Monday to Sunday, six or seven rows' );
+	// Áron, 16 November: „A naptár csúnya, legyen lapozható” – by month, with arrows, whole weeks in every month
+	$panels = array_slice( explode( '<section class="oys-cal__month"', $html ), 1 );
+	ok( count( $panels ) >= 2 && count( $panels ) <= 3, 'the six weeks as two or three months' );
+	ok( ! array_filter( $panels, fn( $p ) => 0 !== substr_count( $p, 'class="oys-cal__day' ) % 7 ), 'every month in whole weeks, Monday to Sunday' );
+	ok( 1 === substr_count( $html, ' data-start' ) && str_contains( $panels[0], 'data-cal-go="-1" disabled' ) && str_contains( end( $panels ), 'disabled aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"' ), 'it opens on one month; no arrow before the first or after the last' );
+	$withclass = array_values( array_filter( $panels, fn( $p ) => str_contains( $p, esc_url( oys_book_url( $in->id ) ) ) ) );
+	ok( $withclass && str_contains( $withclass[0], 'class="oys-cal__item' ) && str_contains( $withclass[0], 'class="session__book oys-cal__go' ), 'the class is listed under its month, with its button on its own' );
 	foreach ( array( $in, $out, $priv ) as $s ) {
 		OYS_Schedule::cancel_session( $s->id, 'test' );
 	}

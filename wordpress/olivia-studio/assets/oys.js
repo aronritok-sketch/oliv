@@ -88,3 +88,42 @@
 		list.scrollTop = list.scrollHeight;
 	}
 })();
+
+/* The calendar by month (Áron, 16 November: „A naptár … legyen lapozható”): one month at a time, the arrows page; it
+   opens on the month of the next class. A tap on a day with a class marks that class in the list under it. */
+(function () {
+	document.querySelectorAll('[data-oys-cal]').forEach(function (cal) {
+		var months = Array.prototype.slice.call(cal.querySelectorAll('.oys-cal__month'));
+		if (months.length < 1) return;
+		var start = months.findIndex(function (m) { return m.hasAttribute('data-start'); });
+		var show = function (i) {
+			months.forEach(function (m, j) { m.hidden = j !== i; });
+		};
+		cal.classList.add('is-paged');
+		show(start < 0 ? 0 : start);
+		cal.addEventListener('click', function (e) {
+			var go = e.target.closest('[data-cal-go]');
+			if (go && !go.disabled) {
+				var i = parseInt(go.getAttribute('data-cal-go'), 10);
+				if (months[i]) {
+					show(i);
+					var f = months[i].querySelector('[data-cal-go]:not([disabled])');
+					if (f) f.focus({ preventScroll: true });
+				}
+				return;
+			}
+			var day = e.target.closest('.oys-cal__day[data-day]');
+			if (!day || e.target.closest('a')) return;
+			var m = day.closest('.oys-cal__month');
+			m.querySelectorAll('.oys-cal__item.is-hl, .oys-cal__day.is-hl').forEach(function (x) { x.classList.remove('is-hl'); });
+			day.classList.add('is-hl');
+			var first = null;
+			m.querySelectorAll('.oys-cal__item[data-day="' + day.getAttribute('data-day') + '"]').forEach(function (x) { x.classList.add('is-hl'); first = first || x; });
+			if (first && first.offsetParent) {
+				var r = first.getBoundingClientRect();
+				if (r.bottom > window.innerHeight - 90 || r.top < 80) first.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+			}
+		});
+	});
+})();
+
