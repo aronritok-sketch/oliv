@@ -874,6 +874,12 @@
   - Fiók, Kéréseid: a „Megfelelő időpontok” is látszik, amíg nincs ajánlat.
   - Új fordítások (hu, es): Service, Group size, Your request, New private request: %1$s – %2$s.
   - Tesztek: 1373/0.
+- **olivia-studio 1.12.4 (téma 3.11.96-tal):** az egyéni óra ajánlatlevele („Az egyéni órád”) kiírja: „Ha
+  kedvezménykódod van, a fizetésnél érvényesítheted: a fizetési oldalon nyisd le a „Van kedvezménykódod?” részt.”
+  Halványsárga dobozban, az ár alatt, csak fizetős ajánlatnál. Áron: „Ebbe az e-mailbe rakd bele, hogyha
+  kedvezménykódod van, akkor a fizetésnél érvényesíthető.”
+  - A kódmező ott van az egyéni óra fizetésénél is (`coupon_field`, ha az ár > 0 és a fizetés be van állítva).
+  - Tesztek: 1374/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -3093,6 +3093,26 @@ test( 'Olívia\'s doc of 14 November, late evening: forints (not dollars) when t
 	ok( str_contains( (string) file_get_contents( get_template_directory() . '/assets/site.css' ), '@media (min-width: 1000px) and (max-height: 740px)' ), 'the side card on a short screen: a slimmer photo, so all of it stays in view' );
 } );
 
+test( 'Áron, 16 November: the private offer email says a discount code can be used when paying', function () {
+	$sent = array();
+	$cap  = function ( $null, $atts ) use ( &$sent ) {
+		$sent[] = $atts['message'];
+		return true;
+	};
+	add_filter( 'pre_wp_mail', $cap, 10, 2 );
+	try {
+		global $wpdb;
+		$uid = make_user( 'Ajánlat' );
+		$wpdb->insert( OYS_Install::table( 'private_requests' ), array( 'user_id' => $uid, 'topic' => 'yoga', 'duration_min' => 60, 'people' => 1, 'location_type' => 'online', 'preferred' => 'Bármikor', 'status' => 'new', 'created_at' => oys_now() ) );
+		$rid = (int) $wpdb->insert_id;
+		$sid = OYS_Privates::offer( $rid, wp_date( 'Y-m-d H:i', time() + 3 * DAY_IN_SECONDS ), 60, 800000, 'Online' );
+		$mail = implode( "\n", $sent );
+		ok( ! is_wp_error( $sid ) && str_contains( $mail, 'If you have a discount code, you can use it when you pay' ), 'the offer email: „if you have a discount code, use it when you pay” (Áron: „rakd bele, hogyha kedvezménykódod van, akkor a fizetésnél érvényesíthető”)' );
+	} finally {
+		remove_filter( 'pre_wp_mail', $cap, 10 );
+	}
+} );
+
 test( 'Áron, 16 November: a private request always says what it is for – the service and what was asked – in both emails, the admin and the account', function () {
 	$sent = array();
 	$cap  = function ( $null, $atts ) use ( &$sent ) {

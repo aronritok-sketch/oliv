@@ -482,6 +482,8 @@ class OYS_Emails {
 
 	protected static function private_offer( $request, $session ) {
 		$blocks = self::session_block( $session ) . '<p><b>' . esc_html( oys_money( $request->price_cents ) ) . '</b></p>'
+			// Áron, 16 November: „Ebbe az e-mailbe rakd bele, hogyha kedvezménykódod van, akkor a fizetésnél érvényesíthető.”
+			. ( (int) $request->price_cents > 0 ? '<p style="margin:0 0 16px;padding:12px 14px;border-radius:10px;background:#FFF4C2;color:#12231A;font-size:14px;line-height:1.5">' . esc_html__( 'If you have a discount code, you can use it when you pay: open “Have a discount code?” on the payment page.', 'olivia-studio' ) . '</p>' : '' )
 			. ( $request->admin_message ? '<p>' . nl2br( esc_html( $request->admin_message ) ) . '</p>' : '' )
 			. ( $session->note ? '<p><b>' . esc_html( $session->note ) . '</b></p>' : '' )
 			. ( OYS_Settings::get( 'private_note' ) ? '<p style="font-size:14px;color:#53635A">' . esc_html( OYS_Settings::get( 'private_note' ) ) . '</p>' : '' );

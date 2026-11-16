@@ -6201,3 +6201,7 @@ msgstr "A kérésed"
 #: includes/class-privates.php
 msgid "New private request: %1$s – %2$s"
 msgstr "Új egyéni kérés: %1$s – %2$s"
+
+#: includes/class-emails.php
+msgid "If you have a discount code, you can use it when you pay: open “Have a discount code?” on the payment page."
+msgstr "Ha kedvezménykódod van, a fizetésnél érvényesítheted: a fizetési oldalon nyisd le a „Van kedvezménykódod?” részt."

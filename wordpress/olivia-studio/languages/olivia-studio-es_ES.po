@@ -4125,3 +4125,7 @@ msgstr "Tu solicitud"
 #: includes/class-privates.php
 msgid "New private request: %1$s – %2$s"
 msgstr "Nueva solicitud privada: %1$s – %2$s"
+
+#: includes/class-emails.php
+msgid "If you have a discount code, you can use it when you pay: open “Have a discount code?” on the payment page."
+msgstr "Si tienes un código de descuento, puedes usarlo al pagar: abre «¿Tienes un código de descuento?» en la página de pago."
