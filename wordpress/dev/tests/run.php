@@ -3093,6 +3093,37 @@ test( 'Olívia\'s doc of 14 November, late evening: forints (not dollars) when t
 	ok( str_contains( (string) file_get_contents( get_template_directory() . '/assets/site.css' ), '@media (min-width: 1000px) and (max-height: 740px)' ), 'the side card on a short screen: a slimmer photo, so all of it stays in view' );
 } );
 
+test( 'Áron, 16 November: a private request always says what it is for – the service and what was asked – in both emails, the admin and the account', function () {
+	$sent = array();
+	$cap  = function ( $null, $atts ) use ( &$sent ) {
+		$sent[] = array( is_array( $atts['to'] ) ? implode( ',', $atts['to'] ) : $atts['to'], $atts['subject'], $atts['message'] );
+		return true;
+	};
+	add_filter( 'pre_wp_mail', $cap, 10, 2 );
+	try {
+		global $wpdb;
+		$uid     = make_user( 'Kérő' );
+		$offered = OYS_Services::offered();
+		$topic   = $offered ? (string) array_key_first( $offered ) : 'yoga';
+		$wpdb->insert( OYS_Install::table( 'private_requests' ), array( 'user_id' => $uid, 'topic' => $topic, 'duration_min' => 60, 'people' => 2, 'location_type' => 'online', 'preferred' => 'Kedd este 19 után', 'notes' => 'Fáj a derekam', 'status' => 'new', 'created_at' => oys_now() ) );
+		$req   = OYS_Privates::get( (int) $wpdb->insert_id );
+		$label = OYS_Privates::topic_label( $topic, 2 );
+		$rows  = OYS_Privates::summary( $req );
+		OYS_Emails::private_request_received( $req );
+		$user  = get_userdata( $uid );
+		$cust  = array_values( array_filter( $sent, fn( $m ) => $user->user_email === $m[0] ) );
+		$staff = array_values( array_filter( $sent, fn( $m ) => $user->user_email !== $m[0] ) );
+		ok( 6 === count( $rows ) && in_array( $label, $rows, true ) && in_array( 'Kedd este 19 után', $rows, true ), 'the request in one list: service, length, how many, where, the times that suit, the note' );
+		ok( $cust && str_contains( $cust[0][2], esc_html( $label ) ) && str_contains( $cust[0][2], 'Kedd este 19 után' ) && str_contains( $cust[0][2], 'Fáj a derekam' ), '… the customer\'s email repeats what they asked for' );
+		ok( ! OYS_Email_Templates::enabled( 'studio_private' ) || ( $staff && str_contains( $staff[0][1], $label ) && str_contains( $staff[0][2], esc_html( $label ) ) && str_contains( $staff[0][2], 'Kedd este 19 után' ) && str_contains( $staff[0][2], $user->user_email ) ), '… and the studio\'s email has the service in its subject and every detail in it, not only the admin' );
+		$adm = (string) file_get_contents( OYS_DIR . 'includes/admin/class-admin.php' );
+		$fe  = (string) file_get_contents( OYS_DIR . 'includes/class-frontend.php' );
+		ok( str_contains( $adm, "'</td><td><b>' . esc_html( OYS_Privates::topic_label( \$r->topic ?? '', (int) \$r->people ) ) . '</b><br>'" ) && str_contains( $fe, "esc_html__( 'Preferred times', 'olivia-studio' ) . ': ' . esc_html( \$r->preferred )" ), '… the admin list leads with the service; the account shows the times asked for until an offer comes' );
+	} finally {
+		remove_filter( 'pre_wp_mail', $cap, 10 );
+	}
+} );
+
 test( 'Olívia\'s doc of 14 November, night: a gift for two goes to two email addresses; Jógáról lists every article; page-head text clear of the photo wave', function () {
 	$sent = array();
 	$cap  = function ( $null, $atts ) use ( &$sent ) {

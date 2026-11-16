@@ -6185,3 +6185,19 @@ msgstr "Élőben, online, a böngésződben"
 #: includes/class-frontend.php
 msgid "A confirmation with a calendar invite is on its way to your inbox."
 msgstr "A visszaigazolás naptármeghívóval úton van a postafiókodba."
+
+#: includes/class-privates.php
+msgid "Service"
+msgstr "Szolgáltatás"
+
+#: includes/class-privates.php
+msgid "Group size"
+msgstr "Létszám"
+
+#: includes/class-privates.php
+msgid "Your request"
+msgstr "A kérésed"
+
+#: includes/class-privates.php
+msgid "New private request: %1$s – %2$s"
+msgstr "Új egyéni kérés: %1$s – %2$s"

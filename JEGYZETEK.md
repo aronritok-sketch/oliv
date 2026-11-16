@@ -861,6 +861,19 @@
     stílusban van.
   - Telefonon a fizetési módnál az ár a szöveg alá kerül. A „Hozol barátokat?” felirat a dobozon belül van.
   - Tesztek: 1369/0.
+- **olivia-studio 1.12.3 (téma 3.11.95-tel):** az egyéni kéréseknél mindig látszik a szolgáltatás és az, hogy mit kért
+  a vendég, a levelekben is (Áron: „Egyéni kérések esetén mindig legyen meg, hogy mi a szolgáltatás, meg mire kért, és
+  az e-mailbe is menjen ki, ne csak az adminban legyen látható.”).
+  - `OYS_Privates::summary()` / `summary_html()`: Szolgáltatás, Időtartam, Létszám, Helyszín, Megfelelő időpontok,
+    Megjegyzés.
+  - Az admin értesítő levele: tárgy „Új egyéni kérés: Egyéni online jóga, 60 perc – Név”. A törzsben a név,
+    kattintható e-mail és telefon, és a teljes összefoglaló. Eddig hiányzott belőle a szolgáltatás, a helyszín pedig
+    nyers kulcsként jelent meg.
+  - A vendég visszaigazoló levele („Megkaptam a kérésed”): bekerült „A kérésed” és ugyanez az összefoglaló.
+  - Admin, Egyéni kérések lista: elöl félkövérrel a szolgáltatás, utána a hossz, a létszám és a helyszín.
+  - Fiók, Kéréseid: a „Megfelelő időpontok” is látszik, amíg nincs ajánlat.
+  - Új fordítások (hu, es): Service, Group size, Your request, New private request: %1$s – %2$s.
+  - Tesztek: 1373/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

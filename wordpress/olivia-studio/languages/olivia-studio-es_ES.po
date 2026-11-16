@@ -4109,3 +4109,19 @@ msgstr "En vivo, online, en tu navegador"
 #: includes/class-frontend.php
 msgid "A confirmation with a calendar invite is on its way to your inbox."
 msgstr "La confirmación con una invitación de calendario está en camino a tu bandeja de entrada."
+
+#: includes/class-privates.php
+msgid "Service"
+msgstr "Servicio"
+
+#: includes/class-privates.php
+msgid "Group size"
+msgstr "Personas"
+
+#: includes/class-privates.php
+msgid "Your request"
+msgstr "Tu solicitud"
+
+#: includes/class-privates.php
+msgid "New private request: %1$s – %2$s"
+msgstr "Nueva solicitud privada: %1$s – %2$s"

@@ -465,16 +465,19 @@ class OYS_Emails {
 	}
 
 	protected static function private_request_received( $request ) {
-		self::compose( 'private_request_received', self::user_email( $request->user_id ), OYS_Email_Templates::vars_for( $request->user_id ), '', array(), oys_account_url( 'private' ) );
+		// what they asked for goes into both emails, not only the admin (Áron, 16 November)
+		$what = '<p style="margin:0 0 6px;font-weight:700">' . esc_html__( 'Your request', 'olivia-studio' ) . '</p>' . OYS_Privates::summary_html( $request );
+		self::compose( 'private_request_received', self::user_email( $request->user_id ), OYS_Email_Templates::vars_for( $request->user_id ), $what, array(), oys_account_url( 'private' ) );
 		if ( ! OYS_Email_Templates::enabled( 'studio_private' ) ) {
 			return;
 		}
 		$u     = get_userdata( $request->user_id );
-		$admin = '<p><b>' . esc_html( $u->display_name ) . '</b> (' . esc_html( $u->user_email ) . ', ' . esc_html( get_user_meta( $u->ID, 'oys_phone', true ) ) . ')</p>'
-			. '<p>' . esc_html( $request->duration_min ) . ' min · ' . esc_html( $request->people ) . ' ' . esc_html__( 'people', 'olivia-studio' ) . ' · ' . esc_html( $request->location_type ) . ' · ' . esc_html( $request->address ) . '</p>'
-			. '<p><b>' . esc_html__( 'Preferred times', 'olivia-studio' ) . ':</b><br>' . nl2br( esc_html( $request->preferred ) ) . '</p>'
-			. '<p><b>' . esc_html__( 'Notes', 'olivia-studio' ) . ':</b><br>' . nl2br( esc_html( $request->notes ) ) . '</p>';
-		self::send( OYS_Settings::get( 'notify_email' ), __( 'New private session request', 'olivia-studio' ), __( 'New private request', 'olivia-studio' ), $admin, array(), array( __( 'Open in dashboard', 'olivia-studio' ), admin_url( 'admin.php?page=oys-private&request=' . (int) $request->id ) ) );
+		$name  = trim( $u->first_name . ' ' . $u->last_name ) ?: $u->display_name;
+		$phone = (string) get_user_meta( $u->ID, 'oys_phone', true );
+		$admin = '<p><b>' . esc_html( $name ) . '</b><br><a href="mailto:' . esc_attr( $u->user_email ) . '">' . esc_html( $u->user_email ) . '</a>' . ( '' !== $phone ? ' · <a href="tel:' . esc_attr( preg_replace( '/[^\d+]/', '', $phone ) ) . '">' . esc_html( $phone ) . '</a>' : '' ) . '</p>'
+			. OYS_Privates::summary_html( $request );
+		$subject = sprintf( __( 'New private request: %1$s – %2$s', 'olivia-studio' ), OYS_Privates::topic_label( $request->topic ?? '', (int) $request->people ) . ', ' . (int) $request->duration_min . ' ' . __( 'min', 'olivia-studio' ), $name );
+		self::send( OYS_Settings::get( 'notify_email' ), $subject, __( 'New private request', 'olivia-studio' ), $admin, array(), array( __( 'Open in dashboard', 'olivia-studio' ), admin_url( 'admin.php?page=oys-private&request=' . (int) $request->id ) ) );
 	}
 
 	protected static function private_offer( $request, $session ) {

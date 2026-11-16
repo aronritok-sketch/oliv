@@ -1453,6 +1453,7 @@ class OYS_Frontend {
 				$what  = OYS_Services::get( (string) ( $r->topic ?? '' ) ) ? esc_html( OYS_Services::label( $r->topic, (int) $r->people ) ) . ', ' . (int) $r->duration_min . ' ' . esc_html__( 'min', 'olivia-studio' ) : sprintf( esc_html__( 'Private session, %d min', 'olivia-studio' ), (int) $r->duration_min );
 				$out .= '<li class="oys-item"><div class="oys-item__main"><h4>' . $what . ' <span class="badge">' . esc_html( $st[ $r->status ] ?? $r->status ) . '</span></h4>'
 					. '<p>' . esc_html( ( $types[ $r->location_type ] ?? '' ) . ' · ' . $detail ) . '</p>'
+					. ( ! $s && '' !== trim( (string) $r->preferred ) ? '<p class="oys-small">' . esc_html__( 'Preferred times', 'olivia-studio' ) . ': ' . esc_html( $r->preferred ) . '</p>' : '' )
 					. ( $r->admin_message ? '<p class="oys-small">' . esc_html( $r->admin_message ) . '</p>' : '' ) . '</div><div class="oys-item__actions">' . $action . '</div></li>';
 			}
 			$out .= '</ul>';

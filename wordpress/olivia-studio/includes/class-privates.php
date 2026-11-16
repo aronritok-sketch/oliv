@@ -66,6 +66,34 @@ class OYS_Privates {
 		return $out;
 	}
 
+	/**
+	 * What was asked for, label → value: the service, its length, how many, where, the times that suit, the note.
+	 * Áron, 16 November: „Egyéni kérések esetén mindig legyen meg, hogy mi a szolgáltatás, meg mire kért, és az
+	 * e-mailbe is menjen ki, ne csak az adminban legyen látható.” – the same list in the emails, the admin and the account.
+	 */
+	public static function summary( $r ) {
+		$types = self::location_types();
+		$rows  = array(
+			__( 'Service', 'olivia-studio' )         => self::topic_label( $r->topic ?? '', (int) $r->people ),
+			__( 'Length', 'olivia-studio' )          => (int) $r->duration_min . ' ' . __( 'min', 'olivia-studio' ),
+			__( 'Group size', 'olivia-studio' )      => max( 1, (int) $r->people ) . ' ' . __( 'people', 'olivia-studio' ),
+			__( 'Location', 'olivia-studio' )        => trim( ( $types[ $r->location_type ] ?? (string) $r->location_type ) . ( '' !== (string) $r->address ? ' – ' . $r->address : '' ) ),
+			__( 'Preferred times', 'olivia-studio' ) => (string) $r->preferred,
+			__( 'Notes', 'olivia-studio' )           => (string) $r->notes,
+		);
+		return array_filter( $rows, fn( $v ) => '' !== trim( (string) $v ) );
+	}
+
+	/** The same as a small table for an email (inline styles: email programs ignore style sheets). */
+	public static function summary_html( $r ) {
+		$html = '<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;margin:0 0 18px">';
+		foreach ( self::summary( $r ) as $label => $value ) {
+			$html .= '<tr><td style="padding:8px 14px 8px 0;border-bottom:1px solid #ECE9EA;vertical-align:top;white-space:nowrap;font-size:13px;color:#53635A">' . esc_html( $label ) . '</td>'
+				. '<td style="padding:8px 0;border-bottom:1px solid #ECE9EA;vertical-align:top;font-size:15px;font-weight:600;color:#12231A">' . nl2br( esc_html( $value ) ) . '</td></tr>';
+		}
+		return $html . '</table>';
+	}
+
 	public static function topic_label( $topic, $people = 1 ) {
 		return OYS_Services::get( (string) $topic ) ? OYS_Services::label( $topic, $people ) : __( 'Private session', 'olivia-studio' );
 	}
