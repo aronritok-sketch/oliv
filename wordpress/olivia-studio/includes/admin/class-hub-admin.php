@@ -81,7 +81,9 @@ class OYS_Hub_Admin {
 		$manage = current_user_can( 'oys_manage' );
 		$u      = wp_get_current_user();
 		$a      = fn( $page, $args = '' ) => admin_url( 'admin.php?page=' . $page . $args );
+		$guide  = array( 'book', __( 'Studio guide', 'olivia-studio' ), OYS_Studio_App::guide_url(), __( 'How everything works', 'olivia-studio' ) );
 		$links  = $manage ? array(
+			$guide,
 			array( 'calendar', __( 'Calendar', 'olivia-studio' ), $a( 'oys-calendar' ), __( 'Classes, move, add', 'olivia-studio' ) ),
 			array( 'list', __( 'Rosters & list', 'olivia-studio' ), $a( 'oys-schedule' ), __( 'Who is coming, check-in', 'olivia-studio' ) ),
 			array( 'star', __( 'Private requests', 'olivia-studio' ), $a( 'oys-private' ), __( 'Offers, one-to-one', 'olivia-studio' ) ),
@@ -97,6 +99,7 @@ class OYS_Hub_Admin {
 			array( 'gear', __( 'Settings', 'olivia-studio' ), $a( 'oys-settings' ), '' ),
 			array( 'globe', __( 'Open the website', 'olivia-studio' ), home_url( '/' ), '' ),
 		) : array(
+			$guide,
 			array( 'calendar', __( 'My classes', 'olivia-studio' ), $a( 'oys-teach' ), __( 'Rosters, write to the class', 'olivia-studio' ) ),
 			array( 'user', __( 'My profile', 'olivia-studio' ), $a( 'oys-teach-profile' ), __( 'Photos, introduction', 'olivia-studio' ) ),
 			array( 'card', __( 'My statement', 'olivia-studio' ), $a( 'oys-teach-statement' ), '' ),
@@ -113,6 +116,12 @@ class OYS_Hub_Admin {
 			'emails'  => $manage ? $a( 'oys-emails' ) : '',
 			'privUrl' => $a( 'oys-private', '&request=' ),
 			'boot'    => array( 'today' => OYS_Hub::today(), 'me' => OYS_Hub::prefs() + array( 'name' => OYS_Hub::chat_name( $u->ID ) ) ),
+			'app'     => array(
+				'link'  => OYS_Studio_App::url(),
+				'guide' => OYS_Studio_App::guide_url(),
+				'sw'    => home_url( '/?oys_app=sw' ),
+				'scope' => (string) wp_parse_url( home_url( '/' ), PHP_URL_PATH ),
+			),
 			'i18n'    => self::strings(),
 		);
 	}
@@ -197,9 +206,35 @@ class OYS_Hub_Admin {
 			'confirmDelete' => __( 'Remove this message from the class chat?', 'olivia-studio' ),
 			'error'         => __( 'Something went wrong. Try again.', 'olivia-studio' ),
 			'offline'       => __( 'No connection. Retrying…', 'olivia-studio' ),
-			'notifyOn'      => __( 'Turn on notifications', 'olivia-studio' ),
-			'notifyIsOn'    => __( 'Notifications are on on this device', 'olivia-studio' ),
-			'notifyHelp'    => __( 'While the Hub is open (also in a background tab), this device shows a notification when someone writes.', 'olivia-studio' ),
+			'appTitle'        => __( 'The Studio on your phone', 'olivia-studio' ),
+			'appHelp'         => __( 'Your own link to the Hub. Put it on your home screen and it opens like an app, with the logo.', 'olivia-studio' ),
+			'appInstall'      => __( 'Install the app', 'olivia-studio' ),
+			'appInstalled'    => __( 'The app is on this device. You are using it now.', 'olivia-studio' ),
+			'appStepsIos'     => array(
+				__( 'Open this page in Safari.', 'olivia-studio' ),
+				__( 'Tap the Share button (the square with the arrow) at the bottom.', 'olivia-studio' ),
+				__( 'Choose „Add to Home Screen”, then „Add”.', 'olivia-studio' ),
+				__( 'Open the Studio from the new icon on the home screen and switch on the notifications below.', 'olivia-studio' ),
+			),
+			'appStepsAndroid' => array(
+				__( 'Open this page in Chrome.', 'olivia-studio' ),
+				__( 'Tap the menu (⋮) at the top right.', 'olivia-studio' ),
+				__( 'Choose „Install app” or „Add to Home screen”.', 'olivia-studio' ),
+				__( 'Open the Studio from the new icon and switch on the notifications below.', 'olivia-studio' ),
+			),
+			'copy'            => __( 'Copy', 'olivia-studio' ),
+			'copied'          => __( 'Link copied.', 'olivia-studio' ),
+			'pushTitle'       => __( 'Notifications on this device', 'olivia-studio' ),
+			'pushHelp'        => __( 'New messages, requests, website messages and class chat messages (not during the class) arrive as a notification, also when the app is closed.', 'olivia-studio' ),
+			'pushOn'          => __( 'Turn on notifications', 'olivia-studio' ),
+			'pushIsOn'        => __( 'Notifications are on on this device.', 'olivia-studio' ),
+			'pushOff'         => __( 'Turn off', 'olivia-studio' ),
+			'pushTest'        => __( 'Send a test', 'olivia-studio' ),
+			'pushSent'        => __( 'Sent: it arrives in a few seconds.', 'olivia-studio' ),
+			'pushNo'          => __( 'This browser cannot show notifications. Use the app from the home screen, or Chrome / Safari.', 'olivia-studio' ),
+			'pushDenied'      => __( 'Notifications are blocked for this site. Allow them in the phone\'s settings, then try again.', 'olivia-studio' ),
+			'pushIosFirst'    => __( 'On an iPhone, first put the Studio on the home screen (steps above) and open it from there: then you can switch on the notifications here.', 'olivia-studio' ),
+			'guide'           => __( 'Studio guide', 'olivia-studio' ),
 			'notifyTitle'   => __( 'New in the Hub', 'olivia-studio' ),
 			'emailMe'       => __( 'Email me', 'olivia-studio' ),
 			'emailMessages' => __( 'when someone writes to me', 'olivia-studio' ),

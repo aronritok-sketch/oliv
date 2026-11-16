@@ -52,6 +52,9 @@
 		note: '<path d="M5 4.5h14v10l-5 5H5z"/><path d="M14 19.5v-5h5"/>',
 		heart: '<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/>',
 		logout: '<path d="M14 4.5h4.5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H14M10 16l-4-4 4-4M6 12h10"/>',
+		book: '<path d="M4.5 5.5c2.5-1 5-1 7.5.5v13c-2.5-1.5-5-1.5-7.5-.5zM19.5 5.5c-2.5-1-5-1-7.5.5v13c2.5-1.5 5-1.5 7.5-.5z"/>',
+		mobile: '<rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 17.5h2"/>',
+		link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7L11.5 6.8"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/>',
 	};
 	const api = async ( path, opts = {} ) => {
 		const o = { method: opts.method || 'GET', credentials: 'same-origin', headers: { 'X-WP-Nonce': B.nonce } };
@@ -674,12 +677,9 @@
 	/* ---------- My settings ---------- */
 	function renderSettings() {
 		const m = S.me || {};
-		const canNotify = 'Notification' in window;
-		const on = canNotify && 'granted' === Notification.permission;
 		$( '[data-panel="settings"]' ).innerHTML = '<h1 class="hub-title">' + esc( T.settings ) + '</h1>' +
+			'<section class="hub-card hub-app" data-app></section>' +
 			'<form class="hub-form" data-prefs>' +
-			'<section class="hub-card"><h2 class="hub-h">' + icon( 'bell' ) + esc( T.notifyOn ) + '</h2><p class="hub-muted">' + esc( T.notifyHelp ) + '</p>' +
-			( canNotify ? '<button type="button" class="hub-btn' + ( on ? '' : ' hub-btn--primary' ) + '" data-notify' + ( on ? ' disabled' : '' ) + '>' + icon( on ? 'check' : 'bell' ) + esc( on ? T.notifyIsOn : T.notifyOn ) + '</button>' : '' ) + '</section>' +
 			'<section class="hub-card"><h2 class="hub-h">' + icon( 'mail' ) + esc( T.emailMe ) + '</h2>' +
 			'<label class="hub-switch"><input type="checkbox" name="email_messages"' + ( m.email_messages ? ' checked' : '' ) + '><span></span>' + esc( T.emailMessages ) + '</label>' +
 			'<label class="hub-switch"><input type="checkbox" name="email_chat"' + ( m.email_chat ? ' checked' : '' ) + '><span></span>' + esc( T.emailChat ) + '</label>' +
@@ -703,14 +703,143 @@
 				toast( err.message, true );
 			}
 		} );
-		const nb = $( '[data-notify]' );
-		if ( nb ) {
-			nb.addEventListener( 'click', async () => {
-				await Notification.requestPermission();
-				renderSettings();
-			} );
+		renderApp();
+	}
+
+	/* ---------- the app on the phone: install, notifications on this device (OYS_Studio_App) ---------- */
+	const A = B.app || {};
+	let installPrompt = null;
+	window.addEventListener( 'beforeinstallprompt', ( e ) => {
+		e.preventDefault();
+		installPrompt = e;
+		if ( 'settings' === S.view ) {
+			renderApp();
+		}
+	} );
+	const standalone = () => window.matchMedia( '(display-mode: standalone)' ).matches || true === window.navigator.standalone;
+	const isIos = () => /iphone|ipad|ipod/i.test( navigator.userAgent ) || ( 'MacIntel' === navigator.platform && navigator.maxTouchPoints > 1 );
+	const pushable = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+	const keyBytes = ( b64 ) => {
+		const raw = atob( ( b64 + '='.repeat( ( 4 - ( b64.length % 4 ) ) % 4 ) ).replace( /-/g, '+' ).replace( /_/g, '/' ) );
+		return Uint8Array.from( raw, ( c ) => c.charCodeAt( 0 ) );
+	};
+	async function worker() {
+		if ( ! ( 'serviceWorker' in navigator ) || ! A.sw ) {
+			return null;
+		}
+		try {
+			const reg = await navigator.serviceWorker.register( A.sw, { scope: A.scope } );
+			// ready can wait forever when the worker never activates: give it a few seconds
+			return await Promise.race( [ navigator.serviceWorker.ready, new Promise( ( ok ) => setTimeout( () => ok( reg.active ? reg : null ), 4000 ) ) ] );
+		} catch ( e ) {
+			return null;
 		}
 	}
+	async function currentSub() {
+		const reg = pushable() ? await worker() : null;
+		return reg ? reg.pushManager.getSubscription() : null;
+	}
+	async function pushOn() {
+		const st = await api( 'push' );
+		if ( ! st.key ) {
+			throw new Error( T.pushNo );
+		}
+		if ( 'granted' !== await Notification.requestPermission() ) {
+			throw new Error( T.pushDenied );
+		}
+		const reg = await worker();
+		if ( ! reg ) {
+			throw new Error( T.pushNo );
+		}
+		let sub = await reg.pushManager.getSubscription();
+		if ( ! sub ) {
+			sub = await reg.pushManager.subscribe( { userVisibleOnly: true, applicationServerKey: keyBytes( st.key ) } );
+		}
+		return api( 'push', { method: 'POST', json: { endpoint: sub.endpoint, ua: navigator.userAgent } } );
+	}
+	async function pushOff() {
+		const sub = await currentSub();
+		if ( sub ) {
+			await api( 'push', { method: 'DELETE', json: { endpoint: sub.endpoint } } ).catch( () => null );
+			await sub.unsubscribe().catch( () => null );
+		}
+	}
+	async function renderApp() {
+		const box = $( '[data-app]' );
+		if ( ! box ) {
+			return;
+		}
+		const sub = await currentSub().catch( () => null );
+		const on = !! sub && 'Notification' in window && 'granted' === Notification.permission;
+		let install = '';
+		if ( standalone() ) {
+			install = '<p class="hub-ok">' + icon( 'check' ) + esc( T.appInstalled ) + '</p>';
+		} else if ( installPrompt ) {
+			install = '<button type="button" class="hub-btn hub-btn--primary" data-install>' + icon( 'mobile' ) + esc( T.appInstall ) + '</button>';
+		} else {
+			install = '<ol class="hub-steps">' + ( isIos() ? T.appStepsIos : T.appStepsAndroid ).map( ( l ) => '<li>' + esc( l ) + '</li>' ).join( '' ) + '</ol>';
+		}
+		let push = '';
+		if ( ! pushable() ) {
+			push = '<p class="hub-muted">' + esc( isIos() && ! standalone() ? T.pushIosFirst : T.pushNo ) + '</p>';
+		} else if ( on ) {
+			push = '<p class="hub-ok">' + icon( 'check' ) + esc( T.pushIsOn ) + '</p><p class="hub-row"><button type="button" class="hub-btn" data-push-test>' + icon( 'bell' ) + esc( T.pushTest ) + '</button>' +
+				'<button type="button" class="hub-btn hub-btn--ghost" data-push-off>' + esc( T.pushOff ) + '</button></p>';
+		} else {
+			push = '<p class="hub-muted">' + esc( T.pushHelp ) + '</p><button type="button" class="hub-btn hub-btn--primary" data-push-on>' + icon( 'bell' ) + esc( T.pushOn ) + '</button>';
+		}
+		box.innerHTML = '<h2 class="hub-h">' + icon( 'mobile' ) + esc( T.appTitle ) + '</h2>' +
+			'<p class="hub-muted">' + esc( T.appHelp ) + '</p>' +
+			'<p class="hub-applink"><a href="' + esc( A.link ) + '">' + icon( 'link' ) + esc( ( A.link || '' ).replace( /^https?:\/\//, '' ) ) + '</a>' +
+			'<button type="button" class="hub-btn hub-btn--ghost hub-btn--sm" data-copy>' + esc( T.copy ) + '</button></p>' +
+			install +
+			'<h3 class="hub-h hub-h--sub">' + icon( 'bell' ) + esc( T.pushTitle ) + '</h3>' + push +
+			( A.guide ? '<p><a class="hub-btn hub-btn--ghost" href="' + esc( A.guide ) + '">' + icon( 'book' ) + esc( T.guide ) + '</a></p>' : '' );
+		const on1 = ( sel, fn ) => {
+			const b = $( sel, box );
+			if ( b ) {
+				b.addEventListener( 'click', async () => {
+					b.disabled = true;
+					try {
+						await fn();
+					} catch ( err ) {
+						toast( err.message || T.error, true );
+					}
+					renderApp();
+				} );
+			}
+		};
+		on1( '[data-install]', async () => {
+			installPrompt.prompt();
+			await installPrompt.userChoice.catch( () => null );
+			installPrompt = null;
+		} );
+		on1( '[data-push-on]', async () => {
+			await pushOn();
+			toast( T.pushIsOn );
+		} );
+		on1( '[data-push-off]', async () => {
+			await pushOff();
+			toast( T.saved );
+		} );
+		on1( '[data-push-test]', async () => {
+			const r = await api( 'push/test', { method: 'POST' } );
+			toast( r.devices ? T.pushSent : T.pushNo, ! r.devices );
+		} );
+		on1( '[data-copy]', async () => {
+			await navigator.clipboard.writeText( A.link );
+			toast( T.copied );
+		} );
+	}
+	// a device that already said yes keeps its subscription fresh on the server (it can change or get lost)
+	( async () => {
+		if ( pushable() && 'granted' === Notification.permission ) {
+			const sub = await currentSub().catch( () => null );
+			if ( sub ) {
+				api( 'push', { method: 'POST', json: { endpoint: sub.endpoint, ua: navigator.userAgent } } ).catch( () => null );
+			}
+		}
+	} )();
 
 	/* ---------- polling and notifications ---------- */
 	let lastTotal = S.counts.total || 0;

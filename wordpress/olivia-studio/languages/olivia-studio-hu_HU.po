@@ -6795,3 +6795,131 @@ msgstr "%d óra"
 #: includes/admin/class-hub-admin.php
 msgid "Rosters"
 msgstr "Névsorok"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Your studio on the phone: messages, class chats, today's classes."
+msgstr "A stúdiód a telefonodon: üzenetek, órai chatek, a mai órák."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Studio guide"
+msgstr "Stúdió útmutató"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Someone wrote to you."
+msgstr "Valaki írt neked."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Private session request: %s"
+msgstr "Egyéni kérés: %s"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Website: %s"
+msgstr "Weboldal: %s"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Class chat: %s"
+msgstr "Órai chat: %s"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Notifications are not available on this server."
+msgstr "Ezen a szerveren nem érhetők el az értesítések."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "This device could not be switched on."
+msgstr "Ezt az eszközt nem sikerült bekapcsolni."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Notifications work on this device. 🌿"
+msgstr "Az értesítések működnek ezen az eszközön. 🌿"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "How everything works"
+msgstr "Hogyan működik minden"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "The Studio on your phone"
+msgstr "A Stúdió a telefonodon"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Your own link to the Hub. Put it on your home screen and it opens like an app, with the logo."
+msgstr "A saját linked a Hubhoz. Tedd ki a kezdőképernyőre, és úgy nyílik meg, mint egy alkalmazás, a logóddal."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Install the app"
+msgstr "App telepítése"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "The app is on this device. You are using it now."
+msgstr "Az app ezen az eszközön van, most is azt használod."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Open this page in Safari."
+msgstr "Nyisd meg ezt az oldalt a Safariban."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Tap the Share button (the square with the arrow) at the bottom."
+msgstr "Alul koppints a Megosztás gombra (a négyzet a felfelé mutató nyíllal)."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Choose „Add to Home Screen”, then „Add”."
+msgstr "Válaszd a „Főképernyőhöz adás” lehetőséget, majd a „Hozzáadás” gombot."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Open the Studio from the new icon on the home screen and switch on the notifications below."
+msgstr "Nyisd meg a Stúdiót a kezdőképernyőn az új ikonnal, és kapcsold be lent az értesítéseket."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Open this page in Chrome."
+msgstr "Nyisd meg ezt az oldalt a Chrome-ban."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Tap the menu (⋮) at the top right."
+msgstr "Koppints jobb felül a menüre (⋮)."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Choose „Install app” or „Add to Home screen”."
+msgstr "Válaszd az „Alkalmazás telepítése” vagy a „Hozzáadás a kezdőképernyőhöz” lehetőséget."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Open the Studio from the new icon and switch on the notifications below."
+msgstr "Nyisd meg a Stúdiót az új ikonnal, és kapcsold be lent az értesítéseket."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Copy"
+msgstr "Másolás"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Link copied."
+msgstr "Link kimásolva."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Notifications on this device"
+msgstr "Értesítések ezen az eszközön"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "New messages, requests, website messages and class chat messages (not during the class) arrive as a notification, also when the app is closed."
+msgstr "Az új üzenetekről, kérésekről, a weboldalról érkező üzenetekről és az órai chatről (az óra alatt nem) értesítést kapsz, akkor is, ha az app be van zárva."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Notifications are on on this device."
+msgstr "Az értesítések be vannak kapcsolva ezen az eszközön."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Turn off"
+msgstr "Kikapcsolom"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Sent: it arrives in a few seconds."
+msgstr "Elküldve: pár másodpercen belül megérkezik."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "This browser cannot show notifications. Use the app from the home screen, or Chrome / Safari."
+msgstr "Ez a böngésző nem tud értesítést mutatni. Használd a kezdőképernyőre tett appot, vagy a Chrome-ot / Safarit."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Notifications are blocked for this site. Allow them in the phone's settings, then try again."
+msgstr "Az értesítések tiltva vannak ennél az oldalnál. Engedélyezd őket a telefon beállításaiban, aztán próbáld újra."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "On an iPhone, first put the Studio on the home screen (steps above) and open it from there: then you can switch on the notifications here."
+msgstr "iPhone-on előbb tedd ki a Stúdiót a kezdőképernyőre (fenti lépések), és onnan nyisd meg: utána itt bekapcsolhatod az értesítéseket."

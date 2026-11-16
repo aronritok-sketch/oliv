@@ -991,6 +991,36 @@
     - a „Kapcsolat” → oliviajoga.online/kapcsolat/;
     - minden bejelentkezés-CTA → az online főoldal; a GYIK két válasza már az új.
   - A .hu ellenőrzője 2288/0 (most), 1219/0 (november 26-tól).
+- **olivia-studio 1.15.0 (téma 3.11.101-gyel) – a Stúdió a telefonon: saját link, app logóval, értesítések, útmutató**
+  (Áron, 2026-11-16: „legyen egy egyedi link ehhez”, „adj egy olyan izét … mint a HelloProVisionnek a telefonjára, egy
+  appot logóval mindennel együtt, hogy onnan elérje és kapjon értesítőt is”, „legyen mobilra optimalizált”):
+  - **Saját link:** `oliviajoga.online/studio/` – ha kell, belépés, utána a Hub (oktatónak a saját Hubja).
+    `/studio/?open=inbox|today|more|settings|t<id>|c<id>` az adott részt nyitja (`OYS_Studio_App`,
+    `includes/class-studio-app.php`).
+  - **App (PWA):**
+    - manifest `/?oys_app=manifest`: „Olívia Jóga Stúdió” / „Olívia Stúdió”, Evergreen szín, ikonok;
+    - ikonok: Olívia logója (krém OLÍVIA, magenta hullám) sötétzöld alapon, `assets/app/` – 192, 512, maskable,
+      apple-touch; a generáló: `dev/studio-app-icons.js`;
+    - service worker: `/?oys_app=sw`, csak értesítéshez, fetch-kezelő nélkül (a HelloProVision CRM mintája).
+    - A Hub és minden Stúdió-oldal fejében ott a manifest, a főképernyő-ikon és a téma-szín, a belépőoldalon is, ha a
+      /studio/-ra visz.
+  - **Push-értesítés, eszközönként** (Hub → Beállításaim → „A Stúdió a telefonodon”):
+    - Mire jön: új üzenet, egyéni kérés, weboldalas üzenet, órai chat (az óra alatt nem).
+    - Akkor is jön, ha az app zárva van. Koppintásra az adott beszélgetés nyílik.
+    - Ha a Hub éppen elöl van, nem jön külön.
+    - Az üres push után a service worker a készülék push-címével kéri le a szöveget (`/?oys_app=pull`).
+    - A VAPID kulcs első használatkor készül, az `oys_push_vapid` opcióban van (nem a repóban) – ne töröld.
+    - Oktató csak a saját beszélgetéseiről kap értesítést. A lejárt eszközt (404/410) a rendszer elfelejti.
+    - REST: `oys/v1/hub/push` (GET/POST/DELETE), `hub/push/test`.
+  - **A Beállításaim kártyája:** a saját link másolás gombbal, telepítés („App telepítése” Androidon, lépések
+    iPhone-ra), értesítés be/ki, próba-értesítés. iPhone-on az értesítés a főképernyőre tett appból kapcsolható be
+    (iOS 16.4+).
+  - **Útmutató mobilra, saját linkkel:** `oliviajoga.online/studio/utmutato/` (`includes/views/studio-guide-hu.php`,
+    `assets/guide.css`; belépés kell, noindex).
+    - Tartalma: az első lépései, az app és az értesítések, a Hub minden füle és funkciója, üzenetek, értesítések,
+      órák, élő óra, egyéni órák, bérletek, vendégek, oktatók.
+    - A Hub „Több” fülén az első csempe.
+  - Tesztek: 1482/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

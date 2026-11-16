@@ -4727,3 +4727,135 @@ msgstr "%d horas"
 #: includes/admin/class-hub-admin.php
 msgid "Rosters"
 msgstr "Listas"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Your studio on the phone: messages, class chats, today's classes."
+msgstr "Tu estudio en el móvil: mensajes, chats de clase, las clases de hoy."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Studio guide"
+msgstr "Guía del estudio"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Someone wrote to you."
+msgstr "Alguien te ha escrito."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Private session request: %s"
+msgstr "Solicitud de sesión privada: %s"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Website: %s"
+msgstr "Web: %s"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Class chat: %s"
+msgstr "Chat de clase: %s"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Notifications are not available on this server."
+msgstr "Las notificaciones no están disponibles en este servidor."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "This device could not be switched on."
+msgstr "No se pudo activar este dispositivo."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Notifications work on this device. 🌿"
+msgstr "Las notificaciones funcionan en este dispositivo. 🌿"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "How everything works"
+msgstr "Cómo funciona todo"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "The Studio on your phone"
+msgstr "El estudio en tu móvil"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Your own link to the Hub. Put it on your home screen and it opens like an app, with the logo."
+msgstr "Tu propio enlace al Hub. Ponlo en la pantalla de inicio y se abre como una app, con el logo."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Install the app"
+msgstr "Instalar la app"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "The app is on this device. You are using it now."
+msgstr "La app está en este dispositivo. La estás usando ahora."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Open this page in Safari."
+msgstr "Abre esta página en Safari."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Tap the Share button (the square with the arrow) at the bottom."
+msgstr "Toca el botón Compartir (el cuadrado con la flecha) abajo."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Choose „Add to Home Screen”, then „Add”."
+msgstr "Elige «Añadir a pantalla de inicio» y luego «Añadir»."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Open the Studio from the new icon on the home screen and switch on the notifications below."
+msgstr "Abre el estudio desde el nuevo icono de la pantalla de inicio y activa abajo las notificaciones."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Open this page in Chrome."
+msgstr "Abre esta página en Chrome."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Tap the menu (⋮) at the top right."
+msgstr "Toca el menú (⋮) arriba a la derecha."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Choose „Install app” or „Add to Home screen”."
+msgstr "Elige «Instalar app» o «Añadir a pantalla de inicio»."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Open the Studio from the new icon and switch on the notifications below."
+msgstr "Abre el estudio desde el nuevo icono y activa abajo las notificaciones."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Copy"
+msgstr "Copiar"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Link copied."
+msgstr "Enlace copiado."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Notifications on this device"
+msgstr "Notificaciones en este dispositivo"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "New messages, requests, website messages and class chat messages (not during the class) arrive as a notification, also when the app is closed."
+msgstr "Los mensajes nuevos, solicitudes, mensajes de la web y del chat de clase (no durante la clase) llegan como notificación, también con la app cerrada."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Notifications are on on this device."
+msgstr "Las notificaciones están activadas en este dispositivo."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Turn off"
+msgstr "Desactivar"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Send a test"
+msgstr "Enviar una prueba"
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Sent: it arrives in a few seconds."
+msgstr "Enviada: llega en unos segundos."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "This browser cannot show notifications. Use the app from the home screen, or Chrome / Safari."
+msgstr "Este navegador no puede mostrar notificaciones. Usa la app desde la pantalla de inicio, o Chrome / Safari."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "Notifications are blocked for this site. Allow them in the phone's settings, then try again."
+msgstr "Las notificaciones están bloqueadas para este sitio. Permítelas en los ajustes del móvil y vuelve a intentarlo."
+
+#: Studio app (OYS_Studio_App, Hub → My settings)
+msgid "On an iPhone, first put the Studio on the home screen (steps above) and open it from there: then you can switch on the notifications here."
+msgstr "En un iPhone, primero pon el estudio en la pantalla de inicio (pasos de arriba) y ábrelo desde allí: luego podrás activar aquí las notificaciones."

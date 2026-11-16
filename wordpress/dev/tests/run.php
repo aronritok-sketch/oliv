@@ -4279,6 +4279,111 @@ test( 'Áron, 16 November: the price cards ask for a time or sell the pass; the 
 	}
 } );
 
+test( 'Áron, 16 November – the Studio on the phone: its own link, an installable app with the logo, the guide', function () {
+	eq( 'hub', OYS_Studio_App::match( '/studio/' ), '/studio/ is the Hub' );
+	eq( 'hub', OYS_Studio_App::match( '/studio?open=inbox' ), 'also without the slash' );
+	eq( 'guide', OYS_Studio_App::match( '/studio/utmutato/' ), '/studio/utmutato/ is the guide' );
+	eq( 'guide', OYS_Studio_App::match( '/studio/' . rawurlencode( 'útmutató' ) . '/' ), 'with the accents too' );
+	eq( 'manifest', OYS_Studio_App::match( '/', array( 'oys_app' => 'manifest' ) ), 'the manifest' );
+	eq( 'sw', OYS_Studio_App::match( '/', array( 'oys_app' => 'sw' ) ), 'the service worker' );
+	eq( '', OYS_Studio_App::match( '/studios/' ), 'other addresses are not ours' );
+	eq( '', OYS_Studio_App::match( '/blog/studio/' ), 'not ours either' );
+	$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0];
+	ok( str_ends_with( OYS_Studio_App::hub_target( 'inbox', $admin ), 'page=oys#inbox' ), '/studio/?open=inbox opens the messages' );
+	ok( str_ends_with( OYS_Studio_App::hub_target( 't12', $admin ), 'page=oys#t12' ), 'and a conversation' );
+	ok( str_ends_with( OYS_Studio_App::hub_target( '"><script>', $admin ), 'page=oys' ), 'anything else: just the Hub' );
+	$m = OYS_Studio_App::manifest();
+	ok( str_ends_with( $m['start_url'], '/studio/' ) && 'standalone' === $m['display'], 'the app starts at /studio/, in its own window' );
+	eq( 3, count( $m['icons'] ), 'three icons, one maskable' );
+	foreach ( array( 'icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png' ) as $f ) {
+		$size = getimagesize( OYS_DIR . 'assets/app/' . $f );
+		ok( $size && $size[0] === $size[1] && $size[0] >= 180, $f . ' is there, square' );
+	}
+	ok( str_contains( OYS_Studio_App::head_tags(), 'rel="manifest"' ) && str_contains( OYS_Studio_App::head_tags(), 'apple-touch-icon' ), 'the Hub page carries the manifest and the home-screen icon' );
+	$sw = OYS_Studio_App::worker();
+	ok( str_contains( $sw, "addEventListener('push'" ) && str_contains( $sw, 'notificationclick' ) && ! str_contains( $sw, "'fetch'" ), 'the worker shows notifications and never sits between the page and the server' );
+	wp_set_current_user( $admin );
+	try {
+		ob_start();
+		OYS_Studio_App::render_guide();
+		$g = ob_get_clean();
+	} finally {
+		wp_set_current_user( 0 );
+	}
+	ok( str_contains( $g, 'Az első lépéseid' ) && str_contains( $g, 'Főképernyőhöz adás' ) && str_contains( $g, '/studio/' ), 'the guide: first steps, how to put it on the phone, the link' );
+	ok( str_contains( $g, 'name="viewport"' ) && str_contains( $g, 'noindex' ), 'made for the phone, not for search engines' );
+} );
+
+test( 'Áron, 16 November – the Studio app: notifications on the phone about messages and class chats', function () {
+	delete_option( OYS_Studio_App::SUBS );
+	$v = OYS_Studio_App::vapid();
+	ok( $v && 87 === strlen( $v['public'] ) && str_contains( $v['private'], 'PRIVATE KEY' ), 'a VAPID key pair is made on first use' );
+	eq( $v['public'], OYS_Studio_App::vapid()['public'], 'and kept' );
+	$jwt = explode( '.', OYS_Studio_App::jwt( 'https://push.example.test/abc', $v ) );
+	eq( 3, count( $jwt ), 'a signed token for the push service' );
+	eq( 64, strlen( base64_decode( strtr( $jwt[2], '-_', '+/' ) . str_repeat( '=', ( 4 - strlen( $jwt[2] ) % 4 ) % 4 ) ) ), 'ES256: a 64-byte signature' );
+	$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0];
+	ok( ! OYS_Studio_App::subscribe( $admin, 'http://evil.test/x' ), 'only https push addresses' );
+	$ep = 'https://push.example.test/send/olivia-phone';
+	ok( OYS_Studio_App::subscribe( $admin, $ep, 'iPhone' ), 'her phone is switched on' );
+	eq( 1, OYS_Studio_App::devices( $admin ), 'one device' );
+	$pings = array();
+	$fake  = function ( $pre, $args, $url ) use ( &$pings ) {
+		if ( str_starts_with( $url, 'https://push.example.test/' ) ) {
+			$pings[] = array( $url, $args['headers'] );
+			return array( 'response' => array( 'code' => str_contains( $url, 'gone' ) ? 410 : 201, 'message' => '' ), 'body' => '', 'headers' => array(), 'cookies' => array() );
+		}
+		return $pre;
+	};
+	add_filter( 'pre_http_request', $fake, 4, 3 );
+	try {
+		$u = make_user( 'Pushvendeg' );
+		$t = OYS_Hub::thread_for( $u );
+		OYS_Hub::add( $t, array( 'body' => 'Szia! Holnap tudok jönni?', 'from_studio' => false, 'author_id' => $u ) );
+		$item = OYS_Studio_App::pull( $ep );
+		eq( 1, count( $item ), 'a customer writes: a notification waits for her phone' );
+		ok( str_contains( $item[0]['body'] ?? '', 'Holnap tudok jönni?' ) && str_ends_with( $item[0]['url'] ?? '', '/studio/?open=t' . $t->id ), 'with the message, opening the conversation' );
+		eq( array(), OYS_Studio_App::pull( $ep ), 'taken once' );
+		OYS_Studio_App::flush();
+		ok( count( $pings ) >= 1 && str_starts_with( $pings[0][1]['Authorization'] ?? '', 'vapid t=' ) && 'high' === ( $pings[0][1]['Urgency'] ?? '' ), 'an empty push, signed, high urgency' );
+		OYS_Hub::add( $t, array( 'body' => 'Persze, várlak!', 'from_studio' => true, 'author_id' => $admin ) );
+		eq( array(), OYS_Studio_App::pull( $ep ), 'her own answer: no notification' );
+		$s   = make_session( array( 'format' => 'online', 'capacity' => 8, 'in_hours' => -30 ) );
+		$who = array( 'owner' => false, 'booking' => (object) array( 'id' => 999998 ), 'user_id' => $u, 'name' => 'Push V.' );
+		OYS_Live::post_message( $s, $who, 'Köszi a mai órát!' );
+		$item = OYS_Studio_App::pull( $ep );
+		ok( str_contains( $item[0]['body'] ?? '', 'Köszi a mai órát!' ) && str_ends_with( $item[0]['url'] ?? '', '/studio/?open=c' . $s->id ), 'a class chat message after the class: a notification' );
+		$now = make_session( array( 'format' => 'online', 'capacity' => 8, 'in_hours' => 0 ) );
+		OYS_Studio_App::on_class_chat( 0, $now, $who );
+		eq( array(), OYS_Studio_App::pull( $ep ), 'during the class: none' );
+		$tt  = make_teacher();
+		$tlu = wp_insert_user( array( 'user_login' => 'pushtanar', 'user_email' => 'pushtanar@example.test', 'user_pass' => 'x-12345678', 'role' => 'oys_teacher' ) );
+		global $wpdb;
+		$wpdb->update( OYS_Install::table( 'teachers' ), array( 'user_id' => $tlu ), array( 'id' => $tt->id ) );
+		OYS_Teachers::flush();
+		OYS_Studio_App::subscribe( $tlu, 'https://push.example.test/send/teacher' );
+		OYS_Hub::add( $t, array( 'body' => 'Még egy kérdés.', 'from_studio' => false, 'author_id' => $u ) );
+		eq( array(), OYS_Studio_App::pull( 'https://push.example.test/send/teacher' ), 'a teacher hears only about their own conversations' );
+		eq( 1, count( OYS_Studio_App::pull( $ep ) ), 'the studio does' );
+		OYS_Studio_App::subscribe( $admin, 'https://push.example.test/send/gone' );
+		OYS_Studio_App::ping( 'https://push.example.test/send/gone' );
+		ok( ! isset( OYS_Studio_App::subs()[ md5( 'https://push.example.test/send/gone' ) ] ), 'a device the push service no longer knows is forgotten' );
+		wp_set_current_user( $u );
+		eq( 403, rest_do_request( new WP_REST_Request( 'GET', '/oys/v1/hub/push' ) )->get_status(), 'customers have no push settings' );
+		wp_set_current_user( $admin );
+		$res = rest_do_request( new WP_REST_Request( 'GET', '/oys/v1/hub/push' ) );
+		ok( 200 === $res->get_status() && $v['public'] === $res->get_data()['key'] && str_ends_with( $res->get_data()['link'], '/studio/' ), 'the Hub gets the key and the link' );
+		$test = rest_do_request( new WP_REST_Request( 'POST', '/oys/v1/hub/push/test' ) );
+		ok( $test->get_data()['devices'] >= 1, 'a test notification goes to her devices' );
+		OYS_Studio_App::flush();
+	} finally {
+		wp_set_current_user( 0 );
+		remove_filter( 'pre_http_request', $fake, 4 );
+		remove_action( 'shutdown', array( 'OYS_Studio_App', 'flush' ) );
+		delete_option( OYS_Studio_App::SUBS );
+	}
+} );
+
 $t = $GLOBALS['oys_t'];
 echo "\n{$t['pass']} assertions passed, {$t['fail']} failed\n";
 exit( $t['fail'] ? 1 : 0 );

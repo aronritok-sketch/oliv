@@ -430,3 +430,18 @@ body.oys-hub-screen .screen-reader-text:not(:focus) { position: absolute; width:
 @media (prefers-reduced-motion: reduce) {
 	.hub *, .hub *::before, .hub *::after { animation: none !important; transition: none !important; }
 }
+
+/* My settings → the Studio on the phone (OYS_Studio_App): the own link, install steps, notifications on this device */
+.hub-app { border: 2px solid var(--hub-forest); }
+.hub-app .hub-btn + .hub-btn { margin-left: 8px; }
+.hub-applink { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 10px 0 14px; padding: 10px 12px; border-radius: 12px; background: var(--hub-sun-soft); }
+.hub-applink a { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; color: var(--hub-forest); text-decoration: none; word-break: break-all; }
+.hub-applink .hub-btn { margin-left: auto; }
+.hub-steps { margin: 0 0 6px; padding-left: 22px; line-height: 1.5; }
+.hub-steps li { margin: 0 0 6px; padding-left: 2px; }
+.hub-steps li::marker { font-weight: 700; color: var(--hub-magenta); }
+.hub-ok { display: flex; align-items: center; gap: 8px; margin: 6px 0 10px; font-weight: 600; color: var(--hub-forest); }
+.hub-ok .hub-i { color: #1d8a5b; }
+.hub-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.hub-app .hub-row .hub-btn + .hub-btn { margin-left: 0; }
+.hub-h--sub { margin-top: 18px !important; }
