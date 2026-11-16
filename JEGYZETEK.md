@@ -1021,6 +1021,15 @@
       órák, élő óra, egyéni órák, bérletek, vendégek, oktatók.
     - A Hub „Több” fülén az első csempe.
   - Tesztek: 1482/0.
+- **téma 3.11.102 – a telefonos menü újratervezve** (Áron, 2026-11-16, fotóval a mobilmenüről: „Ezt itt szar”):
+  - A hibák: az „ONLINE ÓRÁK” cím a logó alá csúszott (a menü 40 px-nél kezdődött, a fejléc 75 px magas), vegyes
+    stílus volt (sötét pillek és képernyőszéles óriásbetűk), és a menü nem fért ki (866 px a 664-ből).
+  - A menü most a fejléc alatt kezdődik. Az „Online órák” kis sárga felirat egy lekerekített lista fölött: az öt óra
+    soronként, a paletta színes pöttyével és nyíllal; a kijelölt óra sárga.
+  - A „Bejelentkezés és árak” egy széles sárga gomb. A Rólam, GYIK, Jógáról és Kapcsolat 2 × 2-es rácsban, a címbetűvel;
+    a megnyitott oldal világos.
+  - A menü saját gombjai és az e-mail-cím telefonon rejtve: az alsó sávban ott a Foglalás és a Fiók.
+  - iPhone 13-on görgetés nélkül kifér; iPhone SE-n sűrűbb sorokkal, legfeljebb 20 px görgetéssel.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -1722,3 +1722,49 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .oj-more-classes { margin: 1.2rem 0 0; }
 .oj-more-classes .btn { gap: .5rem; }
 .oj-more-classes .btn svg { width: 1.1rem; height: 1.1rem; }
+
+/* ==========================================================================
+   Áron, 16 November (a photo of the phone menu: „Ezt itt szar”): the phone menu as one calm screen. Nothing slides under
+   the logo any more (the drawer starts below the header); „Online órák” is a small label over one rounded list of the
+   classes, each with a palette dot and an arrow; „Bejelentkezés és árak” is the one bright button; the other pages are a
+   2 × 2 grid in the display face, not four screen-wide words. The bottom bar already has booking and the account, so the
+   drawer's own buttons and the address stay away. It fits an iPhone screen without scrolling.
+   ========================================================================== */
+@media (max-width: 759px) {
+	.drawer { padding: calc(var(--header-h) + 10px + env(safe-area-inset-top, 0px)) 18px calc(104px + env(safe-area-inset-bottom, 0px)); background: var(--moss); }
+	.nav-open .site-header { background: var(--moss); border-color: var(--moss); }
+	.drawer > nav > ul { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 8px; }
+	.drawer > nav > ul > li.menu-item-has-children { grid-column: 1 / -1; margin-bottom: 6px; }
+	.drawer .sub-toggle { display: none; }
+	/* „Online órák”: a small label over the list */
+	.drawer > nav > ul > li.menu-item-has-children > a { display: inline-block; padding: 0 0 8px; font-family: var(--f-text); font-size: .76rem; font-weight: 700; letter-spacing: .18em; line-height: 1.2; text-transform: uppercase; color: var(--sun); }
+	/* the classes: one rounded list, a dot in the palette's colours, an arrow */
+	.drawer .sub-menu { display: block !important; margin: 0; padding: 0; border-radius: 18px; background: rgba(255, 255, 255, .07); overflow: hidden; }
+	.drawer .sub-menu li + li { border-top: 1px solid rgba(255, 255, 255, .09); }
+	.drawer .sub-menu a { position: relative; display: flex !important; align-items: center; min-height: 46px; padding: .5rem 2.4rem .5rem 2.3rem !important; border-radius: 0; background: none; font-family: var(--f-text); font-size: 1rem !important; font-weight: 600; line-height: 1.25; text-transform: none; color: var(--paper) !important; }
+	.drawer .sub-menu a::before { content: ""; position: absolute; left: 1rem; top: 50%; width: 9px; height: 9px; margin-top: -4.5px; border-radius: 50%; background: var(--sun); }
+	.drawer .sub-menu li:nth-child(2) a::before { background: var(--tangerine, #FFAC81); }
+	.drawer .sub-menu li:nth-child(3) a::before { background: var(--orchid); }
+	.drawer .sub-menu li:nth-child(4) a::before { background: var(--paper); }
+	.drawer .sub-menu li:nth-child(5) a::before { background: #9ED8DB; }
+	.drawer .sub-menu a::after { content: ""; position: absolute; right: 1.1rem; top: 50%; width: 7px; height: 7px; border-top: 2px solid currentColor; border-right: 2px solid currentColor; transform: translateY(-50%) rotate(45deg); opacity: .45; }
+	.drawer .sub-menu a:hover, .drawer .sub-menu a:active, .drawer .sub-menu a:focus-visible, .drawer .sub-menu .current-menu-item > a { background: var(--sun); color: var(--ink) !important; }
+	.drawer .sub-menu .current-menu-item > a::before { background: var(--ink); }
+	/* the pages: a 2 × 2 grid in the display face */
+	.drawer > nav > ul > li:not(.menu-item-has-children) > a { display: flex; align-items: center; min-height: 54px; padding: .45rem .95rem; border-radius: 16px; background: rgba(255, 255, 255, .07); font-family: var(--f-display); font-size: 1.32rem; letter-spacing: .02em; line-height: 1.12; text-transform: uppercase; color: var(--paper); }
+	.drawer > nav > ul > li:not(.menu-item-has-children) > a:hover, .drawer > nav > ul > li:not(.menu-item-has-children) > a:active { background: rgba(255, 255, 255, .16); color: var(--paper); }
+	.drawer > nav > ul > li.current-menu-item > a { background: var(--paper); color: var(--forest); }
+	/* „Bejelentkezés és árak”: the one bright button, the whole width */
+	.drawer > nav > ul > li:has(> a[href*="bejelentkezes-es-arak"]) { grid-column: 1 / -1; }
+	.drawer > nav > ul > li > a[href*="bejelentkezes-es-arak"] { justify-content: center; min-height: 56px; background: var(--sun); color: var(--ink); font-size: 1.45rem; box-shadow: 0 14px 28px -18px rgba(255, 223, 34, .7); }
+	.drawer > nav > ul > li > a[href*="bejelentkezes-es-arak"]:hover, .drawer > nav > ul > li > a[href*="bejelentkezes-es-arak"]:active { background: #fff; color: var(--ink); }
+	/* the bottom bar has „Foglalás” and „Fiók”: no second set of buttons, no address under the menu */
+	.drawer > .btn-row, .drawer > .drawer__contact, .drawer > .langs--drawer { display: none; }
+}
+/* the same on a small phone (iPhone SE): tighter rows, so the pages need at most a short scroll */
+@media (max-width: 759px) and (max-height: 640px) {
+	.drawer { padding-top: calc(var(--header-h) + 2px + env(safe-area-inset-top, 0px)); }
+	.drawer .sub-menu a { min-height: 40px; padding-top: .3rem !important; padding-bottom: .3rem !important; font-size: .95rem !important; }
+	.drawer > nav > ul > li:not(.menu-item-has-children) > a { min-height: 46px; }
+	.drawer > nav > ul > li > a[href*="bejelentkezes-es-arak"] { min-height: 48px; }
+}
