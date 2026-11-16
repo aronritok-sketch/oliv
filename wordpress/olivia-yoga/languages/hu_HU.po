@@ -1563,7 +1563,7 @@ msgid "Live online yoga classes with Olivia Kovacs: group flow yoga on Wednesday
 msgstr "Élő online jógaórák Kovács Olíviával: csoportos flow jóga szerdánként, egyéni online jóga, kismamatorna, stretching, relaxáció és légzés otthonról. Kezdőknek is."
 
 msgid "Online Yoga, Live from Home: Flow Yoga, Prenatal & One-to-One Classes | Olivia Jóga"
-msgstr "Online jóga élőben, otthonról: flow jóga, kismamatorna, egyéni órák | Olívia Jóga"
+msgstr "Online jóga és kismamatorna élőben, otthonról | Olívia Jóga"
 
 msgid "Live online yoga classes with Olivia Kovacs: group flow yoga, individual online yoga, prenatal fitness, stretching, relaxation and breathing."
 msgstr "Élő online jógaórák Kovács Olíviával: csoportos flow jóga, egyéni online jóga, kismamatorna, stretching, relaxáció és légzés."

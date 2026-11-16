@@ -771,6 +771,16 @@
     - `GET /wp-json/oys/v1/status`: levelezés, fizetés, oldalak, órarend, cron, debug, keresők; a titkok csak
       „set” vagy „missing” formában.
   - Tesztek: 1353/0.
+  - Olívia 285 vendége bekerült élesben (REST, X-OYS-Auth). A 286. sor Olívia saját címe, ezt a személyzeti fiók miatt
+    kihagyta. Az újrafuttatás 285-ször „változatlan”-t adott, vagyis minden mező a helyén van.
+- **téma 3.11.87:** az élesítési átnézés javításai.
+  - A `/favicon.ico` a saját ikonra visz (`do_faviconico`). A `get_site_icon_url` a WordPress tartalékcímét is lecseréli.
+  - HSTS fejléc (1 év).
+  - Rövidebb főoldali cím: „Online jóga és kismamatorna élőben, otthonról | Olívia Jóga”.
+  - A hosszú cikkcímeknél elmarad az oldalnév.
+  - A leírásokat a 160 karakter alatti utolsó egész mondatnál vágja. A Jógáról oldal és a kategóriák saját leírást
+    kapnak.
+  - Tesztek: 1353/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

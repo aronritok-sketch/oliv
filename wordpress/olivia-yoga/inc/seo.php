@@ -15,7 +15,7 @@ function oy_meta_description() {
 		return __( 'Hathaflow is a booking system for yoga studios and teachers: timetable, online booking and payment, class passes, memberships, private sessions, online classes and gift cards. This is a demo studio.', 'olivia-yoga' );
 	}
 	if ( is_front_page() && oy_online_only() ) {
-		return __( 'Live online yoga classes with Olivia Kovacs: group flow yoga on Wednesdays, individual online yoga, prenatal fitness, stretching, relaxation and breathing from home. Beginners welcome.', 'olivia-yoga' );
+		return oy_desc_fit( __( 'Live online yoga classes with Olivia Kovacs: group flow yoga on Wednesdays, individual online yoga, prenatal fitness, stretching, relaxation and breathing from home. Beginners welcome.', 'olivia-yoga'  ) );
 	}
 	if ( is_front_page() ) {
 		return __( 'Yoga, mobility and prenatal fitness in Fort Myers, FL: hatha flow and slow flow classes, private yoga at your home, lanai or on the beach, meditation and singing bowl massage with Olivia Kovacs.', 'olivia-yoga' );
@@ -23,7 +23,17 @@ function oy_meta_description() {
 	if ( is_singular() ) {
 		$id   = get_queried_object_id();
 		$desc = oy_tr( $id, 'seo_desc' ) ?: ( oy_translating() ? get_the_excerpt( $id ) : ( get_post_meta( $id, 'oy_seo_desc', true ) ?: get_the_excerpt( $id ) ) );
-		return wp_strip_all_tags( $desc );
+		return oy_online_only() ? oy_desc_fit( wp_strip_all_tags( $desc ) ) : wp_strip_all_tags( $desc );
+	}
+	if ( oy_online_only() && is_home() && get_option( 'page_for_posts' ) ) { // „Jógáról”, the posts page
+		$id = (int) get_option( 'page_for_posts' );
+		return oy_desc_fit( wp_strip_all_tags( get_post_meta( $id, 'oy_seo_desc', true ) ?: get_the_excerpt( $id ) ) ?: get_bloginfo( 'description' ) );
+	}
+	if ( oy_online_only() && is_category() ) {
+		$cat    = get_queried_object();
+		$own    = trim( wp_strip_all_tags( (string) category_description( $cat ) ) );
+		$titles = wp_list_pluck( get_posts( array( 'category' => $cat->term_id, 'numberposts' => 3, 'post_status' => 'publish' ) ), 'post_title' );
+		return oy_desc_fit( $own ?: sprintf( '%s – Kovács Olívia írásai a jógáról: %s.', $cat->name, implode( ', ', $titles ) ) );
 	}
 	return get_bloginfo( 'description' );
 }
@@ -169,7 +179,7 @@ add_filter( 'rest_endpoints', function ( $endpoints ) {
  * Magenta Bloom dot. Without a site icon WordPress sent /favicon.ico to its own grey logo.
  */
 add_filter( 'get_site_icon_url', function ( $url, $size ) {
-	if ( $url || ! oy_online_only() ) {
+	if ( get_option( 'site_icon' ) || ! oy_online_only() ) { // her own icon set in the Customizer wins; WordPress's logo (the fallback /favicon.ico gets) does not
 		return $url;
 	}
 	$file = $size <= 32 ? 'favicon-online-32.png' : ( $size <= 180 ? 'apple-touch-icon-online.png' : 'favicon-online-512.png' );
@@ -303,4 +313,50 @@ function oy_seo_online_graph( array $graph, $site ) {
 		}
 	}
 	return array_values( array_map( fn( $n ) => array_filter( $n, fn( $v ) => null !== $v && '' !== $v ), $graph ) );
+}
+
+/** /favicon.ico (asked for by browsers and search engines without reading the page) → the online site's icon. */
+add_action( 'do_faviconico', function () {
+	if ( oy_online_only() && ! get_option( 'site_icon' ) ) {
+		wp_safe_redirect( get_template_directory_uri() . '/assets/img/favicon-online-512.png', 301 );
+		exit;
+	}
+} );
+
+/** Browsers come back over HTTPS only (a year; no subdomains, no preload list). */
+add_action( 'send_headers', function () {
+	if ( is_ssl() && ! headers_sent() ) {
+		header( 'Strict-Transport-Security: max-age=31536000' );
+	}
+} );
+
+/**
+ * Titles and descriptions the size search results show (Google cuts a title at about 60 characters and a description at
+ * about 160): on the online site a long post title goes without the site name; a description is cut at the last whole
+ * sentence that fits; the posts page and the categories get a description of their own instead of the site's tagline.
+ */
+add_filter( 'document_title_parts', function ( $parts ) {
+	if ( oy_online_only() && is_singular( 'post' ) && mb_strlen( (string) ( $parts['title'] ?? '' ) . ' – ' . oy_site_name() ) > 65 ) {
+		unset( $parts['site'], $parts['tagline'] );
+	}
+	return $parts;
+} );
+
+function oy_desc_fit( $text, $max = 160 ) {
+	$text = trim( (string) preg_replace( '/\s+/u', ' ', (string) $text ) );
+	if ( mb_strlen( $text ) <= $max ) {
+		return $text;
+	}
+	$out = '';
+	foreach ( preg_split( '/(?<=[.!?])\s+/u', $text ) as $sentence ) {
+		if ( mb_strlen( trim( $out . ' ' . $sentence ) ) > $max ) {
+			break;
+		}
+		$out = trim( $out . ' ' . $sentence );
+	}
+	if ( mb_strlen( $out ) >= 70 ) {
+		return $out;
+	}
+	$cut = mb_substr( $text, 0, $max - 1 );
+	return rtrim( mb_substr( $cut, 0, (int) mb_strrpos( $cut, ' ' ) ), ' ,;:–-' ) . '…';
 }
