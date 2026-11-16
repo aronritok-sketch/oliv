@@ -4169,3 +4169,507 @@ msgstr "sus bonos privados valen %s días más"
 #: includes/admin/class-admin.php
 msgid "Empty = the default (%d days, in Settings). 0 = no extension."
 msgstr "Vacío = el valor por defecto (%d días, en Ajustes). 0 = sin prórroga."
+
+#: includes/class-hub.php
+msgid "This conversation no longer exists."
+msgstr "Esta conversación ya no existe."
+
+#: includes/class-hub.php
+msgid "Photo"
+msgstr "Foto"
+
+#: includes/class-hub.php
+msgid "You can't write in this class chat."
+msgstr "No puedes escribir en este chat de clase."
+
+#: includes/class-hub.php
+msgid "Thank you for your message! I'll get back to you soon."
+msgstr "¡Gracias por tu mensaje! Te respondo pronto."
+
+#: includes/class-hub.php
+msgid "Thank you for coming to class today, see you next time!"
+msgstr "¡Gracias por venir hoy a clase, nos vemos la próxima!"
+
+#: includes/class-hub.php
+msgid "You'll find the link to join in your account, under Bookings."
+msgstr "Encontrarás el enlace para entrar en tu cuenta, en Reservas."
+
+#: includes/class-hub.php
+msgid "The photo could not be uploaded."
+msgstr "No se pudo subir la foto."
+
+#: includes/class-hub.php
+msgid "The photo is too large (10 MB at most)."
+msgstr "La foto es demasiado grande (10 MB como máximo)."
+
+#: includes/class-hub.php
+msgid "Only photos can be attached (JPG, PNG, WebP, GIF)."
+msgstr "Solo se pueden adjuntar fotos (JPG, PNG, WebP, GIF)."
+
+#: includes/class-hub.php
+msgid "This photo format can't be opened. Try a JPG or PNG."
+msgstr "Este formato de foto no se puede abrir. Prueba con JPG o PNG."
+
+#: includes/class-hub.php
+msgid "The photo could not be saved."
+msgstr "No se pudo guardar la foto."
+
+#: includes/class-hub.php
+msgid "New message: %s"
+msgstr "Nuevo mensaje: %s"
+
+#: includes/class-hub.php
+msgid "New message"
+msgstr "Nuevo mensaje"
+
+#: includes/class-hub.php
+msgid "Answer in the Hub"
+msgstr "Responder en el Hub"
+
+#: includes/class-hub.php
+msgid "%1$s wrote in the chat of %2$s."
+msgstr "%1$s escribió en el chat de %2$s."
+
+#: includes/class-hub.php
+msgid "Class chat: %1$s – %2$s"
+msgstr "Chat de clase: %1$s – %2$s"
+
+#: includes/class-hub.php
+msgid "New message in a class chat"
+msgstr "Nuevo mensaje en un chat de clase"
+
+#: includes/class-hub.php
+msgid "Private session request"
+msgstr "Solicitud de clase privada"
+
+#: includes/class-hub.php
+msgid "Message sent. You'll get the answer by email and here."
+msgstr "Mensaje enviado. Recibirás la respuesta por email y aquí."
+
+#: includes/class-hub.php
+msgid "You:"
+msgstr "Tú:"
+
+#: includes/class-hub.php
+msgid "Website"
+msgstr "Web"
+
+#: includes/class-hub.php
+msgid "Private request"
+msgstr "Solicitud privada"
+
+#: includes/class-hub.php
+msgid "Tomorrow"
+msgstr "Mañana"
+
+#: includes/class-hub.php
+msgid "Revenue, 30 days"
+msgstr "Ingresos, 30 días"
+
+#: includes/class-hub.php
+msgid "Choose someone to write to."
+msgstr "Elige a quién escribir."
+
+#: includes/class-hub.php
+msgid "This class no longer exists."
+msgstr "Esta clase ya no existe."
+
+#: includes/class-hub.php
+msgid "Hub"
+msgstr "Hub"
+
+#: includes/class-hub.php
+msgid "Classes, move, add"
+msgstr "Clases, mover, añadir"
+
+#: includes/class-hub.php
+msgid "Who is coming, check-in"
+msgstr "Quién viene, asistencia"
+
+#: includes/class-hub.php
+msgid "Offers, one-to-one"
+msgstr "Ofertas, clases privadas"
+
+#: includes/class-hub.php
+msgid "Passes, history, notes"
+msgstr "Bonos, historial, notas"
+
+#: includes/class-hub.php
+msgid "Receipts, refunds"
+msgstr "Recibos, reembolsos"
+
+#: includes/class-hub.php
+msgid "What people can buy"
+msgstr "Lo que se puede comprar"
+
+#: includes/class-hub.php
+msgid "Overview"
+msgstr "Resumen"
+
+#: includes/class-hub.php
+msgid "Numbers, next 7 days"
+msgstr "Cifras, próximos 7 días"
+
+#: includes/class-hub.php
+msgid "Open the website"
+msgstr "Abrir la web"
+
+#: includes/class-hub.php
+msgid "Rosters, write to the class"
+msgstr "Listas, escribir a la clase"
+
+#: includes/class-hub.php
+msgid "Photos, introduction"
+msgstr "Fotos, presentación"
+
+#: includes/class-hub.php
+msgid "Hi, %s!"
+msgstr "¡Hola, %s!"
+
+#: includes/class-hub.php
+msgid "Messages"
+msgstr "Mensajes"
+
+#: includes/class-hub.php
+msgid "More"
+msgstr "Más"
+
+#: includes/class-hub.php
+msgid "My settings"
+msgstr "Mis ajustes"
+
+#: includes/class-hub.php
+msgid "Unread"
+msgstr "Sin leer"
+
+#: includes/class-hub.php
+msgid "Conversations"
+msgstr "Conversaciones"
+
+#: includes/class-hub.php
+msgid "Class chats"
+msgstr "Chats de clase"
+
+#: includes/class-hub.php
+msgid "Requests"
+msgstr "Solicitudes"
+
+#: includes/class-hub.php
+msgid "Done"
+msgstr "Hecho"
+
+#: includes/class-hub.php
+msgid "Search names, messages…"
+msgstr "Buscar nombres, mensajes…"
+
+#: includes/class-hub.php
+msgid "Nothing here. When someone writes, it shows up here."
+msgstr "Aquí no hay nada. Cuando alguien escriba, aparecerá aquí."
+
+#: includes/class-hub.php
+msgid "Choose a conversation on the left."
+msgstr "Elige una conversación a la izquierda."
+
+#: includes/class-hub.php
+msgid "To whom?"
+msgstr "¿A quién?"
+
+#: includes/class-hub.php
+msgid "Type a name or email"
+msgstr "Escribe un nombre o email"
+
+#: includes/class-hub.php
+msgid "Write a message…"
+msgstr "Escribe un mensaje…"
+
+#: includes/class-hub.php
+msgid "A note only you see…"
+msgstr "Una nota que solo ves tú…"
+
+#: includes/class-hub.php
+msgid "Add a photo"
+msgstr "Añadir una foto"
+
+#: includes/class-hub.php
+msgid "Remove the photo"
+msgstr "Quitar la foto"
+
+#: includes/class-hub.php
+msgid "Quick answers"
+msgstr "Respuestas rápidas"
+
+#: includes/class-hub.php
+msgid "Internal note: the customer doesn't see it"
+msgstr "Nota interna: el cliente no la ve"
+
+#: includes/class-hub.php
+msgid "Reopen"
+msgstr "Reabrir"
+
+#: includes/class-hub.php
+msgid "Back"
+msgstr "Atrás"
+
+#: includes/class-hub.php
+msgid "Details"
+msgstr "Detalles"
+
+#: includes/class-hub.php
+msgid "Read"
+msgstr "Leído"
+
+#: includes/class-hub.php
+msgid "From the website"
+msgstr "Desde la web"
+
+#: includes/class-hub.php
+msgid "Open the request"
+msgstr "Abrir la solicitud"
+
+#: includes/class-hub.php
+msgid "Go to the room"
+msgstr "Entrar en la sala"
+
+#: includes/class-hub.php
+msgid "Start the class"
+msgstr "Empezar la clase"
+
+#: includes/class-hub.php
+msgid "Chat"
+msgstr "Chat"
+
+#: includes/class-hub.php
+msgid "%d on the waitlist"
+msgstr "%d en lista de espera"
+
+#: includes/class-hub.php
+msgid "Nobody has booked yet."
+msgstr "Todavía nadie ha reservado."
+
+#: includes/class-hub.php
+msgid "Health note"
+msgstr "Nota de salud"
+
+#: includes/class-hub.php
+msgid "No classes in the next days."
+msgstr "No hay clases en los próximos días."
+
+#: includes/class-hub.php
+msgid "Waiting for you"
+msgstr "Te espera"
+
+#: includes/class-hub.php
+msgid "New messages"
+msgstr "Mensajes nuevos"
+
+#: includes/class-hub.php
+msgid "All answered. 🌿"
+msgstr "Todo respondido. 🌿"
+
+#: includes/class-hub.php
+msgid "Numbers"
+msgstr "Cifras"
+
+#: includes/class-hub.php
+msgid "Latest payments"
+msgstr "Últimos pagos"
+
+#: includes/class-hub.php
+msgid "No valid pass."
+msgstr "No tiene bono válido."
+
+#: includes/class-hub.php
+msgid "%1$d of %2$d left"
+msgstr "quedan %1$d de %2$d"
+
+#: includes/class-hub.php
+msgid "Booked classes"
+msgstr "Clases reservadas"
+
+#: includes/class-hub.php
+msgid "No upcoming class."
+msgstr "No tiene próximas clases."
+
+#: includes/class-hub.php
+msgid "Customer since %s"
+msgstr "Cliente desde %s"
+
+#: includes/class-hub.php
+msgid "%d classes so far"
+msgstr "%d clases hasta ahora"
+
+#: includes/class-hub.php
+msgid "Open the customer page"
+msgstr "Abrir la ficha del cliente"
+
+#: includes/class-hub.php
+msgid "Call"
+msgstr "Llamar"
+
+#: includes/class-hub.php
+msgid "No account yet: wrote on the website. Your answer goes by email."
+msgstr "Aún no tiene cuenta: escribió en la web. Tu respuesta le llega por email."
+
+#: includes/class-hub.php
+msgid "In this class"
+msgstr "En esta clase"
+
+#: includes/class-hub.php
+msgid "The chat is closed for the participants; you can still write."
+msgstr "El chat está cerrado para los participantes; tú aún puedes escribir."
+
+#: includes/class-hub.php
+msgid "Remove this message from the class chat?"
+msgstr "¿Quitar este mensaje del chat de clase?"
+
+#: includes/class-hub.php
+msgid "Something went wrong. Try again."
+msgstr "Algo salió mal. Inténtalo de nuevo."
+
+#: includes/class-hub.php
+msgid "No connection. Retrying…"
+msgstr "Sin conexión. Reintentando…"
+
+#: includes/class-hub.php
+msgid "Turn on notifications"
+msgstr "Activar notificaciones"
+
+#: includes/class-hub.php
+msgid "Notifications are on on this device"
+msgstr "Las notificaciones están activadas en este dispositivo"
+
+#: includes/class-hub.php
+msgid "While the Hub is open (also in a background tab), this device shows a notification when someone writes."
+msgstr "Mientras el Hub esté abierto (también en una pestaña de fondo), este dispositivo avisa cuando alguien escribe."
+
+#: includes/class-hub.php
+msgid "New in the Hub"
+msgstr "Novedad en el Hub"
+
+#: includes/class-hub.php
+msgid "Email me"
+msgstr "Avísame por email"
+
+#: includes/class-hub.php
+msgid "when someone writes to me"
+msgstr "cuando alguien me escribe"
+
+#: includes/class-hub.php
+msgid "when someone writes in a class chat (not during the class)"
+msgstr "cuando alguien escribe en un chat de clase (no durante la clase)"
+
+#: includes/class-hub.php
+msgid "At most one email per conversation every 15 minutes, and none while the Hub is open."
+msgstr "Como máximo un email por conversación cada 15 minutos, y ninguno mientras el Hub está abierto."
+
+#: includes/class-hub.php
+msgid "The studio's emails are switched on and off under Emails & reminders."
+msgstr "Los emails del estudio se activan y desactivan en Emails y recordatorios."
+
+#: includes/class-hub.php
+msgid "My name in the class chats"
+msgstr "Mi nombre en los chats de clase"
+
+#: includes/class-hub.php
+msgid "My quick answers"
+msgstr "Mis respuestas rápidas"
+
+#: includes/class-hub.php
+msgid "One per line. In a conversation, tap „Quick answers” and choose one."
+msgstr "Una por línea. En una conversación, toca «Respuestas rápidas» y elige una."
+
+#: includes/class-hub.php
+msgid "Earlier messages"
+msgstr "Mensajes anteriores"
+
+#: includes/class-hub.php
+msgid "now"
+msgstr "ahora"
+
+#: includes/class-hub.php
+msgid "Loading…"
+msgstr "Cargando…"
+
+#: includes/class-hub.php
+msgid "The Hub needs JavaScript."
+msgstr "El Hub necesita JavaScript."
+
+#: includes/class-hub.php
+msgid "new"
+msgstr "nuevo"
+
+#: includes/class-hub.php
+msgid "Messages with %s"
+msgstr "Mensajes con %s"
+
+#: includes/class-hub.php
+msgid "Write to %s any time: a question, an injury, something before class. The answer comes here and by email."
+msgstr "Escribe a %s cuando quieras: una pregunta, una lesión, algo antes de clase. La respuesta llega aquí y por email."
+
+#: includes/class-hub.php
+msgid "Your message"
+msgstr "Tu mensaje"
+
+#: includes/class-hub.php
+msgid "Write your message…"
+msgstr "Escribe tu mensaje…"
+
+#: includes/class-hub.php
+msgid "Answer to a message"
+msgstr "Respuesta a un mensaje"
+
+#: includes/class-hub.php
+msgid "When you answer someone in the Hub; the answer is in the email and in their account"
+msgstr "Cuando respondes a alguien en el Hub; la respuesta va en el email y en su cuenta"
+
+#: includes/class-hub.php
+msgid "Answer in a class chat"
+msgstr "Respuesta en un chat de clase"
+
+#: includes/class-hub.php
+msgid "When you write in a class chat from the Hub after the class, to those who wrote there (at most every half hour)"
+msgstr "Cuando escribes en un chat de clase desde el Hub después de la clase, a quienes escribieron allí (como máximo cada media hora)"
+
+#: includes/class-hub.php
+msgid "When someone writes to you from their account (at most one email per conversation every 15 minutes, none while the Hub is open)"
+msgstr "Cuando alguien te escribe desde su cuenta (como máximo un email por conversación cada 15 minutos, ninguno mientras el Hub está abierto)"
+
+#: includes/class-hub.php
+msgid "When someone writes in a class chat outside the class (at most one email per class every 15 minutes, none while the Hub is open)"
+msgstr "Cuando alguien escribe en un chat de clase fuera de la clase (como máximo un email por clase cada 15 minutos, ninguno mientras el Hub está abierto)"
+
+#: includes/class-hub.php
+msgid "{teacher} answered your message"
+msgstr "{teacher} respondió a tu mensaje"
+
+#: includes/class-hub.php
+msgid "You have an answer"
+msgstr "Tienes una respuesta"
+
+#: includes/class-hub.php
+msgid "Hi {first_name}, {teacher} answered your message:"
+msgstr "Hola {first_name}, {teacher} respondió a tu mensaje:"
+
+#: includes/class-hub.php
+msgid "You can answer in your account, under Messages."
+msgstr "Puedes responder en tu cuenta, en Mensajes."
+
+#: includes/class-hub.php
+msgid "Open my messages"
+msgstr "Abrir mis mensajes"
+
+#: includes/class-hub.php
+msgid "New in the chat of {class}"
+msgstr "Nuevo en el chat de {class}"
+
+#: includes/class-hub.php
+msgid "New message in the class chat"
+msgstr "Nuevo mensaje en el chat de la clase"
+
+#: includes/class-hub.php
+msgid "Hi {first_name}, there is a new message in the chat of {class} ({date_short}):"
+msgstr "Hola {first_name}, hay un mensaje nuevo en el chat de {class} ({date_short}):"
+
+#: includes/class-hub.php
+msgid "Open the class chat"
+msgstr "Abrir el chat de la clase"

@@ -85,7 +85,14 @@ class OYS_Email_Templates {
 				'Your membership has ended', 'Membership ended', 'Your membership has ended. Thank you for practicing with me! You can join again or buy a class pass any time.', '', 'See prices' ),
 			'membership_payment_failed' => array( __( 'Membership payment failed', 'olivia-studio' ), 'membership', 'customer', __( 'When a monthly payment is declined', 'olivia-studio' ),
 				'Action needed: membership payment failed', 'Payment failed', "We couldn't take this month's membership payment. Your card may have expired or been declined. Stripe will try again over the next few days; please update your card so your membership continues.", '', 'Update my card' ),
+			// Messages (the Hub): Áron, 16 November
+			'message_reply'     => array( __( 'Answer to a message', 'olivia-studio' ), 'account', 'customer', __( 'When you answer someone in the Hub; the answer is in the email and in their account', 'olivia-studio' ),
+				'{teacher} answered your message', 'You have an answer', 'Hi {first_name}, {teacher} answered your message:', 'You can answer in your account, under Messages.', 'Open my messages', array( 'teacher' ) ),
+			'chat_reply'        => array( __( 'Answer in a class chat', 'olivia-studio' ), 'account', 'customer', __( 'When you write in a class chat from the Hub after the class, to those who wrote there (at most every half hour)', 'olivia-studio' ),
+				'New in the chat of {class}', 'New message in the class chat', 'Hi {first_name}, there is a new message in the chat of {class} ({date_short}):', '', 'Open the class chat' ),
 			// Studio notifications (on/off only)
+			'studio_message'      => array( __( 'New message', 'olivia-studio' ), 'studio', 'studio', __( 'When someone writes to you from their account (at most one email per conversation every 15 minutes, none while the Hub is open)', 'olivia-studio' ) ),
+			'studio_class_chat'   => array( __( 'Class chat', 'olivia-studio' ), 'studio', 'studio', __( 'When someone writes in a class chat outside the class (at most one email per class every 15 minutes, none while the Hub is open)', 'olivia-studio' ) ),
 			'studio_payment'      => array( __( 'New payment', 'olivia-studio' ), 'studio', 'studio', __( 'Every payment received', 'olivia-studio' ) ),
 			'studio_private'      => array( __( 'New private request', 'olivia-studio' ), 'studio', 'studio', __( 'Every private session request', 'olivia-studio' ) ),
 			'studio_cancellation' => array( __( 'Customer cancellations', 'olivia-studio' ), 'studio', 'studio', __( 'When a customer cancels', 'olivia-studio' ) ),

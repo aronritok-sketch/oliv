@@ -32,10 +32,13 @@ class OYS_Admin {
 	}
 
 	public static function menu() {
-		$new = count( OYS_Privates::query( 'new' ) );
-		add_menu_page( __( 'Studio', 'olivia-studio' ), __( 'Studio', 'olivia-studio' ) . ( $new ? ' <span class="awaiting-mod">' . $new . '</span>' : '' ), self::CAP, 'oys', array( __CLASS__, 'page_today' ), 'dashicons-universal-access', 3 );
+		$new  = count( OYS_Privates::query( 'new' ) );
+		$wait = OYS_Hub::counts()['total']; // conversations waiting, unread class chats, new requests
+		// Áron, 16 November: the Hub is the studio's first page – one screen for messages, class chats and today
+		add_menu_page( __( 'Studio', 'olivia-studio' ), __( 'Studio', 'olivia-studio' ) . ( $wait ? ' <span class="awaiting-mod">' . $wait . '</span>' : '' ), self::CAP, 'oys', array( 'OYS_Hub_Admin', 'page' ), 'dashicons-universal-access', 3 );
 		$pages = array(
-			'oys'           => array( __( 'Today', 'olivia-studio' ), 'page_today' ),
+			'oys'           => array( __( 'Hub', 'olivia-studio' ) . ( $wait ? ' <span class="awaiting-mod">' . $wait . '</span>' : '' ), array( 'OYS_Hub_Admin', 'page' ) ),
+			'oys-today'     => array( __( 'Overview', 'olivia-studio' ), 'page_today' ),
 			'oys-calendar'  => array( __( 'Calendar', 'olivia-studio' ), 'page_calendar' ),
 			'oys-schedule'  => array( __( 'Rosters & list', 'olivia-studio' ), 'page_schedule' ),
 			'oys-private'   => array( __( 'Private requests', 'olivia-studio' ) . ( $new ? ' <span class="awaiting-mod">' . $new . '</span>' : '' ), 'page_private' ),
@@ -51,7 +54,7 @@ class OYS_Admin {
 			'oys-settings'  => array( __( 'Settings', 'olivia-studio' ), 'page_settings' ),
 		);
 		foreach ( $pages as $slug => $p ) {
-			add_submenu_page( 'oys', $p[0], $p[0], self::CAP, $slug, array( __CLASS__, $p[1] ) );
+			add_submenu_page( 'oys', wp_strip_all_tags( $p[0] ), $p[0], self::CAP, $slug, is_array( $p[1] ) ? $p[1] : array( __CLASS__, $p[1] ) );
 		}
 		// The weekly timetable as a table; the calendar does the same with less typing.
 		add_submenu_page( '', __( 'Weekly timetable', 'olivia-studio' ), '', self::CAP, 'oys-templates', array( __CLASS__, 'page_templates' ) );

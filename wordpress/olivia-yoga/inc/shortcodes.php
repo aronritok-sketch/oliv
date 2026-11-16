@@ -370,6 +370,15 @@ function oy_handle_contact() {
 	}
 	$to = class_exists( 'OYS_Settings' ) ? OYS_Settings::get( 'notify_email' ) : get_option( 'admin_email' );
 	wp_mail( $to, $subject, $body, array( 'Reply-To: ' . $name . ' <' . $email . '>' ) );
+	// Áron, 16 November: every message in one place – the studio's Hub (olivia-studio) keeps it as a conversation
+	$topics = function_exists( 'oy_contact_topics' ) ? oy_contact_topics() : array();
+	do_action( 'oys_contact_message', array(
+		'name'    => $name,
+		'email'   => $email,
+		'phone'   => sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) ),
+		'topic'   => $topics[ sanitize_key( $_POST['topic'] ?? '' ) ] ?? '',
+		'message' => $message,
+	) );
 	wp_safe_redirect( oy_thanks_url( 'uzenet' ) ?: add_query_arg( 'oy_sent', '1', $back ) . '#book' );
 	exit;
 }

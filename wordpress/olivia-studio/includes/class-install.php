@@ -389,11 +389,47 @@ class OYS_Install {
 			booking_id bigint(20) unsigned NOT NULL DEFAULT 0,
 			name varchar(100) NOT NULL DEFAULT '',
 			body text NULL,
+			image varchar(255) NOT NULL DEFAULT '',
 			is_teacher tinyint(1) unsigned NOT NULL DEFAULT 0,
 			deleted tinyint(1) unsigned NOT NULL DEFAULT 0,
 			created_at datetime NOT NULL,
 			PRIMARY KEY  (id),
 			KEY session_id (session_id,id)
+		) $c;" );
+
+		// The Hub: conversations with customers (or a website visitor by email), one per person and teacher.
+		dbDelta( 'CREATE TABLE ' . self::table( 'threads' ) . " (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			user_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			email varchar(190) NOT NULL DEFAULT '',
+			name varchar(190) NOT NULL DEFAULT '',
+			phone varchar(40) NOT NULL DEFAULT '',
+			teacher_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			status varchar(10) NOT NULL DEFAULT 'open',
+			unread_studio tinyint(1) unsigned NOT NULL DEFAULT 0,
+			unread_customer tinyint(1) unsigned NOT NULL DEFAULT 0,
+			last_from varchar(10) NOT NULL DEFAULT '',
+			last_body varchar(255) NOT NULL DEFAULT '',
+			last_at datetime NOT NULL,
+			created_at datetime NOT NULL,
+			PRIMARY KEY  (id),
+			KEY user_id (user_id),
+			KEY email (email),
+			KEY last_at (last_at)
+		) $c;" );
+
+		dbDelta( 'CREATE TABLE ' . self::table( 'thread_msgs' ) . " (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			thread_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			author_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			from_studio tinyint(1) unsigned NOT NULL DEFAULT 0,
+			body text NULL,
+			image varchar(255) NOT NULL DEFAULT '',
+			kind varchar(20) NOT NULL DEFAULT '',
+			ref_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			created_at datetime NOT NULL,
+			PRIMARY KEY  (id),
+			KEY thread_id (thread_id,id)
 		) $c;" );
 	}
 

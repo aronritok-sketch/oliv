@@ -646,9 +646,9 @@ class OYS_Live {
 	}
 
 	/** @return int|WP_Error the new message's id */
-	public static function post_message( $session, array $who, $body ) {
+	public static function post_message( $session, array $who, $body, $image = '' ) {
 		$body = trim( mb_substr( sanitize_textarea_field( (string) $body ), 0, 1000 ) );
-		if ( '' === $body ) {
+		if ( '' === $body && '' === (string) $image ) {
 			return new WP_Error( 'oys_live', __( 'Write a message first.', 'olivia-studio' ) );
 		}
 		if ( ! $who['owner'] && ! self::chat_open( $session ) ) {
@@ -667,10 +667,13 @@ class OYS_Live {
 			'booking_id' => $who['booking'] ? (int) $who['booking']->id : 0,
 			'name'       => mb_substr( $who['name'], 0, 100 ),
 			'body'       => $body,
+			'image'      => (string) $image,
 			'is_teacher' => $who['owner'] ? 1 : 0,
 			'created_at' => oys_now(),
 		) );
-		return (int) $wpdb->insert_id;
+		$id = (int) $wpdb->insert_id;
+		do_action( 'oys_live_chat_posted', $id, $session, $who ); // the Hub: unread count, an email to the teacher
+		return $id;
 	}
 
 	/** The teacher removes any message, a participant their own. */
@@ -688,6 +691,7 @@ class OYS_Live {
 			'id'      => (int) $m->id,
 			'name'    => $m->name,
 			'body'    => $m->body,
+			'image'   => OYS_Hub::image_url( (string) ( $m->image ?? '' ) ),
 			'time'    => oys_date( $m->created_at, 'M j, g:i a' ),
 			'teacher' => (bool) $m->is_teacher,
 			'mine'    => $who['owner'] ? (bool) $m->is_teacher && (int) $m->user_id === (int) $who['user_id'] : ( $who['booking'] && (int) $m->booking_id === (int) $who['booking']->id ),
@@ -909,7 +913,19 @@ class OYS_Live {
 		if ( is_wp_error( $r ) ) {
 			return $r;
 		}
-		$id = self::post_message( $r[0], $r[1], (string) $req->get_param( 'body' ) );
+		// Áron, 16 November: „teremnek a csetjébe lehessen képeket csatolni” – a photo with the message (multipart „image”)
+		$files = $req->get_file_params();
+		$image = '';
+		if ( ! empty( $files['image']['name'] ) ) {
+			if ( ! $r[1]['owner'] && ! self::chat_open( $r[0] ) ) {
+				return self::fail( new WP_Error( 'oys_live', __( 'The chat of this class is closed.', 'olivia-studio' ) ) );
+			}
+			$image = OYS_Hub::save_image( $files['image'] );
+			if ( is_wp_error( $image ) ) {
+				return self::fail( $image );
+			}
+		}
+		$id = self::post_message( $r[0], $r[1], (string) $req->get_param( 'body' ), $image );
 		return is_wp_error( $id ) ? self::fail( $id ) : rest_ensure_response( array( 'id' => $id ) );
 	}
 
@@ -963,6 +979,7 @@ class OYS_Live {
 				'left'      => __( 'You left the class. You can join again.', 'olivia-studio' ),
 				'send'      => __( 'Send', 'olivia-studio' ),
 				'remove'    => __( 'Remove', 'olivia-studio' ),
+				'photo'     => __( 'Photo', 'olivia-studio' ),
 				'teacher'   => __( 'teacher', 'olivia-studio' ),
 				'empty'     => __( 'No messages yet. Say hello!', 'olivia-studio' ),
 				'error'     => __( 'Something went wrong. Try again in a moment.', 'olivia-studio' ),
@@ -1034,7 +1051,10 @@ class OYS_Live {
 		return '<aside class="oys-live__chat" aria-label="' . esc_attr__( 'Class chat', 'olivia-studio' ) . '"><h3>' . esc_html__( 'Class chat', 'olivia-studio' ) . '</h3>'
 			. '<p class="oys-small">' . esc_html( sprintf( _n( 'Stays here after the class: you can keep talking for %d day.', 'Stays here after the class: you can keep talking for %d days.', max( 1, (int) OYS_Settings::get( 'live_chat_days' ) ), 'olivia-studio' ), max( 1, (int) OYS_Settings::get( 'live_chat_days' ) ) ) ) . '</p>'
 			. '<ol class="oys-live__messages" data-live-messages aria-live="polite"></ol>'
-			. ( $open ? '<form class="oys-live__form" data-live-form><label class="screen-reader-text" for="oys-live-msg">' . esc_html__( 'Message', 'olivia-studio' ) . '</label><textarea id="oys-live-msg" name="body" rows="2" maxlength="1000" required placeholder="' . esc_attr__( 'Write to the class…', 'olivia-studio' ) . '"></textarea><button class="btn btn--primary btn--sm" type="submit">' . esc_html__( 'Send', 'olivia-studio' ) . '</button></form>'
+			. ( $open ? '<form class="oys-live__form" data-live-form><div class="oys-live__preview" data-live-preview hidden></div><label class="screen-reader-text" for="oys-live-msg">' . esc_html__( 'Message', 'olivia-studio' ) . '</label><textarea id="oys-live-msg" name="body" rows="2" maxlength="1000" placeholder="' . esc_attr__( 'Write to the class…', 'olivia-studio' ) . '"></textarea>'
+				// Áron, 16 November: „teremnek a csetjébe lehessen képeket csatolni”
+				. '<div class="oys-live__form-row"><label class="oys-live__photo" title="' . esc_attr__( 'Add a photo', 'olivia-studio' ) . '">' . oys_icon( 'camera' ) . '<span class="screen-reader-text">' . esc_html__( 'Add a photo', 'olivia-studio' ) . '</span><input type="file" accept="image/*" data-live-photo hidden></label>'
+				. '<button class="btn btn--primary btn--sm" type="submit">' . esc_html__( 'Send', 'olivia-studio' ) . '</button></div></form>'
 				: '<p class="oys-small">' . esc_html__( 'The chat of this class is closed.', 'olivia-studio' ) . '</p>' )
 			. '</aside>';
 	}

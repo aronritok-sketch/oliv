@@ -262,6 +262,16 @@ class OYS_Emails {
 		return self::send( $to, OYS_Email_Templates::fill( $t['subject'], $vars ), OYS_Email_Templates::fill( $t['heading'], $vars ), $body, $attachments, $cta );
 	}
 
+	/** The Hub: the studio answered a message (OYS_Hub; the language is switched on by the caller). */
+	public static function message_reply_mail( $to, array $vars, $quote_html, $cta_url = '' ) {
+		return self::compose( 'message_reply', $to, $vars, $quote_html, array(), $cta_url, '', (bool) $cta_url );
+	}
+
+	/** The Hub: the studio wrote in a class chat after the class. */
+	public static function chat_reply_mail( $to, array $vars, $quote_html, $cta_url ) {
+		return self::compose( 'chat_reply', $to, $vars, $quote_html, array(), $cta_url );
+	}
+
 	private static function policy_html() {
 		return '<p style="font-size:14px;color:#53635A">' . esc_html( OYS_Settings::get( 'cancel_policy' ) ) . '</p>';
 	}

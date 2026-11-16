@@ -4115,6 +4115,127 @@ test( 'Olivia, 16 November: the pass extension when the studio cancels is a defa
 	}
 } );
 
+test( 'Áron, 16 November – the Hub: a customer writes, the studio hears once, answers, the customer gets it by email and in the account', function () {
+	$u = make_user( 'Hubvendeg' );
+	$t = OYS_Hub::thread_for( $u );
+	ok( $t && (int) $t->user_id === $u, 'a conversation for the customer' );
+	eq( (int) $t->id, (int) OYS_Hub::thread_for( $u )->id, 'one conversation per customer' );
+	$log = sent_mails( fn() => OYS_Hub::add( $t, array( 'body' => 'Szia! Kérdésem van a térdemről.', 'from_studio' => false, 'author_id' => $u ) ) );
+	eq( 1, count( $log ), 'the studio gets an email' );
+	ok( str_contains( $log[0]['html'] ?? '', 'Kérdésem van a térdemről' ) && str_contains( $log[0]['html'] ?? '', 'page=oys#t' . $t->id ), 'with the message and a link to the conversation in the Hub' );
+	eq( 1, (int) OYS_Hub::get( $t->id )->unread_studio, 'unread for the studio' );
+	$again = sent_mails( fn() => OYS_Hub::add( $t, array( 'body' => 'És még valami.', 'from_studio' => false, 'author_id' => $u ) ) );
+	eq( 0, count( $again ), 'a second message within a quarter hour: no second email' );
+	$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0];
+	wp_set_current_user( $admin );
+	try {
+		ok( OYS_Hub::counts()['messages'] >= 1, 'counted on the Hub' );
+		$items = OYS_Hub::inbox( 'unread' );
+		ok( in_array( 't' . $t->id, array_column( $items, 'key' ), true ), 'in the Hub list among the unread' );
+		$reply = sent_mails( fn() => OYS_Hub::add( $t, array( 'body' => 'Tegyél egy takarót a térded alá.', 'from_studio' => true, 'author_id' => $admin ) ) );
+		eq( get_userdata( $u )->user_email, $reply[0]['to'] ?? '', 'the answer goes to the customer by email' );
+		ok( str_contains( $reply[0]['html'] ?? '', 'Tegyél egy takarót' ), 'with the answer in it' );
+		eq( 0, (int) OYS_Hub::get( $t->id )->unread_studio, 'answered: no longer unread for the studio' );
+		eq( 1, OYS_Hub::customer_unread( $u ), 'the customer has one unread conversation' );
+		$note = sent_mails( fn() => OYS_Hub::add( $t, array( 'body' => 'Belső: meniszkusz', 'from_studio' => true, 'kind' => 'note' ) ) );
+		eq( 0, count( $note ), 'an internal note is not emailed' );
+		wp_set_current_user( $u );
+		$_GET['tab'] = 'messages';
+		$html        = OYS_Frontend::sc_account();
+		unset( $_GET['tab'] );
+		ok( str_contains( $html, 'Tegyél egy takarót' ) && ! str_contains( $html, 'meniszkusz' ), 'the account shows the answer, not the internal note' );
+		eq( 0, OYS_Hub::customer_unread( $u ), 'seen in the account: read' );
+	} finally {
+		wp_set_current_user( 0 );
+	}
+} );
+
+test( 'Áron, 16 November – the Hub: the website form and a private request land in the conversation', function () {
+	OYS_Hub::on_contact( array( 'name' => 'Web Látogató', 'email' => 'weblatogato@example.test', 'phone' => '+36 1 234', 'topic' => 'Kismama jóga', 'message' => 'Mikor kezdhetek?' ) );
+	$t = OYS_Hub::thread_for( 0, 'weblatogato@example.test' );
+	ok( $t && 0 === (int) $t->user_id && 'Web Látogató' === $t->name, 'a conversation by email address' );
+	$m = OYS_Hub::messages( $t->id );
+	ok( 'contact' === $m[0]->kind && str_contains( $m[0]->body, 'Mikor kezdhetek?' ) && str_contains( $m[0]->body, 'Kismama jóga' ), 'with the topic and the message' );
+	$u = wp_insert_user( array( 'user_login' => 'weblatogato', 'user_email' => 'weblatogato@example.test', 'user_pass' => 'x-12345678', 'first_name' => 'Web', 'role' => 'oys_customer' ) );
+	eq( (int) $t->id, (int) OYS_Hub::thread_for( $u )->id, 'when they register with that address, the conversation becomes theirs' );
+	global $wpdb;
+	$wpdb->insert( OYS_Install::table( 'private_requests' ), array( 'user_id' => $u, 'topic' => 'yoga', 'duration_min' => 60, 'people' => 1, 'location_type' => 'online', 'preferred' => 'Hétfő este', 'status' => 'new', 'created_at' => oys_now() ) );
+	$r = OYS_Privates::get( (int) $wpdb->insert_id );
+	OYS_Hub::on_private_request( $r );
+	$last = array_values( array_filter( OYS_Hub::messages( $t->id ), fn( $m ) => 'request' === $m->kind ) );
+	ok( $last && str_contains( $last[0]->body, 'Hétfő este' ) && (int) $last[0]->ref_id === (int) $r->id, 'the request with what was asked, linked to the request' );
+} );
+
+test( 'Áron, 16 November – the Hub: class chats with unread counts, an email about them outside the class, a photo in the chat', function () {
+	$s = make_session( array( 'format' => 'online', 'capacity' => 8, 'in_hours' => -30 ) );
+	$u = make_user( 'Chatelo' );
+	$who = array( 'owner' => false, 'booking' => (object) array( 'id' => 999999 ), 'user_id' => $u, 'name' => 'Chatelő K.' );
+	$log = sent_mails( fn() => OYS_Live::post_message( $s, $who, 'Köszönöm az órát!' ) );
+	eq( 1, count( $log ), 'a message after the class: the studio gets an email' );
+	ok( str_contains( $log[0]['html'] ?? '', 'Köszönöm az órát!' ) && str_contains( $log[0]['html'] ?? '', 'page=oys#c' . $s->id ), 'with the message and a link to the class chat in the Hub' );
+	delete_transient( 'oys_live_chat_' . md5( $s->id . '|b999999' ) );
+	$again = sent_mails( fn() => OYS_Live::post_message( $s, $who, 'Még egy.' ) );
+	eq( 0, count( $again ), 'one email per class per quarter hour' );
+	$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0];
+	wp_set_current_user( $admin );
+	try {
+		$chat = array_values( array_filter( OYS_Hub::class_chats(), fn( $c ) => (int) $c['session']->id === (int) $s->id ) );
+		eq( 2, $chat[0]['unread'] ?? -1, 'two unread messages in this class chat' );
+		$id = OYS_Hub::post_to_class( $s, 'Nagyon örülök!' );
+		ok( ! is_wp_error( $id ), 'the studio answers from the Hub' );
+		$chat = array_values( array_filter( OYS_Hub::class_chats(), fn( $c ) => (int) $c['session']->id === (int) $s->id ) );
+		eq( 0, $chat[0]['unread'], 'answered: read' );
+		// a photo, resized and with a random name
+		$img = imagecreatetruecolor( 2400, 1800 );
+		$tmp = tempnam( sys_get_temp_dir(), 'oystest' ) . '.jpg';
+		imagejpeg( $img, $tmp, 90 );
+		$path = OYS_Hub::save_image( array( 'tmp_name' => $tmp, 'name' => 'IMG_1234.jpg', 'size' => filesize( $tmp ), 'error' => 0 ) );
+		ok( is_string( $path ) && preg_match( '#^\d{4}/\d{2}/[0-9a-f]{32}\.jpg$#', $path ), 'saved under a random name' );
+		$size = getimagesize( OYS_Hub::image_dir()[0] . '/' . $path );
+		eq( 1600, max( $size[0], $size[1] ), 'resized to 1600 px' );
+		$bad = tempnam( sys_get_temp_dir(), 'oystest' ) . '.jpg';
+		file_put_contents( $bad, '<?php echo 1;' );
+		ok( is_wp_error( OYS_Hub::save_image( array( 'tmp_name' => $bad, 'name' => 'x.jpg', 'size' => 13, 'error' => 0 ) ) ), 'not a photo: refused' );
+		delete_transient( 'oys_live_chat_' . md5( $s->id . '|u' . $admin ) ); // the 2-second flood guard after the answer above
+		$pid = OYS_Live::post_message( $s, array( 'owner' => true, 'booking' => null, 'user_id' => $admin, 'name' => 'Olívia' ), '', $path );
+		$msg = array_values( array_filter( OYS_Live::messages( $s->id ), fn( $m ) => (int) $m->id === (int) $pid ) );
+		ok( $msg && $msg[0]->image === $path && str_contains( OYS_Hub::shape_chat_msg( $msg[0] )['image'], '/oys-chat/' . $path ), 'a photo alone goes into the class chat' );
+	} finally {
+		wp_set_current_user( 0 );
+	}
+} );
+
+test( 'Áron, 16 November – the Hub: only the studio and teachers, a teacher only their own classes; the REST routes refuse customers', function () {
+	$u = make_user( 'Kivancsi' );
+	wp_set_current_user( $u );
+	try {
+		$res = rest_do_request( new WP_REST_Request( 'GET', '/oys/v1/hub/inbox' ) );
+		ok( $res->get_status() >= 401, 'a customer can\'t read the Hub' );
+	} finally {
+		wp_set_current_user( 0 );
+	}
+	$tid  = OYS_Teachers::save( array( 'name' => 'Hub Tanár', 'email' => 'hubtanar@example.test' ) );
+	$tu   = wp_insert_user( array( 'user_login' => 'hubtanar', 'user_email' => 'hubtanar@example.test', 'user_pass' => 'x-12345678', 'role' => 'oys_teacher' ) );
+	global $wpdb;
+	$wpdb->update( OYS_Install::table( 'teachers' ), array( 'user_id' => $tu ), array( 'id' => $tid ) );
+	OYS_Teachers::flush();
+	$mine  = make_session( array( 'format' => 'online', 'teacher' => $tid, 'in_hours' => -40 ) );
+	$other = make_session( array( 'format' => 'online', 'in_hours' => -41 ) );
+	foreach ( array( $mine, $other ) as $s ) {
+		$wpdb->insert( OYS_Install::table( 'live_chat' ), array( 'session_id' => $s->id, 'user_id' => 1, 'name' => 'X', 'body' => 'hello', 'created_at' => oys_now() ) );
+	}
+	wp_set_current_user( $tu );
+	try {
+		$ids = array_map( fn( $c ) => (int) $c['session']->id, OYS_Hub::class_chats() );
+		ok( in_array( (int) $mine->id, $ids, true ) && ! in_array( (int) $other->id, $ids, true ), 'the teacher sees their own class chat only' );
+		ok( is_wp_error( OYS_Hub::post_to_class( $other, 'x' ) ), 'and can\'t write in another teacher\'s' );
+		$res = rest_do_request( new WP_REST_Request( 'GET', '/oys/v1/hub/chat/' . $other->id ) );
+		eq( 404, $res->get_status(), 'not even through the REST route' );
+	} finally {
+		wp_set_current_user( 0 );
+	}
+} );
+
 $t = $GLOBALS['oys_t'];
 echo "\n{$t['pass']} assertions passed, {$t['fail']} failed\n";
 exit( $t['fail'] ? 1 : 0 );

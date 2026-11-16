@@ -6241,3 +6241,507 @@ msgstr "az egyéni bérletei ennyivel tovább érvényesek: %s nap"
 #: includes/admin/class-admin.php
 msgid "Empty = the default (%d days, in Settings). 0 = no extension."
 msgstr "Üresen = az alapértelmezés (%d nap, a Beállításokban). 0 = nincs hosszabbítás."
+
+#: includes/class-hub.php
+msgid "This conversation no longer exists."
+msgstr "Ez a beszélgetés már nem létezik."
+
+#: includes/class-hub.php
+msgid "Photo"
+msgstr "Fotó"
+
+#: includes/class-hub.php
+msgid "You can't write in this class chat."
+msgstr "Ebbe az órai chatbe nem írhatsz."
+
+#: includes/class-hub.php
+msgid "Thank you for your message! I'll get back to you soon."
+msgstr "Köszönöm az üzeneted! Hamarosan válaszolok."
+
+#: includes/class-hub.php
+msgid "Thank you for coming to class today, see you next time!"
+msgstr "Köszönöm, hogy ma itt voltál az órán, találkozunk legközelebb!"
+
+#: includes/class-hub.php
+msgid "You'll find the link to join in your account, under Bookings."
+msgstr "A belépő linket a fiókodban, a Foglalások alatt találod."
+
+#: includes/class-hub.php
+msgid "The photo could not be uploaded."
+msgstr "A fotót nem sikerült feltölteni."
+
+#: includes/class-hub.php
+msgid "The photo is too large (10 MB at most)."
+msgstr "A fotó túl nagy (legfeljebb 10 MB lehet)."
+
+#: includes/class-hub.php
+msgid "Only photos can be attached (JPG, PNG, WebP, GIF)."
+msgstr "Csak fotót csatolhatsz (JPG, PNG, WebP, GIF)."
+
+#: includes/class-hub.php
+msgid "This photo format can't be opened. Try a JPG or PNG."
+msgstr "Ezt a képformátumot nem lehet megnyitni. Próbáld JPG-ben vagy PNG-ben."
+
+#: includes/class-hub.php
+msgid "The photo could not be saved."
+msgstr "A fotót nem sikerült elmenteni."
+
+#: includes/class-hub.php
+msgid "New message: %s"
+msgstr "Új üzenet: %s"
+
+#: includes/class-hub.php
+msgid "New message"
+msgstr "Új üzenet"
+
+#: includes/class-hub.php
+msgid "Answer in the Hub"
+msgstr "Válasz a Hubban"
+
+#: includes/class-hub.php
+msgid "%1$s wrote in the chat of %2$s."
+msgstr "%1$s írt az órai chatbe: %2$s."
+
+#: includes/class-hub.php
+msgid "Class chat: %1$s – %2$s"
+msgstr "Órai chat: %1$s – %2$s"
+
+#: includes/class-hub.php
+msgid "New message in a class chat"
+msgstr "Új üzenet egy órai chatben"
+
+#: includes/class-hub.php
+msgid "Private session request"
+msgstr "Egyéni óra kérés"
+
+#: includes/class-hub.php
+msgid "Message sent. You'll get the answer by email and here."
+msgstr "Elküldve. A választ e-mailben és itt is megkapod."
+
+#: includes/class-hub.php
+msgid "You:"
+msgstr "Te:"
+
+#: includes/class-hub.php
+msgid "Website"
+msgstr "Weboldal"
+
+#: includes/class-hub.php
+msgid "Private request"
+msgstr "Egyéni kérés"
+
+#: includes/class-hub.php
+msgid "Tomorrow"
+msgstr "Holnap"
+
+#: includes/class-hub.php
+msgid "Revenue, 30 days"
+msgstr "Bevétel, 30 nap"
+
+#: includes/class-hub.php
+msgid "Choose someone to write to."
+msgstr "Válaszd ki, kinek írsz."
+
+#: includes/class-hub.php
+msgid "This class no longer exists."
+msgstr "Ez az óra már nem létezik."
+
+#: includes/class-hub.php
+msgid "Hub"
+msgstr "Hub"
+
+#: includes/class-hub.php
+msgid "Classes, move, add"
+msgstr "Órák, áthelyezés, új óra"
+
+#: includes/class-hub.php
+msgid "Who is coming, check-in"
+msgstr "Ki jön, jelenlét"
+
+#: includes/class-hub.php
+msgid "Offers, one-to-one"
+msgstr "Ajánlatok, egyéni órák"
+
+#: includes/class-hub.php
+msgid "Passes, history, notes"
+msgstr "Bérletek, előzmények, jegyzetek"
+
+#: includes/class-hub.php
+msgid "Receipts, refunds"
+msgstr "Számlák, visszatérítés"
+
+#: includes/class-hub.php
+msgid "What people can buy"
+msgstr "Amit meg lehet venni"
+
+#: includes/class-hub.php
+msgid "Overview"
+msgstr "Áttekintés"
+
+#: includes/class-hub.php
+msgid "Numbers, next 7 days"
+msgstr "Számok, a következő 7 nap"
+
+#: includes/class-hub.php
+msgid "Open the website"
+msgstr "A weboldal megnyitása"
+
+#: includes/class-hub.php
+msgid "Rosters, write to the class"
+msgstr "Névsorok, üzenet az órának"
+
+#: includes/class-hub.php
+msgid "Photos, introduction"
+msgstr "Fotók, bemutatkozás"
+
+#: includes/class-hub.php
+msgid "Hi, %s!"
+msgstr "Szia, %s!"
+
+#: includes/class-hub.php
+msgid "Messages"
+msgstr "Üzenetek"
+
+#: includes/class-hub.php
+msgid "More"
+msgstr "Több"
+
+#: includes/class-hub.php
+msgid "My settings"
+msgstr "Beállításaim"
+
+#: includes/class-hub.php
+msgid "Unread"
+msgstr "Olvasatlan"
+
+#: includes/class-hub.php
+msgid "Conversations"
+msgstr "Beszélgetések"
+
+#: includes/class-hub.php
+msgid "Class chats"
+msgstr "Órai chatek"
+
+#: includes/class-hub.php
+msgid "Requests"
+msgstr "Kérések"
+
+#: includes/class-hub.php
+msgid "Done"
+msgstr "Kész"
+
+#: includes/class-hub.php
+msgid "Search names, messages…"
+msgstr "Keresés: név, üzenet…"
+
+#: includes/class-hub.php
+msgid "Nothing here. When someone writes, it shows up here."
+msgstr "Itt most nincs semmi. Ha valaki ír, itt jelenik meg."
+
+#: includes/class-hub.php
+msgid "Choose a conversation on the left."
+msgstr "Válassz egy beszélgetést a bal oldalon."
+
+#: includes/class-hub.php
+msgid "To whom?"
+msgstr "Kinek?"
+
+#: includes/class-hub.php
+msgid "Type a name or email"
+msgstr "Írj be egy nevet vagy e-mail-címet"
+
+#: includes/class-hub.php
+msgid "Write a message…"
+msgstr "Írj üzenetet…"
+
+#: includes/class-hub.php
+msgid "A note only you see…"
+msgstr "Jegyzet, amit csak te látsz…"
+
+#: includes/class-hub.php
+msgid "Add a photo"
+msgstr "Fotó hozzáadása"
+
+#: includes/class-hub.php
+msgid "Remove the photo"
+msgstr "A fotó törlése"
+
+#: includes/class-hub.php
+msgid "Quick answers"
+msgstr "Gyors válaszok"
+
+#: includes/class-hub.php
+msgid "Internal note: the customer doesn't see it"
+msgstr "Belső jegyzet: a vendég nem látja"
+
+#: includes/class-hub.php
+msgid "Reopen"
+msgstr "Újranyitás"
+
+#: includes/class-hub.php
+msgid "Back"
+msgstr "Vissza"
+
+#: includes/class-hub.php
+msgid "Details"
+msgstr "Részletek"
+
+#: includes/class-hub.php
+msgid "Read"
+msgstr "Olvasta"
+
+#: includes/class-hub.php
+msgid "From the website"
+msgstr "A weboldalról"
+
+#: includes/class-hub.php
+msgid "Open the request"
+msgstr "A kérés megnyitása"
+
+#: includes/class-hub.php
+msgid "Go to the room"
+msgstr "Belépés a terembe"
+
+#: includes/class-hub.php
+msgid "Start the class"
+msgstr "Óra indítása"
+
+#: includes/class-hub.php
+msgid "Chat"
+msgstr "Chat"
+
+#: includes/class-hub.php
+msgid "%d on the waitlist"
+msgstr "%d fő várólistán"
+
+#: includes/class-hub.php
+msgid "Nobody has booked yet."
+msgstr "Még senki nem foglalt."
+
+#: includes/class-hub.php
+msgid "Health note"
+msgstr "Egészségügyi megjegyzés"
+
+#: includes/class-hub.php
+msgid "No classes in the next days."
+msgstr "A következő napokban nincs óra."
+
+#: includes/class-hub.php
+msgid "Waiting for you"
+msgstr "Rád vár"
+
+#: includes/class-hub.php
+msgid "New messages"
+msgstr "Új üzenet"
+
+#: includes/class-hub.php
+msgid "All answered. 🌿"
+msgstr "Mindenre válaszoltál. 🌿"
+
+#: includes/class-hub.php
+msgid "Numbers"
+msgstr "Számok"
+
+#: includes/class-hub.php
+msgid "Latest payments"
+msgstr "Legutóbbi befizetések"
+
+#: includes/class-hub.php
+msgid "No valid pass."
+msgstr "Nincs érvényes bérlete."
+
+#: includes/class-hub.php
+msgid "%1$d of %2$d left"
+msgstr "%1$d / %2$d maradt"
+
+#: includes/class-hub.php
+msgid "Booked classes"
+msgstr "Foglalt órák"
+
+#: includes/class-hub.php
+msgid "No upcoming class."
+msgstr "Nincs következő foglalása."
+
+#: includes/class-hub.php
+msgid "Customer since %s"
+msgstr "Vendég %s óta"
+
+#: includes/class-hub.php
+msgid "%d classes so far"
+msgstr "eddig %d óra"
+
+#: includes/class-hub.php
+msgid "Open the customer page"
+msgstr "A vendég adatlapja"
+
+#: includes/class-hub.php
+msgid "Call"
+msgstr "Hívás"
+
+#: includes/class-hub.php
+msgid "No account yet: wrote on the website. Your answer goes by email."
+msgstr "Még nincs fiókja: a weboldalon írt. A válaszod e-mailben megy ki neki."
+
+#: includes/class-hub.php
+msgid "In this class"
+msgstr "Ezen az órán"
+
+#: includes/class-hub.php
+msgid "The chat is closed for the participants; you can still write."
+msgstr "A résztvevőknek már zárva a chat, te még írhatsz."
+
+#: includes/class-hub.php
+msgid "Remove this message from the class chat?"
+msgstr "Törlöd ezt az üzenetet az órai chatből?"
+
+#: includes/class-hub.php
+msgid "Something went wrong. Try again."
+msgstr "Valami nem sikerült. Próbáld újra."
+
+#: includes/class-hub.php
+msgid "No connection. Retrying…"
+msgstr "Nincs kapcsolat. Újrapróbálom…"
+
+#: includes/class-hub.php
+msgid "Turn on notifications"
+msgstr "Értesítések bekapcsolása"
+
+#: includes/class-hub.php
+msgid "Notifications are on on this device"
+msgstr "Ezen az eszközön be vannak kapcsolva az értesítések"
+
+#: includes/class-hub.php
+msgid "While the Hub is open (also in a background tab), this device shows a notification when someone writes."
+msgstr "Amíg a Hub nyitva van (háttérben lévő fülön is), ez az eszköz jelez, ha valaki ír."
+
+#: includes/class-hub.php
+msgid "New in the Hub"
+msgstr "Újdonság a Hubban"
+
+#: includes/class-hub.php
+msgid "Email me"
+msgstr "Kérek e-mailt"
+
+#: includes/class-hub.php
+msgid "when someone writes to me"
+msgstr "ha valaki ír nekem"
+
+#: includes/class-hub.php
+msgid "when someone writes in a class chat (not during the class)"
+msgstr "ha valaki ír egy órai chatbe (óra közben nem)"
+
+#: includes/class-hub.php
+msgid "At most one email per conversation every 15 minutes, and none while the Hub is open."
+msgstr "Beszélgetésenként legfeljebb 15 percenként egy e-mail, és amíg a Hub nyitva van, egy sem."
+
+#: includes/class-hub.php
+msgid "The studio's emails are switched on and off under Emails & reminders."
+msgstr "A stúdió e-mailjeit az E-mailek és emlékeztetők alatt kapcsolhatod ki-be."
+
+#: includes/class-hub.php
+msgid "My name in the class chats"
+msgstr "A nevem az órai chatekben"
+
+#: includes/class-hub.php
+msgid "My quick answers"
+msgstr "Gyors válaszaim"
+
+#: includes/class-hub.php
+msgid "One per line. In a conversation, tap „Quick answers” and choose one."
+msgstr "Soronként egy. Beszélgetésben koppints a „Gyors válaszok” gombra, és válassz."
+
+#: includes/class-hub.php
+msgid "Earlier messages"
+msgstr "Korábbi üzenetek"
+
+#: includes/class-hub.php
+msgid "now"
+msgstr "most"
+
+#: includes/class-hub.php
+msgid "Loading…"
+msgstr "Betöltés…"
+
+#: includes/class-hub.php
+msgid "The Hub needs JavaScript."
+msgstr "A Hubhoz JavaScript kell."
+
+#: includes/class-hub.php
+msgid "new"
+msgstr "új"
+
+#: includes/class-hub.php
+msgid "Messages with %s"
+msgstr "Üzenetek – %s"
+
+#: includes/class-hub.php
+msgid "Write to %s any time: a question, an injury, something before class. The answer comes here and by email."
+msgstr "Írj bármikor: kérdés, sérülés, bármi, ami az óra előtt fontos. A választ itt és e-mailben is megkapod."
+
+#: includes/class-hub.php
+msgid "Your message"
+msgstr "Az üzeneted"
+
+#: includes/class-hub.php
+msgid "Write your message…"
+msgstr "Írd ide az üzeneted…"
+
+#: includes/class-hub.php
+msgid "Answer to a message"
+msgstr "Válasz egy üzenetre"
+
+#: includes/class-hub.php
+msgid "When you answer someone in the Hub; the answer is in the email and in their account"
+msgstr "Amikor a Hubban válaszolsz valakinek; a válasz benne van a levélben és a fiókjában is"
+
+#: includes/class-hub.php
+msgid "Answer in a class chat"
+msgstr "Válasz az órai chatben"
+
+#: includes/class-hub.php
+msgid "When you write in a class chat from the Hub after the class, to those who wrote there (at most every half hour)"
+msgstr "Ha óra után a Hubból írsz egy órai chatbe: azoknak, akik írtak oda (legfeljebb félóránként)"
+
+#: includes/class-hub.php
+msgid "When someone writes to you from their account (at most one email per conversation every 15 minutes, none while the Hub is open)"
+msgstr "Ha valaki ír neked a fiókjából (beszélgetésenként legfeljebb 15 percenként egy e-mail, amíg a Hub nyitva van, egy sem)"
+
+#: includes/class-hub.php
+msgid "When someone writes in a class chat outside the class (at most one email per class every 15 minutes, none while the Hub is open)"
+msgstr "Ha valaki ír egy órai chatbe az órán kívül (óránként legfeljebb 15 percenként egy e-mail, amíg a Hub nyitva van, egy sem)"
+
+#: includes/class-hub.php
+msgid "{teacher} answered your message"
+msgstr "{teacher} válaszolt az üzenetedre"
+
+#: includes/class-hub.php
+msgid "You have an answer"
+msgstr "Válasz érkezett"
+
+#: includes/class-hub.php
+msgid "Hi {first_name}, {teacher} answered your message:"
+msgstr "Szia {first_name}! {teacher} válaszolt az üzenetedre:"
+
+#: includes/class-hub.php
+msgid "You can answer in your account, under Messages."
+msgstr "Válaszolni a fiókodban, az Üzenetek alatt tudsz."
+
+#: includes/class-hub.php
+msgid "Open my messages"
+msgstr "Üzeneteim megnyitása"
+
+#: includes/class-hub.php
+msgid "New in the chat of {class}"
+msgstr "Új üzenet a(z) {class} chatjében"
+
+#: includes/class-hub.php
+msgid "New message in the class chat"
+msgstr "Új üzenet az órai chatben"
+
+#: includes/class-hub.php
+msgid "Hi {first_name}, there is a new message in the chat of {class} ({date_short}):"
+msgstr "Szia {first_name}! Új üzenet érkezett a(z) {class} ({date_short}) chatjébe:"
+
+#: includes/class-hub.php
+msgid "Open the class chat"
+msgstr "Az órai chat megnyitása"

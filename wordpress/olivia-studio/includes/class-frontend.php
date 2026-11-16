@@ -1220,6 +1220,7 @@ class OYS_Frontend {
 			'passes'     => __( 'Passes', 'olivia-studio' ),
 			'membership' => __( 'Membership', 'olivia-studio' ),
 			'private'    => __( 'Private sessions', 'olivia-studio' ),
+			'messages'   => __( 'Messages', 'olivia-studio' ),
 			'history'    => __( 'History', 'olivia-studio' ),
 			'payments'   => __( 'Payments', 'olivia-studio' ),
 			'profile'    => __( 'Profile', 'olivia-studio' ),
@@ -1254,8 +1255,10 @@ class OYS_Frontend {
 			. $services
 			. '<div class="oys-stat oys-stat--pink"><dt>' . esc_html__( 'Upcoming', 'olivia-studio' ) . '</dt><dd>' . count( $next ) . '</dd></div></dl></header>';
 		$out .= '<nav class="oys-account__nav" aria-label="' . esc_attr__( 'Account', 'olivia-studio' ) . '">';
+		$unread = 'messages' !== $tab ? OYS_Hub::customer_unread( $user_id ) : 0;
 		foreach ( $tabs as $k => $label ) {
-			$out .= '<a href="' . esc_url( oys_account_url( $k ) ) . '"' . ( $k === $tab ? ' aria-current="page"' : '' ) . '>' . esc_html( $label ) . '</a>';
+			$badge = 'messages' === $k && $unread ? ' <span class="oys-badge" aria-label="' . esc_attr__( 'new', 'olivia-studio' ) . '">' . (int) $unread . '</span>' : '';
+			$out  .= '<a href="' . esc_url( oys_account_url( $k ) ) . '"' . ( $k === $tab ? ' aria-current="page"' : '' ) . '>' . esc_html( $label ) . $badge . '</a>';
 		}
 		$out .= '</nav><div class="oys-account__body">';
 		$out .= call_user_func( array( __CLASS__, 'tab_' . $tab ), $user_id );
@@ -1435,6 +1438,46 @@ class OYS_Frontend {
 			$out .= '<tr><td>' . esc_html( oys_date( $o->paid_at ?: $o->created_at, 'M j, Y' ) ) . '</td><td>' . esc_html( $o->description ) . ( 'paid' !== $o->status ? ' <span class="badge">' . esc_html( $st[ $o->status ] ?? $o->status ) . '</span>' : '' ) . '</td><td class="num">' . esc_html( oys_money( $o->amount_cents, $o->currency ) ) . '</td><td>' . ( $o->receipt_url ? '<a class="text-link" href="' . esc_url( $o->receipt_url ) . '" target="_blank" rel="noopener">' . esc_html__( 'Receipt', 'olivia-studio' ) . '</a>' : '' ) . '</td></tr>';
 		}
 		return $out . '</tbody></table>';
+	}
+
+	/**
+	 * Messages with the studio (the Hub): Áron, 16 November – everything people write lands in one place. The studio's
+	 * answers come by email too; a photo can go with a message. Studio notes (kind „note”) stay in the Hub.
+	 */
+	private static function tab_messages( $user_id ) {
+		$threads = OYS_Hub::customer_threads( $user_id );
+		if ( ! $threads ) {
+			$threads = array( (object) array( 'id' => 0, 'teacher_id' => 0 ) );
+		}
+		$owner = (string) OYS_Settings::get( 'owner_name' ) ?: get_bloginfo( 'name' );
+		$out   = '<section class="oys-msgs">';
+		foreach ( $threads as $t ) {
+			$with = (int) $t->teacher_id && OYS_Teachers::get( $t->teacher_id ) ? OYS_Teachers::get( $t->teacher_id )->name : $owner;
+			$msgs = $t->id ? array_values( array_filter( OYS_Hub::messages( $t->id ), fn( $m ) => 'note' !== $m->kind ) ) : array();
+			if ( $t->id && ! empty( $t->unread_customer ) ) {
+				OYS_Hub::mark_read( $t->id, 'customer' );
+			}
+			$out .= '<div class="oys-msgs__thread"><h3 class="oys-msgs__with">' . esc_html( sprintf( __( 'Messages with %s', 'olivia-studio' ), $with ) ) . '</h3>';
+			if ( ! $msgs ) {
+				$out .= '<p class="oys-msgs__intro">' . esc_html( sprintf( __( 'Write to %s any time: a question, an injury, something before class. The answer comes here and by email.', 'olivia-studio' ), $with ) ) . '</p>';
+			}
+			$out .= '<ol class="oys-msgs__list">';
+			foreach ( $msgs as $m ) {
+				$who  = $m->from_studio ? $with : __( 'You', 'olivia-studio' );
+				$body = 'request' === $m->kind ? '<b>' . esc_html( strtok( (string) $m->body, "\n" ) ) . '</b><br>' . nl2br( esc_html( trim( (string) substr( (string) $m->body, strlen( strtok( (string) $m->body, "\n" ) ) ) ) ) ) : nl2br( esc_html( (string) $m->body ) );
+				$out .= '<li class="oys-msg ' . ( $m->from_studio ? 'oys-msg--them' : 'oys-msg--me' ) . ( 'request' === $m->kind ? ' oys-msg--request' : '' ) . '"><div class="oys-msg__bubble">' . $body
+					. ( $m->image ? '<a href="' . esc_url( OYS_Hub::image_url( $m->image ) ) . '" target="_blank" rel="noopener"><img src="' . esc_url( OYS_Hub::image_url( $m->image ) ) . '" alt="' . esc_attr__( 'Photo', 'olivia-studio' ) . '" loading="lazy"></a>' : '' )
+					. '</div><span class="oys-msg__meta">' . esc_html( $who . ' · ' . oys_date( $m->created_at, 'M j, g:i a' ) ) . '</span></li>';
+			}
+			$out .= '</ol><span id="oys-msg-end"></span>'
+				. '<form class="oys-msgs__form" method="post" enctype="multipart/form-data" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '"><input type="hidden" name="action" value="oys_msg">' . wp_nonce_field( 'oys_msg', '_wpnonce', true, false )
+				. '<input type="hidden" name="teacher" value="' . (int) $t->teacher_id . '">'
+				. '<label class="screen-reader-text" for="oys-msg-body-' . (int) $t->id . '">' . esc_html__( 'Your message', 'olivia-studio' ) . '</label>'
+				. '<textarea id="oys-msg-body-' . (int) $t->id . '" name="body" rows="3" placeholder="' . esc_attr__( 'Write your message…', 'olivia-studio' ) . '"></textarea>'
+				. '<div class="oys-msgs__actions"><label class="oys-msgs__photo">' . oys_icon( 'camera' ) . '<span>' . esc_html__( 'Add a photo', 'olivia-studio' ) . '</span><input type="file" name="image" accept="image/*" data-oys-photo></label>'
+				. '<button class="btn btn--primary">' . esc_html__( 'Send', 'olivia-studio' ) . oys_icon( 'arrow' ) . '</button></div></form></div>';
+		}
+		return $out . '</section>';
 	}
 
 	private static function tab_private( $user_id ) {

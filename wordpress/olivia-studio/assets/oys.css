@@ -396,3 +396,38 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 .oys-gift-chosen__price { font-weight: 700; color: var(--oys-orchid); white-space: nowrap; }
 .oys-gift-chosen.is-new { animation: oys-chosen .7s ease; }
 @keyframes oys-chosen { 0% { background: #FCD3E6; } 100% { background: #FFF2F8; } }
+
+/* ---------- Live room chat: photos (Áron, 16 November: „teremnek a csetjébe lehessen képeket csatolni”) ---------- */
+.oys-live__form-row { display: flex; align-items: center; justify-content: space-between; gap: .5rem; }
+.oys-live__form-row .btn { justify-self: auto; }
+.oys-live__form textarea { min-height: 2.8rem; }
+.oys-live__photo { display: inline-grid; place-items: center; width: 2.6rem; height: 2.6rem; border-radius: 50%; cursor: pointer; color: inherit; background: var(--oys-paper); }
+.oys-live__photo:hover { filter: brightness(.95); }
+.oys-live__photo .oys-icon { width: 1.3rem; height: 1.3rem; }
+.oys-live__preview { position: relative; justify-self: start; }
+.oys-live__preview img { display: block; height: 4.5rem; border-radius: 10px; }
+.oys-live__preview-x { position: absolute; top: -.5rem; right: -.5rem; width: 1.6rem; height: 1.6rem; border: 0; border-radius: 50%; background: #002E2C; color: #fff; font-size: 1rem; line-height: 1; cursor: pointer; }
+.oys-live__img { display: block; margin-top: .4rem; }
+.oys-live__img img { display: block; max-width: 100%; max-height: 260px; border-radius: 10px; object-fit: cover; }
+
+/* ---------- Account → Messages (the Hub) ---------- */
+.oys-badge { display: inline-grid; place-items: center; min-width: 1.25rem; height: 1.25rem; margin-left: .3rem; padding: 0 .35rem; border-radius: 999px; background: #DB2E5C; color: #fff; font-size: .72rem; font-weight: 800; line-height: 1; vertical-align: 1px; }
+.oys-msgs__thread { padding: clamp(1rem, 3vw, 1.6rem); border-radius: 22px; background: #fff; }
+.oys-msgs__thread + .oys-msgs__thread { margin-top: 1rem; }
+.oys-msgs__with { margin: 0 0 .4rem; }
+.oys-msgs__intro { margin: 0 0 1rem; color: #4E5F57; }
+.oys-msgs__list { display: flex; flex-direction: column; gap: .7rem; margin: 0 0 1rem; padding: 0; list-style: none; max-height: 60vh; overflow-y: auto; }
+.oys-msgs__list:empty { display: none; }
+.oys-msg { display: flex; flex-direction: column; align-items: flex-start; max-width: min(85%, 560px); margin: 0; }
+.oys-msg--me { align-self: flex-end; align-items: flex-end; }
+.oys-msg__bubble { padding: .7rem 1rem; border-radius: 18px 18px 18px 6px; background: #F4F1EC; overflow-wrap: anywhere; }
+.oys-msg--me .oys-msg__bubble { border-radius: 18px 18px 6px 18px; background: #002E2C; color: #fff; }
+.oys-msg--request .oys-msg__bubble { background: #FFF4C2; color: #12231A; box-shadow: inset 0 0 0 2px #FFC94A; }
+.oys-msg__bubble img { display: block; max-width: min(280px, 100%); margin-top: .5rem; border-radius: 12px; }
+.oys-msg__meta { margin: .25rem .4rem 0; font-size: .78rem; color: #5D6B64; }
+.oys-msgs__form textarea { width: 100%; min-height: 5.5rem; padding: .8rem 1rem; border: 1.5px solid rgba(0, 46, 44, .18); border-radius: 16px; font: inherit; resize: vertical; background: #FBF9F6; }
+.oys-msgs__actions { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .6rem; margin-top: .6rem; }
+.oys-msgs__photo { display: inline-flex; align-items: center; gap: .45rem; padding: .55rem .9rem; border-radius: 999px; background: #F4F1EC; cursor: pointer; font-weight: 600; font-size: .92rem; }
+.oys-msgs__photo .oys-icon { width: 1.2rem; height: 1.2rem; }
+.oys-msgs__photo input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+.oys-msgs__photo.has-file { background: #FFF4C2; }

@@ -898,6 +898,43 @@
     - A szám a `oys_cancel_extend_days` user meta. A saját szám akkor is érvényes, ha az alapértelmezés 0.
     - A csoportos órák lemondásánál továbbra is az alapértelmezés számít.
   - Tesztek: 1400/0.
+- **olivia-studio 1.13.0 (téma 3.11.98-cal) – Hub az adminban.** Áron, 11.16: „az adminon belül kéne egy hub, ahol látja a
+  beszélgetéseket, akik beírnak neki chatbe, órai chatbe, meg arról kapjon értesítőt is az órai chatről … egybe tud kezelni
+  mindent … telefonra legyen leoptimalizálva”; „A hubot meg készítsed adminra. !! Azzal haladjál”.
+  - **Stúdió → Hub** a Stúdió első oldala (`OYS_Hub_Admin`, `assets/hub.js` + `hub.css`). A régi „Ma” oldal neve
+    „Áttekintés” lett (`oys-today`), a menüjelvény a Hubra váró dolgokat számolja.
+    - Telefonon egy panel látszik, alul fülsor: Ma · Üzenetek · Naptár · Több · Beállításaim.
+    - Asztali gépen: sáv, lista, beszélgetés és a vendég kártyája egymás mellett.
+    - A Hub nyitásakor a WP-menü ikonokra csukódik.
+  - **Ma:** üdvözlés és „Rád vár” (új üzenetek, olvasatlan órai chatek, egyéni kérések).
+    - A következő órák kártyán: foglaltság, ki jön (egészségügyi jelzéssel), „Belépés a terembe” / „Óra indítása”,
+      Névsor, Chat.
+    - Alatta számok és a legutóbbi befizetések.
+  - **Üzenetek:** egy listában a beszélgetések, az órai chatek és az új egyéni kérések, szűrőkkel (Mind, Olvasatlan,
+    Beszélgetések, Órai chatek, Kérések, Kész) és kereséssel.
+    - Beszélgetésben: fotó, gyors válaszok, belső jegyzet (a vendég nem látja), „Kész”.
+    - Mellette a vendég kártyája: telefon, e-mail, egészségügyi megjegyzés, bérletek, foglalt órák, egyéni kérések.
+    - „+”: új beszélgetés bármelyik vendéggel.
+  - **Honnan jönnek az üzenetek** (új táblák: `oys_threads`, `oys_thread_msgs`; DB 13):
+    - a vendég fiókjából: új „Üzenetek” fül, fotóval, olvasatlan-jelvénnyel;
+    - a weboldal kapcsolati űrlapjáról (`do_action('oys_contact_message')` a témában); ha később ugyanazzal az e-maillel
+      regisztrál, a beszélgetés az övé lesz;
+    - az egyéni kérésekből (`oys_private_requested`): az összefoglaló bekerül a vendég beszélgetésébe, „Ajánlat küldése”
+      gombbal;
+    - az órai chatekből (`live_chat`), olvasatlanság-számlálással (`oys_hub_chat_seen`).
+  - **Értesítések:**
+    - E-mail Olíviának (vagy az óra oktatójának), ha valaki ír neki, vagy az órán kívül ír az órai chatbe.
+    - Beszélgetésenként vagy óránként legfeljebb 15 percenként egy levél; amíg a Hub nyitva van, egy sem; az óra alatt
+      egy sem.
+    - Új e-mail-sablonok: `studio_message`, `studio_class_chat`, `message_reply` (a válasz e-mailben megy a vendégnek),
+      `chat_reply` (óra utáni Hub-válasz azoknak, akik írtak a chatbe, legfeljebb félóránként).
+    - Amíg a Hub nyitva van (háttérfülön is), böngészőértesítést is ad; ezt a Beállításaimban lehet bekapcsolni.
+  - **Fotó az órai chatben** („teremnek a csetjébe lehessen képeket csatolni”): kamera gomb az élő terem chatjében.
+    - Hubból, fiókból, órai chatből is lehet fotót küldeni.
+    - Átméretezve (leghosszabb oldal 1600 px, JPEG 80%), véletlen fájlnévvel, az `uploads/oys-chat/` alá kerül.
+  - **Oktatók:** a „Tanítás” menü első pontja a Hub, csak a saját óráik chatjeivel és a saját beszélgetéseikkel.
+    - Személyre szabható (Beállításaim): e-mail értesítés be/ki, név az órai chatekben, saját gyors válaszok.
+  - Tesztek: 1433/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

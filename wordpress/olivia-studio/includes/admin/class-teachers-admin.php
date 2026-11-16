@@ -32,7 +32,7 @@ class OYS_Teachers_Admin {
 		// Teachers land on their classes, not the WordPress dashboard.
 		add_action( 'load-index.php', function () {
 			if ( current_user_can( 'oys_teach' ) && ! current_user_can( 'oys_manage' ) && ! current_user_can( 'edit_posts' ) ) {
-				oys_redirect( admin_url( 'admin.php?page=oys-teach' ) );
+				oys_redirect( admin_url( 'admin.php?page=oys-hub' ) );
 			}
 		} );
 	}

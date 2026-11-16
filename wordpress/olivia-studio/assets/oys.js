@@ -66,3 +66,25 @@
 		});
 	});
 })();
+
+/* Account → Messages: the chosen photo's name on the button (the Hub). */
+(function () {
+	document.querySelectorAll('[data-oys-photo]').forEach(function (input) {
+		input.addEventListener('change', function () {
+			var label = input.closest('label');
+			var span = label && label.querySelector('span');
+			var f = input.files && input.files[0];
+			if (label) {
+				label.classList.toggle('has-file', !!f);
+			}
+			if (span) {
+				span.dataset.text = span.dataset.text || span.textContent;
+				span.textContent = f ? f.name : span.dataset.text;
+			}
+		});
+	});
+	var list = document.querySelector('.oys-msgs__list');
+	if (list) {
+		list.scrollTop = list.scrollHeight;
+	}
+})();

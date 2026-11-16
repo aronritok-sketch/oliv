@@ -144,6 +144,7 @@ class OYS_Privates {
 		$wpdb->insert( OYS_Install::table( 'private_requests' ), $row );
 		$request = self::get( (int) $wpdb->insert_id );
 		OYS_Emails::private_request_received( $request );
+		do_action( 'oys_private_requested', $request ); // the Hub: the summary goes into the customer's conversation
 		oys_flash( __( 'Request sent. I\'ll reply within one working day with a time and price.', 'olivia-studio' ) );
 		oys_redirect( oys_account_url( 'private' ) );
 	}

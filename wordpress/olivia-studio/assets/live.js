@@ -24,7 +24,7 @@
 		if (qs) {
 			url += (url.indexOf('?') < 0 ? '?' : '&') + qs;
 		}
-		var headers = { 'Content-Type': 'application/json' };
+		var headers = opts.form ? {} : { 'Content-Type': 'application/json' };
 		if (cfg.nonce) {
 			headers['X-WP-Nonce'] = cfg.nonce;
 		}
@@ -32,7 +32,7 @@
 			method: opts.method || 'GET',
 			headers: headers,
 			credentials: 'same-origin',
-			body: opts.body ? JSON.stringify(opts.body) : undefined
+			body: opts.form ? opts.form : (opts.body ? JSON.stringify(opts.body) : undefined)
 		}).then(function (r) {
 			return r.json().catch(function () { return {}; }).then(function (j) {
 				if (!r.ok) {
@@ -99,11 +99,26 @@
 			});
 			head.appendChild(del);
 		}
-		var body = document.createElement('p');
-		body.className = 'oys-live__msg-body';
-		body.textContent = m.body;
 		li.appendChild(head);
-		li.appendChild(body);
+		if (m.body) {
+			var body = document.createElement('p');
+			body.className = 'oys-live__msg-body';
+			body.textContent = m.body;
+			li.appendChild(body);
+		}
+		if (m.image) { // a photo in the chat (Áron, 16 November)
+			var a = document.createElement('a');
+			a.className = 'oys-live__img';
+			a.href = m.image;
+			a.target = '_blank';
+			a.rel = 'noopener';
+			var img = document.createElement('img');
+			img.src = m.image;
+			img.alt = t.photo || '';
+			img.loading = 'lazy';
+			a.appendChild(img);
+			li.appendChild(a);
+		}
 		list.appendChild(li);
 		last = Math.max(last, m.id);
 	}
@@ -148,16 +163,61 @@
 
 	if (form) {
 		var area = form.querySelector('textarea');
+		var photo = form.querySelector('[data-live-photo]');
+		var preview = form.querySelector('[data-live-preview]');
+		var clearPhoto = function () {
+			if (photo) {
+				photo.value = '';
+			}
+			if (preview) {
+				preview.hidden = true;
+				preview.innerHTML = '';
+			}
+		};
+		if (photo && preview) {
+			photo.addEventListener('change', function () {
+				var f = photo.files && photo.files[0];
+				if (!f) {
+					clearPhoto();
+					return;
+				}
+				preview.innerHTML = '';
+				var img = document.createElement('img');
+				img.alt = '';
+				img.src = URL.createObjectURL(f);
+				var x = document.createElement('button');
+				x.type = 'button';
+				x.className = 'oys-live__preview-x';
+				x.setAttribute('aria-label', t.remove || '×');
+				x.textContent = '×';
+				x.addEventListener('click', clearPhoto);
+				preview.appendChild(img);
+				preview.appendChild(x);
+				preview.hidden = false;
+			});
+		}
 		form.addEventListener('submit', function (e) {
 			e.preventDefault();
 			var text = area.value.trim();
-			if (!text) {
+			var file = photo && photo.files && photo.files[0];
+			if (!text && !file) {
+				area.focus();
 				return;
 			}
-			var btn = form.querySelector('button');
+			var btn = form.querySelector('button[type="submit"]');
 			btn.disabled = true;
-			api('/chat', { method: 'POST', body: { body: text } }).then(function () {
+			var req;
+			if (file) {
+				var fd = new FormData();
+				fd.append('body', text);
+				fd.append('image', file);
+				req = api('/chat', { method: 'POST', form: fd });
+			} else {
+				req = api('/chat', { method: 'POST', body: { body: text } });
+			}
+			req.then(function () {
 				area.value = '';
+				clearPhoto();
 				list.scrollTop = list.scrollHeight;
 				poll();
 			}, function (err) {
