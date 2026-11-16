@@ -642,7 +642,8 @@ class OYS_Admin {
 		$q     = sanitize_text_field( wp_unslash( $_GET['s'] ?? '' ) );
 		$users = get_users( array( 'role__in' => array( 'oys_customer' ), 'search' => $q ? '*' . $q . '*' : '', 'orderby' => 'registered', 'order' => 'DESC', 'number' => 3000 ) );
 		echo '<details class="oys-box"><summary><b>' . esc_html__( 'Import customers (Motibro export, .xlsx or .csv)', 'olivia-studio' ) . '</b></summary><p class="description">' . esc_html__( 'Every column of the export is kept with the customer. Nobody is emailed or subscribed to the newsletter; customers who already have an account keep what they entered, only empty fields are filled. The same file can be imported again safely.', 'olivia-studio' ) . '</p><p class="description">' . esc_html__( 'Three Motibro exports are recognised by their columns: Customers; Valid passes (what is left becomes online credits until the same day – a newer export updates them); Class visits (every class and visit becomes the customer\'s history).', 'olivia-studio' ) . '</p>'
-			. str_replace( '<form ', '<form enctype="multipart/form-data" ', self::form( 'import_customers' ) ) . '<input type="file" name="file" accept=".xlsx,.csv" required> <label><input type="checkbox" name="dry_run" value="1" checked> ' . esc_html__( 'Check only (change nothing)', 'olivia-studio' ) . '</label> <button class="button button-primary">' . esc_html__( 'Import', 'olivia-studio' ) . '</button></form></details>'; // phpcs:ignore
+			. str_replace( '<form ', '<form enctype="multipart/form-data" ', self::form( 'import_customers' ) ) . '<input type="file" name="file" accept=".xlsx,.csv" required> <label>' . esc_html__( 'Passes: bookable online until', 'olivia-studio' ) . ' <input type="date" name="online_until"></label> <label><input type="checkbox" name="dry_run" value="1" checked> ' . esc_html__( 'Check only (change nothing)', 'olivia-studio' ) . '</label> <button class="button button-primary">' . esc_html__( 'Import', 'olivia-studio' ) . '</button></form></details>'; // phpcs:ignore
+		echo OYS_Held::admin_box(); // phpcs:ignore WordPress.Security.EscapeOutput
 		echo '<form method="get"><input type="hidden" name="page" value="oys-customers"><p class="search-box"><input type="search" name="s" value="' . esc_attr( $q ) . '"> <button class="button">' . esc_html__( 'Search', 'olivia-studio' ) . '</button></p></form>';
 		echo '<table class="widefat striped oys-table"><thead><tr><th>' . esc_html__( 'Name', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Email', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Phone', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Classes left', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Private left', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Joined', 'olivia-studio' ) . '</th></tr></thead><tbody>';
 		foreach ( $users as $u ) {
@@ -685,7 +686,7 @@ class OYS_Admin {
 			echo '<tr><td>' . esc_html( $p->name ) . '<br><small>' . esc_html( $p->kind . ' · ' . $p->source ) . '</small></td><td colspan="3">' . self::form( 'adjust_pass', 'class="oys-inline"' ) . '<input type="hidden" name="user" value="' . (int) $user_id . '"><input type="hidden" name="pass" value="' . (int) $p->id . '">' // phpcs:ignore
 				. '<input type="number" name="credits_left" min="0" class="small-text" value="' . (int) $p->credits_left . '"> / ' . (int) $p->credits_total . ' <input type="date" name="expires" value="' . esc_attr( $p->expires_at ? wp_date( 'Y-m-d', oys_ts( $p->expires_at ) ) : '' ) . '"> <button class="button button-small">' . esc_html__( 'Update', 'olivia-studio' ) . '</button></form></td></tr>';
 		}
-		echo '</tbody></table><h3>' . esc_html__( 'Give classes', 'olivia-studio' ) . '</h3>' . self::form( 'grant_pass', 'class="oys-inline-form"' ) . '<input type="hidden" name="user" value="' . (int) $user_id . '">' // phpcs:ignore
+		echo '</tbody></table>' . OYS_Held::customer_box( $user_id ) . '<h3>' . esc_html__( 'Give classes', 'olivia-studio' ) . '</h3>' . self::form( 'grant_pass', 'class="oys-inline-form"' ) . '<input type="hidden" name="user" value="' . (int) $user_id . '">' // phpcs:ignore
 			. '<select name="kind"><option value="class">' . esc_html__( 'Group classes', 'olivia-studio' ) . '</option><option value="private">' . esc_html__( 'Private sessions', 'olivia-studio' ) . '</option></select> '
 			. '<input type="number" name="credits" min="1" value="1" class="small-text"> ' . esc_html__( 'valid for', 'olivia-studio' ) . ' <input type="number" name="days" min="1" value="90" class="small-text"> ' . esc_html__( 'days', 'olivia-studio' )
 			. ' <input name="name" placeholder="' . esc_attr__( 'Label, e.g. Paid in cash', 'olivia-studio' ) . '"> <button class="button button-primary">' . esc_html__( 'Add', 'olivia-studio' ) . '</button></form>';
@@ -737,13 +738,15 @@ class OYS_Admin {
 			self::back( 'oys-customers', array(), $rows->get_error_message(), 'error' );
 		}
 		$dry = ! empty( $_POST['dry_run'] );
-		$res = OYS_Import::import_any( $rows, 'motibro', $dry );
+		$until = sanitize_text_field( wp_unslash( $_POST['online_until'] ?? '' ) );
+		$res   = OYS_Import::import_any( $rows, 'motibro', $dry, '', $until );
 		if ( 'visits' === $res['kind'] ) {
 			$msg = sprintf( $dry ? __( 'Check only – nothing changed. Class visits: %1$d classes would be added (%2$d already here), %3$d visits (%4$d already here), %5$d new customers, %6$d skipped.', 'olivia-studio' ) : __( 'Class visits imported: %1$d classes added (%2$d already here), %3$d visits (%4$d already here), %5$d new customers, %6$d skipped.', 'olivia-studio' ), $res['classes_created'], $res['classes_found'], $res['visits_added'], $res['visits_there'], $res['customers_created'], $res['skipped'] );
 			self::back( 'oys-customers', array(), $msg );
 		}
 		if ( 'passes' === $res['kind'] ) {
-			$msg = sprintf( $dry ? __( 'Check only – nothing changed. Passes: %1$d would be added, %2$d updated, %3$d unchanged, %4$d skipped; %5$d sessions left on them.', 'olivia-studio' ) : __( 'Passes imported: %1$d added, %2$d updated, %3$d unchanged, %4$d skipped; %5$d sessions left on them.', 'olivia-studio' ), $res['created'], $res['updated'], $res['unchanged'], $res['skipped'], $res['credits'] );
+			$msg = sprintf( $dry ? __( 'Check only – nothing changed. Passes: %1$d would be added, %2$d updated, %3$d unchanged, %4$d skipped; %5$d sessions left on them.', 'olivia-studio' ) : __( 'Passes imported: %1$d added, %2$d updated, %3$d unchanged, %4$d skipped; %5$d sessions left on them.', 'olivia-studio' ), $res['created'], $res['updated'], $res['unchanged'], $res['skipped'], $res['credits'] )
+				. ' ' . ( 'online' === $res['mode'] ? sprintf( __( 'Bookable online until %s.', 'olivia-studio' ), $res['online_until'] ) : __( 'Not bookable online: collected under „Passes from Motibro”.', 'olivia-studio' ) );
 			self::back( 'oys-customers', array(), $msg );
 		}
 		$msg = sprintf( $dry ? __( 'Check only – nothing changed. Would be created: %1$d, updated: %2$d, unchanged: %3$d, skipped: %4$d.', 'olivia-studio' ) : __( 'Imported. Created: %1$d, updated: %2$d, unchanged: %3$d, skipped: %4$d.', 'olivia-studio' ), $res['created'], $res['updated'], $res['unchanged'], $res['skipped'] );

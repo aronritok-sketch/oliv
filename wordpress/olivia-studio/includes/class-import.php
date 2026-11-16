@@ -66,7 +66,7 @@ class OYS_Import {
 					if ( ! is_array( $rows ) ) {
 						return new WP_Error( 'oys_rows', 'rows: a list of rows (column name → value) is needed.', array( 'status' => 400 ) );
 					}
-					return self::import_any( $rows, (string) ( $req->get_param( 'source' ) ?: 'motibro' ), (bool) $req->get_param( 'dry_run' ), sanitize_key( (string) $req->get_param( 'kind' ) ) );
+					return self::import_any( $rows, (string) ( $req->get_param( 'source' ) ?: 'motibro' ), (bool) $req->get_param( 'dry_run' ), sanitize_key( (string) $req->get_param( 'kind' ) ), sanitize_text_field( (string) $req->get_param( 'online_until' ) ) );
 				},
 			) );
 		} );
@@ -271,9 +271,8 @@ class OYS_Import {
 	 * the first and last one, the regulars, those drifting away, „N. óra” and „Első óra” on the attendance sheet, the
 	 * monthly reports. Written straight into the tables: no email, no notification, no seat or pass logic.
 	 *
-	 * Passes: what is left on each valid pass becomes online credits until the same expiry date (the sessions locked in
-	 * Motibro stay there, for the classes booked there). No expiry email for these. Importing a newer export updates the
-	 * same passes (left and expiry), so it can be run again after the last class in Motibro.
+	 * Passes: what is left on each valid pass is collected for the studio, not bookable online (OYS_Held); with „online
+	 * until” it becomes online credits until that day. No email. Importing a newer export updates the same entries.
 	 *
 	 * The guest is found by the Motibro id (the customer import keeps it), else by the email; a guest not here yet is
 	 * created as in the customer import. Running the same file again changes nothing.
@@ -292,10 +291,10 @@ class OYS_Import {
 	}
 
 	/** Any of the three exports. */
-	public static function import_any( array $rows, $source = 'motibro', $dry_run = false, $kind = '' ) {
+	public static function import_any( array $rows, $source = 'motibro', $dry_run = false, $kind = '', $online_until = '' ) {
 		$kind = $kind ?: self::detect( $rows );
 		if ( 'passes' === $kind ) {
-			return array_merge( array( 'kind' => 'passes' ), self::passes( $rows, $source, $dry_run ) );
+			return array_merge( array( 'kind' => 'passes' ), self::passes( $rows, $source, $dry_run, $online_until ) );
 		}
 		if ( 'visits' === $kind ) {
 			return array_merge( array( 'kind' => 'visits' ), self::visits( $rows, $source, $dry_run ) );
@@ -458,13 +457,20 @@ class OYS_Import {
 		return $out;
 	}
 
-	/** „Érvényes bérletek” → online credits on the customer's account (what is left, until the same day). */
-	public static function passes( array $rows, $source = 'motibro', $dry_run = false ) {
+	/**
+	 * „Érvényes bérletek” → the sessions left, collected for the studio and not bookable online (OYS_Held; Olívia,
+	 * 16 November). With $online_until (Y-m-d) what is left becomes online credits until that day, or the pass's own
+	 * later day (the export of the end of November: „ha abban az exportban még marad alkalmuk, hosszabbítsd meg a
+	 * bérletüket január 27-ig”). Entries of earlier exports not in this one are flagged.
+	 */
+	public static function passes( array $rows, $source = 'motibro', $dry_run = false, $online_until = '' ) {
 		global $wpdb;
 		$source = sanitize_key( $source ) ?: 'motibro';
+		$online = preg_match( '/^\d{4}-\d{2}-\d{2}$/', (string) $online_until ) ? (string) $online_until : '';
 		$t      = OYS_Install::table( 'passes' );
-		$out    = array( 'created' => 0, 'updated' => 0, 'unchanged' => 0, 'skipped' => 0, 'credits' => 0, 'locked' => 0, 'dry_run' => $dry_run, 'rows' => array() );
+		$out    = array( 'mode' => $online ? 'online' : 'held', 'online_until' => $online, 'created' => 0, 'updated' => 0, 'unchanged' => 0, 'skipped' => 0, 'credits' => 0, 'locked' => 0, 'missing' => 0, 'dry_run' => $dry_run, 'rows' => array() );
 		$seen   = array();
+		$keys   = array();
 		foreach ( $rows as $i => $r ) {
 			$r     = array_map( fn( $v ) => is_scalar( $v ) ? trim( (string) $v ) : '', (array) $r );
 			$email = self::clean( 'email', $r['Email'] ?? '' );
@@ -484,44 +490,34 @@ class OYS_Import {
 				$out['rows'][] = array( $i + 2, $email, 'skipped: ' . $uid->get_error_message() );
 				continue;
 			}
-			$base         = $email . '|' . $name . '|' . $exp;
+			$base          = $email . '|' . $name . '|' . $exp;
 			$seen[ $base ] = ( $seen[ $base ] ?? 0 ) + 1;
-			$key          = $source . '-' . substr( md5( $base . '|' . $seen[ $base ] ), 0, 16 );
-			$expires      = preg_match( '/^\d{4}-\d{2}-\d{2}$/', $exp ) ? oys_local_to_utc( $exp . ' 23:59:59' ) : null;
-			$total        = max( 1, $used + $lock + $left );
+			$key           = $source . '-' . substr( md5( $base . '|' . $seen[ $base ] ), 0, 16 );
+			$keys[]        = $key;
 			$out['credits'] += $left;
 			$out['locked']  += $lock;
-			$have = $uid ? $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $t WHERE user_id = %d AND product_id = %s LIMIT 1", $uid, $key ) ) : null;
-			if ( $have ) {
-				if ( (int) $have->credits_left === $left && (int) $have->credits_total === $total && (string) $have->expires_at === (string) $expires ) {
-					$out['unchanged']++;
-					$out['rows'][] = array( $i + 2, $email, 'unchanged' );
-					continue;
-				}
-				if ( ! $dry_run ) {
-					$wpdb->update( $t, array( 'credits_left' => $left, 'credits_total' => $total, 'expires_at' => $expires ), array( 'id' => (int) $have->id ) );
-				}
-				$out['updated']++;
-				$out['rows'][] = array( $i + 2, $email, 'updated' );
+			if ( ! $uid ) { // check only, a customer to be created
+				$out['created']++;
+				$out['rows'][] = array( $i + 2, $email, 'created' );
 				continue;
 			}
-			if ( ! $dry_run ) {
-				$wpdb->insert( $t, array(
-					'user_id'            => (int) $uid,
-					'product_id'         => $key,
-					'name'               => $name,
-					'kind'               => 'online',
-					'credits_total'      => $total,
-					'credits_left'       => $left,
-					'expires_at'         => $expires,
-					'order_id'           => 0,
-					'source'             => $source,
-					'expiry_notice_sent' => 1, // no „your pass is expiring” email for a pass brought over
-					'created_at'         => oys_now(),
-				) );
+			$res = OYS_Held::put( $key, $uid, array( 'name' => $name, 'used' => $used, 'locked' => $lock, 'left' => $left, 'expires' => $exp, 'source' => $source ), $dry_run );
+			if ( $online ) {
+				$pass = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $t WHERE user_id = %d AND product_id = %s LIMIT 1", $uid, $key ) );
+				$res  = $pass ? ( (int) $pass->credits_left === $left && wp_date( 'Y-m-d', oys_ts( (string) $pass->expires_at ) ) === max( $online, $exp ) ? 'unchanged' : 'updated' ) : ( $left > 0 ? 'created' : 'unchanged' );
+				if ( ! $dry_run && 'unchanged' !== $res ) {
+					if ( $left > 0 ) {
+						OYS_Held::to_online( $key, $online );
+					} elseif ( $pass ) {
+						$wpdb->update( $t, array( 'credits_left' => 0 ), array( 'id' => (int) $pass->id ) );
+					}
+				}
 			}
-			$out['created']++;
-			$out['rows'][] = array( $i + 2, $email, 'created' );
+			$out[ $res ]++;
+			$out['rows'][] = array( $i + 2, $email, $res );
+		}
+		if ( ! $dry_run ) {
+			$out['missing'] = OYS_Held::flag_missing( $keys, $source );
 		}
 		return $out;
 	}

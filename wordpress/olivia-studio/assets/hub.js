@@ -790,6 +790,9 @@
 			}
 			if ( ! u.guest ) {
 				h += '<h4>' + esc( T.passes ) + '</h4>' + ( u.passes && u.passes.length ? '<ul class="hub-ctx__list">' + u.passes.map( ( p ) => '<li><b>' + esc( p.name ) + '</b><small>' + esc( fmt( T.left, p.left, p.total ) ) + ( p.expires ? ' · ' + esc( fmt( T.until, p.expires ) ) : '' ) + '</small></li>' ).join( '' ) + '</ul>' : '<p class="hub-muted">' + esc( T.noPasses ) + '</p>' );
+				if ( u.held && u.held.length ) {
+					h += '<h4>' + esc( T.heldTitle ) + '</h4><ul class="hub-ctx__list">' + u.held.map( ( p ) => '<li><b>' + esc( p.name ) + '</b><small>' + esc( fmt( T.heldLine, p.left, p.value ) ) + '</small></li>' ).join( '' ) + '</ul>' + ( u.url ? '<p class="hub-muted hub-small"><a href="' + esc( u.url ) + '#held">' + esc( T.heldHow ) + '</a></p>' : '' );
+				}
 				h += '<h4>' + esc( T.upcoming ) + '</h4>' + ( u.next && u.next.length ? '<ul class="hub-ctx__list">' + u.next.map( ( n ) => '<li><b>' + esc( n.title ) + '</b><small>' + esc( n.when ) + '</small></li>' ).join( '' ) + '</ul>' : '<p class="hub-muted">' + esc( T.noUpcoming ) + '</p>' );
 				if ( u.requests && u.requests.length ) {
 					h += '<h4>' + esc( T.privates ) + '</h4><ul class="hub-ctx__list">' + u.requests.map( ( r ) => '<li><a href="' + esc( r.url ) + '"><b>' + esc( r.label ) + '</b><small>' + esc( r.status ) + '</small></a></li>' ).join( '' ) + '</ul>';

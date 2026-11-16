@@ -4676,21 +4676,48 @@ test( 'Áron, 16 November: Motibro valid passes and class visits → the custome
 		$again = OYS_Import::import_any( $rows, 'motibro', false );
 		ok( 0 === $again['classes_created'] && 0 === $again['visits_added'] && 6 === $again['visits_there'], 'a second run changes nothing' );
 
-		// valid passes: what is left becomes online credits until the same day; a newer export updates them
+		// valid passes (Olívia, 16 November): what is left is collected, not bookable online; redeemable by value
 		$prow = fn( $mail, $used, $locked, $left, $exp ) => array( 'Vendég' => 'Ismert Teszt', 'Email' => $mail, 'Felhasznált alkalmak' => $used, 'Zárolt alkalmak' => $locked, 'Hátralévő alkalmak' => $left, 'Lejárat' => $exp, 'Bérlet neve' => 'Hatha flow jóga bérlet - 5 alkalom (60p)', 'Oktató' => 'Teszt Oktató' );
 		$passes = array( $prow( $kmail, 2, 1, 2, '2027-01-15' ), $prow( 'uj.vendeg.motibro@example.test', 0, 0, 5, '2027-03-01' ), $prow( 'nincs.ilyen@example.test', 1, 0, 4, '2027-02-01' ) );
 		eq( 'passes', OYS_Import::detect( $passes ), 'the passes export is recognised' );
 		$p = OYS_Import::import_any( $passes, 'motibro', false );
-		ok( 3 === $p['created'] && 11 === $p['credits'] && 1 === $p['locked'], 'three passes, 11 sessions left, 1 locked in Motibro' );
-		eq( 2, OYS_Passes::available_for( $known, $s, 'online' ), 'the known guest can book online with the 2 sessions left' );
-		$pass = OYS_Passes::for_user( $known, true )[0];
-		ok( 5 === (int) $pass->credits_total && 'motibro' === $pass->source && 1 === (int) $pass->expiry_notice_sent && str_starts_with( (string) $pass->expires_at, substr( oys_local_to_utc( '2027-01-15 23:59:59' ), 0, 10 ) ), '2 of 5, until the same day, from Motibro, no expiry email' );
+		ok( 'held' === $p['mode'] && 3 === $p['created'] && 11 === $p['credits'] && 1 === $p['locked'], 'three passes collected, 11 sessions left, 1 locked in Motibro' );
+		eq( 0, OYS_Passes::available_for( $known, $s, 'online' ), 'not bookable online' );
+		$held = OYS_Held::for_user( $known );
+		ok( 1 === count( $held ) && 2 === $held[0]['left'] && 230000 === $held[0]['per_cents'] && 460000 === OYS_Held::value_cents( $held[0] ), 'collected for the studio: 2 sessions, worth what they paid there (2 × 2 300 Ft)' );
 		ok( (bool) get_user_by( 'email', 'nincs.ilyen@example.test' ), 'a pass holder not here yet becomes a customer' );
+		[ $hn, $hs ] = OYS_Held::totals();
+		ok( $hn >= 3 && $hs >= 11, 'the totals on the Hub' );
+		wp_set_current_user( get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0] );
+		ok( 2 === OYS_Hub::customer_card( $known )['held'][0]['left'], 'the Hub card shows it when the customer writes' );
+		ok( (bool) array_filter( OYS_Hub::passes_summary(), fn( $t ) => 'tag' === $t['icon'] && str_contains( $t['value'], '11' ) ), 'and a tile on Today' );
+		wp_set_current_user( 0 );
 		$same = OYS_Import::import_any( $passes, 'motibro', false );
 		eq( 3, $same['unchanged'], 'the same file again changes nothing' );
 		$passes[0] = $prow( $kmail, 3, 0, 1, '2027-01-15' );
 		$upd       = OYS_Import::import_any( $passes, 'motibro', false );
-		ok( 1 === $upd['updated'] && 1 === (int) OYS_Passes::for_user( $known, true )[0]->credits_left, 'a newer export (one more used there) updates the pass' );
+		ok( 1 === $upd['updated'] && 1 === OYS_Held::for_user( $known )[0]['left'], 'a newer export (one more used there) updates it' );
+		// the end of November: what is left becomes online credits until 27 January (or the pass's own later day)
+		$late = OYS_Import::import_any( array( $passes[0], $passes[1] ), 'motibro', false, 'passes', '2027-01-27' );
+		ok( 'online' === $late['mode'] && 2 === $late['created'] && 1 === $late['missing'], 'online until 27 January; the pass no longer in the export is flagged' );
+		eq( 1, OYS_Passes::available_for( $known, $s, 'online' ), 'now bookable online: the 1 left' );
+		$pass = OYS_Passes::for_user( $known, true )[0];
+		ok( '2027-01-27' === wp_date( 'Y-m-d', oys_ts( $pass->expires_at ) ) && 'motibro' === $pass->source && 1 === (int) $pass->expiry_notice_sent, 'until 27 January, no expiry email' );
+		$newp = OYS_Passes::for_user( $new->ID, true )[0];
+		eq( '2027-03-01', wp_date( 'Y-m-d', oys_ts( $newp->expires_at ) ), 'a pass valid longer keeps its own day' );
+		eq( array(), OYS_Held::for_user( $known ), 'no longer in the list to redeem' );
+		$again = OYS_Import::import_any( array( $passes[0], $passes[1] ), 'motibro', false, 'passes', '2027-01-27' );
+		eq( 2, $again['unchanged'], 'the same late export again changes nothing' );
+		// redeem by value; the earlier bookable passes moved into the list
+		$third = OYS_Held::for_user( get_user_by( 'email', 'nincs.ilyen@example.test' )->ID )[0];
+		ok( ! empty( $third['missing'] ), 'the one missing from the newer export is marked' );
+		$r = OYS_Held::act( $third['key'], 'redeem', 'egyéni óra' );
+		ok( 'redeemed' === $r['status'] && str_contains( $r['note'], 'egyéni óra' ), 'redeemed, with what for' );
+		global $wpdb;
+		$old = make_user( 'Regibérlet' );
+		$wpdb->insert( OYS_Install::table( 'passes' ), array( 'user_id' => $old, 'product_id' => 'motibro-0123456789abcdef', 'name' => 'Hatha flow jóga bérlet - 5 alkalom (60p)', 'kind' => 'online', 'credits_total' => 5, 'credits_left' => 3, 'expires_at' => oys_utc_plus( 20 * DAY_IN_SECONDS ), 'source' => 'motibro', 'created_at' => oys_now() ) );
+		$conv = OYS_Held::from_passes( 'motibro' );
+		ok( $conv['held'] >= 1 && 0 === OYS_Passes::balance( $old, 'online' ) && 3 === OYS_Held::for_user( $old )[0]['left'], 'the passes imported as bookable earlier move into the list' );
 	} finally {
 		remove_filter( 'pre_wp_mail', $count, 1 );
 		remove_action( 'oys_push_notified', $spy );

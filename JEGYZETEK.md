@@ -1166,6 +1166,28 @@
   - A futás eredménye: 239 óra, 1556 látogatás, 16 bérlet 34 hátralévő alkalommal. Ugyanaz a fájl másodszor nem
     változtat semmit.
   - Vendégadat a repóba nem került (a teszt kitalált adatokkal fut). Tesztek: 1556/0.
+- **olivia-studio 1.20.0 (téma 3.11.108-cal) – a Motibro bérletek nem foglalhatók online, beváltható lista az adminban**
+  (Olívia, 2026-11-16, portál-chat: „november végén küldöm az új exportot … ha abban az exportban még marad alkalmuk,
+  hosszabbítsd meg a bérletüket január 27-ig és a maradék alkalmukat tudják felhasználni online addig. Van több olyan
+  vendég, akinek van még alkalom a bérletén, ezeket ne hozd át, ne foglalhassanak online, de valahova gyűjtsd össze nekem
+  az adminon belül, hogy ha esetleg írnak nekem, akkor tudjuk beváltani őket akár egyénire az értéknek megfelelően!”).
+  - **Tárolás:** `OYS_Held` (`includes/class-held.php`), `oys_held_credits` opció.
+    - Bejegyzésenként: vendég, bérlet, felhasznált, zárolt és hátralévő alkalom, lejárat ott, az export napja.
+    - Egy alkalom értéke: a vendég utolsó ilyen bérletes látogatásának ára az importált jegyzetből (`· 2800 Ft`),
+      különben 2 800 Ft.
+    - Állapot: beváltható / online foglalható / beváltva; jegyzet.
+  - **A passes import alapból a listába gyűjt** (nem foglalható). „Online foglalható eddig” dátummal (admin
+    feltöltés, REST `online_until`) a hátralévő alkalom online alkalom lesz addig, vagy a bérlet saját későbbi napjáig;
+    nincs lejárati levél. Ez a november végi exporthoz kell, 2027-01-27-tel. Ami egy frissebb exportban már nincs
+    benne, azt megjelöli („nézd meg a Motibróban”).
+  - **A már átvitt 16 foglalható bérlet** a `customers/held/from-passes` útvonallal került át a listába, utána az
+    eredeti exporttal frissítve (felhasznált, zárolt).
+  - **Az adminban:**
+    - Stúdió → Vendégek tetején: „Motibro bérletek: beváltható maradék alkalmak” (összesen alkalom és érték),
+      soronként „Beváltva” (mire) és „Online foglalhatóvá” (dátum);
+    - a vendég adatlapján a Bérletek alatt is;
+    - a Hubban a beszélgetés melletti vendégkártyán („Motibróból (online nem foglalható)”), és egy csempe a Ma fülön.
+  - Tesztek: 1568/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

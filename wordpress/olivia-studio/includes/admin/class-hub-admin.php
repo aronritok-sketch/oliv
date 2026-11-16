@@ -275,6 +275,10 @@ class OYS_Hub_Admin {
 			'autoPlain'       => __( 'If you don\'t mark them, %d hours after the class everyone booked is marked as here.', 'olivia-studio' ),
 			'fullRoster'      => __( 'Full roster', 'olivia-studio' ),
 			'firstClass'      => __( 'First class', 'olivia-studio' ),
+			'heldTitle'       => __( 'From Motibro (not bookable online)', 'olivia-studio' ),
+			/* translators: 1: sessions, 2: their value */
+			'heldLine'        => __( '%1$s sessions left · worth %2$s', 'olivia-studio' ),
+			'heldHow'         => __( 'Redeem or make bookable online', 'olivia-studio' ),
 			'wasAway'         => __( 'Back after a long time', 'olivia-studio' ),
 			'addPerson'       => __( 'Add someone', 'olivia-studio' ),
 			'addHelp'         => __( 'With their pass if they have one, else to pay at the studio. After the class they are marked as came.', 'olivia-studio' ),

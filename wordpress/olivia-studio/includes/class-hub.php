@@ -714,6 +714,7 @@ class OYS_Hub {
 			'since'    => oys_date( $u->user_registered, 'M j, Y' ),
 			'visits'   => $visits,
 			'passes'   => $passes,
+			'held'     => self::can_manage() ? OYS_Held::card_lines( $u->ID ) : array(),
 			'next'     => $next,
 			'requests' => $requests,
 			'url'      => self::can_manage() ? admin_url( 'admin.php?page=oys-customers&user=' . (int) $u->ID ) : '',
@@ -829,6 +830,10 @@ class OYS_Hub {
 		}
 		if ( $holds ) {
 			$rows[] = array( 'card', __( 'Seats held during payment', 'olivia-studio' ), (string) $holds, __( 'free again if the payment is not finished', 'olivia-studio' ), '' );
+		}
+		[ $held_n, $held_s, $held_v ] = OYS_Held::totals();
+		if ( $held_n ) { // Olívia, 16 November: not bookable online, redeemable on request
+			$rows[] = array( 'tag', __( 'From Motibro, to redeem', 'olivia-studio' ), sprintf( _n( '%d session', '%d sessions', $held_s, 'olivia-studio' ), $held_s ), sprintf( __( '%1$s · %2$d customers · not bookable online', 'olivia-studio' ), oys_money( $held_v ), $held_n ), '' );
 		}
 		return array_map( fn( $r ) => array( 'icon' => $r[0], 'label' => $r[1], 'value' => $r[2], 'note' => $r[3], 'tone' => $r[4] ), $rows );
 	}

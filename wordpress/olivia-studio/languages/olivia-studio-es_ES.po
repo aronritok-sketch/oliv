@@ -5511,3 +5511,118 @@ msgstr "Solo comprobación: no ha cambiado nada. Bonos: se añadirían %1$d, %2$
 #, php-format
 msgid "Passes imported: %1$d added, %2$d updated, %3$d unchanged, %4$d skipped; %5$d sessions left on them."
 msgstr "Bonos importados: %1$d añadidos, %2$d actualizados, %3$d sin cambios, %4$d omitidos; les quedan %5$d sesiones."
+
+#: Motibro passes held (OYS_Held)
+#, php-format
+msgid "Online until %s"
+msgstr "Online hasta el %s"
+
+#: Motibro passes held (OYS_Held)
+msgid "Give the last day they can use them online."
+msgstr "Indica el último día en que pueden usarlas online."
+
+#: Motibro passes held (OYS_Held)
+msgid "redeemed"
+msgstr "canjeado"
+
+#: Motibro passes held (OYS_Held)
+msgid "to redeem"
+msgstr "por canjear"
+
+#: Motibro passes held (OYS_Held)
+msgid "moved online"
+msgstr "pasado a online"
+
+#: Motibro passes held (OYS_Held)
+msgid "not in the newer export – check in Motibro"
+msgstr "no está en la exportación más reciente: compruébalo en Motibro"
+
+#: Motibro passes held (OYS_Held)
+msgid "expired there"
+msgstr "caducado allí"
+
+#: Motibro passes held (OYS_Held)
+msgid "What for, e.g. a private session on 3 Dec"
+msgstr "Para qué, p. ej. sesión privada el 3 dic."
+
+#: Motibro passes held (OYS_Held)
+msgid "Redeemed"
+msgstr "Canjeado"
+
+#: Motibro passes held (OYS_Held)
+msgid "Make bookable online"
+msgstr "Reservable online"
+
+#: Motibro passes held (OYS_Held)
+msgid "Back to the list"
+msgstr "Volver a la lista"
+
+#: Motibro passes held (OYS_Held)
+#, php-format
+msgid "as of %1$s: used %2$d, locked there %3$d · valid there until %4$s"
+msgstr "a %1$s: usadas %2$d, bloqueadas allí %3$d · válido allí hasta %4$s"
+
+#: Motibro passes held (OYS_Held)
+#, php-format
+msgid "%s / session"
+msgstr "%s / sesión"
+
+#: Motibro passes held (OYS_Held)
+msgid "Customer and pass"
+msgstr "Cliente y bono"
+
+#: Motibro passes held (OYS_Held)
+msgid "Sessions left"
+msgstr "Sesiones restantes"
+
+#: Motibro passes held (OYS_Held)
+msgid "Value"
+msgstr "Valor"
+
+#: Motibro passes held (OYS_Held)
+msgid "Passes from Motibro: sessions left to redeem"
+msgstr "Bonos de Motibro: sesiones por canjear"
+
+#: Motibro passes held (OYS_Held)
+#, php-format
+msgid "%1$d passes, %2$d sessions, %3$s"
+msgstr "%1$d bonos, %2$d sesiones, %3$s"
+
+#: Motibro passes held (OYS_Held)
+msgid "These sessions are not bookable online. If the customer writes, redeem them by their value (for example for a private session) and mark them redeemed, or make them bookable online until a day."
+msgstr "Estas sesiones no se pueden reservar online. Si el cliente escribe, canjéalas por su valor (por ejemplo, por una sesión privada) y márcalas como canjeadas, o hazlas reservables online hasta un día."
+
+#: Motibro passes held (OYS_Held)
+msgid "From Motibro (not bookable online)"
+msgstr "De Motibro (no reservable online)"
+
+#: Motibro passes held (OYS_Held)
+msgid "Passes: bookable online until"
+msgstr "Bonos: reservables online hasta"
+
+#: Motibro passes held (OYS_Held)
+#, php-format
+msgid "Bookable online until %s."
+msgstr "Reservables online hasta el %s."
+
+#: Motibro passes held (OYS_Held)
+msgid "Not bookable online: collected under „Passes from Motibro”."
+msgstr "No reservables online: reunidos en «Bonos de Motibro»."
+
+#: Motibro passes held (OYS_Held)
+msgid "From Motibro, to redeem"
+msgstr "De Motibro, por canjear"
+
+#: Motibro passes held (OYS_Held)
+#, php-format
+msgid "%1$s · %2$d customers · not bookable online"
+msgstr "%1$s · %2$d clientes · no reservable online"
+
+#: Motibro passes held (OYS_Held)
+#, php-format
+msgid "%1$s sessions left · worth %2$s"
+msgstr "Quedan %1$s sesiones · valor %2$s"
+
+#: Motibro passes held (OYS_Held)
+msgid "Redeem or make bookable online"
+msgstr "Canjear o hacer reservable online"
