@@ -726,6 +726,14 @@
   - robots.txt: `anthropic-ai` ki. A fejlécben `rel="describedby"` mutat az llms.txt-re.
   - `/wp-json/oy/v1/indexnow`: a kulcsfájl címe és az utolsó beküldés eredménye.
   - Tesztek: 1334/0.
+- **3.11.84:** ellenőrzés (Áron: „ellenőrizd, mert a sitemap például be van küldve”).
+  - Google: a domain DNS TXT-vel hitelesítve, a sitemapot Áron beküldte a Search Console-ba.
+  - Sitemap: 44 cím, mind 200-as válasz, egyiken sincs noindex.
+  - Javítás: a Jógáról oldal és a 4 kategória kapott canonical címkét (a WordPress csak egyes oldalakra írt).
+  - Bing-hitelesítésnek nincs nyoma (meta, BingSiteAuth.xml).
+  - A friss domain még nem látszik a keresőkben.
+  - Az oliviajoga.hu (ELIN.hu) nem linkel az oliviajoga.online-ra.
+  - Tesztek: 1334/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

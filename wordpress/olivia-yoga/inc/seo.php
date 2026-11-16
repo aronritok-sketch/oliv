@@ -71,6 +71,15 @@ add_action( 'wp_head', function () {
 	if ( is_singular() && has_post_thumbnail() ) {
 		echo '<meta property="og:image" content="' . esc_url( get_the_post_thumbnail_url( null, 'large' ) ) . '">';
 	}
+	// WordPress writes a canonical only on single pages; the posts page („Jógáról”) and the categories get theirs here (the
+	// sitemap check of 16 November: 5 of its 44 addresses had none)
+	if ( ! is_singular() && ! is_front_page() && ( is_home() || is_category() ) ) {
+		$canon = is_home() ? get_permalink( (int) get_option( 'page_for_posts' ) ) : get_category_link( get_queried_object_id() );
+		$paged = (int) get_query_var( 'paged' );
+		if ( $canon ) {
+			echo '<link rel="canonical" href="' . esc_url( $paged > 1 ? trailingslashit( $canon ) . 'page/' . $paged . '/' : $canon ) . '">' . "\n";
+		}
+	}
 	echo '<meta name="twitter:card" content="summary_large_image">' . ( 'fort-myers' === oy_edition() ? '<meta name="geo.region" content="US-FL"><meta name="geo.placename" content="Fort Myers">' : '' ) . "\n";
 	if ( oy_is_demo() ) { // A demo studio: no business or person data for search engines.
 		echo '<script type="application/ld+json">' . wp_json_encode( array( '@context' => 'https://schema.org', '@type' => 'WebSite', 'url' => home_url( '/' ), 'name' => oy_site_name() ), JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG ) . '</script>' . "\n";
