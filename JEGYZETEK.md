@@ -781,6 +781,17 @@
   - A leírásokat a 160 karakter alatti utolsó egész mondatnál vágja. A Jógáról oldal és a kategóriák saját leírást
     kapnak.
   - Tesztek: 1353/0.
+- **téma 3.11.88:** Google Analytics 4 (G-WM1P5R67VJ, a laptopon készült), csak hozzájárulással.
+  - Consent Mode v2: alapból minden „denied”. A gtag.js csak az „Elfogadom” után töltődik; a hozzájárulás csak a
+    mérésre szól (analytics_storage), reklámra nem.
+  - Saját sütisáv („Elfogadom” / „Csak a szükségesek”), a döntés az `oy_consent` sütiben (1 év). A láblécben
+    „Sütibeállítások” link (`#cookie-settings`), ami újranyitja a sávot.
+  - Ha az Ads Connect bővítmény saját sávja be van kapcsolva (Meta Pixel), a mi sávunk eltűnik, és a GA a `hpvac_choice`
+    sütit, illetve a `hpvac:consent` eseményt követi.
+  - A köszönőoldal `generate_lead` eseménye a GA4-be is megy (`gtag('event', …)`).
+  - Az adatkezelési tájékoztatóban élesben csak a „Sütik” és a „Kik férnek hozzá?” bekezdés cserélődik
+    (`oy_migrate_ga4`); Olívia többi szövege marad.
+  - Tesztek: 1358/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
