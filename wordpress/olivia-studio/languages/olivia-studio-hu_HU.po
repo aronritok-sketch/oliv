@@ -1130,7 +1130,7 @@ msgstr "Ma nincs csoportos óra. Egyéni óra kérésre elérhető."
 #: includes/class-frontend.php:98
 #: includes/class-frontend.php:447
 msgid "You're booked"
-msgstr "Foglalva vagy"
+msgstr "Lefoglaltad"
 
 #: includes/class-frontend.php:100
 msgid "Waitlist #%d"
@@ -1679,7 +1679,7 @@ msgstr[1] "Vendégek hozzáadva!"
 
 #: includes/class-frontend.php:666
 msgid "You're booked!"
-msgstr "Foglalva vagy!"
+msgstr "Lefoglaltad!"
 
 #: includes/class-frontend.php:666
 msgid "%1$s on %2$s. A confirmation with a calendar invite is on its way to your inbox."

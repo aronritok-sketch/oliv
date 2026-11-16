@@ -1237,6 +1237,19 @@
     - Ha a cím a képernyő alsó részén van, egyetlen nyugodt mozdulattal felkerül a tetejére. Csak a képernyőn lévő fejlécet
       veszi figyelembe; telefonon a fejléc elgördül, ez okozta a túlgörgetést.
   - Tesztek: 1572/0.
+- **olivia-studio 1.22.0 + téma 3.11.111 – a lefoglalt óra egyszer, érthetően mondja, és van hova tovább lépni** (Áron,
+  2026-11-16, képpel: „Foglalva vagy nem jo.”). A naptár listájában kétszer állt (egy kis sor és egy szürke kapszula),
+  a „Foglalva vagy” pedig magyarul is döcögött.
+  - **Szöveg:** „You're booked” → „Lefoglaltad” (a foglalás utáni képernyőn „Lefoglaltad!”), mindenhol, e-mailben is.
+  - **A naptár listájában** a lefoglalt órának:
+    - magenta a napdoboza;
+    - a név és az idő alatt egyetlen sor áll: magenta körös pipa + „Lefoglaltad”;
+    - alatta körvonalas gomb: „Foglalásaim” (a fiókba, ahol látja és lemondhatja). Online órán, ha 12 órán belül kezdődik,
+      a gomb „Belépek az órára”, és a saját belépőlinkjére visz.
+  - **A rácsban:** a napja magenta számmal, a pöttye gyűrűs; asztali gépen a csipben pipa, és ugyanoda visz, mint a gomb.
+  - **Az órakártyán** (következő órák, órarend): a pipás „Lefoglaltad” mellett ugyanez a gomb.
+  - A lezárt óránál is egyszer áll a „Foglalás lezárva” (csak a kapszula, a kis sor nem).
+  - Tesztek: 1578/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -61,6 +61,19 @@ class OYS_Frontend {
 	 * to its booking; on a phone the days show dots and the month's classes are listed under it. Without JavaScript every
 	 * month shows, one under the other.
 	 */
+	/**
+	 * The next useful step for a class the visitor has booked: [url, label]. On the day of an online class it is the way in
+	 * (their own link to the live room or the meeting), otherwise their bookings, where they can see and cancel it.
+	 */
+	public static function mine_action( $booking, $session ) {
+		$join = OYS_Bookings::join_link( $booking, $session );
+		$soon = oys_ts( $session->starts_at ) - time() < 12 * HOUR_IN_SECONDS && oys_ts( $session->ends_at ) > time();
+		if ( $join && $soon ) {
+			return array( $join, __( 'Join the class', 'olivia-studio' ) );
+		}
+		return array( oys_account_url(), __( 'My bookings', 'olivia-studio' ) );
+	}
+
 	public static function sc_calendar( $atts ) {
 		$atts   = shortcode_atts( array( 'kind' => 'group,event', 'class' => '' ), $atts );
 		$window = max( 7, (int) OYS_Settings::get( 'booking_window_days' ) );
@@ -83,12 +96,12 @@ class OYS_Frontend {
 			$mine = $user_id ? OYS_Bookings::active_for( $user_id, $s->id ) : null;
 			$left = OYS_Schedule::spots_left( $s );
 			if ( $mine && 'pending' !== $mine->status ) {
-				return array( 'is-mine', __( 'You\'re booked', 'olivia-studio' ) );
+				return array( 'is-mine', __( 'You\'re booked', 'olivia-studio' ), $mine );
 			}
 			if ( OYS_Schedule::closed_reason( $s ) ) {
-				return array( 'is-closed', __( 'Booking closed', 'olivia-studio' ) );
+				return array( 'is-closed', __( 'Booking closed', 'olivia-studio' ), null );
 			}
-			return $left < 1 ? array( 'is-full', __( 'Full, waitlist open', 'olivia-studio' ) ) : array( '', sprintf( _n( '%d spot left', '%d spots left', min( $left, 99 ), 'olivia-studio' ), min( $left, 99 ) ) );
+			return $left < 1 ? array( 'is-full', __( 'Full, waitlist open', 'olivia-studio' ), null ) : array( '', sprintf( _n( '%d spot left', '%d spots left', min( $left, 99 ), 'olivia-studio' ), min( $left, 99 ) ), null );
 		};
 		$monday = fn( $d ) => $d->modify( '-' . ( (int) $d->format( 'N' ) - 1 ) . ' days' );
 		$heads  = '';
@@ -115,18 +128,34 @@ class OYS_Frontend {
 				$state .= ! $other && $key === $today->format( 'Y-m-d' ) ? ' is-today' : '';
 				$day_s = $other ? array() : ( $by_day[ $key ] ?? array() );
 				$chips = '';
-				foreach ( $day_s as $s ) {
-					list( $cls, $note ) = $link( $s );
-					$title  = (string) apply_filters( 'oys_card_title', oys_session_title( $s ), $s );
-					$chips .= '<a class="oys-cal__chip ' . esc_attr( $cls ) . '" href="' . esc_url( oys_book_url( $s->id ) ) . '"><b>' . esc_html( oys_time( $s->starts_at ) ) . '</b> <span>' . esc_html( $title ) . '</span></a>';
-					$list  .= '<li class="oys-cal__item ' . esc_attr( $cls ) . '" data-day="' . esc_attr( $key ) . '"><span class="oys-cal__when"><b>' . esc_html( wp_date( 'D', $ts ) ) . '</b>' . esc_html( wp_date( oys_date_format( 'M j' ), $ts ) ) . '</span>'
-						. '<span class="oys-cal__what"><b>' . esc_html( $title ) . '</b><small>' . esc_html( oys_time( $s->starts_at ) . '–' . oys_time( $s->ends_at ) ) . '</small><small class="oys-cal__left">' . esc_html( $note ) . '</small></span>'
-						. ( in_array( $cls, array( '', 'is-full' ), true ) ? '<a class="session__book oys-cal__go' . ( 'is-full' === $cls ? ' session__book--wait' : '' ) . '" href="' . esc_url( oys_book_url( $s->id ) ) . '">' . esc_html( 'is-full' === $cls ? __( 'Join the waitlist', 'olivia-studio' ) : __( 'Book', 'olivia-studio' ) ) . oys_icon( 'arrow' ) . '</a>' : '<span class="session__status oys-cal__go">' . esc_html( $note ) . '</span>' ) . '</li>';
+				$states = array_map( $link, $day_s );
+				foreach ( $day_s as $i => $s ) {
+					list( $cls, $note, $mine ) = $states[ $i ];
+					$title = (string) apply_filters( 'oys_card_title', oys_session_title( $s ), $s );
+					// Áron, 16 November: „Foglalva vagy nem jo.” – it said so twice (a line and a grey pill). A booked class now
+					// says it once, with a tick, and the button is the next useful step: on the day of an online class the
+					// way in, otherwise the guest's bookings (where they can also cancel).
+					$go = $mine ? self::mine_action( $mine, $s ) : null;
+					$chips .= '<a class="oys-cal__chip ' . esc_attr( $cls ) . '" href="' . esc_url( $go ? $go[0] : oys_book_url( $s->id ) ) . '"><b>' . ( $mine ? oys_icon( 'check' ) : '' ) . esc_html( oys_time( $s->starts_at ) ) . '</b> <span>' . esc_html( $title ) . '</span></a>';
+					if ( $mine ) {
+						$state_line = '<small class="oys-cal__ok">' . oys_icon( 'check' ) . esc_html( $note ) . '</small>';
+						$button     = '<a class="session__book session__book--mine oys-cal__go" href="' . esc_url( $go[0] ) . '">' . esc_html( $go[1] ) . oys_icon( 'arrow' ) . '</a>';
+					} elseif ( 'is-closed' === $cls ) {
+						$state_line = '';
+						$button     = '<span class="session__status oys-cal__go">' . esc_html( $note ) . '</span>';
+					} else {
+						$state_line = '<small class="oys-cal__left">' . esc_html( $note ) . '</small>';
+						$button     = '<a class="session__book oys-cal__go' . ( 'is-full' === $cls ? ' session__book--wait' : '' ) . '" href="' . esc_url( oys_book_url( $s->id ) ) . '">' . esc_html( 'is-full' === $cls ? __( 'Join the waitlist', 'olivia-studio' ) : __( 'Book', 'olivia-studio' ) ) . oys_icon( 'arrow' ) . '</a>';
+					}
+					$list .= '<li class="oys-cal__item ' . esc_attr( $cls ) . '" data-day="' . esc_attr( $key ) . '"><span class="oys-cal__when"><b>' . esc_html( wp_date( 'D', $ts ) ) . '</b>' . esc_html( wp_date( oys_date_format( 'M j' ), $ts ) ) . '</span>'
+						. '<span class="oys-cal__what"><b>' . esc_html( $title ) . '</b><small>' . esc_html( oys_time( $s->starts_at ) . '–' . oys_time( $s->ends_at ) ) . '</small>' . $state_line . '</span>'
+						. $button . '</li>';
 				}
 				$label = wp_date( oys_date_format( 'l, F j' ), $ts ) . ( $day_s ? ': ' . implode( ', ', array_map( fn( $s ) => oys_time( $s->starts_at ) . ' ' . apply_filters( 'oys_card_title', oys_session_title( $s ), $s ), $day_s ) ) : '' );
-				$grid .= '<div class="oys-cal__day' . esc_attr( $state ) . ( $day_s ? ' has-class' : '' ) . '" role="listitem"' . ( $other ? ' aria-hidden="true"' : ' aria-label="' . esc_attr( $label ) . '"' ) . ( $day_s ? ' data-day="' . esc_attr( $key ) . '"' : '' ) . '>'
+				$has_mine = in_array( 'is-mine', array_column( $states, 0 ), true );
+				$grid .= '<div class="oys-cal__day' . esc_attr( $state ) . ( $day_s ? ' has-class' : '' ) . ( $has_mine ? ' has-mine' : '' ) . '" role="listitem"' . ( $other ? ' aria-hidden="true"' : ' aria-label="' . esc_attr( $label ) . '"' ) . ( $day_s ? ' data-day="' . esc_attr( $key ) . '"' : '' ) . '>'
 					. '<span class="oys-cal__num">' . esc_html( $day->format( 'j' ) ) . '</span>'
-					. ( $day_s ? '<span class="oys-cal__dots" aria-hidden="true">' . str_repeat( '<i></i>', min( 3, count( $day_s ) ) ) . '</span><div class="oys-cal__chips">' . $chips . '</div>' : '' ) . '</div>';
+					. ( $day_s ? '<span class="oys-cal__dots" aria-hidden="true">' . implode( '', array_map( fn( $st ) => 'is-mine' === $st[0] ? '<i class="is-mine"></i>' : '<i></i>', array_slice( $states, 0, 3 ) ) ) . '</span><div class="oys-cal__chips">' . $chips . '</div>' : '' ) . '</div>';
 			}
 			$name    = wp_date( _x( 'F Y', 'calendar month', 'olivia-studio' ), $m->getTimestamp() );
 			$prev    = $mi > 0 ? sprintf( __( 'Previous month: %s', 'olivia-studio' ), wp_date( _x( 'F Y', 'calendar month', 'olivia-studio' ), $months[ $mi - 1 ]->getTimestamp() ) ) : '';
@@ -194,7 +223,9 @@ class OYS_Frontend {
 				$title     = $class_url && 'group' === $s->kind ? '<a href="' . esc_url( $class_url ) . '">' . $plain . '</a>' : $plain;
 
 				if ( $mine && 'pending' !== $mine->status ) {
-					$action = '<span class="session__status is-booked">' . oys_icon( 'check' ) . esc_html__( 'You\'re booked', 'olivia-studio' ) . '</span>';
+					$go     = self::mine_action( $mine, $s );
+					$action = '<span class="session__status is-booked">' . oys_icon( 'check' ) . esc_html__( 'You\'re booked', 'olivia-studio' ) . '</span>'
+						. '<a class="session__book session__book--mine" href="' . esc_url( $go[0] ) . '">' . esc_html( $go[1] ) . oys_icon( 'arrow' ) . '</a>';
 				} elseif ( $wait ) {
 					$action = '<span class="session__status">' . sprintf( esc_html__( 'Waitlist #%d', 'olivia-studio' ), $wait ) . '</span>';
 				} elseif ( OYS_Schedule::closed_reason( $s ) ) {

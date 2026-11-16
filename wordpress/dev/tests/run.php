@@ -4264,6 +4264,28 @@ test( 'Áron, 16 November: the price cards ask for a time or sell the pass; the 
 	ok( 1 === substr_count( $html, ' data-start' ) && str_contains( $panels[0], 'data-cal-go="-1" disabled' ) && str_contains( end( $panels ), 'disabled aria-hidden="true"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7"' ), 'it opens on one month; no arrow before the first or after the last' );
 	$withclass = array_values( array_filter( $panels, fn( $p ) => str_contains( $p, esc_url( oys_book_url( $in->id ) ) ) ) );
 	ok( $withclass && str_contains( $withclass[0], 'class="oys-cal__item' ) && str_contains( $withclass[0], 'class="session__book oys-cal__go' ), 'the class is listed under its month, with its button on its own' );
+	// Áron, 16 November: „Foglalva vagy nem jo.” – a booked class says it once, with a tick, and offers the next step
+	$guest = make_user( 'Naptar' );
+	OYS_Bookings::book_manual( $guest, $in, 'comp', false, true, 'online' );
+	$soon = make_session( array( 'format' => 'online', 'capacity' => 8, 'in_hours' => 3 ) );
+	OYS_Bookings::book_manual( $guest, $soon, 'comp', false, true, 'online' );
+	wp_set_current_user( $guest );
+	try {
+		$html  = do_shortcode( '[oys_calendar]' );
+		$items = array_values( array_filter( explode( '<li class="oys-cal__item', $html ), fn( $p ) => str_starts_with( $p, ' is-mine' ) ) );
+		eq( 2, count( $items ), 'both booked classes are marked as the guest\'s' );
+		$label = esc_html__( 'You\'re booked', 'olivia-studio' );
+		ok( ! array_filter( $items, fn( $p ) => 1 !== substr_count( $p, $label ) || str_contains( $p, 'session__status' ) || ! str_contains( $p, 'class="oys-cal__ok"' ) ), 'it says „booked” once, with a tick – no second line, no grey pill' );
+		$far = current( array_filter( $items, fn( $p ) => str_contains( $p, esc_html( wp_date( oys_date_format( 'M j' ), oys_ts( $in->starts_at ) ) ) ) ) );
+		ok( $far && str_contains( $far, 'session__book--mine oys-cal__go" href="' . esc_url( oys_account_url() ) . '"' ), 'a class days away: the button goes to the guest\'s bookings' );
+		ok( (bool) array_filter( $items, fn( $p ) => str_contains( $p, esc_html__( 'Join the class', 'olivia-studio' ) ) ), 'an online class in a few hours: the button is the way in' );
+		ok( str_contains( $html, ' has-mine' ) && str_contains( $html, '<i class="is-mine"></i>' ), 'the day in the grid shows it is the guest\'s class' );
+		$card = do_shortcode( '[oys_schedule days="14"]' );
+		ok( str_contains( $card, 'session__status is-booked' ) && str_contains( $card, 'session__book--mine' ), 'the class card: the tick and the same next step' );
+	} finally {
+		wp_set_current_user( 0 );
+		OYS_Schedule::cancel_session( $soon->id, 'test' );
+	}
 	foreach ( array( $in, $out, $priv ) as $s ) {
 		OYS_Schedule::cancel_session( $s->id, 'test' );
 	}

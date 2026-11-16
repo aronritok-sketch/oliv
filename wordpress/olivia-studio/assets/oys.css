@@ -465,7 +465,8 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 .oys-cal__chip b { color: #FFDF22; }
 .oys-cal__chip.is-full { background: #6c7a76; }
 .oys-cal__chip.is-mine { background: var(--cal-accent); }
-.oys-cal__chip.is-mine b { color: #fff; }
+.oys-cal__chip.is-mine b { display: inline-flex; align-items: center; gap: .2rem; color: #fff; }
+.oys-cal__chip.is-mine .oys-icon { width: 13px; height: 13px; }
 .oys-cal__chip.is-closed { background: rgba(0, 46, 44, .35); }
 .oys-cal__list { display: none; margin: 1rem 0 0; padding: 0; list-style: none; }
 .oys-cal__item { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: .6rem 1rem; margin: 0 0 .6rem; padding: .8rem; border-radius: 18px; background: #fff; box-shadow: inset 0 0 0 1px var(--cal-line); transition: box-shadow .2s; }
@@ -476,6 +477,12 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 .oys-cal__what b { display: block; line-height: 1.25; }
 .oys-cal__what small { display: block; margin-top: .15rem; font-size: .9rem; }
 .oys-cal__what .oys-cal__left { margin-top: .05rem; font-size: .82rem; opacity: .7; }
+/* a booked class: the date box in the accent, one line with a tick, a quiet outlined button */
+.oys-cal__item.is-mine .oys-cal__when { background: var(--cal-accent); color: #fff; }
+.oys-cal__what .oys-cal__ok { display: inline-flex; align-items: center; gap: .4rem; margin-top: .35rem; font-size: .86rem; font-weight: 700; color: var(--cal-ink); }
+.oys-cal__ok .oys-icon { flex: none; width: 18px; height: 18px; padding: 2px; border-radius: 50%; background: var(--cal-accent); color: #fff; stroke-width: 3; }
+.session__book.session__book--mine { background: transparent; color: var(--cal-ink, #002E2C); box-shadow: inset 0 0 0 2px currentColor; }
+.session__book.session__book--mine:hover { background: var(--cal-soft, rgba(0, 46, 44, .06)); color: var(--cal-ink, #002E2C); }
 .oys-cal__item .oys-cal__go { white-space: nowrap; }
 .oys-cal__note, .oys-cal__empty { margin: .9rem 0 0; font-size: .9rem; opacity: .8; }
 @media (max-width: 720px) {
@@ -486,6 +493,8 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 	.oys-cal__chips { display: none; }
 	.oys-cal__dots { display: flex; gap: 3px; }
 	.oys-cal__dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--cal-accent); }
+	.oys-cal__dots i.is-mine { background: var(--cal-ink); box-shadow: 0 0 0 2px var(--cal-soft), 0 0 0 3px var(--cal-accent); }
+	.oys-cal__day.has-mine .oys-cal__num { color: var(--cal-accent); }
 	.oys-cal__list { display: block; }
 	.oys-cal__arrow { width: 44px; height: 44px; }
 }
@@ -493,7 +502,7 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 	/* the line of a class: the day and the name side by side, the button under them, full width – nothing squeezed */
 	.oys-cal__item { grid-template-columns: auto minmax(0, 1fr); padding: .75rem; }
 	.oys-cal__item .oys-cal__go { grid-column: 1 / -1; width: 100%; justify-content: center; text-align: center; }
-	.oys-cal__item .session__status { display: block; padding: .55rem; border-radius: 999px; background: rgba(0, 46, 44, .06); font-size: .78rem; }
+	.oys-cal__item .session__status { display: block; margin: 0; padding: .55rem; border-radius: 999px; background: rgba(0, 46, 44, .06); font-size: .78rem; }
 }
 
 /* ---------- The waiting room (Áron, 16 November: „a váró … szarul néz ki, az is kapjon egy új dizájnt”) ---------- */
