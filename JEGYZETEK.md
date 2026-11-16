@@ -805,6 +805,19 @@
   - Az adatkezelési oldalon a Meta-bekezdés csak bekapcsolt Pixelnél jelenik meg (`the_content`); az adatbázisban nincs
     tárolva.
   - Tesztek: 1361/0.
+- **téma 3.11.90:** Olívia doksija, 11.16. („oliviajoga.online módosítások 11.16.”, 7 pont).
+  - Óratípus-kártyák: egérrel fölé víve megmarad a szöveg színe. Eddig a linkek magenta hover-színe eltüntette a
+    feliratot a magenta kismamatorna-kártyán.
+  - Képminőség: `wp_img_tag_add_auto_sizes` ki. A WordPress „sizes: auto” értéke miatt a 4:3-ra vágott fekvő fotóhoz túl
+    kicsi kép jött (a stretching 300 px-es változata).
+  - Kismamatorna-fotó: Olívia eredetijéből (IMG_9679, 4160×6240) 1600 px-es webes változat. REST-ből feltöltve (média
+    255), és ez lett a kismamatorna kiemelt képe; a régi 500 px-es volt.
+  - Online órák oldal: az „Egyéni online órák” rész tangerine-barack dobozba kerül, „Időpontot kérek” gombbal és az
+    egyéni óra linkjével (`oy_private_callout`, `the_content`). Olívia szövege nem változik.
+  - Hullámvonal: a pöttyök körül nincs kivágott gyűrű. Mobilon minden vonaldarab az egyik pötty közepétől a következőéig
+    fut, így egybefüggő.
+  - Főoldal, kismamatorna-blokk: halványsárga háttér; a kép mögött a zöld helyett tangerine, a sárga helyett halványsárga.
+  - Tesztek: 1366/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

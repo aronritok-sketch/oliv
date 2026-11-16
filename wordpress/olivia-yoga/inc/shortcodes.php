@@ -512,6 +512,28 @@ function oy_fitmummy( $cls = '' ) {
 		. '<figcaption>' . esc_html__( 'Prenatal & postnatal fitness training: Fitmummy method', 'olivia-yoga' ) . '</figcaption></figure>';
 }
 
+/**
+ * Olívia, 16 November: „ez a szekció az online órák alatt is legyen szebben kiemelve és legyen cta, hogy időpontot
+ * kérhetsz” – on the Online órák page the „Egyéni online órák” part (its heading up to the next one) becomes a box in
+ * the one-to-one colour, with „Időpontot kérek” and the way to the one-to-one page, like on the home page. Her text
+ * stays as she wrote it (the box is put round it while the page is shown).
+ */
+function oy_private_callout( $html ) {
+	return oy_online_only() && is_page( oy_page_slug( 'yoga-classes' ) ) ? oy_private_callout_html( $html ) : $html;
+}
+
+function oy_private_callout_html( $html ) {
+	if ( str_contains( $html, 'oj-callout' ) ) {
+		return $html;
+	}
+	return preg_replace_callback( '~(<h2[^>]*\bid="egyeni-orak"[^>]*>.*?</h2>)(.*?)(?=<h2\b|$)~su', function ( $m ) {
+		$cta = '<p class="btn-row oj-callout__cta">' . oy_btn( add_query_arg( 'topic', 'egyeni-joga', oy_private_url() ), 'Időpontot kérek', 'orchid' )
+			. '<a class="text-link" href="' . esc_url( oy_class_url( 'egyeni-online-joga' ) ) . '">Bővebben az egyéni óráról</a></p>';
+		return '<section class="oj-callout oj-callout--one" aria-labelledby="egyeni-orak">' . $m[1] . trim( $m[2] ) . $cta . '</section>' . "\n";
+	}, $html, 1 );
+}
+add_filter( 'the_content', 'oy_private_callout', 20 );
+
 // Shortcodes on their own line come wrapped in <p>; unwrap them so blocks aren't nested in paragraphs.
 add_filter( 'the_content', function ( $content ) {
 	return preg_replace( '#<p>\s*(\[(?:oy|oys)_[^\]]+\])\s*</p>#', '$1', $content );

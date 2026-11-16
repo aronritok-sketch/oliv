@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OY_VERSION', '3.11.89' );
+define( 'OY_VERSION', '3.11.90' );
 
 require_once get_template_directory() . '/inc/edition.php';
 
@@ -21,6 +21,10 @@ require_once get_template_directory() . '/inc/seo.php';
 require_once get_template_directory() . '/inc/login.php';
 require_once get_template_directory() . '/inc/llms.php';
 require_once get_template_directory() . '/inc/consent.php';
+
+// Olívia, 16 November: „itt kicsiben nagyon szétesett a kép minősége” – WordPress's „sizes: auto” makes the browser take
+// the picture as wide as its box, but a card crops a wide photo to 4:3 and needs a bigger one; our own sizes say so.
+add_filter( 'wp_img_tag_add_auto_sizes', '__return_false' );
 // Szerkesztés a weboldalon (Olivia, 11.13): only on her Hungarian sites, not the US one or the Hathaflow demo
 add_filter( 'oye_enabled', fn( $on ) => $on && ( oy_online_only() || 'hu' === oy_default_lang() ) && ! oy_is_demo() );
 require_once get_template_directory() . '/inc/page-editor.php';

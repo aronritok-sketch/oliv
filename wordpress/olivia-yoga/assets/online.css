@@ -1519,3 +1519,35 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 @media (min-width: 1000px) {
 	.entry ol.oj-flow--wave.oj-flow--n5 > li > p { font-size: .94rem; padding-inline: .8rem; hyphens: auto; overflow-wrap: break-word; }
 }
+
+/* ── Olívia, 16 November ─────────────────────────────────────────────────────────────────────────────────────────── */
+/* „itt ugyanolyan színű a felirat mint a háttér ha ráviszem a kurzort” – the class cards keep their text colour on hover
+   (the links' Magenta Bloom hover made it vanish on the Magenta card) */
+.oj-class-card:hover, .oj-class-card:focus-visible { color: var(--ink); }
+.oj-class-card--flow:hover, .oj-class-card--pre:hover, .oj-class-card--mob:hover,
+.oj-class-card--flow:focus-visible, .oj-class-card--pre:focus-visible, .oj-class-card--mob:focus-visible { color: #fff; }
+/* „mobilon kicsit szakadozik a vonal” – the dots sit on the line (no ring cut out of it), and on a phone each piece of
+   the line runs from one dot's centre to the next one's, under the dots, so it reads as one line */
+.entry ol.oj-flow--wave > li > .oj-flow__n { box-shadow: none !important; }
+@media (max-width: 759px) {
+	.entry ol.oj-flow--wave > li:not(:last-child)::before { z-index: 0; top: 1.35rem; bottom: calc(-1rem - 1.35rem); background-position: center top; background-size: 100% 44px; background-repeat: repeat-y; }
+	.entry ol.oj-flow--wave > li > .oj-flow__n { z-index: 1; }
+	.entry ol.oj-flow--wave.oj-flow--n5 > li:not(:last-child)::before { z-index: 0; top: 1.35rem; bottom: calc(-1rem - 1.35rem); background-position: center top; background-size: 100% 44px; background-repeat: repeat-y; }
+}
+/* the Online órák page: „Egyéni online órák” in a box of its own, with „Időpontot kérek” */
+.entry .oj-callout { position: relative; overflow: hidden; margin: 2.4rem 0; padding: clamp(1.5rem, 3.4vw, 2.6rem); border-radius: 28px; background: var(--lilac-soft); }
+.entry .oj-callout::before { content: ""; position: absolute; right: -70px; top: -70px; width: 220px; height: 220px; border-radius: 50%; background: var(--tangerine); opacity: .55; pointer-events: none; }
+.entry .oj-callout > * { position: relative; }
+.entry .oj-callout > h2 { margin-top: 0; max-width: 20ch; }
+.entry .oj-callout > ul { list-style: none; padding: 0; margin: 1rem 0 1.2rem; display: grid; gap: .55rem; }
+.entry .oj-callout > ul > li { position: relative; margin: 0; padding: .7rem 1rem .7rem 2.6rem; border-radius: 16px; background: #fff; line-height: 1.5; }
+.entry .oj-callout > ul > li::before { content: ""; position: absolute; left: 1rem; top: 1.05rem; width: .8rem; height: .8rem; border-radius: 50%; background: var(--tangerine); }
+.entry .oj-callout > p:not(.oj-callout__cta) { max-width: 70ch; }
+.entry .oj-callout__cta { display: flex; flex-wrap: wrap; align-items: center; gap: .8rem 1.4rem; margin: 1.4rem 0 0; }
+@media (min-width: 900px) { .entry .oj-callout > ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* home, prenatal block: „legyen halvány sárga a háttér”, behind the photo „zöld helyett … tangerine, a sárga helyett a
+   halványsárga” */
+.section--pale.oj-prenatal { background: var(--sun-soft); }
+.oj-prenatal .oj-waved--soft > .oj-blob:not(.oj-brush) .oj-blob__front { fill: var(--tangerine); }
+.oj-prenatal .oj-waved--soft > .oj-blob:not(.oj-brush) .oj-blob__back { fill: color-mix(in srgb, var(--sun) 50%, #fff); }
+
