@@ -894,7 +894,7 @@ class OYS_Hub {
 	public static function rest_poll() {
 		self::mark_active();
 		$items = self::inbox( 'unread' );
-		return rest_ensure_response( array( 'counts' => self::counts(), 'latest' => array_slice( array_map( fn( $i ) => array( 'key' => $i['key'], 'title' => $i['title'], 'sub' => $i['sub'], 'ts' => $i['ts'] ), $items ), 0, 5 ) ) );
+		return rest_ensure_response( array( 'v' => OYS_VERSION, 'counts' => self::counts(), 'latest' => array_slice( array_map( fn( $i ) => array( 'key' => $i['key'], 'title' => $i['title'], 'sub' => $i['sub'], 'ts' => $i['ts'] ), $items ), 0, 5 ) ) );
 	}
 
 	private static function thread_req( WP_REST_Request $req ) {

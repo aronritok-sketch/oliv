@@ -563,6 +563,10 @@ body.oys-hub-screen .screen-reader-text:not(:focus) { position: absolute; width:
 	body.oys-hub-screen #wpbody { padding-top: 0 !important; }
 	body.oys-hub-screen .hub { padding-top: env(safe-area-inset-top, 0px); }
 }
+html.oys-app.wp-toolbar { padding-top: 0 !important; }
+html.oys-app body.oys-hub-screen { --hub-bar: 0px; }
+html.oys-app body.oys-hub-screen #wpadminbar, html.oys-app body.oys-hub-screen #adminmenumain { display: none !important; }
+html.oys-app body.oys-hub-screen #wpcontent { margin-left: 0 !important; }
 .hub-day__h span { text-transform: none; }
 .hub-att__btn--here:not(.is-on) { border-color: #bfe3cf; color: #1d8a5b; }
 .hub-att__btn--miss:not(.is-on) { border-color: #f3c3d0; color: var(--hub-magenta); }

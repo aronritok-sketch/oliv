@@ -4564,6 +4564,7 @@ test( 'Áron, 16 November (Motibro automations) – pushes on bookings, „who c
 		$req = new WP_REST_Request( 'POST', '/oys/v1/hub/class/' . $over->id . '/add' );
 		$req->set_body_params( array( 'user' => make_user( 'Restben' ) ) );
 		eq( 200, rest_do_request( $req )->get_status(), 'quick add over REST' );
+		eq( OYS_VERSION, OYS_Hub::rest_poll()->get_data()['v'], 'the open app learns the version (and reloads itself on a new one)' );
 		wp_set_current_user( 0 );
 	} finally {
 		remove_action( 'oys_push_notified', $spy, 10 );

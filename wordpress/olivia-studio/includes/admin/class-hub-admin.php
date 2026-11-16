@@ -78,6 +78,10 @@ class OYS_Hub_Admin {
 	}
 
 	private static function boot() {
+		return array_merge( array( 'v' => OYS_VERSION ), self::boot_data() );
+	}
+
+	private static function boot_data() {
 		$manage = current_user_can( 'oys_manage' );
 		$u      = wp_get_current_user();
 		$a      = fn( $page, $args = '' ) => admin_url( 'admin.php?page=' . $page . $args );

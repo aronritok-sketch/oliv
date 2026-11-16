@@ -1042,10 +1042,39 @@
 	/* ---------- polling and notifications ---------- */
 	let lastTotal = S.counts.total || 0;
 	let lastKeys = new Set();
+	/* a new version is live: the app on the phone stays open for days, so it reloads itself – when nobody is typing
+	   and no sheet is open, or the next time it comes to the front */
+	let reloading = false;
+	let waiting = false;
+	function reloadWhenIdle() {
+		const busy = () => document.querySelector( '.hub-sheet' ) || ( document.activeElement && /^(INPUT|TEXTAREA|SELECT)$/.test( document.activeElement.tagName ) && document.activeElement.value );
+		if ( reloading ) {
+			return;
+		}
+		if ( document.hidden || ! busy() ) {
+			reloading = true;
+			window.location.reload();
+			return;
+		}
+		if ( waiting ) {
+			return;
+		}
+		waiting = true;
+		document.addEventListener( 'visibilitychange', () => {
+			if ( ! document.hidden && ! busy() && ! reloading ) {
+				reloading = true;
+				window.location.reload();
+			}
+		} );
+	}
+
 	async function poll() {
 		try {
 			const d = await api( 'poll' );
 			root.classList.remove( 'is-offline' );
+			if ( d.v && B.v && d.v !== B.v ) {
+				reloadWhenIdle();
+			}
 			const fresh = ( d.latest || [] ).filter( ( i ) => ! lastKeys.has( i.key + ':' + i.ts ) );
 			if ( ! S.push && d.counts.total > lastTotal && fresh.length && 'Notification' in window && 'granted' === Notification.permission && ( document.hidden || fresh[ 0 ].key !== S.open ) ) {
 				const n = new Notification( fresh[ 0 ].title || T.notifyTitle, { body: fresh[ 0 ].sub || '', tag: 'oys-hub-' + fresh[ 0 ].key } );

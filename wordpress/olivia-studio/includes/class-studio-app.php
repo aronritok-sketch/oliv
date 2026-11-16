@@ -182,6 +182,8 @@ class OYS_Studio_App {
 		if ( str_starts_with( $page, 'oys' ) && OYS_Hub::can() ) {
 			self::own_icon( 'admin_head' );
 			echo self::head_tags(); // phpcs:ignore WordPress.Security.EscapeOutput
+			// the home-screen app: iPhone says so in navigator.standalone (not every iOS answers the display-mode query)
+			echo "<script>(function(){try{if(window.navigator.standalone||window.matchMedia('(display-mode: standalone)').matches){document.documentElement.classList.add('oys-app');}}catch(e){}})();</script>\n"; // phpcs:ignore WordPress.Security.EscapeOutput
 		}
 	}
 

@@ -1131,6 +1131,17 @@
       oktató csak a saját vendégeit adhatja hozzá; az óra vége után 2 napig lehet.
   - Útmutató: Értesítések (a három push, a két új levél), Óra után: jelenléti ív (látogatási adatok, hozzáadás),
     E-mailek. Fordítások hu + es. Tesztek: 1533/0.
+- **olivia-studio 1.18.1 (téma 3.11.106-tal) – az appban sehol nincs WordPress-fejléc, és magától frissül** (Áron,
+  2026-11-16, iPhone-képernyőképpel: „Fent meg bent van a wp admin header”).
+  - Ok: a kép 1.17.0 élesítése előtt készült. Az iPhone a kezdőképernyős app oldalát a memóriában tartja, és újranyitáskor
+    nem tölti újra, így a régi változat maradt. Ellenőrizve WordPress 7.1.4-en (az élőn ez fut) iPhone-nézetben: a Hubon
+    nincs sáv.
+  - Új: az app minden Stúdió-oldalon kap egy `oys-app` osztályt a `<html>`-en (`navigator.standalone` iPhone-on,
+    különben `display-mode: standalone`), így a WP-sáv akkor is eltűnik, ha az iOS nem jelzi a standalone módot a
+    CSS-nek.
+  - Új: a Hub `poll` válasza és a boot adat hordozza a verziót (`v`). Ha élesben új változat van, a nyitott app
+    újratölti magát: ha senki nem gépel és nincs nyitott lap, azonnal, különben amikor legközelebb előtérbe kerül.
+  - Tesztek: 1534/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

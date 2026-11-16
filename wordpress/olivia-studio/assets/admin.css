@@ -107,3 +107,8 @@ body[class*="_page_oys"] .update-nag, body.toplevel_page_oys .update-nag { displ
 	body:has(.oys-appbar) #wpadminbar { display: none !important; }
 	body:has(.oys-appbar) #wpbody { padding-top: env(safe-area-inset-top, 0px); }
 }
+@media (max-width: 899px) {
+	html.oys-app.wp-toolbar { padding-top: 0 !important; }
+	html.oys-app #wpadminbar { display: none !important; }
+	html.oys-app #wpbody { padding-top: env(safe-area-inset-top, 0px); }
+}
