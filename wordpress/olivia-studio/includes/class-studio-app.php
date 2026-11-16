@@ -71,7 +71,7 @@ class OYS_Studio_App {
 	/** Where /studio/?open=… leads (only the Hub's own views and conversations). */
 	public static function hub_target( $open, $user_id = 0 ) {
 		$open = (string) $open;
-		$open = preg_match( '/^(today|inbox|more|settings|[tc]\d+)$/', $open ) ? $open : '';
+		$open = preg_match( '/^(today|inbox|calendar|reports|more|settings|[tcs]\d+)$/', $open ) ? $open : '';
 		return OYS_Hub::hub_url( $open, ! user_can( $user_id ?: get_current_user_id(), 'oys_manage' ) );
 	}
 

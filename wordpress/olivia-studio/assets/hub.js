@@ -314,11 +314,12 @@
 		}
 		const t = d.tally || {};
 		const row = ( p ) => {
-			const sub = [ p.due ? '' : p.paid, p.pass, p.due ? fmt( T.dueHere, p.due ) : '' ].filter( Boolean ).join( ' · ' );
+			const sub = [ p.first ? '' : p.visit, p.due ? '' : p.paid, p.pass, p.due ? fmt( T.dueHere, p.due ) : '' ].filter( Boolean ).join( ' · ' );
+			const badge = p.first ? ' <i class="hub-tag hub-tag--hot">' + esc( T.firstClass ) + '</i>' : ( p.away ? ' <i class="hub-tag hub-tag--warn">' + esc( T.wasAway ) + '</i>' : '' );
 			const room = null === p.joined ? '' : ( p.joined ? '<i class="hub-tag hub-tag--ok">' + esc( T.wasInRoom ) + '</i>' : ( d.over ? '<i class="hub-tag">' + esc( T.notInRoom ) + '</i>' : '' ) );
 			return '<li class="hub-att is-' + esc( p.status ) + '">' +
 				'<div class="hub-att__who">' + ( p.user ? '<button type="button" class="hub-att__name" data-person="' + p.user + '">' + esc( p.name ) + '</button>' : '<b class="hub-att__name">' + esc( p.name ) + '</b>' ) +
-				( p.health ? ' <i class="hub-flag" title="' + esc( p.health ) + '">' + esc( T.health ) + '</i>' : '' ) + room +
+				( p.health ? ' <i class="hub-flag" title="' + esc( p.health ) + '">' + esc( T.health ) + '</i>' : '' ) + badge + room +
 				'<small>' + esc( sub ) + '</small>' + ( p.health ? '<small class="hub-att__health">' + esc( p.health ) + '</small>' : '' ) + '</div>' +
 				'<div class="hub-att__do" role="group">' +
 				'<button type="button" class="hub-att__btn hub-att__btn--here' + ( 'attended' === p.status ? ' is-on' : '' ) + '" data-mark="' + p.booking + '" data-st="' + ( 'attended' === p.status ? 'confirmed' : 'attended' ) + '">' + icon( 'check' ) + '<span>' + esc( T.here ) + '</span></button>' +
@@ -332,6 +333,7 @@
 			( d.people.length && t.confirmed && d.started ? '<p class="hub-row"><button type="button" class="hub-btn hub-btn--primary" data-all="attended">' + icon( 'check' ) + esc( T.allHere ) + '</button></p>' : '' ) +
 			( d.people.length ? '<ul class="hub-atts">' + d.people.map( row ).join( '' ) + '</ul>' : '<p class="hub-muted">' + esc( T.nobody ) + '</p>' ) +
 			( d.auto && ! d.over ? '<p class="hub-muted hub-small">' + esc( fmt( d.live ? T.autoLive : T.autoPlain, d.auto ) ) + '</p>' : '' ) +
+			( d.canAdd ? '<details class="hub-addp"><summary class="hub-btn hub-btn--ghost">' + icon( 'plus' ) + esc( T.addPerson ) + '</summary><p class="hub-muted hub-small">' + esc( T.addHelp ) + '</p><label class="hub-search">' + icon( 'search' ) + '<input type="search" placeholder="' + esc( T.findCustomer ) + '" data-addfind aria-label="' + esc( T.addPerson ) + '"></label><ul class="hub-found" data-addfound></ul></details>' : '' ) +
 			'<p class="hub-row hub-sheet__links">' + ( d.live ? '<a class="hub-btn" href="' + esc( d.live ) + '" target="_blank" rel="noopener">' + icon( 'video' ) + esc( T.room ) + '</a><button type="button" class="hub-btn" data-chat="' + d.id + '">' + icon( 'chat' ) + esc( T.chat ) + '</button>' : '' ) +
 			'<a class="hub-btn hub-btn--ghost" href="' + esc( d.roster ) + '">' + icon( 'list' ) + esc( T.fullRoster ) + '</a></p></div>';
 		const send = async ( path, json ) => {
@@ -344,6 +346,35 @@
 		$$( '[data-mark]', el ).forEach( ( b ) => b.addEventListener( 'click', () => send( 'mark', { booking: parseInt( b.dataset.mark, 10 ), status: b.dataset.st } ) ) );
 		$$( '[data-all]', el ).forEach( ( b ) => b.addEventListener( 'click', () => send( 'mark', { all: 1, status: b.dataset.all } ) ) );
 		$$( '[data-collect]', el ).forEach( ( b ) => b.addEventListener( 'click', () => send( 'collect', { booking: parseInt( b.dataset.collect, 10 ), with: 'cash' } ) ) );
+		const addIn = $( '[data-addfind]', el );
+		if ( addIn ) {
+			const list = $( '[data-addfound]', el );
+			const have = d.people.map( ( p ) => p.user );
+			let at;
+			const find = async () => {
+				try {
+					const r = ( await api( 'customers?q=' + encodeURIComponent( addIn.value.trim() ) ) ).filter( ( u ) => ! have.includes( u.id ) );
+					list.innerHTML = r.map( ( u ) => '<li><button type="button" data-addu="' + u.id + '"><span class="hub-av">' + esc( initials( u.name ) ) + '</span><span><b>' + esc( u.name ) + '</b><small>' + esc( u.email ) + '</small></span></button></li>' ).join( '' ) || '<li class="hub-muted">—</li>';
+					$$( '[data-addu]', list ).forEach( ( b ) => b.addEventListener( 'click', async () => {
+						b.disabled = true;
+						await send( 'add', { user: parseInt( b.dataset.addu, 10 ) } );
+						toast( T.added );
+					} ) );
+				} catch ( e ) {
+					toast( e.message, true );
+				}
+			};
+			addIn.addEventListener( 'input', () => {
+				clearTimeout( at );
+				at = setTimeout( find, 250 );
+			} );
+			$( '.hub-addp', el ).addEventListener( 'toggle', ( e ) => {
+				if ( e.target.open && ! list.innerHTML ) {
+					find();
+					addIn.focus();
+				}
+			} );
+		}
 		$$( '[data-person]', el ).forEach( ( b ) => b.addEventListener( 'click', () => {
 			el.remove();
 			startWith( parseInt( b.dataset.person, 10 ) );
@@ -841,6 +872,9 @@
 			'<label class="hub-switch"><input type="checkbox" name="email_messages"' + ( m.email_messages ? ' checked' : '' ) + '><span></span>' + esc( T.emailMessages ) + '</label>' +
 			'<label class="hub-switch"><input type="checkbox" name="email_chat"' + ( m.email_chat ? ' checked' : '' ) + '><span></span>' + esc( T.emailChat ) + '</label>' +
 			'<p class="hub-muted">' + esc( T.emailNote ) + ( B.manage && B.emails ? ' <a href="' + esc( B.emails ) + '">' + esc( T.studioEmails ) + '</a>' : '' ) + '</p></section>' +
+			'<section class="hub-card"><h2 class="hub-h">' + icon( 'bell' ) + esc( T.pushMe ) + '</h2>' +
+			[ [ 'push_bookings', T.pushBookings ], [ 'push_sheet', T.pushSheet ], [ 'push_daily', T.pushDaily ] ].map( ( k ) => '<label class="hub-switch"><input type="checkbox" name="' + k[ 0 ] + '"' + ( m[ k[ 0 ] ] ? ' checked' : '' ) + '><span></span>' + esc( k[ 1 ] ) + '</label>' ).join( '' ) +
+			'<p class="hub-muted">' + esc( T.pushNote ) + '</p></section>' +
 			'<section class="hub-card"><h2 class="hub-h">' + icon( 'user' ) + esc( T.chatName ) + '</h2><input type="text" name="chat_name" value="' + esc( m.chat_name || '' ) + '" placeholder="' + esc( m.name || B.name ) + '"></section>' +
 			'<section class="hub-card"><h2 class="hub-h">' + icon( 'bolt' ) + esc( T.replies ) + '</h2><p class="hub-muted">' + esc( T.repliesHelp ) + '</p><textarea name="replies" rows="6">' + esc( ( m.replies || [] ).join( '\n' ) ) + '</textarea></section>' +
 			'<p><button class="hub-btn hub-btn--primary hub-btn--block">' + esc( T.save ) + '</button></p></form>';
@@ -852,6 +886,9 @@
 				S.me = Object.assign( S.me || {}, await api( 'me', { method: 'POST', json: {
 					email_messages: f.get( 'email_messages' ) ? 1 : 0,
 					email_chat: f.get( 'email_chat' ) ? 1 : 0,
+					push_bookings: f.get( 'push_bookings' ) ? 1 : 0,
+					push_sheet: f.get( 'push_sheet' ) ? 1 : 0,
+					push_daily: f.get( 'push_daily' ) ? 1 : 0,
 					chat_name: f.get( 'chat_name' ),
 					replies: String( f.get( 'replies' ) || '' ).split( '\n' ).map( ( s ) => s.trim() ).filter( Boolean ),
 				} } ) );

@@ -1100,6 +1100,37 @@
     - A Hub „Több” fülén csempe lett a weboldal szerkesztéséhez, a cikkekhez, a GYIK-hez, az óraoldalakhoz és a
       képekhez.
   - Az útmutató új részei: Heti naptár, Óra után: jelenléti ív, Kimutatások. Tesztek: 1505/0.
+- **olivia-studio 1.18.0 (téma 3.11.105-tel) – a Motibro automatizmusai** (Áron, 2026-11-16: „Telefonos értesítés,
+  ez jó, ez már megvan … És akkor mehet a kutatás, dolgozz tovább.”).
+  - **Kutatás:** help.motibro.com, az Automatizációk (16 db) és a SMART Jelenléti Ív cikkei. Ami még hiányzott:
+    lezáratlan jelenléti ív értesítő az oktatónak, napi összefoglaló a vezetőnek, értesítés foglalásról, lemondásról és
+    várólistáról, emlékeztető a lemorzsolódó vendégeknek, hétvégi „heti kedvcsináló”, egyéni látogatási adatok a jelenléti
+    íven, korai lemorzsolódás jelző, új vendég gyors felvétele óra előtt vagy után.
+  - **Push a telefonra** (`OYS_Hub_Auto`, `includes/class-hub-auto.php`):
+    - új foglalás, lemondás, várólista (`oys_booking_confirmed`, `oys_booking_cancelled`, új `oys_waitlist_joined`
+      hook); amit a stúdió maga csinál, arról nem jön, vendégsorról sem;
+    - óra után 10–70 perccel „Ki jött el?”, ha van jelöletlen vendég; egyszer, `oys_sheet_pushed_<id>` opció (14 nap
+      után törlődik); koppintásra a jelenléti ív nyílik (`/studio/?open=s<id>`, a `hub_target` már engedi az
+      `s\d+`, `calendar`, `reports` célokat is);
+    - reggel 7:30 és 10:00 között egyszer (`oys_daily_push`): a mai órák a foglalások számával, ami vár (üzenet, órai
+      chat, kérés, kitöltendő jelenléti ív), tegnap hányan jöttek el; ha nincs mit mondani, nem jön;
+    - mindhárom kikapcsolható: Hub → Beállításaim → „Értesítések a telefonon” (`push_bookings`, `push_sheet`,
+      `push_daily`, alap: be; a mentés, ami nem küldi őket, megtartja).
+  - **Két új vendég-e-mail** az Emlékeztetők között, **alapból kikapcsolva** (új `off` jelző a sablonban: amíg a stúdió
+    nem kapcsolja be, nem megy):
+    - `we_miss_you`: a lemorzsolódóknak (`OYS_Hub_Classes::drifting()`), a következő órákkal, vendégenként legfeljebb
+      60 naponta (`oys_missed_sent`), naponta egyszer 10 és 19 óra között;
+    - `weekly_digest`: szombaton a hírlevél-feliratkozóknak a jövő hét órái (`OYS_Emails::week_html()`, kevés hely
+      jelzéssel), leiratkozó linkkel és List-Unsubscribe fejléccel, hetente egyszer (`oys_weekly_digest`).
+    - A próbaküldés és az előnézet a valódi óralistát mutatja.
+  - **Jelenléti ív:**
+    - mindenkinél „N. óra” (eddigi eljövetelek + 1), „Első óra” címke, és „Rég nem járt”, ha 45 napnál több telt el az
+      előző óta („3 hónap után újra itt”);
+    - „Valaki hozzáadása”: vendégkereső, `hub/class/{id}/add`; bérlettel, ha van, különben helyszíni fizetés (ár
+      esedékes, „Fizetve” gomb), ingyenes óránál ajándék; óra után egyből „itt volt”, előtte megy a foglalási e-mail;
+      oktató csak a saját vendégeit adhatja hozzá; az óra vége után 2 napig lehet.
+  - Útmutató: Értesítések (a három push, a két új levél), Óra után: jelenléti ív (látogatási adatok, hozzáadás),
+    E-mailek. Fordítások hu + es. Tesztek: 1533/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -566,3 +566,10 @@ body.oys-hub-screen .screen-reader-text:not(:focus) { position: absolute; width:
 .hub-day__h span { text-transform: none; }
 .hub-att__btn--here:not(.is-on) { border-color: #bfe3cf; color: #1d8a5b; }
 .hub-att__btn--miss:not(.is-on) { border-color: #f3c3d0; color: var(--hub-magenta); }
+
+/* 1.18.0: quick add on the attendance sheet (Motibro: „új vendég gyors felvétele”) */
+.hub-addp { margin: 12px 0 4px; }
+.hub-addp > summary { list-style: none; display: inline-flex; }
+.hub-addp > summary::-webkit-details-marker { display: none; }
+.hub-addp[open] > summary { margin-bottom: 6px; }
+.hub-addp .hub-found { max-height: 240px; overflow: auto; }

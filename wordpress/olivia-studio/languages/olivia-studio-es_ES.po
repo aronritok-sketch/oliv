@@ -5286,3 +5286,196 @@ msgid "%d class in 90 days"
 msgid_plural "%d classes in 90 days"
 msgstr[0] "%d clase en 90 días"
 msgstr[1] "%d clases en 90 días"
+
+#: Hub: automations
+#, php-format
+msgid "Cancelled: %s"
+msgstr "Ha cancelado: %s"
+
+#: Hub: automations
+#, php-format
+msgid "On the waitlist: %s"
+msgstr "En lista de espera: %s"
+
+#: Hub: automations
+#, php-format
+msgid "Class over: %s"
+msgstr "Clase terminada: %s"
+
+#: Hub: automations
+#, php-format
+msgid "Good morning, %s!"
+msgstr "¡Buenos días, %s!"
+
+#: Hub: automations
+#, php-format
+msgid "Waiting for you: %s"
+msgstr "Te espera: %s"
+
+#: Hub: automations
+msgid "We miss you (drifting away)"
+msgstr "Te echamos de menos (se está alejando)"
+
+#: Hub: automations
+msgid "To someone who came regularly but not in the last 30 days and has nothing booked; at most once in 60 days"
+msgstr "A quien venía con regularidad pero no en los últimos 30 días y no tiene reservas; como mucho una vez cada 60 días"
+
+#: Hub: automations
+msgid "We miss you, {first_name}"
+msgstr "Te echo de menos, {first_name}"
+
+#: Hub: automations
+msgid "We miss you"
+msgstr "Te echo de menos"
+
+#: Hub: automations
+msgid "Hi {first_name}, I haven't seen you on the mat for a while. Your place is waiting whenever you're ready – here are the next classes."
+msgstr "Hola, {first_name}: hace tiempo que no te veo en la esterilla. Tu sitio te espera cuando quieras; estas son las próximas clases."
+
+#: Hub: automations
+msgid "Take care of yourself!"
+msgstr "¡Cuídate mucho!"
+
+#: Hub: automations
+msgid "Next week's classes (weekend)"
+msgstr "Las clases de la semana que viene (fin de semana)"
+
+#: Hub: automations
+msgid "On Saturday, to the newsletter subscribers: the classes of the coming week"
+msgstr "El sábado, a los suscriptores del boletín: las clases de la semana siguiente"
+
+#: Hub: automations
+msgid "Next week on the mat"
+msgstr "La semana que viene en la esterilla"
+
+#: Hub: automations
+msgid "Hi {first_name}, here is what is coming up next week. Book your spot!"
+msgstr "Hola, {first_name}: esto es lo que viene la semana próxima. ¡Reserva tu plaza!"
+
+#: Hub: automations
+msgid "All classes"
+msgstr "Todas las clases"
+
+#: Hub: automations
+msgid "Full – waitlist open"
+msgstr "Completa: lista de espera abierta"
+
+#: Hub: automations
+msgid "First class"
+msgstr "Primera clase"
+
+#: Hub: automations
+#, php-format
+msgid "back after %s"
+msgstr "vuelve tras %s"
+
+#: Hub: automations
+msgid "Customer not found."
+msgstr "No se encontró el cliente."
+
+#: Hub: automations
+msgid "Already on the list."
+msgstr "Ya está en la lista."
+
+#: Hub: automations
+msgid "This class is closed."
+msgstr "Esta clase ya está cerrada."
+
+#: Hub: automations
+msgid "Back after a long time"
+msgstr "Vuelve tras mucho tiempo"
+
+#: Hub: automations
+msgid "Add someone"
+msgstr "Añadir a alguien"
+
+#: Hub: automations
+msgid "With their pass if they have one, else to pay at the studio. After the class they are marked as came."
+msgstr "Con su bono si tiene uno; si no, paga en el estudio. Después de la clase se marca como que vino."
+
+#: Hub: automations
+msgid "Added to the class"
+msgstr "Añadido a la clase"
+
+#: Hub: automations
+msgid "Notifications on the phone"
+msgstr "Notificaciones en el móvil"
+
+#: Hub: automations
+msgid "New bookings, cancellations, waitlist"
+msgstr "Reservas nuevas, cancelaciones, lista de espera"
+
+#: Hub: automations
+msgid "After class: „who came?” (the attendance sheet)"
+msgstr "Después de clase: «¿quién vino?» (la hoja de asistencia)"
+
+#: Hub: automations
+msgid "Every morning: the day ahead (around 7:30)"
+msgstr "Cada mañana: el día que tienes por delante (hacia las 7:30)"
+
+#: Hub: automations
+msgid "Messages and class chats always come. Switch the notifications on for this phone above."
+msgstr "Los mensajes y los chats de clase siempre llegan. Activa arriba las notificaciones en este móvil."
+
+#: Hub: automations
+#, php-format
+msgid "%d booked"
+msgid_plural "%d booked"
+msgstr[0] "%d reserva"
+msgstr[1] "%d reservas"
+
+#: Hub: automations
+#, php-format
+msgid "Who came? %d person to mark – one tap each."
+msgid_plural "Who came? %d people to mark – one tap each."
+msgstr[0] "¿Quién vino? %d persona por marcar: un toque cada una."
+msgstr[1] "¿Quién vino? %d personas por marcar: un toque cada una."
+
+#: Hub: automations
+#, php-format
+msgid "Today: %d class"
+msgid_plural "Today: %d classes"
+msgstr[0] "Hoy: %d clase"
+msgstr[1] "Hoy: %d clases"
+
+#: Hub: automations
+#, php-format
+msgid "%d message"
+msgid_plural "%d messages"
+msgstr[0] "%d mensaje"
+msgstr[1] "%d mensajes"
+
+#: Hub: automations
+#, php-format
+msgid "%d class chat"
+msgid_plural "%d class chats"
+msgstr[0] "%d chat de clase"
+msgstr[1] "%d chats de clase"
+
+#: Hub: automations
+#, php-format
+msgid "%d private request"
+msgid_plural "%d private requests"
+msgstr[0] "%d solicitud privada"
+msgstr[1] "%d solicitudes privadas"
+
+#: Hub: automations
+#, php-format
+msgid "%d attendance sheet to fill in"
+msgid_plural "%d attendance sheets to fill in"
+msgstr[0] "%d hoja de asistencia por rellenar"
+msgstr[1] "%d hojas de asistencia por rellenar"
+
+#: Hub: automations
+#, php-format
+msgid "Yesterday %d person came"
+msgid_plural "Yesterday %d people came"
+msgstr[0] "Ayer vino %d persona"
+msgstr[1] "Ayer vinieron %d personas"
+
+#: Hub: automations
+#, php-format
+msgid "Class no. %d"
+msgid_plural "Class no. %d"
+msgstr[0] "Clase n.º %d"
+msgstr[1] "Clase n.º %d"

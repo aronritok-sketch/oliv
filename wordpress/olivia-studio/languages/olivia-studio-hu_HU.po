@@ -7587,3 +7587,188 @@ msgstr "F j."
 msgctxt "week view range"
 msgid "M j"
 msgstr "M j."
+
+#: Hub: automations
+#, php-format
+msgid "Cancelled: %s"
+msgstr "Lemondta: %s"
+
+#: Hub: automations
+#, php-format
+msgid "On the waitlist: %s"
+msgstr "Várólistára jelentkezett: %s"
+
+#: Hub: automations
+#, php-format
+msgid "Class over: %s"
+msgstr "Vége az órának: %s"
+
+#: Hub: automations
+#, php-format
+msgid "Good morning, %s!"
+msgstr "Jó reggelt, %s!"
+
+#: Hub: automations
+#, php-format
+msgid "Waiting for you: %s"
+msgstr "Rád vár: %s"
+
+#: Hub: automations
+msgid "We miss you (drifting away)"
+msgstr "Hiányzol (aki rég nem járt)"
+
+#: Hub: automations
+msgid "To someone who came regularly but not in the last 30 days and has nothing booked; at most once in 60 days"
+msgstr "Annak, aki rendszeresen járt, de az elmúlt 30 napban nem, és nincs foglalása; legfeljebb 60 naponta egyszer"
+
+#: Hub: automations
+msgid "We miss you, {first_name}"
+msgstr "Hiányzol, {first_name}"
+
+#: Hub: automations
+msgid "We miss you"
+msgstr "Hiányzol"
+
+#: Hub: automations
+msgid "Hi {first_name}, I haven't seen you on the mat for a while. Your place is waiting whenever you're ready – here are the next classes."
+msgstr "Szia {first_name}! Egy ideje nem láttalak a matracon. A helyed vár, amikor csak készen állsz – itt vannak a következő órák."
+
+#: Hub: automations
+msgid "Take care of yourself!"
+msgstr "Vigyázz magadra!"
+
+#: Hub: automations
+msgid "Next week's classes (weekend)"
+msgstr "A jövő heti órák (hétvégén)"
+
+#: Hub: automations
+msgid "On Saturday, to the newsletter subscribers: the classes of the coming week"
+msgstr "Szombaton, a hírlevél-feliratkozóknak: a következő hét órái"
+
+#: Hub: automations
+msgid "Next week on the mat"
+msgstr "Jövő héten a matracon"
+
+#: Hub: automations
+msgid "Hi {first_name}, here is what is coming up next week. Book your spot!"
+msgstr "Szia {first_name}! Ezek az órák lesznek jövő héten. Foglald le a helyed!"
+
+#: Hub: automations
+msgid "All classes"
+msgstr "Az összes óra"
+
+#: Hub: automations
+msgid "Full – waitlist open"
+msgstr "Betelt – várólista nyitva"
+
+#: Hub: automations
+#, php-format
+msgid "back after %s"
+msgstr "%s után újra itt"
+
+#: Hub: automations
+msgid "Customer not found."
+msgstr "Nincs ilyen vendég."
+
+#: Hub: automations
+msgid "Already on the list."
+msgstr "Már a listán van."
+
+#: Hub: automations
+msgid "This class is closed."
+msgstr "Ez az óra már le van zárva."
+
+#: Hub: automations
+msgid "Back after a long time"
+msgstr "Rég nem járt"
+
+#: Hub: automations
+msgid "With their pass if they have one, else to pay at the studio. After the class they are marked as came."
+msgstr "A bérletével, ha van neki, különben a helyszínen fizet. Óra után eljöttnek jelöljük."
+
+#: Hub: automations
+msgid "Added to the class"
+msgstr "Hozzáadva az órához"
+
+#: Hub: automations
+msgid "Notifications on the phone"
+msgstr "Értesítések a telefonon"
+
+#: Hub: automations
+msgid "New bookings, cancellations, waitlist"
+msgstr "Új foglalások, lemondások, várólista"
+
+#: Hub: automations
+msgid "After class: „who came?” (the attendance sheet)"
+msgstr "Óra után: „ki jött el?” (jelenléti ív)"
+
+#: Hub: automations
+msgid "Every morning: the day ahead (around 7:30)"
+msgstr "Minden reggel: a napod (7:30 körül)"
+
+#: Hub: automations
+msgid "Messages and class chats always come. Switch the notifications on for this phone above."
+msgstr "Az üzenetekről és az órai chatekről mindig kapsz értesítést. Ehhez fent kapcsold be az értesítéseket ezen a telefonon."
+
+#: Hub: automations
+#, php-format
+msgid "%d booked"
+msgid_plural "%d booked"
+msgstr[0] "%d foglalás"
+msgstr[1] "%d foglalás"
+
+#: Hub: automations
+#, php-format
+msgid "Who came? %d person to mark – one tap each."
+msgid_plural "Who came? %d people to mark – one tap each."
+msgstr[0] "Ki jött el? %d embert kell bejelölnöd – mindenkinél egy koppintás."
+msgstr[1] "Ki jött el? %d embert kell bejelölnöd – mindenkinél egy koppintás."
+
+#: Hub: automations
+#, php-format
+msgid "Today: %d class"
+msgid_plural "Today: %d classes"
+msgstr[0] "Ma: %d óra"
+msgstr[1] "Ma: %d óra"
+
+#: Hub: automations
+#, php-format
+msgid "%d message"
+msgid_plural "%d messages"
+msgstr[0] "%d üzenet"
+msgstr[1] "%d üzenet"
+
+#: Hub: automations
+#, php-format
+msgid "%d class chat"
+msgid_plural "%d class chats"
+msgstr[0] "%d órai chat"
+msgstr[1] "%d órai chat"
+
+#: Hub: automations
+#, php-format
+msgid "%d private request"
+msgid_plural "%d private requests"
+msgstr[0] "%d egyéni kérés"
+msgstr[1] "%d egyéni kérés"
+
+#: Hub: automations
+#, php-format
+msgid "%d attendance sheet to fill in"
+msgid_plural "%d attendance sheets to fill in"
+msgstr[0] "%d jelenléti ív vár kitöltésre"
+msgstr[1] "%d jelenléti ív vár kitöltésre"
+
+#: Hub: automations
+#, php-format
+msgid "Yesterday %d person came"
+msgid_plural "Yesterday %d people came"
+msgstr[0] "Tegnap %d ember jött el"
+msgstr[1] "Tegnap %d ember jött el"
+
+#: Hub: automations
+#, php-format
+msgid "Class no. %d"
+msgid_plural "Class no. %d"
+msgstr[0] "%d. óra"
+msgstr[1] "%d. óra"

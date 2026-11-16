@@ -39,6 +39,8 @@ class OYS_Emails {
 				return is_object( $a ) && $a->guest_of ? $uid( OYS_Bookings::get( $a->guest_of ) ) : 0;
 			case 'waitlist_spot_open':
 			case 'welcome':
+			case 'we_miss_you':
+			case 'weekly_digest':
 			case 'birthday':
 			case 'raffle_winner':
 				return (int) $a;
@@ -434,6 +436,47 @@ class OYS_Emails {
 		self::compose( 'pass_purchased', self::user_email( $o->user_id ), array_merge( OYS_Email_Templates::vars_for( $o->user_id ), array( 'pass' => oys_t( $p->name ) ) ), $blocks, array(), home_url( '/schedule-pricing/' ) );
 	}
 
+	/** Came regularly, not lately, nothing booked (OYS_Hub_Auto, Motibro's „emlékeztető lemorzsolódó vendégeknek”). */
+	protected static function we_miss_you( $user_id ) {
+		return self::compose( 'we_miss_you', self::user_email( $user_id ), OYS_Email_Templates::vars_for( $user_id ), self::upcoming_html(), array(), home_url( '/' ) );
+	}
+
+	/** Saturday: the coming week's classes to the newsletter subscribers, with the unsubscribe link (Motibro's „heti kedvcsináló”). */
+	protected static function weekly_digest( $user_id ) {
+		$t = OYS_Email_Templates::get( 'weekly_digest' );
+		$u = get_userdata( $user_id );
+		if ( ! $t || ! $t['enabled'] || ! $u || '1' !== (string) get_user_meta( $user_id, 'oys_marketing', true ) ) {
+			return false;
+		}
+		$week = self::week_html();
+		if ( '' === $week ) {
+			return false;
+		}
+		$vars  = OYS_Email_Templates::vars_for( $user_id );
+		$unsub = OYS_Newsletter::unsubscribe_url( $user_id );
+		$cta   = $t['button'] ? array( OYS_Email_Templates::fill( $t['button'], $vars ), home_url( '/' ) ) : null;
+		$html  = self::newsletter_html( OYS_Email_Templates::fill( $t['heading'], $vars ), '', OYS_Email_Templates::paragraphs( $t['message'], $vars ) . $week . OYS_Email_Templates::paragraphs( $t['closing'], $vars ), $cta, $unsub );
+		return self::send_raw( $u->user_email, OYS_Email_Templates::fill( $t['subject'], $vars ), $html, array( 'List-Unsubscribe: <' . $unsub . '>', 'List-Unsubscribe-Post: List-Unsubscribe=One-Click' ) );
+	}
+
+	/** Next Monday to Sunday's public classes as a table ('' when there are none). */
+	public static function week_html() {
+		$tz   = wp_timezone();
+		$mon  = new DateTimeImmutable( 'monday next week', $tz );
+		$utc  = new DateTimeZone( 'UTC' );
+		$list = OYS_Schedule::query( array( 'kind' => array( 'group', 'event' ), 'from' => $mon->setTimezone( $utc )->format( 'Y-m-d H:i:s' ), 'to' => $mon->modify( '+7 days' )->setTimezone( $utc )->format( 'Y-m-d H:i:s' ), 'status' => 'scheduled', 'limit' => 30 ) );
+		if ( ! $list ) {
+			return '';
+		}
+		$rows = '';
+		foreach ( $list as $s ) {
+			$free  = OYS_Schedule::spots_left( $s );
+			$rows .= '<tr><td style="padding:9px 12px 9px 0;border-bottom:1px solid #d8d8d0;vertical-align:top"><b>' . esc_html( oys_session_title( $s ) ) . '</b><br><span style="font-size:14px;color:#53635A">' . esc_html( oys_date( $s->starts_at, 'l, F j · g:i a' ) ) . ( $free <= 3 ? ' · ' . esc_html( $free ? sprintf( _n( '%d spot left', '%d spots left', $free, 'olivia-studio' ), $free ) : __( 'Full – waitlist open', 'olivia-studio' ) ) : '' ) . '</span></td>'
+				. '<td style="padding:9px 0;border-bottom:1px solid #d8d8d0;text-align:right;vertical-align:middle;white-space:nowrap"><a href="' . esc_url( oys_book_url( $s->id ) ) . '" style="color:#2B5036;font-weight:700">' . esc_html__( 'Book', 'olivia-studio' ) . ' →</a></td></tr>';
+		}
+		return '<table role="presentation" cellpadding="0" cellspacing="0" style="width:100%;border-top:2px solid #12231A;margin:18px 0">' . $rows . '</table>';
+	}
+
 	protected static function welcome( $user_id ) {
 		self::compose( 'welcome', self::user_email( $user_id ), OYS_Email_Templates::vars_for( $user_id ), self::upcoming_html(), array(), oys_account_url() );
 	}
@@ -654,6 +697,11 @@ class OYS_Emails {
 		$demo   = (object) array( 'title' => $vars['class'], 'class_slug' => '', 'starts_at' => gmdate( 'Y-m-d 17:00:00', time() + 2 * DAY_IN_SECONDS ), 'ends_at' => gmdate( 'Y-m-d 18:30:00', time() + 2 * DAY_IN_SECONDS ), 'location' => $online ? '' : 'Fort Myers', 'format' => $online ? 'online' : 'studio', 'teacher_id' => 0, 'kind' => 'group' );
 		$details = in_array( $key, array( 'booking_confirmed', 'guests_added', 'guest_invite', 'booking_cancelled', 'class_cancelled', 'guest_cancelled', 'session_changed', 'waitlist_promoted', 'waitlist_spot_open', 'reminder', 'private_offer' ), true )
 			? self::session_block( $demo ) : '';
+		if ( 'we_miss_you' === $key || 'welcome' === $key ) {
+			$details = self::upcoming_html();
+		} elseif ( 'weekly_digest' === $key ) {
+			$details = self::week_html() ?: self::upcoming_html( 6 );
+		}
 		if ( 'join_reminder' === $key ) {
 			$details = '<p style="margin:22px 0 6px"><a href="#" style="display:inline-block;background:#C6A3EE;color:#12231A;text-decoration:none;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:13px;padding:13px 20px;border-radius:999px;border:2px solid #12231A">' . esc_html__( 'Join the live class', 'olivia-studio' ) . '</a></p>';
 		}

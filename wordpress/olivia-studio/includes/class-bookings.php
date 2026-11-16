@@ -694,7 +694,10 @@ class OYS_Bookings {
 
 	public static function join_waitlist( $user_id, $session_id ) {
 		global $wpdb;
-		$wpdb->query( $wpdb->prepare( 'INSERT IGNORE INTO ' . OYS_Install::table( 'waitlist' ) . ' (session_id, user_id, created_at) VALUES (%d, %d, %s)', $session_id, $user_id, oys_now() ) );
+		$added = $wpdb->query( $wpdb->prepare( 'INSERT IGNORE INTO ' . OYS_Install::table( 'waitlist' ) . ' (session_id, user_id, created_at) VALUES (%d, %d, %s)', $session_id, $user_id, oys_now() ) );
+		if ( $added ) {
+			do_action( 'oys_waitlist_joined', (int) $user_id, (int) $session_id );
+		}
 	}
 
 	public static function leave_waitlist( $user_id, $session_id ) {

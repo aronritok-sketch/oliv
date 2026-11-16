@@ -256,6 +256,10 @@ class OYS_Hub {
 			'chat_name'      => (string) ( $p['chat_name'] ?? '' ),
 			'replies'        => array_values( array_filter( array_map( 'strval', (array) ( $p['replies'] ?? self::default_replies() ) ) ) ),
 			'signature'      => (string) ( $p['signature'] ?? '' ),
+			// pushes to the phone app (OYS_Hub_Auto): bookings/cancellations/waitlist, „who came?” after class, the morning summary
+			'push_bookings'  => isset( $p['push_bookings'] ) ? (int) $p['push_bookings'] : 1,
+			'push_sheet'     => isset( $p['push_sheet'] ) ? (int) $p['push_sheet'] : 1,
+			'push_daily'     => isset( $p['push_daily'] ) ? (int) $p['push_daily'] : 1,
 		);
 	}
 
@@ -268,6 +272,8 @@ class OYS_Hub {
 	}
 
 	public static function save_prefs( $user_id, array $in ) {
+		$old     = self::prefs( $user_id );
+		$keep    = fn( $k ) => array_key_exists( $k, $in ) ? ( empty( $in[ $k ] ) ? 0 : 1 ) : $old[ $k ];
 		$replies = array_slice( array_values( array_filter( array_map( fn( $r ) => mb_substr( sanitize_textarea_field( (string) $r ), 0, 500 ), (array) ( $in['replies'] ?? array() ) ) ) ), 0, 12 );
 		update_user_meta( $user_id, 'oys_hub_prefs', array(
 			'email_messages' => empty( $in['email_messages'] ) ? 0 : 1,
@@ -275,6 +281,9 @@ class OYS_Hub {
 			'chat_name'      => mb_substr( sanitize_text_field( (string) ( $in['chat_name'] ?? '' ) ), 0, 60 ),
 			'replies'        => $replies,
 			'signature'      => mb_substr( sanitize_textarea_field( (string) ( $in['signature'] ?? '' ) ), 0, 300 ),
+			'push_bookings'  => $keep( 'push_bookings' ),
+			'push_sheet'     => $keep( 'push_sheet' ),
+			'push_daily'     => $keep( 'push_daily' ),
 		) );
 		return self::prefs( $user_id );
 	}

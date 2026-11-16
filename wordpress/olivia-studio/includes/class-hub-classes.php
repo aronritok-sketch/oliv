@@ -136,7 +136,9 @@ class OYS_Hub_Classes {
 		$live   = oys_has_online( $s ) && OYS_Live::uses_live( $s );
 		$labels = OYS_Bookings::paid_with_labels();
 		$people = array();
-		foreach ( OYS_Bookings::for_session( $s->id, array( 'confirmed', 'attended', 'no_show' ) ) as $b ) {
+		$rows   = OYS_Bookings::for_session( $s->id, array( 'confirmed', 'attended', 'no_show' ) );
+		$visits = self::visits( $s, array_map( fn( $b ) => (int) $b->user_id, array_filter( $rows, fn( $b ) => ! $b->guest_of ) ) );
+		foreach ( $rows as $b ) {
 			$pass = '';
 			if ( 'credit' === $b->paid_with && ! $b->guest_of ) {
 				$left = OYS_Passes::balance( (int) $b->user_id, OYS_Bookings::credit_kind( $s, $b->mode ) );
@@ -153,6 +155,9 @@ class OYS_Hub_Classes {
 				'due'     => $due ? oys_money( $due ) : '',
 				'joined'  => $live ? in_array( (int) $b->id, $joined, true ) : null,
 				'health'  => $b->guest_of ? '' : (string) get_user_meta( (int) $b->user_id, 'oys_health_notes', true ),
+				'visit'   => $b->guest_of ? '' : ( $visits[ (int) $b->user_id ] ?? array( 'first' => true, 'line' => __( 'First class', 'olivia-studio' ), 'away' => false ) )['line'],
+				'first'   => ! $b->guest_of && ( $visits[ (int) $b->user_id ]['first'] ?? true ),
+				'away'    => ! $b->guest_of && ( $visits[ (int) $b->user_id ]['away'] ?? false ),
 			);
 		}
 		$tally = self::tally( $s->id );
@@ -168,7 +173,65 @@ class OYS_Hub_Classes {
 			'tally'   => $tally,
 			'waitlist' => count( OYS_Bookings::waitlist( $s->id ) ),
 			'auto'    => (int) OYS_Settings::get( 'auto_attendance_hours' ),
+			'canAdd'  => 'scheduled' === $s->status && oys_ts( $s->ends_at ) > time() - 2 * DAY_IN_SECONDS,
 		);
+	}
+
+	/**
+	 * Motibro's „egyéni látogatási adatok” and „korai lemorzsolódás” on the sheet: per person how many classes before
+	 * this one, „First class” when none, and whether they had been away for long (45+ days since the previous).
+	 * @return array user id → [first, line, away]
+	 */
+	public static function visits( $s, array $user_ids ) {
+		$user_ids = array_values( array_unique( array_filter( array_map( 'intval', $user_ids ) ) ) );
+		if ( ! $user_ids ) {
+			return array();
+		}
+		global $wpdb;
+		$b    = OYS_Install::table( 'bookings' );
+		$t    = OYS_Install::table( 'sessions' );
+		$in   = implode( ',', $user_ids );
+		$rows = $wpdb->get_results( $wpdb->prepare( "SELECT b.user_id, COUNT(*) n, MAX(t.starts_at) last FROM $b b JOIN $t t ON t.id = b.session_id WHERE b.status = 'attended' AND b.guest_of = 0 AND b.user_id IN ($in) AND t.starts_at < %s GROUP BY b.user_id", $s->starts_at ) ); // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- integers
+		$out  = array();
+		foreach ( $rows as $r ) {
+			$n    = (int) $r->n;
+			$away = oys_ts( $s->starts_at ) - oys_ts( $r->last ) > 45 * DAY_IN_SECONDS;
+			$out[ (int) $r->user_id ] = array(
+				'first' => false,
+				'away'  => $away,
+				'line'  => sprintf( _n( 'Class no. %d', 'Class no. %d', $n + 1, 'olivia-studio' ), $n + 1 ) . ( $away ? ' · ' . sprintf( __( 'back after %s', 'olivia-studio' ), human_time_diff( oys_ts( $r->last ), oys_ts( $s->starts_at ) ) ) : '' ),
+			);
+		}
+		return $out;
+	}
+
+	/**
+	 * Motibro's „új vendég gyors felvétele óra előtt vagy után”: someone into the class from the sheet. With a pass
+	 * when they have one for it, else to pay at the studio (the price is due, „Paid” collects it). After the class they
+	 * are marked as came; before it they get the usual booking email.
+	 */
+	public static function add( $s, $user_id ) {
+		$user_id = (int) $user_id;
+		if ( ! $user_id || ! get_userdata( $user_id ) ) {
+			return new WP_Error( 'oys_hub', __( 'Customer not found.', 'olivia-studio' ), array( 'status' => 404 ) );
+		}
+		foreach ( OYS_Bookings::for_session( $s->id, array( 'confirmed', 'attended', 'no_show' ) ) as $b ) {
+			if ( (int) $b->user_id === $user_id && ! $b->guest_of ) {
+				return new WP_Error( 'oys_hub', __( 'Already on the list.', 'olivia-studio' ), array( 'status' => 400 ) );
+			}
+		}
+		$mode   = 'online' === $s->format ? 'online' : 'studio';
+		$over   = oys_ts( $s->ends_at ) < time();
+		$method = $s->credits_allowed && OYS_Passes::available_for( $user_id, $s, $mode ) > 0 ? 'credit' : ( OYS_Schedule::price_for( $s, $mode ) > 0 ? 'door' : 'comp' );
+		$id     = OYS_Bookings::book_manual( $user_id, $s, $method, ! $over, true, $mode );
+		if ( is_wp_error( $id ) ) {
+			return $id;
+		}
+		if ( $over ) {
+			OYS_Bookings::set_attendance( is_array( $id ) ? reset( $id ) : $id, 'attended' );
+		}
+		OYS_Bookings::leave_waitlist( $user_id, $s->id );
+		return true;
 	}
 
 	/** Mark one booking (or a guest) of the class. */
@@ -376,6 +439,7 @@ class OYS_Hub_Classes {
 		register_rest_route( $ns, '/hub/week', array( 'methods' => 'GET', 'permission_callback' => $can, 'callback' => fn( WP_REST_Request $r ) => self::week( (string) $r->get_param( 'start' ) ) ) );
 		register_rest_route( $ns, '/hub/class/(?P<id>\d+)', array( 'methods' => 'GET', 'permission_callback' => $can, 'callback' => array( __CLASS__, 'rest_sheet' ) ) );
 		register_rest_route( $ns, '/hub/class/(?P<id>\d+)/mark', array( 'methods' => 'POST', 'permission_callback' => $can, 'callback' => array( __CLASS__, 'rest_mark' ) ) );
+		register_rest_route( $ns, '/hub/class/(?P<id>\d+)/add', array( 'methods' => 'POST', 'permission_callback' => $can, 'callback' => array( __CLASS__, 'rest_add' ) ) );
 		register_rest_route( $ns, '/hub/class/(?P<id>\d+)/collect', array( 'methods' => 'POST', 'permission_callback' => $can, 'callback' => array( __CLASS__, 'rest_collect' ) ) );
 		register_rest_route( $ns, '/hub/reports', array( 'methods' => 'GET', 'permission_callback' => $manage, 'callback' => fn( WP_REST_Request $r ) => self::report( (string) $r->get_param( 'month' ) ) ) );
 	}
@@ -405,6 +469,23 @@ class OYS_Hub_Classes {
 			}
 		}
 		return self::sheet( OYS_Schedule::get( $s->id ) );
+	}
+
+	public static function rest_add( WP_REST_Request $req ) {
+		$s = self::session_req( $req );
+		if ( is_wp_error( $s ) ) {
+			return $s;
+		}
+		$uid = (int) $req->get_param( 'user' );
+		// a teacher adds only the customers they can see (OYS_Hub::search_customers keeps to their scope)
+		if ( null !== OYS_Hub::scope() && ( ! get_userdata( $uid ) || ! in_array( $uid, array_column( OYS_Hub::search_customers( get_userdata( $uid )->user_email ), 'id' ), true ) ) ) {
+			return new WP_Error( 'oys_hub', __( 'Customer not found.', 'olivia-studio' ), array( 'status' => 404 ) );
+		}
+		if ( ! self::sheet( $s )['canAdd'] ) {
+			return new WP_Error( 'oys_hub', __( 'This class is closed.', 'olivia-studio' ), array( 'status' => 400 ) );
+		}
+		$res = self::add( $s, $uid );
+		return is_wp_error( $res ) ? $res : self::sheet( OYS_Schedule::get( $s->id ) );
 	}
 
 	public static function rest_collect( WP_REST_Request $req ) {

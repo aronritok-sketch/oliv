@@ -4475,6 +4475,150 @@ test( 'Áron, 16 November (Motibro) – the Hub: the week, the attendance sheet 
 	}
 } );
 
+test( 'Áron, 16 November (Motibro automations) – pushes on bookings, „who came?” after class, the morning summary, retention emails, visits and quick add on the sheet', function () {
+	$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0];
+	$saved = get_option( OYS_Studio_App::SUBS );
+	$got   = array();
+	$spy   = function ( $user, $title, $body, $url, $tag, $n ) use ( &$got ) {
+		$got[] = compact( 'user', 'title', 'body', 'url', 'tag', 'n' );
+	};
+	$fake  = fn( $pre, $args, $url ) => str_contains( $url, 'push.example.test' ) ? array( 'headers' => array(), 'body' => '', 'response' => array( 'code' => 201, 'message' => 'Created' ), 'cookies' => array() ) : $pre;
+	add_action( 'oys_push_notified', $spy, 10, 6 );
+	add_filter( 'pre_http_request', $fake, 4, 3 );
+	try {
+		update_option( OYS_Studio_App::SUBS, array(), false );
+		OYS_Studio_App::subscribe( $admin, 'https://push.example.test/send/auto' );
+		OYS_Hub::save_prefs( $admin, array() );
+		$p = OYS_Hub::prefs( $admin );
+		ok( $p['push_bookings'] && $p['push_sheet'] && $p['push_daily'], 'the three phone notifications are on by default' );
+
+		// a customer books → the studio's phone
+		$s = make_session( array( 'format' => 'online', 'capacity' => 2, 'in_hours' => 30 ) );
+		$u = make_user( 'Pushfoglalo' );
+		wp_set_current_user( $u );
+		$bid = OYS_Bookings::book_manual( $u, $s, 'comp', false, true, 'online' );
+		$hit = array_values( array_filter( $got, fn( $g ) => (int) $g['user'] === (int) $admin && str_contains( $g['title'], 'Pushfoglalo' ) ) );
+		ok( $hit && str_contains( $hit[0]['url'], 'open=s' . $s->id ), 'a new booking: a push that opens the class' );
+		$got = array();
+		OYS_Bookings::cancel( $bid, array( 'notify' => false ) );
+		ok( (bool) array_filter( $got, fn( $g ) => str_contains( $g['title'], 'Pushfoglalo' ) ), 'a cancellation: a push' );
+		$got = array();
+		OYS_Bookings::join_waitlist( $u, $s->id );
+		ok( (bool) array_filter( $got, fn( $g ) => 'w' . $s->id === $g['tag'] ), 'someone on the waitlist: a push' );
+		OYS_Bookings::leave_waitlist( $u, $s->id );
+		// the studio books someone in itself → no push to itself
+		wp_set_current_user( $admin );
+		$got = array();
+		OYS_Bookings::book_manual( make_user( 'Studiofoglal' ), $s, 'comp', false, true, 'online' );
+		eq( array(), $got, 'what the studio does itself: no push' );
+		// switched off
+		OYS_Hub::save_prefs( $admin, array( 'push_bookings' => 0 ) );
+		ok( ! OYS_Hub::prefs( $admin )['push_bookings'] && OYS_Hub::prefs( $admin )['push_daily'], 'one switch off, the others kept' );
+		wp_set_current_user( make_user( 'Csendes' ) );
+		$got = array();
+		OYS_Bookings::book_manual( get_current_user_id(), $s, 'comp', false, true, 'online' );
+		eq( array(), $got, 'bookings switched off: no push' );
+		OYS_Hub::save_prefs( $admin, array( 'push_bookings' => 1 ) );
+		wp_set_current_user( 0 );
+
+		// „who came?” 10–70 minutes after the class, once
+		$over = make_session( array( 'format' => 'online', 'in_hours' => -1.4 ) ); // ended about 25 minutes ago
+		$v1   = make_user( 'Regi' );
+		$v2   = make_user( 'Uj' );
+		$old  = make_session( array( 'format' => 'online', 'in_hours' => -24 * 70 ) );
+		$ob   = OYS_Bookings::book_manual( $v1, $old, 'comp', false, true, 'online' );
+		OYS_Bookings::set_attendance( $ob, 'attended' );
+		OYS_Bookings::book_manual( $v1, $over, 'comp', false, true, 'online' );
+		OYS_Bookings::book_manual( $v2, $over, 'comp', false, true, 'online' );
+		$got = array();
+		OYS_Hub_Auto::sheet_reminders();
+		$hit = array_values( array_filter( $got, fn( $g ) => 's' . $over->id === $g['tag'] ) );
+		ok( $hit && str_contains( $hit[0]['url'], 'open=s' . $over->id ), 'after class: „who came?” opens the attendance sheet' );
+		$got = array();
+		OYS_Hub_Auto::sheet_reminders();
+		eq( array(), array_filter( $got, fn( $g ) => 's' . $over->id === $g['tag'] ), 'only once' );
+		ok( str_contains( OYS_Studio_App::hub_target( 's' . $over->id, $admin ), '#s' . $over->id ), 'the app link opens the sheet' );
+
+		// the morning summary
+		$text = OYS_Hub_Auto::summary( $admin );
+		ok( '' !== $text, 'the morning: the day and what is waiting' );
+		$got = array();
+		eq( 1, OYS_Hub_Auto::morning_send(), 'the morning push goes to the phone' );
+		update_option( 'oys_daily_push', wp_date( 'Y-m-d' ), false );
+		$got = array();
+		OYS_Hub_Auto::morning();
+		eq( array(), $got, 'once a day' );
+
+		// the sheet: visits, first class, quick add
+		wp_set_current_user( $admin );
+		$sheet = OYS_Hub_Classes::sheet( OYS_Schedule::get( $over->id ) );
+		$by    = array_column( $sheet['people'], null, 'user' );
+		ok( $by[ $v2 ]['first'], 'never came before: „First class”' );
+		ok( ! $by[ $v1 ]['first'] && $by[ $v1 ]['away'] && str_contains( $by[ $v1 ]['visit'], '2' ), 'came before, long ago: class no. 2, back after a long time' );
+		$v3 = make_user( 'Gyors' );
+		OYS_Passes::grant( $v3, array( 'credits' => 3, 'kind' => 'online' ) );
+		ok( true === OYS_Hub_Classes::add( OYS_Schedule::get( $over->id ), $v3 ), 'quick add after class' );
+		$row = array_values( array_filter( OYS_Bookings::for_session( $over->id, array( 'attended' ) ), fn( $b ) => (int) $b->user_id === $v3 ) );
+		ok( $row && 'credit' === $row[0]->paid_with, 'with their pass, marked as came' );
+		ok( is_wp_error( OYS_Hub_Classes::add( OYS_Schedule::get( $over->id ), $v3 ) ), 'not twice' );
+		$req = new WP_REST_Request( 'POST', '/oys/v1/hub/class/' . $over->id . '/add' );
+		$req->set_body_params( array( 'user' => make_user( 'Restben' ) ) );
+		eq( 200, rest_do_request( $req )->get_status(), 'quick add over REST' );
+		wp_set_current_user( 0 );
+	} finally {
+		remove_action( 'oys_push_notified', $spy, 10 );
+		remove_filter( 'pre_http_request', $fake, 4 );
+		update_option( OYS_Studio_App::SUBS, $saved ?: array(), false );
+		wp_set_current_user( 0 );
+	}
+
+	// the customer emails: off until the studio switches them on
+	ok( ! OYS_Email_Templates::enabled( 'we_miss_you' ) && ! OYS_Email_Templates::enabled( 'weekly_digest' ), 'the two new customer emails start switched off' );
+	$mails = array();
+	$catch = function ( $null, $atts ) use ( &$mails ) {
+		$mails[] = $atts;
+		return true;
+	};
+	add_filter( 'pre_wp_mail', $catch, 5, 2 );
+	try {
+		$d = make_user( 'Lemorzsolodo' );
+		foreach ( array( -24 * 50, -24 * 55 ) as $h ) {
+			$x = make_session( array( 'in_hours' => $h ) );
+			OYS_Bookings::set_attendance( OYS_Bookings::book_manual( $d, $x, 'comp', false, true ), 'attended' );
+		}
+		$now = new DateTimeImmutable( 'next tuesday 11:00', wp_timezone() );
+		eq( 0, OYS_Hub_Auto::retention_send( $now )['missed'], 'switched off: nothing goes' );
+		OYS_Email_Templates::save( 'we_miss_you', array( 'enabled' => 1 ) );
+		OYS_Email_Templates::save( 'weekly_digest', array( 'enabled' => 1 ) );
+		$mails = array();
+		ok( OYS_Hub_Auto::retention_send( $now )['missed'] >= 1, '„we miss you” to those drifting away' );
+		ok( (bool) array_filter( $mails, fn( $m ) => str_contains( (string) $m['to'], 'lemorzsolodo' ) ), 'to her' );
+		$mails = array();
+		OYS_Hub_Auto::retention_send( $now );
+		eq( array(), array_filter( $mails, fn( $m ) => str_contains( (string) $m['to'], 'lemorzsolodo' ) ), 'not again for 60 days' );
+		// Saturday: next week's classes, to the newsletter subscribers
+		$mon = new DateTimeImmutable( 'monday next week 18:00', wp_timezone() );
+		make_session( array( 'in_hours' => ( $mon->getTimestamp() - time() ) / HOUR_IN_SECONDS ) );
+		$sub = make_user( 'Hirlevel' );
+		update_user_meta( $sub, 'oys_marketing', '1' );
+		$no  = make_user( 'Nemkeri' );
+		$mails = array();
+		delete_option( 'oys_weekly_digest' );
+		$sat = new DateTimeImmutable( 'saturday this week 10:30', wp_timezone() );
+		ok( OYS_Hub_Auto::retention_send( $sat )['weekly'] >= 1, 'Saturday: the weekly classes go out' );
+		$to_sub = array_values( array_filter( $mails, fn( $m ) => str_contains( (string) $m['to'], 'hirlevel' ) ) );
+		ok( $to_sub && str_contains( $to_sub[0]['message'], 'oys_unsub' ), 'to the subscriber, with the unsubscribe link' );
+		eq( array(), array_filter( $mails, fn( $m ) => str_contains( (string) $m['to'], 'nemkeri' ) ), 'not to those who did not ask for the newsletter' );
+		$mails = array();
+		OYS_Hub_Auto::retention_send( $sat );
+		eq( array(), array_filter( $mails, fn( $m ) => str_contains( (string) $m['to'], 'hirlevel' ) ), 'once a week' );
+	} finally {
+		remove_filter( 'pre_wp_mail', $catch, 5 );
+		OYS_Email_Templates::save( 'we_miss_you', array( 'enabled' => 0 ) );
+		OYS_Email_Templates::save( 'weekly_digest', array( 'enabled' => 0 ) );
+	}
+} );
+
 $t = $GLOBALS['oys_t'];
 echo "\n{$t['pass']} assertions passed, {$t['fail']} failed\n";
 exit( $t['fail'] ? 1 : 0 );

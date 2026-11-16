@@ -198,7 +198,7 @@ class OYS_Email_Templates {
 			}
 		}
 		$t['lang']       = $lang;
-		$t['enabled']    = ! isset( $saved['enabled'] ) || (int) $saved['enabled'];
+		$t['enabled']    = isset( $saved['enabled'] ) ? (bool) (int) $saved['enabled'] : empty( $t['off'] );
 		$t['customized'] = (bool) array_intersect_key( $over, array_flip( self::FIELDS ) );
 		return $t;
 	}

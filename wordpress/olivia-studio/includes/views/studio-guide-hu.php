@@ -173,6 +173,8 @@ $groups = array(
 			<li>Mindenki mellett két gomb: <b>✓ Itt volt</b> és <b>✕ Nem jött el</b>. Egy koppintás, és kész; ha mellényúltál, koppints újra.</li>
 			<li><b>„Mindenki itt volt”</b>: aki még jelöletlen, az mind eljött. A legtöbbször ez az egy koppintás elég, és utána csak azt jelölöd, aki nem jött.</li>
 			<li>Minden vendégnél látod, hogyan fizetett (bérlet, kártya, helyszínen), <b>hány alkalom maradt a bérletén</b>, és ha van, az egészségügyi megjegyzését.</li>
+			<li><b>Hányadik órája:</b> mindenki mellett ott van, hányadik órája nálad („3. óra”). Akinek ez az első, annál egy rózsaszín <b>„Első óra”</b> címke áll, akinél 45 napnál több telt el az előző óta, annál egy sárga <b>„Rég nem járt”</b>: nekik jólesik egy személyes szó az óra elején.</li>
+			<li><b>Valaki hozzáadása:</b> a lista alatt a <b>„Valaki hozzáadása”</b> gombbal bárkit felveszel az órára, óra előtt vagy után is (pl. ha valaki foglalás nélkül jött be). Írd be a nevét vagy az e-mail-címét, koppints rá, és kész: ha van bérlete, abból vonódik le, ha nincs, „a helyszínen fizet” lesz, és a <b>„Fizetve”</b> gombbal jelölöd, ha kifizette. Óra után hozzáadva egyből „itt volt”.</li>
 			<li><b>Élő online óránál</b> azt is látod, ki volt bent a teremben (<i>„bent volt a teremben”</i> / <i>„nem lépett be a terembe”</i>).</li>
 			<li><b>Magától is kitöltődik:</b> ha nem jelölöd, 3 órával az óra után a rendszer kitölti: aki bent volt az élő teremben, az „itt volt”, aki nem, az „nem jött el”. Amit te jelöltél, az úgy marad. (Beállítások → Foglalási szabályok, 0 = kikapcsolva.)</li>
 			<li><b>Foglalt, de nem jött el:</b> a bérletes alkalom ilyenkor is elhasználódik (a foglaláskor vonódik le), ahogy eddig is. A „Nem jött el” jelölés a kimutatásokba kerül.</li>
@@ -240,9 +242,20 @@ $groups = array(
 	<section class="g-sec" id="ertesitesek">
 		<h2>Értesítések</h2>
 		<ul>
-			<li><b>A telefonodon (app):</b> minden új üzenetről, kérésről és az órán kívüli órai chatről, azonnal (<a href="#app">bekapcsolás fent</a>).</li>
+			<li><b>A telefonodon (app):</b> minden új üzenetről, kérésről és az órán kívüli órai chatről, azonnal (<a href="#app">bekapcsolás fent</a>). És ezekről is, maguktól:
+				<ul>
+					<li><b>Új foglalás, lemondás, várólista:</b> ha valaki foglal, lemond vagy várólistára jelentkezik (amit te magad csinálsz, arról nem jön). Koppintásra megnyílik az óra jelenléti íve.</li>
+					<li><b>Óra után: „ki jött el?”</b> – az óra vége után 10 perccel, ha még van jelöletlen vendég. Koppintásra egyből a jelenléti ív nyílik meg, és egy-egy koppintással kész.</li>
+					<li><b>Minden reggel 7:30 körül:</b> a napod egy mondatban – a mai órák és hányan foglaltak, mi vár rád (üzenet, órai chat, kérés, kitöltendő jelenléti ív), és hányan jöttek el tegnap. Ha nincs semmi, nem jön.</li>
+				</ul>
+				Ezeket egyenként kikapcsolhatod: Hub → Beállításaim → <b>Értesítések a telefonon</b>.</li>
 			<li><b>E-mailben:</b> ha valaki ír neked, vagy az órán kívül ír egy órai chatbe. Beszélgetésenként legfeljebb 15 percenként egyet, és egyet sem, amíg a Hub nyitva van, vagy amíg az óra tart. A Beállításaimban kikapcsolhatod.</li>
 			<li>A stúdió többi levele (foglalás, emlékeztető, lemondás, ajánlat, ajándékutalvány…) az <a href="#emailek">E-mailek és emlékeztetők</a> oldalon kapcsolható ki-be.</li>
+			<li><b>Két új levél a vendégeknek</b> (az Emlékeztetők között, <b>alapból kikapcsolva</b> – te döntöd el, kéred-e, és a szövegüket is átírhatod):
+				<ul>
+					<li><b>Hiányzol (aki rég nem járt):</b> annak, aki rendszeresen járt, de az elmúlt 30 napban nem, és nincs foglalása – egy kedves sor tőled és a következő órák. Egy vendég legfeljebb 60 naponta egyszer kapja.</li>
+					<li><b>A jövő heti órák (hétvégén):</b> szombaton a hírlevél-feliratkozóknak a következő hét órái, foglalás gombbal (akinél kevés a hely, ott az is látszik). Csak annak megy, aki kérte a hírlevelet, és benne van a leiratkozó link.</li>
+				</ul></li>
 		</ul>
 	</section>
 
@@ -378,6 +391,7 @@ $groups = array(
 		<ul>
 			<li>Levelenként <b>ki-be kapcsolható</b>, látod, mikor megy ki és kinek.</li>
 			<li><b>„Szöveg szerkesztése”:</b> átírhatod a tárgyat, a címet, az üzenetet, a záró megjegyzést és a gomb feliratát. <b>„Próba küldése”</b> – megkapod magadnak, hogy lásd.</li>
+			<li>Az <b>Emlékeztetők</b> között két új levél van, alapból kikapcsolva: <b>Hiányzol (aki rég nem járt)</b> és <b>A jövő heti órák (hétvégén)</b>. Ha kéred őket, kapcsold be, és küldj magadnak egy próbát (<a href="#ertesitesek">részletek</a>).</li>
 			<li>Fent: a feladó neve és címe, és a levélküldő szerver (ehhez ne nyúlj).</li>
 		</ul>
 	</section>
