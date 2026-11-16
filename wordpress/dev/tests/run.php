@@ -754,7 +754,7 @@ test( 'reminders: two class reminders, online join link, pass about to expire', 
 	$b = OYS_Install::table( 'bookings' );
 	$u = make_user( 'Rita' );
 	$s = make_session( array( 'in_hours' => 20 ) );
-	$id = OYS_Bookings::book_manual( $u, $s, 'comp', false );
+	$id = OYS_Bookings::book_manual( $u, $s, 'comp', false, true, 'online' );
 	$wpdb->update( $b, array( 'created_at' => oys_utc_plus( -3 * DAY_IN_SECONDS ) ), array( 'id' => $id ) );
 	// Only count Rita's emails: the dev database may hold other classes with reminders due.
 	$rita = fn( $log ) => array_filter( $log, fn( $m ) => get_userdata( $u )->user_email === $m['to'] );
@@ -1265,7 +1265,7 @@ test( 'minimum: bring-a-friend email before the decision, once', function () {
 	OYS_Settings::update( array( 'min_people_default' => 3, 'decide_hours_default' => 3, 'min_nudge_hours' => 12 ) );
 	$u = make_user( 'Fay' );
 	$s = make_session( array( 'in_hours' => 10, 'location' => 'Beach' ) );
-	OYS_Bookings::book_manual( $u, $s, 'comp', false );
+	OYS_Bookings::book_manual( $u, $s, 'comp', false, true, 'online' );
 	$log  = sent_mails( fn() => OYS_Locations::run() );
 	$mine = array_values( array_filter( $log, fn( $m ) => get_userdata( $u )->user_email === $m['to'] ) );
 	eq( 1, count( $mine ), 'bring-a-friend email' );
@@ -4263,7 +4263,7 @@ test( 'Áron, 16 November: the price cards ask for a time or sell the pass; the 
 	}
 	$s   = make_session( array( 'format' => 'online', 'capacity' => 8, 'in_hours' => 30 ) );
 	$u   = make_user( 'Varo' );
-	$bid = OYS_Bookings::book_manual( $u, $s, 'comp', false );
+	$bid = OYS_Bookings::book_manual( $u, $s, 'comp', false, true, 'online' );
 	wp_set_current_user( $u );
 	$_GET['live'] = $s->id;
 	try {
@@ -4410,6 +4410,66 @@ test( 'Áron, 16 November – the Hub\'s Today: valid passes, locked sessions, w
 	wp_set_current_user( $tu );
 	try {
 		ok( empty( OYS_Hub::today()['passes'] ), 'a teacher does not' );
+	} finally {
+		wp_set_current_user( 0 );
+	}
+} );
+
+test( 'Áron, 16 November (Motibro) – the Hub: the week, the attendance sheet after class, the live room fills it in, the reports', function () {
+	$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0];
+	$s     = make_session( array( 'format' => 'online', 'capacity' => 8, 'in_hours' => -5 ) );
+	$a     = make_user( 'Jelenlet A' );
+	$b     = make_user( 'Jelenlet B' );
+	$c     = make_user( 'Jelenlet C' );
+	foreach ( array( $a, $b, $c ) as $u ) {
+		OYS_Passes::grant( $u, array( 'credits' => 5, 'kind' => 'online' ) );
+	}
+	$ids = array();
+	foreach ( array( $a, $b, $c ) as $u ) {
+		$ids[ $u ] = OYS_Bookings::book_manual( $u, $s, 'comp', false, true, 'online' );
+	}
+	wp_set_current_user( $admin );
+	try {
+		$week = OYS_Hub_Classes::week( wp_date( 'Y-m-d', oys_ts( $s->starts_at ) ) );
+		eq( 7, count( $week['days'] ), 'the week: Monday to Sunday' );
+		$found = array_merge( ...array_map( fn( $d ) => array_column( $d['classes'], 'id' ), $week['days'] ) );
+		ok( in_array( (int) $s->id, $found, true ), 'the class is in its week' );
+		$card = OYS_Hub_Classes::card( $s );
+		eq( 3, $card['open'], 'over, three people still to mark' );
+		ok( in_array( (int) $s->id, array_column( OYS_Hub_Classes::to_mark(), 'id' ), true ), 'on Today under „after class”' );
+		$sheet = OYS_Hub_Classes::sheet( $s );
+		eq( 3, count( $sheet['people'] ), 'the sheet lists the three' );
+		OYS_Hub_Classes::mark( $s, $ids[ $a ], 'attended' );
+		OYS_Hub_Classes::mark( $s, $ids[ $b ], 'no_show' );
+		eq( 'attended', OYS_Bookings::get( $ids[ $a ] )->status, 'one tap: here' );
+		eq( 'no_show', OYS_Bookings::get( $ids[ $b ] )->status, 'one tap: did not come' );
+		ok( is_wp_error( OYS_Hub_Classes::mark( $s, 999999, 'attended' ) ), 'a booking of another class is refused' );
+		eq( 1, OYS_Hub_Classes::mark_rest( $s ), '„Everyone came” marks the one left' );
+		eq( 'attended', OYS_Bookings::get( $ids[ $c ] )->status, 'the last one too' );
+		$res = rest_do_request( new WP_REST_Request( 'GET', '/oys/v1/hub/week' ) );
+		eq( 200, $res->get_status(), 'the week over REST' );
+		$rep = OYS_Hub_Classes::report( wp_date( 'Y-m', oys_ts( $s->starts_at ) ) );
+		$k   = array_column( $rep['kpis'], 1, 0 );
+		ok( (int) $k[ __( 'Came', 'olivia-studio' ) ] >= 2 && (int) $k[ __( 'Booked but did not come', 'olivia-studio' ) ] >= 1, 'the month: who came, who did not' );
+		ok( str_contains( $rep['export'], 'oys_hub_export' ), 'an Excel export link' );
+	} finally {
+		wp_set_current_user( 0 );
+	}
+	// the live room fills the sheet in: who came in attended, who did not did not come
+	$s2 = make_session( array( 'format' => 'online', 'capacity' => 8, 'in_hours' => -6 ) );
+	$x  = OYS_Bookings::book_manual( $a, $s2, 'comp', false, true, 'online' );
+	$y  = OYS_Bookings::book_manual( $b, $s2, 'comp', false, true, 'online' );
+	OYS_Hub_Classes::on_join( $s2, array( 'owner' => false, 'booking' => OYS_Bookings::get( $x ) ) );
+	OYS_Hub_Classes::on_join( $s2, array( 'owner' => false, 'booking' => OYS_Bookings::get( $x ) ) );
+	eq( array( (int) $x ), OYS_Hub_Classes::joined( $s2->id ), 'the room remembers who came in, once' );
+	OYS_Hub_Classes::auto_attendance();
+	$live = OYS_Live::uses_live( $s2 );
+	eq( 'attended', OYS_Bookings::get( $x )->status, 'in the room: here' );
+	eq( $live ? 'no_show' : 'attended', OYS_Bookings::get( $y )->status, $live ? 'not in the room: did not come' : 'no live room on this site: everyone booked is here' );
+	$u = make_user( 'Nemstudio' );
+	wp_set_current_user( $u );
+	try {
+		eq( 403, rest_do_request( new WP_REST_Request( 'GET', '/oys/v1/hub/reports' ) )->get_status(), 'customers get no reports' );
 	} finally {
 		wp_set_current_user( 0 );
 	}

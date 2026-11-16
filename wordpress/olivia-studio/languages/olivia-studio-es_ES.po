@@ -5045,3 +5045,244 @@ msgstr "Do"
 #: assets/calendar.js (OYS_Calendar::strings)
 msgid "Never mind"
 msgstr "Volver"
+
+#: Hub: week, attendance, reports
+msgid "This booking is not in this class."
+msgstr "Esta reserva no es de esta clase."
+
+#: Hub: week, attendance, reports
+msgid "Classes"
+msgstr "Clases"
+
+#: Hub: week, attendance, reports
+msgid "Came"
+msgstr "Vino"
+
+#: Hub: week, attendance, reports
+msgid "Booked but did not come"
+msgstr "Reservó pero no vino"
+
+#: Hub: week, attendance, reports
+msgid "Attendance"
+msgstr "Asistencia"
+
+#: Hub: week, attendance, reports
+msgid "Different people"
+msgstr "Personas distintas"
+
+#: Hub: week, attendance, reports
+msgid "Cancelled in time"
+msgstr "Canceló a tiempo"
+
+#: Hub: week, attendance, reports
+msgid "Revenue"
+msgstr "Ingresos"
+
+#: Hub: week, attendance, reports
+msgid "Passes sold or given"
+msgstr "Bonos vendidos o regalados"
+
+#: Hub: week, attendance, reports
+msgid "New customers"
+msgstr "Clientes nuevos"
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "last class: %s"
+msgstr "última clase: %s"
+
+#: Hub: week, attendance, reports
+msgid "birthday today 🎂"
+msgstr "hoy es su cumpleaños 🎂"
+
+#: Hub: week, attendance, reports
+msgid "Not allowed."
+msgstr "No permitido."
+
+#: Hub: week, attendance, reports
+msgid "Cancelled late"
+msgstr "Canceló tarde"
+
+#: Hub: week, attendance, reports
+msgid "This class is not yours."
+msgstr "Esta clase no es tuya."
+
+#: Hub: week, attendance, reports
+msgid "This booking has nothing to pay at the studio."
+msgstr "Esta reserva no tiene nada que pagar en el estudio."
+
+#: Hub: week, attendance, reports
+msgid "The attendance sheet fills itself in this many hours after a class (0 = off)"
+msgstr "La lista de asistencia se completa sola estas horas después de la clase (0 = no)"
+
+#: Hub: week, attendance, reports
+msgid "Edit the website"
+msgstr "Editar la web"
+
+#: Hub: week, attendance, reports
+msgid "Texts and photos, on the page"
+msgstr "Textos y fotos, en la página"
+
+#: Hub: week, attendance, reports
+msgid "Articles"
+msgstr "Artículos"
+
+#: Hub: week, attendance, reports
+msgid "FAQ"
+msgstr "Preguntas"
+
+#: Hub: week, attendance, reports
+msgid "Class pages"
+msgstr "Páginas de clases"
+
+#: Hub: week, attendance, reports
+msgid "Photos"
+msgstr "Fotos"
+
+#: Hub: week, attendance, reports
+msgid "After class: who came?"
+msgstr "Después de clase: ¿quién vino?"
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "%d to mark"
+msgstr "%d por marcar"
+
+#: Hub: week, attendance, reports
+msgid "Reports"
+msgstr "Informes"
+
+#: Hub: week, attendance, reports
+msgid "Attendance, revenue, regulars"
+msgstr "Asistencia, ingresos, habituales"
+
+#: Hub: week, attendance, reports
+msgid "This week"
+msgstr "Esta semana"
+
+#: Hub: week, attendance, reports
+msgid "New class, move, cancel"
+msgstr "Nueva clase, mover, cancelar"
+
+#: Hub: week, attendance, reports
+msgid "No class"
+msgstr "Sin clase"
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "%1$d of %2$d came"
+msgstr "vinieron %1$d de %2$d"
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "to pay here: %s"
+msgstr "paga aquí: %s"
+
+#: Hub: week, attendance, reports
+msgid "was in the room"
+msgstr "estuvo en la sala"
+
+#: Hub: week, attendance, reports
+msgid "did not come into the room"
+msgstr "no entró en la sala"
+
+#: Hub: week, attendance, reports
+msgid "Here"
+msgstr "Vino"
+
+#: Hub: week, attendance, reports
+msgid "Did not come"
+msgstr "No vino"
+
+#: Hub: week, attendance, reports
+msgid "came"
+msgstr "vinieron"
+
+#: Hub: week, attendance, reports
+msgid "did not come"
+msgstr "no vinieron"
+
+#: Hub: week, attendance, reports
+msgid "not marked"
+msgstr "sin marcar"
+
+#: Hub: week, attendance, reports
+msgid "on the waitlist"
+msgstr "en lista de espera"
+
+#: Hub: week, attendance, reports
+msgid "Everyone came"
+msgstr "Vinieron todos"
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "If you don't mark them, %d hours after the class whoever was in the live room is marked as here, the others as not come."
+msgstr "Si no los marcas, %d horas después de la clase quien estuvo en la sala en vivo queda como presente y los demás como ausentes."
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "If you don't mark them, %d hours after the class everyone booked is marked as here."
+msgstr "Si no los marcas, %d horas después de la clase todos los reservados quedan como presentes."
+
+#: Hub: week, attendance, reports
+msgid "Full roster"
+msgstr "Lista completa"
+
+#: Hub: week, attendance, reports
+msgid "Previous month"
+msgstr "Mes anterior"
+
+#: Hub: week, attendance, reports
+msgid "Next month"
+msgstr "Mes siguiente"
+
+#: Hub: week, attendance, reports
+msgid "By class"
+msgstr "Por clase"
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "%1$s classes · %2$s booked · %3$s came · %4$s per class"
+msgstr "%1$s clases · %2$s reservas · %3$s vinieron · %4$s por clase"
+
+#: Hub: week, attendance, reports
+msgid "Birthdays today"
+msgstr "Cumpleaños de hoy"
+
+#: Hub: week, attendance, reports
+msgid "Greet"
+msgstr "Felicitar"
+
+#: Hub: week, attendance, reports
+msgid "Regulars (90 days)"
+msgstr "Habituales (90 días)"
+
+#: Hub: week, attendance, reports
+msgid "Drifting away"
+msgstr "Se están alejando"
+
+#: Hub: week, attendance, reports
+msgid "They came regularly, but not in the last 30 days and have nothing booked. A kind message often brings them back."
+msgstr "Venían con regularidad, pero no en los últimos 30 días y no tienen reservas. Un mensaje amable suele traerlos de vuelta."
+
+#: Hub: week, attendance, reports
+msgid "Download the month (Excel)"
+msgstr "Descargar el mes (Excel)"
+
+#: Hub: week, attendance, reports
+msgid "Nobody yet."
+msgstr "Nadie aún."
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "%d session left on the pass"
+msgid_plural "%d sessions left on the pass"
+msgstr[0] "%d sesión queda en el bono"
+msgstr[1] "%d sesiones quedan en el bono"
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "%d class in 90 days"
+msgid_plural "%d classes in 90 days"
+msgstr[0] "%d clase en 90 días"
+msgstr[1] "%d clases en 90 días"

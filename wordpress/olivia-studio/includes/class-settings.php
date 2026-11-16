@@ -28,6 +28,7 @@ class OYS_Settings {
 			'cancel_hours'            => 12,
 			'private_cancel_hours'    => 24,
 			'cancel_extend_days'      => 7,
+			'auto_attendance_hours'   => 3, // the attendance sheet fills itself in this many hours after a class (0 = off)
 			// timetables: list days without a group class too („yes”), or only the days with a class and, under the
 			// timetable, a box for the one-to-one sessions („no”; Olivia, 13 November: „itt legyenek csak a szerdák”)
 			'schedule_empty_days'     => 'yes',

@@ -100,3 +100,10 @@ body[class*="_page_oys"] .update-nag, body.toplevel_page_oys .update-nag { displ
 	.oys-appbar svg { width: 22px; height: 22px; }
 	.oys-appbar i { position: absolute; top: 0; right: calc(50% - 24px); min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: #db2e5c; color: #fff; font-size: 10.5px; font-style: normal; font-weight: 800; line-height: 18px; text-align: center; box-sizing: border-box; }
 }
+
+/* the Studio installed as an app on the phone: no WordPress bar on the Studio pages either (the bottom bar leads on) */
+@media (display-mode: standalone) and (max-width: 899px) {
+	html.wp-toolbar:has(.oys-appbar) { padding-top: 0 !important; }
+	body:has(.oys-appbar) #wpadminbar { display: none !important; }
+	body:has(.oys-appbar) #wpbody { padding-top: env(safe-area-inset-top, 0px); }
+}

@@ -7352,3 +7352,238 @@ msgstr "V"
 #: assets/calendar.js (OYS_Calendar::strings)
 msgid "Never mind"
 msgstr "Mégse"
+
+#: Hub: week, attendance, reports
+msgid "This booking is not in this class."
+msgstr "Ez a foglalás nem ehhez az órához tartozik."
+
+#: Hub: week, attendance, reports
+msgid "Came"
+msgstr "Eljött"
+
+#: Hub: week, attendance, reports
+msgid "Booked but did not come"
+msgstr "Foglalt, de nem jött el"
+
+#: Hub: week, attendance, reports
+msgid "Different people"
+msgstr "Különböző vendég"
+
+#: Hub: week, attendance, reports
+msgid "Cancelled in time"
+msgstr "Időben lemondta"
+
+#: Hub: week, attendance, reports
+msgid "Revenue"
+msgstr "Bevétel"
+
+#: Hub: week, attendance, reports
+msgid "Passes sold or given"
+msgstr "Eladott vagy adott bérlet"
+
+#: Hub: week, attendance, reports
+msgid "New customers"
+msgstr "Új vendégek"
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "last class: %s"
+msgstr "utolsó óra: %s"
+
+#: Hub: week, attendance, reports
+msgid "birthday today 🎂"
+msgstr "ma van a születésnapja 🎂"
+
+#: Hub: week, attendance, reports
+msgid "Not allowed."
+msgstr "Nincs jogosultság."
+
+#: Hub: week, attendance, reports
+msgid "Cancelled late"
+msgstr "Későn lemondta"
+
+#: Hub: week, attendance, reports
+msgid "This class is not yours."
+msgstr "Ez az óra nem a tiéd."
+
+#: Hub: week, attendance, reports
+msgid "This booking has nothing to pay at the studio."
+msgstr "Ennél a foglalásnál nincs helyszínen fizetendő összeg."
+
+#: Hub: week, attendance, reports
+msgid "The attendance sheet fills itself in this many hours after a class (0 = off)"
+msgstr "A jelenléti ív ennyi órával az óra után magától kitöltődik (0 = ki)"
+
+#: Hub: week, attendance, reports
+msgid "Edit the website"
+msgstr "Weboldal szerkesztése"
+
+#: Hub: week, attendance, reports
+msgid "Texts and photos, on the page"
+msgstr "Szövegek és képek, az oldalon"
+
+#: Hub: week, attendance, reports
+msgid "Articles"
+msgstr "Cikkek"
+
+#: Hub: week, attendance, reports
+msgid "FAQ"
+msgstr "GYIK"
+
+#: Hub: week, attendance, reports
+msgid "Class pages"
+msgstr "Óraoldalak"
+
+#: Hub: week, attendance, reports
+msgid "After class: who came?"
+msgstr "Óra után: ki jött el?"
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "%d to mark"
+msgstr "%d jelöletlen"
+
+#: Hub: week, attendance, reports
+msgid "Reports"
+msgstr "Kimutatások"
+
+#: Hub: week, attendance, reports
+msgid "Attendance, revenue, regulars"
+msgstr "Jelenlét, bevétel, törzsvendégek"
+
+#: Hub: week, attendance, reports
+msgid "This week"
+msgstr "Ez a hét"
+
+#: Hub: week, attendance, reports
+msgid "New class, move, cancel"
+msgstr "Új óra, áthelyezés, lemondás"
+
+#: Hub: week, attendance, reports
+msgid "No class"
+msgstr "Nincs óra"
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "%1$d of %2$d came"
+msgstr "%2$d-ból %1$d eljött"
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "to pay here: %s"
+msgstr "helyszínen fizet: %s"
+
+#: Hub: week, attendance, reports
+msgid "was in the room"
+msgstr "bent volt a teremben"
+
+#: Hub: week, attendance, reports
+msgid "did not come into the room"
+msgstr "nem lépett be a terembe"
+
+#: Hub: week, attendance, reports
+msgid "Did not come"
+msgstr "Nem jött el"
+
+#: Hub: week, attendance, reports
+msgid "came"
+msgstr "eljött"
+
+#: Hub: week, attendance, reports
+msgid "did not come"
+msgstr "nem jött el"
+
+#: Hub: week, attendance, reports
+msgid "not marked"
+msgstr "jelöletlen"
+
+#: Hub: week, attendance, reports
+msgid "on the waitlist"
+msgstr "várólistán"
+
+#: Hub: week, attendance, reports
+msgid "Everyone came"
+msgstr "Mindenki itt volt"
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "If you don't mark them, %d hours after the class whoever was in the live room is marked as here, the others as not come."
+msgstr "Ha nem jelölöd, az óra után %d órával aki bent volt az élő teremben, az „itt volt” lesz, a többiek „nem jött el”."
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "If you don't mark them, %d hours after the class everyone booked is marked as here."
+msgstr "Ha nem jelölöd, az óra után %d órával mindenki, aki foglalt, „itt volt” lesz."
+
+#: Hub: week, attendance, reports
+msgid "Full roster"
+msgstr "Teljes névsor"
+
+#: Hub: week, attendance, reports
+msgid "Previous month"
+msgstr "Előző hónap"
+
+#: Hub: week, attendance, reports
+msgid "Next month"
+msgstr "Következő hónap"
+
+#: Hub: week, attendance, reports
+msgid "By class"
+msgstr "Óránként"
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "%1$s classes · %2$s booked · %3$s came · %4$s per class"
+msgstr "%1$s óra · %2$s foglalás · %3$s eljött · %4$s fő/óra"
+
+#: Hub: week, attendance, reports
+msgid "Birthdays today"
+msgstr "Mai születésnapok"
+
+#: Hub: week, attendance, reports
+msgid "Greet"
+msgstr "Felköszöntöm"
+
+#: Hub: week, attendance, reports
+msgid "Regulars (90 days)"
+msgstr "Törzsvendégek (90 nap)"
+
+#: Hub: week, attendance, reports
+msgid "Drifting away"
+msgstr "Lemorzsolódók"
+
+#: Hub: week, attendance, reports
+msgid "They came regularly, but not in the last 30 days and have nothing booked. A kind message often brings them back."
+msgstr "Rendszeresen jártak, de az elmúlt 30 napban nem, és nincs foglalásuk. Egy kedves üzenet gyakran visszahozza őket."
+
+#: Hub: week, attendance, reports
+msgid "Download the month (Excel)"
+msgstr "A hónap letöltése (Excel)"
+
+#: Hub: week, attendance, reports
+msgid "Nobody yet."
+msgstr "Még senki."
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "%d session left on the pass"
+msgid_plural "%d sessions left on the pass"
+msgstr[0] "%d alkalom maradt a bérleten"
+msgstr[1] "%d alkalom maradt a bérleten"
+
+#: Hub: week, attendance, reports
+#, php-format
+msgid "%d class in 90 days"
+msgid_plural "%d classes in 90 days"
+msgstr[0] "%d óra 90 nap alatt"
+msgstr[1] "%d óra 90 nap alatt"
+
+#: Hub week view (date format)
+msgctxt "week view day"
+msgid "F j"
+msgstr "F j."
+
+#: Hub week view (date format)
+msgctxt "week view range"
+msgid "M j"
+msgstr "M j."

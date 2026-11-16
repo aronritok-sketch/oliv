@@ -14,7 +14,7 @@ $link   = esc_html( preg_replace( '#^https?://#', '', $app['link'] ) );
 $admin  = fn( $page ) => esc_url( admin_url( 'admin.php?page=' . $page ) );
 $groups = array(
 	'Kezdés'              => array( 'teendok' => 'Az első lépéseid', 'app' => 'A Stúdió a telefonodon' ),
-	'A Hub'               => array( 'hub' => 'A Hub fülei', 'berletek-osszesito' => 'Bérletek és alkalmak', 'uzenetek' => 'Üzenetek', 'ertesitesek' => 'Értesítések' ),
+	'A Hub'               => array( 'hub' => 'A Hub fülei', 'heti-naptar' => 'Heti naptár', 'jelenleti-iv' => 'Óra után: jelenléti ív', 'kimutatasok' => 'Kimutatások', 'berletek-osszesito' => 'Bérletek és alkalmak', 'uzenetek' => 'Üzenetek', 'ertesitesek' => 'Értesítések' ),
 	'Az admin, menüpontonként' => array(
 		'menu'         => 'Az admin felépítése',
 		'attekintes'   => 'Áttekintés',
@@ -130,6 +130,7 @@ $groups = array(
 				<ul>
 					<li><b>Rád vár:</b> hány új üzenet, olvasatlan órai chat és egyéni kérés van. Koppints rá, és odavisz.</li>
 					<li><b>A következő órák:</b> mikor, hányan foglaltak, ki jön (egészségügyi megjegyzéssel, ha van), és hányan várnak a várólistán. A kártyán: <b>„Belépés a terembe”</b> (az óra idején <b>„Óra indítása”</b>), <b>„Névsor”</b>, <b>„Chat”</b>. Egy névre koppintva egyből írhatsz neki.</li>
+					<li><b>Óra után: ki jött el?</b> Az elmúlt két nap órái, ahol még van jelöletlen vendég: koppints rá, és kitöltöd a jelenléti ívet (<a href="#jelenleti-iv">lent</a>).</li>
 					<li><b>Bérletek és alkalmak:</b> az összesítő (<a href="#berletek-osszesito">lent részletesen</a>).</li>
 					<li><b>A számok:</b> az elmúlt 30 nap bevétele, a következő 7 nap foglaltsága, a vendégek száma és a legutóbbi befizetések.</li>
 				</ul>
@@ -137,9 +138,9 @@ $groups = array(
 			<dt>Üzenetek</dt>
 			<dd>Minden beszélgetés és órai chat egy listában (<a href="#uzenetek">lent</a>).</dd>
 			<dt>Naptár</dt>
-			<dd>Az órák naptára (<a href="#naptar">lent</a>).</dd>
+			<dd>A heti naptár: a hét minden órája, napról napra (<a href="#heti-naptar">lent</a>).</dd>
 			<dt>Több</dt>
-			<dd>Ez az útmutató és az admin minden oldala egy koppintással (<a href="#menu">lent a lista</a>), a weboldal megnyitása és a kilépés.</dd>
+			<dd>A <b>Kimutatások</b>, ez az útmutató, az admin minden oldala egy koppintással (<a href="#menu">lent a lista</a>), a weboldal szerkesztése, a cikkek, a GYIK, az óraoldalak, a képek, a weboldal megnyitása és a kilépés. Így az appban nincs szükség a WordPress menüjére.</dd>
 			<dt>Beállításaim</dt>
 			<dd>
 				<ul>
@@ -151,7 +152,46 @@ $groups = array(
 				Ne felejtsd el a <b>„Mentés”</b> gombot.
 			</dd>
 		</dl>
-		<p>A többi stúdióoldal is telefonra van igazítva: alul ugyanez a sáv látszik (Ma, Üzenetek, Naptár, Névsorok, Több), a táblázatok pedig kártyák, soronként egy.</p>
+		<p>A többi stúdióoldal is telefonra van igazítva: alul ugyanez a sáv látszik (Ma, Üzenetek, Naptár, Névsorok, Több), a táblázatok pedig kártyák, soronként egy. Telefonon és az appban a Hub fölött nincs WordPress-fejléc: úgy néz ki, mint egy app.</p>
+	</section>
+
+	<section class="g-sec" id="heti-naptar">
+		<h2>Heti naptár</h2>
+		<p>A Hub <b>Naptár</b> fülén a hét minden napja látszik, hétfőtől vasárnapig, minden órával: mikor kezdődik, hányan foglaltak, és ha már véget ért, hogy kitöltötted-e a jelenléti ívet (<i>„3 jelöletlen”</i> vagy <i>„4-ból 4 eljött”</i>). A mai nap ki van emelve.</p>
+		<ul>
+			<li>Felül a nyilakkal lapozol a hetek között; az <b>„Ez a hét”</b> gomb visszahoz.</li>
+			<li>Egy órára koppintva megnyílik a <a href="#jelenleti-iv">jelenléti íve</a>.</li>
+			<li>Új órát, áthelyezést, lemondást az <b>„Új óra, áthelyezés, lemondás”</b> gomb nyit meg (a nagy naptár, <a href="#naptar">lent</a>).</li>
+		</ul>
+	</section>
+
+	<section class="g-sec" id="jelenleti-iv">
+		<h2>Óra után: jelenléti ív</h2>
+		<p>Minden órának van jelenléti íve: a Ma fülön az óra kártyáján a <b>„Névsor”</b>, a Naptárban az órára koppintva, vagy óra után a Ma fülön az <b>„Óra után: ki jött el?”</b> résznél nyílik meg.</p>
+		<ul>
+			<li>Felül a számok: hányan jöttek el, hányan nem, és hány vendég jelöletlen még.</li>
+			<li>Mindenki mellett két gomb: <b>✓ Itt volt</b> és <b>✕ Nem jött el</b>. Egy koppintás, és kész; ha mellényúltál, koppints újra.</li>
+			<li><b>„Mindenki itt volt”</b>: aki még jelöletlen, az mind eljött. A legtöbbször ez az egy koppintás elég, és utána csak azt jelölöd, aki nem jött.</li>
+			<li>Minden vendégnél látod, hogyan fizetett (bérlet, kártya, helyszínen), <b>hány alkalom maradt a bérletén</b>, és ha van, az egészségügyi megjegyzését.</li>
+			<li><b>Élő online óránál</b> azt is látod, ki volt bent a teremben (<i>„bent volt a teremben”</i> / <i>„nem lépett be a terembe”</i>).</li>
+			<li><b>Magától is kitöltődik:</b> ha nem jelölöd, 3 órával az óra után a rendszer kitölti: aki bent volt az élő teremben, az „itt volt”, aki nem, az „nem jött el”. Amit te jelöltél, az úgy marad. (Beállítások → Foglalási szabályok, 0 = kikapcsolva.)</li>
+			<li><b>Foglalt, de nem jött el:</b> a bérletes alkalom ilyenkor is elhasználódik (a foglaláskor vonódik le), ahogy eddig is. A „Nem jött el” jelölés a kimutatásokba kerül.</li>
+			<li>Ha valaki a helyszínen fizet, mellette a <b>„Fizetve”</b> gombbal jelölöd, hogy kifizette. A kártyás befizetések számlája automatikusan elkészül, ehhez nem kell semmit tenned.</li>
+			<li>Alul: <b>Belépés a terembe</b>, <b>Chat</b>, és a <b>Teljes névsor</b> (ott vehetsz fel valakit kézzel, és írhatsz mindenkinek).</li>
+		</ul>
+	</section>
+
+	<section class="g-sec" id="kimutatasok">
+		<h2>Kimutatások</h2>
+		<p>A Hub <b>Több</b> fülén (és a Ma fülön a számok alatt) a <b>Kimutatások</b>: egy hónap egy képernyőn, a nyilakkal lapozol a hónapok között.</p>
+		<ul>
+			<li><b>A hónap számai:</b> órák, foglalások, ki jött el, ki foglalt, de nem jött el, a megjelenés aránya, hány különböző vendég járt, ki mondta le időben, a bevétel, az eladott vagy adott bérletek, az új vendégek.</li>
+			<li><b>Óránként:</b> melyik órára hányan foglaltak és jöttek el, átlagosan hány fő volt egy órán.</li>
+			<li><b>Mai születésnapok:</b> akinek ma van a születésnapja (ha megadta a fiókjában), egy „Felköszöntöm” gombbal.</li>
+			<li><b>Törzsvendégek (90 nap):</b> a tíz leghűségesebb vendéged.</li>
+			<li><b>Lemorzsolódók:</b> akik rendszeresen jártak, de az elmúlt 30 napban nem, és nincs foglalásuk. Egy kedves üzenet gyakran visszahozza őket; az <b>„Üzenet”</b> gombbal egyből írhatsz nekik.</li>
+			<li><b>A hónap letöltése (Excel):</b> minden foglalás a hónapból (nap, óra, vendég, e-mail, fizetés, eljött-e), Excelben megnyitható fájlban.</li>
+		</ul>
 	</section>
 
 	<section class="g-sec" id="berletek-osszesito">

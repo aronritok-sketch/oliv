@@ -1008,6 +1008,7 @@ class OYS_Admin {
 			'weeks_ahead'           => __( 'Create weekly classes this many weeks ahead', 'olivia-studio' ),
 			'hold_minutes'          => __( 'Hold a spot during card payment (minutes, 30 or more)', 'olivia-studio' ),
 			'max_guests'            => __( 'Guests a customer can bring per booking (0 = off)', 'olivia-studio' ),
+			'auto_attendance_hours' => __( 'The attendance sheet fills itself in this many hours after a class (0 = off)', 'olivia-studio' ),
 		);
 		foreach ( $nums as $k => $l ) {
 			echo '<tr><th>' . esc_html( $l ) . '</th><td>' . $f( $k, 'number', 'small-text', 'min="0"' ) . ( 'cancel_extend_days' === $k ? '<p class="description">' . esc_html__( 'The default. For a private client you can set another number on their customer page.', 'olivia-studio' ) . '</p>' : '' ) . '</td></tr>'; // phpcs:ignore

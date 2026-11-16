@@ -390,6 +390,7 @@ class OYS_Live {
 			}
 		}
 		$lang = self::lang( $session );
+		do_action( 'oys_live_joined', $session, $who ); // the attendance sheet: who came into the room (OYS_Hub_Classes)
 		return array(
 			'url'    => self::ws_url(),
 			'token'  => self::token( $identity, mb_substr( $who['name'], 0, 60 ), $grant, $closes - time(), wp_json_encode( array( 'role' => $who['owner'] ? 'teacher' : 'student' ) ) ),

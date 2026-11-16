@@ -1061,6 +1061,45 @@
     - amihez ne nyúljon; a foglalás és lemondás szabályai, élő óra, egyéni órák.
   - **A Hub fülei** telefonon nem lógnak ki („Beállításaim”).
   - Tesztek: 1488/0.
+- **olivia-studio 1.17.0 (téma 3.11.104-gyel) – Motibro legjobb funkciói a Hubban** (Áron, 2026-11-16 este:
+  „Nézd meg a Motibróba a funkciókat, óra utáni … jelentés, hogy ki jött el, meg ki nem”, „a hubból tudja kezelni óra
+  után nagyon egyszerűen”, „heti nézetes naptár is legyen”, „ott van a WordPress … fejléc, azt tüntesd el”).
+  - **Kutatás:** a Motibro funkciólistája, árai és jóga-stúdiós oldala (get.motibro.com: teljes-funkciolista, arak,
+    megoldasaink/joga-pilates-studio). A jelenléti íven egy érintéssel jelölhető a vendég, és látszik a bérlet és a
+    tartozás. További funkciók:
+    - „Foglalt, de nem jött el”, automatikus bérletlevonás;
+    - havi jelenlét- és bevétel-kimutatás, toplisták, lemorzsolódók, születésnap-jelző, Excel-export;
+    - Billingo / Számlázz.hu számlázás, várólista, minimális létszám, lejárat-emlékeztető;
+    - oktatói elszámolás, QR-os jelenlét.
+  - **Heti naptár a Hubban** (Naptár fül, `OYS_Hub_Classes::week`, REST `hub/week`):
+    - hétfőtől vasárnapig, lapozással;
+    - óránként a foglaltság és a jelenléti ív állása;
+    - a „nagy” naptár egy gombnyira.
+  - **Jelenléti ív** (`hub/class/{id}`, `/mark`, `/collect`; a Ma kártyán a „Névsor” is ezt nyitja):
+    - „Itt volt” / „Nem jött el” egy koppintással, és „Mindenki itt volt”;
+    - vendégenként a fizetés módja, a bérlet hátralévő alkalmai, az egészségügyi megjegyzés, és hogy bent volt-e az
+      élő teremben;
+    - a helyszíni fizetésnél egy „Fizetve” gomb.
+    - A Ma fülön az „Óra után: ki jött el?” rész az elmúlt két nap jelöletlen óráit mutatja.
+  - **Automatikus jelenlét:**
+    - Az élő terem megjegyzi, ki lépett be: `oys_live_joined` hook, `oys_live_joined_<session>` opció, 30 nap után
+      törlődik.
+    - `auto_attendance_hours` (alap: 3, a Beállítások → Foglalási szabályok alatt) órával az óra után, óránkénti
+      cronnal tölt: aki bent volt, az „itt volt”, aki nem, az „nem jött el”.
+    - Élő terem nélküli óránál mindenki „itt volt”. A kézi jelölés megmarad.
+  - **Kimutatások** (Hub → Több / Ma, `hub/reports`, csak a stúdiónak):
+    - a hónap számai: órák, foglalások, eljött, foglalt de nem jött el, megjelenés %, különböző vendég, időben
+      lemondta, bevétel, bérletek, új vendégek;
+    - óránkénti bontás, mai születésnapok, törzsvendégek (90 nap), lemorzsolódók üzenet gombbal;
+    - a hónap foglalásai CSV-ben, Excelhez (UTF-8 BOM, pontosvessző; `admin_post_oys_hub_export`).
+  - **Számlázás:** a kártyás befizetéseket a CRM könyveli a QuickBooksba (`OYS_HPV_Pay`). A jelenléti íven a fizetés
+    módja látszik, és a helyszíni fizetés jelölhető. Billingo / Számlázz.hu nincs bekötve.
+  - **App WordPress-fejléc nélkül:**
+    - Telefonon és telepített appban (`display-mode: standalone`) a Hubon nincs admin sáv és WP-menü.
+    - A többi Stúdió-oldalon az appban nincs admin sáv: az alsó sáv vezet.
+    - A Hub „Több” fülén csempe lett a weboldal szerkesztéséhez, a cikkekhez, a GYIK-hez, az óraoldalakhoz és a
+      képekhez.
+  - Az útmutató új részei: Heti naptár, Óra után: jelenléti ív, Kimutatások. Tesztek: 1505/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

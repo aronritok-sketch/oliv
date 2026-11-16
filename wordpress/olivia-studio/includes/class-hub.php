@@ -750,7 +750,7 @@ class OYS_Hub {
 				'waitlist' => count( OYS_Bookings::waitlist( $s->id ) ),
 			);
 		}
-		$out = array( 'classes' => $classes, 'counts' => self::counts() );
+		$out = array( 'classes' => $classes, 'counts' => self::counts(), 'tomark' => class_exists( 'OYS_Hub_Classes' ) ? OYS_Hub_Classes::to_mark() : array() );
 		if ( null === $scope ) {
 			$o    = self::t( 'orders' );
 			$rev  = 0;

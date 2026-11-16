@@ -468,3 +468,101 @@ body.oys-hub-screen .screen-reader-text:not(:focus) { position: absolute; width:
 	.hub-nav__tab span { display: block; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; letter-spacing: -.01em; }
 }
 @media (max-width: 420px) { .hub-nav__tab { font-size: 10.5px; } }
+
+/* ==========================================================================
+   The week, the attendance sheet, the reports (OYS_Hub_Classes; Áron: „heti nézetes naptár”, „óra után … ki jött, ki
+   nem jött el”, „minden vezető motibro funkció”)
+   ========================================================================== */
+.hub-week, .hub-reports { padding: 28px clamp(16px, 4vw, 48px) 48px; }
+.hub-weekbar { display: grid; grid-template-columns: 42px 1fr 42px; align-items: center; gap: 8px; margin: 0 0 6px; }
+.hub-weekbar__t { text-align: center; }
+.hub-weekbar__t .hub-title { margin: 0 !important; }
+.hub-weekbar__t p { margin: 2px 0 0; color: var(--hub-muted); font-weight: 600; }
+.hub-weekbar .hub-btn--icon { display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: #fff; box-shadow: 0 1px 0 var(--hub-line); }
+.hub-btn--next .hub-i { transform: rotate(180deg); }
+.hub-weektools { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin: 8px 0 16px; }
+.hub-days { display: grid; gap: 10px; }
+@media (min-width: 1100px) { .hub-days { grid-template-columns: repeat(7, minmax(0, 1fr)); align-items: start; } }
+.hub-day { padding: 12px; border-radius: var(--hub-r); background: #fff; box-shadow: 0 1px 0 var(--hub-line); }
+.hub-day.is-today { box-shadow: 0 0 0 2px var(--hub-forest); }
+.hub-day.is-empty { background: transparent; box-shadow: none; padding: 6px 12px; }
+.hub-day__h { display: flex; align-items: baseline; gap: 8px; margin: 0 0 8px !important; font-size: 14px !important; text-transform: capitalize; }
+.hub-day.is-empty .hub-day__h { margin: 0 !important; color: var(--hub-muted); font-weight: 600; }
+.hub-day__h span { color: var(--hub-muted); font-weight: 600; }
+.hub-day.is-today .hub-day__h b { color: var(--hub-magenta); }
+.hub-day__none { display: none; }
+.hub-wclass { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 10px; width: 100%; margin: 0 0 6px; padding: 10px 12px; border: 0; border-radius: 14px; background: var(--hub-cream); color: var(--hub-ink); font: inherit; text-align: left; cursor: pointer; }
+.hub-wclass:hover { background: var(--hub-sun-soft); }
+.hub-wclass.is-over { opacity: .9; }
+.hub-wclass__time { font-weight: 800; font-size: 13px; color: var(--hub-forest); white-space: nowrap; }
+.hub-wclass__body { display: grid; min-width: 0; }
+.hub-wclass__body b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; }
+.hub-wclass__body small { color: var(--hub-muted); font-size: 12px; }
+@media (min-width: 1100px) { .hub-wclass { grid-template-columns: 1fr; gap: 2px; } }
+.hub-tag { display: inline-block; padding: 2px 8px; border-radius: 999px; background: rgba(0, 46, 44, .07); color: var(--hub-muted); font-size: 11px; font-style: normal; font-weight: 700; white-space: nowrap; }
+.hub-tag--ok { background: #e3f4ea; color: #1d6b45; }
+.hub-tag--warn { background: var(--hub-sun-soft); color: #7a4b00; }
+.hub-tag--hot { background: var(--hub-magenta); color: #fff; }
+/* after class on Today */
+.hub-tomark { display: grid; gap: 8px; }
+.hub-tomark__item { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 12px; width: 100%; padding: 14px 16px; border: 0; border-radius: var(--hub-r); background: var(--hub-sun-soft); color: var(--hub-ink); font: inherit; text-align: left; cursor: pointer; }
+.hub-tomark__item > .hub-i:last-child { transform: rotate(180deg); color: var(--hub-muted); }
+.hub-tomark__item span { display: grid; }
+.hub-tomark__item small { color: #7a4b00; font-weight: 600; }
+.hub-link-btn { padding: 0; border: 0; background: none; color: var(--hub-forest); font: inherit; font-weight: 700; cursor: pointer; }
+/* the attendance sheet */
+.hub-sheet--class { align-items: end; padding: 0; }
+@media (min-width: 700px) { .hub-sheet--class { align-items: start; padding: 6vh 16px 16px; } }
+.hub-sheet__box--wide { width: min(640px, 100%); max-height: 92vh; padding: 16px 16px 18px; border-radius: 22px 22px 0 0; }
+@media (min-width: 700px) { .hub-sheet__box--wide { border-radius: 22px; max-height: 86vh; } }
+.hub-sheet__head { display: flex !important; align-items: flex-start !important; justify-content: space-between; gap: 10px; padding: 0 0 6px !important; }
+.hub-sheet__head h2 { margin: 0; font-size: 20px; color: var(--hub-forest); }
+.hub-sheet__head p { margin: 2px 0 0; }
+.hub-tally { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 12px; }
+.hub-tally span { display: inline-flex; align-items: baseline; gap: 6px; padding: 8px 12px; border-radius: 12px; background: var(--hub-cream); color: var(--hub-muted); font-size: 13px; font-weight: 600; }
+.hub-tally b { font-size: 20px; color: var(--hub-ink); }
+.hub-tally .is-here b { color: #1d8a5b; }
+.hub-tally .is-miss b { color: var(--hub-magenta); }
+.hub-atts { list-style: none; margin: 0 0 12px; padding: 0; }
+.hub-att { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 10px; padding: 10px 0; border-top: 1px solid var(--hub-line); }
+.hub-att__who { min-width: 0; }
+.hub-att__name { padding: 0; border: 0; background: none; color: var(--hub-ink); font: inherit; font-weight: 700; text-align: left; cursor: pointer; }
+.hub-att__who small { display: block; margin-top: 2px; color: var(--hub-muted); font-size: 12px; }
+.hub-att__health { color: #7a4b00 !important; }
+.hub-att__who .hub-tag { margin-left: 4px; }
+.hub-att__do { display: flex; gap: 6px; }
+.hub-att__btn { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-width: 64px; min-height: 52px; padding: 6px 8px; border: 1.5px solid var(--hub-line); border-radius: 14px; background: #fff; color: var(--hub-muted); font: inherit; font-size: 11px; font-weight: 700; cursor: pointer; }
+.hub-att__btn .hub-i { width: 20px; height: 20px; }
+.hub-att__btn--here.is-on { border-color: #1d8a5b; background: #1d8a5b; color: #fff; }
+.hub-att__btn--miss.is-on { border-color: var(--hub-magenta); background: var(--hub-magenta); color: #fff; }
+.hub-att__btn--pay { border-color: var(--hub-sun); background: var(--hub-sun-soft); color: #7a4b00; }
+.hub-att.is-attended .hub-att__name { color: #1d6b45; }
+.hub-att.is-no_show .hub-att__name { color: var(--hub-magenta); text-decoration: line-through; }
+@media (max-width: 420px) { .hub-att__btn span { display: none; } .hub-att__btn { min-width: 48px; } }
+.hub-small { font-size: 12.5px; }
+.hub-sheet__links { margin-top: 8px; }
+/* reports */
+.hub-kpis--report { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 700px) { .hub-kpis--report { grid-template-columns: repeat(5, minmax(0, 1fr)); } }
+.hub-plist { list-style: none; margin: 0; padding: 0; border-radius: var(--hub-r); background: #fff; box-shadow: 0 1px 0 var(--hub-line); }
+.hub-plist li { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 14px; border-top: 1px solid var(--hub-line); }
+.hub-plist li:first-child { border-top: 0; }
+.hub-plist span { display: grid; min-width: 0; }
+.hub-plist small { color: var(--hub-muted); font-size: 12.5px; }
+@media (max-width: 899px) { .hub-week, .hub-reports { padding: 16px 16px 30px; } }
+
+/* ==========================================================================
+   Áron, 16 November: „ott van a WordPress beállításoknak a fejléc, azt tüntesd el … appnak tűnjön 100%-ban” – on the Hub
+   there is no WordPress bar and no WordPress menu, on a phone and in the app; the Hub has its own navigation
+   ========================================================================== */
+@media (max-width: 899px), (display-mode: standalone) {
+	html.wp-toolbar:has(body.oys-hub-screen) { padding-top: 0 !important; }
+	body.oys-hub-screen { --hub-bar: 0px; }
+	body.oys-hub-screen #wpadminbar, body.oys-hub-screen #adminmenumain, body.oys-hub-screen #screen-meta, body.oys-hub-screen #screen-meta-links { display: none !important; }
+	body.oys-hub-screen #wpcontent, body.oys-hub-screen #wpfooter { margin-left: 0 !important; }
+	body.oys-hub-screen #wpbody { padding-top: 0 !important; }
+	body.oys-hub-screen .hub { padding-top: env(safe-area-inset-top, 0px); }
+}
+.hub-day__h span { text-transform: none; }
+.hub-att__btn--here:not(.is-on) { border-color: #bfe3cf; color: #1d8a5b; }
+.hub-att__btn--miss:not(.is-on) { border-color: #f3c3d0; color: var(--hub-magenta); }

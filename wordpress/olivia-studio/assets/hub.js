@@ -130,19 +130,12 @@
 			'<div class="hub-conv" data-conv><div class="hub-conv__empty">' + icon( 'chat' ) + '<p>' + esc( T.pick ) + '</p></div></div>' +
 			'<aside class="hub-ctx" data-ctx></aside>' +
 			'</section>' +
+			'<section class="hub-view hub-week" data-panel="calendar"></section>' +
+			'<section class="hub-view hub-reports" data-panel="reports"></section>' +
 			'<section class="hub-view hub-more" data-panel="more"></section>' +
 			'<section class="hub-view hub-settings" data-panel="settings"></section>' +
 			'</main>';
-		$$( '[data-view]' ).forEach( ( b ) => b.addEventListener( 'click', () => {
-			if ( 'calendar' === b.dataset.view ) {
-				const cal = B.links.find( ( l ) => 'calendar' === l[ 0 ] );
-				if ( cal ) {
-					window.location.href = cal[ 2 ];
-				}
-				return;
-			}
-			go( b.dataset.view );
-		} ) );
+		$$( '[data-view]' ).forEach( ( b ) => b.addEventListener( 'click', () => go( b.dataset.view ) ) );
 		$$( '[data-filter]' ).forEach( ( b ) => b.addEventListener( 'click', () => {
 			S.filter = b.dataset.filter;
 			loadInbox();
@@ -168,6 +161,10 @@
 			refreshToday();
 		} else if ( 'inbox' === view ) {
 			loadInbox();
+		} else if ( 'calendar' === view ) {
+			loadWeek( S.week || '' );
+		} else if ( 'reports' === view ) {
+			loadReports( S.month || '' );
 		} else if ( 'more' === view ) {
 			renderMore();
 		} else if ( 'settings' === view ) {
@@ -209,7 +206,12 @@
 		let h = '<header class="hub-hello"><p class="hub-hello__date">' + esc( B.today ) + '</p><h1>' + esc( fmt( T.hi, B.name ) ) + '</h1></header>';
 		h += '<section class="hub-block"><h2 class="hub-h">' + esc( T.needsYou ) + '</h2>';
 		h += any ? '<div class="hub-wait">' + wait.map( ( w ) => '<button type="button" class="hub-wait__item' + ( w[ 1 ] ? ' is-hot' : '' ) + '" data-goto="' + w[ 0 ] + '">' + icon( w[ 3 ] ) + '<b>' + ( w[ 1 ] || 0 ) + '</b><span>' + esc( w[ 2 ] ) + '</span></button>' ).join( '' ) + '</div>' : '<p class="hub-clear">' + esc( T.allClear ) + '</p>';
-		h += '</section><section class="hub-block"><h2 class="hub-h">' + esc( T.nextClasses ) + '</h2>';
+		h += '</section>';
+		if ( d.tomark && d.tomark.length ) {
+			// Áron: „óra után nagyon egyszerűen … ki jött, ki nem jött el”
+			h += '<section class="hub-block"><h2 class="hub-h">' + esc( T.afterClass ) + '</h2><div class="hub-tomark">' + d.tomark.map( ( c ) => '<button type="button" class="hub-tomark__item" data-sheet="' + c.id + '">' + icon( 'check' ) + '<span><b>' + esc( c.title ) + '</b><small>' + esc( c.day + ' ' + c.time ) + ' · ' + esc( fmt( T.toMark, c.open ) ) + '</small></span>' + icon( 'back' ) + '</button>' ).join( '' ) + '</div></section>';
+		}
+		h += '<section class="hub-block"><h2 class="hub-h">' + esc( T.nextClasses ) + '</h2>';
 		if ( ! d.classes.length ) {
 			h += '<p class="hub-muted">' + esc( T.noClasses ) + '</p>';
 		}
@@ -223,6 +225,7 @@
 		if ( d.kpis ) {
 			h += '<section class="hub-block"><h2 class="hub-h">' + esc( T.numbers ) + '</h2><div class="hub-kpis">' + d.kpis.map( ( k ) => '<div class="hub-kpi"><span>' + esc( k[ 0 ] ) + '</span><b>' + esc( k[ 1 ] ) + '</b></div>' ).join( '' ) + '</div>';
 			if ( d.payments && d.payments.length ) {
+				h += '<p class="hub-more"><button type="button" class="hub-link-btn" data-goview="reports">' + esc( T.reports ) + ' →</button></p>';
 				h += '<h3 class="hub-h3">' + esc( T.payments ) + '</h3><ul class="hub-pay">' + d.payments.map( ( p ) => '<li><span><b>' + esc( p.who ) + '</b><small>' + esc( p.what ) + '</small></span><span class="hub-pay__amt">' + esc( p.amount ) + '<small>' + esc( p.when ) + '</small></span></li>' ).join( '' ) + '</ul>';
 			}
 			h += '</section>';
@@ -235,6 +238,150 @@
 		} ) );
 		$$( '[data-chat]', p ).forEach( ( b ) => b.addEventListener( 'click', () => openItem( 'c' + b.dataset.chat ) ) );
 		$$( '[data-person]', p ).forEach( ( b ) => b.addEventListener( 'click', () => startWith( parseInt( b.dataset.person, 10 ) ) ) );
+		$$( '[data-sheet]', p ).forEach( ( b ) => b.addEventListener( 'click', () => openSheet( parseInt( b.dataset.sheet, 10 ) ) ) );
+		$$( '[data-goview]', p ).forEach( ( b ) => b.addEventListener( 'click', () => go( b.dataset.goview ) ) );
+	}
+
+	/* ---------- The week (Áron: „heti nézetes naptár is legyen”) ---------- */
+	async function loadWeek( start ) {
+		const p = $( '[data-panel="calendar"]' );
+		if ( ! S.weekData ) {
+			p.innerHTML = '<p class="hub__loading">' + esc( T.loading ) + '</p>';
+		}
+		try {
+			S.weekData = await api( 'week' + ( start ? '?start=' + encodeURIComponent( start ) : '' ) );
+			S.week = S.weekData.start;
+			renderWeek();
+		} catch ( e ) {
+			toast( e.message, true );
+		}
+	}
+	function renderWeek() {
+		const w = S.weekData;
+		const p = $( '[data-panel="calendar"]' );
+		const cal = B.links.find( ( l ) => 'calendar' === l[ 0 ] );
+		let h = '<header class="hub-weekbar"><button type="button" class="hub-btn hub-btn--icon" data-wk="' + w.prev + '" aria-label="' + esc( T.prevWeek ) + '">' + icon( 'back' ) + '</button>' +
+			'<div class="hub-weekbar__t"><h1 class="hub-title">' + esc( T.calendar ) + '</h1><p>' + esc( w.label ) + '</p></div>' +
+			'<button type="button" class="hub-btn hub-btn--icon hub-btn--next" data-wk="' + w.next + '" aria-label="' + esc( T.nextWeek ) + '">' + icon( 'back' ) + '</button></header>' +
+			'<p class="hub-weektools">' + ( w.this ? '' : '<button type="button" class="hub-btn hub-btn--sm" data-wk="">' + esc( T.thisWeek ) + '</button>' ) +
+			( cal ? '<a class="hub-btn hub-btn--sm hub-btn--ghost" href="' + esc( cal[ 2 ] ) + '">' + icon( 'plus' ) + esc( T.editCalendar ) + '</a>' : '' ) + '</p><div class="hub-days">';
+		w.days.forEach( ( d ) => {
+			h += '<section class="hub-day' + ( d.today ? ' is-today' : '' ) + ( d.classes.length ? '' : ' is-empty' ) + '"><h2 class="hub-day__h"><b>' + esc( d.name ) + '</b><span>' + esc( d.day ) + '</span></h2>';
+			h += d.classes.length ? d.classes.map( ( c ) => {
+				const state = c.over ? ( c.open ? '<i class="hub-tag hub-tag--warn">' + esc( fmt( T.toMark, c.open ) ) + '</i>' : '<i class="hub-tag hub-tag--ok">' + esc( fmt( T.came, c.here, c.booked ) ) + '</i>' ) : ( c.now ? '<i class="hub-tag hub-tag--hot">LIVE</i>' : '' );
+				return '<button type="button" class="hub-wclass' + ( c.over ? ' is-over' : '' ) + '" data-sheet="' + c.id + '"><span class="hub-wclass__time">' + esc( c.time ) + '</span><span class="hub-wclass__body"><b>' + esc( c.title ) + '</b><small>' + esc( fmt( T.booked, c.booked, c.capacity ) ) + '</small></span>' + state + '</button>';
+			} ).join( '' ) : '<p class="hub-day__none">' + esc( T.noClassDay ) + '</p>';
+			h += '</section>';
+		} );
+		p.innerHTML = h + '</div>';
+		$$( '[data-wk]', p ).forEach( ( b ) => b.addEventListener( 'click', () => loadWeek( b.dataset.wk ) ) );
+		$$( '[data-sheet]', p ).forEach( ( b ) => b.addEventListener( 'click', () => openSheet( parseInt( b.dataset.sheet, 10 ) ) ) );
+	}
+
+	/* ---------- The attendance sheet (a class's list, after class one tap per person) ---------- */
+	async function openSheet( id ) {
+		let el = document.querySelector( '.hub-sheet--class' );
+		if ( ! el ) {
+			el = document.createElement( 'div' );
+			el.className = 'hub-sheet hub-sheet--class';
+			el.setAttribute( 'role', 'dialog' );
+			el.setAttribute( 'aria-modal', 'true' );
+			root.appendChild( el );
+		}
+		el.innerHTML = '<div class="hub-sheet__box"><p class="hub__loading">' + esc( T.loading ) + '</p></div>';
+		try {
+			renderSheet( await api( 'class/' + id ) );
+		} catch ( e ) {
+			el.remove();
+			toast( e.message, true );
+		}
+	}
+	function closeSheet() {
+		const el = document.querySelector( '.hub-sheet--class' );
+		if ( el ) {
+			el.remove();
+		}
+		if ( 'calendar' === S.view ) {
+			loadWeek( S.week );
+		} else if ( 'today' === S.view ) {
+			refreshToday();
+		}
+	}
+	function renderSheet( d ) {
+		const el = document.querySelector( '.hub-sheet--class' );
+		if ( ! el ) {
+			return;
+		}
+		const t = d.tally || {};
+		const row = ( p ) => {
+			const sub = [ p.due ? '' : p.paid, p.pass, p.due ? fmt( T.dueHere, p.due ) : '' ].filter( Boolean ).join( ' · ' );
+			const room = null === p.joined ? '' : ( p.joined ? '<i class="hub-tag hub-tag--ok">' + esc( T.wasInRoom ) + '</i>' : ( d.over ? '<i class="hub-tag">' + esc( T.notInRoom ) + '</i>' : '' ) );
+			return '<li class="hub-att is-' + esc( p.status ) + '">' +
+				'<div class="hub-att__who">' + ( p.user ? '<button type="button" class="hub-att__name" data-person="' + p.user + '">' + esc( p.name ) + '</button>' : '<b class="hub-att__name">' + esc( p.name ) + '</b>' ) +
+				( p.health ? ' <i class="hub-flag" title="' + esc( p.health ) + '">' + esc( T.health ) + '</i>' : '' ) + room +
+				'<small>' + esc( sub ) + '</small>' + ( p.health ? '<small class="hub-att__health">' + esc( p.health ) + '</small>' : '' ) + '</div>' +
+				'<div class="hub-att__do" role="group">' +
+				'<button type="button" class="hub-att__btn hub-att__btn--here' + ( 'attended' === p.status ? ' is-on' : '' ) + '" data-mark="' + p.booking + '" data-st="' + ( 'attended' === p.status ? 'confirmed' : 'attended' ) + '">' + icon( 'check' ) + '<span>' + esc( T.here ) + '</span></button>' +
+				'<button type="button" class="hub-att__btn hub-att__btn--miss' + ( 'no_show' === p.status ? ' is-on' : '' ) + '" data-mark="' + p.booking + '" data-st="' + ( 'no_show' === p.status ? 'confirmed' : 'no_show' ) + '">' + icon( 'x' ) + '<span>' + esc( T.missed ) + '</span></button>' +
+				( p.due ? '<button type="button" class="hub-att__btn hub-att__btn--pay" data-collect="' + p.booking + '">' + icon( 'card' ) + '<span>' + esc( T.paidCash ) + '</span></button>' : '' ) +
+				'</div></li>';
+		};
+		el.innerHTML = '<div class="hub-sheet__box hub-sheet__box--wide">' +
+			'<header class="hub-sheet__head"><div><h2>' + esc( d.title ) + '</h2><p class="hub-muted">' + esc( d.when ) + '</p></div><button type="button" class="hub-btn hub-btn--icon" data-close aria-label="' + esc( T.close ) + '">' + icon( 'x' ) + '</button></header>' +
+			'<div class="hub-tally"><span class="is-here"><b>' + ( t.attended || 0 ) + '</b>' + esc( T.cameN ) + '</span><span class="is-miss"><b>' + ( t.no_show || 0 ) + '</b>' + esc( T.missedN ) + '</span><span><b>' + ( t.confirmed || 0 ) + '</b>' + esc( d.over ? T.unmarked : T.bookedN ) + '</span>' + ( d.waitlist ? '<span><b>' + d.waitlist + '</b>' + esc( T.waitingN ) + '</span>' : '' ) + '</div>' +
+			( d.people.length && t.confirmed && d.started ? '<p class="hub-row"><button type="button" class="hub-btn hub-btn--primary" data-all="attended">' + icon( 'check' ) + esc( T.allHere ) + '</button></p>' : '' ) +
+			( d.people.length ? '<ul class="hub-atts">' + d.people.map( row ).join( '' ) + '</ul>' : '<p class="hub-muted">' + esc( T.nobody ) + '</p>' ) +
+			( d.auto && ! d.over ? '<p class="hub-muted hub-small">' + esc( fmt( d.live ? T.autoLive : T.autoPlain, d.auto ) ) + '</p>' : '' ) +
+			'<p class="hub-row hub-sheet__links">' + ( d.live ? '<a class="hub-btn" href="' + esc( d.live ) + '" target="_blank" rel="noopener">' + icon( 'video' ) + esc( T.room ) + '</a><button type="button" class="hub-btn" data-chat="' + d.id + '">' + icon( 'chat' ) + esc( T.chat ) + '</button>' : '' ) +
+			'<a class="hub-btn hub-btn--ghost" href="' + esc( d.roster ) + '">' + icon( 'list' ) + esc( T.fullRoster ) + '</a></p></div>';
+		const send = async ( path, json ) => {
+			try {
+				renderSheet( await api( 'class/' + d.id + '/' + path, { method: 'POST', json } ) );
+			} catch ( e ) {
+				toast( e.message, true );
+			}
+		};
+		$$( '[data-mark]', el ).forEach( ( b ) => b.addEventListener( 'click', () => send( 'mark', { booking: parseInt( b.dataset.mark, 10 ), status: b.dataset.st } ) ) );
+		$$( '[data-all]', el ).forEach( ( b ) => b.addEventListener( 'click', () => send( 'mark', { all: 1, status: b.dataset.all } ) ) );
+		$$( '[data-collect]', el ).forEach( ( b ) => b.addEventListener( 'click', () => send( 'collect', { booking: parseInt( b.dataset.collect, 10 ), with: 'cash' } ) ) );
+		$$( '[data-person]', el ).forEach( ( b ) => b.addEventListener( 'click', () => {
+			el.remove();
+			startWith( parseInt( b.dataset.person, 10 ) );
+		} ) );
+		$$( '[data-chat]', el ).forEach( ( b ) => b.addEventListener( 'click', () => {
+			el.remove();
+			openItem( 'c' + b.dataset.chat );
+		} ) );
+		$( '[data-close]', el ).addEventListener( 'click', closeSheet );
+		el.addEventListener( 'click', ( e ) => {
+			if ( e.target === el ) {
+				closeSheet();
+			}
+		} );
+	}
+
+	/* ---------- Reports (Motibro: havi jelenlét/bevétel, toplisták, lemorzsolódók, születésnapok, Excel) ---------- */
+	async function loadReports( month ) {
+		const p = $( '[data-panel="reports"]' );
+		p.innerHTML = '<p class="hub__loading">' + esc( T.loading ) + '</p>';
+		try {
+			const r = await api( 'reports' + ( month ? '?month=' + encodeURIComponent( month ) : '' ) );
+			S.month = r.month;
+			const people = ( list, cta ) => list.length ? '<ul class="hub-plist">' + list.map( ( x ) => '<li><span><b>' + esc( x.name ) + '</b><small>' + esc( x.note ) + '</small></span>' + ( x.user ? '<button type="button" class="hub-btn hub-btn--sm" data-person="' + x.user + '">' + icon( 'chat' ) + esc( cta ) + '</button>' : '' ) + '</li>' ).join( '' ) + '</ul>' : '<p class="hub-muted">' + esc( T.noneYet ) + '</p>';
+			p.innerHTML = '<header class="hub-weekbar"><button type="button" class="hub-btn hub-btn--icon" data-mo="' + r.prev + '" aria-label="' + esc( T.prevMonth ) + '">' + icon( 'back' ) + '</button>' +
+				'<div class="hub-weekbar__t"><h1 class="hub-title">' + esc( T.reports ) + '</h1><p>' + esc( r.label ) + '</p></div>' +
+				( r.isNow ? '<span></span>' : '<button type="button" class="hub-btn hub-btn--icon hub-btn--next" data-mo="' + r.next + '" aria-label="' + esc( T.nextMonth ) + '">' + icon( 'back' ) + '</button>' ) + '</header>' +
+				'<div class="hub-kpis hub-kpis--report">' + r.kpis.map( ( k ) => '<div class="hub-kpi"><span>' + esc( k[ 0 ] ) + '</span><b>' + esc( k[ 1 ] ) + '</b></div>' ).join( '' ) + '</div>' +
+				( r.classes.length ? '<section class="hub-block"><h2 class="hub-h">' + esc( T.byClass ) + '</h2><ul class="hub-plist">' + r.classes.map( ( c ) => '<li><span><b>' + esc( c.name ) + '</b><small>' + esc( fmt( T.byClassLine, c.classes, c.booked, c.here, c.avg ) ) + '</small></span></li>' ).join( '' ) + '</ul></section>' : '' ) +
+				( r.birthdays.length ? '<section class="hub-block"><h2 class="hub-h">' + esc( T.birthdays ) + '</h2>' + people( r.birthdays, T.greet ) + '</section>' : '' ) +
+				'<section class="hub-block"><h2 class="hub-h">' + esc( T.regulars ) + '</h2>' + people( r.regulars, T.writeTo ) + '</section>' +
+				'<section class="hub-block"><h2 class="hub-h">' + esc( T.drifting ) + '</h2><p class="hub-muted">' + esc( T.driftingHelp ) + '</p>' + people( r.drifting, T.writeTo ) + '</section>' +
+				'<p><a class="hub-btn hub-btn--block" href="' + esc( r.export ) + '">' + icon( 'list' ) + esc( T.exportCsv ) + '</a></p>';
+			$$( '[data-mo]', p ).forEach( ( b ) => b.addEventListener( 'click', () => loadReports( b.dataset.mo ) ) );
+			$$( '[data-person]', p ).forEach( ( b ) => b.addEventListener( 'click', () => startWith( parseInt( b.dataset.person, 10 ) ) ) );
+		} catch ( e ) {
+			p.innerHTML = '<p class="hub-muted">' + esc( e.message ) + '</p>';
+		}
 	}
 
 	function classCard( s ) {
@@ -247,7 +394,7 @@
 			( s.people.length ? '<ul class="hub-people">' + s.people.map( ( p ) => '<li>' + ( p.user ? '<button type="button" data-person="' + p.user + '">' : '<span>' ) + esc( p.name ) + ( p.health ? ' <i class="hub-flag" title="' + esc( p.health ) + '">' + esc( T.health ) + '</i>' : '' ) + ( p.here ? ' ✓' : '' ) + ( p.user ? '</button>' : '</span>' ) + '</li>' ).join( '' ) + '</ul>' : '<p class="hub-muted">' + esc( T.nobody ) + '</p>' ) +
 			'<div class="hub-class__act">' +
 			( s.live ? '<a class="hub-btn' + ( s.now ? ' hub-btn--hot' : ' hub-btn--primary' ) + '" href="' + esc( s.live ) + '" target="_blank" rel="noopener">' + icon( 'video' ) + esc( s.now ? T.roomNow : T.room ) + '</a>' : '' ) +
-			'<a class="hub-btn" href="' + esc( s.roster ) + '">' + icon( 'list' ) + esc( T.roster ) + '</a>' +
+			'<button type="button" class="hub-btn" data-sheet="' + s.id + '">' + icon( 'list' ) + esc( T.roster ) + '</button>' +
 			( s.live ? '<button type="button" class="hub-btn" data-chat="' + s.id + '">' + icon( 'chat' ) + esc( T.chat ) + '</button>' : '' ) +
 			'</div></article>';
 	}
@@ -678,8 +825,10 @@
 	/* ---------- More ---------- */
 	function renderMore() {
 		$( '[data-panel="more"]' ).innerHTML = '<h1 class="hub-title">' + esc( T.more ) + '</h1><div class="hub-tiles">' +
+			( B.manage ? '<button type="button" class="hub-tile" data-goview="reports">' + icon( 'chart' ) + '<b>' + esc( T.reports ) + '</b><small>' + esc( T.reportsSub ) + '</small></button>' : '' ) +
 			B.links.map( ( l ) => '<a class="hub-tile" href="' + esc( l[ 2 ] ) + '"' + ( 'globe' === l[ 0 ] ? ' target="_blank" rel="noopener"' : '' ) + '>' + icon( l[ 0 ] ) + '<b>' + esc( l[ 1 ] ) + '</b>' + ( l[ 3 ] ? '<small>' + esc( l[ 3 ] ) + '</small>' : '' ) + '</a>' ).join( '' ) +
 			'<a class="hub-tile hub-tile--quiet" href="' + esc( B.logout ) + '">' + icon( 'logout' ) + '<b>' + esc( T.logout ) + '</b></a></div>';
+		$$( '[data-goview]', $( '[data-panel="more"]' ) ).forEach( ( b ) => b.addEventListener( 'click', () => go( b.dataset.goview ) ) );
 	}
 
 	/* ---------- My settings ---------- */
@@ -893,7 +1042,10 @@
 	if ( /^[tc]\d+$/.test( hash ) ) {
 		go( 'inbox', false );
 		openItem( hash );
-	} else if ( [ 'today', 'inbox', 'more', 'settings' ].includes( hash ) ) {
+	} else if ( /^s\d+$/.test( hash ) ) {
+		go( 'calendar', false );
+		openSheet( parseInt( hash.slice( 1 ), 10 ) );
+	} else if ( [ 'today', 'inbox', 'calendar', 'reports', 'more', 'settings' ].includes( hash ) ) {
 		go( hash, false );
 	} else {
 		go( 'today', false );
