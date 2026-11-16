@@ -818,6 +818,12 @@
     fut, így egybefüggő.
   - Főoldal, kismamatorna-blokk: halványsárga háttér; a kép mögött a zöld helyett tangerine, a sárga helyett halványsárga.
   - Tesztek: 1366/0.
+- **téma 3.11.91:** Olívia 11.16-os doksija, új pont: „itt még nem néznek ki jól a pöttyök” (az Egyéni online órák
+  doboz listája).
+  - A lista saját osztályt kap (`oj-callout__list`), így az oldal általános listastílusa (`.entry ul:not([class])`) nem
+    teszi a pöttyöt a fehér kártya sarkára.
+  - Tangerine pötty finom gyűrűvel, az első sor közepéhez igazítva.
+  - Tesztek: 1366/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

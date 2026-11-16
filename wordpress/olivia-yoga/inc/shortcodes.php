@@ -529,7 +529,8 @@ function oy_private_callout_html( $html ) {
 	return preg_replace_callback( '~(<h2[^>]*\bid="egyeni-orak"[^>]*>.*?</h2>)(.*?)(?=<h2\b|$)~su', function ( $m ) {
 		$cta = '<p class="btn-row oj-callout__cta">' . oy_btn( add_query_arg( 'topic', 'egyeni-joga', oy_private_url() ), 'Időpontot kérek', 'orchid' )
 			. '<a class="text-link" href="' . esc_url( oy_class_url( 'egyeni-online-joga' ) ) . '">Bővebben az egyéni óráról</a></p>';
-		return '<section class="oj-callout oj-callout--one" aria-labelledby="egyeni-orak">' . $m[1] . trim( $m[2] ) . $cta . '</section>' . "\n";
+		$body = preg_replace( '~<ul>~', '<ul class="oj-callout__list">', trim( $m[2] ), 1 ); // its own dots, not the page's list waves (Olívia, 16 November: „itt még nem néznek ki jól a pöttyök”)
+		return '<section class="oj-callout oj-callout--one" aria-labelledby="egyeni-orak">' . $m[1] . $body . $cta . '</section>' . "\n";
 	}, $html, 1 );
 }
 add_filter( 'the_content', 'oy_private_callout', 20 );

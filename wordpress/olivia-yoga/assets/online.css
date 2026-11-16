@@ -1539,12 +1539,12 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .entry .oj-callout::before { content: ""; position: absolute; right: -70px; top: -70px; width: 220px; height: 220px; border-radius: 50%; background: var(--tangerine); opacity: .55; pointer-events: none; }
 .entry .oj-callout > * { position: relative; }
 .entry .oj-callout > h2 { margin-top: 0; max-width: 20ch; }
-.entry .oj-callout > ul { list-style: none; padding: 0; margin: 1rem 0 1.2rem; display: grid; gap: .55rem; }
-.entry .oj-callout > ul > li { position: relative; margin: 0; padding: .7rem 1rem .7rem 2.6rem; border-radius: 16px; background: #fff; line-height: 1.5; }
-.entry .oj-callout > ul > li::before { content: ""; position: absolute; left: 1rem; top: 1.05rem; width: .8rem; height: .8rem; border-radius: 50%; background: var(--tangerine); }
+.entry ul.oj-callout__list { list-style: none; padding: 0; margin: 1rem 0 1.2rem; display: grid; gap: .6rem; }
+.entry ul.oj-callout__list > li { position: relative; margin: 0; padding: .8rem 1.1rem .8rem 2.7rem; border-radius: 16px; background: #fff; line-height: 1.5; box-shadow: 0 10px 24px -20px rgba(7, 38, 36, .5); }
+.entry ul.oj-callout__list > li::before { content: ""; position: absolute; left: 1.1rem; top: calc(.8rem + .75em - 5px); width: 10px; height: 10px; border-radius: 50%; background: var(--tangerine); box-shadow: 0 0 0 4px color-mix(in srgb, var(--tangerine) 30%, transparent); }
 .entry .oj-callout > p:not(.oj-callout__cta) { max-width: 70ch; }
 .entry .oj-callout__cta { display: flex; flex-wrap: wrap; align-items: center; gap: .8rem 1.4rem; margin: 1.4rem 0 0; }
-@media (min-width: 900px) { .entry .oj-callout > ul { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (min-width: 900px) { .entry ul.oj-callout__list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* home, prenatal block: „legyen halvány sárga a háttér”, behind the photo „zöld helyett … tangerine, a sárga helyett a
    halványsárga” */
 .section--pale.oj-prenatal { background: var(--sun-soft); }
