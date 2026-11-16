@@ -3829,6 +3829,47 @@ test( 'terms of sale: the line under the pay buttons links the ÁSZF when the si
 	ok( str_contains( $html, 'href="https://example.test/aszf/"' ) && str_contains( $html, 'általános szerződési feltételeket' ), 'Hungarian line with the link' );
 } );
 
+test( 'customers from Motibro: every column kept, nobody emailed, an existing account keeps what was entered, a second run changes nothing', function () {
+	$mails = 0;
+	$cap   = function ( $r ) use ( &$mails ) {
+		$mails++;
+		return true;
+	};
+	add_filter( 'pre_wp_mail', $cap, 5 );
+	$existing = OYS_Customers::find_or_create( 'mar.itt@example.test', 'Meglévő Vendég' );
+	update_user_meta( $existing, 'oys_phone', '+36 1 111 1111' );
+	$rows = array(
+		array( 'Id' => '900001', 'Vezetéknév' => 'Teszt', 'Keresztnév' => 'Anna', 'Becenév' => 'Panni', 'Email' => 'Teszt.Anna@Example.test', 'Telefonszám' => '6301234567.0', 'Nem' => 'Nő', 'Születési idő' => '1985-03-04 00:00:00', 'Regisztráció időpontja' => '2025.08.29.', 'Első óralátogatás időpontja' => '2025-09-16 19:15:00', 'Utolsó óralátogatás időpontja' => '2026-11-11 18:30:00', 'Megjegyzés' => '', 'Kurzusok' => 'Hatha flow jóga 21. kerület, INGYENES hatha flow jóga', 'Aktív tanfolyamtagság' => '', 'Számlázási név' => 'Teszt Anna', 'Ország' => 'HU', 'Irányítószám' => '3534.0', 'Város' => 'Miskolc', 'Számlázási cím' => 'Fő utca 1.', 'Adószám' => '' ),
+		array( 'Id' => '900002', 'Vezetéknév' => 'Email', 'Keresztnév' => 'Nélküli', 'Email' => '', 'Telefonszám' => '06201234567', 'Regisztráció időpontja' => '2024.01.02.' ),
+		array( 'Id' => '900003', 'Vezetéknév' => 'Vendég', 'Keresztnév' => 'Meglévő', 'Email' => 'mar.itt@example.test', 'Telefonszám' => '06309999999', 'Város' => 'Budapest' ),
+		array( 'Id' => '', 'Vezetéknév' => '', 'Keresztnév' => '', 'Email' => '' ),
+	);
+	$dry = OYS_Import::import( $rows, 'motibro', true );
+	eq( array( 2, 1, 0, 1 ), array( $dry['created'], $dry['updated'], $dry['unchanged'], $dry['skipped'] ), 'check only: 2 new, 1 to fill, 1 empty row skipped' );
+	ok( ! get_user_by( 'email', 'teszt.anna@example.test' ), '… and nothing written' );
+	$res = OYS_Import::import( $rows );
+	eq( array( 2, 1, 0, 1 ), array( $res['created'], $res['updated'], $res['unchanged'], $res['skipped'] ), 'import: 2 created, 1 filled, 1 skipped' );
+	$u = get_user_by( 'email', 'teszt.anna@example.test' );
+	$m = fn( $k ) => (string) get_user_meta( $u->ID, $k, true );
+	ok( $u && in_array( 'oys_customer', $u->roles, true ) && 'Anna' === $u->first_name && 'Teszt' === $u->last_name && 'Panni' === $u->nickname, 'name, nickname, customer role' );
+	eq( array( '06301234567', 'Nő', '1985-03-04', '2025-08-29', '2025-09-16 19:15', '2026-11-11 18:30', 'Hatha flow jóga 21. kerület, INGYENES hatha flow jóga', 'Teszt Anna', 'HU', '3534', 'Miskolc', 'Fő utca 1.', '900001', 'motibro' ), array( $m( 'oys_phone' ), $m( 'oys_gender' ), $m( 'oys_birth_date' ), $m( 'oys_registered' ), $m( 'oys_first_visit' ), $m( 'oys_last_visit' ), $m( 'oys_courses' ), $m( 'oys_billing_name' ), $m( 'oys_billing_country' ), $m( 'oys_billing_zip' ), $m( 'oys_billing_city' ), $m( 'oys_billing_address' ), $m( 'oys_ext_id' ), $m( 'oys_ext_source' ) ), 'every column kept (the phone the export wrote as a decimal back to 06…, the postcode without .0)' );
+	ok( str_starts_with( $u->user_registered, '2025-08-29' ), 'the account is registered on the day of the Motibro registration' );
+	ok( '' === $m( 'oys_marketing' ) && ! OYS_Customers::has_waiver( $u->ID ), 'not subscribed to the newsletter, no agreement marked accepted' );
+	$no = get_users( array( 'meta_key' => 'oys_ext_id', 'meta_value' => '900002', 'fields' => 'all' ) );
+	ok( $no && '' === $no[0]->user_email && 'motibro-900002' === $no[0]->user_login && '06201234567' === get_user_meta( $no[0]->ID, 'oys_phone', true ), 'a guest without an email is kept too' );
+	ok( '+36 1 111 1111' === get_user_meta( $existing, 'oys_phone', true ) && 'Budapest' === get_user_meta( $existing, 'oys_billing_city', true ) && '900003' === get_user_meta( $existing, 'oys_ext_id', true ), 'an existing account keeps its phone, gets the imported data' );
+	$again = OYS_Import::import( $rows );
+	eq( array( 0, 0, 3 ), array( $again['created'], $again['updated'], $again['unchanged'] ), 'the same file again changes nothing' );
+	eq( 0, $mails, 'nobody is emailed' );
+	remove_filter( 'pre_wp_mail', $cap, 5 );
+	$tmp = wp_tempnam( 'x.csv' );
+	file_put_contents( $tmp, "\xEF\xBB\xBFId;Vezetéknév;Keresztnév;Email\n900004;Csv;Elek;csv.elek@example.test\n" );
+	$csv = OYS_Import::read_file( $tmp, 'lista.csv' );
+	unlink( $tmp );
+	eq( array( array( 'Id' => '900004', 'Vezetéknév' => 'Csv', 'Keresztnév' => 'Elek', 'Email' => 'csv.elek@example.test' ) ), $csv, 'a .csv export (semicolons, BOM) is read too' );
+	ok( false !== has_action( 'rest_api_init' ) && class_exists( 'ZipArchive' ), 'the REST route and the .xlsx reader are there' );
+} );
+
 test( 'helpers: money and periods', function () {
 	eq( '$25', oys_money( 2500, 'usd' ), 'whole dollars' );
 	eq( '$25.50', oys_money( 2550, 'usd' ), 'cents' );

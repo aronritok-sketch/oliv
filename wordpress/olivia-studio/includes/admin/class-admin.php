@@ -24,7 +24,7 @@ class OYS_Admin {
 			}
 		} );
 		$actions = array( 'save_session', 'cancel_session', 'roster', 'save_template', 'delete_template', 'generate', 'private_offer', 'private_decline',
-			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'live_test', 'live_test_open', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'smtp_test', 'hpv_register', 'message', 'pay_later_reset', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_delete', 'save_ai' );
+			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'live_test', 'live_test_open', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'smtp_test', 'hpv_register', 'message', 'pay_later_reset', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_delete', 'save_ai', 'import_customers' );
 		foreach ( $actions as $a ) {
 			add_action( 'admin_post_oys_admin_' . $a, array( __CLASS__, 'guard' ) );
 		}
@@ -629,7 +629,9 @@ class OYS_Admin {
 		}
 		self::header( __( 'Customers', 'olivia-studio' ) );
 		$q     = sanitize_text_field( wp_unslash( $_GET['s'] ?? '' ) );
-		$users = get_users( array( 'role__in' => array( 'oys_customer' ), 'search' => $q ? '*' . $q . '*' : '', 'orderby' => 'registered', 'order' => 'DESC', 'number' => 300 ) );
+		$users = get_users( array( 'role__in' => array( 'oys_customer' ), 'search' => $q ? '*' . $q . '*' : '', 'orderby' => 'registered', 'order' => 'DESC', 'number' => 3000 ) );
+		echo '<details class="oys-box"><summary><b>' . esc_html__( 'Import customers (Motibro export, .xlsx or .csv)', 'olivia-studio' ) . '</b></summary><p class="description">' . esc_html__( 'Every column of the export is kept with the customer. Nobody is emailed or subscribed to the newsletter; customers who already have an account keep what they entered, only empty fields are filled. The same file can be imported again safely.', 'olivia-studio' ) . '</p>'
+			. str_replace( '<form ', '<form enctype="multipart/form-data" ', self::form( 'import_customers' ) ) . '<input type="file" name="file" accept=".xlsx,.csv" required> <label><input type="checkbox" name="dry_run" value="1" checked> ' . esc_html__( 'Check only (change nothing)', 'olivia-studio' ) . '</label> <button class="button button-primary">' . esc_html__( 'Import', 'olivia-studio' ) . '</button></form></details>'; // phpcs:ignore
 		echo '<form method="get"><input type="hidden" name="page" value="oys-customers"><p class="search-box"><input type="search" name="s" value="' . esc_attr( $q ) . '"> <button class="button">' . esc_html__( 'Search', 'olivia-studio' ) . '</button></p></form>';
 		echo '<table class="widefat striped oys-table"><thead><tr><th>' . esc_html__( 'Name', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Email', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Phone', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Classes left', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Private left', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Joined', 'olivia-studio' ) . '</th></tr></thead><tbody>';
 		foreach ( $users as $u ) {
@@ -653,6 +655,19 @@ class OYS_Admin {
 			. '<p><b>' . esc_html__( 'Agreement', 'olivia-studio' ) . ':</b> ' . ( OYS_Customers::has_waiver( $user_id ) ? esc_html( sprintf( __( 'accepted %s', 'olivia-studio' ), oys_date( get_user_meta( $user_id, 'oys_waiver_at', true ) ) ) ) : esc_html__( 'not accepted (current version)', 'olivia-studio' ) ) . '</p>'
 			. '<p><b>' . esc_html__( 'Newsletter', 'olivia-studio' ) . ':</b> ' . ( get_user_meta( $user_id, 'oys_marketing', true ) ? esc_html__( 'yes', 'olivia-studio' ) : esc_html__( 'no', 'olivia-studio' ) ) . '</p>'
 			. self::pay_later_status( $user_id ) . '</div>';
+		$imported = array_filter( array_map( fn( $k ) => (string) get_user_meta( $user_id, 'oys_' . $k, true ), array_combine( OYS_Import::FIELDS, OYS_Import::FIELDS ) ), 'strlen' );
+		if ( $imported ) {
+			echo '<div class="oys-box"><h2>' . esc_html__( 'Customer data', 'olivia-studio' ) . '</h2><table class="widefat oys-table"><tbody>';
+			if ( '' !== (string) get_user_meta( $user_id, 'nickname', true ) ) {
+				echo '<tr><th>' . esc_html__( 'Nickname', 'olivia-studio' ) . '</th><td>' . esc_html( get_user_meta( $user_id, 'nickname', true ) ) . '</td></tr>';
+			}
+			foreach ( OYS_Import::labels() as $k => $label ) {
+				if ( isset( $imported[ $k ] ) ) {
+					echo '<tr><th>' . esc_html( $label ) . '</th><td>' . nl2br( esc_html( 'ext_source' === $k ? ucfirst( $imported[ $k ] ) : $imported[ $k ] ) ) . '</td></tr>';
+				}
+			}
+			echo '</tbody></table></div>';
+		}
 
 		echo '<div class="oys-box"><h2>' . esc_html__( 'Passes', 'olivia-studio' ) . '</h2><table class="widefat oys-table"><thead><tr><th>' . esc_html__( 'Pass', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Left', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Expires', 'olivia-studio' ) . '</th><th></th></tr></thead><tbody>';
 		foreach ( OYS_Passes::for_user( $user_id ) as $p ) {
@@ -693,6 +708,21 @@ class OYS_Admin {
 				. self::form( 'pay_later_reset', 'class="oys-inline"' ) . '<input type="hidden" name="user" value="' . (int) $user_id . '"><button class="button button-small">' . esc_html__( 'Allow paying at the studio again', 'olivia-studio' ) . '</button></form>';
 		}
 		return $out . ( $missed ? sprintf( esc_html__( 'allowed (%d missed so far)', 'olivia-studio' ), $missed ) : esc_html__( 'allowed', 'olivia-studio' ) ) . '</p>';
+	}
+
+	private static function do_import_customers() {
+		$f = $_FILES['file'] ?? null; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		if ( ! $f || ! empty( $f['error'] ) || ! is_uploaded_file( $f['tmp_name'] ) ) {
+			self::back( 'oys-customers', array(), __( 'Choose the file to import.', 'olivia-studio' ), 'error' );
+		}
+		$rows = OYS_Import::read_file( $f['tmp_name'], sanitize_file_name( $f['name'] ) );
+		if ( is_wp_error( $rows ) ) {
+			self::back( 'oys-customers', array(), $rows->get_error_message(), 'error' );
+		}
+		$dry = ! empty( $_POST['dry_run'] );
+		$res = OYS_Import::import( $rows, 'motibro', $dry );
+		$msg = sprintf( $dry ? __( 'Check only – nothing changed. Would be created: %1$d, updated: %2$d, unchanged: %3$d, skipped: %4$d.', 'olivia-studio' ) : __( 'Imported. Created: %1$d, updated: %2$d, unchanged: %3$d, skipped: %4$d.', 'olivia-studio' ), $res['created'], $res['updated'], $res['unchanged'], $res['skipped'] );
+		self::back( 'oys-customers', array(), $msg );
 	}
 
 	private static function do_grant_pass() {

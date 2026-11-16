@@ -6098,3 +6098,78 @@ msgstr "Ez egy páros ajándék: egyikőtök váltja be a kódot a fiókjában, 
 
 msgid "What to have ready for the class"
 msgstr "Mire lesz szükséged az órán?"
+
+msgid "Imported from"
+msgstr "Importálva innen"
+
+msgid "ID there"
+msgstr "Azonosító ott"
+
+msgid "Gender"
+msgstr "Nem"
+
+msgid "Date of birth"
+msgstr "Születési idő"
+
+msgid "Registered there"
+msgstr "Regisztráció ott"
+
+msgid "Last class"
+msgstr "Utolsó óra"
+
+msgid "Courses"
+msgstr "Kurzusok"
+
+msgid "Active course membership"
+msgstr "Aktív tanfolyamtagság"
+
+msgid "Billing name"
+msgstr "Számlázási név"
+
+msgid "Country"
+msgstr "Ország"
+
+msgid "Postcode"
+msgstr "Irányítószám"
+
+msgid "City"
+msgstr "Város"
+
+msgid "Billing address"
+msgstr "Számlázási cím"
+
+msgid "Tax number"
+msgstr "Adószám"
+
+msgid "Customer data"
+msgstr "Vendégadatok"
+
+msgid "Nickname"
+msgstr "Becenév"
+
+msgid "Import customers (Motibro export, .xlsx or .csv)"
+msgstr "Vendégek importálása (Motibro-export, .xlsx vagy .csv)"
+
+msgid "Every column of the export is kept with the customer. Nobody is emailed or subscribed to the newsletter; customers who already have an account keep what they entered, only empty fields are filled. The same file can be imported again safely."
+msgstr "Az export minden oszlopa megmarad a vendégnél. Senki nem kap e-mailt, és senki nem kerül fel a hírlevélre. Akinek már van fiókja, annál megmarad, amit megadott, csak az üres mezők töltődnek ki. Ugyanaz a fájl nyugodtan újra importálható."
+
+msgid "Check only (change nothing)"
+msgstr "Csak ellenőrzés (nem változtat semmit)"
+
+msgid "Import"
+msgstr "Importálás"
+
+msgid "Choose the file to import."
+msgstr "Válaszd ki az importálandó fájlt."
+
+msgid "Check only – nothing changed. Would be created: %1$d, updated: %2$d, unchanged: %3$d, skipped: %4$d."
+msgstr "Csak ellenőrzés, semmi nem változott. Új vendég lenne: %1$d, frissülne: %2$d, változatlan: %3$d, kihagyva: %4$d."
+
+msgid "Imported. Created: %1$d, updated: %2$d, unchanged: %3$d, skipped: %4$d."
+msgstr "Kész. Új vendég: %1$d, frissítve: %2$d, változatlan: %3$d, kihagyva: %4$d."
+
+msgid "The file could not be read."
+msgstr "A fájlt nem sikerült beolvasni."
+
+msgid "This server cannot open .xlsx files; save the sheet as .csv and upload that."
+msgstr "Ez a szerver nem tud .xlsx fájlt megnyitni. Mentsd a táblázatot .csv-ként, és azt töltsd fel."

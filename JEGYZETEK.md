@@ -734,6 +734,27 @@
   - A friss domain még nem látszik a keresőkben.
   - Az oliviajoga.hu (ELIN.hu) nem linkel az oliviajoga.online-ra.
   - Tesztek: 1334/0.
+- **olivia-studio 1.11.0 / téma 3.11.85:** Áron: Olívia Motibro-vendéglistája („importáld őket … minden mező feleljen meg
+  a listának”). Új: `includes/class-import.php`.
+  - A Motibro „Vendégek” export mind a 20 oszlopa átjön:
+    - a név, a becenév, az e-mail és a telefon a WordPress és a bővítmény saját mezőibe;
+    - a többi `oys_*` metaként: Motibro-azonosító, nem, születési idő, regisztráció, első és utolsó óra, megjegyzés,
+      kurzusok, tanfolyamtagság, számlázási név, ország, irányítószám, város, cím, adószám.
+    - A fiók regisztrációs dátuma a Motibro-regisztráció napja.
+  - Az admin vendéglapján új „Vendégadatok” doboz mutatja ezeket. A vendéglista 300 helyett 3000 sort mutat.
+  - Az import nem küld e-mailt, nem iratkoztat fel hírlevélre (a listában nincs hozzájárulás), és a részvételi
+    nyilatkozatot sem jelöli elfogadottnak. A vendég a „Elfelejtetted a jelszavad?” úton lép be először.
+  - Meglévő fiók: amit a vendég megadott, megmarad, csak az üres mezők töltődnek ki. Admin vagy menedzser fiókhoz nem
+    nyúl.
+  - E-mail nélküli vendég is bekerül (`motibro-<id>` login).
+  - Az újrafuttatás nem változtat semmin: a Motibro-azonosító alapján megtalálja a vendéget.
+  - Javítás: a Motibro 88 telefonszámot tizedesként exportált („6301234567.0”). Ezek visszakapják a 06-os alakot. Az
+    irányítószámokról lekerül a „.0”.
+  - Két út, a személyes adat egyiken sem megy át a repón:
+    - feltöltés: Stúdió → Vendégek → „Vendégek importálása” (.xlsx vagy .csv, „csak ellenőrzés” móddal);
+    - REST: `POST /wp-json/oys/v1/customers/import` (rows, dry_run; csak `oys_manage` jogosultsággal).
+  - Olívia listája: 286 vendég, 278 e-mail, 271 telefon. A helyi próbafuttatás eredménye: 286 új, 0 kihagyott.
+  - Tesztek: 1347/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
