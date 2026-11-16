@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="<?php echo oy_online_only() ? '#002E2C' : '#2B5036'; ?>">
 <?php // the online edition's palette (Olívia, 15 November: „favicont is cseréld a megfelelő színűre”): Evergreen (#002E2C, the new palette) with a Magenta Bloom circle like the wave of the logo („favicont is igazítsd a jelenlegi színekhez”) ?>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='20' fill='%23<?php echo oy_online_only() ? '002E2C' : '2B5036'; ?>'/%3E%3Ccircle cx='31' cy='16' r='5' fill='%23<?php echo oy_online_only() ? 'E63462' : 'EE3F9A'; ?>'/%3E%3C/svg%3E">
+<?php if ( ! oy_online_only() ) : // the online site's icons are real files (inc/seo.php, get_site_icon_url) ?><link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='20' fill='%23<?php echo oy_online_only() ? '002E2C' : '2B5036'; ?>'/%3E%3Ccircle cx='31' cy='16' r='5' fill='%23<?php echo oy_online_only() ? 'E63462' : 'EE3F9A'; ?>'/%3E%3C/svg%3E"><?php endif; ?>
 <?php wp_head(); ?>
 </head>
 <body <?php body_class( 'lang-' . oy_lang() ); ?>>

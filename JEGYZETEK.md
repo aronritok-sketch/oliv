@@ -755,6 +755,22 @@
     - REST: `POST /wp-json/oys/v1/customers/import` (rows, dry_run; csak `oys_manage` jogosultsággal).
   - Olívia listája: 286 vendég, 278 e-mail, 271 telefon. A helyi próbafuttatás eredménye: 286 új, 0 kihagyott.
   - Tesztek: 1347/0.
+- **olivia-studio 1.12.0 / téma 3.11.86:** élesítés előtti átnézés (Áron: „nézd meg mindent … a telefonszám megadásakor
+  nincs köszönő oldal … mindennek tökéletesnek kell lenni”).
+  - Köszönőoldal (`/koszonjuk/`, noindex): a visszahívás és az üzenet után ide visz, és egy `generate_lead` eseményt
+    küld a dataLayerbe. A migráció egyszer hozza létre (`oy_migrate_1116`, `hpv/hpv.php`).
+  - Az Olíviának menő üzenetértesítő magyar lett („Üzenet a weboldalról”, Név, E-mail, Telefon, Téma).
+  - Favicon: valódi fájlok (32, 512, apple-touch 180) a `get_site_icon_url`-en át. Eddig a `/favicon.ico` a WordPress
+    szürke logójára irányított.
+  - Alapértelmezett megosztási kép (`og-online.jpg`, 1200×630) a saját kép nélküli oldalakon.
+  - Az admin felhasználónév nem szivárog ki:
+    - a `?author=1` a WordPress kanonikus átirányítása előtt a főoldalra visz;
+    - a `/wp/v2/users` bejelentkezés nélkül nem érhető el.
+  - `OYS_Ops`:
+    - X-OYS-Auth fejléc az alkalmazásjelszóhoz, mert a szerver eldobja az Authorization fejlécet;
+    - `GET /wp-json/oys/v1/status`: levelezés, fizetés, oldalak, órarend, cron, debug, keresők; a titkok csak
+      „set” vagy „missing” formában.
+  - Tesztek: 1353/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

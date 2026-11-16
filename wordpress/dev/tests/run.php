@@ -3611,6 +3611,17 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	ok( str_contains( $robots, 'User-agent: OAI-SearchBot' ) && str_contains( $robots, 'User-agent: GPTBot' ) && str_contains( $robots, 'User-agent: ClaudeBot' ) && str_contains( $robots, 'User-agent: Claude-SearchBot' ) && str_contains( $robots, 'User-agent: Google-Extended' ) && str_contains( $robots, 'User-agent: PerplexityBot' ) && ! str_contains( $robots, 'anthropic-ai' ) && str_contains( $robots, '/llms.txt' ), 'robots.txt lets the AI crawlers in by name (OpenAI, Anthropic, Google, Perplexity …) and points to llms.txt' );
 	ok( 'Jógaoktató, pre- és postnatális tréner' === $lgraph[0]['jobTitle'] && 3 === count( $lgraph[0]['hasCredential'] ) && isset( $lgraph[1]['hasOfferCatalog'] ) && ! isset( $lgraph[1]['makesOffer'] ), 'structured data in Hungarian: her real qualifications, the classes as a catalogue of services' );
 	ok( (bool) preg_match( '/^[a-f0-9]{32}$/', oy_indexnow_key() ) && false === oy_indexnow_send( array( home_url( '/' ) ) ) && has_action( 'oy_indexnow_all' ), 'IndexNow: the site has its own key; a local or test copy never announces itself' );
+	update_option( 'oy_edition', 'hu-online' );
+	$icon  = get_site_icon_url( 32 );
+	$thx   = oy_thanks();
+	update_option( 'oy_edition', 'fort-myers' );
+	ok( str_ends_with( $icon, '/assets/img/favicon-online-32.png' ) && is_file( get_template_directory() . '/assets/img/og-online.jpg' ) && is_file( get_template_directory() . '/assets/img/apple-touch-icon-online.png' ), 'the online site has real icon files (not WordPress\'s logo at /favicon.ico) and a 1200×630 share picture' );
+	$was = get_current_user_id();
+	wp_set_current_user( 0 );
+	$eps = apply_filters( 'rest_endpoints', array( '/wp/v2/users' => array(), '/wp/v2/users/(?P<id>[\d]+)' => array(), '/wp/v2/pages' => array() ) );
+	wp_set_current_user( $was );
+	ok( array( '/wp/v2/pages' ) === array_keys( $eps ), 'the REST user list is not public (it showed the login names)' );
+	ok( str_contains( $thx, 'Amíg vársz' ) && str_contains( $thx, 'Vissza a főoldalra' ) && function_exists( 'oy_migrate_1116' ), 'a thank-you page after a call-back request or a message („nincs köszönő oldal”)' );
 	ok( str_contains( $ocss2, '.page-head--sandy { --tone: var(--sandy); }' ) && str_contains( $ocss2, '.page-head--forest { --tone: var(--forest); }' ) && str_contains( $ocss2, '.page-head--tangerine { --tone: var(--tangerine); }' ) && str_contains( $ocss2, '.page-head--forest h1, .page-head--forest .lead { color: #fff; }' ), '… on the Evergreen head the title and the text are white' );
 	ok( str_contains( $ocss2, '.way--lilac { --tone: var(--lilac-soft); }' ) && str_contains( $ocss2, '.page-head--lilac { --tone: var(--lilac-soft); }' ) && ! str_contains( $ocss2, 'rgba(166, 235, 205' ), 'no mint anywhere: the old mint tone is Tangerine Dream, whole cards and heads its light peach („ezeket a kék háttereket hagyjuk el mindenhol, figyelj az új színekre”)' );
 	ok( str_contains( $ocss2, '.oj-hero .hero__visual > .oj-blob:not(.oj-brush) .oj-blob__back { fill: var(--forest); }' ), 'the hero: the back wave behind the photo Evergreen („itt a hátsó hullám még legyen a zöld szín”)' );
@@ -3868,6 +3879,20 @@ test( 'customers from Motibro: every column kept, nobody emailed, an existing ac
 	unlink( $tmp );
 	eq( array( array( 'Id' => '900004', 'Vezetéknév' => 'Csv', 'Keresztnév' => 'Elek', 'Email' => 'csv.elek@example.test' ) ), $csv, 'a .csv export (semicolons, BOM) is read too' );
 	ok( false !== has_action( 'rest_api_init' ) && class_exists( 'ZipArchive' ), 'the REST route and the .xlsx reader are there' );
+} );
+
+test( 'going live: the manager can check the site from outside (X-OYS-Auth, /status), never a secret in the answer', function () {
+	ok( has_filter( 'determine_current_user', array( 'OYS_Ops', 'header_auth' ) ) && 0 === OYS_Ops::header_auth( 0 ), 'the header login is there and does nothing without the header' );
+	$_SERVER['HTTP_X_OYS_AUTH'] = base64_encode( 'nobody:wrong pass' );
+	$_SERVER['HTTPS']           = 'on';
+	$_SERVER['REQUEST_URI']     = '/wp-json/oys/v1/status';
+	eq( 0, OYS_Ops::header_auth( 0 ), 'a wrong application password lets nobody in' );
+	unset( $_SERVER['HTTP_X_OYS_AUTH'], $_SERVER['HTTPS'] );
+	OYS_Settings::update( array( 'stripe_secret_key' => 'sk_test_hidden_123' ) );
+	$st   = OYS_Ops::status();
+	$json = wp_json_encode( $st );
+	OYS_Settings::update( array( 'stripe_secret_key' => '' ) );
+	ok( isset( $st['mail']['smtp'], $st['payments']['provider'], $st['site']['search_engines'], $st['schedule']['upcoming_60_days'], $st['people']['customers'] ) && ! str_contains( (string) $json, 'sk_test_hidden_123' ) && 'set' === $st['settings']['stripe_secret_key'], 'the status: mail, payments, search engines, schedule, customers – keys only as set or missing' );
 } );
 
 test( 'helpers: money and periods', function () {

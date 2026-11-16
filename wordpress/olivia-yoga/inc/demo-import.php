@@ -1681,3 +1681,19 @@ function oy_migrate_online() {
 	update_option( 'oy_online_rev', $rev );
 	return $log;
 }
+
+/**
+ * Áron, 16 November: „a telefonszám megadásakor, mikor visszahívást kérek, nincs köszönő oldal” – the thank-you page of
+ * the online site's requests (/koszonjuk/, not indexed), made once; her edits to it stay.
+ */
+function oy_migrate_1116() {
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1116_rev' ) === '2026-11-16a' ) {
+		return array();
+	}
+	update_option( 'oy_1116_rev', '2026-11-16a' );
+	if ( get_page_by_path( 'koszonjuk' ) ) {
+		return array();
+	}
+	$id = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Köszönöm!', 'post_name' => 'koszonjuk', 'post_content' => '[oy_thanks]', 'comment_status' => 'closed' ) );
+	return $id && ! is_wp_error( $id ) ? array( 'thank-you page' ) : array();
+}

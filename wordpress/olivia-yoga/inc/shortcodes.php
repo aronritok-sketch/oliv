@@ -319,7 +319,7 @@ add_action( 'admin_post_oy_callback', 'oy_handle_callback' );
 function oy_handle_callback() {
 	check_admin_referer( 'oy_callback' );
 	$back = preg_replace( '/#.*$/', '', remove_query_arg( 'oy_called', wp_get_referer() ?: oy_page_link( 'contact' ) ) );
-	$done = fn( $ok ) => wp_safe_redirect( add_query_arg( 'oy_called', $ok ? '1' : '0', $back ) . '#visszahivas' );
+	$done = fn( $ok ) => wp_safe_redirect( $ok && oy_thanks_url( 'visszahivas' ) ? oy_thanks_url( 'visszahivas' ) : add_query_arg( 'oy_called', $ok ? '1' : '0', $back ) . '#visszahivas' );
 	if ( ! empty( $_POST['website'] ) ) {
 		$done( true ); // honeypot: pretend success
 		exit;
@@ -361,10 +361,56 @@ function oy_handle_contact() {
 	$langs = function_exists( 'oys_languages' ) ? oys_languages() : array( 'en' => array( 'name' => 'English' ) );
 	$lang  = sanitize_key( $_POST['lang'] ?? 'en' );
 	$body  = sprintf( "Name: %s\nEmail: %s\nPhone: %s\nTopic: %s\nArea: %s\nLanguage: %s\n\n%s", $name, $email, sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) ), sanitize_key( $_POST['topic'] ?? '' ), sanitize_text_field( wp_unslash( $_POST['area'] ?? '' ) ), $langs[ $lang ]['name'] ?? 'English', $message );
-	$to    = class_exists( 'OYS_Settings' ) ? OYS_Settings::get( 'notify_email' ) : get_option( 'admin_email' );
-	wp_mail( $to, 'Website message: ' . $name, $body, array( 'Reply-To: ' . $name . ' <' . $email . '>' ) );
-	wp_safe_redirect( add_query_arg( 'oy_sent', '1', $back ) . '#book' );
+	$subject = 'Website message: ' . $name;
+	if ( oy_online_only() ) { // Olívia reads it in Hungarian
+		$topics  = oy_contact_topics();
+		$topic   = sanitize_key( $_POST['topic'] ?? '' );
+		$subject = 'Üzenet a weboldalról: ' . $name;
+		$body    = sprintf( "Név: %s\nE-mail: %s\nTelefon: %s\nTéma: %s\n\n%s\n\n(Válaszolj erre a levélre, és az üzenet írójának megy.)", $name, $email, sanitize_text_field( wp_unslash( $_POST['phone'] ?? '' ) ) ?: '–', $topics[ $topic ] ?? '–', $message );
+	}
+	$to = class_exists( 'OYS_Settings' ) ? OYS_Settings::get( 'notify_email' ) : get_option( 'admin_email' );
+	wp_mail( $to, $subject, $body, array( 'Reply-To: ' . $name . ' <' . $email . '>' ) );
+	wp_safe_redirect( oy_thanks_url( 'uzenet' ) ?: add_query_arg( 'oy_sent', '1', $back ) . '#book' );
 	exit;
+}
+
+/**
+ * Áron, 16 November: „a telefonszám megadásakor, mikor visszahívást kérek, nincs köszönő oldal” – on the online site a
+ * request (a call back, a message) ends on its own thank-you page: what happens next, and where to look meanwhile. The
+ * page (/koszonjuk/) is made once by the theme's setup, is not indexed, and fires a „generate_lead” event for analytics.
+ */
+function oy_thanks_url( $type ) {
+	if ( ! oy_online_only() ) {
+		return '';
+	}
+	$page = get_page_by_path( 'koszonjuk' );
+	return $page && 'publish' === $page->post_status ? add_query_arg( 't', sanitize_key( $type ), get_permalink( $page ) ) : '';
+}
+
+function oy_thanks() {
+	$t     = sanitize_key( $_GET['t'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification
+	$texts = array(
+		'visszahivas' => array( 'Megkaptam a telefonszámodat.', 'Hamarosan visszahívlak, általában egy napon belül. Ha addig kérdésed van, írj nyugodtan: ' ),
+		'uzenet'      => array( 'Megkaptam az üzenetedet.', 'Hamarosan válaszolok e-mailben, általában egy napon belül. Ha nem találod a levelemet, nézd meg a spam mappát is, vagy írj ide: ' ),
+	);
+	$x     = $texts[ $t ] ?? array( 'Köszönöm, hogy írtál.', 'Hamarosan jelentkezem. Ha addig kérdésed van: ' );
+	$fb    = function_exists( 'oys_fb_group_url' ) ? oys_fb_group_url() : '';
+	$links = array(
+		array( oy_page_link( 'yoga-classes' ), 'Online órák', 'csoportos flow jóga, egyéni jóga, kismamatorna, stretching, relaxáció' ),
+		array( oy_page_link( 'schedule-pricing' ), 'Bejelentkezés és árak', 'órarend, bérletek, foglalás' ),
+		array( oy_page_link( 'faq' ), 'Gyakori kérdések', 'hogyan működik egy élő online óra' ),
+	);
+	if ( $fb ) {
+		$links[] = array( $fb, 'Facebook-csoportunk', 'beszélgetések, hírek az órákról' );
+	}
+	$list = '';
+	foreach ( $links as $l ) {
+		$list .= '<li><a href="' . esc_url( $l[0] ) . '"><b>' . esc_html( $l[1] ) . '</b></a> – ' . esc_html( $l[2] ) . '</li>';
+	}
+	$event = in_array( $t, array( 'visszahivas', 'uzenet' ), true ) ? '<script>window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:"generate_lead",lead_type:' . wp_json_encode( $t ) . '});</script>' : '';
+	return '<div class="oj-opening oj-opening--sun oj-thanks"><p class="oj-opening__tag">' . esc_html( $x[0] ) . '</p><p>' . esc_html( $x[1] ) . '<a href="mailto:' . esc_attr( OY_EMAIL ) . '">' . esc_html( OY_EMAIL ) . '</a>.</p></div>'
+		. '<h2>Amíg vársz</h2><ul class="oj-thanks__links">' . $list . '</ul>'
+		. '<p>' . oy_btn( home_url( '/' ), 'Vissza a főoldalra' ) . '</p>' . $event;
 }
 
 function oy_btn_row( $html ) {
@@ -382,6 +428,7 @@ add_action( 'init', function () {
 	add_shortcode( 'oy_areas', fn() => oy_areas_list() );
 	add_shortcode( 'oy_breath', fn() => oy_breath() );
 	add_shortcode( 'oy_contact_form', fn() => oy_contact_form() );
+	add_shortcode( 'oy_thanks', fn() => oy_thanks() );
 	add_shortcode( 'oy_moments', fn() => '<div class="block-wide">' . oy_moments_grid() . '</div>' );
 	add_shortcode( 'oy_schedule', fn() => '<div class="block-wide">' . $studio( 'oys_schedule', '<p>' . esc_html__( 'The timetable is coming soon.', 'olivia-yoga' ) . '</p>' ) . oy_replay_note() . oy_cancel_note() . '</div>' );
 	add_shortcode( 'oy_pricing', fn() => '<div class="block-wide">' . $studio( 'oys_pricing', '' ) . '</div>' );

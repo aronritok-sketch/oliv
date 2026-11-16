@@ -50,6 +50,7 @@ add_action( 'hpv_child_setup', function ( $from, $to, $slug ) {
 	$log = array_merge( $log, oy_migrate_doc_1114() ); // her raw journal photos, the prenatal kit „may be needed” (once)
 	$log = array_merge( $log, oy_migrate_1114c() ); // 2015 on her timeline, names for the web copies of her photos (once)
 	$log = array_merge( $log, oy_migrate_1114d() ); // 2018 on her timeline, the general kit list, „charge your device” (once)
+	$log = array_merge( $log, oy_migrate_1116() ); // the thank-you page of the requests (once)
 	kses_remove_filters();
 	$log = array_merge( $log, oy_import_all( false ) );
 	kses_init_filters();

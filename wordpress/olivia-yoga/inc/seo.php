@@ -70,6 +70,10 @@ add_action( 'wp_head', function () {
 	echo '<meta property="og:title" content="' . esc_attr( wp_get_document_title() ) . '"><meta property="og:description" content="' . esc_attr( $desc ) . '"><meta property="og:url" content="' . esc_url( $url ) . '">';
 	if ( is_singular() && has_post_thumbnail() ) {
 		echo '<meta property="og:image" content="' . esc_url( get_the_post_thumbnail_url( null, 'large' ) ) . '">';
+	} elseif ( oy_online_only() ) {
+		// the pages without a photo of their own (home, prices, contact …) share a 1200×630 picture of her, not nothing
+		$og = get_template_directory_uri() . '/assets/img/og-online.jpg';
+		echo '<meta property="og:image" content="' . esc_url( $og ) . '"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630"><meta name="twitter:image" content="' . esc_url( $og ) . '">';
 	}
 	// WordPress writes a canonical only on single pages; the posts page („Jógáról”) and the categories get theirs here (the
 	// sitemap check of 16 November: 5 of its 44 addresses had none)
@@ -150,7 +154,27 @@ add_action( 'template_redirect', function () {
 		wp_safe_redirect( home_url( '/' ), 301 );
 		exit;
 	}
+}, 1 ); // before WordPress's own canonical redirect, which would first show the login name (?author=1 → /author/<login>/)
+
+// The user list of the REST API is not public either (it listed the login names); logged-in editors keep it.
+add_filter( 'rest_endpoints', function ( $endpoints ) {
+	if ( ! is_user_logged_in() ) {
+		unset( $endpoints['/wp/v2/users'], $endpoints['/wp/v2/users/(?P<id>[\d]+)'] );
+	}
+	return $endpoints;
 } );
+
+/**
+ * The online site's icon as real files (search results, home screens, /favicon.ico): the Evergreen circle with the
+ * Magenta Bloom dot. Without a site icon WordPress sent /favicon.ico to its own grey logo.
+ */
+add_filter( 'get_site_icon_url', function ( $url, $size ) {
+	if ( $url || ! oy_online_only() ) {
+		return $url;
+	}
+	$file = $size <= 32 ? 'favicon-online-32.png' : ( $size <= 180 ? 'apple-touch-icon-online.png' : 'favicon-online-512.png' );
+	return get_template_directory_uri() . '/assets/img/' . $file;
+}, 10, 2 );
 
 /**
  * Pages that don't belong in search results: account, booking and checkout-return; on the online site also the booking
@@ -165,6 +189,8 @@ function oy_noindex_page_ids() {
 	if ( oy_online_only() ) {
 		$t     = get_page_by_path( 'teachers' );
 		$ids[] = $t ? (int) $t->ID : 0;
+		$k     = get_page_by_path( 'koszonjuk' ); // the thank-you page after a request
+		$ids[] = $k ? (int) $k->ID : 0;
 	}
 	return array_values( array_filter( $ids ) );
 }
