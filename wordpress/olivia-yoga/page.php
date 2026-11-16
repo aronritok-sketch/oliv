@@ -13,6 +13,8 @@ while ( have_posts() ) :
 	// after paying (?oys_order=…): no big „Foglalás” head over the confirmation – the confirmation itself is the page
 	// (Áron, 16 November: „Nem tetszik” – a coloured band, then the card)
 	$return = oy_online_only() && 'book' === $studio && ! empty( $_GET['oys_order'] ); // phpcs:ignore WordPress.Security.NonceVerification
+	// the account, signed in: the greeting card is the head (Áron, 16 November: „Ez így csúnya nagyon … illeszkedjen mindenhez”)
+	$return = $return || ( oy_online_only() && 'account' === $studio && is_user_logged_in() && empty( $_GET['live'] ) ); // phpcs:ignore WordPress.Security.NonceVerification
 	if ( ! $return ) {
 		echo oy_page_head( get_the_title(), has_excerpt() ? get_the_excerpt() : '', array( array( get_the_title(), get_permalink() ) ), $slug, '', $photo ); // phpcs:ignore
 	}

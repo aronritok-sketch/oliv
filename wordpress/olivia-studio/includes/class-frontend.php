@@ -1241,7 +1241,8 @@ class OYS_Frontend {
 		$online  = OYS_Passes::balance( $user_id, 'online' );
 		$member  = OYS_Memberships::current_for( $user_id );
 		$next    = OYS_Bookings::for_user( $user_id, 'upcoming', array( 'confirmed' ) );
-		$out     = $flash . '<div class="oys-account"><header class="oys-account__head"><div><h2>' . sprintf( esc_html__( 'Hi, %s', 'olivia-studio' ), esc_html( $user->first_name ?: $user->display_name ) ) . '</h2></div><dl class="oys-stats">';
+		// the greeting with „Log out” beside it (not as the last of the tabs: Áron, 16 November – „Ez így csúnya nagyon”)
+		$out     = $flash . '<div class="oys-account"><header class="oys-account__head"><div class="oys-account__hello"><h2>' . sprintf( esc_html__( 'Hi, %s', 'olivia-studio' ), esc_html( $user->first_name ?: $user->display_name ) ) . '</h2><a href="' . esc_url( wp_logout_url( home_url( '/' ) ) ) . '" class="oys-logout">' . esc_html__( 'Log out', 'olivia-studio' ) . '</a></div><dl class="oys-stats">';
 		if ( $member ) {
 			$left = (int) $member->classes_per_period ? OYS_Memberships::remaining( $member ) . ' / ' . (int) $member->classes_per_period : '∞';
 			$out .= '<div class="oys-stat oys-stat--sun"><dt>' . esc_html__( 'Membership', 'olivia-studio' ) . '</dt><dd>' . esc_html( $left ) . '</dd></div>';
@@ -1255,7 +1256,7 @@ class OYS_Frontend {
 		foreach ( $tabs as $k => $label ) {
 			$out .= '<a href="' . esc_url( oys_account_url( $k ) ) . '"' . ( $k === $tab ? ' aria-current="page"' : '' ) . '>' . esc_html( $label ) . '</a>';
 		}
-		$out .= '<a href="' . esc_url( wp_logout_url( home_url( '/' ) ) ) . '" class="oys-logout">' . esc_html__( 'Log out', 'olivia-studio' ) . '</a></nav><div class="oys-account__body">';
+		$out .= '</nav><div class="oys-account__body">';
 		$out .= call_user_func( array( __CLASS__, 'tab_' . $tab ), $user_id );
 		return $out . '</div>' . oys_fb_group_link() . '</div>';
 	}

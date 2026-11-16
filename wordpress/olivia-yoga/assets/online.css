@@ -1607,3 +1607,94 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 	body:has(.tabbar) { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
 }
 
+/* ── The account and the booking screens in the site's look (Áron, 16 November: „Ez így csúnya nagyon. Csináld meg,
+   hogy normális legyen a felhasználói fiók felület. Illeszkedjen mindenhez.”) – no black frames and hard shadows:
+   white cards with soft shadows, rounded like the rest of the site, the palette's colours ── */
+.layout--return { padding-top: clamp(1.2rem, 4vw, 2.6rem); }
+/* the greeting card: Evergreen, the name, „Kilépés”, the numbers */
+.entry .oys-account__head { position: relative; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr); justify-content: stretch; align-items: start; gap: 1.1rem; margin: 0 0 1rem; padding: clamp(1.3rem, 4vw, 2rem); border-radius: 28px; background: var(--forest); color: #fff; }
+.entry .oys-account__head::before { content: ""; position: absolute; right: -56px; top: -64px; width: 150px; height: 150px; border-radius: 50%; background: var(--sun); pointer-events: none; }
+.entry .oys-account__head > * { position: relative; }
+.entry .oys-account__hello { justify-content: space-between; align-items: flex-start; flex-wrap: nowrap; max-width: none; }
+.entry .oys-private-note { font-size: .95rem; font-weight: 500; }
+.entry .oys-account__head h2 { color: #fff; font-size: clamp(2.2rem, 8vw, 3.3rem); line-height: 1; }
+.entry .oys-account__hello .oys-logout { flex: none; margin-top: .2rem; padding: .55rem .9rem; border-radius: 999px; background: rgba(255, 255, 255, .92); color: var(--forest); font-size: .7rem; text-decoration: none; }
+.entry .oys-account__hello .oys-logout:hover { background: #fff; color: var(--orchid); }
+.entry .oys-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: .6rem; width: 100%; max-width: none; margin: 0; }
+.entry .oys-stat { min-width: 0; padding: .85rem 1rem .9rem; border: 0; border-radius: 18px; background: rgba(255, 255, 255, .1); }
+.entry .oys-stat dt { display: flex; align-items: center; gap: .45rem; color: rgba(255, 255, 255, .78); font-size: .66rem; line-height: 1.3; }
+.entry .oys-stat dt::before { content: ""; flex: none; width: 8px; height: 8px; border-radius: 50%; background: var(--tangerine); }
+.entry .oys-stat--pink dt::before { background: var(--orchid); }
+.entry .oys-stat--sun dt::before { background: var(--sun); }
+.entry .oys-stat dd { margin-top: .35rem; color: #fff; font-size: 2.5rem; }
+/* the tabs: one row, sideways on a phone */
+.entry .oys-account__nav { display: flex; flex-wrap: nowrap; gap: .3rem; overflow-x: auto; margin: 0 0 1.8rem; padding: .35rem; border: 0; border-radius: 999px; background: #fff; box-shadow: 0 14px 30px -24px rgba(0, 46, 44, .55); scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.entry .oys-account__nav::-webkit-scrollbar { display: none; }
+.entry .oys-account__nav a { flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 1.05rem; border: 0; border-radius: 999px; color: var(--forest); font-size: .74rem; white-space: nowrap; }
+.entry .oys-account__nav a:hover { border: 0; background: var(--paper); color: var(--forest); }
+.entry .oys-account__nav a[aria-current="page"] { background: var(--forest); color: #fff; }
+.entry .oys-account__nav .oys-logout { display: none; }
+/* the content of the tabs */
+@media (min-width: 760px) { .entry .oys-stats { grid-template-columns: repeat(auto-fill, minmax(170px, 230px)); } }
+.entry .oys-account__body { overflow: visible; padding: 0; }
+.entry .oys-account__body h3 { margin: 2rem 0 .9rem; font-size: clamp(1.35rem, 1.15rem + .9vw, 1.8rem); }
+.entry .oys-account__body h3:first-child { margin-top: 0; }
+.entry .oys-list { display: grid; gap: .75rem; border-top: 0; }
+.entry .oys-item { padding: 1rem 1.1rem; border: 0; border-radius: 22px; background: #fff; box-shadow: 0 18px 34px -30px rgba(0, 46, 44, .65); }
+.entry .oys-item__when { width: 62px; height: 66px; border-radius: 16px; background: var(--sun-soft); }
+.entry .oys-item__when b { color: var(--forest); }
+.entry .oys-item__when span { color: var(--orchid); }
+.entry .oys-item__main h4 { font-size: 1.08rem; line-height: 1.3; }
+.entry .oys-item__main h4 .badge { margin-left: .2rem; }
+.entry .oys-item__actions .btn { min-height: 40px; }
+.entry .oys-policy { margin: 1.4rem 0 0; padding: 1rem 1.15rem; border: 0; border-radius: 18px; background: var(--sun-soft); color: var(--forest); }
+.entry .oys-empty { padding: 1.1rem 1.2rem; border-radius: 18px; background: #fff; }
+.entry .oys-passes { gap: .75rem; }
+.entry .oys-pass { border: 0; border-radius: 22px; background: #fff; box-shadow: 0 18px 34px -30px rgba(0, 46, 44, .65); }
+.entry .oys-pass--private { background: var(--sun-soft); }
+.entry .oys-pass.is-done { background: var(--paper); box-shadow: none; }
+.entry .oys-meter { height: 8px; border: 0; background: var(--paper); }
+.entry .oys-meter span { background: var(--orchid); border-radius: 99px; }
+.entry .oys-buy li { border-bottom: 1px solid var(--line); }
+.entry .oys-account__body .oys-table { border-collapse: separate; border-spacing: 0; overflow: hidden; border-radius: 20px; background: #fff; box-shadow: 0 18px 34px -30px rgba(0, 46, 44, .65); }
+.entry .oys-account__body .oys-table th { padding: .9rem .8rem .7rem 1rem; border-bottom: 1px solid var(--line); }
+.entry .oys-account__body .oys-table td { padding: .85rem .8rem .85rem 1rem; border-bottom: 1px solid var(--line); }
+.entry .oys-account__body .oys-table tr:last-child td { border-bottom: 0; }
+@media (max-width: 640px) { .entry .oys-account__body { overflow-x: auto; } }
+/* cards, choices and notes everywhere in the booking screens */
+.entry .oys-card { border: 0; border-radius: 24px; background: #fff; box-shadow: 0 26px 54px -44px rgba(0, 46, 44, .65); }
+.entry .oys-summary { background: var(--sun-soft); box-shadow: none; }
+.entry .oys-facts { border-top: 1px solid color-mix(in srgb, var(--forest) 18%, transparent); }
+.entry .oys-option, .entry .oys-mode { border: 1.5px solid color-mix(in srgb, var(--forest) 16%, transparent); border-radius: 18px; background: #fff; box-shadow: none; }
+.entry .oys-option:hover, .entry .oys-mode:hover { border-color: color-mix(in srgb, var(--forest) 35%, transparent); background: #fff; }
+.entry .oys-option:has(input:checked) { border-color: var(--orchid); background: color-mix(in srgb, var(--tangerine) 18%, #fff); box-shadow: none; }
+.entry .oys-option input { accent-color: var(--orchid); }
+.entry .oys-mode.is-active { border-color: var(--forest); background: var(--forest); box-shadow: none; }
+.entry .oys-membership { background: var(--sun-soft); box-shadow: none; }
+.entry .oys-notice { border: 0; border-radius: 18px; background: var(--sun-soft); color: var(--forest); }
+.entry .oys-notice--error { background: var(--pink-soft); }
+.entry .oys-guests, .entry .oys-waiver { border: 0; border-radius: 18px; background: var(--paper); }
+.entry .oys-guests { padding: 1rem 1.1rem 1.1rem; }
+.entry .oys-guests legend { float: left; width: 100%; margin: 0 0 .2rem; padding: 0; }
+.entry .oys-guests legend + * { clear: both; }
+.entry .oys-option__price { font-size: 1.3rem; line-height: 1.1; text-align: right; }
+@media (max-width: 560px) {
+	.entry .oys-option { grid-template-columns: auto minmax(0, 1fr); }
+	.entry .oys-option__price { grid-column: 2; text-align: left; }
+}
+.entry .oys-guestrow__remove { border: 1.5px solid color-mix(in srgb, var(--forest) 25%, transparent); border-radius: 12px; }
+.entry .oys-guestlist li { border-radius: 12px; background: var(--paper); }
+.entry .oys-guestlist li:nth-child(even) { background: var(--sun-soft); }
+.entry .oys-amount span { border: 1.5px solid color-mix(in srgb, var(--forest) 22%, transparent); }
+.entry .oys-amount input:checked + span { border-color: var(--orchid); background: color-mix(in srgb, var(--tangerine) 22%, #fff); box-shadow: none; }
+.entry .oys-due { border: 0; border-radius: 14px; background: var(--sun-soft); }
+.entry .oys-tabs__nav { display: inline-flex; flex-wrap: nowrap; gap: .3rem; padding: .35rem; border-radius: 999px; background: var(--paper); }
+.entry .oys-tabs__nav button { min-height: 44px; border: 0; color: var(--forest); }
+.entry .oys-tabs__nav button[aria-selected="true"] { background: var(--forest); color: #fff; }
+/* the Facebook group: one soft line, like on the confirmation */
+.entry .oys-fb a { display: flex; align-items: center; gap: .85rem; max-width: 640px; padding: .9rem 1rem; border-radius: 18px; background: color-mix(in srgb, var(--tangerine) 22%, #fff); color: var(--forest); font-weight: 600; font-size: .95rem; line-height: 1.4; text-decoration: none; }
+.entry .oys-fb a:hover { background: color-mix(in srgb, var(--tangerine) 38%, #fff); color: var(--forest); }
+.entry .oys-fb .oys-icon:first-child { width: 38px; height: 38px; padding: 8px; background: var(--forest); color: #fff; stroke: #fff; }
+.entry .oys-fb span { flex: 1; }
+.entry .oys-account > .oys-fb { margin-top: 2rem; }
+

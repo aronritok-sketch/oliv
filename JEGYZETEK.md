@@ -848,6 +848,19 @@
   - A menüsoron megmaradt a `data-action-bar` attribútum, így a sütisáv és a foglalás-gomb régi szabályai is
     működnek. Az élő óra teljes képernyős nézete fölötte van.
   - Tesztek: 1368/0.
+- **olivia-studio 1.12.2 + téma 3.11.94:** a fiók és a foglalási képernyők az oldal stílusában (Áron: „Ez így csúnya
+  nagyon. Csináld meg, hogy normális legyen a felhasználói fiók felület. Illeszkedjen mindenhez.”).
+  - Fiók, bejelentkezve: nincs nagy „Fiókom” fejléc. Helyette Evergreen üdvözlő kártya: „Szia, …”, mellette
+    „Kilépés”, alatta áttetsző számkártyák (bérlet, közelgő), színes pöttyel.
+  - A „Kilépés” a köszönés mellé került, már nem a fülek közt van. A fülek egy sorban vannak, telefonon oldalra
+    görgethetők, és a nyitott fül magától a látható részre gördül (`site.js`).
+  - A listák, bérletek, táblázatok, üres állapotok és a lemondási feltétel fehér vagy halványsárga, kerek kártyák lettek,
+    puha árnyékkal. A dátumdoboz halványsárga.
+  - Minden foglalási képernyőn (`.oys-card`, összegző, fizetési módok, vendégek, nyilatkozat, figyelmeztetések, összeg
+    választó, regisztráció/belépés fülek) eltűnt a fekete keret és a kemény árnyék. A Facebook-sor mindenhol az új
+    stílusban van.
+  - Telefonon a fizetési módnál az ár a szöveg alá kerül. A „Hozol barátokat?” felirat a dobozon belül van.
+  - Tesztek: 1369/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

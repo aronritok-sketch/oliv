@@ -68,6 +68,8 @@
 /* Account */
 .oys-account__head { display: flex; flex-wrap: wrap; gap: 1.25rem 2rem; justify-content: space-between; align-items: end; margin-bottom: 1.5rem; }
 .oys-account__head h2 { margin: 0; }
+.oys-account__hello { display: flex; flex-wrap: wrap; gap: .4rem 1.2rem; align-items: baseline; }
+.oys-account__hello .oys-logout { font-size: .8rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--oys-muted); }
 .oys-stats { display: flex; gap: .75rem; margin: 0; flex-wrap: wrap; }
 .oys-stat { border: 2px solid var(--oys-ink); border-radius: 6px; padding: .7rem 1rem; min-width: 130px; background: var(--oys-lilac); }
 .oys-stat--pink { background: var(--oys-pink); }
