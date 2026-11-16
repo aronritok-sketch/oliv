@@ -382,7 +382,16 @@ test( 'membership: renewal invoice recorded once as a payment', function () {
 	ok( in_array( 'past_due', OYS_Memberships::BOOKABLE, true ), 'past due members can still book while Stripe retries' );
 } );
 
-test( 'waitlist: a member is moved in when a seat opens', function () {
+test( 'waitlist, automatic move-in switched on: a member is moved in when a seat opens', function () {
+	OYS_Settings::update( array( 'waitlist_auto' => 1 ) );
+	try {
+		waitlist_member_moved_in();
+	} finally {
+		OYS_Settings::update( array( 'waitlist_auto' => 0 ) );
+	}
+} );
+
+function waitlist_member_moved_in() {
 	$s     = make_session( array( 'capacity' => 1 ) );
 	$first = make_user();
 	OYS_Passes::grant( $first, array( 'credits' => 1 ) );
@@ -394,7 +403,7 @@ test( 'waitlist: a member is moved in when a seat opens', function () {
 	$in = OYS_Bookings::active_for( $member, $s->id );
 	ok( $in && 'membership' === $in->paid_with, 'member booked from the waitlist with the membership' );
 	eq( 0, OYS_Bookings::waitlist_position( $member, $s->id ), 'removed from the waitlist' );
-} );
+}
 
 test( 'gift card: redeem once', function () {
 	global $wpdb;
@@ -4031,6 +4040,79 @@ test( 'helpers: money and periods', function () {
 	eq( 2550, oys_cents_from_input( '$25.50' ), 'parse input' );
 	eq( 'per month', OYS_Products::period_label( array( 'interval' => 'month', 'interval_count' => 1 ) ), 'monthly label' );
 	eq( 'every 3 months', OYS_Products::period_label( array( 'interval' => 'month', 'interval_count' => 3 ) ), 'quarterly label' );
+} );
+
+test( 'Olivia, 16 November: a spot from the waitlist is not booked in by itself – everyone gets an email, first to book gets it', function () {
+	eq( 0, (int) OYS_Settings::get( 'waitlist_auto' ), 'by default no automatic move-in' );
+	ok( ! OYS_Email_Templates::in_use( 'waitlist_promoted' ) && OYS_Email_Templates::in_use( 'waitlist_spot_open' ), 'the Emails page shows only the „a spot opened” email' );
+	$s     = make_session( array( 'capacity' => 1 ) );
+	$first = make_user( 'Elso' );
+	OYS_Passes::grant( $first, array( 'credits' => 1 ) );
+	$bid    = OYS_Bookings::book_with_credit( $first, $s, false );
+	$member = make_user( 'Tag' );
+	make_membership( $member, 0 );
+	$holder = make_user( 'Berletes' );
+	OYS_Passes::grant( $holder, array( 'credits' => 5 ) );
+	$plain = make_user( 'Sima' );
+	foreach ( array( $member, $holder, $plain ) as $u ) {
+		OYS_Bookings::join_waitlist( $u, $s->id );
+	}
+	$_GET['session'] = (int) $s->id;
+	wp_set_current_user( $plain );
+	try {
+		$html = OYS_Frontend::sc_book();
+	} finally {
+		wp_set_current_user( 0 );
+		unset( $_GET['session'] );
+	}
+	ok( str_contains( $html, 'on the waitlist. When a spot opens, we email everyone on the waitlist straight away, and whoever books first gets it.' ) && ! str_contains( $html, 'booked in automatically' ), 'the booking page says so (no „booked in automatically”)' );
+	$log  = sent_mails( fn() => OYS_Bookings::cancel( $bid, array( 'notify' => false ) ) );
+	ok( ! OYS_Bookings::active_for( $member, $s->id ) && ! OYS_Bookings::active_for( $holder, $s->id ), 'nobody is booked in by themselves (not the member, not the pass holder)' );
+	eq( 1, OYS_Schedule::spots_left( OYS_Schedule::get( $s->id ) ), 'the spot stays free' );
+	$to = array_map( fn( $m ) => is_array( $m['to'] ) ? implode( ',', $m['to'] ) : $m['to'], $log );
+	sort( $to );
+	$want = array_map( fn( $u ) => get_userdata( $u )->user_email, array( $member, $holder, $plain ) );
+	sort( $want );
+	eq( $want, $to, 'all three on the waitlist get the email' );
+	ok( str_contains( $log[0]['html'] ?? '', esc_url( oys_book_url( $s->id ) ) ) && str_contains( $log[0]['html'] ?? '', 'Book now' ), 'with a button to book the class' );
+	eq( 3, count( OYS_Bookings::waitlist( $s->id ) ), 'everyone stays on the waitlist until they book' );
+	ok( ! is_wp_error( OYS_Bookings::book_with_credit( $holder, OYS_Schedule::get( $s->id ), false ) ), 'the first to book gets the spot' );
+	eq( 0, OYS_Bookings::waitlist_position( $holder, $s->id ), 'and leaves the waitlist' );
+	ok( is_wp_error( OYS_Bookings::book_with_membership( $member, OYS_Schedule::get( $s->id ), false ) ), 'the next one is too late: the class is full again' );
+	$again = sent_mails( fn() => OYS_Schedule::release_seats( $s->id, 0 ) );
+	eq( 0, count( $again ), 'no second email to the same people within a quarter of an hour' );
+	OYS_Settings::update( array( 'waitlist_auto' => 1 ) );
+	ok( OYS_Email_Templates::in_use( 'waitlist_promoted' ), 'switched on in Settings: the „moved in” email is back on the Emails page' );
+	OYS_Settings::update( array( 'waitlist_auto' => 0 ) );
+} );
+
+test( 'Olivia, 16 November: the pass extension when the studio cancels is a default – a private client can have their own number', function () {
+	$default = make_user( 'Alap' );
+	$own     = make_user( 'Sajat' );
+	$none    = make_user( 'Nulla' );
+	update_user_meta( $own, 'oys_cancel_extend_days', 14 );
+	update_user_meta( $none, 'oys_cancel_extend_days', 0 );
+	eq( 7, OYS_Passes::cancel_extend_days_for( $default ), 'nothing set: the default (7)' );
+	eq( 14, OYS_Passes::cancel_extend_days_for( $own ), 'their own number' );
+	eq( 0, OYS_Passes::cancel_extend_days_for( $none ), '0: no extension for them' );
+	$run = function ( $u ) {
+		$s    = make_session( array( 'kind' => 'private', 'capacity' => 1 ) );
+		$pass = OYS_Passes::get( OYS_Passes::grant( $u, array( 'product_id' => 'p', 'name' => 'private', 'kind' => OYS_Bookings::credit_kind( $s ), 'credits' => 5, 'validity_days' => 56, 'order_id' => 0, 'source' => 'purchase' ) ) );
+		$b    = OYS_Bookings::book_with_credit( $u, $s, false );
+		ok( ! is_wp_error( $b ), 'booked with the private pass' );
+		OYS_Schedule::cancel_session( $s->id, 'test' );
+		return (int) round( ( oys_ts( OYS_Passes::get( $pass->id )->expires_at ) - oys_ts( $pass->expires_at ) ) / DAY_IN_SECONDS );
+	};
+	eq( 7, $run( $default ), 'the studio cancels: 7 days longer by default' );
+	eq( 14, $run( $own ), 'with their own number: 14 days longer' );
+	eq( 0, $run( $none ), 'with 0: not extended' );
+	OYS_Settings::update( array( 'cancel_extend_days' => 0 ) );
+	try {
+		eq( 14, $run( $own ), 'the default switched off: their own number still counts' );
+		eq( 0, $run( $default ), 'and the others get nothing' );
+	} finally {
+		OYS_Settings::update( array( 'cancel_extend_days' => 7 ) );
+	}
 } );
 
 $t = $GLOBALS['oys_t'];

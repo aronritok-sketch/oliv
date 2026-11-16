@@ -175,14 +175,14 @@ class OYS_Passes {
 	 * le, az érvényesség kitolódik”. Returns how many passes were extended.
 	 */
 	public static function extend_for_cancelled( $session ) {
-		$days = (int) OYS_Settings::get( 'cancel_extend_days' );
-		if ( $days <= 0 || ! $session || ! $session->credits_allowed ) {
+		if ( ! $session || ! $session->credits_allowed ) {
 			return 0;
 		}
+		$days = (int) OYS_Settings::get( 'cancel_extend_days' );
 		if ( 'private' === $session->kind ) {
 			return self::extend_private_for_cancelled( $session, $days );
 		}
-		if ( ! in_array( $session->kind, array( 'group', 'event' ), true ) ) {
+		if ( $days <= 0 || ! in_array( $session->kind, array( 'group', 'event' ), true ) ) {
 			return 0;
 		}
 		$kinds = 'online' === $session->format ? array( 'online', 'class' ) : ( 'hybrid' === $session->format ? array( 'class', 'online' ) : array( 'class' ) );
@@ -198,22 +198,32 @@ class OYS_Passes {
 
 	/**
 	 * The studio cancelled a private session (Olivia, 13 November: „Oktatói lemondás esetén 1 héttel hosszabb
-	 * érvényesség” on the one-to-one passes too): the booked person's passes of that kind run that many days longer.
+	 * érvényesség” on the one-to-one passes too): the booked person's passes of that kind run longer, by the client's
+	 * own number of days if one is set on their customer page, else by the default.
 	 */
-	private static function extend_private_for_cancelled( $session, $days ) {
-		$users = array_unique( array_map( fn( $b ) => (int) $b->user_id, OYS_Bookings::for_session( $session->id ) ) );
-		$users = array_filter( $users );
-		if ( ! $users ) {
-			return 0;
-		}
+	private static function extend_private_for_cancelled( $session, $default ) {
+		$users = array_filter( array_unique( array_map( fn( $b ) => (int) $b->user_id, OYS_Bookings::for_session( $session->id ) ) ) );
 		global $wpdb;
-		$t   = OYS_Install::table( 'passes' );
-		$in  = implode( ',', array_fill( 0, count( $users ), '%d' ) );
-		$sql = $wpdb->prepare(
-			"UPDATE $t SET expires_at = DATE_ADD(expires_at, INTERVAL %d DAY) WHERE kind = %s AND user_id IN ($in) AND credits_left > 0 AND expires_at IS NOT NULL AND expires_at > %s", // phpcs:ignore
-			array_merge( array( $days, OYS_Bookings::credit_kind( $session ) ), $users, array( oys_now() ) )
-		);
-		return (int) $wpdb->query( $sql ); // phpcs:ignore
+		$t = OYS_Install::table( 'passes' );
+		$n = 0;
+		foreach ( $users as $user_id ) {
+			$days = self::cancel_extend_days_for( $user_id, $default );
+			if ( $days <= 0 ) {
+				continue;
+			}
+			$n += (int) $wpdb->query( $wpdb->prepare( "UPDATE $t SET expires_at = DATE_ADD(expires_at, INTERVAL %d DAY) WHERE kind = %s AND user_id = %d AND credits_left > 0 AND expires_at IS NOT NULL AND expires_at > %s", $days, OYS_Bookings::credit_kind( $session ), $user_id, oys_now() ) ); // phpcs:ignore
+		}
+		return $n;
+	}
+
+	/**
+	 * How many days longer a private client's passes run when the studio cancels their session: their own number
+	 * (user meta `oys_cancel_extend_days`, set on the customer page) or the default setting. Olivia, 16 November:
+	 * „ez a rész legyen csak alapértelmezett és tudjam beállítani az egyéni óra vendégeinél.”
+	 */
+	public static function cancel_extend_days_for( $user_id, $default = null ) {
+		$own = (string) get_user_meta( (int) $user_id, 'oys_cancel_extend_days', true );
+		return '' === $own ? (int) ( $default ?? OYS_Settings::get( 'cancel_extend_days' ) ) : max( 0, (int) $own );
 	}
 
 	/** Give a credit back. If the original pass has expired, the credit comes back as a fresh 30-day credit. */

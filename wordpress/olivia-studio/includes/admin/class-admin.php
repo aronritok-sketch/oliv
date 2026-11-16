@@ -24,7 +24,7 @@ class OYS_Admin {
 			}
 		} );
 		$actions = array( 'save_session', 'cancel_session', 'roster', 'save_template', 'delete_template', 'generate', 'private_offer', 'private_decline',
-			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'live_test', 'live_test_open', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'smtp_test', 'hpv_register', 'message', 'pay_later_reset', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_delete', 'save_ai', 'import_customers' );
+			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'live_test', 'live_test_open', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'smtp_test', 'hpv_register', 'message', 'pay_later_reset', 'customer_extend', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_delete', 'save_ai', 'import_customers' );
 		foreach ( $actions as $a ) {
 			add_action( 'admin_post_oys_admin_' . $a, array( __CLASS__, 'guard' ) );
 		}
@@ -428,6 +428,14 @@ class OYS_Admin {
 		self::back( 'oys-schedule', array( 'session' => $session_id ), is_wp_error( $res ) ? $res->get_error_message() : sprintf( _n( 'Message sent to %d person.', 'Message sent to %d people.', $res, 'olivia-studio' ), $res ) );
 	}
 
+	/** Customer page: their own pass extension when the studio cancels their private session (empty = the default). */
+	private static function do_customer_extend() {
+		$user_id = (int) $_POST['user'];
+		$days    = trim( (string) wp_unslash( $_POST['days'] ?? '' ) );
+		'' === $days ? delete_user_meta( $user_id, 'oys_cancel_extend_days' ) : update_user_meta( $user_id, 'oys_cancel_extend_days', max( 0, (int) $days ) );
+		self::back( 'oys-customers', array( 'user' => $user_id ), __( 'Saved.', 'olivia-studio' ) );
+	}
+
 	private static function do_pay_later_reset() {
 		$user_id = (int) $_POST['user'];
 		update_user_meta( $user_id, 'oys_pay_later_reset', oys_now() );
@@ -677,7 +685,13 @@ class OYS_Admin {
 		echo '</tbody></table><h3>' . esc_html__( 'Give classes', 'olivia-studio' ) . '</h3>' . self::form( 'grant_pass', 'class="oys-inline-form"' ) . '<input type="hidden" name="user" value="' . (int) $user_id . '">' // phpcs:ignore
 			. '<select name="kind"><option value="class">' . esc_html__( 'Group classes', 'olivia-studio' ) . '</option><option value="private">' . esc_html__( 'Private sessions', 'olivia-studio' ) . '</option></select> '
 			. '<input type="number" name="credits" min="1" value="1" class="small-text"> ' . esc_html__( 'valid for', 'olivia-studio' ) . ' <input type="number" name="days" min="1" value="90" class="small-text"> ' . esc_html__( 'days', 'olivia-studio' )
-			. ' <input name="name" placeholder="' . esc_attr__( 'Label, e.g. Paid in cash', 'olivia-studio' ) . '"> <button class="button button-primary">' . esc_html__( 'Add', 'olivia-studio' ) . '</button></form></div></div>';
+			. ' <input name="name" placeholder="' . esc_attr__( 'Label, e.g. Paid in cash', 'olivia-studio' ) . '"> <button class="button button-primary">' . esc_html__( 'Add', 'olivia-studio' ) . '</button></form>';
+		// Olivia, 16 November: the default pass extension (Settings), and her own number for a private client.
+		$own = (string) get_user_meta( $user_id, 'oys_cancel_extend_days', true );
+		echo '<h3 id="extend">' . esc_html__( 'If you cancel their private session', 'olivia-studio' ) . '</h3>' . self::form( 'customer_extend', 'class="oys-inline-form"' ) . '<input type="hidden" name="user" value="' . (int) $user_id . '">' // phpcs:ignore
+			. sprintf( esc_html__( 'their private passes are valid longer by %s days', 'olivia-studio' ), '<input type="number" name="days" min="0" class="small-text" value="' . esc_attr( $own ) . '" placeholder="' . (int) OYS_Settings::get( 'cancel_extend_days' ) . '">' )
+			. ' <button class="button">' . esc_html__( 'Save', 'olivia-studio' ) . '</button>'
+			. '<p class="description">' . sprintf( esc_html__( 'Empty = the default (%d days, in Settings). 0 = no extension.', 'olivia-studio' ), (int) OYS_Settings::get( 'cancel_extend_days' ) ) . '</p></form></div></div>';
 
 		$ms = OYS_Memberships::for_user( $user_id );
 		if ( $ms ) {
@@ -988,14 +1002,17 @@ class OYS_Admin {
 			'cancel_extend_days'    => __( 'When the studio cancels a class, passes are valid longer by (days, 0 = off)', 'olivia-studio' ),
 			'booking_window_days'   => __( 'Show classes this many days ahead', 'olivia-studio' ),
 			'booking_close_minutes' => __( 'Online booking closes (minutes before start)', 'olivia-studio' ),
-			'waitlist_cutoff_hours' => __( 'Waitlist stops moving people in (hours before start)', 'olivia-studio' ),
 			'weeks_ahead'           => __( 'Create weekly classes this many weeks ahead', 'olivia-studio' ),
 			'hold_minutes'          => __( 'Hold a spot during card payment (minutes, 30 or more)', 'olivia-studio' ),
 			'max_guests'            => __( 'Guests a customer can bring per booking (0 = off)', 'olivia-studio' ),
 		);
 		foreach ( $nums as $k => $l ) {
-			echo '<tr><th>' . esc_html( $l ) . '</th><td>' . $f( $k, 'number', 'small-text', 'min="0"' ) . '</td></tr>'; // phpcs:ignore
+			echo '<tr><th>' . esc_html( $l ) . '</th><td>' . $f( $k, 'number', 'small-text', 'min="0"' ) . ( 'cancel_extend_days' === $k ? '<p class="description">' . esc_html__( 'The default. For a private client you can set another number on their customer page.', 'olivia-studio' ) . '</p>' : '' ) . '</td></tr>'; // phpcs:ignore
 		}
+		// Olivia, 16 November: no automatic move-in from the waitlist, an email to everyone, first to book gets the spot.
+		echo '<tr><th>' . esc_html__( 'Waitlist', 'olivia-studio' ) . '</th><td><label><input type="hidden" name="s[waitlist_auto]" value="0"><input type="checkbox" name="s[waitlist_auto]" value="1"' . checked( 1, (int) $s['waitlist_auto'], false ) . '> ' . esc_html__( 'Book people with a pass or membership in by themselves when a spot opens', 'olivia-studio' ) . '</label>'
+			. '<p class="description">' . esc_html__( 'Off: everyone on the waitlist gets an email with a button to book, and whoever books first gets the spot.', 'olivia-studio' ) . '</p>'
+			. '<p>' . sprintf( esc_html__( 'When it is on, this stops %s hours before the start.', 'olivia-studio' ), $f( 'waitlist_cutoff_hours', 'number', 'small-text', 'min="0"' ) ) . '</p></td></tr>'; // phpcs:ignore
 		echo '</table><h2 id="pay-later">' . esc_html__( 'Paying at the studio and donations', 'olivia-studio' ) . '</h2><table class="form-table">';
 		echo '<tr><th>' . esc_html__( 'Who can book now and pay at the studio', 'olivia-studio' ) . '</th><td><select name="s[pay_later]">'
 			. '<option value="all"' . selected( $s['pay_later'], 'all', false ) . '>' . esc_html__( 'Everyone', 'olivia-studio' ) . '</option>'

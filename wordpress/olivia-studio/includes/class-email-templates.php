@@ -44,7 +44,7 @@ class OYS_Email_Templates {
 				'Changed: {class}, {day} {date_short}, {time}', 'Your class has changed', "Hi {first_name}, there's a change to your class. Your spot is kept, nothing to do if the new details work for you.", "Can't make the new time? Cancel in your account and your class goes back on your pass (or you get a class credit).", 'My bookings' ),
 			'waitlist_promoted' => array( __( 'Moved in from the waitlist', 'olivia-studio' ), 'bookings', 'customer', __( 'When a spot opens and someone with a pass or membership is booked in automatically', 'olivia-studio' ),
 				"You're in: {class}, {date_short}", "You're off the waitlist", "Good news: a spot opened up and you're in. {how}", "Can't make it after all? Cancel from your account so the next person can come.", 'Manage booking', array( 'how' ) ),
-			'waitlist_spot_open' => array( __( 'A spot opened (waitlist)', 'olivia-studio' ), 'bookings', 'customer', __( "When a spot opens for someone on the waitlist who can't be booked in automatically", 'olivia-studio' ),
+			'waitlist_spot_open' => array( __( 'A spot opened (waitlist)', 'olivia-studio' ), 'bookings', 'customer', __( 'When a spot opens: to those on the waitlist, and whoever books first gets it', 'olivia-studio' ),
 				'A spot opened: {class}, {date_short}', 'A spot is free', "A spot just opened in a class you're waiting for. It goes to whoever books first.", '', 'Book now' ),
 			// Reminders
 			'reminder'          => array( __( 'Class reminder', 'olivia-studio' ), 'reminders', 'customer', __( 'Before the class, at the times set under Reminders', 'olivia-studio' ),
@@ -146,6 +146,7 @@ class OYS_Email_Templates {
 				'gifts'      => (bool) array_filter( $products, fn( $p ) => ! empty( $p['giftable'] ) ),
 				'birthday'   => (bool) (int) OYS_Settings::get( 'birthday_on' ),
 				'raffle'     => OYS_Rewards::period_months() > 0,
+				'waitlist'   => (bool) (int) OYS_Settings::get( 'waitlist_auto' ),
 			);
 		}
 		$needs = array(
@@ -158,6 +159,7 @@ class OYS_Email_Templates {
 			'gift_card' => 'gifts', 'gift_receipt' => 'gifts',
 			'birthday' => 'birthday',
 			'raffle_winner' => 'raffle', 'raffle_announcement' => 'raffle',
+			'waitlist_promoted' => 'waitlist',
 		);
 		return ! isset( $needs[ $key ] ) || ! empty( $f[ $needs[ $key ] ] );
 	}

@@ -729,13 +729,21 @@ class OYS_Bookings {
 	}
 
 	/**
-	 * A seat opened up. People with a membership or a valid pass are moved in automatically, in waitlist order;
-	 * everyone else gets an email that a spot is free (first to book gets it).
-	 * Stops before `waitlist_cutoff_hours` so nobody is surprised by a last-minute booking.
+	 * A seat opened up. By default nobody is booked in by themselves: everyone on the waitlist gets an email with a
+	 * button, and whoever books first gets the spot (Olivia, 16 November: „Várólistára ne automatikus beléptetés
+	 * legyen, csak kapjon egy értesítést, hogy felszabadult hely és be tudjon jelentkezni egy gombbal. Aki onnan
+	 * előbb bejelentkezik, azé a felszabadult hely.”).
+	 * With `waitlist_auto` on: people with a membership or a valid pass are moved in, in waitlist order, and everyone
+	 * else gets the email once; this stops `waitlist_cutoff_hours` before the start so nobody is surprised by a
+	 * last-minute booking.
 	 */
 	public static function process_waitlist( $session_id ) {
 		$session = OYS_Schedule::get( $session_id );
 		if ( ! $session || 'scheduled' !== $session->status ) {
+			return;
+		}
+		if ( ! (int) OYS_Settings::get( 'waitlist_auto' ) ) {
+			self::notify_waitlist( $session );
 			return;
 		}
 		if ( time() > oys_ts( $session->starts_at ) - (int) OYS_Settings::get( 'waitlist_cutoff_hours' ) * HOUR_IN_SECONDS ) {
@@ -766,6 +774,24 @@ class OYS_Bookings {
 				$wpdb->update( OYS_Install::table( 'waitlist' ), array( 'notified_at' => oys_now() ), array( 'id' => $entry->id ) );
 				OYS_Emails::waitlist_spot_open( (int) $entry->user_id, $session );
 			}
+		}
+	}
+
+	/**
+	 * Everyone on the waitlist hears that a spot is free, while the class can still be booked online. One email per
+	 * person per quarter hour, so a booking and its guests cancelled one after the other send one email, not three.
+	 */
+	private static function notify_waitlist( $session ) {
+		if ( OYS_Schedule::spots_left( $session ) < 1 || '' !== OYS_Schedule::closed_reason( $session ) ) {
+			return;
+		}
+		global $wpdb;
+		foreach ( self::waitlist( $session->id ) as $entry ) {
+			if ( $entry->notified_at && oys_ts( $entry->notified_at ) > time() - 15 * MINUTE_IN_SECONDS ) {
+				continue;
+			}
+			$wpdb->update( OYS_Install::table( 'waitlist' ), array( 'notified_at' => oys_now() ), array( 'id' => $entry->id ) );
+			OYS_Emails::waitlist_spot_open( (int) $entry->user_id, $session );
 		}
 	}
 

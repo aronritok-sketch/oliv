@@ -880,6 +880,24 @@
   kedvezménykódod van, akkor a fizetésnél érvényesíthető.”
   - A kódmező ott van az egyéni óra fizetésénél is (`coupon_field`, ha az ár > 0 és a fizetés be van állítva).
   - Tesztek: 1374/0.
+- **olivia-studio 1.12.5 (téma 3.11.97-tel) – Olívia 11.16-os doksijának két új pontja:**
+  - **Várólista: nincs automatikus beléptetés.** „Várólistára ne automatikus beléptetés legyen, csak kapjon egy értesítést,
+    hogy felszabadult hely és be tudjon jelentkezni egy gombbal. Aki onnan előbb bejelentkezik, azé a felszabadult hely.”
+    - Ha felszabadul egy hely, mindenki, aki a várólistán van, egyszerre kap e-mailt egy „Foglalok most” gombbal.
+    - Aki elsőként foglal, azé a hely. A foglalással lekerül a várólistáról, a többiek rajta maradnak.
+    - Az értesítés addig megy ki, amíg az óra online foglalható. Egy ember negyedóránként legfeljebb egy levelet kap
+      (pl. ha egy foglalás és a vendégei egymás után mondódnak le).
+    - Új beállítás: `waitlist_auto` (alapból 0). Bekapcsolva a régi működés tér vissza: a bérletes vagy tagsággal
+      rendelkező vendég magától bekerül. Ilyenkor számít a `waitlist_cutoff_hours` határidő is.
+    - A foglalási oldal szövege a beállítást követi. Az E-mailek oldalon a „Bekerült a várólistáról” levél csak
+      bekapcsolt automatikus beléptetésnél látszik. A hathaflow demó GYIK-szövege is ennek megfelelően változott.
+  - **Bérlet-hosszabbítás, ha a stúdió mond le egy órát: a beállítás csak alapértelmezés.** Az egyéni óra vendégeinél
+    vendégenként felülírható: „ez a rész legyen csak alapértelmezett és tudjam beállítani az egyéni óra vendégeinél.”
+    - Vendégek → a vendég adatlapja → „Ha te mondod le az egyéni óráját … nap”.
+    - Üresen az alapértelmezés (7 nap) érvényes, 0 esetén nincs hosszabbítás.
+    - A szám a `oys_cancel_extend_days` user meta. A saját szám akkor is érvényes, ha az alapértelmezés 0.
+    - A csoportos órák lemondásánál továbbra is az alapértelmezés számít.
+  - Tesztek: 1400/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

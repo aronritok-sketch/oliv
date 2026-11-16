@@ -33,6 +33,9 @@ class OYS_Settings {
 			'schedule_empty_days'     => 'yes',
 			'dropin_credit_days'      => 90,
 			'waitlist_cutoff_hours'   => 2,
+			// 0: a free spot is offered to the whole waitlist by email, first to book gets it (Olivia, 16 November); 1: people
+			// with a pass or membership are booked in by themselves, in waitlist order
+			'waitlist_auto'           => 0,
 			'booking_window_days'     => 28,
 			'booking_close_minutes'   => 30,
 			'weeks_ahead'             => 6,

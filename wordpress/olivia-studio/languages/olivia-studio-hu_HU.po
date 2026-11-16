@@ -801,8 +801,8 @@ msgid "A spot opened (waitlist)"
 msgstr "Felszabadult egy hely (várólista)"
 
 #: includes/class-email-templates.php:47
-msgid "When a spot opens for someone on the waitlist who can't be booked in automatically"
-msgstr "Ha felszabadul egy hely annak, aki a várólistán van, de nem kerülhet be magától"
+msgid "When a spot opens: to those on the waitlist, and whoever books first gets it"
+msgstr "Ha felszabadul egy hely: a várólistán lévőknek, és azé a hely, aki elsőként foglal"
 
 #: includes/class-email-templates.php:50
 msgid "Before the class, at the times set under Reminders"
@@ -6205,3 +6205,39 @@ msgstr "Új egyéni kérés: %1$s – %2$s"
 #: includes/class-emails.php
 msgid "If you have a discount code, you can use it when you pay: open “Have a discount code?” on the payment page."
 msgstr "Ha kedvezménykódod van, a fizetésnél érvényesítheted: a fizetési oldalon nyisd le a „Van kedvezménykódod?” részt."
+
+#: includes/class-frontend.php
+msgid "You're number %d on the waitlist. When a spot opens, we email everyone on the waitlist straight away, and whoever books first gets it."
+msgstr "%d. vagy a várólistán. Ha felszabadul egy hely, azonnal e-mailt küldünk mindenkinek a várólistán, és azé a hely, aki elsőként foglal."
+
+#: includes/class-frontend.php
+msgid "Join the waitlist. When a spot opens, we email you straight away with a button to book, and whoever books first gets it."
+msgstr "Iratkozz fel a várólistára. Ha felszabadul egy hely, azonnal e-mailt küldünk egy foglalás gombbal, és azé a hely, aki elsőként foglal."
+
+#: includes/admin/class-admin.php
+msgid "The default. For a private client you can set another number on their customer page."
+msgstr "Ez az alapértelmezés. Egyéni órás vendégnél a vendég adatlapján (Vendégek) más számot is megadhatsz."
+
+#: includes/admin/class-admin.php
+msgid "Book people with a pass or membership in by themselves when a spot opens"
+msgstr "Ha felszabadul egy hely, a bérlettel vagy tagsággal rendelkezők automatikusan bekerülnek"
+
+#: includes/admin/class-admin.php
+msgid "Off: everyone on the waitlist gets an email with a button to book, and whoever books first gets the spot."
+msgstr "Kikapcsolva: mindenki, aki a várólistán van, e-mailt kap egy foglalás gombbal, és azé a hely, aki elsőként foglal."
+
+#: includes/admin/class-admin.php
+msgid "When it is on, this stops %s hours before the start."
+msgstr "Bekapcsolva ez a kezdés előtt %s órával leáll."
+
+#: includes/admin/class-admin.php
+msgid "If you cancel their private session"
+msgstr "Ha te mondod le az egyéni óráját"
+
+#: includes/admin/class-admin.php
+msgid "their private passes are valid longer by %s days"
+msgstr "az egyéni bérletei ennyivel tovább érvényesek: %s nap"
+
+#: includes/admin/class-admin.php
+msgid "Empty = the default (%d days, in Settings). 0 = no extension."
+msgstr "Üresen = az alapértelmezés (%d nap, a Beállításokban). 0 = nincs hosszabbítás."

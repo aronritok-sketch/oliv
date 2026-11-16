@@ -701,11 +701,12 @@ class OYS_Frontend {
 			if ( oys_is_hybrid( $s ) && OYS_Schedule::spots_left( $s, 'online' ) > 0 ) {
 				$out .= '<p><a class="btn btn--orchid" href="' . esc_url( add_query_arg( 'mode', 'online', $here ) ) . '">' . esc_html__( 'Join live online instead', 'olivia-studio' ) . '</a></p>';
 			}
+			$auto = (int) OYS_Settings::get( 'waitlist_auto' );
 			if ( $pos ) {
-				$out .= '<p>' . sprintf( esc_html__( 'You\'re number %d on the waitlist. If a spot opens and you have a pass or membership, you\'re booked in automatically and we email you. Otherwise we email you so you can book first.', 'olivia-studio' ), $pos ) . '</p>'
+				$out .= '<p>' . sprintf( $auto ? esc_html__( 'You\'re number %d on the waitlist. If a spot opens and you have a pass or membership, you\'re booked in automatically and we email you. Otherwise we email you so you can book first.', 'olivia-studio' ) : esc_html__( 'You\'re number %d on the waitlist. When a spot opens, we email everyone on the waitlist straight away, and whoever books first gets it.', 'olivia-studio' ), $pos ) . '</p>'
 					. self::form_open( 'oys_waitlist' ) . '<input type="hidden" name="session" value="' . (int) $s->id . '"><input type="hidden" name="do" value="leave"><button class="btn btn--ghost">' . esc_html__( 'Leave the waitlist', 'olivia-studio' ) . '</button></form>';
 			} else {
-				$out .= '<p>' . esc_html__( 'Join the waitlist. If a spot opens and you have a pass or membership, you\'re booked in automatically. Otherwise we email you straight away.', 'olivia-studio' ) . '</p>'
+				$out .= '<p>' . ( $auto ? esc_html__( 'Join the waitlist. If a spot opens and you have a pass or membership, you\'re booked in automatically. Otherwise we email you straight away.', 'olivia-studio' ) : esc_html__( 'Join the waitlist. When a spot opens, we email you straight away with a button to book, and whoever books first gets it.', 'olivia-studio' ) ) . '</p>'
 					. self::form_open( 'oys_waitlist' ) . '<input type="hidden" name="session" value="' . (int) $s->id . '"><input type="hidden" name="do" value="join"><button class="btn btn--primary">' . esc_html__( 'Join the waitlist', 'olivia-studio' ) . '</button></form>';
 			}
 			return $out . '</div></div></div>';

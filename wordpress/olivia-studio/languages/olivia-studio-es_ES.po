@@ -801,8 +801,8 @@ msgid "A spot opened (waitlist)"
 msgstr ""
 
 #: includes/class-email-templates.php:47
-msgid "When a spot opens for someone on the waitlist who can't be booked in automatically"
-msgstr ""
+msgid "When a spot opens: to those on the waitlist, and whoever books first gets it"
+msgstr "Cuando se libera una plaza: a quienes están en la lista de espera, y es para quien reserve primero"
 
 #: includes/class-email-templates.php:50
 msgid "Before the class, at the times set under Reminders"
@@ -4129,3 +4129,43 @@ msgstr "Nueva solicitud privada: %1$s – %2$s"
 #: includes/class-emails.php
 msgid "If you have a discount code, you can use it when you pay: open “Have a discount code?” on the payment page."
 msgstr "Si tienes un código de descuento, puedes usarlo al pagar: abre «¿Tienes un código de descuento?» en la página de pago."
+
+#: includes/class-frontend.php
+msgid "You're number %d on the waitlist. When a spot opens, we email everyone on the waitlist straight away, and whoever books first gets it."
+msgstr "Eres el número %d en la lista de espera. Cuando se libere una plaza, avisaremos por email a todos los de la lista, y será para quien reserve primero."
+
+#: includes/class-frontend.php
+msgid "Join the waitlist. When a spot opens, we email you straight away with a button to book, and whoever books first gets it."
+msgstr "Apúntate a la lista de espera. Cuando se libere una plaza, te enviaremos un email con un botón para reservar, y será para quien reserve primero."
+
+#: includes/admin/class-admin.php
+msgid "The default. For a private client you can set another number on their customer page."
+msgstr "Es el valor por defecto. Para un cliente de clases privadas puedes poner otro número en su ficha de cliente."
+
+#: includes/admin/class-admin.php
+msgid "Waitlist"
+msgstr "Lista de espera"
+
+#: includes/admin/class-admin.php
+msgid "Book people with a pass or membership in by themselves when a spot opens"
+msgstr "Cuando se libere una plaza, reservar automáticamente a quienes tienen bono o membresía"
+
+#: includes/admin/class-admin.php
+msgid "Off: everyone on the waitlist gets an email with a button to book, and whoever books first gets the spot."
+msgstr "Desactivado: todos los de la lista de espera reciben un email con un botón para reservar, y la plaza es para quien reserve primero."
+
+#: includes/admin/class-admin.php
+msgid "When it is on, this stops %s hours before the start."
+msgstr "Si está activado, se detiene %s horas antes del inicio."
+
+#: includes/admin/class-admin.php
+msgid "If you cancel their private session"
+msgstr "Si cancelas su clase privada"
+
+#: includes/admin/class-admin.php
+msgid "their private passes are valid longer by %s days"
+msgstr "sus bonos privados valen %s días más"
+
+#: includes/admin/class-admin.php
+msgid "Empty = the default (%d days, in Settings). 0 = no extension."
+msgstr "Vacío = el valor por defecto (%d días, en Ajustes). 0 = sin prórroga."
