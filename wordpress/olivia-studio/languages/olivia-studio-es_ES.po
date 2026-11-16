@@ -4859,3 +4859,189 @@ msgstr "Las notificaciones están bloqueadas para este sitio. Permítelas en los
 #: Studio app (OYS_Studio_App, Hub → My settings)
 msgid "On an iPhone, first put the Studio on the home screen (steps above) and open it from there: then you can switch on the notifications here."
 msgstr "En un iPhone, primero pon el estudio en la pantalla de inicio (pasos de arriba) y ábrelo desde allí: luego podrás activar aquí las notificaciones."
+
+#: Hub → Today, passes
+msgid "Passes and sessions"
+msgstr "Bonos y sesiones"
+
+#: Hub → Today, passes
+msgid "Every customer's passes"
+msgstr "Los bonos de cada cliente"
+
+#: Hub → Today, passes
+msgid "Valid passes"
+msgstr "Bonos válidos"
+
+#: Hub → Today, passes
+msgid "%1$s left · %2$s"
+msgstr "%1$s restantes · %2$s"
+
+#: Hub → Today, passes
+msgid "Locked sessions"
+msgstr "Sesiones reservadas"
+
+#: Hub → Today, passes
+msgid "taken from passes for classes still ahead"
+msgstr "descontadas de bonos para clases por venir"
+
+#: Hub → Today, passes
+msgid "Group and online"
+msgstr "Grupales y online"
+
+#: Hub → Today, passes
+msgid "One-to-one"
+msgstr "Individuales"
+
+#: Hub → Today, passes
+msgid "Expiring in 14 days"
+msgstr "Caducan en 14 días"
+
+#: Hub → Today, passes
+msgid "%s still on them"
+msgstr "aún con %s"
+
+#: Hub → Today, passes
+msgid "Booked classes ahead"
+msgstr "Reservas próximas"
+
+#: Hub → Today, passes
+msgid "all bookings, any payment"
+msgstr "todas las reservas, cualquier pago"
+
+#: Hub → Today, passes
+msgid "Expired unused, 30 days"
+msgstr "Caducadas sin usar (30 días)"
+
+#: Hub → Today, passes
+msgid "Gift cards not redeemed"
+msgstr "Tarjetas regalo sin canjear"
+
+#: Hub → Today, passes
+msgid "Active memberships"
+msgstr "Membresías activas"
+
+#: Hub → Today, passes
+msgid "Seats held during payment"
+msgstr "Plazas retenidas durante el pago"
+
+#: Hub → Today, passes
+msgid "free again if the payment is not finished"
+msgstr "se liberan si el pago no se completa"
+
+#: Hub → Today, passes
+msgid "%d session"
+msgid_plural "%d sessions"
+msgstr[0] "%d sesión"
+msgstr[1] "%d sesiones"
+
+#: Hub → Today, passes
+msgid "%d pass"
+msgid_plural "%d passes"
+msgstr[0] "%d bono"
+msgstr[1] "%d bonos"
+
+#: Hub → Today, passes
+msgid "%d customer"
+msgid_plural "%d customers"
+msgstr[0] "%d cliente"
+msgstr[1] "%d clientes"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Previous week"
+msgstr "Semana anterior"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Today"
+msgstr "Hoy"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Next week"
+msgstr "Semana siguiente"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Show cancelled"
+msgstr "Mostrar canceladas"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "New class"
+msgstr "Nueva clase"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Close"
+msgstr "Cerrar"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Title"
+msgstr "Título"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Starts"
+msgstr "Empieza"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Minutes"
+msgstr "Minutos"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Location"
+msgstr "Lugar"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Price"
+msgstr "Precio"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Spots"
+msgstr "Plazas"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Description"
+msgstr "Descripción"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Repeat"
+msgstr "Repetir"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Create"
+msgstr "Crear"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Save changes"
+msgstr "Guardar cambios"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Cancel class"
+msgstr "Cancelar clase"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Mon"
+msgstr "Lu"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Tue"
+msgstr "Ma"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Wed"
+msgstr "Mi"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Thu"
+msgstr "Ju"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Fri"
+msgstr "Vi"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Sat"
+msgstr "Sá"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Sun"
+msgstr "Do"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Never mind"
+msgstr "Volver"

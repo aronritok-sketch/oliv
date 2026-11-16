@@ -72,3 +72,6 @@ body.g { margin: 0; background: var(--g-cream); color: var(--g-ink); font: 17px/
 
 .g-cta { margin: 16px 0 0; }
 .g-foot { padding: 0 16px 32px; padding-bottom: max(32px, env(safe-area-inset-bottom)); text-align: center; font-size: 13px; color: var(--g-muted); }
+.g-toc__group { margin: 12px 0 4px; font-size: 14px; font-weight: 800; color: var(--g-forest); }
+.g-toc__group:first-of-type { margin-top: 0; }
+.g-toc ol + .g-toc__group { padding-top: 8px; border-top: 1px solid var(--g-line); }

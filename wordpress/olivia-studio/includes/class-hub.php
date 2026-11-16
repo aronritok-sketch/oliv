@@ -770,8 +770,58 @@ class OYS_Hub {
 				$recent[] = array( 'who' => $u ? ( trim( $u->first_name . ' ' . $u->last_name ) ?: $u->display_name ) : (string) $row->email, 'what' => (string) $row->description, 'amount' => oys_money( (int) $row->amount_cents, $row->currency ), 'when' => self::ago( $row->paid_at ) );
 			}
 			$out['payments'] = $recent;
+			$out['passes']   = self::passes_summary();
 		}
 		return $out;
+	}
+
+	/**
+	 * The passes at a glance on the Hub's Today (Áron, 16 November: „kell egy a hubnak a főoldalára egy összesítő, hogy
+	 * mennyi érvényes bérlet van még, meg annyi zárolt, meg ilyenek”). Valid = sessions left and not expired; locked =
+	 * sessions already taken from a pass for a class still ahead (they come back if the booking is cancelled in time).
+	 * @return array[] { icon, label, value, note }
+	 */
+	public static function passes_summary() {
+		global $wpdb;
+		$p   = self::t( 'passes' );
+		$b   = self::t( 'bookings' );
+		$s   = self::t( 'sessions' );
+		$now = oys_now();
+		$tally = array( 'group' => array( 'n' => 0, 'c' => 0 ), 'one' => array( 'n' => 0, 'c' => 0 ) );
+		$people = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(DISTINCT user_id) FROM $p WHERE credits_left > 0 AND ( expires_at IS NULL OR expires_at > %s )", $now ) );
+		foreach ( $wpdb->get_results( $wpdb->prepare( "SELECT kind, COUNT(*) n, SUM(credits_left) c FROM $p WHERE credits_left > 0 AND ( expires_at IS NULL OR expires_at > %s ) GROUP BY kind", $now ) ) as $r ) {
+			$k                  = in_array( $r->kind, array( 'class', 'online' ), true ) ? 'group' : 'one';
+			$tally[ $k ]['n'] += (int) $r->n;
+			$tally[ $k ]['c'] += (int) $r->c;
+		}
+		list( $group, $one ) = array( $tally['group'], $tally['one'] );
+		$locked  = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $b b JOIN $s s ON s.id = b.session_id WHERE b.status = 'confirmed' AND b.paid_with = 'credit' AND s.status = 'scheduled' AND s.starts_at > %s", $now ) );
+		$ahead   = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $b b JOIN $s s ON s.id = b.session_id WHERE b.status = 'confirmed' AND s.status = 'scheduled' AND s.starts_at > %s", $now ) );
+		$holds   = (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $b WHERE status = 'pending' AND hold_expires IS NOT NULL AND hold_expires > %s", $now ) );
+		$soon    = $wpdb->get_row( $wpdb->prepare( "SELECT COUNT(*) n, COALESCE(SUM(credits_left), 0) c FROM $p WHERE credits_left > 0 AND expires_at IS NOT NULL AND expires_at > %s AND expires_at <= %s", $now, oys_utc_plus( 14 * DAY_IN_SECONDS ) ) );
+		$lapsed  = $wpdb->get_row( $wpdb->prepare( "SELECT COUNT(*) n, COALESCE(SUM(credits_left), 0) c FROM $p WHERE credits_left > 0 AND expires_at IS NOT NULL AND expires_at <= %s AND expires_at > %s", $now, oys_utc_plus( -30 * DAY_IN_SECONDS ) ) );
+		$members = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . self::t( 'memberships' ) . " WHERE status IN ('active','trialing','past_due')" );
+		$gifts   = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . self::t( 'gift_cards' ) . " WHERE status = 'active'" );
+		$sess    = fn( $c ) => sprintf( _n( '%d session', '%d sessions', $c, 'olivia-studio' ), $c );
+		$pass    = fn( $c ) => sprintf( _n( '%d pass', '%d passes', $c, 'olivia-studio' ), $c );
+		$cust    = fn( $c ) => sprintf( _n( '%d customer', '%d customers', $c, 'olivia-studio' ), $c );
+		$rows    = array(
+			array( 'tag', __( 'Valid passes', 'olivia-studio' ), (string) ( $group['n'] + $one['n'] ), sprintf( __( '%1$s left · %2$s', 'olivia-studio' ), $sess( $group['c'] + $one['c'] ), $cust( $people ) ), 'hot' ),
+			array( 'lock', __( 'Locked sessions', 'olivia-studio' ), (string) $locked, __( 'taken from passes for classes still ahead', 'olivia-studio' ), '' ),
+			array( 'users', __( 'Group and online', 'olivia-studio' ), $sess( $group['c'] ), $pass( $group['n'] ), '' ),
+			array( 'star', __( 'One-to-one', 'olivia-studio' ), $sess( $one['c'] ), $pass( $one['n'] ), '' ),
+			array( 'clock', __( 'Expiring in 14 days', 'olivia-studio' ), $pass( (int) $soon->n ), sprintf( __( '%s still on them', 'olivia-studio' ), $sess( (int) $soon->c ) ), (int) $soon->n ? 'warn' : '' ),
+			array( 'calendar', __( 'Booked classes ahead', 'olivia-studio' ), (string) $ahead, __( 'all bookings, any payment', 'olivia-studio' ), '' ),
+			array( 'x', __( 'Expired unused, 30 days', 'olivia-studio' ), $sess( (int) $lapsed->c ), $pass( (int) $lapsed->n ), '' ),
+			array( 'gift', __( 'Gift cards not redeemed', 'olivia-studio' ), (string) $gifts, '', '' ),
+		);
+		if ( $members ) {
+			$rows[] = array( 'heart', __( 'Active memberships', 'olivia-studio' ), (string) $members, '', '' );
+		}
+		if ( $holds ) {
+			$rows[] = array( 'card', __( 'Seats held during payment', 'olivia-studio' ), (string) $holds, __( 'free again if the payment is not finished', 'olivia-studio' ), '' );
+		}
+		return array_map( fn( $r ) => array( 'icon' => $r[0], 'label' => $r[1], 'value' => $r[2], 'note' => $r[3], 'tone' => $r[4] ), $rows );
 	}
 
 	/** Customers to start a conversation with (a teacher: the people booked into their classes). */

@@ -52,6 +52,8 @@
 		note: '<path d="M5 4.5h14v10l-5 5H5z"/><path d="M14 19.5v-5h5"/>',
 		heart: '<path d="M12 20s-7.5-4.6-7.5-10A4.3 4.3 0 0 1 12 7.4 4.3 4.3 0 0 1 19.5 10c0 5.4-7.5 10-7.5 10z"/>',
 		logout: '<path d="M14 4.5h4.5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1H14M10 16l-4-4 4-4M6 12h10"/>',
+		lock: '<rect x="5" y="10.5" width="14" height="10" rx="2"/><path d="M8 10.5V7.5a4 4 0 0 1 8 0v3"/>',
+		clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
 		book: '<path d="M4.5 5.5c2.5-1 5-1 7.5.5v13c-2.5-1.5-5-1.5-7.5-.5zM19.5 5.5c-2.5-1-5-1-7.5.5v13c2.5-1.5 5-1.5 7.5-.5z"/>',
 		mobile: '<rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 17.5h2"/>',
 		link: '<path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7L11.5 6.8"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1.5-1.5"/>',
@@ -212,6 +214,12 @@
 			h += '<p class="hub-muted">' + esc( T.noClasses ) + '</p>';
 		}
 		h += '<div class="hub-classes">' + d.classes.map( classCard ).join( '' ) + '</div></section>';
+		if ( d.passes && d.passes.length ) {
+			// Áron: „egy összesítő, hogy mennyi érvényes bérlet van még, meg annyi zárolt”
+			h += '<section class="hub-block"><h2 class="hub-h">' + esc( T.passesTitle ) + '</h2><div class="hub-sums">' +
+				d.passes.map( ( r ) => '<div class="hub-sum' + ( r.tone ? ' hub-sum--' + esc( r.tone ) : '' ) + '">' + icon( r.icon ) + '<span class="hub-sum__label">' + esc( r.label ) + '</span><b class="hub-sum__val">' + esc( r.value ) + '</b>' + ( r.note ? '<small>' + esc( r.note ) + '</small>' : '' ) + '</div>' ).join( '' ) +
+				'</div>' + ( B.customers ? '<p class="hub-more"><a href="' + esc( B.customers ) + '">' + esc( T.allCustomers ) + ' →</a></p>' : '' ) + '</section>';
+		}
 		if ( d.kpis ) {
 			h += '<section class="hub-block"><h2 class="hub-h">' + esc( T.numbers ) + '</h2><div class="hub-kpis">' + d.kpis.map( ( k ) => '<div class="hub-kpi"><span>' + esc( k[ 0 ] ) + '</span><b>' + esc( k[ 1 ] ) + '</b></div>' ).join( '' ) + '</div>';
 			if ( d.payments && d.payments.length ) {
@@ -740,12 +748,14 @@
 		return reg ? reg.pushManager.getSubscription() : null;
 	}
 	async function pushOn() {
+		// first, while the tap still counts: an iPhone only asks for permission straight from the tap
+		const perm = await Notification.requestPermission();
+		if ( 'granted' !== perm ) {
+			throw new Error( T.pushDenied );
+		}
 		const st = await api( 'push' );
 		if ( ! st.key ) {
 			throw new Error( T.pushNo );
-		}
-		if ( 'granted' !== await Notification.requestPermission() ) {
-			throw new Error( T.pushDenied );
 		}
 		const reg = await worker();
 		if ( ! reg ) {
@@ -771,6 +781,7 @@
 		}
 		const sub = await currentSub().catch( () => null );
 		const on = !! sub && 'Notification' in window && 'granted' === Notification.permission;
+		S.push = on;
 		let install = '';
 		if ( standalone() ) {
 			install = '<p class="hub-ok">' + icon( 'check' ) + esc( T.appInstalled ) + '</p>';
@@ -836,6 +847,7 @@
 		if ( pushable() && 'granted' === Notification.permission ) {
 			const sub = await currentSub().catch( () => null );
 			if ( sub ) {
+				S.push = true; // the phone notifies: no second notification from the open page
 				api( 'push', { method: 'POST', json: { endpoint: sub.endpoint, ua: navigator.userAgent } } ).catch( () => null );
 			}
 		}
@@ -849,7 +861,7 @@
 			const d = await api( 'poll' );
 			root.classList.remove( 'is-offline' );
 			const fresh = ( d.latest || [] ).filter( ( i ) => ! lastKeys.has( i.key + ':' + i.ts ) );
-			if ( d.counts.total > lastTotal && fresh.length && 'Notification' in window && 'granted' === Notification.permission && ( document.hidden || fresh[ 0 ].key !== S.open ) ) {
+			if ( ! S.push && d.counts.total > lastTotal && fresh.length && 'Notification' in window && 'granted' === Notification.permission && ( document.hidden || fresh[ 0 ].key !== S.open ) ) {
 				const n = new Notification( fresh[ 0 ].title || T.notifyTitle, { body: fresh[ 0 ].sub || '', tag: 'oys-hub-' + fresh[ 0 ].key } );
 				n.onclick = () => {
 					window.focus();

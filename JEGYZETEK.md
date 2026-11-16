@@ -1030,6 +1030,37 @@
     a megnyitott oldal világos.
   - A menü saját gombjai és az e-mail-cím telefonon rejtve: az alsó sávban ott a Foglalás és a Fiók.
   - iPhone 13-on görgetés nélkül kifér; iPhone SE-n sűrűbb sorokkal, legfeljebb 20 px görgetéssel.
+- **olivia-studio 1.16.0 (téma 3.11.103-mal) – Áron, 2026-11-16 este** („Nem működik az app”, „kell egy a hubnak a
+  főoldalára egy összesítő …”, „a teljes adminról már legyen”):
+  - **A Hub Ma fülén „Bérletek és alkalmak” összesítő** (`OYS_Hub::passes_summary`, csak a stúdiónak, oktatónak nem):
+    - érvényes bérletek (darab, hátralévő alkalom, hány vendégnél);
+    - zárolt alkalmak: bérletből lefoglalt, még előttünk álló órák (`paid_with = credit`), időben lemondva visszajárnak;
+    - csoportos/online és egyéni alkalmak külön;
+    - 14 napon belül lejáró bérletek (sárga, ha van);
+    - előttünk álló foglalások, a 30 napon belül lejárt, fel nem használt alkalmak;
+    - be nem váltott ajándékutalványok, aktív tagságok, fizetés alatt tartott helyek;
+    - link: „Minden vendég bérletei” → Vendégek.
+  - **App, iPhone-javítások:**
+    - Az értesítés-engedélyt a koppintásra rögtön kéri: az iPhone csak így kérdez, hálózati kérés után már nem.
+    - A Stúdió oldalain és a /studio/ belépőoldalán csak a logós ikon van; korábban a webhely kis ikonja nyert a
+      kezdőképernyőn.
+    - A push mindig látható értesítést ad: az iPhone a néma push után letiltja az eszközt.
+    - Ha a készüléken be van kapcsolva a push, a nyitott Hub nem ad második értesítést.
+    - `apple-mobile-web-app-status-bar-style: default`.
+  - **A Naptár magyarul:**
+    - Az `assets/calendar.js` szövegei eddig angolul voltak („+ New class”, „Show cancelled”). Most a nyelvi fájlból
+      jönnek: `OYS_Calendar::strings`, `_()` / `f()`.
+    - 24 órás idő és magyar dátum.
+    - A párbeszédablak bezáró gombja „Mégse”, hogy ne keveredjen az óra lemondásával.
+  - **Az útmutató a teljes adminról** (`/studio/utmutato/`):
+    - kezdés, a Hub és a bérlet-összesítő;
+    - minden Stúdió-menüpont: Áttekintés, Naptár, Névsorok, Egyéni óra kérések, Vendégek (adatlap, importálás),
+      Tagságok, Fizetések, Ajándékutalványok, Árak és bérletek, Helyszínek, Hírlevél, Kuponok és jutalmak, E-mailek,
+      Beállítások, Oktatók;
+    - a weboldal tartalma: szerkesztés a weboldalon, Szövegek és képek, Óratípusok, GYIK, cikkek, oldalak, menük;
+    - amihez ne nyúljon; a foglalás és lemondás szabályai, élő óra, egyéni órák.
+  - **A Hub fülei** telefonon nem lógnak ki („Beállításaim”).
+  - Tesztek: 1488/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

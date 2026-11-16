@@ -114,6 +114,7 @@ class OYS_Hub_Admin {
 			'links'   => $links,
 			'logout'  => wp_logout_url( home_url( '/' ) ),
 			'emails'  => $manage ? $a( 'oys-emails' ) : '',
+			'customers' => $manage ? $a( 'oys-customers' ) : '',
 			'privUrl' => $a( 'oys-private', '&request=' ),
 			'boot'    => array( 'today' => OYS_Hub::today(), 'me' => OYS_Hub::prefs() + array( 'name' => OYS_Hub::chat_name( $u->ID ) ) ),
 			'app'     => array(
@@ -235,6 +236,8 @@ class OYS_Hub_Admin {
 			'pushDenied'      => __( 'Notifications are blocked for this site. Allow them in the phone\'s settings, then try again.', 'olivia-studio' ),
 			'pushIosFirst'    => __( 'On an iPhone, first put the Studio on the home screen (steps above) and open it from there: then you can switch on the notifications here.', 'olivia-studio' ),
 			'guide'           => __( 'Studio guide', 'olivia-studio' ),
+			'passesTitle'     => __( 'Passes and sessions', 'olivia-studio' ),
+			'allCustomers'    => __( 'Every customer\'s passes', 'olivia-studio' ),
 			'notifyTitle'   => __( 'New in the Hub', 'olivia-studio' ),
 			'emailMe'       => __( 'Email me', 'olivia-studio' ),
 			'emailMessages' => __( 'when someone writes to me', 'olivia-studio' ),

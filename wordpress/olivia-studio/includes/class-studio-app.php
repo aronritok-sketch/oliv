@@ -31,8 +31,8 @@ class OYS_Studio_App {
 	public static function init() {
 		add_action( 'parse_request', array( __CLASS__, 'route' ), 0 );
 		add_action( 'rest_api_init', array( __CLASS__, 'routes' ) );
-		add_action( 'admin_head', array( __CLASS__, 'admin_head' ) );
-		add_action( 'login_head', array( __CLASS__, 'login_head' ) );
+		add_action( 'admin_head', array( __CLASS__, 'admin_head' ), 1 );
+		add_action( 'login_head', array( __CLASS__, 'login_head' ), 1 );
 		add_action( 'oys_hub_message', array( __CLASS__, 'on_message' ), 10, 3 );
 		add_action( 'oys_live_chat_posted', array( __CLASS__, 'on_class_chat' ), 10, 3 );
 	}
@@ -172,6 +172,7 @@ class OYS_Studio_App {
 			. '<meta name="theme-color" content="' . esc_attr( self::THEME ) . '">' . "\n"
 			. '<meta name="mobile-web-app-capable" content="yes">' . "\n"
 			. '<meta name="apple-mobile-web-app-capable" content="yes">' . "\n"
+			. '<meta name="apple-mobile-web-app-status-bar-style" content="default">' . "\n"
 			. '<meta name="apple-mobile-web-app-title" content="' . esc_attr( $n['short'] ) . '">' . "\n"
 			. '<link rel="apple-touch-icon" href="' . esc_url( self::icon( 'apple-touch-icon.png' ) ) . '">' . "\n";
 	}
@@ -179,6 +180,7 @@ class OYS_Studio_App {
 	public static function admin_head() {
 		$page = sanitize_key( $_GET['page'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification
 		if ( str_starts_with( $page, 'oys' ) && OYS_Hub::can() ) {
+			self::own_icon( 'admin_head' );
 			echo self::head_tags(); // phpcs:ignore WordPress.Security.EscapeOutput
 		}
 	}
@@ -186,7 +188,15 @@ class OYS_Studio_App {
 	public static function login_head() {
 		$to = (string) ( $_REQUEST['redirect_to'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification
 		if ( str_contains( $to, '/studio/' ) ) {
+			self::own_icon( 'login_head' );
 			echo self::head_tags(); // phpcs:ignore WordPress.Security.EscapeOutput
+		}
+	}
+
+	/** The site's own icon (a second apple-touch-icon) would win on the iPhone's home screen: not on the Studio's pages. */
+	private static function own_icon( $hook ) {
+		foreach ( array( 10, 99 ) as $prio ) {
+			remove_action( $hook, 'wp_site_icon', $prio );
 		}
 	}
 
@@ -204,9 +214,7 @@ self.addEventListener('push', (e) => {
 			if (res.ok) item = ((await res.json()).items || [])[0] || null;
 		} catch (err) { /* no network: a general notification */ }
 		item = item || { title: TITLE, body: FALLBACK, url: START };
-		// the Hub is open and in front: it shows the news itself
-		const wins = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
-		if (wins.some((w) => w.visibilityState === 'visible' && w.focused && /page=oys/.test(w.url))) return;
+		// always shown: an iPhone switches off a device that gets a push without a notification
 		await self.registration.showNotification(item.title, { body: item.body, icon: ICON, badge: BADGE, tag: item.tag || undefined, renotify: !!item.tag, data: { url: item.url || START } });
 	})());
 });

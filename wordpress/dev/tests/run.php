@@ -4384,6 +4384,37 @@ test( 'Áron, 16 November – the Studio app: notifications on the phone about m
 	}
 } );
 
+test( 'Áron, 16 November – the Hub\'s Today: valid passes, locked sessions, what expires soon', function () {
+	$before = array_column( OYS_Hub::passes_summary(), 'value', 'label' );
+	$u = make_user( 'Berletes' );
+	$s = make_session( array( 'in_hours' => 50 ) );
+	OYS_Passes::grant( $u, array( 'credits' => 5 ) );
+	OYS_Passes::grant( $u, array( 'credits' => 2, 'validity_days' => 5 ) );
+	$id = OYS_Bookings::book_party( $u, $s, array( 'method' => 'credit', 'guests' => array(), 'notify' => false ) );
+	ok( is_int( $id ), 'booked from a pass' );
+	$after = array_column( OYS_Hub::passes_summary(), 'value', 'label' );
+	$valid = __( 'Valid passes', 'olivia-studio' );
+	$lock  = __( 'Locked sessions', 'olivia-studio' );
+	eq( (int) $before[ $valid ] + 2, (int) $after[ $valid ], 'two more valid passes' );
+	eq( (int) $before[ $lock ] + 1, (int) $after[ $lock ], 'one more locked session (taken from a pass for a class ahead)' );
+	$soon = array_values( array_filter( OYS_Hub::passes_summary(), fn( $r ) => __( 'Expiring in 14 days', 'olivia-studio' ) === $r['label'] ) );
+	ok( $soon && 'warn' === $soon[0]['tone'], 'a pass expiring within 14 days is flagged' );
+	$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0];
+	wp_set_current_user( $admin );
+	try {
+		ok( ! empty( OYS_Hub::today()['passes'] ), 'the studio sees it on the Hub\'s Today' );
+	} finally {
+		wp_set_current_user( 0 );
+	}
+	$tu = wp_insert_user( array( 'user_login' => 'berlettanar', 'user_email' => 'berlettanar@example.test', 'user_pass' => 'x-12345678', 'role' => 'oys_teacher' ) );
+	wp_set_current_user( $tu );
+	try {
+		ok( empty( OYS_Hub::today()['passes'] ), 'a teacher does not' );
+	} finally {
+		wp_set_current_user( 0 );
+	}
+} );
+
 $t = $GLOBALS['oys_t'];
 echo "\n{$t['pass']} assertions passed, {$t['fail']} failed\n";
 exit( $t['fail'] ? 1 : 0 );

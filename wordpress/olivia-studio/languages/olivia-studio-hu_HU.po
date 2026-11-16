@@ -6923,3 +6923,432 @@ msgstr "Az értesítések tiltva vannak ennél az oldalnál. Engedélyezd őket 
 #: Studio app (OYS_Studio_App, Hub → My settings)
 msgid "On an iPhone, first put the Studio on the home screen (steps above) and open it from there: then you can switch on the notifications here."
 msgstr "iPhone-on előbb tedd ki a Stúdiót a kezdőképernyőre (fenti lépések), és onnan nyisd meg: utána itt bekapcsolhatod az értesítéseket."
+
+#: Hub → Today, passes
+msgid "Passes and sessions"
+msgstr "Bérletek és alkalmak"
+
+#: Hub → Today, passes
+msgid "Every customer's passes"
+msgstr "Minden vendég bérletei"
+
+#: Hub → Today, passes
+msgid "Valid passes"
+msgstr "Érvényes bérletek"
+
+#: Hub → Today, passes
+msgid "%1$s left · %2$s"
+msgstr "%1$s maradt · %2$s"
+
+#: Hub → Today, passes
+msgid "Locked sessions"
+msgstr "Zárolt alkalmak"
+
+#: Hub → Today, passes
+msgid "taken from passes for classes still ahead"
+msgstr "a bérletekből lefoglalva, még előttük álló órákra"
+
+#: Hub → Today, passes
+msgid "Group and online"
+msgstr "Csoportos és online"
+
+#: Hub → Today, passes
+msgid "One-to-one"
+msgstr "Egyéni órák"
+
+#: Hub → Today, passes
+msgid "Expiring in 14 days"
+msgstr "14 napon belül lejár"
+
+#: Hub → Today, passes
+msgid "%s still on them"
+msgstr "még %s van rajtuk"
+
+#: Hub → Today, passes
+msgid "Booked classes ahead"
+msgstr "Előttünk álló foglalások"
+
+#: Hub → Today, passes
+msgid "all bookings, any payment"
+msgstr "minden foglalás, bármilyen fizetéssel"
+
+#: Hub → Today, passes
+msgid "Expired unused, 30 days"
+msgstr "Lejárt, fel nem használt (30 nap)"
+
+#: Hub → Today, passes
+msgid "Gift cards not redeemed"
+msgstr "Be nem váltott ajándékutalványok"
+
+#: Hub → Today, passes
+msgid "Active memberships"
+msgstr "Aktív tagságok"
+
+#: Hub → Today, passes
+msgid "Seats held during payment"
+msgstr "Fizetés alatt tartott helyek"
+
+#: Hub → Today, passes
+msgid "free again if the payment is not finished"
+msgstr "felszabadulnak, ha a fizetés nem fejeződik be"
+
+#: Hub → Today, passes
+msgid "%d session"
+msgid_plural "%d sessions"
+msgstr[0] "%d alkalom"
+msgstr[1] "%d alkalom"
+
+#: Hub → Today, passes
+msgid "%d pass"
+msgid_plural "%d passes"
+msgstr[0] "%d bérlet"
+msgstr[1] "%d bérlet"
+
+#: Hub → Today, passes
+msgid "%d customer"
+msgid_plural "%d customers"
+msgstr[0] "%d vendégnél"
+msgstr[1] "%d vendégnél"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+#, php-format
+msgid "Something went wrong (%s)."
+msgstr "Valami hiba történt (%s)."
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Previous week"
+msgstr "Előző hét"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Next week"
+msgstr "Következő hét"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+#, php-format
+msgid "%1$s sessions · %2$s/%3$s booked"
+msgstr "%1$s óra · %2$s/%3$s foglalva"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Show cancelled"
+msgstr "Lemondottak is"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "New class"
+msgstr "Új óra"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Click an empty time to add a class. Drag a class to move it, drag its bottom edge to change its length."
+msgstr "Üres időpontra kattintva új órát teszel fel. Az órát áthúzva áthelyezed, az alját húzva a hosszát állítod."
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Nothing this week yet. Click a time to add a class."
+msgstr "Ezen a héten még nincs óra. Kattints egy időpontra, és tegyél fel egyet."
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Event"
+msgstr "Esemény"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Private"
+msgstr "Egyéni"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+#, php-format
+msgid "Fewer than %1$s booked; decided %2$s"
+msgstr "Kevesebb mint %1$s foglalás; döntés: %2$s"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "waiting"
+msgstr "várólistán"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+#, php-format
+msgid "This is a weekly class (%s)."
+msgstr "Ez egy heti óra (%s)."
+
+#: assets/calendar.js (OYS_Calendar::strings)
+#, php-format
+msgid "Email the people booked (%s) about the change"
+msgstr "E-mail a foglalóknak (%s) a változásról"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Only this date"
+msgstr "Csak ez a nap"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "This and following weeks"
+msgstr "Ez és a következő hetek"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Save change"
+msgstr "Mentés"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Change which dates?"
+msgstr "Melyik napokat módosítsuk?"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Save change?"
+msgstr "Mentsük a változást?"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Close"
+msgstr "Bezárás"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "stopped"
+msgstr "leállítva"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "in the studio"
+msgstr "a stúdióban"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "booked"
+msgstr "foglalva"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "paying now"
+msgstr "éppen fizet"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Confirmed: goes ahead"
+msgstr "Megerősítve: az óra megtartva"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+#, php-format
+msgid "Needs %1$s to go ahead · decided %2$s"
+msgstr "%1$s fő kell az órához · döntés: %2$s"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "To collect at the studio:"
+msgstr "A helyszínen fizetendő:"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Roster & attendance"
+msgstr "Névsor és jelenlét"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Message everyone"
+msgstr "Üzenet mindenkinek"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Booking page"
+msgstr "Foglalási oldal"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Start the Zoom class"
+msgstr "A Zoom-óra indítása"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Meeting"
+msgstr "Meeting"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "none"
+msgstr "nincs"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Title"
+msgstr "Cím"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "e.g. Full Moon Flow with live music"
+msgstr "pl. Teliholdas flow élő zenével"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Me"
+msgstr "Én"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Hidden teacher"
+msgstr "Rejtett oktató"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Minutes"
+msgstr "Perc"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Both"
+msgstr "Mindkettő"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "In the studio and streamed live: people choose how they join."
+msgstr "A stúdióban és élőben online is: a vendég választja, hogyan csatlakozik."
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Studio or address"
+msgstr "Stúdió vagy cím"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Online link (leave empty: a Zoom meeting is created automatically)"
+msgstr "Online link (üresen hagyva Zoom-meeting készül magától)"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Online link (Zoom, Meet…)"
+msgstr "Online link (Zoom, Meet…)"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Online spots (0 = no limit)"
+msgstr "Online helyek (0 = nincs korlát)"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Online ticket"
+msgstr "Online jegy"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Fixed price"
+msgstr "Fix ár"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Drop-in price"
+msgstr "Alkalmi jegy ára"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+#, php-format
+msgid "People choose what to give (from %s), by card or at the studio. The price above is the suggested amount."
+msgstr "A vendég választja, mennyit ad (legalább %s), kártyával vagy a helyszínen. A fenti ár a javasolt összeg."
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Passes and memberships can be used"
+msgstr "Bérlettel és tagsággal is foglalható"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "People can book now and pay at the studio"
+msgstr "Most foglalhatnak, és a helyszínen fizetnek"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "switched off in Settings"
+msgstr "a Beállításokban kikapcsolva"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Minimum to go ahead"
+msgstr "Minimális létszám"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "People (empty = location default)"
+msgstr "Fő (üres = a helyszín alapértéke)"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Decide hours before"
+msgstr "Döntés ennyi órával előtte"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Short note (shown on the timetable)"
+msgstr "Rövid megjegyzés (az órarendben látszik)"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "e.g. Bring a towel"
+msgstr "pl. Hozz törölközőt"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Repeat"
+msgstr "Ismétlés"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Just this date"
+msgstr "Csak ez a nap"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+#, php-format
+msgid "Every week on %s"
+msgstr "Minden héten: %s"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Create"
+msgstr "Létrehozás"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Save changes"
+msgstr "Változások mentése"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Cancel class"
+msgstr "Óra lemondása"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Suggested amount"
+msgstr "Javasolt összeg"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+#, php-format
+msgid "Cancelled automatically if fewer than %1$s people are booked %2$s hours before; everyone gets other dates."
+msgstr "Magától elmarad, ha %2$s órával előtte kevesebb mint %1$s fő foglalt; mindenki más időpontokat kap."
+
+#: assets/calendar.js (OYS_Calendar::strings)
+#, php-format
+msgid "Default for %s."
+msgstr "Ez a(z) %s alapértéke."
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "No minimum: the class always goes ahead."
+msgstr "Nincs minimum: az óra mindig megvalósul."
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Everyone booked gets an email. Pass and membership bookings get their class back; card payments become a class credit (you can refund in Payments instead)."
+msgstr "Minden foglaló e-mailt kap. A bérlettel és tagsággal foglalók visszakapják az alkalmat; a kártyás fizetésből óra-jóváírás lesz (helyette a Fizetéseknél vissza is térítheted)."
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Reason in the email (optional)"
+msgstr "Indoklás az e-mailben (nem kötelező)"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "e.g. Olivia is unwell"
+msgstr "pl. Olívia beteg"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Keep"
+msgstr "Megtartom"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Cancel this date"
+msgstr "Ezt a napot lemondom"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Stop the weekly class"
+msgstr "A heti óra leállítása"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "“Stop the weekly class” cancels this and every following date and stops new dates being added."
+msgstr "A „heti óra leállítása” ezt és minden későbbi napot lemond, és új napok sem jönnek létre."
+
+#: assets/calendar.js (OYS_Calendar::strings)
+#, php-format
+msgid "Cancel %s?"
+msgstr "Lemondod: %s?"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "That day has passed."
+msgstr "Ez a nap már elmúlt."
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Mon"
+msgstr "H"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Tue"
+msgstr "K"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Wed"
+msgstr "Sze"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Thu"
+msgstr "Cs"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Fri"
+msgstr "P"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Sat"
+msgstr "Szo"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Sun"
+msgstr "V"
+
+#: assets/calendar.js (OYS_Calendar::strings)
+msgid "Never mind"
+msgstr "Mégse"

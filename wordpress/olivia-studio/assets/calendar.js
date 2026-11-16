@@ -11,7 +11,10 @@
 
   const HOUR = 64;          // px per hour
   const SNAP = 15;          // minutes
-  const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+  const L = C.i18n || {};
+  const _ = (s) => L[s] || s; // the site's language (OYS_Calendar::strings)
+  const f = (s, ...a) => { let i = 0; return String(s).replace(/%(\d)\$[sd]|%[sd]/g, (m, n) => String(a[n ? n - 1 : i++])); };
+  const DAY_NAMES = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map(_);
   const TONES = ['forest', 'lilac', 'sun', 'sage', 'sky'];
   const classKeys = Object.keys(C.classes);
 
@@ -25,10 +28,10 @@
   function weekday(d) { return (parse(d).getUTCDay() + 6) % 7; }
   function toMin(t) { const [h, m] = t.split(':').map(Number); return h * 60 + m; }
   function toTime(min) { min = Math.max(0, Math.min(23 * 60 + 45, min)); return String(Math.floor(min / 60)).padStart(2, '0') + ':' + String(min % 60).padStart(2, '0'); }
-  function clock(t) { let [h, m] = t.split(':').map(Number); const ap = h >= 12 ? 'pm' : 'am'; h = h % 12 || 12; return h + (m ? ':' + String(m).padStart(2, '0') : '') + ' ' + ap; }
-  function longDate(d) { return parse(d).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' }); }
-  function shortDate(d) { return parse(d).toLocaleDateString(undefined, { month: 'short', day: 'numeric', timeZone: 'UTC' }); }
-  function money(c) { return (c / 100).toLocaleString(undefined, { style: 'currency', currency: C.currency, minimumFractionDigits: c % 100 ? 2 : 0 }); }
+  function clock(t) { if (C.h24) return t.slice(0, 5); let [h, m] = t.split(':').map(Number); const ap = h >= 12 ? 'pm' : 'am'; h = h % 12 || 12; return h + (m ? ':' + String(m).padStart(2, '0') : '') + ' ' + ap; }
+  function longDate(d) { return parse(d).toLocaleDateString(C.locale || undefined, { weekday: 'long', month: 'long', day: 'numeric', timeZone: 'UTC' }); }
+  function shortDate(d) { return parse(d).toLocaleDateString(C.locale || undefined, { month: 'short', day: 'numeric', timeZone: 'UTC' }); }
+  function money(c) { return (c / 100).toLocaleString(C.locale || undefined, { style: 'currency', currency: C.currency, minimumFractionDigits: c % 100 ? 2 : 0 }); }
   function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch])); }
   function tone(s) {
     if (s.kind === 'event') return 'pink';
@@ -53,7 +56,7 @@
       body: body ? JSON.stringify(body) : undefined,
     });
     const json = await res.json().catch(() => ({}));
-    if (!res.ok) throw new Error(json.message || 'Something went wrong (' + res.status + ').');
+    if (!res.ok) throw new Error(json.message || f(_('Something went wrong (%s).'), res.status));
     return json;
   }
 
@@ -108,13 +111,13 @@
     const seats = total.reduce((n, s) => n + s.capacity, 0);
 
     let html = '<div class="oys-cal__bar">'
-      + '<div class="oys-cal__nav"><button type="button" class="button" data-go="-7" aria-label="Previous week">‹</button>'
-      + '<button type="button" class="button" data-go="today">Today</button>'
-      + '<button type="button" class="button" data-go="7" aria-label="Next week">›</button>'
+      + '<div class="oys-cal__nav"><button type="button" class="button" data-go="-7" aria-label="' + esc(_('Previous week')) + '">‹</button>'
+      + '<button type="button" class="button" data-go="today">' + esc(_('Today')) + '</button>'
+      + '<button type="button" class="button" data-go="7" aria-label="' + esc(_('Next week')) + '">›</button>'
       + '<h2 class="oys-cal__title">' + esc(shortDate(all[0])) + ' – ' + esc(shortDate(all[6])) + '</h2></div>'
-      + '<div class="oys-cal__tools"><span class="oys-cal__stat">' + total.length + ' sessions · ' + booked + '/' + seats + ' booked</span>'
-      + '<label class="oys-cal__toggle"><input type="checkbox" data-cancelled' + (state.showCancelled ? ' checked' : '') + '> Show cancelled</label>'
-      + '<button type="button" class="button button-primary" data-new>+ New class</button></div></div>';
+      + '<div class="oys-cal__tools"><span class="oys-cal__stat">' + esc(f(_('%1$s sessions · %2$s/%3$s booked'), total.length, booked, seats)) + '</span>'
+      + '<label class="oys-cal__toggle"><input type="checkbox" data-cancelled' + (state.showCancelled ? ' checked' : '') + '> ' + esc(_('Show cancelled')) + '</label>'
+      + '<button type="button" class="button button-primary" data-new>+ ' + esc(_('New class')) + '</button></div></div>';
 
     if (narrow) {
       html += '<div class="oys-cal__daytabs" role="tablist">' + all.map((d, i) => '<button type="button" role="tab" aria-selected="' + (d === state.day) + '" data-day="' + d + '"' + (d === C.today ? ' class="is-today"' : '') + '><span>' + DAY_NAMES[i] + '</span><b>' + parse(d).getUTCDate() + '</b></button>').join('') + '</div>';
@@ -141,10 +144,10 @@
       html += '</div>';
     });
     html += '</div>';
-    html += '<p class="oys-cal__hint">Click an empty time to add a class. Drag a class to move it, drag its bottom edge to change its length. <a href="' + esc(C.listUrl) + '">List view</a></p>';
+    html += '<p class="oys-cal__hint">' + esc(_('Click an empty time to add a class. Drag a class to move it, drag its bottom edge to change its length.')) + ' <a href="' + esc(C.listUrl) + '">' + esc(_('List view')) + '</a></p>';
     root.innerHTML = html;
     if (!visible.length) {
-      root.querySelector('.oys-cal__grid').insertAdjacentHTML('beforeend', '<p class="oys-cal__empty">Nothing this week yet. Click a time to add a class.</p>');
+      root.querySelector('.oys-cal__grid').insertAdjacentHTML('beforeend', '<p class="oys-cal__empty">' + esc(_('Nothing this week yet. Click a time to add a class.')) + '</p>');
     }
   }
 
@@ -162,18 +165,18 @@
     if (height < 44) cls.push('is-short');
     const end = toTime(toMin(s.start) + s.duration);
     const badges = (s.series ? '<i class="oys-ev__rep" title="' + esc(s.series.label) + '">↻</i>' : '')
-      + (s.format === 'online' ? '<i class="oys-ev__tag">Online</i>' : '')
-      + (s.format === 'hybrid' ? '<i class="oys-ev__tag">+ Live ' + s.online_booked + '</i>' : '')
-      + (s.teacher ? '<i class="oys-ev__tag oys-ev__tag--teacher" title="Teacher">' + esc(s.teacher) + '</i>' : '')
-      + (s.kind === 'event' ? '<i class="oys-ev__tag">Event</i>' : '')
-      + (s.kind === 'private' ? '<i class="oys-ev__tag">Private</i>' : '')
-      + (s.pricing === 'donation' ? '<i class="oys-ev__tag" title="By donation">♡</i>' : '')
-      + (s.minimum && s.minimum.short ? '<i class="oys-ev__tag oys-ev__tag--warn" title="Fewer than ' + s.minimum.people + ' booked; decided ' + esc(s.minimum.at) + '">min ' + s.minimum.people + '</i>' : '');
+      + (s.format === 'online' ? '<i class="oys-ev__tag">' + esc(_('Online')) + '</i>' : '')
+      + (s.format === 'hybrid' ? '<i class="oys-ev__tag">+ ' + esc(_('Live')) + ' ' + s.online_booked + '</i>' : '')
+      + (s.teacher ? '<i class="oys-ev__tag oys-ev__tag--teacher" title="' + esc(_('Teacher')) + '">' + esc(s.teacher) + '</i>' : '')
+      + (s.kind === 'event' ? '<i class="oys-ev__tag">' + esc(_('Event')) + '</i>' : '')
+      + (s.kind === 'private' ? '<i class="oys-ev__tag">' + esc(_('Private')) + '</i>' : '')
+      + (s.pricing === 'donation' ? '<i class="oys-ev__tag" title="' + esc(_('By donation')) + '">♡</i>' : '')
+      + (s.minimum && s.minimum.short ? '<i class="oys-ev__tag oys-ev__tag--warn" title="' + esc(f(_('Fewer than %1$s booked; decided %2$s'), s.minimum.people, s.minimum.at)) + '">min ' + s.minimum.people + '</i>' : '');
     return '<div class="' + cls.join(' ') + '" data-id="' + s.id + '" tabindex="0" role="button" aria-label="' + esc(s.label + ', ' + longDate(s.date) + ' ' + clock(s.start)) + '"'
       + ' style="top:' + top + 'px;height:' + height + 'px;left:calc(' + (s._col || 0) * w + '% + 2px);width:calc(' + w + '% - 4px)">'
       + '<span class="oys-ev__time">' + clock(s.start) + ' – ' + clock(end) + '</span>'
       + '<span class="oys-ev__name">' + esc(s.label) + '</span>'
-      + '<span class="oys-ev__meta">' + badges + (s.status === 'cancelled' ? '<i class="oys-ev__tag">Cancelled</i>' : '<b>' + s.booked + '/' + s.capacity + '</b>' + (s.waitlist ? ' +' + s.waitlist + ' waiting' : '')) + '</span>'
+      + '<span class="oys-ev__meta">' + badges + (s.status === 'cancelled' ? '<i class="oys-ev__tag">' + esc(_('Cancelled')) + '</i>' : '<b>' + s.booked + '/' + s.capacity + '</b>' + (s.waitlist ? ' +' + s.waitlist + ' ' + esc(_('waiting')) : '')) + '</span>'
       + (s.status === 'scheduled' && !s.past ? '<span class="oys-ev__resize" aria-hidden="true"></span>' : '')
       + '</div>';
   }
@@ -216,12 +219,12 @@
     const needsNotice = s.booked > 0 && what !== 'details';
     if (!s.series && !needsNotice) return { scope: 'one', notify: false };
     let body = '';
-    if (s.series) body += '<p>This is a weekly class (' + esc(s.series.label) + ').</p>';
-    if (needsNotice) body += '<p><label><input type="checkbox" name="notify" checked> Email the ' + s.booked + ' ' + (s.booked === 1 ? 'person' : 'people') + ' booked about the change</label></p>';
+    if (s.series) body += '<p>' + esc(f(_('This is a weekly class (%s).'), s.series.label)) + '</p>';
+    if (needsNotice) body += '<p><label><input type="checkbox" name="notify" checked> ' + esc(f(_('Email the people booked (%s) about the change'), s.booked)) + '</label></p>';
     const buttons = s.series
-      ? [{ label: 'Cancel', value: 'x' }, { label: 'Only this date', value: 'one' }, { label: 'This and following weeks', value: 'series', primary: true }]
-      : [{ label: 'Cancel', value: 'x' }, { label: 'Save change', value: 'one', primary: true }];
-    const r = await dialog(s.series ? 'Change which dates?' : 'Save change?', body, buttons);
+      ? [{ label: _('Never mind'), value: 'x' }, { label: _('Only this date'), value: 'one' }, { label: _('This and following weeks'), value: 'series', primary: true }]
+      : [{ label: _('Never mind'), value: 'x' }, { label: _('Save change'), value: 'one', primary: true }];
+    const r = await dialog(s.series ? _('Change which dates?') : _('Save change?'), body, buttons);
     if (!r || r.value === 'x') return null;
     const n = r.form.querySelector('[name=notify]');
     return { scope: r.value, notify: !!(n && n.checked) };
@@ -238,52 +241,52 @@
     const d = document.createElement('aside');
     d.className = 'oys-drawer';
     d.setAttribute('role', 'dialog');
-    d.setAttribute('aria-label', isNew ? 'New class' : v.label);
-    const kinds = { group: 'Class', event: 'Event / workshop', private: 'Private' };
-    let html = '<div class="oys-drawer__head"><h2>' + (isNew ? 'New class' : esc(v.label)) + '</h2><button type="button" class="oys-drawer__x" aria-label="Close">×</button></div><div class="oys-drawer__body">';
+    d.setAttribute('aria-label', isNew ? _('New class') : v.label);
+    const kinds = { group: _('Class'), event: _('Event / workshop'), private: _('Private') };
+    let html = '<div class="oys-drawer__head"><h2>' + (isNew ? esc(_('New class')) : esc(v.label)) + '</h2><button type="button" class="oys-drawer__x" aria-label="' + esc(_('Close')) + '">×</button></div><div class="oys-drawer__body">';
     if (!isNew) {
-      html += '<p class="oys-drawer__when">' + esc(longDate(v.date)) + ' · ' + clock(v.start) + ' – ' + clock(toTime(toMin(v.start) + v.duration)) + (v.status === 'cancelled' ? ' · <b class="oys-chip is-bad">Cancelled</b>' : '') + '</p>';
-      if (v.series) html += '<p class="oys-drawer__series">↻ ' + esc(v.series.label) + (v.series.active ? '' : ' (stopped)') + '</p>';
-      html += '<div class="oys-drawer__people"><div class="oys-meter"><span style="width:' + Math.min(100, v.booked / v.capacity * 100) + '%"></span></div><p><b>' + v.booked + ' / ' + v.capacity + '</b> ' + (v.format === 'hybrid' ? 'in the studio · <b>' + v.online_booked + (v.online_capacity ? ' / ' + v.online_capacity : '') + '</b> online' : 'booked') + (v.held ? ' · ' + v.held + ' paying now' : '') + (v.waitlist ? ' · ' + v.waitlist + ' on the waitlist' : '') + '</p>'
+      html += '<p class="oys-drawer__when">' + esc(longDate(v.date)) + ' · ' + clock(v.start) + ' – ' + clock(toTime(toMin(v.start) + v.duration)) + (v.status === 'cancelled' ? ' · <b class="oys-chip is-bad">' + esc(_('Cancelled')) + '</b>' : '') + '</p>';
+      if (v.series) html += '<p class="oys-drawer__series">↻ ' + esc(v.series.label) + (v.series.active ? '' : ' (' + esc(_('stopped')) + ')') + '</p>';
+      html += '<div class="oys-drawer__people"><div class="oys-meter"><span style="width:' + Math.min(100, v.booked / v.capacity * 100) + '%"></span></div><p><b>' + v.booked + ' / ' + v.capacity + '</b> ' + (v.format === 'hybrid' ? esc(_('in the studio')) + ' · <b>' + v.online_booked + (v.online_capacity ? ' / ' + v.online_capacity : '') + '</b> ' + esc(_('online')) : esc(_('booked'))) + (v.held ? ' · ' + v.held + ' ' + esc(_('paying now')) : '') + (v.waitlist ? ' · ' + v.waitlist + ' on the waitlist' : '') + '</p>'
         + (v.people.length ? '<ul>' + v.people.map(p => '<li>' + esc(p) + '</li>').join('') + '</ul>' : '')
-        + (v.minimum && v.minimum.people && v.status === 'scheduled' ? '<p class="oys-drawer__min' + (v.minimum.short ? ' is-short' : '') + '">' + (v.minimum.state === 1 ? '✓ Confirmed: goes ahead' : 'Needs ' + v.minimum.people + ' to go ahead · decided ' + esc(v.minimum.at)) + '</p>' : '')
-        + (v.due ? '<p class="oys-drawer__due">To collect at the studio: <b>' + money(v.due) + '</b></p>' : '')
-        + '<p class="oys-drawer__links"><a class="button" href="' + esc(C.rosterUrl + v.id) + '">Roster &amp; attendance</a> ' + (v.booked && v.status === 'scheduled' ? '<a class="button" href="' + esc(C.rosterUrl + v.id) + '#message">Message everyone</a> ' : '') + '<a class="button-link" href="' + esc(C.bookUrl + v.id) + '" target="_blank" rel="noopener">Booking page ↗</a></p>'
-        + (v.zoom && v.status === 'scheduled' ? '<p class="oys-drawer__zoom"><a class="button button-primary" href="' + esc(v.zoom.start) + '" target="_blank" rel="noopener">Start the Zoom class</a> <span>Meeting ' + esc(v.zoom.id) + '</span></p>' : '')
+        + (v.minimum && v.minimum.people && v.status === 'scheduled' ? '<p class="oys-drawer__min' + (v.minimum.short ? ' is-short' : '') + '">' + (v.minimum.state === 1 ? '✓ ' + esc(_('Confirmed: goes ahead')) : esc(f(_('Needs %1$s to go ahead · decided %2$s'), v.minimum.people, v.minimum.at))) + '</p>' : '')
+        + (v.due ? '<p class="oys-drawer__due">' + esc(_('To collect at the studio:')) + ' <b>' + money(v.due) + '</b></p>' : '')
+        + '<p class="oys-drawer__links"><a class="button" href="' + esc(C.rosterUrl + v.id) + '">' + esc(_('Roster & attendance')) + '</a> ' + (v.booked && v.status === 'scheduled' ? '<a class="button" href="' + esc(C.rosterUrl + v.id) + '#message">' + esc(_('Message everyone')) + '</a> ' : '') + '<a class="button-link" href="' + esc(C.bookUrl + v.id) + '" target="_blank" rel="noopener">' + esc(_('Booking page')) + ' ↗</a></p>'
+        + (v.zoom && v.status === 'scheduled' ? '<p class="oys-drawer__zoom"><a class="button button-primary" href="' + esc(v.zoom.start) + '" target="_blank" rel="noopener">' + esc(_('Start the Zoom class')) + '</a> <span>' + esc(_('Meeting')) + ' ' + esc(v.zoom.id) + '</span></p>' : '')
         + '</div>';
     }
     html += '<form class="oys-drawer__form"' + (locked ? ' inert' : '') + '>';
-    html += '<div class="oys-seg" role="radiogroup" aria-label="Type">' + Object.keys(kinds).map(k => '<label><input type="radio" name="kind" value="' + k + '"' + (v.kind === k ? ' checked' : '') + (isNew ? '' : ' disabled') + '><span>' + kinds[k] + '</span></label>').join('') + '</div>';
-    html += field('Class', '<select name="class_slug"><option value="">— none —</option>' + classKeys.map(k => '<option value="' + esc(k) + '"' + (v.class_slug === k ? ' selected' : '') + '>' + esc(C.classes[k]) + '</option>').join('') + '</select>', 'f-class');
-    html += field('Title', '<input type="text" name="title" value="' + esc(v.title) + '" placeholder="e.g. Full Moon Flow with live music">', 'f-title');
+    html += '<div class="oys-seg" role="radiogroup" aria-label="' + esc(_('Type')) + '">' + Object.keys(kinds).map(k => '<label><input type="radio" name="kind" value="' + k + '"' + (v.kind === k ? ' checked' : '') + (isNew ? '' : ' disabled') + '><span>' + kinds[k] + '</span></label>').join('') + '</div>';
+    html += field(esc(_('Class')), '<select name="class_slug"><option value="">— ' + esc(_('none')) + ' —</option>' + classKeys.map(k => '<option value="' + esc(k) + '"' + (v.class_slug === k ? ' selected' : '') + '>' + esc(C.classes[k]) + '</option>').join('') + '</select>', 'f-class');
+    html += field(esc(_('Title')), '<input type="text" name="title" value="' + esc(v.title) + '" placeholder="' + esc(_('e.g. Full Moon Flow with live music')) + '">', 'f-title');
     const teachers = C.teachers || [];
     if (teachers.length || v.teacher_id) {
-      html += field('Teacher', '<select name="teacher_id"><option value="0">' + esc(C.ownerName || 'Me') + '</option>' + teachers.map(t => '<option value="' + t.id + '"' + (+v.teacher_id === t.id ? ' selected' : '') + '>' + esc(t.name) + '</option>').join('') + (v.teacher_id && !teachers.some(t => t.id === +v.teacher_id) ? '<option value="' + v.teacher_id + '" selected>' + esc(v.teacher || 'Hidden teacher') + '</option>' : '') + '</select>', 'f-teacher');
+      html += field(esc(_('Teacher')), '<select name="teacher_id"><option value="0">' + esc(C.ownerName || _('Me')) + '</option>' + teachers.map(t => '<option value="' + t.id + '"' + (+v.teacher_id === t.id ? ' selected' : '') + '>' + esc(t.name) + '</option>').join('') + (v.teacher_id && !teachers.some(t => t.id === +v.teacher_id) ? '<option value="' + v.teacher_id + '" selected>' + esc(v.teacher || _('Hidden teacher')) + '</option>' : '') + '</select>', 'f-teacher');
     }
-    html += '<div class="oys-row">' + field('Date', '<input type="date" name="date" required value="' + esc(v.date) + '">') + field('Starts', '<input type="time" name="start" step="300" required value="' + esc(v.start) + '">') + field('Minutes', '<input type="number" name="duration" min="15" max="600" step="5" value="' + v.duration + '">') + '</div>';
-    const formats = { studio: 'In person', online: 'Online', hybrid: 'Both' };
-    html += '<div class="oys-seg" role="radiogroup" aria-label="Where">' + Object.keys(formats).map(k => '<label><input type="radio" name="format" value="' + k + '"' + ((v.format || 'studio') === k ? ' checked' : '') + '><span>' + formats[k] + '</span></label>').join('') + '</div>';
-    html += '<p class="description f-hybrid-note">In the studio and streamed live: people choose how they join.</p>';
-    html += field('Location', '<input type="text" name="location" list="oys-locations" value="' + esc(v.location) + '" placeholder="Studio or address">', 'f-loc');
+    html += '<div class="oys-row">' + field(esc(_('Date')), '<input type="date" name="date" required value="' + esc(v.date) + '">') + field(esc(_('Starts')), '<input type="time" name="start" step="300" required value="' + esc(v.start) + '">') + field(esc(_('Minutes')), '<input type="number" name="duration" min="15" max="600" step="5" value="' + v.duration + '">') + '</div>';
+    const formats = { studio: _('In person'), online: _('Online'), hybrid: _('Both') };
+    html += '<div class="oys-seg" role="radiogroup" aria-label="' + esc(_('Where')) + '">' + Object.keys(formats).map(k => '<label><input type="radio" name="format" value="' + k + '"' + ((v.format || 'studio') === k ? ' checked' : '') + '><span>' + formats[k] + '</span></label>').join('') + '</div>';
+    html += '<p class="description f-hybrid-note">' + esc(_('In the studio and streamed live: people choose how they join.')) + '</p>';
+    html += field(esc(_('Location')), '<input type="text" name="location" list="oys-locations" value="' + esc(v.location) + '" placeholder="' + esc(_('Studio or address')) + '">', 'f-loc');
     html += '<datalist id="oys-locations">' + (C.locations || []).filter(l => l.id !== 'online').map(l => '<option value="' + esc(l.name) + '">').join('') + '</datalist>';
-    html += field(C.zoom ? 'Online link (leave empty: a Zoom meeting is created automatically)' : 'Online link (Zoom, Meet…)', '<input type="url" name="online_url" value="' + esc(v.online_url) + '" placeholder="https://">', 'f-url');
-    html += '<div class="oys-row f-online">' + field('Online spots (0 = no limit)', '<input type="number" name="online_capacity" min="0" value="' + (v.online_capacity || 0) + '">') + field('Online ticket (' + esc(C.currency) + ')', '<input type="number" name="online_price" min="0" step="0.01" value="' + ((v.format === 'hybrid' ? v.online_price : C.prices.online) / 100) + '">') + '</div>';
-    html += '<div class="oys-seg oys-seg--sm" role="radiogroup" aria-label="Price">' + [['fixed', 'Fixed price'], ['donation', 'By donation']].map(p => '<label><input type="radio" name="pricing" value="' + p[0] + '"' + ((v.pricing || 'fixed') === p[0] ? ' checked' : '') + '><span>' + p[1] + '</span></label>').join('') + '</div>';
-    html += '<div class="oys-row">' + field('Spots', '<input type="number" name="capacity" min="1" value="' + v.capacity + '">') + field('<span class="f-price-label">Drop-in price</span> (' + esc(C.currency) + ')', '<input type="number" name="price" min="0" step="0.01" value="' + (v.price / 100) + '">') + '</div>';
-    html += '<p class="description f-donation-note">People choose what to give (from ' + money(C.donationMin) + '), by card or at the studio. The price above is the suggested amount.</p>';
-    html += '<label class="oys-check"><input type="checkbox" name="credits_allowed"' + (v.credits_allowed ? ' checked' : '') + '> Passes and memberships can be used</label>';
-    html += '<label class="oys-check f-paylater"><input type="checkbox" name="pay_later"' + (v.pay_later !== false ? ' checked' : '') + '> People can book now and pay at the studio' + (C.payLater === 'off' ? ' <small>(switched off in Settings)</small>' : '') + '</label>';
-    html += '<fieldset class="oys-min f-min"><legend>Minimum to go ahead</legend><div class="oys-row">'
-      + field('People (empty = location default)', '<input type="number" name="min_people" min="0" value="' + (v.min_people == null ? '' : v.min_people) + '" placeholder="">')
-      + field('Decide hours before', '<input type="number" name="decide_hours" min="1" value="' + (v.decide_hours == null ? '' : v.decide_hours) + '" placeholder="">') + '</div>'
+    html += field(esc(C.zoom ? _('Online link (leave empty: a Zoom meeting is created automatically)') : _('Online link (Zoom, Meet…)')), '<input type="url" name="online_url" value="' + esc(v.online_url) + '" placeholder="https://">', 'f-url');
+    html += '<div class="oys-row f-online">' + field(esc(_('Online spots (0 = no limit)')), '<input type="number" name="online_capacity" min="0" value="' + (v.online_capacity || 0) + '">') + field(esc(_('Online ticket')) + ' (' + esc(C.currency) + ')', '<input type="number" name="online_price" min="0" step="0.01" value="' + ((v.format === 'hybrid' ? v.online_price : C.prices.online) / 100) + '">') + '</div>';
+    html += '<div class="oys-seg oys-seg--sm" role="radiogroup" aria-label="' + esc(_('Price')) + '">' + [['fixed', _('Fixed price')], ['donation', _('By donation')]].map(p => '<label><input type="radio" name="pricing" value="' + p[0] + '"' + ((v.pricing || 'fixed') === p[0] ? ' checked' : '') + '><span>' + p[1] + '</span></label>').join('') + '</div>';
+    html += '<div class="oys-row">' + field(esc(_('Spots')), '<input type="number" name="capacity" min="1" value="' + v.capacity + '">') + field('<span class="f-price-label">' + esc(_('Drop-in price')) + '</span> (' + esc(C.currency) + ')', '<input type="number" name="price" min="0" step="0.01" value="' + (v.price / 100) + '">') + '</div>';
+    html += '<p class="description f-donation-note">' + esc(f(_('People choose what to give (from %s), by card or at the studio. The price above is the suggested amount.'), money(C.donationMin))) + '</p>';
+    html += '<label class="oys-check"><input type="checkbox" name="credits_allowed"' + (v.credits_allowed ? ' checked' : '') + '> ' + esc(_('Passes and memberships can be used')) + '</label>';
+    html += '<label class="oys-check f-paylater"><input type="checkbox" name="pay_later"' + (v.pay_later !== false ? ' checked' : '') + '> ' + esc(_('People can book now and pay at the studio')) + (C.payLater === 'off' ? ' <small>(' + esc(_('switched off in Settings')) + ')</small>' : '') + '</label>';
+    html += '<fieldset class="oys-min f-min"><legend>' + esc(_('Minimum to go ahead')) + '</legend><div class="oys-row">'
+      + field(esc(_('People (empty = location default)')), '<input type="number" name="min_people" min="0" value="' + (v.min_people == null ? '' : v.min_people) + '" placeholder="">')
+      + field(esc(_('Decide hours before')), '<input type="number" name="decide_hours" min="1" value="' + (v.decide_hours == null ? '' : v.decide_hours) + '" placeholder="">') + '</div>'
       + '<p class="description f-min-hint"></p></fieldset>';
-    html += '<div class="oys-row">' + field('Short note (shown on the timetable)', '<input type="text" name="note" value="' + esc(v.note) + '" placeholder="e.g. Bring a towel">')
-      + field('Taught in', '<select name="lang">' + Object.keys(C.langs || { en: 'English' }).map(k => '<option value="' + k + '"' + ((v.lang || 'en') === k ? ' selected' : '') + '>' + esc((C.langs || {})[k] || k) + '</option>').join('') + '</select>') + '</div>';
-    html += field('Description', '<textarea name="description" rows="3">' + esc(v.description) + '</textarea>', 'f-desc');
-    if (isNew) html += field('Repeat', '<select name="repeat"><option value="none">Just this date</option><option value="weekly">Every week on ' + DAY_NAMES[weekday(v.date)] + '</option></select>', 'f-repeat');
+    html += '<div class="oys-row">' + field(esc(_('Short note (shown on the timetable)')), '<input type="text" name="note" value="' + esc(v.note) + '" placeholder="' + esc(_('e.g. Bring a towel')) + '">')
+      + field(esc(_('Taught in')), '<select name="lang">' + Object.keys(C.langs || { en: 'English' }).map(k => '<option value="' + k + '"' + ((v.lang || 'en') === k ? ' selected' : '') + '>' + esc((C.langs || {})[k] || k) + '</option>').join('') + '</select>') + '</div>';
+    html += field(esc(_('Description')), '<textarea name="description" rows="3">' + esc(v.description) + '</textarea>', 'f-desc');
+    if (isNew) html += field(esc(_('Repeat')), '<select name="repeat"><option value="none">' + esc(_('Just this date')) + '</option><option value="weekly">' + esc(f(_('Every week on %s'), DAY_NAMES[weekday(v.date)])) + '</option></select>', 'f-repeat');
     html += '</form></div><div class="oys-drawer__foot">';
-    if (!locked) html += '<button type="button" class="button button-primary" data-save>' + (isNew ? 'Create' : 'Save changes') + '</button>';
-    if (!isNew && v.status === 'scheduled' && !v.past) html += '<button type="button" class="button oys-danger" data-cancel>Cancel class…</button>';
+    if (!locked) html += '<button type="button" class="button button-primary" data-save>' + esc(isNew ? _('Create') : _('Save changes')) + '</button>';
+    if (!isNew && v.status === 'scheduled' && !v.past) html += '<button type="button" class="button oys-danger" data-cancel>' + esc(_('Cancel class')) + '…</button>';
     html += '</div>';
     d.innerHTML = html;
     document.body.appendChild(d);
@@ -302,7 +305,7 @@
       d.querySelector('.f-hybrid-note').hidden = !hybrid;
       const donation = (form.querySelector('[name=pricing]:checked') || {}).value === 'donation';
       d.querySelector('.f-donation-note').hidden = !donation;
-      d.querySelector('.f-price-label').textContent = donation ? 'Suggested amount' : 'Drop-in price';
+      d.querySelector('.f-price-label').textContent = donation ? _('Suggested amount') : _('Drop-in price');
       d.querySelector('.f-paylater').hidden = online || kind === 'private';
       d.querySelector('.f-min').hidden = kind === 'private';
       const loc = online ? (C.locations || []).find(l => l.id === 'online') : (C.locations || []).find(l => l.id !== 'online' && l.name.toLowerCase() === form.location.value.trim().toLowerCase());
@@ -312,12 +315,12 @@
       const people = form.min_people.value === '' ? (kind === 'group' ? defPeople : 0) : +form.min_people.value;
       const hours = form.decide_hours.value === '' ? defHours : +form.decide_hours.value;
       d.querySelector('.f-min-hint').innerHTML = people > 0
-        ? 'Cancelled automatically if fewer than <b>' + people + '</b> people are booked <b>' + hours + ' hours</b> before; everyone gets other dates. ' + (loc ? 'Default for ' + esc(loc.name) + '.' : '') + ' <a href="' + esc(C.locationsUrl) + '">Locations</a>'
-        : 'No minimum: the class always goes ahead.';
+        ? f(esc(_('Cancelled automatically if fewer than %1$s people are booked %2$s hours before; everyone gets other dates.')), '<b>' + people + '</b>', '<b>' + hours + '</b>') + ' ' + (loc ? esc(f(_('Default for %s.'), loc.name)) : '') + ' <a href="' + esc(C.locationsUrl) + '">' + esc(_('Locations')) + '</a>'
+        : esc(_('No minimum: the class always goes ahead.'));
       const rep = d.querySelector('.f-repeat');
       if (rep) {
         rep.hidden = kind !== 'group';
-        rep.querySelector('option[value=weekly]').textContent = 'Every week on ' + DAY_NAMES[weekday(form.date.value || C.today)];
+        rep.querySelector('option[value=weekly]').textContent = f(_('Every week on %s'), DAY_NAMES[weekday(form.date.value || C.today)]);
       }
     };
     form.addEventListener('input', e => { if (['location', 'min_people', 'decide_hours'].indexOf(e.target.name) >= 0) sync(); });
@@ -399,13 +402,13 @@
   }
 
   async function cancelSession(v) {
-    let body = '<p>Everyone booked gets an email. Pass and membership bookings get their class back; card payments become a class credit (you can refund in Payments instead).</p>'
-      + '<p><label class="oys-f"><span>Reason in the email (optional)</span><input type="text" name="reason" class="regular-text" placeholder="e.g. Olivia is unwell"></label></p>';
+    let body = '<p>' + esc(_('Everyone booked gets an email. Pass and membership bookings get their class back; card payments become a class credit (you can refund in Payments instead).')) + '</p>'
+      + '<p><label class="oys-f"><span>' + esc(_('Reason in the email (optional)')) + '</span><input type="text" name="reason" class="regular-text" placeholder="' + esc(_('e.g. Olivia is unwell')) + '"></label></p>';
     const buttons = v.series
-      ? [{ label: 'Keep', value: 'x' }, { label: 'Cancel this date', value: 'one', danger: true }, { label: 'Stop the weekly class', value: 'series', danger: true }]
-      : [{ label: 'Keep', value: 'x' }, { label: 'Cancel class', value: 'one', danger: true }];
-    if (v.series) body += '<p class="description">“Stop the weekly class” cancels this and every following date and stops new dates being added.</p>';
-    const r = await dialog('Cancel ' + v.label + ', ' + shortDate(v.date) + '?', body, buttons);
+      ? [{ label: _('Keep'), value: 'x' }, { label: _('Cancel this date'), value: 'one', danger: true }, { label: _('Stop the weekly class'), value: 'series', danger: true }]
+      : [{ label: _('Keep'), value: 'x' }, { label: _('Cancel class'), value: 'one', danger: true }];
+    if (v.series) body += '<p class="description">' + esc(_('“Stop the weekly class” cancels this and every following date and stops new dates being added.')) + '</p>';
+    const r = await dialog(f(_('Cancel %s?'), v.label + ', ' + shortDate(v.date)), body, buttons);
     if (!r || r.value === 'x') return;
     try {
       const res = await api('sessions/' + v.id + '/cancel', { scope: r.value, reason: r.form.querySelector('[name=reason]').value });
@@ -493,7 +496,7 @@
       const col = e.target.closest('.oys-cal__col');
       const rect = col.getBoundingClientRect();
       const mins = +col.dataset.h0 * 60 + Math.floor((e.clientY - rect.top) / HOUR * 60 / 30) * 30;
-      if (col.dataset.date < C.today) { toast('That day has passed.', true); return; }
+      if (col.dataset.date < C.today) { toast(_('That day has passed.'), true); return; }
       openDrawer(null, { date: col.dataset.date, start: toTime(mins) });
     }
   });
