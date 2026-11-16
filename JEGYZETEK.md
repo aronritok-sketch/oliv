@@ -1198,6 +1198,20 @@
     - az aronritok.com, facebook, instagram, youtube, tiktok, linkedin, pinterest és threads linkekre.
   - Az oldalon belüli ugrások (#…, pl. „Ugrás a tartalomra”, „Sütibeállítások”) maradnak. A fizetés alatti ÁSZF-link
     (plugin) eddig is új ablakban nyílt.
+- **Órarend-sztori és Facebook-képek az oliviajoga.online mostani dizájnjával** (Olívia, 2026-11-16, portál-chat:
+  „az órarend sztorit és a facebook képeket szerkeszd újra … a jelenlegi háttér maradjon. A képek teljes egészében
+  legyenek, nem kell rájuk szöveg, de kis design jöhet”).
+  - Generátor: `oliviajoga-hu/tools/facebook/online_social.py` (story / photos), a kép a `cover.js`-sel készül.
+  - **A sztori (1080×1920):** a háttér a régi (`orarend_bg.py` → `orarend-hatter.png`). Rajta:
+    - a weboldal logója kártyán;
+    - „ONLINE JÓGA” sárga és „ÓRAREND” magenta blokkon (Anton);
+    - két kártya: szerda 18:30–20:00, online flow jóga, 90 perc, első óra december 16.; egyéni órák egyeztetett
+      időpontban (privát jóga, kismamatorna, mobilizáció, relaxáció és légzés);
+    - sötétzöld gomb: „Bejelentkezés: oliviajoga.online”;
+    - a weboldal foltjai és négy pöttye.
+  - **17 Facebook-kép:** a fotó egészben, lekerekítve, krém kerettel, öt színkészlet váltakozva (sárga, krém, zsálya,
+    mandarin, sötétzöld háttér), a weboldal két foltja és a négy pötty; nincs szöveg és logó.
+  - Elküldve a portálba: 9148779 (sztori), 9148780 (zip). A fotók nem kerülnek a repóba.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
