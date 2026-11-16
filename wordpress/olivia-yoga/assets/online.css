@@ -1551,3 +1551,30 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .oj-prenatal .oj-waved--soft > .oj-blob:not(.oj-brush) .oj-blob__front { fill: var(--tangerine); }
 .oj-prenatal .oj-waved--soft > .oj-blob:not(.oj-brush) .oj-blob__back { fill: color-mix(in srgb, var(--sun) 50%, #fff); }
 
+/* after paying: the confirmation in the site's look (Áron, 16 November: „Nem tetszik” – a peach box with a hard black
+   shadow, uneven buttons, a long sentence with the date, a blue Facebook line) */
+.layout--return { padding-top: clamp(1.4rem, 5vw, 3rem); }
+.entry .oys-card.oys-done { position: relative; overflow: hidden; max-width: 640px; margin: 0 auto; padding: clamp(1.6rem, 5vw, 2.6rem); border: 0; border-radius: 28px; background: #fff; box-shadow: 0 34px 70px -46px rgba(0, 46, 44, .55); }
+.entry .oys-card.oys-done::before { content: ""; position: absolute; right: -80px; top: -80px; width: 230px; height: 230px; border-radius: 50%; background: var(--sun-soft); pointer-events: none; }
+.entry .oys-card.oys-done > * { position: relative; }
+.entry .oys-done__badge { width: 64px; height: 64px; margin-bottom: 1rem; background: var(--sun); color: var(--forest); box-shadow: 0 0 0 8px color-mix(in srgb, var(--sun) 30%, transparent); }
+.entry .oys-done__badge .oys-icon { width: 30px; height: 30px; }
+.entry .oys-done h2 { margin: 0 0 1.1rem; font-size: clamp(2.1rem, 8vw, 3rem); line-height: 1; }
+.entry .oys-done__ticket { gap: .75rem; margin: 0 0 1.1rem; padding: 1.1rem 1.25rem; border-radius: 20px; background: var(--paper); }
+.entry .oys-done__ticket > div { grid-template-columns: 4.4rem minmax(0, 1fr); gap: .6rem; align-items: baseline; }
+.entry .oys-done__ticket dt { color: var(--forest); opacity: .6; }
+.entry .oys-done__ticket dd { color: var(--forest); font-size: 1.04rem; line-height: 1.4; }
+.entry .oys-done__lead { margin: 0 0 1.3rem; color: var(--muted, #4B5B59); }
+.entry .oys-done__actions { display: flex; flex-wrap: wrap; gap: .7rem; margin: 0 0 1rem; }
+.entry .oys-done__actions .btn { min-height: 48px; }
+.entry .oys-done__receipt { margin: 0 0 1.2rem; }
+.entry .oys-done__receipt a { font-size: .95rem; }
+.entry .oys-done .oys-fb { margin: 0; }
+.entry .oys-done .oys-fb a { display: flex; align-items: center; gap: .85rem; padding: .9rem 1rem; border-radius: 18px; background: color-mix(in srgb, var(--tangerine) 22%, #fff); color: var(--forest); font-weight: 600; font-size: .95rem; line-height: 1.4; text-decoration: none; }
+.entry .oys-done .oys-fb a:hover { background: color-mix(in srgb, var(--tangerine) 38%, #fff); color: var(--forest); }
+.entry .oys-done .oys-fb .oys-icon:first-child { width: 38px; height: 38px; padding: 8px; background: var(--forest); color: #fff; stroke: #fff; }
+.entry .oys-done .oys-fb span { flex: 1; }
+@media (max-width: 559px) {
+	.entry .oys-done__actions .btn { flex: 1 1 100%; justify-content: center; }
+}
+

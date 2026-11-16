@@ -10,10 +10,15 @@ while ( have_posts() ) :
 	$studio = oy_is_studio_page();
 	$aside  = $studio ? '' : oy_page_aside( $slug );
 	$photo  = $studio && 'gifts' !== $studio ? '' : oy_post_photo( get_the_ID(), '', '(min-width: 960px) 36vw, 90vw', true );
-	echo oy_page_head( get_the_title(), has_excerpt() ? get_the_excerpt() : '', array( array( get_the_title(), get_permalink() ) ), $slug, '', $photo ); // phpcs:ignore
+	// after paying (?oys_order=…): no big „Foglalás” head over the confirmation – the confirmation itself is the page
+	// (Áron, 16 November: „Nem tetszik” – a coloured band, then the card)
+	$return = oy_online_only() && 'book' === $studio && ! empty( $_GET['oys_order'] ); // phpcs:ignore WordPress.Security.NonceVerification
+	if ( ! $return ) {
+		echo oy_page_head( get_the_title(), has_excerpt() ? get_the_excerpt() : '', array( array( get_the_title(), get_permalink() ) ), $slug, '', $photo ); // phpcs:ignore
+	}
 	?>
 	<div class="container">
-		<div class="layout<?php echo $aside ? ' layout--aside' : ''; ?><?php echo $studio ? ' layout--studio' : ''; ?>">
+		<div class="layout<?php echo $aside ? ' layout--aside' : ''; ?><?php echo $studio ? ' layout--studio' : ''; ?><?php echo $return ? ' layout--return' : ''; ?>">
 			<?php
 			if ( 'schedule-pricing' === $slug && ! $studio ) {
 				oy_main_transform_set( 'pricing' ); // the facts and the one-to-one boxes, after Olívia's own edits (oy_main_transform)

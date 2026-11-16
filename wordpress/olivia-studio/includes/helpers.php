@@ -56,6 +56,7 @@ function oys_date_format( $format ) {
 		'M j, g:i a'     => 'M. j. G:i',
 		'M j, Y'         => 'Y. M. j.',
 		'l, F j'         => 'F j., l',
+		'l, F j \a\t g:i a' => 'F j., l, G:i', // the booking's confirmation: „december 16., szerda, 18:30” (not „… at 18:30”)
 		'l, g:i a'       => 'l G:i',
 		'F j'            => 'F j.',
 		'M j'            => 'M. j.', // WordPress's Hungarian short months have no full stop (nov) – the date needs it (nov. 7.)
@@ -236,7 +237,7 @@ function oys_fb_group_link( $text = '' ) {
 		return '';
 	}
 	$text = $text ?: __( 'Join our Facebook group: class news, photos and a friendly community', 'olivia-studio' );
-	return '<p class="oys-fb"><a href="' . esc_url( $url ) . '" target="_blank" rel="noopener">' . oys_icon( 'facebook' ) . '<span>' . esc_html( $text ) . '</span></a></p>';
+	return '<p class="oys-fb"><a href="' . esc_url( $url ) . '" target="_blank" rel="noopener">' . oys_icon( 'facebook' ) . '<span>' . esc_html( $text ) . '</span>' . oys_icon( 'arrow' ) . '</a></p>';
 }
 
 /** One-shot notices shown on the next page view (per user or per browser). */

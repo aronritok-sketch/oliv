@@ -177,7 +177,17 @@
 .session__donation { display: inline-block; margin-left: .35rem; padding: 0 .45rem; border: 1.5px solid currentColor; border-radius: 999px; font-size: .78em; font-weight: 700; }
 .oys-fb { margin: 1rem 0 0; }
 .oys-fb a { display: inline-flex; align-items: center; gap: .5rem; font-weight: 700; color: var(--oys-forest); text-decoration: underline; text-underline-offset: 3px; }
-.oys-fb .oys-icon { width: 22px; height: 22px; flex: none; padding: 3px; border-radius: 50%; background: #1877F2; color: #fff; stroke: #fff; }
+.oys-fb .oys-icon:first-child { width: 22px; height: 22px; flex: none; padding: 3px; border-radius: 50%; background: #1877F2; color: #fff; stroke: #fff; }
+.oys-fb .oys-icon:last-child:not(:first-child) { width: 16px; height: 16px; flex: none; }
+/* the booking's confirmation: a tick, the booking as a small ticket, the buttons */
+.oys-done__badge { display: inline-grid; place-items: center; width: 52px; height: 52px; margin-bottom: .6rem; border-radius: 50%; background: var(--oys-ink); color: #fff; }
+.oys-done__badge .oys-icon { width: 26px; height: 26px; stroke-width: 2.4; }
+.oys-done__ticket { display: grid; gap: .55rem; margin: 0 0 1rem; padding: .9rem 1rem; border-radius: 6px; background: rgba(255, 255, 255, .6); }
+.oys-done__ticket > div { display: grid; grid-template-columns: 5.5rem minmax(0, 1fr); gap: .75rem; }
+.oys-done__ticket dt { padding-top: .12rem; font-size: .76rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; opacity: .7; }
+.oys-done__ticket dd { margin: 0; font-weight: 700; }
+.oys-done__receipt a { display: inline-flex; align-items: center; gap: .4rem; }
+.oys-done__receipt .oys-icon { width: 18px; height: 18px; }
 .oys-account > .oys-fb { margin-top: 1.5rem; }
 .oys-private-note { display: flex; gap: .6rem; align-items: flex-start; font-weight: 500; }
 .oys-private-note .oys-icon { width: 22px; height: 22px; flex: none; margin-top: 2px; }

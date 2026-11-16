@@ -824,6 +824,20 @@
     teszi a pöttyöt a fehér kártya sarkára.
   - Tangerine pötty finom gyűrűvel, az első sor közepéhez igazítva.
   - Tesztek: 1366/0.
+- **olivia-studio 1.12.1 + téma 3.11.92:** a fizetés utáni visszaigazolás (Áron: „Nem tetszik” – képernyőkép a
+  „Foglalva vagy!” kártyáról).
+  - A kártya felépítése: pipás jelvény, „Foglalva vagy!”, alatta jegyszerű blokk (Óra / Mikor / Hol, és ha vannak, a
+    vendégek), egy mondat a visszaigazoló levélről, majd a gombok. Eddig az egészet egy hosszú mondat írta le.
+  - A dátum magyarul: „december 16., szerda, 18:30”, nem „… at 18:30”. Ehhez új bejegyzés került az
+    `oys_date_format`-ba.
+  - Nyugta: kis ikonos link. Facebook-csoport: saját sor, a márka színeiben, nyíllal (az `oys_fb_group_link` mindenhol
+    nyilat kap).
+  - Online téma: a `?oys_order` visszatérő nézeten nincs nagy „Foglalás” fejléc (`layout--return`). A kártya fehér,
+    kerekített, a sarkában halványsárga kör; a pötty sárga, az összefoglaló platina hátterű. Telefonon a gombok teljes
+    szélesek.
+  - Új fordítások (hu, es): Guests, Live online, in your browser, A confirmation with a calendar invite is on its way to
+    your inbox.
+  - Tesztek: 1367/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -4097,3 +4097,15 @@ msgstr "Es un regalo para dos: una de vosotras canjea el código en su cuenta y 
 
 msgid "What to have ready for the class"
 msgstr "Qué tener preparado para la clase"
+
+#: includes/class-frontend.php
+msgid "Guests"
+msgstr "Invitados"
+
+#: includes/class-frontend.php
+msgid "Live online, in your browser"
+msgstr "En vivo, online, en tu navegador"
+
+#: includes/class-frontend.php
+msgid "A confirmation with a calendar invite is on its way to your inbox."
+msgstr "La confirmación con una invitación de calendario está en camino a tu bandeja de entrada."

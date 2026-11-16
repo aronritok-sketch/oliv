@@ -6173,3 +6173,15 @@ msgstr "A fájlt nem sikerült beolvasni."
 
 msgid "This server cannot open .xlsx files; save the sheet as .csv and upload that."
 msgstr "Ez a szerver nem tud .xlsx fájlt megnyitni. Mentsd a táblázatot .csv-ként, és azt töltsd fel."
+
+#: includes/class-frontend.php
+msgid "Guests"
+msgstr "Vendégek"
+
+#: includes/class-frontend.php
+msgid "Live online, in your browser"
+msgstr "Élőben, online, a böngésződben"
+
+#: includes/class-frontend.php
+msgid "A confirmation with a calendar invite is on its way to your inbox."
+msgstr "A visszaigazolás naptármeghívóval úton van a postafiókodba."

@@ -850,11 +850,18 @@ class OYS_Frontend {
 			$s      = OYS_Schedule::get( $rows[0]->session_id );
 			$host   = $rows[0]->guest_of ? (int) $rows[0]->guest_of : (int) $rows[0]->id;
 			$guests = array_filter( $rows, fn( $r ) => $r->guest_of );
-			$html  .= '<h2>' . esc_html( count( $guests ) === count( $rows ) ? _n( 'Guest added!', 'Guests added!', count( $guests ), 'olivia-studio' ) : __( 'You\'re booked!', 'olivia-studio' ) ) . '</h2><p>' . sprintf( esc_html__( '%1$s on %2$s. A confirmation with a calendar invite is on its way to your inbox.', 'olivia-studio' ), '<b>' . esc_html( oys_session_title( $s ) ) . '</b>', esc_html( oys_date( $s->starts_at, 'l, F j \a\t g:i a' ) ) ) . '</p>';
-			if ( $guests ) {
-				$html .= '<p>' . esc_html( sprintf( _n( 'Guest: %s', 'Guests: %s', count( $guests ), 'olivia-studio' ), implode( ', ', wp_list_pluck( $guests, 'guest_name' ) ) ) ) . '</p>';
-			}
-			$html .= '<p class="btn-row"><a class="btn btn--primary" href="' . esc_url( oys_account_url() ) . '">' . esc_html__( 'My bookings', 'olivia-studio' ) . '</a>' . self::ics_link( $host ) . '</p>';
+			// Áron, 16 November („Nem tetszik”): a tick, the booking as a small ticket (class, when, where, guests), then the
+			// buttons – not one long sentence. The date in the language of the page (Hungarian: „december 16., szerda, 18:30”).
+			$mode   = oys_mode_for( $s, (string) ( $rows[0]->mode ?? 'studio' ) );
+			$ticket = '<div><dt>' . esc_html__( 'Class', 'olivia-studio' ) . '</dt><dd>' . esc_html( oys_session_title( $s ) ) . '</dd></div>'
+				. '<div><dt>' . esc_html__( 'When', 'olivia-studio' ) . '</dt><dd>' . esc_html( oys_date( $s->starts_at, 'l, F j \a\t g:i a' ) ) . '</dd></div>'
+				. ( 'online' === $mode ? '<div><dt>' . esc_html__( 'Where', 'olivia-studio' ) . '</dt><dd>' . esc_html__( 'Live online, in your browser', 'olivia-studio' ) . '</dd></div>' : '' )
+				. ( $guests ? '<div><dt>' . esc_html( 1 === count( $guests ) ? __( 'Guest', 'olivia-studio' ) : __( 'Guests', 'olivia-studio' ) ) . '</dt><dd>' . esc_html( implode( ', ', wp_list_pluck( $guests, 'guest_name' ) ) ) . '</dd></div>' : '' );
+			$html  .= '<span class="oys-done__badge" aria-hidden="true">' . oys_icon( 'check' ) . '</span>'
+				. '<h2>' . esc_html( count( $guests ) === count( $rows ) ? _n( 'Guest added!', 'Guests added!', count( $guests ), 'olivia-studio' ) : __( 'You\'re booked!', 'olivia-studio' ) ) . '</h2>'
+				. '<dl class="oys-done__ticket">' . $ticket . '</dl>'
+				. '<p class="oys-done__lead">' . esc_html__( 'A confirmation with a calendar invite is on its way to your inbox.', 'olivia-studio' ) . '</p>';
+			$html .= '<p class="btn-row oys-done__actions"><a class="btn btn--primary" href="' . esc_url( oys_account_url() ) . '">' . esc_html__( 'My bookings', 'olivia-studio' ) . '</a>' . self::ics_link( $host ) . '</p>';
 		} elseif ( 'gift' === $order->type ) {
 			$html .= '<h2>' . esc_html__( 'Gift sent!', 'olivia-studio' ) . '</h2><p>' . sprintf( esc_html__( 'We emailed the gift card to %s and sent you a receipt.', 'olivia-studio' ), esc_html( $order->meta['recipient_email'] ?? '' ) ) . '</p>';
 		} elseif ( 'membership' === $order->type ) {
@@ -863,7 +870,7 @@ class OYS_Frontend {
 			$html .= '<h2>' . esc_html__( 'Your pass is ready', 'olivia-studio' ) . '</h2><p>' . esc_html__( 'Book any class from the timetable in one click.', 'olivia-studio' ) . '</p><p class="btn-row"><a class="btn btn--primary" href="' . esc_url( oys_page_url( 'book' ) ) . '">' . esc_html__( 'Book a class', 'olivia-studio' ) . '</a></p>';
 		}
 		if ( $order->receipt_url ) {
-			$html .= '<p><a class="text-link" href="' . esc_url( $order->receipt_url ) . '" target="_blank" rel="noopener">' . esc_html__( 'View receipt', 'olivia-studio' ) . '</a></p>';
+			$html .= '<p class="oys-done__receipt"><a class="text-link" href="' . esc_url( $order->receipt_url ) . '" target="_blank" rel="noopener">' . oys_icon( 'ticket' ) . '<span>' . esc_html__( 'View receipt', 'olivia-studio' ) . '</span></a></p>';
 		}
 		return $html . oys_fb_group_link() . '</div>';
 	}
