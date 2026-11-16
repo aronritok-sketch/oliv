@@ -9,11 +9,11 @@ ink and buttons, light cards with soft shadows, the organic blobs of the site (t
 - The story (1080 x 1920): the background stays her picture without its old text (orarend_bg.py → orarend-hatter.png);
   over it the logo, the title on colour blocks and two cards: the group class (Wednesday 18:30–20:00, 90 minutes) and the
   one-to-one sessions (by appointment), the address in a dark button.
-- The Facebook images: every photo whole (nothing cut off), with rounded corners, on a palette background with two of
-  the site's blobs behind it and the four dots; no text, no logo. Five colour sets in turn.
+- The Facebook images: every photo whole (nothing cut off), framed like the site's hero: one background colour, the
+  hero's blob behind the photo, rounded corners; no text, no logo. In colour and in black and white.
 
     python3 -I online_social.py story <orarend-hatter.png> <logo.svg> <html folder>
-    python3 -I online_social.py photos <prepared photo folder> <html folder>
+    python3 -I online_social.py photos <prepared photo folder> <html folder> [gray]
     node cover.js <html folder> <png folder>        (then JPEG: the caller converts)
 """
 import os
@@ -51,9 +51,9 @@ def story(bg, logo_svg, out):
 *{{margin:0;box-sizing:border-box}} html,body{{width:{W}px;height:{H}px;overflow:hidden}}
 body{{position:relative;font-family:Cabin,sans-serif;color:{INK};background:url("file://{bg}") center/cover no-repeat}}
 .blob{{position:absolute;overflow:visible}} .dot{{position:absolute;border-radius:50%;display:block}}
-.tag{{position:absolute;left:64px;top:64px;padding:18px 26px 14px;border-radius:26px;background:{CARD};box-shadow:0 14px 34px rgba(0,46,44,.18)}}
-.logo{{display:block;width:210px;height:auto;color:{FOREST}}}
-.title{{position:absolute;left:64px;top:300px}}
+.tag{{position:absolute;left:66px;top:70px;opacity:.78}}
+.logo{{display:block;width:150px;height:auto;color:{FOREST}}}
+.title{{position:absolute;left:64px;top:290px}}
 .title b{{display:table;font:400 108px/1 Anton,sans-serif;text-transform:uppercase;letter-spacing:.005em;padding:10px 26px 6px;margin:0 0 14px}}
 .title .t1{{background:{SUN};color:{FOREST}}}
 .title .t2{{background:{PINK};color:{FOREST};font-size:184px;padding:14px 30px 8px}}
@@ -78,14 +78,13 @@ li i{{flex:0 0 22px;height:22px;border-radius:50%;display:block}}
 <div class="tag">{logo}</div>
 {dots(842, 120, 13, 40)}
 <div class="title"><b class="t1">Online jóga</b><b class="t2">Órarend</b></div>
-<div class="card" style="top:748px">
+<div class="card" style="top:760px">
   <p class="kick"><i></i>Csoportos · élő online</p>
   <p class="big">Szerda</p>
   <p class="time">18:30–20:00</p>
   <p class="line">Online flow jóga · 90 perc</p>
-  <p class="first"><i></i>Első óra: december 16.</p>
 </div>
-<div class="card" style="top:1316px">
+<div class="card" style="top:1290px">
   <p class="kick"><i style="background:{FOREST}"></i>Egyéni órák · online</p>
   <p class="mid">Egyeztetett időpontban</p>
   <ul>
@@ -102,47 +101,38 @@ li i{{flex:0 0 22px;height:22px;border-radius:50%;display:block}}
     print('online-joga-orarend', W, H)
 
 
-# background, the big blob (back, front), the small blob (back, front)
-SETS = [
-    (SUN, (FOREST, PINK), (PINK, TANGERINE)),
-    (PAPER, (PINK, SUN), (FOREST, SAGE_SOFT)),
-    (SAGE_SOFT, (FOREST, TANGERINE), (SUN, PINK)),
-    (TANG_SOFT, (PINK, FOREST), (SUN, TANGERINE)),
-    (FOREST, (SUN, TANGERINE), (PINK, SUN)),
-]
+# The Facebook images, second round (Olívia: „nem az igaziak, legyél kreatívabb, egyben legyenek letisztultak”): the
+# site's hero as the frame – one background colour, the hero's own blob (Evergreen back, light front) behind the photo,
+# the photo whole with rounded corners. The blob on the right and on the left in turn; three colour sets in turn.
+# gray=True: the photo in black and white, as on the home page (Olívia, 16 November).
+SETS = [(SUN, FOREST, PAPER), (PAPER, PINK, SUN), (FOREST, SUN, TANGERINE)]
 
 
-def photos(src, out):
+def photos(src, out, gray=False):
     os.makedirs(out, exist_ok=True)
     skip = {'fb13-img5438.jpg'}  # the same photo as fb04 (it was twice in her folder)
     n = 0
     for f in sorted(os.listdir(src)):
         if f in skip or not f.lower().endswith(('.jpg', '.jpeg', '.png')):
             continue
-        n += 1
         w0, h0 = Image.open(os.path.join(src, f)).size
-        long_ = 1760
-        k = long_ / max(w0, h0)
+        k = 1500 / max(w0, h0)
         pw, ph = round(w0 * k), round(h0 * k)
-        pad = 150
-        W, H = pw + 2 * pad, ph + 2 * pad
-        bg, (b1, f1), (b2, f2) = SETS[(n - 1) % len(SETS)]
-        corner = (n - 1) % 2  # the big blob bottom right, or top right, in turn
-        big = round(max(W, H) * .62)
-        small = round(max(W, H) * .34)
-        if corner == 0:
-            blobs = blob(W - big * .78, H - big * .74, big, big * .82, b1, f1, flip=True, rot=-4) + blob(-small * .3, -small * .28, small, small * .8, b2, f2, rot=12)
-            d = dots(pad + 8, H - pad + 54, 15, 46)
-        else:
-            blobs = blob(W - big * .74, -big * .3, big, big * .82, b1, f1, flip=True, rot=172) + blob(-small * .32, H - small * .58, small, small * .8, b2, f2, rot=-10)
-            d = dots(W - pad - 8 - 3 * 46 - 30, pad - 84, 15, 46)
+        right = n % 2 == 0
+        near, far, tb = round(pw * .07), round(pw * .22), round(ph * .11)
+        W, H = pw + near + far, ph + 2 * tb
+        bg, back, front = SETS[n % len(SETS)]
+        bw, bh = round(W * .74), round(H * .8)
+        by = round((H - bh) / 2 + H * .06)
+        px, bx, m = (near, W - bw, 'matrix(-1 0 0 1 100 0)') if right else (far, 0, 'matrix(1 0 0 1 0 0)')
+        n += 1
         html = f'''<!doctype html><html lang="hu" data-w="{W}" data-h="{H}"><head><meta charset="utf-8"><style>
-*{{margin:0;box-sizing:border-box}} html,body{{width:{W}px;height:{H}px;overflow:hidden;background:{bg}}}
-.blob{{position:absolute;overflow:visible}} .dot{{position:absolute;border-radius:50%;display:block}}
-.ph{{position:absolute;left:{pad}px;top:{pad}px;width:{pw}px;height:{ph}px;border-radius:38px;overflow:hidden;
-  box-shadow:0 26px 60px rgba(0,46,44,.28),0 0 0 10px {CARD}}}
-.ph img{{width:100%;height:100%;display:block;object-fit:cover}}
-</style></head><body>{blobs}{d}<div class="ph"><img src="file://{os.path.join(src, f)}" alt=""></div></body></html>'''
+*{{margin:0}} html,body{{width:{W}px;height:{H}px;overflow:hidden;background:{bg};position:relative}}
+.b{{position:absolute;left:{bx}px;top:{by}px;width:{bw}px;height:{bh}px}}
+.p{{position:absolute;left:{px}px;top:{tb}px;width:{pw}px;height:{ph}px;border-radius:26px;overflow:hidden;box-shadow:0 30px 70px rgba(0,30,28,.28)}}
+.p img{{width:100%;height:100%;display:block;{'filter:grayscale(1) contrast(1.06);' if gray else ''}}}
+</style></head><body><svg class="b" viewBox="0 0 100 100" preserveAspectRatio="none"><g transform="{m}"><path d="{BACK}" fill="{back}"/><path d="{FRONT}" fill="{front}"/></g></svg>
+<div class="p"><img src="file://{os.path.join(src, f)}" alt=""></div></body></html>'''
         name = f'olivia-joga-{n:02d}'
         open(os.path.join(out, name + '.html'), 'w', encoding='utf-8').write(html)
         print(name, f, W, H)
@@ -152,4 +142,4 @@ if __name__ == '__main__':
     if sys.argv[1] == 'story':
         story(sys.argv[2], sys.argv[3], sys.argv[4])
     else:
-        photos(sys.argv[2], sys.argv[3])
+        photos(sys.argv[2], sys.argv[3], gray=len(sys.argv) > 4 and sys.argv[4] == 'gray')

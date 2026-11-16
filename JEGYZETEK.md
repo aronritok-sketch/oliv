@@ -1212,6 +1212,14 @@
   - **17 Facebook-kép:** a fotó egészben, lekerekítve, krém kerettel, öt színkészlet váltakozva (sárga, krém, zsálya,
     mandarin, sötétzöld háttér), a weboldal két foltja és a négy pötty; nincs szöveg és logó.
   - Elküldve a portálba: 9148779 (sztori), 9148780 (zip). A fotók nem kerülnek a repóba.
+  - **Második kör** (Olívia, 9148781: „a facebook képek nem az igaziak, legyél kreatívabb, egyben legyenek letisztultak.
+    az órarendben a logó legyen átlátszó és ne feltűnő, az első óra nem kell bele!”):
+    - A Facebook-képek a weboldal nyitóképét idézik: egy háttérszín (sárga, krém vagy sötétzöld váltakozva), mögötte a
+      hero saját foltja (hátsó + elülső hullám, felváltva jobbról és balról), a fotó egészben, lekerekítve, árnyékkal.
+      Nincs pötty, keret, szöveg.
+    - Színes és fekete-fehér változat is készült (a főoldali képek is fekete-fehérek).
+    - Sztori: a logó kártya nélkül, 150 px, 78% átlátszóság; „Első óra” kikerült; a térközök kiegyenlítve.
+    - Elküldve: 9148782 (sztori), 9148783 (előnézet), 9148784 (zip).
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
