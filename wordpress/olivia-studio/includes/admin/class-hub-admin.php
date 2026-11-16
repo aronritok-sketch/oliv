@@ -13,6 +13,7 @@ class OYS_Hub_Admin {
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'teacher_menu' ), 21 );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue' ) );
+		add_action( 'admin_footer', array( __CLASS__, 'appbar' ) );
 		// on the Hub the WordPress menu folds to icons: the Hub has its own navigation
 		add_filter( 'admin_body_class', function ( $c ) {
 			return self::is_hub_screen() ? $c . ' oys-hub-screen folded' : $c;
@@ -31,7 +32,43 @@ class OYS_Hub_Admin {
 		}
 	}
 
+	/** Any Studio / Teaching page (not the Hub itself). */
+	public static function is_studio_screen() {
+		$page = sanitize_key( $_GET['page'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification
+		return is_admin() && str_starts_with( $page, 'oys' ) && ! self::is_hub_screen();
+	}
+
+	/**
+	 * Áron, 16 November: „Az admint optimalizáld le teljesen telefonra” – on every Studio page a phone gets the Hub's
+	 * bottom bar (Hub, messages, calendar, rosters, more) and its tables turn into cards (admin-mobile.js + admin.css).
+	 */
+	public static function appbar() {
+		if ( ! self::is_studio_screen() || ! OYS_Hub::can() ) {
+			return;
+		}
+		$manage = current_user_can( 'oys_manage' );
+		$hub    = admin_url( 'admin.php?page=' . ( $manage ? 'oys' : 'oys-hub' ) );
+		$page   = sanitize_key( $_GET['page'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification
+		$n      = OYS_Hub::counts()['total'];
+		$svg    = fn( $d ) => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' . $d . '</svg>';
+		$items  = array(
+			array( $hub . '#today', __( 'Today', 'olivia-studio' ), '<path d="M4 11 12 4l8 7v8.5a1 1 0 0 1-1 1h-4.5V15h-5v5.5H5a1 1 0 0 1-1-1z"/>', false ),
+			array( $hub . '#inbox', __( 'Messages', 'olivia-studio' ), '<path d="M4.5 6.5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H11l-4.5 3.5V16.5a2 2 0 0 1-2-2z"/>', false, $n ),
+			$manage ? array( admin_url( 'admin.php?page=oys-calendar' ), __( 'Calendar', 'olivia-studio' ), '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/>', 'oys-calendar' === $page ) : array( admin_url( 'admin.php?page=oys-teach' ), __( 'My classes', 'olivia-studio' ), '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/>', 'oys-teach' === $page ),
+			$manage ? array( admin_url( 'admin.php?page=oys-schedule' ), __( 'Rosters', 'olivia-studio' ), '<path d="M9 6.5h11M9 12h11M9 17.5h11M4.5 6.5h.01M4.5 12h.01M4.5 17.5h.01"/>', 'oys-schedule' === $page ) : null,
+			array( $hub . '#more', __( 'More', 'olivia-studio' ), '<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>', ! in_array( $page, array( 'oys-calendar', 'oys-schedule', 'oys-teach' ), true ) ),
+		);
+		echo '<nav class="oys-appbar" aria-label="' . esc_attr__( 'Studio', 'olivia-studio' ) . '">';
+		foreach ( array_filter( $items ) as $it ) {
+			echo '<a href="' . esc_url( $it[0] ) . '"' . ( $it[3] ? ' class="is-on" aria-current="page"' : '' ) . '>' . $svg( $it[2] ) . esc_html( $it[1] ) . ( ! empty( $it[4] ) ? '<i>' . (int) $it[4] . '</i>' : '' ) . '</a>'; // phpcs:ignore
+		}
+		echo '</nav>';
+	}
+
 	public static function enqueue() {
+		if ( self::is_studio_screen() ) {
+			wp_enqueue_script( 'oys-admin-mobile', OYS_URL . 'assets/admin-mobile.js', array(), OYS_VERSION, true );
+		}
 		if ( ! self::is_hub_screen() ) {
 			return;
 		}

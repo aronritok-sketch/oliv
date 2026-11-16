@@ -965,6 +965,17 @@
     - „a gyakorlás és az élet és elme kategória színe most ugyanolyan”: a témák a cikkszám sorrendjében kapnak színt
       (`oy_cat_tone`), négy színből: magenta, barack, sárga, sötétzöld (`card--forest`).
   - Tesztek: 1441/0.
+- **olivia-studio 1.14.1 (téma 3.11.100-zal) – a Stúdió admin telefonon** („Az admint optimalizáld le teljesen
+  telefonra”):
+  - Minden Stúdió- és Tanítás-oldalon (a Hubon kívül) telefonon alul a Hub sávja látszik: Ma · Üzenetek (jelvénnyel) ·
+    Naptár · Névsorok · Több (`OYS_Hub_Admin::appbar`).
+  - A táblázatok kártyákká alakulnak: soronként egy kártya, cellánként címkézett sor (`assets/admin-mobile.js`
+    `data-label`, `admin.css`). Az oszlopok nem lógnak ki, nincs vízszintes görgetés (9 oldalon ellenőrizve, 390 px).
+  - Nagyobb gombok, 16 px-es mezők (az iPhone nem nagyít rájuk), egymás alá rendezett dobozok és KPI-k. A WP-frissítés
+    figyelmeztetése és a lábléc el van rejtve.
+  - Tárhely a `/oys/v1/status`-ban (`storage`): szabad és teljes lemezhely, uploads, chatfotók, felvételek
+    (`OYS_Ops::storage`).
+  - Tesztek: 1441/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

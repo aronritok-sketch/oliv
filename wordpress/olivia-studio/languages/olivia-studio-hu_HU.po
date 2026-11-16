@@ -6791,3 +6791,7 @@ msgstr "%d nap"
 #: includes/class-live.php
 msgid "%d hours"
 msgstr "%d óra"
+
+#: includes/admin/class-hub-admin.php
+msgid "Rosters"
+msgstr "Névsorok"

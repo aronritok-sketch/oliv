@@ -112,7 +112,41 @@ class OYS_Ops {
 				'overdue'  => $next && $next < time() - 15 * MINUTE_IN_SECONDS,
 			),
 			'plugins'  => array_values( (array) get_option( 'active_plugins' ) ),
+			'storage'  => self::storage(),
 			'settings' => $settings,
+		);
+	}
+
+	/**
+	 * What the site's own files take and how much room is left (Áron, 16 November: „számold el, hogy mennyi fog kelleni,
+	 * mennyit kell még venni” – the chat photos and the class recordings), in megabytes.
+	 */
+	public static function storage() {
+		$size = function ( $dir ) {
+			$bytes = 0;
+			$n     = 0;
+			if ( is_dir( $dir ) ) {
+				foreach ( new RecursiveIteratorIterator( new RecursiveDirectoryIterator( $dir, FilesystemIterator::SKIP_DOTS ) ) as $f ) {
+					if ( $f->isFile() && 'index.php' !== $f->getFilename() ) {
+						$bytes += $f->getSize();
+						$n++;
+					}
+				}
+			}
+			return array( round( $bytes / 1048576, 1 ), $n );
+		};
+		$up    = wp_upload_dir( null, false )['basedir'];
+		$free  = function_exists( 'disk_free_space' ) ? @disk_free_space( $up ) : false; // phpcs:ignore WordPress.PHP.NoSilencedErrors
+		$total = function_exists( 'disk_total_space' ) ? @disk_total_space( $up ) : false; // phpcs:ignore WordPress.PHP.NoSilencedErrors
+		list( $chat_mb, $chat_n ) = $size( OYS_Hub::image_dir()[0] );
+		list( $rec_mb, $rec_n )   = $size( OYS_Live::rec_dir() );
+		list( $up_mb )            = $size( $up );
+		return array(
+			'disk_free_mb'  => false === $free ? null : round( $free / 1048576 ),
+			'disk_total_mb' => false === $total ? null : round( $total / 1048576 ),
+			'uploads_mb'    => $up_mb,
+			'chat_photos'   => array( 'mb' => $chat_mb, 'files' => $chat_n ),
+			'recordings'    => array( 'mb' => $rec_mb, 'files' => $rec_n, 'keep_days' => (int) OYS_Settings::get( 'live_keep_days' ) ),
 		);
 	}
 }

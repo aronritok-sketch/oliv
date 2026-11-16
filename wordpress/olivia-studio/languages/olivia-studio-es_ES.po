@@ -4723,3 +4723,7 @@ msgstr "%d días"
 #: includes/class-live.php
 msgid "%d hours"
 msgstr "%d horas"
+
+#: includes/admin/class-hub-admin.php
+msgid "Rosters"
+msgstr "Listas"
