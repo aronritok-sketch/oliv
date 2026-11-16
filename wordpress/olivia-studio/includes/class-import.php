@@ -23,6 +23,9 @@ defined( 'ABSPATH' ) || exit;
 
 class OYS_Import {
 
+	/** Customers this request created while importing passes or visits. */
+	private static $created = 0;
+
 	/** The columns of the Motibro export → the field they fill. */
 	const MOTIBRO = array(
 		'Id'                           => 'ext_id',
@@ -63,7 +66,7 @@ class OYS_Import {
 					if ( ! is_array( $rows ) ) {
 						return new WP_Error( 'oys_rows', 'rows: a list of rows (column name → value) is needed.', array( 'status' => 400 ) );
 					}
-					return self::import( $rows, (string) ( $req->get_param( 'source' ) ?: 'motibro' ), (bool) $req->get_param( 'dry_run' ) );
+					return self::import_any( $rows, (string) ( $req->get_param( 'source' ) ?: 'motibro' ), (bool) $req->get_param( 'dry_run' ), sanitize_key( (string) $req->get_param( 'kind' ) ) );
 				},
 			) );
 		} );
@@ -257,6 +260,270 @@ class OYS_Import {
 		}
 		update_user_meta( $user->ID, 'oys_imported_at', current_time( 'mysql', true ) );
 		return 'updated';
+	}
+
+	/* ------------------------------------------------------------------------------------------------------------ *
+	 * Áron, 16 November: „Ezt meg a vendégekhez dobd hozzá” – Motibro's „Érvényes bérletek” (valid passes) and
+	 * „Óralátogatások” (class visits) exports.
+	 *
+	 * Visits: every class becomes a past class here (same time, name and place), every visit a booking marked as came
+	 * („Earlier system”, the Motibro pass and price in its note). So each customer's history is here: how many classes,
+	 * the first and last one, the regulars, those drifting away, „N. óra” and „Első óra” on the attendance sheet, the
+	 * monthly reports. Written straight into the tables: no email, no notification, no seat or pass logic.
+	 *
+	 * Passes: what is left on each valid pass becomes online credits until the same expiry date (the sessions locked in
+	 * Motibro stay there, for the classes booked there). No expiry email for these. Importing a newer export updates the
+	 * same passes (left and expiry), so it can be run again after the last class in Motibro.
+	 *
+	 * The guest is found by the Motibro id (the customer import keeps it), else by the email; a guest not here yet is
+	 * created as in the customer import. Running the same file again changes nothing.
+	 * ------------------------------------------------------------------------------------------------------------ */
+
+	/** Which export this is, from its columns: 'passes', 'visits' or 'customers'. */
+	public static function detect( array $rows ) {
+		$cols = $rows ? array_map( 'trim', array_keys( (array) reset( $rows ) ) ) : array();
+		if ( in_array( 'Hátralévő alkalmak', $cols, true ) ) {
+			return 'passes';
+		}
+		if ( in_array( 'Óra időpontja', $cols, true ) ) {
+			return 'visits';
+		}
+		return 'customers';
+	}
+
+	/** Any of the three exports. */
+	public static function import_any( array $rows, $source = 'motibro', $dry_run = false, $kind = '' ) {
+		$kind = $kind ?: self::detect( $rows );
+		if ( 'passes' === $kind ) {
+			return array_merge( array( 'kind' => 'passes' ), self::passes( $rows, $source, $dry_run ) );
+		}
+		if ( 'visits' === $kind ) {
+			return array_merge( array( 'kind' => 'visits' ), self::visits( $rows, $source, $dry_run ) );
+		}
+		return array_merge( array( 'kind' => 'customers' ), self::import( $rows, $source, $dry_run ) );
+	}
+
+	/** The guest of a row: by the id there, else the email; created (as in the customer import) when $create. */
+	private static function guest( $ext_id, $email, $name, $source, $dry_run, $create = true, $registered = '' ) {
+		static $cache = array();
+		$key = $source . '|' . $ext_id . '|' . $email . '|' . ( $dry_run ? 'd' : 'w' ) . ( $create ? 'c' : 'n' );
+		if ( isset( $cache[ $key ] ) ) {
+			return $cache[ $key ];
+		}
+		$user = null;
+		if ( $ext_id ) {
+			$found = get_users( array( 'meta_key' => 'oys_ext_id', 'meta_value' => $ext_id, 'number' => 5, 'fields' => 'ID' ) ); // phpcs:ignore WordPress.DB.SlowDBQuery
+			foreach ( $found as $id ) {
+				if ( get_user_meta( (int) $id, 'oys_ext_source', true ) === $source ) {
+					$user = get_userdata( (int) $id );
+					break;
+				}
+			}
+		}
+		if ( ! $user && $email ) {
+			$user = get_user_by( 'email', $email ) ?: null;
+		}
+		if ( $user && ( user_can( $user, 'manage_options' ) || user_can( $user, 'oys_manage' ) ) ) {
+			return $cache[ $key ] = new WP_Error( 'oys_staff', 'the email belongs to a staff account' );
+		}
+		if ( $user ) {
+			return $cache[ $key ] = (int) $user->ID;
+		}
+		if ( ! $create ) {
+			return $cache[ $key ] = new WP_Error( 'oys_guest', 'no customer with this email' );
+		}
+		if ( $dry_run ) {
+			return $cache[ $key ] = 0; // would be created
+		}
+		// „Vezetéknév Keresztnév” as Motibro writes it
+		$parts = preg_split( '/\s+/u', trim( (string) $name ), 2 );
+		$res   = self::upsert( array_merge( array_fill_keys( array_merge( array_values( self::MOTIBRO ), array( 'ext_source' ) ), '' ), array(
+			'ext_id'     => (string) $ext_id,
+			'email'      => (string) $email,
+			'last_name'  => count( $parts ) > 1 ? $parts[0] : '',
+			'first_name' => count( $parts ) > 1 ? $parts[1] : (string) ( $parts[0] ?? '' ),
+			'registered' => (string) $registered, // their first class there, so the reports don't count them as new today
+		) ), $source, false );
+		if ( is_wp_error( $res ) ) {
+			return $cache[ $key ] = $res;
+		}
+		self::$created++;
+		unset( $cache[ $key ] );
+		return self::guest( $ext_id, $email, $name, $source, false, false );
+	}
+
+	/** „Óralátogatások” → past classes and the visits as bookings marked as came. */
+	public static function visits( array $rows, $source = 'motibro', $dry_run = false ) {
+		global $wpdb;
+		$source = sanitize_key( $source ) ?: 'motibro';
+		$st     = OYS_Install::table( 'sessions' );
+		$bt     = OYS_Install::table( 'bookings' );
+		$out    = array( 'classes_created' => 0, 'classes_found' => 0, 'visits_added' => 0, 'visits_there' => 0, 'customers_created' => 0, 'skipped' => 0, 'dry_run' => $dry_run, 'rows' => array() );
+		$groups = array();
+		$before = self::$created;
+		$new    = array();
+		$since  = array();
+		foreach ( $rows as $i => $r ) {
+			$r     = array_map( fn( $v ) => is_scalar( $v ) ? trim( (string) $v ) : '', (array) $r );
+			$when  = self::date( $r['Óra időpontja'] ?? '', 'Y-m-d H:i' );
+			$title = sanitize_text_field( $r['Óra elnevezése'] ?? '' ) ?: sanitize_text_field( $r['Kurzus neve'] ?? '' );
+			if ( ! preg_match( '/^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/', $when ) || '' === $title ) {
+				$out['skipped']++;
+				$out['rows'][] = array( $i + 2, '', 'skipped: no class time or name' );
+				continue;
+			}
+			$place                     = sanitize_text_field( $r['Helyszín'] ?? '' );
+			$who                       = ( $r['Vendég ID'] ?? '' ) . '|' . strtolower( (string) ( $r['Email'] ?? '' ) );
+			$since[ $who ]             = min( $since[ $who ] ?? '9999', substr( $when, 0, 10 ) );
+			$groups[ "$when|$title|$place" ][] = array( $i, $r, $when, $title, $place );
+		}
+		foreach ( $groups as $list ) {
+			[ , $first, $when, $title, $place ] = $list[0];
+			$room    = sanitize_text_field( $first['Terem'] ?? '' );
+			$online  = 'online' === strtolower( $place );
+			$minutes = preg_match( '/slow\s*flow|90\s*p/iu', $title . ' ' . ( $first['Bérletfelhasználás'] ?? '' ) ) ? 90 : 60;
+			$start   = oys_local_to_utc( $when . ':00' );
+			$loc     = $online ? '' : trim( $place . ( $room ? ' · ' . $room : '' ) );
+			$sid     = (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $st WHERE starts_at = %s AND title = %s AND location = %s AND format = %s LIMIT 1", $start, $title, $loc, $online ? 'online' : 'studio' ) );
+			if ( $sid ) {
+				$out['classes_found']++;
+			} elseif ( ! $dry_run ) {
+				$event = ! preg_match( '/hatha|slow\s*flow|online\s*jóga/iu', $title ) || preg_match( '/\d{4}\.\d{2}\.\d{2}|workshop|hangfürdő|nőnapi/iu', $title );
+				$wpdb->insert( $st, array(
+					'kind'            => $event ? 'event' : 'group',
+					'class_slug'      => '',
+					'title'           => $title,
+					'starts_at'       => $start,
+					'ends_at'         => gmdate( 'Y-m-d H:i:s', strtotime( $start . ' UTC' ) + $minutes * MINUTE_IN_SECONDS ),
+					'capacity'        => count( $list ),
+					'booked'          => 0,
+					'location'        => $loc,
+					'format'          => $online ? 'online' : 'studio',
+					'price_cents'     => 0,
+					'credits_allowed' => 0,
+					'pay_later'       => 0,
+					'teacher_id'      => 0,
+					'status'          => 'scheduled',
+					'created_at'      => oys_now(),
+				) );
+				$sid = (int) $wpdb->insert_id;
+				$out['classes_created']++;
+			} else {
+				$out['classes_created']++;
+			}
+			foreach ( $list as [ $i, $r ] ) {
+				$ext   = is_numeric( $r['Vendég ID'] ?? '' ) ? (string) (int) round( (float) $r['Vendég ID'] ) : sanitize_text_field( $r['Vendég ID'] ?? '' );
+				$email = self::clean( 'email', $r['Email'] ?? '' );
+				$known = $dry_run ? self::guest( $ext, $email, '', $source, true, false ) : null;
+				$uid   = $dry_run ? $known : self::guest( $ext, $email, $r['Vendég neve'] ?? '', $source, false, true, $since[ ( $r['Vendég ID'] ?? '' ) . '|' . strtolower( (string) ( $r['Email'] ?? '' ) ) ] ?? '' );
+				if ( is_wp_error( $uid ) && ! ( $dry_run && 'oys_guest' === $uid->get_error_code() ) ) {
+					$out['skipped']++;
+					$out['rows'][] = array( $i + 2, $email ?: '#' . $ext, 'skipped: ' . $uid->get_error_message() );
+					continue;
+				}
+				if ( $dry_run && is_wp_error( $uid ) ) {
+					$new[ $ext . '|' . $email ] = 1; // would be created
+					$out['visits_added']++;
+					continue;
+				}
+				$there = $sid ? (int) $wpdb->get_var( $wpdb->prepare( "SELECT id FROM $bt WHERE session_id = %d AND user_id = %d AND guest_of = 0 LIMIT 1", $sid, $uid ) ) : 0;
+				if ( $there ) {
+					$out['visits_there']++;
+					continue;
+				}
+				$out['visits_added']++;
+				if ( $dry_run ) {
+					continue;
+				}
+				$used  = sanitize_text_field( $r['Bérletfelhasználás'] ?? '' );
+				$money = (int) round( (float) ( $r['Órára jutó bevétel (HUF)'] ?? 0 ) );
+				$wpdb->insert( $bt, array(
+					'session_id'    => $sid,
+					'user_id'       => (int) $uid,
+					'status'        => 'attended',
+					'paid_with'     => 'import',
+					'mode'          => $online ? 'online' : 'studio',
+					'note'          => trim( ucfirst( $source ) . ': ' . $used . ( $money > 0 ? ' · ' . $money . ' Ft' : '' ) ),
+					'created_at'    => $start,
+					'checked_in_at' => $start,
+				) );
+			}
+			if ( ! $dry_run && $sid ) {
+				OYS_Schedule::recount( $sid );
+				$n = (int) $wpdb->get_var( $wpdb->prepare( "SELECT booked FROM $st WHERE id = %d", $sid ) );
+				$wpdb->query( $wpdb->prepare( "UPDATE $st SET capacity = GREATEST(capacity, %d) WHERE id = %d", $n, $sid ) );
+			}
+		}
+		$out['customers_created'] = $dry_run ? count( $new ) : self::$created - $before;
+		return $out;
+	}
+
+	/** „Érvényes bérletek” → online credits on the customer's account (what is left, until the same day). */
+	public static function passes( array $rows, $source = 'motibro', $dry_run = false ) {
+		global $wpdb;
+		$source = sanitize_key( $source ) ?: 'motibro';
+		$t      = OYS_Install::table( 'passes' );
+		$out    = array( 'created' => 0, 'updated' => 0, 'unchanged' => 0, 'skipped' => 0, 'credits' => 0, 'locked' => 0, 'dry_run' => $dry_run, 'rows' => array() );
+		$seen   = array();
+		foreach ( $rows as $i => $r ) {
+			$r     = array_map( fn( $v ) => is_scalar( $v ) ? trim( (string) $v ) : '', (array) $r );
+			$email = self::clean( 'email', $r['Email'] ?? '' );
+			$name  = sanitize_text_field( $r['Bérlet neve'] ?? '' ) ?: __( 'Class pass', 'olivia-studio' );
+			$exp   = self::date( $r['Lejárat'] ?? '', 'Y-m-d' );
+			$left  = max( 0, (int) ( $r['Hátralévő alkalmak'] ?? 0 ) );
+			$used  = max( 0, (int) ( $r['Felhasznált alkalmak'] ?? 0 ) );
+			$lock  = max( 0, (int) ( $r['Zárolt alkalmak'] ?? 0 ) );
+			if ( ! $email ) {
+				$out['skipped']++;
+				$out['rows'][] = array( $i + 2, '', 'skipped: no email' );
+				continue;
+			}
+			$uid = self::guest( '', $email, $r['Vendég'] ?? '', $source, $dry_run );
+			if ( is_wp_error( $uid ) ) {
+				$out['skipped']++;
+				$out['rows'][] = array( $i + 2, $email, 'skipped: ' . $uid->get_error_message() );
+				continue;
+			}
+			$base         = $email . '|' . $name . '|' . $exp;
+			$seen[ $base ] = ( $seen[ $base ] ?? 0 ) + 1;
+			$key          = $source . '-' . substr( md5( $base . '|' . $seen[ $base ] ), 0, 16 );
+			$expires      = preg_match( '/^\d{4}-\d{2}-\d{2}$/', $exp ) ? oys_local_to_utc( $exp . ' 23:59:59' ) : null;
+			$total        = max( 1, $used + $lock + $left );
+			$out['credits'] += $left;
+			$out['locked']  += $lock;
+			$have = $uid ? $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $t WHERE user_id = %d AND product_id = %s LIMIT 1", $uid, $key ) ) : null;
+			if ( $have ) {
+				if ( (int) $have->credits_left === $left && (int) $have->credits_total === $total && (string) $have->expires_at === (string) $expires ) {
+					$out['unchanged']++;
+					$out['rows'][] = array( $i + 2, $email, 'unchanged' );
+					continue;
+				}
+				if ( ! $dry_run ) {
+					$wpdb->update( $t, array( 'credits_left' => $left, 'credits_total' => $total, 'expires_at' => $expires ), array( 'id' => (int) $have->id ) );
+				}
+				$out['updated']++;
+				$out['rows'][] = array( $i + 2, $email, 'updated' );
+				continue;
+			}
+			if ( ! $dry_run ) {
+				$wpdb->insert( $t, array(
+					'user_id'            => (int) $uid,
+					'product_id'         => $key,
+					'name'               => $name,
+					'kind'               => 'online',
+					'credits_total'      => $total,
+					'credits_left'       => $left,
+					'expires_at'         => $expires,
+					'order_id'           => 0,
+					'source'             => $source,
+					'expiry_notice_sent' => 1, // no „your pass is expiring” email for a pass brought over
+					'created_at'         => oys_now(),
+				) );
+			}
+			$out['created']++;
+			$out['rows'][] = array( $i + 2, $email, 'created' );
+		}
+		return $out;
 	}
 
 	/* ------------------------------------------------------------------------------------------------------------ *

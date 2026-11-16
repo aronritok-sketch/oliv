@@ -641,7 +641,7 @@ class OYS_Admin {
 		self::header( __( 'Customers', 'olivia-studio' ) );
 		$q     = sanitize_text_field( wp_unslash( $_GET['s'] ?? '' ) );
 		$users = get_users( array( 'role__in' => array( 'oys_customer' ), 'search' => $q ? '*' . $q . '*' : '', 'orderby' => 'registered', 'order' => 'DESC', 'number' => 3000 ) );
-		echo '<details class="oys-box"><summary><b>' . esc_html__( 'Import customers (Motibro export, .xlsx or .csv)', 'olivia-studio' ) . '</b></summary><p class="description">' . esc_html__( 'Every column of the export is kept with the customer. Nobody is emailed or subscribed to the newsletter; customers who already have an account keep what they entered, only empty fields are filled. The same file can be imported again safely.', 'olivia-studio' ) . '</p>'
+		echo '<details class="oys-box"><summary><b>' . esc_html__( 'Import customers (Motibro export, .xlsx or .csv)', 'olivia-studio' ) . '</b></summary><p class="description">' . esc_html__( 'Every column of the export is kept with the customer. Nobody is emailed or subscribed to the newsletter; customers who already have an account keep what they entered, only empty fields are filled. The same file can be imported again safely.', 'olivia-studio' ) . '</p><p class="description">' . esc_html__( 'Three Motibro exports are recognised by their columns: Customers; Valid passes (what is left becomes online credits until the same day – a newer export updates them); Class visits (every class and visit becomes the customer\'s history).', 'olivia-studio' ) . '</p>'
 			. str_replace( '<form ', '<form enctype="multipart/form-data" ', self::form( 'import_customers' ) ) . '<input type="file" name="file" accept=".xlsx,.csv" required> <label><input type="checkbox" name="dry_run" value="1" checked> ' . esc_html__( 'Check only (change nothing)', 'olivia-studio' ) . '</label> <button class="button button-primary">' . esc_html__( 'Import', 'olivia-studio' ) . '</button></form></details>'; // phpcs:ignore
 		echo '<form method="get"><input type="hidden" name="page" value="oys-customers"><p class="search-box"><input type="search" name="s" value="' . esc_attr( $q ) . '"> <button class="button">' . esc_html__( 'Search', 'olivia-studio' ) . '</button></p></form>';
 		echo '<table class="widefat striped oys-table"><thead><tr><th>' . esc_html__( 'Name', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Email', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Phone', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Classes left', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Private left', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Joined', 'olivia-studio' ) . '</th></tr></thead><tbody>';
@@ -737,7 +737,15 @@ class OYS_Admin {
 			self::back( 'oys-customers', array(), $rows->get_error_message(), 'error' );
 		}
 		$dry = ! empty( $_POST['dry_run'] );
-		$res = OYS_Import::import( $rows, 'motibro', $dry );
+		$res = OYS_Import::import_any( $rows, 'motibro', $dry );
+		if ( 'visits' === $res['kind'] ) {
+			$msg = sprintf( $dry ? __( 'Check only – nothing changed. Class visits: %1$d classes would be added (%2$d already here), %3$d visits (%4$d already here), %5$d new customers, %6$d skipped.', 'olivia-studio' ) : __( 'Class visits imported: %1$d classes added (%2$d already here), %3$d visits (%4$d already here), %5$d new customers, %6$d skipped.', 'olivia-studio' ), $res['classes_created'], $res['classes_found'], $res['visits_added'], $res['visits_there'], $res['customers_created'], $res['skipped'] );
+			self::back( 'oys-customers', array(), $msg );
+		}
+		if ( 'passes' === $res['kind'] ) {
+			$msg = sprintf( $dry ? __( 'Check only – nothing changed. Passes: %1$d would be added, %2$d updated, %3$d unchanged, %4$d skipped; %5$d sessions left on them.', 'olivia-studio' ) : __( 'Passes imported: %1$d added, %2$d updated, %3$d unchanged, %4$d skipped; %5$d sessions left on them.', 'olivia-studio' ), $res['created'], $res['updated'], $res['unchanged'], $res['skipped'], $res['credits'] );
+			self::back( 'oys-customers', array(), $msg );
+		}
 		$msg = sprintf( $dry ? __( 'Check only – nothing changed. Would be created: %1$d, updated: %2$d, unchanged: %3$d, skipped: %4$d.', 'olivia-studio' ) : __( 'Imported. Created: %1$d, updated: %2$d, unchanged: %3$d, skipped: %4$d.', 'olivia-studio' ), $res['created'], $res['updated'], $res['unchanged'], $res['skipped'] );
 		self::back( 'oys-customers', array(), $msg );
 	}

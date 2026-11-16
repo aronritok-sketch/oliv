@@ -331,7 +331,13 @@ $groups = array(
 			<li><b>Tagságok, foglalások, befizetések</b> listája.</li>
 			<li><b>Helyszíni fizetés:</b> ha valaki többször nem jött el egy „helyszínen fizetek” foglalásra, a rendszer előre fizetésre állítja; itt újra engedélyezheted.</li>
 		</ul>
-		<p><b>Importálás:</b> a lista tetején a Motibro vendégexportja (.xlsx vagy .csv) beolvasható. Előbb a <b>„Csak ellenőrzés”</b> megmutatja, mi változna; senki nem kap e-mailt, és ugyanaz a fájl többször is beolvasható.</p>
+		<p><b>Importálás:</b> a lista tetején a Motibro exportjai (.xlsx vagy .csv) beolvashatók, a rendszer az oszlopaikról ismeri fel őket:</p>
+		<ul>
+			<li><b>Vendégek:</b> minden adatuk (név, e-mail, telefon, születésnap, számlázási adatok, megjegyzés…).</li>
+			<li><b>Érvényes bérletek:</b> ami a bérleten még hátravan, online alkalomként kerül a vendég fiókjába, ugyanaddig a napig érvényesen. A Motibróban zárolt alkalmak (amikre ott már foglaltak) ott maradnak. Ha később egy frissebb exportot olvasol be, ugyanazokat a bérleteket frissíti, nem duplázza.</li>
+			<li><b>Óralátogatások:</b> minden korábbi óra és látogatás a vendég történetébe kerül (eljött, „Korábbi rendszer”). Így a jelenléti íven a „hányadik órája” a régi órákat is számolja, és a törzsvendégek, a lemorzsolódók és a havi kimutatások is a teljes múltat mutatják.</li>
+		</ul>
+		<p>Előbb a <b>„Csak ellenőrzés”</b> megmutatja, mi változna. Senki nem kap e-mailt vagy értesítést, és ugyanaz a fájl többször is beolvasható.</p>
 	</section>
 
 	<section class="g-sec" id="tagsagok">

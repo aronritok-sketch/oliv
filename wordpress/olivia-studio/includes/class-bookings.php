@@ -820,6 +820,7 @@ class OYS_Bookings {
 			'cash'       => __( 'Cash', 'olivia-studio' ),
 			'comp'       => __( 'Complimentary', 'olivia-studio' ),
 			'admin'      => __( 'Added by studio', 'olivia-studio' ),
+			'import'     => __( 'Earlier system', 'olivia-studio' ),
 		);
 	}
 }

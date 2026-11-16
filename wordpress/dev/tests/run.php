@@ -4620,6 +4620,85 @@ test( 'Áron, 16 November (Motibro automations) – pushes on bookings, „who c
 	}
 } );
 
+test( 'Áron, 16 November: Motibro valid passes and class visits → the customers (history, credits), nobody emailed, a second run changes nothing', function () {
+	$mails = 0;
+	$count = function () use ( &$mails ) {
+		$mails++;
+		return true;
+	};
+	$pushes = 0;
+	$spy    = function () use ( &$pushes ) {
+		$pushes++;
+	};
+	add_filter( 'pre_wp_mail', $count, 1 );
+	add_action( 'oys_push_notified', $spy );
+	try {
+		$known = make_user( 'Ismert' );
+		update_user_meta( $known, 'oys_ext_id', '990001' );
+		update_user_meta( $known, 'oys_ext_source', 'motibro' );
+		$kmail = get_userdata( $known )->user_email;
+		$visit = fn( $id, $mail, $name, $when, $title = 'Hatha flow jóga 18. kerület', $place = 'Prána Jógaközpont', $used = 'Hatha flow jóga bérlet - 5 alkalom (60p)', $money = '2300.0' ) => array(
+			'Vendég neve' => $name, 'Email' => $mail, 'Vendég ID' => $id, 'Óra időpontja' => $when, 'Óra elnevezése' => $title, 'Kurzus neve' => $title,
+			'Tanfolyam neve' => '', 'Oktató' => 'Teszt Oktató', 'Helyszín' => $place, 'Terem' => 'kerti terem', 'Bérletfelhasználás' => $used,
+			'Órára jutó bevétel (HUF)' => $money, 'Számla' => 'Igen', 'Megjegyzés' => '',
+		);
+		$rows = array(
+			$visit( '990001', $kmail, 'Ismert Teszt', '2025-03-03 17:45' ),
+			$visit( '990002', 'uj.vendeg.motibro@example.test', 'Újvendég Anna', '2025-03-03 17:45' ),
+			$visit( '990001', $kmail, 'Ismert Teszt', '2025-03-10 17:45' ),
+			$visit( '990001', $kmail, 'Ismert Teszt', '2025-04-01 18:00', 'Slow flow jóga 11. kerület', 'Budai PK', 'Slow flow jóga - 1 alkalom (90p)', '5000.0' ),
+			$visit( '990003', '', 'Emailnelkuli Bea', '2025-03-10 17:45' ),
+			$visit( '990001', $kmail, 'Ismert Teszt', '2026-01-31 10:00', 'HANGjóga 2026.01.31. - 18. kerület', 'Prána Jógaközpont', 'HANGjóga jegy', '8000.0' ),
+		);
+		eq( 'visits', OYS_Import::detect( $rows ), 'the visits export is recognised by its columns' );
+		$dry = OYS_Import::import_any( $rows, 'motibro', true );
+		ok( 4 === $dry['classes_created'] && 6 === $dry['visits_added'] && 2 === $dry['customers_created'], 'check only: 4 classes, 6 visits, 2 new customers' );
+		eq( 0, (int) count( get_users( array( 'search' => 'uj.vendeg.motibro@example.test', 'search_columns' => array( 'user_email' ) ) ) ), 'check only changes nothing' );
+		$res = OYS_Import::import_any( $rows, 'motibro', false );
+		ok( 4 === $res['classes_created'] && 6 === $res['visits_added'] && 2 === $res['customers_created'] && 0 === $res['skipped'], 'imported: 4 classes, 6 visits, 2 new customers' );
+		$new = get_user_by( 'email', 'uj.vendeg.motibro@example.test' );
+		ok( $new && 'Anna' === $new->first_name && 'Újvendég' === $new->last_name && '990002' === get_user_meta( $new->ID, 'oys_ext_id', true ), 'a new guest: „Vezetéknév Keresztnév” split, the Motibro id kept' );
+		ok( str_starts_with( $new->user_registered, '2025-03-0' ), 'registered on the day of their first class there (not a new customer of today)' );
+		$hist = OYS_Bookings::for_user( $known, 'past', array( 'attended' ) );
+		eq( 4, count( $hist ), 'the known guest has the 4 classes in the history' );
+		ok( 'import' === $hist[0]->paid_with && str_contains( (string) $hist[0]->note, 'Motibro:' ), 'marked as from the earlier system, with the Motibro pass in the note' );
+		global $wpdb;
+		$slow = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . OYS_Install::table( 'sessions' ) . ' WHERE title = %s', 'Slow flow jóga 11. kerület' ) );
+		ok( $slow && 90 * 60 === oys_ts( $slow->ends_at ) - oys_ts( $slow->starts_at ) && str_contains( $slow->location, 'Budai PK' ) && 'studio' === $slow->format, 'the class: 90 minutes for slow flow, the place kept' );
+		$hang = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . OYS_Install::table( 'sessions' ) . ' WHERE title = %s', 'HANGjóga 2026.01.31. - 18. kerület' ) );
+		eq( 'event', $hang->kind, 'a dated special is an event' );
+		$first = $wpdb->get_row( $wpdb->prepare( 'SELECT * FROM ' . OYS_Install::table( 'sessions' ) . ' WHERE title = %s AND starts_at = %s', 'Hatha flow jóga 18. kerület', oys_local_to_utc( '2025-03-03 17:45:00' ) ) );
+		eq( 2, (int) $first->booked, 'two people in the first class' );
+		// the history counts on the attendance sheet
+		$s     = make_session( array( 'format' => 'online', 'in_hours' => 30 ) );
+		$v     = OYS_Hub_Classes::visits( $s, array( $known ) );
+		ok( ! $v[ $known ]['first'] && str_contains( $v[ $known ]['line'], '5' ), 'online, the known guest comes for the 5th time, not the first' );
+		$again = OYS_Import::import_any( $rows, 'motibro', false );
+		ok( 0 === $again['classes_created'] && 0 === $again['visits_added'] && 6 === $again['visits_there'], 'a second run changes nothing' );
+
+		// valid passes: what is left becomes online credits until the same day; a newer export updates them
+		$prow = fn( $mail, $used, $locked, $left, $exp ) => array( 'Vendég' => 'Ismert Teszt', 'Email' => $mail, 'Felhasznált alkalmak' => $used, 'Zárolt alkalmak' => $locked, 'Hátralévő alkalmak' => $left, 'Lejárat' => $exp, 'Bérlet neve' => 'Hatha flow jóga bérlet - 5 alkalom (60p)', 'Oktató' => 'Teszt Oktató' );
+		$passes = array( $prow( $kmail, 2, 1, 2, '2027-01-15' ), $prow( 'uj.vendeg.motibro@example.test', 0, 0, 5, '2027-03-01' ), $prow( 'nincs.ilyen@example.test', 1, 0, 4, '2027-02-01' ) );
+		eq( 'passes', OYS_Import::detect( $passes ), 'the passes export is recognised' );
+		$p = OYS_Import::import_any( $passes, 'motibro', false );
+		ok( 3 === $p['created'] && 11 === $p['credits'] && 1 === $p['locked'], 'three passes, 11 sessions left, 1 locked in Motibro' );
+		eq( 2, OYS_Passes::available_for( $known, $s, 'online' ), 'the known guest can book online with the 2 sessions left' );
+		$pass = OYS_Passes::for_user( $known, true )[0];
+		ok( 5 === (int) $pass->credits_total && 'motibro' === $pass->source && 1 === (int) $pass->expiry_notice_sent && str_starts_with( (string) $pass->expires_at, substr( oys_local_to_utc( '2027-01-15 23:59:59' ), 0, 10 ) ), '2 of 5, until the same day, from Motibro, no expiry email' );
+		ok( (bool) get_user_by( 'email', 'nincs.ilyen@example.test' ), 'a pass holder not here yet becomes a customer' );
+		$same = OYS_Import::import_any( $passes, 'motibro', false );
+		eq( 3, $same['unchanged'], 'the same file again changes nothing' );
+		$passes[0] = $prow( $kmail, 3, 0, 1, '2027-01-15' );
+		$upd       = OYS_Import::import_any( $passes, 'motibro', false );
+		ok( 1 === $upd['updated'] && 1 === (int) OYS_Passes::for_user( $known, true )[0]->credits_left, 'a newer export (one more used there) updates the pass' );
+	} finally {
+		remove_filter( 'pre_wp_mail', $count, 1 );
+		remove_action( 'oys_push_notified', $spy );
+	}
+	eq( 0, $mails, 'nobody was emailed' );
+	eq( 0, $pushes, 'no phone notification' );
+} );
+
 $t = $GLOBALS['oys_t'];
 echo "\n{$t['pass']} assertions passed, {$t['fail']} failed\n";
 exit( $t['fail'] ? 1 : 0 );

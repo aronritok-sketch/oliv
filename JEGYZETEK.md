@@ -1142,6 +1142,30 @@
   - Új: a Hub `poll` válasza és a boot adat hordozza a verziót (`v`). Ha élesben új változat van, a nyitott app
     újratölti magát: ha senki nem gépel és nincs nyitott lap, azonnal, különben amikor legközelebb előtérbe kerül.
   - Tesztek: 1534/0.
+- **olivia-studio 1.19.0 (téma 3.11.107-tel) – a Motibro bérletei és óralátogatásai a vendégekhez** (Áron,
+  2026-11-16, két exporttal: „Érvényes bérletek 2026-11-16”, „Óralátogatások 2024-02-10 – 2026-11-16”: „Ezt meg a
+  vendégekhez dobd hozzá.”).
+  - Az import (Stúdió → Vendégek → Importálás, illetve a `customers/import` REST-útvonal) az oszlopairól ismeri fel a
+    három Motibro-exportot: Vendégek, Érvényes bérletek, Óralátogatások (`OYS_Import::detect` / `import_any`).
+  - **Óralátogatások:**
+    - minden óra (időpont + név + helyszín) múltbeli óra lesz itt: a Motibro óraneve, a helyszín és a terem;
+      Online → online; Slow flow 90 perc, a többi 60 perc; dátumos különlegesség (HANGjóga, workshop, hangfürdő,
+      Nőnapi…) esemény;
+    - minden látogatás egy „eljött” foglalás `paid_with = import` („Korábbi rendszer”), a jegyzetben a Motibro bérlet és
+      az órára jutó bevétel;
+    - közvetlenül a táblákba megy: nincs e-mail, push, helyfoglalás vagy bérletlevonás;
+    - a vendéget a Motibro-azonosító (`oys_ext_id`), különben az e-mail-cím alapján találja meg; ha nincs még itt,
+      létrehozza (a „Vezetéknév Keresztnév” sorrendet szétbontja), és a regisztrációja az első ottani órájának napja
+      lesz.
+  - **Érvényes bérletek:**
+    - ami hátravan, online alkalom lesz (`kind = online`, `source = motibro`) ugyanaddig a napig;
+    - az összes alkalom = felhasznált + zárolt + hátralévő;
+    - a Motibróban zárolt alkalmak (ott foglalt órák) ott maradnak;
+    - nincs „lejár a bérleted” levél (`expiry_notice_sent = 1`);
+    - egy frissebb export ugyanazokat a bérleteket frissíti (kulcs: `product_id = motibro-<hash>`), nem duplázza.
+  - A futás eredménye: 239 óra, 1556 látogatás, 16 bérlet 34 hátralévő alkalommal. Ugyanaz a fájl másodszor nem
+    változtat semmit.
+  - Vendégadat a repóba nem került (a teszt kitalált adatokkal fut). Tesztek: 1556/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
