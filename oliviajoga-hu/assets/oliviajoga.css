@@ -726,3 +726,35 @@ h1, h2, .oj-h2, .oj-display, .oj-title__h, .page-head .page-head__title, .oj-loc
 
 /* One h1 per page (SEO, 2026-11-12): the old site's own h1s in the content are h2s now – they keep their size */
 .oj-was-h1 { font-size: var(--step-4); }
+
+/* ---------- Olivia, 16 November ---------- */
+/* „itt a fontos ne legyen feljebb, mint a többi szöveg”: „Fontos!” sits on the first line of the text */
+.oj-alert--online .oj-alert__text h2 { grid-row: span 3; align-self: start; font-size: clamp(1.6rem, 1.3rem + 1vw, 2.1rem); line-height: 1; margin-top: .12em; }
+@media (min-width: 760px) { .oj-alert--online .oj-alert__text { align-items: start; } }
+/* every one-to-one online service with its prices in a fold, as on oliviajoga.online */
+.oj-svcs .price-group__head { margin-bottom: 1rem; }
+.oj-svcs__list { display: grid; gap: .7rem; }
+.oj-svc { border-radius: var(--radius); background: var(--card); box-shadow: 0 1px 0 var(--rule, rgba(0,0,0,.1)); overflow: hidden; }
+.oj-svc summary { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: .2rem 1rem; padding: 1.05rem 1.3rem; cursor: pointer; list-style: none; }
+.oj-svc summary::-webkit-details-marker { display: none; }
+.oj-svc__name { font-family: var(--f-display); font-weight: 400; font-size: clamp(1.25rem, 1.05rem + .7vw, 1.6rem); text-transform: uppercase; line-height: 1.05; color: var(--ink); }
+.oj-svc__meta { grid-column: 1; font-size: .9rem; color: var(--muted, #555); }
+.oj-svc__plus { grid-column: 2; grid-row: 1 / span 2; position: relative; width: 34px; height: 34px; border-radius: 50%; background: var(--sun-soft, #FFF3C4); }
+.oj-svc__plus::before, .oj-svc__plus::after { content: ""; position: absolute; left: 50%; top: 50%; width: 14px; height: 2px; margin: -1px 0 0 -7px; background: var(--forest); transition: transform .2s; }
+.oj-svc__plus::after { transform: rotate(90deg); }
+.oj-svc[open] .oj-svc__plus { background: var(--orchid); }
+.oj-svc[open] .oj-svc__plus::before, .oj-svc[open] .oj-svc__plus::after { background: #fff; }
+.oj-svc[open] .oj-svc__plus::after { transform: rotate(0); }
+.oj-svc__body { padding: 0 1.3rem 1.3rem; }
+.oj-svc__table { width: 100%; border-collapse: collapse; margin: 0 0 1rem; font-size: .98rem; }
+.oj-svc__table th, .oj-svc__table td { padding: .6rem .4rem; border-top: 1px solid var(--rule, rgba(0,0,0,.1)); text-align: right; }
+.oj-svc__table thead th { border-top: 0; font-size: .74rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted, #555); }
+.oj-svc__table th[scope=row] { text-align: left; font-weight: 700; }
+.oj-svc__table th small { display: block; font-weight: 500; color: var(--muted, #555); }
+.oj-svc__table td { font-weight: 700; white-space: nowrap; }
+.oj-svc .btn-row { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1.2rem; margin: 0; }
+.oj-korszak__svcs { margin: .8rem 0 0; max-width: 58ch; font-size: .98rem; }
+
+/* Kapcsolat from 26 November (Olivia 11.16): the same two boxes, the Wednesday online class and the one-to-one option instead of the old times */
+.oj-loc--contact .oj-loc__was { margin: 1rem 0 .2rem; font-weight: 600; color: var(--ink); }
+.oj-slot--words span:nth-child(2) { font-family: var(--f-text); font-size: 1rem; font-weight: 700; line-height: 1.3; }

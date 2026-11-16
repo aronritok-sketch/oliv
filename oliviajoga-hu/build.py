@@ -33,13 +33,15 @@ SITE_TITLE = 'Jóga 18. és 21. kerület | Kovács Olívia'
 NOTICE = 'Óráimat 2026. november 25-ig tartom!'  # the site's announcement banner
 # Olivia, „oliviajoga.hu módosítások 11.12.”: after 25 November she teaches live online yoga on oliviajoga.online (ours).
 ONLINE = 'https://oliviajoga.online'  # Olivia: the final domain, without www
-ONLINE_PATHS = {'home': '/', 'yoga': '/online-jogaorak/', 'prenatal': '/online-jogaorak/kismamatorna/', 'account': '/fiokom/',
-                'gift': '/ajandekutalvany/'}
+ONLINE_PATHS = {'home': '/', 'yoga': '/online-orak/csoportos-online-flow-joga/', 'prenatal': '/online-orak/online-kismamatorna/',
+                'account': '/fiokom/', 'gift': '/ajandekutalvany/', 'classes': '/online-orak/', 'request': '/fiokom/?tab=private',
+                'private': '/online-orak/egyeni-online-joga/', 'stretching': '/online-orak/online-stretching-es-mobilizacio/',
+                'relax': '/online-orak/relaxacio-es-legzes/', 'prices': '/bejelentkezes-es-arak/', 'contact': '/kapcsolat/'}
 ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.5.1'
+VERSION = '1.5.2'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -75,7 +77,21 @@ REMOVED_FILES = {
 REMOVED_EMBEDS = {'docs.google.com/forms'}
 # Olivia (11.12): the gift card is an online one now, bought on the online site – the old steps (write to me, Motibro
 # invitation) are replaced; tools/check.py skips these.
-PRICES_SUB = ('élő online, csoportos hatha flow jóga órák', 'és egyéni, privát online kismamatorna')
+# Olivia (hu-11.12, 16 November): „áraknál ugyanúgy ahogy az oliviajoga.onlineon, az alcímbe írj bele minden szolgáltatást”
+PRICES_SUB = ('élő online, csoportos hatha flow jóga órák', 'egyéni online jóga, online kismamatorna, stretching és mobilizáció, relaxáció és légzés')
+# Olivia (11.15 doc, 16 November): „az oliviajoga.hu-n írjuk bele az összes új szolgáltatást, ne csak a csoportos órát.
+# Legalább egyszer említsük meg” – and on the prices page (hu-11.12): every service's prices in a fold, as on the online site.
+# The prices are the online site's (oliviajoga.online, 16 November): (name, online key, request topic, [(who, length,
+# one session, 5 sessions)]).
+ONLINE_SERVICES = [
+    ('Egyéni online jóga', 'private', 'egyeni-joga', [('Egyedül', '60 perc', '8 000 Ft', '35 000 Ft'), ('Egyedül', '90 perc', '10 000 Ft', '43 000 Ft'),
+                                                       ('Párban', '60 perc', '12 000 Ft', '52 000 Ft'), ('Párban', '90 perc', '15 000 Ft', '65 000 Ft')]),
+    ('Online kismamatorna', 'prenatal', 'prenatal', [('Egyedül', '60 perc', '8 000 Ft', '35 000 Ft'), ('A barátnőddel', '60 perc', '12 000 Ft', '52 000 Ft')]),
+    ('Online stretching és mobilizáció', 'stretching', 'stretching', [('Egyedül', '60 perc', '7 000 Ft', '30 000 Ft'), ('Párban', '60 perc', '10 500 Ft', '45 000 Ft')]),
+    ('Relaxáció és légzés', 'relax', 'relax', [('Egyedül', '30 perc', '5 000 Ft', '20 000 Ft'), ('Párban', '30 perc', '7 500 Ft', '32 000 Ft')]),
+]
+SERVICES_LINE = ('Élő online, a saját otthonodból: csoportos hatha flow jóga szerdánként 18:30-tól 20:00-ig, és egyéni '
+                 'időpontban egyéni online jóga, online kismamatorna, stretching és mobilizáció, relaxáció és légzés.')
 REPLACED_TEXT = {'csoportos hatha flow jóga órák Budapest 18. kerület Budapest 21. kerület', '1 órás vagy 5 alkalmas jóga ajándékutalvány', 'Ezekre az információkra lesz szükségem az ajándékutalvány kiállításához:'}
 REPLACED_TEXT_START = ('Vásárlás után kérlek, vedd fel velem a kapcsolatot', 'Ahhoz, hogy az ajándékozott tudjon online foglalni')  # Kapcsolat: the message form
 DROPPED_LENGTHS = {'90 perc'}  # Árak: there are no 90-minute classes any more
@@ -221,7 +237,9 @@ def link(path):
     """The address of an old page: /rólam on oliviajoga.hu (the server serves rólam/index.html), …/rólam/ in a preview."""
     path = path.strip('/')
     if AFTER and path == 'bejelentkezés-jóga-bérlet':
-        return online('account')  # Olivia: from 26 November straight to her account on the online site
+        return online('prices')  # Olivia (16 Nov): from 26 November to „Bejelentkezés és árak” on the online site
+    if AFTER and path == 'kapcsolat':
+        return online('contact')  # Olivia (16 Nov): „A kapcsolatnál irányítson át az oliviajoga.online/kapcsolat/-ra”
     if path == 'főoldal':
         path = ''  # the same page as the home page
     if not path:
@@ -267,12 +285,10 @@ def fix_links(h):
 
 def after_href(h):
     """From 26 November (Olivia): every booking link goes to the online site's home page, the passes to the online
-    yoga page, „Bejelentkezés & jóga bérlet” to her account there."""
+    yoga page, „Bejelentkezés & jóga bérlet” to „Bejelentkezés és árak” there."""
     if not AFTER:
         return h
-    if 'motibro.com/musers' in h:
-        return online('yoga')
-    if 'motibro.com' in h:
+    if 'motibro.com' in h:  # Olivia, 16 November: „minden cta, ami a bejelentkezésre vonatkozik, irányítson a … főoldalára”
         return online('home')
     return h
 
@@ -735,11 +751,12 @@ PAY_LOGOS = [('visa', 'Visa'), ('master', 'Mastercard'), ('maestro', 'Maestro'),
 
 
 def nav_items():
-    """The menu: after 25 November „Bejelentkezés & jóga bérlet” opens her account on the online site and „Online
+    """The menu: after 25 November „Bejelentkezés & jóga bérlet” opens „Bejelentkezés és árak” on the online site and „Online
     kismamatorna” is new (Olivia)."""
     if not AFTER:
         return [(link(p), n) for p, n in NAV]
-    items = [(online('account') if p == 'bejelentkezés-jóga-bérlet' else link(p), n) for p, n in NAV]
+    items = [(link(p), n) for p, n in NAV]  # link(): „Bejelentkezés & jóga bérlet” and „Kapcsolat” go to the online site
+    items.insert(len(items) - 1, (online('classes'), 'Online órák'))  # Olivia, 16 November: „az online órák is legyen új menüpont”
     items.insert(len(items) - 1, (online('prenatal'), 'Online kismamatorna'))
     return items
 
@@ -932,8 +949,28 @@ PRENATAL_TEXT = ('Az online kismamatorna egyéni óra, de jöhetsz akár a bará
 NB = '\u00a0'
 YOGA_PRICES = [('1 alkalom', f'3{NB}000 Ft', '90 perc', [('Napi online jóga jegy vásárlás', 'yoga'), ('1 alkalmas online jóga ajándékutalvány vásárlás', 'gift')]),
                ('5 alkalom', f'13{NB}000 Ft', '90 perc · 8 hétig érvényes', [('5 alkalmas online jóga bérlet vásárlás', 'yoga'), ('5 alkalmas online jóga ajándékutalvány vásárlás', 'gift')])]
-PRENATAL_PRICES = [('1 alkalom', f'5{NB}000 Ft', '60 perc, egyéni'), ('5 alkalmas bérlet', f'22{NB}000 Ft', 'lejárat nélkül'),
-                   ('1 alkalom barátnővel', f'8{NB}000 Ft', 'kettőtöknek'), ('5 alkalom barátnővel', f'36{NB}000 Ft', 'kettőtöknek, lejárat nélkül')]
+# „Árakat frissítsd” (Olivia, 16 November): the online site's prices
+PRENATAL_PRICES = [('1 alkalom', f'8{NB}000 Ft', '60 perc, egyéni'), ('5 alkalmas bérlet', f'35{NB}000 Ft', 'lejárat nélkül'),
+                   ('1 alkalom barátnővel', f'12{NB}000 Ft', 'kettőtöknek'), ('5 alkalom barátnővel', f'52{NB}000 Ft', 'kettőtöknek, lejárat nélkül')]
+
+
+def services_html(title='Egyéni online órák'):
+    """Every one-to-one online service with its prices in a fold (as on oliviajoga.online's prices page), each with
+    „Időpontot kérek” (her account's request form, the service filled in) and the class page."""
+    out = ''
+    for name, key, topic, rows in ONLINE_SERVICES:
+        lens = sorted({r[1] for r in rows}, key=lambda x: int(x.split()[0]))
+        frm = min(int(r[2].replace('\u00a0', '').replace(' ', '').replace('Ft', '')) for r in rows)
+        trs = ''.join(f'<tr><th scope="row">{esc(w)}<small>{esc(l)}</small></th><td>{esc(one)}</td><td>{esc(five)}</td></tr>' for w, l, one, five in rows)
+        ask = online('request') + '&topic=' + topic
+        out += (f'<details class="oj-svc"><summary><span class="oj-svc__name">{esc(name)}</span>'
+                f'<span class="oj-svc__meta">{esc(" / ".join(lens))} · {f"{frm:,}".replace(",", NB)} Ft-tól</span><span class="oj-svc__plus" aria-hidden="true"></span></summary>'
+                f'<div class="oj-svc__body"><table class="oj-svc__table"><thead><tr><th></th><th>1 alkalom</th><th>5 alkalom</th></tr></thead><tbody>{trs}</tbody></table>'
+                f'<p class="btn-row">{button(ask, "Időpontot kérek", "orchid")}'
+                f'<a class="text-link" href="{esc(online(key))}"{ext_attr(online(key))}>Bővebben az óráról</a></p></div></details>')
+    return (f'<section class="price-group oj-svcs" data-reveal><header class="price-group__head"><p class="kicker">oliviajoga.online</p>'
+            f'<h3>{esc(title)}</h3><p class="price-group__text">Négyszemközt vagy párban, élőben, online. Időpontot a fiókodban kérhetsz, és hamarosan visszaírok.</p></header>'
+            f'<div class="oj-svcs__list">{out}</div></section>')
 
 
 def online_words():
@@ -976,7 +1013,8 @@ def korszak_section():
     cells = ''.join(f'<figure class="oj-korszak__cell oj-korszak__cell--{n % 7}" style="--i:{n}">{new_pic(k, "(min-width: 960px) 20vw, 33vw")}</figure>'
                     for n, k in enumerate(keys))
     return wrap(f'<div class="oj-korszak" data-reveal><div class="oj-korszak__text"><p class="kicker">3 év közös gyakorlás</p>'
-                f'<h2 class="oj-h2">Egy korszak lezárult</h2><p class="oj-lead">{esc(KORSZAK_TEXT)}</p>'
+                f'<h2 class="oj-h2">Egy korszak {"lezárult" if AFTER else "lezárul"}</h2><p class="oj-lead">{esc(KORSZAK_TEXT if AFTER else KORSZAK_TEXT.replace("lezárult", "lezárul"))}</p>'
+                f'<p class="oj-korszak__svcs">{esc(SERVICES_LINE)}</p>'
                 f'<p class="btn-row">{button(online(), "Jóga online", "orchid", " btn--lg")}</p>'
                 f'</div>'
                 f'<div class="oj-korszak__grid">{cells}{band("pink", True)}</div></div>', 'section oj-korszak-wrap')
@@ -1239,10 +1277,10 @@ def booking_page(p):
     secs = [s for s in p['sections'] if not is_prefooter(s) and not is_badges(s)]
     title = title_of(secs[0])
     head = page_head(title, p['path'], [('', 'Főoldal')], '', theme_pic(PAGE_PHOTO['bejelentkezés-jóga-bérlet'], eager=True), 'pink')
-    if AFTER:  # the WordPress theme sends this address straight to her account there (Olivia); a fallback page
+    if AFTER:  # the WordPress theme sends this address straight to „Bejelentkezés és árak” there (Olivia); a fallback page
         return head + (f'<div class="container oj-flow"><div class="oj-alert oj-alert--online" data-reveal><div class="oj-alert__text">'
                        f'<p>A bejelentkezés, a bérleted és a foglalásaid az oliviajoga.online oldalon vannak.</p>{online_words()}</div>'
-                       f'<p class="btn-row oj-online__go">{button(online("account"), "Fiókom", "orchid", " btn--lg")}'
+                       f'<p class="btn-row oj-online__go">{button(online("prices"), "Bejelentkezés és árak", "orchid", " btn--lg")}'
                        f'{button(online(), "oliviajoga.online " + icon("arrow"), "ghost", " btn--lg")}</p></div></div>')
     out, i = [], 1
     while i < len(secs):
@@ -1286,12 +1324,6 @@ def contact_page(p):
         s = secs[i]
         h = next((b for b in tiles_blocks([t for c in s['columns'] for t in c if not is_divider(t)]) if b['t'] == 'h1'), None)
         nxt = secs[i + 1] if i + 1 < len(secs) else None
-        if h and nxt and any(t['type'] == 'embed' for c in nxt['columns'] for t in c) and AFTER:
-            words = [t for c in nxt['columns'] for t in c if t['type'] in ('text', 'button')]
-            place = next((b for b in tiles_blocks(words) if b['t'].startswith('h')), None)
-            boxes.append(f'<div class="oj-was__place">{seo_heading(h, "oj-was__h")}{heading(place, "oj-was__name") if place else ""}</div>')
-            i += 2
-            continue
         if h and nxt and any(t['type'] == 'embed' for c in nxt['columns'] for t in c):
             emb = next(t for c in nxt['columns'] for t in c if t['type'] == 'embed')
             words = [t for c in nxt['columns'] for t in c if t['type'] in ('text', 'button')]
@@ -1302,12 +1334,23 @@ def contact_page(p):
             links = [only_link(b) for b in bs if only_link(b)]
             tone = ['pink', 'lilac'][len(boxes) % 2]
             notes_html = ''.join('<p class="oj-loc__note">' + fix_links(b['html']) + '</p>' for b in notes)
+            slots, mapped = slot_rows(times), embed_html(emb["src"], norm(text_of(place["html"])) if place else "Térkép")
+            if AFTER:
+                # Olivia (11.12, „november 26-án”): the Kapcsolat page stays exactly as it is – the same two boxes with the
+                # district, Prána and Korall – only the old timetable gives way to the Wednesday class and the one-to-one
+                # option, the map goes, and the buttons take you to the online site.
+                slots = (f'<p class="oj-loc__note oj-loc__was">2026. november 25-ig itt tartottam az óráimat. '
+                         f'Innentől élő online jógán folytathatjuk, otthonról:</p>'
+                         f'<ul class="oj-slots"><li class="oj-slot oj-slot--2"><span>szerda</span><span>18.30 - 20.00</span></li>'
+                         f'<li class="oj-slot oj-slot--2 oj-slot--words"><span>egyéni</span><span>egyeztetett időpontban</span></li></ul>')
+                mapped = ''
+                links = [(hh, 'Online jóga bejelentkezés' if re.match(r'\s*bejelentkezés', text_of(ll), re.I) else ll) for hh, ll in links]
             boxes.append(f'<article class="oj-loc oj-loc--{tone} oj-loc--contact" data-reveal>{seo_heading(h, "oj-loc__kw")}'
-                         f'{heading(place, "oj-loc__place") if place else ""}{slot_rows(times)}'
+                         f'{heading(place, "oj-loc__place") if place else ""}{slots}'
                          # Olivia (2026-11-06): the buttons and maps of the two boxes in one line → this block sits at the bottom
                          f'<div class="oj-loc__foot">{notes_html}'
                          f'<p class="btn-row">{"".join(button(hh, ll, "dark" if n == 0 else "ghost") for n, (hh, ll) in enumerate(links))}</p>'
-                         f'{embed_html(emb["src"], norm(text_of(place["html"])) if place else "Térkép")}</div></article>')
+                         f'{mapped}</div></article>')
             i += 2
             continue
         if boxes:
@@ -1337,8 +1380,6 @@ def contact_page(p):
 
 
 def contact_boxes(boxes):
-    if AFTER:
-        return f'<div class="oj-locs oj-locs--contact">{online_boxes()}</div>{was_strip("".join(boxes))}'
     return f'<div class="oj-locs oj-locs--contact">{"".join(boxes)}</div>'
 
 
@@ -1410,7 +1451,7 @@ def prices_after(head):
         return (f'<article class="price price--{["paper", "forest"][n % 2]}"><h4>{esc(count)}</h4><p class="price__amount">{esc(amount)}</p>'
                 f'<p class="price__unit">{esc(unit)}</p>{more}<ul class="oj-price-links">{lis}</ul>'
                 f'{button(online(cta[1]), cta[0], ["dark", "orchid"][n % 2])}</article>')
-    yoga = ''.join(card(n, c, a, u, links, ('Online jóga bejelentkezés', 'yoga'),
+    yoga = ''.join(card(n, c, a, u, links, ('Online jóga bejelentkezés', 'home'),
                         '<p class="price__note">Ha én mondok le egy órát, a bérlet érvényessége annyival kitolódik.</p>' if n else '')
                    for n, (c, a, u, links) in enumerate(YOGA_PRICES))
     pre = [(c, a, u) for c, a, u in PRENATAL_PRICES]
@@ -1421,9 +1462,7 @@ def prices_after(head):
     groups = (f'<section class="price-group price-group--text" data-reveal><header class="price-group__head"><p class="kicker">Élő online jóga</p><h3>90 perc</h3>'
               f'<p class="price-group__text">{esc(YOGA_90)}</p><p class="price-group__when">Szerdánként 18:30-tól 20:00-ig, élőben, online.</p></header>'
               f'<div class="price-group__cards" style="--n:2">{yoga}</div></section>'
-              f'<section class="price-group price-group--text" data-reveal><header class="price-group__head"><p class="kicker">Online kismamatorna</p><h3>60 perc</h3>'
-              f'<p class="price-group__text">{esc(PRENATAL_TEXT)}</p></header>'
-              f'<div class="price-group__cards" style="--n:2">{duo}</div></section>')
+              + services_html())  # the prenatal class and every other one-to-one service in a fold (Olivia, 16 November)
     return head + f'<div class="container oj-flow"><div class="pricing oj-pricing">{groups}</div></div>'
 
 
@@ -1484,7 +1523,7 @@ def prices_page(p):
             elif ol or text_of(b.get('html', '')).strip() == 'Bejelentkezés':
                 label = ol[1] if ol else fix_links(b['html'])
                 book = f'<p class="btn-row">{button(ol[0] if ol else MOTIBRO, label, "ghost")}</p>'
-    body = f'<div class="container oj-flow"><div class="pricing oj-pricing">{"".join(groups)}</div></div>'
+    body = f'<div class="container oj-flow"><div class="pricing oj-pricing">{"".join(groups)}{services_html("Élő online órák: egyéni online órák")}</div></div>'
     return head + body
 
 
@@ -1741,7 +1780,7 @@ def main():
         AFTER = True
         after = {path: {'content': body, 'prefooter': prefooter(pg), 'desc': description(pg)} for path, pg, body, cls, schema in render_all(journal_cards)}
         chrome['after'] = {'from': AFTER_FROM, 'header': header(''), 'footer': footer(), 'pages': after,
-                           'redirect': {'bejelentkezés-jóga-bérlet': online('account')}}
+                           'redirect': {'bejelentkezés-jóga-bérlet': online('prices'), 'kapcsolat': online('contact')}}
         AFTER = False
         return wp_theme(wp_pages, chrome)
     for path, pg, body, cls, schema in render_all(journal_cards):

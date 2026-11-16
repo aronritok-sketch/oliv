@@ -108,6 +108,24 @@ Olivia doksija két részből áll: amit most kért, és amit **november 26-tól
   rózsaszín hullámos fátyol marad. Az új szöveg az ő méreteire, az ő betűivel (`orarend.py`, 1151 × 2048 → JPG
   1080 × 1920). Ha Olivia átküldi a nyers fotót, a háttér abból is készülhet.
 
+- **1.5.2 (Olivia 11.15 és hu-11.12 doksi, 2026-11-16):**
+  - Az Árak alcíme a csoportos órán túl minden új szolgáltatást felsorol (`PRICES_SUB`): egyéni online jóga, online
+    kismamatorna, stretching és mobilizáció, relaxáció és légzés.
+  - Az Árak oldalon „Egyéni online órák” rész, lenyílókban az oliviajoga.online árai (`ONLINE_SERVICES`,
+    `services_html()`), „Időpontot kérek” (az online fiók kérés-űrlapja) és „Bővebben az óráról” gombbal. Most a
+    csoportos árak alatt, november 26-tól a kismama-kártyák helyén.
+  - A FONTOS! doboz címe a szöveggel egy vonalban, felül.
+  - „Egy korszak lezárul” november 25-ig, utána „lezárult”, alatta a szolgáltatások sora.
+  - November 26-tól (`AFTER`):
+    - új menüpont az „Online órák” (→ /online-orak/);
+    - a „Bejelentkezés & jóga bérlet” → oliviajoga.online/bejelentkezes-es-arak/;
+    - a „Kapcsolat” → oliviajoga.online/kapcsolat/ (menü, lábléc, WordPress-átirányítás);
+    - minden Motibro-link → az online főoldal.
+  - A statikus Kapcsolat-oldal (tartalék) a mostani két helyszínes dobozt tartja meg:
+    - a kerület, Prána és Korall marad, „tartottam” szöveggel;
+    - szerda 18.30–20.00 és egyéni időpont az órarend helyett;
+    - térkép nélkül, a gombok az online oldalra.
+
 ## Fájlok
 
 | | |

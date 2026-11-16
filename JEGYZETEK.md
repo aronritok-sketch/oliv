@@ -976,6 +976,21 @@
   - Tárhely a `/oys/v1/status`-ban (`storage`): szabad és teljes lemezhely, uploads, chatfotók, felvételek
     (`OYS_Ops::storage`).
   - Tesztek: 1441/0.
+- **oliviajoga.hu 1.5.2 (téma: oliviayoga 1.5.2, élesben a saját tűjével) – Olívia .hu-s pontjai
+  (11.15 és hu-11.12 doksi):**
+  - „az oliviajoga.hu-n írjuk bele az összes új szolgáltatást, ne csak a csoportos órát”: az Árak alcíme és a
+    „korszak” szekció is felsorolja: egyéni online jóga, online kismamatorna, stretching és mobilizáció, relaxáció és
+    légzés.
+  - „Árakat frissítsd … lenyílóba ugyanúgy az összes többi szolgáltatás árát is, ahogy az oliviajoga.onlineon”: az Árak
+    oldalon az „Egyéni online órák” lenyílói az élő árakkal. Minden lenyílóban „Időpontot kérek” és „Bővebben az
+    óráról” gomb.
+  - „itt a fontos ne legyen feljebb, mint a többi szöveg”: a FONTOS! cím a szöveggel egy vonalban.
+  - November 26-tól:
+    - új menüpont az „Online órák”;
+    - a „Bejelentkezés & jóga bérlet” menüpont → oliviajoga.online/bejelentkezes-es-arak/;
+    - a „Kapcsolat” → oliviajoga.online/kapcsolat/;
+    - minden bejelentkezés-CTA → az online főoldal; a GYIK két válasza már az új.
+  - A .hu ellenőrzője 2288/0 (most), 1219/0 (november 26-tól).
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
