@@ -1970,3 +1970,15 @@ msgstr "legalább 3 fővel indul"
 
 msgid "beginners welcome"
 msgstr "kezdőket is szeretettel várok"
+
+#: inc/shortcodes.php
+msgid "Buy %d sessions"
+msgstr "Bérletet veszek (%d alkalom)"
+
+#: inc/shortcodes.php
+msgid "Calendar"
+msgstr "Naptár"
+
+#: inc/shortcodes.php
+msgid "More classes in the calendar"
+msgstr "További órák a naptárban"

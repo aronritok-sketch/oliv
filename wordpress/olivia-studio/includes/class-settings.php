@@ -36,7 +36,7 @@ class OYS_Settings {
 			// 0: a free spot is offered to the whole waitlist by email, first to book gets it (Olivia, 16 November); 1: people
 			// with a pass or membership are booked in by themselves, in waitlist order
 			'waitlist_auto'           => 0,
-			'booking_window_days'     => 28,
+			'booking_window_days'     => 42, // Áron, 16 November: „6 héttel előre foglalható”
 			'booking_close_minutes'   => 30,
 			'weeks_ahead'             => 6,
 			'reminder_hours'          => 24,

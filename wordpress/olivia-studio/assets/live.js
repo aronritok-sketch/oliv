@@ -315,22 +315,48 @@
 		return lkP;
 	}
 
-	// Before the room opens: a countdown, then the button.
+	// Before the room opens: a countdown (days, hours, minutes, seconds), then the button (Áron, 16 November: the waiting room).
 	var opensAt = cfg.opens - (cfg.owner ? 3600000 : 0);
+	var countEl = q('[data-live-count]');
+	var lastLabel = '';
+	function pad(n) {
+		return ('0' + n).slice(-2);
+	}
 	function tick() {
 		var left = opensAt - Date.now();
 		if (left <= 0) {
 			joinBtn.disabled = false;
+			if (lobby) {
+				lobby.classList.add('is-open');
+			}
+			if (countEl) {
+				countEl.hidden = true;
+			}
 			if (cfg.phase === 'before') {
 				cfg.phase = 'open';
 				status.textContent = t.openNow;
 			}
 			return;
 		}
-		var min = Math.ceil(left / 60000);
-		var label = min >= 120 ? Math.floor(min / 60) + ':' + ('0' + (min % 60)).slice(-2) + ' h' : min + ' ' + (t.min || 'min');
-		status.textContent = (t.opensIn || '%s').replace('%s', label);
-		setTimeout(tick, 30000);
+		var sec = Math.floor(left / 1000);
+		var d = Math.floor(sec / 86400), h = Math.floor(sec % 86400 / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60;
+		if (countEl) {
+			var set = function (u, v) { var el = countEl.querySelector('[data-u="' + u + '"]'); if (el) { el.textContent = v; } };
+			set('d', d);
+			set('h', pad(h));
+			set('m', pad(m));
+			set('s', pad(s));
+			countEl.classList.toggle('no-days', d === 0);
+		}
+		// for screen readers and as the line above the clock: once a minute, in words
+		var u = t.units || ['%d days', '%d hours', '%d minutes'];
+		var words = d ? u[0].replace('%d', d) + ' ' + u[1].replace('%d', h) : (h ? u[1].replace('%d', h) + ' ' + u[2].replace('%d', m) : u[2].replace('%d', Math.max(1, Math.ceil(sec / 60))));
+		var label = (t.opensIn || '%s').replace('%s', words);
+		if (label !== lastLabel) {
+			status.textContent = label;
+			lastLabel = label;
+		}
+		setTimeout(tick, 1000);
 	}
 	if (cfg.phase === 'before') {
 		tick();

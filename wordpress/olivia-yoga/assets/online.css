@@ -87,7 +87,7 @@
 /* 14 Nov, later: „A főoldalon az ÖSZES kép legyen színes, ha ráviszem a kurzort” – every picture, linked or not */
 .home main .photo, .home main .frame img { transition: filter .45s ease; }
 .home main .photo:hover, .home main .frame:hover img, .home main a:hover .photo, .home main a:focus-visible .photo, .home main a:hover .frame img, .home main a:focus-visible .frame img { filter: none; }
-.home main .way .photo, .home main .cards .frame img { filter: none; }
+.home main .cards .frame img { filter: none; } /* the class cards (.way) are black and white too since 16 November */
 
 /* The closing block in peach („ez a rész legyen ez a szín”) */
 .cta.oj-cta--peach { background: var(--sun-soft); }
@@ -1698,3 +1698,27 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .entry .oys-fb span { flex: 1; }
 .entry .oys-account > .oys-fb { margin-top: 2rem; }
 
+
+/* ---------- Olívia, 16 November (doc, evening) ---------- */
+/* „ezek a képek is legyenek alapból fekete-fehérek, a főoldalon, és amikor ráviszem a kurzort, akkor színes”: the class cards
+   follow the home page's black-and-white photos (the exception above is gone); on a phone a tap colours them */
+.home main .way:active .photo { filter: none; }
+/* „itt legyen halványsárga és magenta a hullám és ugyanolyan mint ezeknél” – the intro photo: the prenatal block's soft wave */
+.oj-intro-wave > .oj-blob:not(.oj-brush) .oj-blob__front { fill: var(--orchid); }
+.oj-intro-wave > .oj-blob:not(.oj-brush) .oj-blob__back { fill: color-mix(in srgb, var(--sun) 50%, #fff); }
+@media (prefers-reduced-motion: reduce) { .ways--five .way__pic img, .ways--five .way__pic .photo { transition: none; } }
+/* „a gyakorlás és az élet és elme kategória színe most ugyanolyan a cikkeknél. Legyen más színű”: a fourth topic colour */
+.card--forest { --tone: var(--forest); }
+.card--forest .card__cat { color: #fff; }
+/* Áron, 16 November: the price cards get their buttons – ask for a time, or buy the pass */
+.oj-price__act { display: flex; flex-wrap: wrap; gap: .5rem; margin: .9rem 0 0; }
+.oj-price__act .btn { flex: 1 1 auto; justify-content: center; }
+/* the calendar under the timetable, and the link to it from the home page (Áron, 16 November) */
+.oj-cal-wrap { margin: clamp(2rem, 4vw, 3rem) 0 1rem; scroll-margin-top: 90px; }
+.oj-cal-wrap > h3 { margin: 0 0 1rem; }
+.oys-cal { --cal-accent: var(--orchid); --cal-soft: var(--sun-soft); }
+.oys-cal__chip { background: var(--forest); }
+.oys-cal__chip b { color: var(--sun); }
+.oj-more-classes { margin: 1.2rem 0 0; }
+.oj-more-classes .btn { gap: .5rem; }
+.oj-more-classes .btn svg { width: 1.1rem; height: 1.1rem; }

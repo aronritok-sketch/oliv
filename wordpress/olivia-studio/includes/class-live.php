@@ -1009,6 +1009,7 @@ class OYS_Live {
 				'saved'     => __( 'Saved.', 'olivia-studio' ),
 				'opensIn'   => __( 'The room opens in %s.', 'olivia-studio' ),
 				'min'       => __( 'min', 'olivia-studio' ),
+				'units'     => array( __( '%d days', 'olivia-studio' ), __( '%d hours', 'olivia-studio' ), __( '%d minutes', 'olivia-studio' ) ),
 				'openNow'   => __( 'The room is open.', 'olivia-studio' ),
 				'full'      => __( 'Full screen', 'olivia-studio' ),
 				'fullExit'  => __( 'Exit full screen', 'olivia-studio' ),
@@ -1032,13 +1033,21 @@ class OYS_Live {
 		} else {
 			$out .= '<div class="oys-live__video" data-live-video hidden><div class="oys-live__main" data-live-main></div><div class="oys-live__tiles" data-live-tiles></div>'
 				. '<p class="oys-live__note" data-live-note hidden></p><div class="oys-live__bar" data-live-bar></div></div>'
-				. '<div class="oys-live__lobby" data-live-lobby><p class="oys-live__status" data-live-status>'
-				. ( 'open' === $phase ? esc_html__( 'The room is open.', 'olivia-studio' ) : esc_html( sprintf( __( 'The room opens %d minutes before the class.', 'olivia-studio' ), max( 5, (int) OYS_Settings::get( 'live_open_minutes' ) ) ) ) ) . '</p>'
-				. '<button type="button" class="btn btn--primary" data-live-join' . ( 'open' === $phase ? '' : ' disabled' ) . '>' . esc_html( $who['owner'] ? __( 'Go live', 'olivia-studio' ) : __( 'Join the class', 'olivia-studio' ) ) . '</button>'
-				. '<ul class="oys-live__tips"><li>' . esc_html__( 'In your browser, no app needed. On a phone or tablet, open this page in Chrome or Safari.', 'olivia-studio' ) . '</li>'
-				. ( $who['owner'] ? '' : '<li>' . esc_html__( 'Charge your device or plug it in, so it does not run out during the class.', 'olivia-studio' ) . '</li>' ) // Olívia, 14 November: „ne felejtse el feltölteni az eszközét”
-				. '<li>' . esc_html( $who['owner'] || self::two_way( $session ) ? __( 'Allow the camera and the microphone when your browser asks. You can turn both off in the room.', 'olivia-studio' ) : sprintf( __( 'You see and hear %s; your camera and microphone stay off. Questions go in the chat.', 'olivia-studio' ), $teacher ) ) . '</li>'
-				. ( self::records( $session ) ? '<li>' . esc_html( sprintf( __( 'The class is recorded, but only %s is on the recording: you are not.', 'olivia-studio' ), $teacher ) ) . '</li>' : '' )
+				// Áron, 16 November: „a váró … írja, hogy mennyi idő múlva nyílik … szarul néz ki, az is kapjon egy új dizájnt” – a
+				// waiting room with a live countdown (days, hours, minutes, seconds), when the room opens, and the prep as cards
+				. '<div class="oys-live__lobby oys-lobby' . ( 'open' === $phase ? ' is-open' : '' ) . '" data-live-lobby><div class="oys-lobby__hero">'
+				. '<p class="oys-lobby__badge"><i aria-hidden="true"></i>' . esc_html( 'open' === $phase ? __( 'The room is open', 'olivia-studio' ) : __( 'Waiting room', 'olivia-studio' ) ) . '</p>'
+				. '<p class="oys-live__status oys-lobby__status" data-live-status aria-live="polite">' . ( 'open' === $phase ? esc_html__( 'The room is open.', 'olivia-studio' ) : esc_html( sprintf( __( 'The room opens %d minutes before the class.', 'olivia-studio' ), max( 5, (int) OYS_Settings::get( 'live_open_minutes' ) ) ) ) ) . '</p>'
+				. '<div class="oys-lobby__count" data-live-count aria-hidden="true"' . ( 'open' === $phase ? ' hidden' : '' ) . '>'
+				. '<span><b data-u="d">0</b><small>' . esc_html__( 'days', 'olivia-studio' ) . '</small></span><span><b data-u="h">00</b><small>' . esc_html__( 'hours', 'olivia-studio' ) . '</small></span>'
+				. '<span><b data-u="m">00</b><small>' . esc_html__( 'minutes', 'olivia-studio' ) . '</small></span><span><b data-u="s">00</b><small>' . esc_html__( 'seconds', 'olivia-studio' ) . '</small></span></div>'
+				. '<p class="oys-lobby__opens">' . oys_icon( 'clock' ) . esc_html( sprintf( __( 'Opens %1$s · the class: %2$s', 'olivia-studio' ), oys_date( gmdate( 'Y-m-d H:i:s', self::window( $session )[0] ), 'l, F j · g:i a' ), oys_time( $session->starts_at ) . '–' . oys_time( $session->ends_at ) ) ) . '</p>'
+				. '<button type="button" class="btn btn--primary oys-lobby__join" data-live-join' . ( 'open' === $phase ? '' : ' disabled' ) . '>' . oys_icon( 'video' ) . esc_html( $who['owner'] ? __( 'Go live', 'olivia-studio' ) : __( 'Join the class', 'olivia-studio' ) ) . '</button>'
+				. '</div><h3 class="oys-lobby__h">' . esc_html__( 'Before the class', 'olivia-studio' ) . '</h3><ul class="oys-live__tips oys-lobby__tips">'
+				. '<li>' . oys_icon( 'screen' ) . '<span>' . esc_html__( 'In your browser, no app needed. On a phone or tablet, open this page in Chrome or Safari.', 'olivia-studio' ) . '</span></li>'
+				. ( $who['owner'] ? '' : '<li>' . oys_icon( 'heart' ) . '<span>' . esc_html__( 'Charge your device or plug it in, so it does not run out during the class.', 'olivia-studio' ) . '</span></li>' ) // Olívia, 14 November: „ne felejtse el feltölteni az eszközét”
+				. '<li>' . oys_icon( 'video' ) . '<span>' . esc_html( $who['owner'] || self::two_way( $session ) ? __( 'Allow the camera and the microphone when your browser asks. You can turn both off in the room.', 'olivia-studio' ) : sprintf( __( 'You see and hear %s; your camera and microphone stay off. Questions go in the chat.', 'olivia-studio' ), $teacher ) ) . '</span></li>'
+				. ( self::records( $session ) ? '<li>' . oys_icon( 'check' ) . '<span>' . esc_html( sprintf( __( 'The class is recorded, but only %s is on the recording: you are not.', 'olivia-studio' ), $teacher ) ) . '</span></li>' : '' )
 				. '</ul></div>'
 				. ( $who['owner'] ? '<div class="oys-live__owner" data-live-owner hidden><span data-live-rec-state></span> <button type="button" class="btn btn--ghost btn--sm" data-live-rec hidden></button> <span class="oys-small" data-live-intro></span></div>' : '' );
 		}
@@ -1048,7 +1057,7 @@ class OYS_Live {
 
 	private static function chat_html( $session, array $who ) {
 		$open = $who['owner'] || self::chat_open( $session );
-		return '<aside class="oys-live__chat" aria-label="' . esc_attr__( 'Class chat', 'olivia-studio' ) . '"><h3>' . esc_html__( 'Class chat', 'olivia-studio' ) . '</h3>'
+		return '<aside class="oys-live__chat" aria-label="' . esc_attr__( 'Class chat', 'olivia-studio' ) . '"><h3>' . oys_icon( 'chat' ) . esc_html__( 'Class chat', 'olivia-studio' ) . '</h3>'
 			. '<p class="oys-small">' . esc_html( sprintf( _n( 'Stays here after the class: you can keep talking for %d day.', 'Stays here after the class: you can keep talking for %d days.', max( 1, (int) OYS_Settings::get( 'live_chat_days' ) ), 'olivia-studio' ), max( 1, (int) OYS_Settings::get( 'live_chat_days' ) ) ) ) . '</p>'
 			. '<ol class="oys-live__messages" data-live-messages aria-live="polite"></ol>'
 			. ( $open ? '<form class="oys-live__form" data-live-form><div class="oys-live__preview" data-live-preview hidden></div><label class="screen-reader-text" for="oys-live-msg">' . esc_html__( 'Message', 'olivia-studio' ) . '</label><textarea id="oys-live-msg" name="body" rows="2" maxlength="1000" placeholder="' . esc_attr__( 'Write to the class…', 'olivia-studio' ) . '"></textarea>'

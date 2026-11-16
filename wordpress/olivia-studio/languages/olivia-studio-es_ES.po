@@ -4673,3 +4673,53 @@ msgstr "Hola {first_name}, hay un mensaje nuevo en el chat de {class} ({date_sho
 #: includes/class-hub.php
 msgid "Open the class chat"
 msgstr "Abrir el chat de la clase"
+
+#: includes/class-frontend.php
+msgid "You can book up to %d week ahead."
+msgid_plural "You can book up to %d weeks ahead."
+msgstr[0] "Puedes reservar hasta con %d semana de antelación."
+msgstr[1] "Puedes reservar hasta con %d semanas de antelación."
+
+#: includes/class-frontend.php
+msgid "No group classes in these weeks yet."
+msgstr "Aún no hay clases de grupo en estas semanas."
+
+#: includes/class-live.php
+msgid "The room is open"
+msgstr "La sala está abierta"
+
+#: includes/class-live.php
+msgid "Waiting room"
+msgstr "Sala de espera"
+
+#: includes/class-live.php
+msgid "days"
+msgstr "días"
+
+#: includes/class-live.php
+msgid "hours"
+msgstr "horas"
+
+#: includes/class-live.php
+msgid "minutes"
+msgstr "minutos"
+
+#: includes/class-live.php
+msgid "seconds"
+msgstr "seg"
+
+#: includes/class-live.php
+msgid "Opens %1$s · the class: %2$s"
+msgstr "Abre: %1$s · la clase: %2$s"
+
+#: includes/class-live.php
+msgid "Before the class"
+msgstr "Antes de la clase"
+
+#: includes/class-live.php
+msgid "%d days"
+msgstr "%d días"
+
+#: includes/class-live.php
+msgid "%d hours"
+msgstr "%d horas"

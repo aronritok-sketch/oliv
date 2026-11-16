@@ -25,6 +25,10 @@ class OYS_Install {
 			// v3: weekly dates remember the slot they were created for, so moving one date doesn't re-create it.
 			global $wpdb;
 			$wpdb->query( 'UPDATE ' . self::table( 'sessions' ) . ' SET tpl_slot = starts_at WHERE template_id > 0 AND tpl_slot IS NULL' );
+			// v14: booking 6 weeks ahead (Áron, 16 November: „6 héttel előre foglalható”) where the old 4 weeks were kept
+			if ( 28 === (int) OYS_Settings::get( 'booking_window_days' ) ) {
+				OYS_Settings::update( array( 'booking_window_days' => 42 ) );
+			}
 			// v4: every booking of an online class is an online booking.
 			$wpdb->query( 'UPDATE ' . self::table( 'bookings' ) . ' b JOIN ' . self::table( 'sessions' ) . " s ON s.id = b.session_id SET b.mode = 'online' WHERE s.format = 'online' AND b.mode <> 'online'" );
 		}

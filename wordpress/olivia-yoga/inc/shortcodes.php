@@ -94,7 +94,13 @@ function oy_price_cards( $service ) {
 		$head = '<span class="oj-price__who">' . ( $pair ? esc_html__( 'As a pair', 'olivia-yoga' ) : esc_html__( 'Alone', 'olivia-yoga' ) ) . '</span>'
 			. ( $len ? '<span class="oj-price__len">' . oy_icon( 'clock' ) . esc_html( sprintf( __( '%d minutes', 'olivia-yoga' ), $len ) ) . '</span>' : '' )
 			. '<span class="oj-price__from">' . esc_html( sprintf( __( 'from %s', 'olivia-yoga' ), oys_money( $from ) ) ) . '</span>';
-		$body = '<dl class="oj-price__rows">' . $rows . '</dl>' . ( $pair ? '<p class="oj-price__for">' . esc_html__( 'for the two of you', 'olivia-yoga' ) . '</p>' : '' );
+		// Áron, 16 November: „ahol van, mennyibe kerül egy-egy óra, ott legyen egy közvetlen foglalás gomb, vagy kérés küldése
+		// gomb, mert így haszontalanok az árak” – ask for a time with this service, length and number of people filled in,
+		// or buy the 5-session pass straight away
+		$ask  = add_query_arg( array( 'topic' => $service, 'length' => $len ?: null, 'people' => $pair ? 2 : 1 ), oy_private_url() );
+		$act  = '<p class="oj-price__act"><a class="btn btn--orchid btn--sm" href="' . esc_url( $ask ) . '">' . esc_html__( 'Ask for a time', 'olivia-yoga' ) . '</a>'
+			. ( ! empty( $g['pack'] ) && function_exists( 'oys_page_url' ) ? '<a class="btn btn--ghost btn--sm" href="' . esc_url( oys_page_url( 'book', array( 'product' => $g['pack']['id'] ) ) ) . '">' . esc_html( sprintf( __( 'Buy %d sessions', 'olivia-yoga' ), max( 1, (int) $g['pack']['credits'] ) ) ) . '</a>' : '' ) . '</p>';
+		$body = '<dl class="oj-price__rows">' . $rows . '</dl>' . ( $pair ? '<p class="oj-price__for">' . esc_html__( 'for the two of you', 'olivia-yoga' ) . '</p>' : '' ) . $act;
 		$out .= $pair
 			? '<details class="oj-price oj-price--pair"><summary class="oj-price__head">' . $head . '<span class="oj-fold__icon" aria-hidden="true"></span></summary>' . $body . '</details>'
 			: '<div class="oj-price oj-price--solo"><div class="oj-price__head">' . $head . '</div>' . $body . '</div>';
@@ -439,7 +445,10 @@ add_action( 'init', function () {
 	add_shortcode( 'oy_contact_form', fn() => oy_contact_form() );
 	add_shortcode( 'oy_thanks', fn() => oy_thanks() );
 	add_shortcode( 'oy_moments', fn() => '<div class="block-wide">' . oy_moments_grid() . '</div>' );
-	add_shortcode( 'oy_schedule', fn() => '<div class="block-wide">' . $studio( 'oys_schedule', '<p>' . esc_html__( 'The timetable is coming soon.', 'olivia-yoga' ) . '</p>' ) . oy_replay_note() . oy_cancel_note() . '</div>' );
+	// Áron, 16 November: after the list a real calendar of the bookable weeks (the home page's „Heti élő órák” links here)
+	add_shortcode( 'oy_schedule', fn() => '<div class="block-wide">' . $studio( 'oys_schedule', '<p>' . esc_html__( 'The timetable is coming soon.', 'olivia-yoga' ) . '</p>' )
+		. ( shortcode_exists( 'oys_calendar' ) && oy_online_only() ? '<section class="oj-cal-wrap" id="naptar" aria-labelledby="naptar-title"><h3 id="naptar-title">' . esc_html__( 'Calendar', 'olivia-yoga' ) . '</h3>' . do_shortcode( '[oys_calendar]' ) . '</section>' : '' )
+		. oy_replay_note() . oy_cancel_note() . '</div>' );
 	add_shortcode( 'oy_pricing', fn() => '<div class="block-wide">' . $studio( 'oys_pricing', '' ) . '</div>' );
 	add_shortcode( 'oy_events', fn() => '<div class="block-wide oy-events-dark">' . $studio( 'oys_events', '' ) . '</div>' );
 	add_shortcode( 'oy_booking_link', fn( $a ) => oy_btn_row( oy_btn( oy_book_url(), oy_t( $a['label'] ?? '' ) ?: __( 'Book a class', 'olivia-yoga' ) ) ) );
@@ -528,7 +537,15 @@ function oy_fitmummy( $cls = '' ) {
  * stays as she wrote it (the box is put round it while the page is shown).
  */
 function oy_private_callout( $html ) {
-	return oy_online_only() && is_page( oy_page_slug( 'yoga-classes' ) ) ? oy_private_callout_html( $html ) : $html;
+	if ( ! oy_online_only() ) {
+		return $html;
+	}
+	// Olívia, 16 November: „ez a szekció a bejelentkezés és árak alatt is legyen szebben kiemelve és legyen cta, hogy
+	// időpontot kérhetsz” – the prices page's „Egyéni online órák” gets the same box and button
+	if ( is_page( oy_page_slug( 'schedule-pricing' ) ) ) {
+		$html = preg_replace( '~<h2>(\s*Egyéni online órák\s*)</h2>~u', '<h2 id="egyeni-orak">$1</h2>', $html, 1 );
+	}
+	return is_page( oy_page_slug( 'yoga-classes' ) ) || is_page( oy_page_slug( 'schedule-pricing' ) ) ? oy_private_callout_html( $html ) : $html;
 }
 
 function oy_private_callout_html( $html ) {
@@ -536,8 +553,8 @@ function oy_private_callout_html( $html ) {
 		return $html;
 	}
 	return preg_replace_callback( '~(<h2[^>]*\bid="egyeni-orak"[^>]*>.*?</h2>)(.*?)(?=<h2\b|$)~su', function ( $m ) {
-		$cta = '<p class="btn-row oj-callout__cta">' . oy_btn( add_query_arg( 'topic', 'egyeni-joga', oy_private_url() ), 'Időpontot kérek', 'orchid' )
-			. '<a class="text-link" href="' . esc_url( oy_class_url( 'egyeni-online-joga' ) ) . '">Bővebben az egyéni óráról</a></p>';
+		// Olívia, 16 November: „Bővebben az egyéni óráról” – „ezt szedjük ki … mert nem illik ide”: the one button only
+		$cta = '<p class="btn-row oj-callout__cta">' . oy_btn( add_query_arg( 'topic', 'egyeni-joga', oy_private_url() ), 'Időpontot kérek', 'orchid' ) . '</p>';
 		$body = preg_replace( '~<ul>~', '<ul class="oj-callout__list">', trim( $m[2] ), 1 ); // its own dots, not the page's list waves (Olívia, 16 November: „itt még nem néznek ki jól a pöttyök”)
 		return '<section class="oj-callout oj-callout--one" aria-labelledby="egyeni-orak">' . $m[1] . $body . $cta . '</section>' . "\n";
 	}, $html, 1 );

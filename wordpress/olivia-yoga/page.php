@@ -15,6 +15,8 @@ while ( have_posts() ) :
 	$return = oy_online_only() && 'book' === $studio && ! empty( $_GET['oys_order'] ); // phpcs:ignore WordPress.Security.NonceVerification
 	// the account, signed in: the greeting card is the head (Áron, 16 November: „Ez így csúnya nagyon … illeszkedjen mindenhez”)
 	$return = $return || ( oy_online_only() && 'account' === $studio && is_user_logged_in() && empty( $_GET['live'] ) ); // phpcs:ignore WordPress.Security.NonceVerification
+	// the live page of a class (waiting room, room, after class) has its own title: no „Fiókom” banner over it (Áron, 16 November)
+	$return = $return || ( oy_online_only() && 'account' === $studio && ! empty( $_GET['live'] ) ); // phpcs:ignore WordPress.Security.NonceVerification
 	if ( ! $return ) {
 		echo oy_page_head( get_the_title(), has_excerpt() ? get_the_excerpt() : '', array( array( get_the_title(), get_permalink() ) ), $slug, '', $photo ); // phpcs:ignore
 	}

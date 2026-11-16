@@ -16,7 +16,7 @@ defined( 'ABSPATH' ) || exit;
 class OYS_Frontend {
 
 	public static function init() {
-		foreach ( array( 'schedule', 'events', 'pricing', 'book', 'account', 'gift_cards', 'private_request', 'private_box' ) as $sc ) {
+		foreach ( array( 'schedule', 'calendar', 'events', 'pricing', 'book', 'account', 'gift_cards', 'private_request', 'private_box' ) as $sc ) {
 			add_shortcode( 'oys_' . $sc, array( __CLASS__, 'sc_' . $sc ) );
 		}
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'assets' ) );
@@ -53,6 +53,74 @@ class OYS_Frontend {
 	/* ======================================================================
 	   Timetable
 	   ====================================================================== */
+
+	/**
+	 * [oys_calendar] – the classes as a real calendar, week rows from this Monday to the end of the booking window
+	 * (setting `booking_window_days`; Áron, 16 November: „6 héttel előre foglalható, és csak annyira látszódjon a naptár
+	 * is”). Every class is a link to its booking; on a phone the days show dots and the list under the grid has the classes.
+	 */
+	public static function sc_calendar( $atts ) {
+		$atts   = shortcode_atts( array( 'kind' => 'group,event', 'class' => '' ), $atts );
+		$window = max( 7, (int) OYS_Settings::get( 'booking_window_days' ) );
+		$tz     = wp_timezone();
+		$today  = new DateTimeImmutable( 'today', $tz );
+		$start  = $today->modify( '-' . ( (int) $today->format( 'N' ) - 1 ) . ' days' ); // Monday of this week
+		$last   = $today->modify( '+' . ( $window - 1 ) . ' days' );
+		$end    = $last->modify( '+' . ( 7 - (int) $last->format( 'N' ) ) . ' days' ); // Sunday of the last week
+		$items  = OYS_Schedule::query( array(
+			'kind'       => array_filter( array_map( 'trim', explode( ',', $atts['kind'] ) ) ),
+			'from'       => oys_now(),
+			'to'         => $last->modify( '+1 day' )->setTimezone( new DateTimeZone( 'UTC' ) )->format( 'Y-m-d H:i:s' ),
+			'status'     => 'scheduled',
+			'class_slug' => sanitize_title( $atts['class'] ),
+		) );
+		$by_day = array();
+		foreach ( $items as $s ) {
+			$by_day[ wp_date( 'Y-m-d', oys_ts( $s->starts_at ) ) ][] = $s;
+		}
+		$user_id = get_current_user_id();
+		$link    = function ( $s ) use ( $user_id ) {
+			$mine = $user_id ? OYS_Bookings::active_for( $user_id, $s->id ) : null;
+			$left = OYS_Schedule::spots_left( $s );
+			if ( $mine && 'pending' !== $mine->status ) {
+				return array( 'is-mine', __( 'You\'re booked', 'olivia-studio' ) );
+			}
+			if ( OYS_Schedule::closed_reason( $s ) ) {
+				return array( 'is-closed', __( 'Booking closed', 'olivia-studio' ) );
+			}
+			return $left < 1 ? array( 'is-full', __( 'Full, waitlist open', 'olivia-studio' ) ) : array( '', sprintf( _n( '%d spot left', '%d spots left', min( $left, 99 ), 'olivia-studio' ), min( $left, 99 ) ) );
+		};
+		$heads = '';
+		for ( $i = 0; $i < 7; $i++ ) {
+			$heads .= '<span class="oys-cal__dow" aria-hidden="true">' . esc_html( wp_date( 'D', $start->modify( "+$i days" )->getTimestamp() ) ) . '</span>';
+		}
+		$grid = '';
+		$list = '';
+		for ( $day = $start; $day <= $end; $day = $day->modify( '+1 day' ) ) {
+			$key   = $day->format( 'Y-m-d' );
+			$ts    = $day->getTimestamp();
+			$state = $day < $today ? ' is-past' : ( $day > $last ? ' is-after' : '' );
+			$state .= $key === $today->format( 'Y-m-d' ) ? ' is-today' : '';
+			$day_s = $by_day[ $key ] ?? array();
+			$num   = '<span class="oys-cal__num">' . esc_html( (int) $day->format( 'j' ) === 1 || $key === $start->format( 'Y-m-d' ) ? wp_date( oys_date_format( 'M j' ), $ts ) : $day->format( 'j' ) ) . '</span>';
+			$chips = '';
+			foreach ( $day_s as $s ) {
+				list( $cls, $note ) = $link( $s );
+				$title  = (string) apply_filters( 'oys_card_title', oys_session_title( $s ), $s );
+				$chips .= '<a class="oys-cal__chip ' . esc_attr( $cls ) . '" href="' . esc_url( oys_book_url( $s->id ) ) . '"><b>' . esc_html( oys_time( $s->starts_at ) ) . '</b> <span>' . esc_html( $title ) . '</span></a>';
+				$list  .= '<li class="oys-cal__item ' . esc_attr( $cls ) . '" id="oys-cal-' . esc_attr( $key ) . '"><span class="oys-cal__when"><b>' . esc_html( wp_date( 'D', $ts ) ) . '</b>' . esc_html( wp_date( oys_date_format( 'M j' ), $ts ) ) . '</span>'
+					. '<span class="oys-cal__what"><b>' . esc_html( $title ) . '</b><small>' . esc_html( oys_time( $s->starts_at ) . '–' . oys_time( $s->ends_at ) . ' · ' . $note ) . '</small></span>'
+					. ( in_array( $cls, array( '', 'is-full' ), true ) ? '<a class="session__book' . ( 'is-full' === $cls ? ' session__book--wait' : '' ) . '" href="' . esc_url( oys_book_url( $s->id ) ) . '">' . esc_html( 'is-full' === $cls ? __( 'Join the waitlist', 'olivia-studio' ) : __( 'Book', 'olivia-studio' ) ) . oys_icon( 'arrow' ) . '</a>' : '<span class="session__status">' . esc_html( $note ) . '</span>' ) . '</li>';
+			}
+			$label = wp_date( oys_date_format( 'l, F j' ), $ts ) . ( $day_s ? ': ' . implode( ', ', array_map( fn( $s ) => oys_time( $s->starts_at ) . ' ' . apply_filters( 'oys_card_title', oys_session_title( $s ), $s ), $day_s ) ) : '' );
+			$grid .= '<div class="oys-cal__day' . esc_attr( $state ) . ( $day_s ? ' has-class' : '' ) . '" role="listitem" aria-label="' . esc_attr( $label ) . '">' . $num
+				. ( $day_s ? '<span class="oys-cal__dots" aria-hidden="true">' . str_repeat( '<i></i>', min( 3, count( $day_s ) ) ) . '</span><div class="oys-cal__chips">' . $chips . '</div>' : '' ) . '</div>';
+		}
+		$note = sprintf( _n( 'You can book up to %d week ahead.', 'You can book up to %d weeks ahead.', (int) round( $window / 7 ), 'olivia-studio' ), (int) round( $window / 7 ) );
+		return '<div class="oys-cal" data-oys-cal><div class="oys-cal__grid" role="list">' . $heads . $grid . '</div>'
+			. ( $list ? '<ol class="oys-cal__list">' . $list . '</ol>' : '<p class="oys-cal__empty">' . esc_html__( 'No group classes in these weeks yet.', 'olivia-studio' ) . '</p>' )
+			. '<p class="oys-cal__note">' . esc_html( $note ) . '</p></div>';
+	}
 
 	public static function sc_schedule( $atts ) {
 		$atts  = shortcode_atts( array( 'days' => 14, 'kind' => 'group,event', 'class' => '', 'empty_days' => '', 'next' => 0 ), $atts );

@@ -13,8 +13,10 @@ $oy_cards = $args['posts'] ?? array();
 		$tone = OY_ACCENTS[ $i % 4 ];
 		// the online site, Olívia, 15 November: „az azonos témák legyenek azonos színűek. A főoldalon is ugyanúgy” – the colour
 		// follows the topic (category), so every „A jóga 8 ága” card wears the same one, in the palette's three colours
+		// Olívia, 16 November: „a gyakorlás és az élet és elme kategória színe most ugyanolyan … Legyen más színű”: every
+		// topic its own colour, in the order of the topics (no two neighbours alike)
 		if ( oy_online_only() && $cat ) {
-			$tone = array( 'lilac', 'pink', 'sun' )[ absint( crc32( $cat[0]->slug ) ) % 3 ];
+			$tone = oy_cat_tone( $cat[0] );
 		}
 		?>
 	<article class="card card--<?php echo esc_attr( $tone ); ?><?php echo get_post_meta( $p->ID, 'oy_art', true ) ? ' card--art' : ''; ?>"><a href="<?php echo esc_url( get_permalink( $p ) ); ?>">

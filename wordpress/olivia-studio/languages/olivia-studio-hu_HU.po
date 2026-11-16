@@ -6745,3 +6745,49 @@ msgstr "Szia {first_name}! Új üzenet érkezett a(z) {class} ({date_short}) cha
 #: includes/class-hub.php
 msgid "Open the class chat"
 msgstr "Az órai chat megnyitása"
+
+#: includes/class-frontend.php
+msgid "You can book up to %d week ahead."
+msgid_plural "You can book up to %d weeks ahead."
+msgstr[0] "Legfeljebb %d héttel előre foglalhatsz."
+msgstr[1] "Legfeljebb %d héttel előre foglalhatsz."
+
+#: includes/class-frontend.php
+msgid "No group classes in these weeks yet."
+msgstr "Ezekben a hetekben még nincs csoportos óra."
+
+#: includes/class-live.php
+msgid "The room is open"
+msgstr "A terem nyitva"
+
+#: includes/class-live.php
+msgid "Waiting room"
+msgstr "Váró"
+
+#: includes/class-live.php
+msgid "hours"
+msgstr "óra"
+
+#: includes/class-live.php
+msgid "minutes"
+msgstr "perc"
+
+#: includes/class-live.php
+msgid "seconds"
+msgstr "mp"
+
+#: includes/class-live.php
+msgid "Opens %1$s · the class: %2$s"
+msgstr "Nyitás: %1$s · az óra: %2$s"
+
+#: includes/class-live.php
+msgid "Before the class"
+msgstr "Az óra előtt"
+
+#: includes/class-live.php
+msgid "%d days"
+msgstr "%d nap"
+
+#: includes/class-live.php
+msgid "%d hours"
+msgstr "%d óra"

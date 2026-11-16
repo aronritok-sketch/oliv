@@ -6,6 +6,23 @@
 defined( 'ABSPATH' ) || exit;
 
 const OY_ACCENTS = array( 'lilac', 'pink', 'sun', 'sage' );
+
+/**
+ * A journal topic's colour on the online site: the topics take the palette's four colours in turn, the one with the most
+ * articles first (magenta, as „A jóga 8 ága” has been), so no two topics share a colour.
+ */
+function oy_cat_tone( $cat ) {
+	static $order = null;
+	if ( null === $order ) {
+		$terms = get_terms( array( 'taxonomy' => 'category', 'hide_empty' => false, 'exclude' => array( (int) get_option( 'default_category' ) ) ) );
+		$terms = is_array( $terms ) ? $terms : array();
+		usort( $terms, fn( $a, $b ) => array( (int) $b->count, (int) $a->term_id ) <=> array( (int) $a->count, (int) $b->term_id ) );
+		$order = array_map( fn( $t ) => (int) $t->term_id, $terms );
+	}
+	$tones = array( 'pink', 'lilac', 'sun', 'forest' );
+	$i     = array_search( (int) $cat->term_id, $order, true );
+	return $tones[ ( false === $i ? absint( crc32( $cat->slug ) ) : $i ) % count( $tones ) ];
+}
 /**
  * Olívia, 15 November (evening): „csoportos óra legyen a zöldünk fehér betűvel, kismamatorna magenta, egyéni online jóga
  * tangerine, stretching és mobilizáció olyan sötétzöld …” and „az azonos témák legyenek azonos színűek. A főoldalon is

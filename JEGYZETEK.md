@@ -935,6 +935,36 @@
   - **Oktatók:** a „Tanítás” menü első pontja a Hub, csak a saját óráik chatjeivel és a saját beszélgetéseikkel.
     - Személyre szabható (Beállításaim): e-mail értesítés be/ki, név az órai chatekben, saját gyors válaszok.
   - Tesztek: 1433/0.
+- **olivia-studio 1.14.0 (téma 3.11.99-cel) – Áron listája és Olívia 11.16-os doksija, este.**
+  - **Árak mellett közvetlen gomb** („ahol van, mennyibe kerül egy-egy óra, ott legyen egy közvetlen foglalás gomb, vagy
+    kérés küldése gomb”):
+    - az óraoldalak árkártyáin (`oy_price_cards`) „Időpontot kérek” gomb, előre kitöltött szolgáltatással, hosszal és
+      létszámmal (`topic`, `length`, `people`);
+    - mellette „Bérletet veszek (5 alkalom)”, ami egyenesen a bérlet fizetéséhez visz.
+  - **Naptár** („a heti élő órák … következő 3 … utána legyen egy naptárnézet … 6 héttel előre foglalható, és csak annyira
+    látszódjon a naptár is”):
+    - új `[oys_calendar]` shortcode: hétfőtől vasárnapig tartó sorok a foglalási ablak végéig;
+    - asztali gépen az órák kis címkék a napokban, foglalás linkkel;
+    - telefonon pöttyök a napokon, alatta lista Foglalás gombbal.
+    - A „Bejelentkezés és árak” oldalon az órarend alatt (`#naptar`); a főoldal következő 3 órája alatt „További órák
+      a naptárban” gomb vezet ide.
+    - `booking_window_days` alapból 42 nap (6 hét). A DB 14-es frissítés az élő oldal 28 napját 42-re emeli.
+  - **Váró új dizájn** („a váró … írja, hogy mennyi idő múlva nyílik … szarul néz ki”):
+    - sötétzöld kártya, élő visszaszámlálás (nap, óra, perc, mp), nyitás időpontja, magenta „Belépek az órára” gomb,
+      amely nyitáskor lüktet;
+    - alatta az „Az óra előtt” teendők kártyákon, ikonokkal; a chat is lekerekített kártya lett;
+    - a régi „724:50 h” formátum megszűnt, és az élő oldal fölött nincs „Fiókom” fejléc.
+  - **Olívia 11.16, este:**
+    - „ezek a képek is legyenek alapból fekete-fehérek, a főoldalon, és amikor ráviszem a kurzort, akkor színes”: a
+      főoldali órakártyák fotói is fekete-fehérek, egérrel vagy koppintásra színesek.
+    - „itt legyen halványsárga és magenta a hullám és ugyanolyan mint ezeknél”: a bemutatkozó fotó mögött is a kismama
+      blokk lágy hulláma van, halványsárga + magenta színben.
+    - „ez a szekció a bejelentkezés és árak alatt is legyen szebben kiemelve és legyen cta”: az árak oldal „Egyéni online
+      órák” része ugyanaz a kiemelt doboz, „Időpontot kérek” gombbal.
+    - „Bővebben az egyéni óráról … ezt szedjük ki”: a kiemelt dobozból kikerült.
+    - „a gyakorlás és az élet és elme kategória színe most ugyanolyan”: a témák a cikkszám sorrendjében kapnak színt
+      (`oy_cat_tone`), négy színből: magenta, barack, sárga, sötétzöld (`card--forest`).
+  - Tesztek: 1441/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -3837,7 +3837,8 @@ test( 'online edition, Olívia\'s doc of 14 November, last points: one level for
 		$home = (string) ob_get_clean();
 		ok( (bool) preg_match( '/<h1[^>]*>.*oj-breath--w1.*oj-breath--w2.*oj-breath--w3.*<\/h1>/s', $home ), 'the hero: three equal marks' );
 		ok( ! str_contains( $home, 'class="kicker"' ), 'home: no labels' );
-		ok( 2 === substr_count( $home, 'oj-waved--soft' ) && 1 === substr_count( $home, 'oj-brush' ), 'one-to-one and prenatal: the hero\'s soft wave (the stroke stays only by the intro)' );
+		// since 16 November the intro too: „itt legyen halványsárga és magenta a hullám és ugyanolyan mint ezeknél”
+		ok( 3 === substr_count( $home, 'oj-waved--soft' ) && 0 === substr_count( $home, 'oj-brush' ) && str_contains( $home, 'oj-intro-wave' ), 'one-to-one, prenatal and the intro: the hero\'s soft wave (pale yellow and magenta by the intro)' );
 		ob_start();
 		load_template( get_template_directory() . '/footer.php', false );
 		$foot = (string) ob_get_clean();
@@ -4233,6 +4234,48 @@ test( 'Áron, 16 November – the Hub: only the studio and teachers, a teacher o
 		eq( 404, $res->get_status(), 'not even through the REST route' );
 	} finally {
 		wp_set_current_user( 0 );
+	}
+} );
+
+test( 'Áron, 16 November: the price cards ask for a time or sell the pass; the calendar shows the bookable 6 weeks; the waiting room counts down', function () {
+	require_once get_template_directory() . '/inc/demo-import.php';
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		oy_migrate_prices();
+		$cards = oy_price_cards( 'egyeni-joga' );
+		ok( str_contains( $cards, 'topic=egyeni-joga' ) && str_contains( $cards, 'length=90' ) && str_contains( $cards, 'people=2' ), 'each card asks for a time with its service, length and number of people' );
+		ok( 4 === substr_count( $cards, 'oj-price__act' ) && str_contains( $cards, 'product=' ), 'and buys its 5-session pass straight away' );
+	} finally {
+		delete_option( 'oy_edition' );
+	}
+	eq( 42, (int) OYS_Settings::get( 'booking_window_days' ), 'bookable 6 weeks ahead' );
+	$in   = make_session( array( 'format' => 'online', 'capacity' => 8, 'in_hours' => 24 * 10 ) );
+	$out  = make_session( array( 'format' => 'online', 'capacity' => 8, 'in_hours' => 24 * 50 ) );
+	$priv = make_session( array( 'format' => 'online', 'kind' => 'private', 'capacity' => 1, 'in_hours' => 24 * 11 ) );
+	$html = do_shortcode( '[oys_calendar]' );
+	ok( str_contains( $html, 'class="oys-cal"' ) && str_contains( $html, esc_url( oys_book_url( $in->id ) ) ), 'the calendar: a class in 10 days links to its booking' );
+	ok( ! str_contains( $html, esc_url( oys_book_url( $out->id ) ) ), 'nothing beyond the 6 weeks' );
+	ok( ! str_contains( $html, esc_url( oys_book_url( $priv->id ) ) ), 'no private sessions' );
+	$weeks = substr_count( $html, 'class="oys-cal__day' ) / 7;
+	ok( $weeks >= 6 && $weeks <= 7 && is_int( substr_count( $html, 'class="oys-cal__day' ) / 7 ), 'whole weeks, Monday to Sunday, six or seven rows' );
+	foreach ( array( $in, $out, $priv ) as $s ) {
+		OYS_Schedule::cancel_session( $s->id, 'test' );
+	}
+	$s   = make_session( array( 'format' => 'online', 'capacity' => 8, 'in_hours' => 30 ) );
+	$u   = make_user( 'Varo' );
+	$bid = OYS_Bookings::book_manual( $u, $s, 'comp', false );
+	wp_set_current_user( $u );
+	$_GET['live'] = $s->id;
+	try {
+		$page = OYS_Live::page();
+	} finally {
+		unset( $_GET['live'] );
+		wp_set_current_user( 0 );
+	}
+	if ( OYS_Live::uses_live( $s ) ) {
+		ok( str_contains( $page, 'data-live-count' ) && str_contains( $page, 'data-u="h"' ) && str_contains( $page, 'oys-lobby__opens' ), 'the waiting room: a countdown and when the room opens' );
+	} else {
+		ok( true, 'live rooms are off on this test site' );
 	}
 } );
 

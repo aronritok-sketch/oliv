@@ -90,7 +90,7 @@ $steps  = array(
 
 <section class="section" id="intro" aria-labelledby="intro-title"><div class="container">
 	<div class="intro__grid">
-		<div class="intro__visual" data-reveal><div class="oj-waved"><?php echo oy_brush_blob( 'lilac', 'left' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'olivia-golden-hour-arms', '(min-width: 960px) 50vw, 100vw' ); // phpcs:ignore ?></div></div></div>
+		<div class="intro__visual" data-reveal><?php // Olívia, 16 November: „itt legyen halványsárga és magenta a hullám és ugyanolyan mint ezeknél” – the prenatal block's soft wave ?><div class="oj-waved oj-waved--soft oj-intro-wave"><?php echo oy_soft_blob( 'pink', 'left' ); // phpcs:ignore ?><div class="frame"><?php echo oy_photo( 'olivia-golden-hour-arms', '(min-width: 960px) 50vw, 100vw' ); // phpcs:ignore ?></div></div></div>
 		<div class="prose" data-reveal>
 			<?php
 			while ( have_posts() ) {
@@ -213,7 +213,7 @@ $more     = array(
 <section class="section section--tight" id="schedule" aria-labelledby="schedule-title"><div class="container">
 	<header class="section__head section__head--row" data-reveal><div><?php echo oy_kicker( __( 'Next classes', 'olivia-yoga' ) ); // phpcs:ignore ?><h2 id="schedule-title"><?php esc_html_e( 'Weekly live classes', 'olivia-yoga' ); ?></h2><?php // Olívia, 14 November: „ezt is kiszedhetjük” – no line under the title ?></div><?php echo oy_btn( oy_page_link( 'schedule-pricing' ), oy_schedule_label(), 'ghost' ); // phpcs:ignore ?></header>
 	<?php // Olivia, 13 November: only the Wednesdays (the next ones, however far), and the one-to-one sessions in a box of their own; 14 November: „itt mindig a következő 3 óra legyen látható” ?>
-	<?php echo shortcode_exists( 'oys_schedule' ) ? do_shortcode( '[oys_schedule days="7" next="3" empty_days="no"]' ) . oy_replay_note() . ( shortcode_exists( 'oys_private_box' ) ? do_shortcode( '[oys_private_box]' ) : '' ) . oy_cancel_note() : ''; // phpcs:ignore ?>
+	<?php echo shortcode_exists( 'oys_schedule' ) ? do_shortcode( '[oys_schedule days="7" next="3" empty_days="no"]' ) . ( shortcode_exists( 'oys_calendar' ) ? '<p class="oj-more-classes"><a class="btn btn--ghost" href="' . esc_url( oy_page_link( 'schedule-pricing' ) . '#naptar' ) . '">' . oy_icon( 'calendar' ) . esc_html__( 'More classes in the calendar', 'olivia-yoga' ) . '</a></p>' : '' ) /* Áron, 16 November */ . oy_replay_note() . ( shortcode_exists( 'oys_private_box' ) ? do_shortcode( '[oys_private_box]' ) : '' ) . oy_cancel_note() : ''; // phpcs:ignore ?>
 </div></section>
 
 <section class="section section--moss hatha" aria-labelledby="hatha-title"><div class="container hatha__grid">
