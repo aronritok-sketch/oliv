@@ -407,7 +407,7 @@ function oy_thanks() {
 	foreach ( $links as $l ) {
 		$list .= '<li><a href="' . esc_url( $l[0] ) . '"><b>' . esc_html( $l[1] ) . '</b></a> – ' . esc_html( $l[2] ) . '</li>';
 	}
-	$event = in_array( $t, array( 'visszahivas', 'uzenet' ), true ) ? '<script>window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:"generate_lead",lead_type:' . wp_json_encode( $t ) . '});if(window.gtag){gtag("event","generate_lead",{lead_type:' . wp_json_encode( $t ) . '});}</script>' : '';
+	$event = in_array( $t, array( 'visszahivas', 'uzenet' ), true ) ? '<script>window.dataLayer=window.dataLayer||[];window.dataLayer.push({event:"generate_lead",lead_type:' . wp_json_encode( $t ) . '});if(window.gtag){gtag("event","generate_lead",{lead_type:' . wp_json_encode( $t ) . '});}if(window.oyPixelLoaded&&window.fbq){fbq("track","Lead",{content_category:' . wp_json_encode( $t ) . '});}</script>' : '';
 	return '<div class="oj-opening oj-opening--sun oj-thanks"><p class="oj-opening__tag">' . esc_html( $x[0] ) . '</p><p>' . esc_html( $x[1] ) . '<a href="mailto:' . esc_attr( OY_EMAIL ) . '">' . esc_html( OY_EMAIL ) . '</a>.</p></div>'
 		. '<h2>Amíg vársz</h2><ul class="oj-thanks__links">' . $list . '</ul>'
 		. '<p>' . oy_btn( home_url( '/' ), 'Vissza a főoldalra' ) . '</p>' . $event;

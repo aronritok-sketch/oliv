@@ -792,6 +792,19 @@
   - Az adatkezelési tájékoztatóban élesben csak a „Sütik” és a „Kik férnek hozzá?” bekezdés cserélődik
     (`oy_migrate_ga4`); Olívia többi szövege marad.
   - Tesztek: 1358/0.
+- **téma 3.11.89:** Meta Pixel előkészítve (Áron: „csinálj meta pixelt Oliviának”). Egy beállítás kapcsolja be:
+  `oy_meta_pixel`, REST-ből: `POST /wp-json/wp/v2/settings {"oy_meta_pixel":"…"}`.
+  - A Pixelt nem tudtuk létrehozni az Ads hubból. A HelloProVision.com hirdetési fiókján (act_1136444968940656) már van
+    egy Pixel, és a Meta ezt adja: „#6200 A pixel already exists for this account”. A hubon létrejött Olívia profilja
+    (2090002, szüneteltetve, fiók nélkül); a HPV-fiókot csak a próbára kötöttük hozzá, utána rögtön levettük.
+  - Ha az azonosító be van állítva, a sáv két célt kér: Statisztika (GA) és Marketing (Meta). A „Beállítások” gombbal
+    külön-külön is választható.
+  - Süti: `oy_consent` = all / stats / ads / denied. A 3.11.88-as `granted` csak statisztikát jelent, ezért a sáv
+    újra kérdez.
+  - Az `fbevents.js` csak marketing-hozzájárulás után töltődik. A köszönőoldal `Lead` eseményt küld.
+  - Az adatkezelési oldalon a Meta-bekezdés csak bekapcsolt Pixelnél jelenik meg (`the_content`); az adatbázisban nincs
+    tárolva.
+  - Tesztek: 1361/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
