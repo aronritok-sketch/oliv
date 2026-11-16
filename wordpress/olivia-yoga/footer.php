@@ -37,11 +37,25 @@ $gift = function_exists( 'oys_page_url' ) ? oys_page_url( 'gifts' ) : oy_contact
 		</div>
 	</div>
 </footer>
+<?php if ( oy_online_only() ) : // Áron, 16 November: „App-szerű legyen” – on a phone one bar at the bottom, like an app: the classes, booking (in the middle, raised), the account and the menu; the header above is only the logo
+	$oy_here = oy_is_studio_page();
+	$oy_tabs = array(
+		array( oy_page_link( 'yoga-classes' ), 'lotus', 'Órák', is_page( oy_page_slug( 'yoga-classes' ) ) || is_singular( 'oy_class' ) ),
+		array( oy_book_url(), 'calendar', 'Foglalás', 'book' === $oy_here, true ),
+		array( oy_account_url(), 'user', 'Fiók', 'account' === $oy_here ),
+	);
+	?>
+<nav class="tabbar" aria-label="Gyors menü" data-action-bar data-tabbar>
+	<?php foreach ( $oy_tabs as $oy_t ) : ?><a class="tabbar__item<?php echo ! empty( $oy_t[4] ) ? ' tabbar__item--main' : ''; ?><?php echo $oy_t[3] ? ' is-current' : ''; ?>" href="<?php echo esc_url( $oy_t[0] ); ?>"<?php echo $oy_t[3] ? ' aria-current="page"' : ''; ?>><?php echo ! empty( $oy_t[4] ) ? '<span class="tabbar__dot">' . oy_icon( $oy_t[1] ) . '</span>' : oy_icon( $oy_t[1] ); // phpcs:ignore ?><span class="tabbar__label"><?php echo esc_html( $oy_t[2] ); ?></span></a><?php endforeach; ?>
+	<button class="tabbar__item tabbar__menu" type="button" aria-expanded="false" aria-controls="drawer" data-nav-toggle><span class="i-open"><?php echo oy_icon( 'menu' ); // phpcs:ignore ?></span><span class="i-close"><?php echo oy_icon( 'close' ); // phpcs:ignore ?></span><span class="tabbar__label"><span class="i-open">Menü</span><span class="i-close">Bezár</span></span></button>
+</nav>
+<?php else : ?>
 <nav class="action-bar" aria-label="<?php esc_attr_e( 'Quick actions', 'olivia-yoga' ); ?>" data-action-bar>
 	<a href="<?php echo esc_url( oy_book_url() ); ?>"><?php echo oy_icon( 'calendar' ); // phpcs:ignore ?><?php esc_html_e( 'Book', 'olivia-yoga' ); ?></a>
 	<a href="<?php echo esc_url( oy_private_url() ); ?>"><?php echo oy_icon( 'home', 'icon' ); // phpcs:ignore ?><?php echo esc_html( oy_online_only() ? __( 'Individual', 'olivia-yoga' ) : __( 'Private', 'olivia-yoga' ) ); ?></a>
 	<a href="<?php echo esc_url( oy_account_url() ); ?>"><?php echo oy_icon( 'user' ); // phpcs:ignore ?><?php esc_html_e( 'Account', 'olivia-yoga' ); ?></a>
 </nav>
+<?php endif; ?>
 <?php if ( ! in_array( oy_is_studio_page(), array( 'book', 'account' ), true ) ) : ?><a class="book-fab" href="<?php echo esc_url( oy_book_url() ); ?>" data-book-fab><?php echo oy_icon( 'calendar' ); // phpcs:ignore ?><?php esc_html_e( 'Book a class', 'olivia-yoga' ); ?></a><?php endif; ?>
 <?php wp_footer(); ?>
 </body>

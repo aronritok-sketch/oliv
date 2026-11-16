@@ -21,12 +21,14 @@
 	window.addEventListener('scroll', onScroll, { passive: true });
 
 	/* Mobile drawer */
-	var toggle = document.querySelector('[data-nav-toggle]');
+	// the header's round button, and on the online site's phones the bottom bar's „Menü” too
+	var toggles = Array.prototype.slice.call(document.querySelectorAll('[data-nav-toggle]'));
+	var toggle = toggles[0];
 	function setNav(open) {
 		body.classList.toggle('nav-open', open);
-		if (toggle) toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+		toggles.forEach(function (t) { t.setAttribute('aria-expanded', open ? 'true' : 'false'); });
 	}
-	if (toggle) toggle.addEventListener('click', function () { setNav(!body.classList.contains('nav-open')); });
+	toggles.forEach(function (t) { t.addEventListener('click', function () { toggle = t; setNav(!body.classList.contains('nav-open')); }); });
 	document.addEventListener('keydown', function (e) {
 		if (e.key !== 'Escape') return;
 		if (body.classList.contains('nav-open')) { setNav(false); toggle && toggle.focus(); }

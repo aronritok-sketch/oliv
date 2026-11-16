@@ -1578,3 +1578,32 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 	.entry .oys-done__actions .btn { flex: 1 1 100%; justify-content: center; }
 }
 
+/* ── Áron, 16 November: „App-szerű legyen” – on a phone the header is only the logo (it scrolls away with the page),
+   and one bar at the bottom does the rest, like an app: Órák · Foglalás (raised, in the middle) · Fiók · Menü ── */
+.tabbar { display: none; }
+@media (max-width: 759px) {
+	.site-header { position: relative; top: auto; }
+	.site-header__inner { justify-content: center; min-height: 74px; }
+	.site-header .brand { margin: 0; }
+	.site-header .oj-brand .oj-logo { height: 58px; }
+	.site-header .nav-toggle, .site-header .header-cta { display: none; }
+	.tabbar { position: fixed; z-index: 70; left: 0; right: 0; bottom: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: end; padding: 6px 6px calc(6px + env(safe-area-inset-bottom, 0px)); background: #fff; border-top: 1px solid color-mix(in srgb, var(--forest) 9%, transparent); box-shadow: 0 -10px 30px -20px rgba(0, 46, 44, .5); }
+	.tabbar__item { position: relative; display: grid; justify-items: center; align-content: end; gap: 3px; min-height: 54px; padding: 6px 0 4px; border: 0; background: none; color: var(--forest); font: inherit; font-size: .72rem; font-weight: 600; letter-spacing: .02em; text-decoration: none; cursor: pointer; -webkit-tap-highlight-color: transparent; }
+	.tabbar__item:hover, .tabbar__item:focus-visible { color: var(--forest); }
+	.tabbar__item svg { width: 24px; height: 24px; }
+	.tabbar__item svg.icon--art { width: 28px; height: 28px; margin: -2px 0; stroke-width: 2.6; }
+	.tabbar__item.is-current { color: var(--orchid); }
+	.tabbar__item.is-current:not(.tabbar__item--main)::before { content: ""; position: absolute; top: 0; left: 50%; width: 22px; height: 3px; margin-left: -11px; border-radius: 0 0 3px 3px; background: var(--orchid); }
+	.tabbar__item--main { margin-top: -26px; }
+	.tabbar__dot { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: var(--orchid); color: #fff; box-shadow: 0 10px 22px -10px rgba(219, 46, 92, .9), 0 0 0 5px #fff; transition: transform .2s; }
+	.tabbar__item--main:active .tabbar__dot { transform: scale(.94); }
+	.tabbar__dot svg { width: 24px; height: 24px; }
+	.tabbar__menu .i-close { display: none; }
+	.nav-open .tabbar__menu .i-open { display: none; }
+	.nav-open .tabbar__menu .i-close { display: inline; }
+	.nav-open .tabbar__menu { color: var(--orchid); }
+	.nav-open .tabbar { transform: none !important; }
+	.drawer { padding-top: calc(40px + env(safe-area-inset-top, 0px)); padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)); }
+	body:has(.tabbar) { padding-bottom: calc(76px + env(safe-area-inset-bottom, 0px)); }
+}
+

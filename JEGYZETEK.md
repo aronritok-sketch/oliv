@@ -838,6 +838,16 @@
   - Új fordítások (hu, es): Guests, Live online, in your browser, A confirmation with a calendar invite is on its way to
     your inbox.
   - Tesztek: 1367/0.
+- **téma 3.11.93:** app-szerű mobilnavigáció (Áron: „App-szerű legyen”). A négy bemutatott változat (A letisztult
+  fejléc, B app-szerű alsó menü, C lebegő sziget, D fejléc + foglalósáv) közül a B-t választotta.
+  - Telefonon (759 px alatt), csak az online kiadásban: fent csak a logó, középre igazítva, nagyobban (58 px). A fejléc
+    nem ragad, görgetéskor kimegy a képből. A kerek menügomb és a régi lebegő alsó sáv megszűnt.
+  - Alul fix menüsor: Órák · Foglalás (középen, kiemelt magenta kör) · Fiók · Menü. A Menü nyitja és zárja a
+    fiókmenüt (ilyenkor „Bezár”). Az aktuális oldal gombja magenta, felül kis jelzővel.
+  - `site.js`: minden `[data-nav-toggle]` gomb nyitja és zárja a menüt.
+  - A menüsoron megmaradt a `data-action-bar` attribútum, így a sütisáv és a foglalás-gomb régi szabályai is
+    működnek. Az élő óra teljes képernyős nézete fölötte van.
+  - Tesztek: 1368/0.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
