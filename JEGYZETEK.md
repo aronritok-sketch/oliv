@@ -1188,6 +1188,16 @@
     - a vendég adatlapján a Bérletek alatt is;
     - a Hubban a beszélgetés melletti vendégkártyán („Motibróból (online nem foglalható)”), és egy csempe a Ma fülön.
   - Tesztek: 1568/0.
+- **téma 3.11.109 – a jogi oldalak, a készítő és a közösségi linkek új ablakban** (Olívia, 2026-11-16, portál-chat: „az
+  oliviajoga.onlineon az aronritok.com, az impresszum, az ászf és az adatkezelési meg a social platformok külön ablakban
+  nyíljanak meg”).
+  - A láblécben (ÁSZF, Impresszum, Adatvédelem, „Készítette: Ritók-Filip Áron”) és a sütisávban (Adatkezelési
+    tájékoztató) `target="_blank" rel="noopener"`. A közösségi ikonok és a Facebook-csoport eddig is így nyíltak.
+  - Minden más helyen (oldalszövegek, cikkek, GYIK) egy kis script (`oy_new_window_script`, `wp_footer`) teszi ugyanezt:
+    - a jogi oldalakra és az adatvédelmi oldalra mutató linkekre;
+    - az aronritok.com, facebook, instagram, youtube, tiktok, linkedin, pinterest és threads linkekre.
+  - Az oldalon belüli ugrások (#…, pl. „Ugrás a tartalomra”, „Sütibeállítások”) maradnak. A fizetés alatti ÁSZF-link
+    (plugin) eddig is új ablakban nyílt.
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -139,7 +139,7 @@ function oy_consent_bar() {
 	}
 	?>
 <div class="oy-consent" id="oy-consent" role="dialog" aria-live="polite" aria-labelledby="oy-consent-title" data-ga="<?php echo $ga ? '1' : '0'; ?>" data-px="<?php echo $px ? '1' : '0'; ?>" hidden>
-	<p class="oy-consent__text"><b id="oy-consent-title">Sütik</b> A működéshez szükséges sütik mindig működnek. <?php echo esc_html( $what ); ?> <a href="<?php echo esc_url( $privacy ); ?>">Adatkezelési tájékoztató</a></p>
+	<p class="oy-consent__text"><b id="oy-consent-title">Sütik</b> A működéshez szükséges sütik mindig működnek. <?php echo esc_html( $what ); ?> <a href="<?php echo esc_url( $privacy ); ?>" target="_blank" rel="noopener">Adatkezelési tájékoztató</a></p>
 <?php if ( $px ) : ?>
 	<div class="oy-consent__opts" hidden>
 		<label class="oy-consent__opt"><input type="checkbox" checked disabled> <span><b>Szükséges</b> belépés, foglalás, biztonság – mindig működik</span></label>

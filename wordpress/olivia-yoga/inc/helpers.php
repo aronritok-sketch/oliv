@@ -714,6 +714,25 @@ function oy_specialities_line( $cls = 'specialities' ) {
 }
 
 /** The theme's legal pages that exist (for the footer): slug → [title, url]. */
+/**
+ * Olívia, 16 November (portál-chat): „az oliviajoga.onlineon az aronritok.com, az impresszum, az ászf és az adatkezelési
+ * meg a social platformok külön ablakban nyíljanak meg”. The footer and the cookie bar have it in the markup; this catches
+ * the same links anywhere else (in page texts, articles, the FAQ…).
+ */
+function oy_new_window_script() {
+	if ( is_admin() ) {
+		return;
+	}
+	$own = array_values( array_map( fn( $l ) => wp_make_link_relative( $l[1] ), oy_legal_pages() ) );
+	$own[] = wp_make_link_relative( get_privacy_policy_url() ?: oy_page_link( 'privacy-policy' ) );
+	$own   = array_values( array_unique( array_filter( $own, fn( $u ) => '' !== $u && '/' !== $u ) ) );
+	echo '<script>(function(){var own=' . wp_json_encode( $own ) . ',ext=/(^|\.)(aronritok\.com|facebook\.com|fb\.com|instagram\.com|youtube\.com|youtu\.be|tiktok\.com|linkedin\.com|pinterest\.com|threads\.net)$/i;'
+		. 'function mark(a){var h=a.getAttribute("href")||"",u;if(h.charAt(0)==="#"||/^(javascript|mailto|tel):/i.test(h))return;try{u=new URL(a.href,location.href);}catch(e){return;}if(u.hostname===location.hostname&&u.pathname===location.pathname&&u.hash)return;var p=u.pathname.replace(/\/+$/,"")+"/";'
+		. 'if(ext.test(u.hostname)||(u.hostname===location.hostname&&own.some(function(o){return p===o.replace(/\/+$/,"")+"/";}))){a.target="_blank";if(!/noopener/.test(a.rel))a.rel=(a.rel+" noopener").trim();}}'
+		. 'document.querySelectorAll("a[href]").forEach(mark);})();</script>' . "\n";
+}
+add_action( 'wp_footer', 'oy_new_window_script', 99 );
+
 function oy_legal_pages() {
 	$out = array();
 	foreach ( get_posts( array( 'post_type' => 'page', 'post_status' => 'publish', 'numberposts' => 5, 'meta_key' => 'oy_legal', 'orderby' => 'menu_order title', 'order' => 'ASC' ) ) as $p ) {
