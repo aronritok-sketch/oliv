@@ -4833,7 +4833,7 @@ test( 'Olívia, 17 November (chat): the group class page has its prices like the
 		ok( str_contains( $g, 'oj-price oj-price--solo' ) && str_contains( $g, esc_html( oys_money( 300000 ) ) ) && str_contains( $g, esc_html( oys_money( 1300000 ) ) ) && str_contains( $g, esc_html( oys_money( 260000 ) ) ), 'the group card: one class, the 5-class pass and its price per class' );
 		ok( str_contains( $g, 'product=t-group-5' ) && str_contains( $g, esc_url( oy_book_url() ) ) && str_contains( $g, esc_html__( 'In a group', 'olivia-yoga' ) ), '… book a class or buy the pass, „Csoportban”' );
 		$solo = oy_price_cards( 't-solo' );
-		ok( str_contains( $solo, '<span class="oj-price__from">' . esc_html( oys_money( 800000 ) ) . '</span>' ), 'the price in a card\'s head: the price itself, no „-tól”' );
+		ok( ! str_contains( $solo, 'oj-price__from' ) && ! str_contains( $g, 'oj-price__from' ) && str_contains( $solo, esc_html( oys_money( 800000 ) ) ), 'no price in a card\'s head (no „-tól”, and not twice): the rows say it' );
 		$data = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content-hu-online.json' ), true );
 		ok( str_contains( $data['classes']['hatha-flow']['content'], "<h2>Árak</h2>\n[oy_prices service=\"group\"]\n[oy_booking_link]" ), 'the group class page: „Árak” before the booking button' );
 		$post = get_page_by_path( 'hatha-flow', OBJECT, 'oy_class' );
@@ -4885,6 +4885,7 @@ test( 'Olívia and Áron, 17 November: stretching and relaxation explain how it 
 		delete_option( 'oy_1117_rev' );
 		delete_option( 'oy_edition' );
 	}
+	ok( ! str_contains( (string) file_get_contents( get_template_directory() . '/functions.php' ), '>@oliivia_yoga<' ), 'the Instagram name without „@” („ide nem kell @”)' );
 	$js  = (string) file_get_contents( get_template_directory() . '/assets/site.js' );
 	ok( str_contains( $js, "closest('details > summary')" ) && str_contains( $js, 'pinned.el.getBoundingClientRect().top - pinned.top' ), 'a tapped folding title stays where it was when the open one above closes' );
 	$css = (string) file_get_contents( get_template_directory() . '/assets/site.css' );

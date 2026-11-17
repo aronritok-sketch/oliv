@@ -1299,6 +1299,15 @@
     - Minden talált link egyszer, HTTP-válaszra.
   - Tesztek: 1604/0.
 
+- **téma 3.11.115 – Olívia 11.17-i képernyőképei** (chat).
+  - **„jobb felső sarokban nem kell a 3000 Ft … és az összes többinél sem kell az 1 alkalmas összeg hisz ott van
+    mégegyszer”:** az árkártyák fejlécében nincs ár, csak a sorokban (csoportos, egyéni, páros kártyák).
+  - **„ide nem kell @”:** a kapcsolat oldalon az Instagram neve „oliivia_yoga”, „@” nélkül.
+  - **Kiadás:** a 3.11.114 élő verziót rögzítő feltöltését elutasította a GitHub, mert közben más is feltöltött az ágra.
+    A szkript mégis „shipped”-et írt. Most a feltöltés után ellenőrzi, hogy a rögzítés tényleg fent van-e; ha nincs,
+    hibával áll le, és a `pin.sh OLD NEW` csak a rögzítést ismétli meg a friss ágon.
+  - Tesztek: 1605/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

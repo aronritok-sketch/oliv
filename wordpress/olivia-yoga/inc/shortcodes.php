@@ -93,11 +93,10 @@ function oy_price_cards( $service ) {
 		// Olívia, 15 November: „az ilyen árak is legyenek inkább lenyithatók”, then „a két egyedüli maradhat kinyitva, a párosok
 		// maradjanak csak lenyithatóak és csak mobilon kell, asztalin látszódhat minden” – the cards alone are always open; the
 		// pair cards fold under their head on a phone (site.js opens them on a wider screen)
-		$from = (int) ( $g['single'] ?? $g['pack'] )['price_cents']; // one session, or the pass where there is no single
 		$head = '<span class="oj-price__who">' . ( $pair ? esc_html__( 'As a pair', 'olivia-yoga' ) : esc_html__( 'Alone', 'olivia-yoga' ) ) . '</span>'
-			. ( $len ? '<span class="oj-price__len">' . oy_icon( 'clock' ) . esc_html( sprintf( __( '%d minutes', 'olivia-yoga' ), $len ) ) . '</span>' : '' )
-			// Olívia, 17 November: „ez a -tól nem kell egyiknél se” – the price itself
-			. '<span class="oj-price__from">' . esc_html( oys_money( $from ) ) . '</span>';
+			. ( $len ? '<span class="oj-price__len">' . oy_icon( 'clock' ) . esc_html( sprintf( __( '%d minutes', 'olivia-yoga' ), $len ) ) . '</span>' : '' );
+		// Olívia, 17 November: „ez a -tól nem kell egyiknél se”, then „jobb felső sarokban nem kell a 3000 Ft … és az összes
+		// többinél sem kell az 1 alkalmas összeg hisz ott van mégegyszer” – no price in the head, the rows say it
 		// Áron, 16 November: „ahol van, mennyibe kerül egy-egy óra, ott legyen egy közvetlen foglalás gomb, vagy kérés küldése
 		// gomb, mert így haszontalanok az árak” – ask for a time with this service, length and number of people filled in,
 		// or buy the 5-session pass straight away
@@ -143,8 +142,7 @@ function oy_group_price_card() {
 	}
 	$len  = (int) ( $single ?: $pack )['duration_min'];
 	$head = '<span class="oj-price__who">' . esc_html__( 'In a group', 'olivia-yoga' ) . '</span>'
-		. ( $len ? '<span class="oj-price__len">' . oy_icon( 'clock' ) . esc_html( sprintf( __( '%d minutes', 'olivia-yoga' ), $len ) ) . '</span>' : '' )
-		. '<span class="oj-price__from">' . esc_html( oys_money( (int) ( $single ?: $pack )['price_cents'] ) ) . '</span>';
+		. ( $len ? '<span class="oj-price__len">' . oy_icon( 'clock' ) . esc_html( sprintf( __( '%d minutes', 'olivia-yoga' ), $len ) ) . '</span>' : '' );
 	$act  = '<p class="oj-price__act"><a class="btn btn--orchid btn--sm" href="' . esc_url( oy_book_url() ) . '">' . esc_html__( 'Book a class', 'olivia-yoga' ) . '</a>'
 		. ( $pack && function_exists( 'oys_page_url' ) ? '<a class="btn btn--ghost btn--sm" href="' . esc_url( oys_page_url( 'book', array( 'product' => $pack['id'] ) ) ) . '">' . esc_html( sprintf( __( 'Buy %d sessions', 'olivia-yoga' ), max( 1, (int) $pack['credits'] ) ) ) . '</a>' : '' ) . '</p>';
 	return '<div class="oj-prices oj-prices--group"><div class="oj-price oj-price--solo"><div class="oj-price__head">' . $head . '</div><dl class="oj-price__rows">' . $rows . '</dl>' . $act . '</div></div>';
