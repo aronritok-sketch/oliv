@@ -1366,6 +1366,25 @@
       oldalra.
     - Az ELIN-en csak a levelezés maradt: a webtárhely lemondható, a levelezés nem.
 
+- **Kutatás: „egyéni jóga” vagy „privát jóga”?** (Áron, 2026-11-17: „Csinálj kutatást, hogy privát jógára, vagy
+  egyéni jógára van nagyobb kereslet, SEO-szempontból, és küldd el Olíviának”). Az eredményt elküldtem Olíviának a portálon.
+  - **Forrás:** SEO OS 16-os projekt („Online jóga Magyarország – piackutatás”), DataForSEO → Google Ads keresési mennyiség,
+    Magyarország / magyar. 38 kifejezés, ebből 25 új (kézzel felvéve); a lekérdezés a 46855-ös feladat. Plusz a Google
+    keresési javaslatai (hl=hu, gl=hu).
+  - **Havi keresések:**
+    - „egyéni jógaóra” 10, „egyéni jógaóra árak” 10 (CPC 0,30 / 0,06 USD);
+    - „jóga magánóra” 10, „magán jógaóra” 10;
+    - minden „privát” változat (privát jóga, -óra, -óra, online, budapest, ár, oktatás, oktató, kismamatorna) a
+      küszöb alatt (nincs adat);
+    - összevetésnek: „online jóga” 110, „jógaóra” 70, „jóga budapest” 720.
+  - **A Google javaslatai:**
+    - „egyéni jóga” → 6 (árak, jógaóra, oktatás, város);
+    - „privát jóga” → 4 (óra, budapest).
+  - **Javaslat:**
+    - A fő név maradjon az „egyéni (online) jóga” a címben, a menüben és az URL-ben (az .online-on már így van).
+    - A szövegben egyszer-kétszer a „privát” és a „magánóra” is szerepeljen.
+    - Az árak maradjanak kint.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
