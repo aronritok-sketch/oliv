@@ -1319,6 +1319,13 @@
     - a páros árkártyák ott mindig nyitva vannak;
     - a Firefox által megszakított képletöltés nem hibás fájl.
   - Tesztek: 1605/0.
+  - **Második teljes futás élesben a 3.11.116-on: 2615/2615, 0 hiba.** Eszközönként:
+    - iPhone SE/13/15 Pro Max, Pixel 7, Galaxy S9+: 229-229;
+    - iPad Mini és Pro 11: 254-254;
+    - Galaxy Tab S4: 217;
+    - Chrome, Safari, Firefox gépen: 218-218;
+    - a 91 link mind válaszol.
+  - **Ezzel ez a fejlesztési kör lezárva** (Áron, 11.17: „utolsó kör, utána zárjuk a fejlesztést”).
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
