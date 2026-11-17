@@ -4069,6 +4069,84 @@ test( 'going live: the manager can check the site from outside (X-OYS-Auth, /sta
 	ok( isset( $st['mail']['smtp'], $st['payments']['provider'], $st['site']['search_engines'], $st['schedule']['upcoming_60_days'], $st['people']['customers'] ) && ! str_contains( (string) $json, 'sk_test_hidden_123' ) && 'set' === $st['settings']['stripe_secret_key'], 'the status: mail, payments, search engines, schedule, customers – keys only as set or missing' );
 } );
 
+test( 'reviews (Olívia, 11.17): only attended students write, name/first name/anonymous, nothing shows before approval, one request each', function () {
+	update_option( OYS_Reviews::SINCE, gmdate( 'Y-m-d H:i:s', time() - 30 * DAY_IN_SECONDS ) );
+	$u = make_user( 'Reka' );
+	update_user_meta( $u, 'first_name', 'Réka' );
+	update_user_meta( $u, 'last_name', 'Kiss' );
+	wp_update_user( array( 'ID' => $u, 'display_name' => 'Réka Kiss' ) );
+	ok( ! OYS_Reviews::can_write( $u ), 'no class attended: cannot write' );
+	ok( is_wp_error( OYS_Reviews::save( $u, 'Nagyon jó óra volt, köszönöm!', 'full', true ) ), 'not saved without a class' );
+	$s  = make_session( array( 'in_hours' => -6 ) );
+	$bk = OYS_Bookings::book_manual( $u, $s, 'comp', false, true );
+	OYS_Bookings::set_attendance( $bk, 'attended' );
+	ok( OYS_Reviews::can_write( $u ), 'attended: can write' );
+
+	// the signed link identifies the student without logging in; a forged one does not
+	$url = OYS_Reviews::url( $u );
+	parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $q );
+	$_REQUEST['t'] = $q['t'];
+	eq( $u, OYS_Reviews::who(), 'the signed link is the student' );
+	$_REQUEST['t'] = $u . '-0000000000aaaaaaaaaa';
+	eq( 0, OYS_Reviews::who(), 'a forged link is nobody' );
+	unset( $_REQUEST['t'] );
+
+	ok( is_wp_error( OYS_Reviews::save( $u, 'Jó', 'full', true ) ), 'too short: not saved' );
+	ok( is_wp_error( OYS_Reviews::save( $u, 'Nagyon jó óra volt, köszönöm!', 'full', false ) ), 'without agreeing: not saved' );
+	$push = array();
+	$cap  = function ( $ok, $uid ) use ( &$push ) { $push[] = $uid; return false; };
+	add_filter( 'oys_push_allowed', $cap, 10, 2 );
+	$id = OYS_Reviews::save( $u, "Nagyon jó óra volt, köszönöm!\r\n\r\n\r\n\r\n<b>Jövök</b> még.", 'full', true );
+	remove_filter( 'oys_push_allowed', $cap, 10 );
+	ok( is_int( $id ) && 'pending' === get_post_status( $id ), 'saved, waiting for approval' );
+	eq( "Nagyon jó óra volt, köszönöm!\n\nJövök még.", get_post( $id )->post_content, 'no tags, no endless empty lines' );
+	ok( (bool) $push, 'the studio gets a push' );
+	eq( 'Hatha Flow', get_post_meta( $id, '_oys_class', true ), 'the class it was about' );
+	eq( '', OYS_Reviews::display(), 'nothing on the site before approval' );
+
+	wp_update_post( array( 'ID' => $id, 'post_status' => 'publish' ) );
+	$html = OYS_Reviews::display();
+	ok( str_contains( $html, 'Réka Kiss' ) && str_contains( $html, 'Hatha Flow' ) && str_contains( $html, 'id="velemenyek"' ), 'approved: on the site with the full name' );
+	ok( ! str_contains( $html, '@example.test' ), 'never the email address' );
+	OYS_Reviews::save( $u, 'Nagyon jó óra volt, köszönöm! Jövök még.', 'first', true );
+	eq( $id, OYS_Reviews::of( $u )->ID, 'one review per student: changed, not a second one' );
+	eq( 'pending', get_post_status( $id ), 'a changed review waits again' );
+	wp_update_post( array( 'ID' => $id, 'post_status' => 'publish' ) );
+	$html = OYS_Reviews::display();
+	ok( str_contains( $html, '<b>Réka</b>' ) && ! str_contains( $html, 'Kiss' ), 'first name only' );
+	update_post_meta( $id, '_oys_display', 'anon' );
+	ok( ! str_contains( OYS_Reviews::display(), 'Réka' ), 'without a name: no name at all' );
+
+	// the request: once, only for classes after the switch-on, not for the studio
+	$v = make_user( 'Vera' );
+	$s2 = make_session( array( 'in_hours' => -8 ) );
+	OYS_Bookings::set_attendance( OYS_Bookings::book_manual( $v, $s2, 'comp', false, true ), 'attended' );
+	$old = make_user( 'Regi' );
+	$s3  = make_session( array( 'in_hours' => -24 * 60 ) );
+	OYS_Bookings::set_attendance( OYS_Bookings::book_manual( $old, $s3, 'comp', false, true ), 'attended' );
+	$log = sent_mails( fn() => OYS_Reviews::ask_now() );
+	$to  = array_column( $log, 'to' );
+	ok( in_array( get_userdata( $v )->user_email, $to, true ), 'the student of a recent class is asked' );
+	ok( ! in_array( get_userdata( $old )->user_email, $to, true ), 'a class from before the switch-on: no request (no mass email)' );
+	ok( ! in_array( get_userdata( $u )->user_email, $to, true ), 'who has written already: not asked' );
+	$mine = array_values( array_filter( $log, fn( $m ) => get_userdata( $v )->user_email === $m['to'] ) )[0] ?? array();
+	ok( str_contains( $mine['html'] ?? '', 'velemeny' ) && str_contains( $mine['html'] ?? '', 't=' . $v . '-' ), 'the email has the student\'s own link' );
+	eq( 0, count( array_filter( array_column( sent_mails( fn() => OYS_Reviews::ask_now() ), 'to' ), fn( $e ) => get_userdata( $v )->user_email === $e ) ), 'asked once only' );
+
+	// the privacy page tells about reviews; the form page stays out of search engines
+	$pp = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Adatvédelem', 'post_content' => '<ul><li><strong>Hírlevél:</strong> csak ha feliratkozol.</li></ul>' ) );
+	update_option( 'wp_page_for_privacy_policy', $pp );
+	$GLOBALS['post'] = get_post( $pp );
+	setup_postdata( $GLOBALS['post'] );
+	ok( str_contains( OYS_Reviews::privacy( get_post( $pp )->post_content ), 'oys-privacy-reviews' ), 'the privacy page: a line about reviews after the newsletter' );
+	wp_reset_postdata();
+	OYS_Reviews::ensure_page();
+	$page = get_post( (int) get_option( 'oys_review_page' ) );
+	ok( $page && str_contains( $page->post_content, '[oys_review_form]' ) && 'velemeny' === $page->post_name, 'the form page /velemeny/' );
+	$args = OYS_Reviews::sitemap( array(), 'page' );
+	ok( in_array( $page->ID, $args['post__not_in'], true ), 'not in the sitemap' );
+} );
+
 test( 'helpers: money and periods', function () {
 	eq( '$25', oys_money( 2500, 'usd' ), 'whole dollars' );
 	eq( '$25.50', oys_money( 2550, 'usd' ), 'cents' );

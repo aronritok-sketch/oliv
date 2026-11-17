@@ -237,6 +237,8 @@ $more     = array(
 	<?php echo $studio( 'oys_pricing' ); // phpcs:ignore ?>
 </div></section>
 
+<?php echo $studio( 'oys_reviews' ); // phpcs:ignore -- vendégvélemények (Olívia, 11.17): csak ha van jóváhagyott ?>
+
 <section class="section" id="faq" aria-labelledby="faq-title"><div class="container faq-grid">
 	<header class="section__head" data-reveal><?php echo oy_kicker( __( 'FAQ', 'olivia-yoga' ) ); // phpcs:ignore ?><h2 id="faq-title"><?php esc_html_e( 'Got a question?', 'olivia-yoga' ) /* Olívia, 14 November: „ez kicsit erőltetett, ne ez legyen a fő kérdés” */; ?></h2><p><a class="text-link" href="<?php echo esc_url( oy_page_link( 'faq' ) ); ?>"><?php esc_html_e( 'All questions', 'olivia-yoga' ); ?></a></p></header>
 	<?php echo oy_faq_list( true ); // phpcs:ignore ?>

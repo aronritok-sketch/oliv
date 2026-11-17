@@ -40,6 +40,7 @@ class OYS_Emails {
 			case 'waitlist_spot_open':
 			case 'welcome':
 			case 'we_miss_you':
+			case 'review_request':
 			case 'weekly_digest':
 			case 'birthday':
 			case 'raffle_winner':
@@ -439,6 +440,11 @@ class OYS_Emails {
 	/** Came regularly, not lately, nothing booked (OYS_Hub_Auto, Motibro's „emlékeztető lemorzsolódó vendégeknek”). */
 	protected static function we_miss_you( $user_id ) {
 		return self::compose( 'we_miss_you', self::user_email( $user_id ), OYS_Email_Templates::vars_for( $user_id ), self::upcoming_html(), array(), home_url( '/' ) );
+	}
+
+	/** After the first attended class: a few words about it (OYS_Reviews; the guest's own signed link). */
+	protected static function review_request( $user_id, $url ) {
+		return self::compose( 'review_request', self::user_email( $user_id ), OYS_Email_Templates::vars_for( $user_id ), '', array(), $url );
 	}
 
 	/** Saturday: the coming week's classes to the newsletter subscribers, with the unsubscribe link (Motibro's „heti kedvcsináló”). */

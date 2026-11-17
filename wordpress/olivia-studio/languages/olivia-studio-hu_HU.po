@@ -7930,3 +7930,123 @@ msgstr "Következő hónap: %s"
 msgctxt "calendar month"
 msgid "F Y"
 msgstr "Y. F"
+
+msgid "Reviews"
+msgstr "Vélemények"
+
+msgid "Review"
+msgstr "Vélemény"
+
+msgid "Edit review"
+msgstr "Vélemény szerkesztése"
+
+msgid "Search reviews"
+msgstr "Keresés a véleményekben"
+
+msgid "No reviews yet."
+msgstr "Még nincs vélemény."
+
+msgid "A student"
+msgstr "Egy vendég"
+
+msgid "Reviews can be written by students who have attended a class. Open the link from our email, or log in."
+msgstr "Véleményt az írhat, aki már volt órán. Nyisd meg a levélben kapott linket, vagy lépj be."
+
+msgid "Reviews can be written by students who have attended a class. After your first class you can write one here."
+msgstr "Véleményt az írhat, aki már volt órán. Az első órád után itt megírhatod."
+
+msgid "With my full name (%s)"
+msgstr "A teljes nevemmel (%s)"
+
+msgid "With my first name only (%s)"
+msgstr "Csak a keresztnevemmel (%s)"
+
+msgid "Without a name"
+msgstr "Név nélkül"
+
+msgid "Your review is on the site. If you change it, it appears again after the studio has read it."
+msgstr "A véleményed már kint van az oldalon. Ha módosítod, újra átnézem, és utána jelenik meg."
+
+msgid "You have written a review already – you can change it here."
+msgstr "Már írtál véleményt – itt módosíthatod."
+
+msgid "Please write at least a sentence."
+msgstr "Kérlek, írj legalább egy mondatot."
+
+msgid "How was the class? What did it give you?"
+msgstr "Milyen volt az óra? Mit adott neked?"
+
+msgid "How should it appear?"
+msgstr "Hogyan jelenjen meg?"
+
+msgid "I agree that my review appears on the website the way I chose above. I can change or withdraw it at any time."
+msgstr "Hozzájárulok, hogy a véleményem a fent választott módon megjelenjen a weboldalon. Bármikor módosíthatom vagy visszavonhatom."
+
+msgid "Save my review"
+msgstr "Mentés"
+
+msgid "Send my review"
+msgstr "Elküldöm"
+
+msgid "Thank you!"
+msgstr "Köszönöm!"
+
+msgid "The studio reads it, and it appears on the site soon."
+msgstr "Átolvasom, és hamarosan megjelenik az oldalon."
+
+msgid "If you would like to, you can also share it on Google – it helps others find the classes."
+msgstr "Ha szeretnéd, a Google-on is megoszthatod – ezzel másoknak is segítesz rátalálni az órákra."
+
+msgid "Review on Google"
+msgstr "Értékelés a Google-on"
+
+msgid "This link is not valid any more. Please open it again from the email."
+msgstr "Ez a link már nem érvényes. Kérlek, nyisd meg újra a levélből."
+
+msgid "New review"
+msgstr "Új vélemény"
+
+msgid "What students say"
+msgstr "Akik már velem gyakoroltak"
+
+msgid "Written by students who have attended a class."
+msgstr "A véleményeket olyan vendégek írták, akik már voltak órán."
+
+msgid "Review request (after the first class)"
+msgstr "Véleménykérés (az első óra után)"
+
+msgid "Once per student, a few hours after the first class they attended"
+msgstr "Vendégenként egyszer, pár órával az első óra után, amin részt vett"
+
+msgid "How was the class, {first_name}?"
+msgstr "Milyen volt az óra, {first_name}?"
+
+msgid "How was it?"
+msgstr "Milyen volt?"
+
+msgid "Hi {first_name}, thank you for practising with me. Would you write a few words about the class? You choose whether it appears with your full name, your first name only, or without a name."
+msgstr "Szia {first_name}! Köszönöm, hogy velem gyakoroltál. Írnál pár mondatot arról, milyen volt az óra? Te választod ki, hogy a teljes neveddel, csak a keresztneveddel vagy név nélkül jelenjen meg."
+
+msgid "Write a review"
+msgstr "Megírom"
+
+msgid "Appears as"
+msgstr "Így jelenik meg"
+
+msgid "Student"
+msgstr "Vendég"
+
+msgid "Hide from the site"
+msgstr "Levétel az oldalról"
+
+msgid "Show on the site"
+msgstr "Megjelenítés az oldalon"
+
+msgid "Your review"
+msgstr "Véleményed"
+
+msgid "Review:"
+msgstr "Vélemény:"
+
+msgid "only if you write one – its text, the name you chose to show (full name, first name or none) and when you agreed to it. It appears on the site after the studio has read it; you can change or withdraw it at any time."
+msgstr "csak ha írsz: a szövege, a választott megjelenés (teljes név, keresztnév vagy név nélkül), és hogy mikor járultál hozzá. Az oldalon azután jelenik meg, hogy átolvastam; bármikor módosíthatod vagy visszavonhatod."

@@ -1488,6 +1488,30 @@
     - Ehhez a böngészőnek egyszer el kell érnie egy új címet, pl. `https://oliviajoga.hu/?uj`.
     - A régi Google Site-ra kell egy gomb erre a címre (Áron vagy Olívia).
 
+- **Vendégvélemények – olivia-studio 1.23.0, oliviajoga.online 3.12.0** (Olívia, 11.17: „szeretnék valamilyen formában
+  véleménykérést … Lehessen névvel és név nélkül véleményezni. Szólj Áronnak …”; Áron: „Mindkettő” – saját vélemények és
+  Google).
+  - Új `includes/class-reviews.php`.
+  - **Ki írhat:** aki már volt órán. A levélben saját, aláírt linket kap (belépés nélkül működik), vagy belépve írhat.
+    Vendégenként egy vélemény, később módosítható.
+  - **Megjelenés:**
+    - a vendég választ: teljes név, csak keresztnév vagy név nélkül („Egy vendég”), és hozzájárul;
+    - e-mail-cím soha nem jelenik meg;
+    - jóváhagyás nélkül semmi nem kerül ki: Stúdió → Vélemények (Megjelenítés / Levétel), és push-értesítés Olíviának.
+  - **Az oldalon:**
+    - a főoldalon a GYIK előtt, kártyákon, alattuk a mondat, hogy olyan vendégek írták, akik már voltak órán;
+    - amíg nincs jóváhagyott vélemény, a blokk nem jelenik meg.
+  - **Kérés:**
+    - a `review_request` levél (Stúdió → E-mailek, alapból bekapcsolva), vendégenként egyszer, az első óra után, 10–19 óra
+      között;
+    - csak a bekapcsolás utáni órákra, így a régi vendégek nem kapnak tömeges levelet.
+  - **Google:** a köszönő oldalon mindenkinek felajánlja a Google-értékelést, szűrés nélkül.
+    - Csak akkor jelenik meg, ha az `oys_google_review_url` be van állítva (REST: /wp/v2/settings).
+    - Olívia Google Cégprofil-linkjét a portálon elkértük.
+  - Az űrlap oldala `/velemeny/`: a bővítmény hozza létre, nincs a keresőben és a sitemapben.
+  - Az adatvédelmi oldalon a hírlevél után egy „Vélemény” sor jelenik meg, futás közben hozzáadva, az oldal szövegéhez nem nyúl.
+  - Tesztek: 1641/0. Helyben próbálva telefonnézetben: 3 kártya, az űrlap 3 névválasztással, a küldés köszönő oldalra visz.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

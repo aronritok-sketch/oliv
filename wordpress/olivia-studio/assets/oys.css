@@ -548,3 +548,23 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 	.oys-lobby__join { width: 100%; justify-content: center; }
 	.oys-lobby__count { gap: .35rem; }
 }
+
+/* ---------- Reviews (OYS_Reviews): cards on the site, the form ---------- */
+.oys-reviews__grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr)); gap: 18px; margin-top: 8px; }
+.oys-review { margin: 0; padding: 22px 22px 18px; border-radius: 22px; background: var(--card, #FFFDFB); box-shadow: 0 1px 0 rgba(7, 38, 36, .06), 0 10px 30px rgba(7, 38, 36, .06); display: flex; flex-direction: column; gap: 14px; }
+.oys-review blockquote { margin: 0; padding: 0; border: 0; font-size: 1.02rem; line-height: 1.6; color: var(--text, #1E3432); }
+.oys-review blockquote p { margin: 0 0 .6em; }
+.oys-review blockquote p:last-child { margin-bottom: 0; }
+.oys-review blockquote::before { content: "“"; display: block; height: .55em; font-size: 3rem; line-height: 1; color: var(--orchid, #DB2E5C); opacity: .5; }
+.oys-review figcaption { margin-top: auto; display: flex; flex-direction: column; gap: 2px; font-size: .92rem; }
+.oys-review figcaption span { color: var(--muted, #53635A); font-size: .86rem; }
+.oys-reviews__note { margin: 14px 0 0; font-size: .86rem; color: var(--muted, #53635A); }
+.oys-review-form { max-width: 640px; margin: 0 auto; display: grid; gap: 14px; }
+.oys-review-form textarea { width: 100%; min-height: 150px; padding: 12px 14px; border-radius: 14px; border: 1px solid rgba(7, 38, 36, .25); font: inherit; line-height: 1.55; background: #fff; }
+.oys-review-form__label { font-weight: 700; }
+.oys-review-form__names { margin: 0; padding: 0; border: 0; display: grid; gap: 8px; }
+.oys-review-form__names legend { font-weight: 700; margin-bottom: 6px; }
+.oys-review-form__opt { display: flex; gap: 10px; align-items: flex-start; line-height: 1.45; cursor: pointer; min-height: 44px; }
+.oys-review-form__opt input { width: 20px; height: 20px; margin: 2px 0 0; flex: none; accent-color: var(--orchid, #DB2E5C); }
+.oys-review-form__note { margin: 0; padding: 10px 14px; border-radius: 12px; background: rgba(43, 80, 54, .08); }
+.oys-review-thanks h2 { margin: 0; }
