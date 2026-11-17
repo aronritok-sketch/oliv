@@ -13,8 +13,13 @@
  * kódot nem tartalmaz és nem kér: a párosítás a varázsló távirányítóján megy (POST hpv-setup/v1/remote/keys
  * {"HPV_HOTPOT_PAIR_CODE": "…"}), vagy az adminban (Beállítások → HelloProVision HotPot).
  *
+ * A bővítményeket a saját GitHub-címkéjükről teszi fel (az iu_theme frissítőjével: git/matching-refs/tags + a kiadás
+ * csatolmánya), nem a varázsló kiadáslistájából: az csak a legújabb 1000 kiadást látja, a hlprv-ben pedig 1700 fölött
+ * vannak, így a ritkán frissülő HotPot Connect „nincs kiadás” lett (2026-11-17, mindkét Olívia-oldalon).
+ *
  * Dev és staging oldalon nem fut; kikapcsolás: define( 'HPV_KIT', false ). Ha valami nem sikerült (pl. a GitHub épp nem
- * válaszolt), óránként újrapróbálja, legfeljebb 24-szer. Az utolsó kör: get_option( 'hpv_kit_log' ).
+ * válaszolt, vagy a kör félbeszakadt), óránként újrapróbálja, legfeljebb 24-szer; naponta egyszer megnézi, hiányzik-e
+ * valami (pl. valaki kikapcsolta), és ha igen, visszateszi. Az utolsó kör: get_option( 'hpv_kit_log' ).
  *
  * Közös fájl: az oliv repó wordpress/hpv/hpv-kit.php-ja kerül minden Olívia-témába (build-child-themes.py, és az
  * oliviajoga-hu/build.py --wp) – itt szerkeszd.
@@ -30,6 +35,16 @@ if ( ! defined( 'HPV_KIT_PLUGINS' ) ) {
 
 add_action( 'hpv_child_setup', 'hpv_kit_run', 90, 0 ); // a téma saját beállítása után
 add_action( 'hpv_kit_retry', 'hpv_kit_run', 10, 0 );
+add_action( 'hpv_kit_daily', function () {
+	if ( hpv_kit_missing() ) {
+		hpv_kit_run();
+	}
+} );
+add_action( 'init', function () { // a napi önellenőrzés ütemezése (olcsó: csak a cron-listát nézi; a futás dönti el, kell-e)
+	if ( ! wp_next_scheduled( 'hpv_kit_daily' ) ) {
+		wp_schedule_event( time() + HOUR_IN_SECONDS, 'daily', 'hpv_kit_daily' );
+	}
+} );
 
 /** Fusson-e itt: csak az éles oldalon, az iu_theme frissítőjével (tőle jön a GitHub-hozzáférés). */
 function hpv_kit_on(): bool {
@@ -51,6 +66,10 @@ function hpv_kit_run(): array {
 		return array( 'már fut' );
 	}
 	set_transient( 'hpv_kit_lock', 1, 10 * MINUTE_IN_SECONDS );
+	// Ha a kör félbeszakad (időkorlát), az újrapróba így is megmarad; sikeres kör végén törlődik.
+	if ( (int) get_option( 'hpv_kit_tries', 0 ) < 24 && ! wp_next_scheduled( 'hpv_kit_retry' ) ) {
+		wp_schedule_single_event( time() + HOUR_IN_SECONDS, 'hpv_kit_retry' );
+	}
 	$log = array();
 	$bad = false;
 	try {
@@ -63,30 +82,23 @@ function hpv_kit_run(): array {
 		}
 
 		// 1. A beállító varázsló.
-		if ( ! is_file( WP_PLUGIN_DIR . '/' . HPV_KIT_SETUP ) ) {
-			$res   = hpv_kit_install_setup();
-			$log[] = 'beállító varázsló: ' . $res;
-			$bad   = $bad || str_starts_with( $res, 'hiba' );
-		}
-		if ( is_file( WP_PLUGIN_DIR . '/' . HPV_KIT_SETUP ) && ! is_plugin_active( HPV_KIT_SETUP ) ) {
-			$act = activate_plugin( HPV_KIT_SETUP );
-			delete_transient( 'hpv_setup_redirect' ); // az admin ne ugorjon a varázslóba a következő belépéskor
-			$log[] = is_wp_error( $act ) ? 'hiba: a varázsló nem kapcsolható be – ' . $act->get_error_message() : 'beállító varázsló bekapcsolva';
-			$bad   = $bad || is_wp_error( $act );
-		}
-
-		// 2. A weboldal-bővítmények (a varázsló telepítője: GitHub-kiadás, bekapcsolás).
-		if ( function_exists( 'hpv_setup_install_plugins' ) ) {
-			$need = array_values( array_filter( HPV_KIT_PLUGINS, fn( $s ) => ! is_plugin_active( $s . '/' . $s . '.php' ) ) );
-			if ( $need ) {
-				foreach ( hpv_setup_install_plugins( 'site', $need ) as $slug => $res ) {
-					$log[] = $slug . ': ' . ( 'ok' === $res ? 'telepítve, bekapcsolva' : 'hiba: ' . $res );
-					$bad   = $bad || 'ok' !== $res;
-				}
+		// 1–2. A beállító varázsló, aztán a weboldal-bővítmények: a GitHub-címkéjükről, majd bekapcsolva.
+		foreach ( array_merge( array( 'helloprovision-setup' ), HPV_KIT_PLUGINS ) as $slug ) {
+			$main  = $slug . '/' . $slug . '.php';
+			$label = 'helloprovision-setup' === $slug ? 'beállító varázsló' : $slug;
+			if ( ! is_file( WP_PLUGIN_DIR . '/' . $main ) ) {
+				$res   = hpv_kit_install_release( $slug );
+				$log[] = $label . ': ' . $res;
+				$bad   = $bad || str_starts_with( $res, 'hiba' );
 			}
-		} elseif ( is_plugin_active( HPV_KIT_SETUP ) ) {
-			$log[] = 'hiba: a varázsló telepítője nem töltődött be';
-			$bad   = true;
+			if ( is_file( WP_PLUGIN_DIR . '/' . $main ) && ! is_plugin_active( $main ) ) {
+				$act = activate_plugin( $main );
+				if ( 'helloprovision-setup' === $slug ) {
+					delete_transient( 'hpv_setup_redirect' ); // az admin ne ugorjon a varázslóba a következő belépéskor
+				}
+				$log[] = is_wp_error( $act ) ? 'hiba: ' . $label . ' nem kapcsolható be – ' . $act->get_error_message() : $label . ' bekapcsolva';
+				$bad   = $bad || is_wp_error( $act );
+			}
 		}
 
 		// 3. A weboldal mu-pluginjai (ügyféloldalon alapból egyik sincs kijelölve – a csomag kijelöli őket).
@@ -113,17 +125,30 @@ function hpv_kit_run(): array {
 	$tries = $bad ? (int) get_option( 'hpv_kit_tries', 0 ) + 1 : 0;
 	update_option( 'hpv_kit_tries', $tries, false );
 	update_option( 'hpv_kit_log', array( 'time' => time(), 'ok' => ! $bad, 'log' => $log ), false );
-	if ( $bad && $tries < 24 && ! wp_next_scheduled( 'hpv_kit_retry' ) ) {
-		wp_schedule_single_event( time() + HOUR_IN_SECONDS, 'hpv_kit_retry' );
+	if ( ! $bad || $tries >= 24 ) {
+		wp_clear_scheduled_hook( 'hpv_kit_retry' );
 	}
 	return $log;
 }
 
-/** A beállító varázsló legújabb kiadása a GitHubról (a letöltést az iu_theme frissítője hitelesíti a tokennel). */
-function hpv_kit_install_setup(): string {
-	$all = \IUTheme\Site::versions( 'helloprovision-setup' );
+/** Hiányzik-e valami a csomagból (a napi önellenőrzéshez; hálózat nélkül). */
+function hpv_kit_missing(): bool {
+	require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	$dir = defined( 'WPMU_PLUGIN_DIR' ) ? WPMU_PLUGIN_DIR : WP_CONTENT_DIR . '/mu-plugins';
+	foreach ( array_merge( array( 'helloprovision-setup' ), HPV_KIT_PLUGINS ) as $slug ) {
+		if ( ! is_plugin_active( $slug . '/' . $slug . '.php' ) ) {
+			return true;
+		}
+	}
+	return (bool) array_filter( HPV_KIT_MU, fn( $f ) => ! is_file( $dir . '/' . $f ) );
+}
+
+/** Egy HelloProVision bővítmény legújabb kiadása a címkéjéről („<slug>-v<verzió>”, csatolmány: „<slug>.zip”); a letöltést
+ *  az iu_theme frissítője hitelesíti a tokennel. */
+function hpv_kit_install_release( string $slug ): string {
+	$all = \IUTheme\Site::versions( $slug );
 	$ver = (string) end( $all );
-	$url = '' !== $ver ? \IUTheme\Site::asset( 'helloprovision-setup', $ver ) : '';
+	$url = '' !== $ver ? \IUTheme\Site::asset( $slug, $ver ) : '';
 	if ( '' === $url ) {
 		return 'hiba: nincs elérhető kiadás a GitHubon (HPV_GITHUB_TOKEN?)';
 	}

@@ -1397,7 +1397,12 @@
     - Az admin nem ugrik át a varázslóba.
     - Kulcsot nem tartalmaz. A HotPot-kapcsolati kód a varázsló távirányítóján megy be (`hpv-setup/v1/remote/keys`).
     - Dev és staging oldalon nem fut.
-    - Próba: `WP_DIR=… HPV_SETUP_SRC=<hlprv> php wordpress/dev/tests/kit.php` → 20/20.
+    - Próba: `WP_DIR=… HPV_SETUP_SRC=<hlprv> php wordpress/dev/tests/kit.php` → 28/28 (1.5.6 / 3.11.118).
+    - **1.5.6 / 3.11.118.** Az 1.5.5 / 3.11.117 élesen feltette a varázslót, az Ads Connectet és a mu-pluginokat. A HotPot
+      Connect „nincs kiadás” hibát kapott: a varázsló csak a legújabb 1000 kiadást látja, a hlprv-ben pedig 1794 van.
+      - A csomag azóta minden bővítményt közvetlenül a GitHub-címkéjéről tesz fel.
+      - Ha egy kör félbeszakad, az újrapróba akkor is megmarad.
+      - Naponta egyszer megnézi, hiányzik-e valami, és ha igen, visszateszi.
   - **HotPot:** a két oldal felvéve Olívia ügyfélkartonjához (4070003): oliviajoga.hu = 150002, oliviajoga.online = 150003.
     - A kapcsolati kódok 7 napig érvényesek. Nincsenek a repóban; ha lejárnak, a HotPotban újat lehet kérni.
   - **SEO OS:** két új projekt, „draft”, Olívia ügyfele alatt.
