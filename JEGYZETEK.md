@@ -1453,6 +1453,15 @@
       - a süti `stats`, a link újranyitja a sávot;
       - a tájékoztató oldal 200-zal jön, Aroviával.
     - Search Console: Áron beküldte a .hu sitemapjét.
+  - **HotPot mindkét oldalon párosítva** (11.17).
+    - Az .online-t a `claude` felhasználó alkalmazásjelszavával párosítottam (képernyőkép, `X-OJ-Remote`, első olvasatra jó).
+    - Mindkét oldal jelentést küld:
+      - .hu: állapot 72%, 2 frissítés vár;
+      - .online: állapot 80%, 5 frissítés vár;
+      - sebezhetőség egyiken sincs.
+    - A kapcsolati kódok elhasználva, a scratchpadből törölve.
+    - A két alkalmazásjelszó csak a munkamenet scratchpadjében van (600-as jogosultsággal). Mindkettő chatben ment át,
+      ezért ha végeztünk, vissza kell vonni őket.
     - A munkamenet hálózati titka az `X-OYS-Auth`-ot felülírja, és az űrlap a szóközös alkalmazásjelszót nem fogadta el.
     - Áron a jelszót képernyőképen küldte; csak a scratchpadben van (600-as jogosultsággal), a repóban nincs.
   - **HotPot:** a két oldal felvéve Olívia ügyfélkartonjához (4070003): oliviajoga.hu = 150002, oliviajoga.online = 150003.
