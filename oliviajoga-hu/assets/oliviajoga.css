@@ -704,10 +704,17 @@ h1, h2, .oj-h2, .oj-display, .oj-title__h, .page-head .page-head__title, .oj-loc
    the photos come in one after the other and float gently, the brush stroke draws itself in and flows across them,
    one photo at a time lights up in colour (and the one under the pointer). Nothing moves with reduced motion. */
 .oj-korszak__cell { position: relative; isolation: isolate; }
-.oj-korszak__cell .photo { transition: filter 1.2s ease, transform 1.6s cubic-bezier(.2, .8, .2, 1); }
+/* Áron, 17 November (élesítés, eszközös teszt): fading the photo's own grayscale filter crashed Safari on an iPhone
+   (WebKit) a few seconds into the home page. The photo now stays in colour under a grey layer that takes its colour
+   away (blend mode „saturation”); lighting up fades only that layer's opacity – the same look, and cheap to draw. */
+.is-home main .oj-korszak__cell .photo { filter: none; }
+.oj-korszak__cell .photo { transition: transform 1.6s cubic-bezier(.2, .8, .2, 1); }
 .is-home main .oj-korszak__cell.is-lit .photo,
-.is-home main .oj-korszak__cell:hover .photo { filter: none; transform: scale(1.09); }
-.oj-korszak__cell::after { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+.is-home main .oj-korszak__cell:hover .photo { transform: scale(1.09); }
+.is-home .oj-korszak__cell::before { content: ""; position: absolute; inset: 0; z-index: 1; border-radius: inherit; pointer-events: none;
+	background: hsl(0 0% 50%); mix-blend-mode: saturation; transition: opacity 1.2s ease; }
+.is-home .oj-korszak__cell.is-lit::before, .is-home .oj-korszak__cell:hover::before { opacity: 0; }
+.oj-korszak__cell::after { content: ""; position: absolute; inset: 0; z-index: 2; border-radius: inherit; pointer-events: none;
 	box-shadow: inset 0 0 0 0 var(--orchid); transition: box-shadow .7s ease; }
 .oj-korszak__cell.is-lit::after, .oj-korszak__cell:hover::after { box-shadow: inset 0 0 0 3px var(--orchid); }
 .oj-korszak__cell--0, .oj-korszak__cell--3 { --r: -3deg; }
@@ -758,3 +765,8 @@ h1, h2, .oj-h2, .oj-display, .oj-title__h, .page-head .page-head__title, .oj-loc
 /* Kapcsolat from 26 November (Olivia 11.16): the same two boxes, the Wednesday online class and the one-to-one option instead of the old times */
 .oj-loc--contact .oj-loc__was { margin: 1rem 0 .2rem; font-weight: 600; color: var(--ink); }
 .oj-slot--words span:nth-child(2) { font-family: var(--f-text); font-size: 1rem; font-weight: 700; line-height: 1.3; }
+
+/* Áron, 17 November (élesítés, eszközös teszt): nothing scrolls sideways on a phone (the brush behind the photo on
+   „Rólam” reached past the screen), and every button is at least 44 px high on a touch screen. */
+body { overflow-x: clip; }
+@media (pointer: coarse), (max-width: 759px) { .btn, .btn--sm { min-height: 44px; } }

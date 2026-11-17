@@ -1327,6 +1327,26 @@
     - a 91 link mind válaszol.
   - **Ezzel ez a fejlesztési kör lezárva** (Áron, 11.17: „utolsó kör, utána zárjuk a fejlesztést”).
 
+- **oliviajoga.hu ÉLES (2026-11-17)** (Áron: „rakd ki a szerverre! és javítsd mindent amit kell, cseréltem a dns-eket”).
+  - **DNS az ELIN-nél (Áron):** csak az `@` és a `www` A-rekord változott, a 37.148.205.64-re (VPS). Az MX, az
+    `mx1`/`mx2`/`mail`, az autoconfig/autodiscover, a TXT és a CAA maradt; Olívia levelezése az ELIN-en fut tovább.
+  - **A szerveren** az éles oldal (`oliviajoga-hu`) már fent volt (a fő chat előkészítette az `oliviajoga-hu-src` dev
+    oldalból). Innen a távirányítóval (`services/deploy/hpv-vps.py ssl-site oliviajoga-hu`) Let's Encrypt-tanúsítvány
+    az oliviajoga.hu-ra és a www-re, 2027-02-15-ig, automatikus megújítással.
+    - http → https, www → oliviajoga.hu.
+    - Indexelhető, a canonical és az og:url a https://oliviajoga.hu.
+    - Az oldaltérképben 31 oldal, mind 200.
+    - Nincs dev- és Google Sites-link; a PHP-napló üres.
+  - **Eszközös teszt (`dev/qa`) a 31 oldalon, három valódi hibával:**
+    1. **A főoldal iPhone-on (WebKit) néhány másodperc után összeomlott.** Az ok a „korszak” fotórácsban a képek saját
+       fekete-fehér szűrőjének áttűnése (`transition: filter`) a kigyúláskor.
+       - Kizárással megtalálva: szűrő vagy áttűnés nélkül nem omlik össze, a lebegő animáció nem számít.
+       - Most a fotó színes, fölötte egy szürke, „saturation” keverésű réteg; kigyúláskor csak ennek az átlátszósága
+         változik. Ugyanaz a látvány, kétszer egymás után sem omlik össze.
+    2. **„Rólam”: telefonon oldalra görgethető volt** (a fotó mögötti ecsetvonás kilógott). Most `body { overflow-x: clip }`.
+    3. **„Bejelentkezés online” gomb:** 37 px magas volt. Érintőképernyőn minden gomb legalább 44 px.
+  - Téma 1.5.3; a `tools/check.py` 2288/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
