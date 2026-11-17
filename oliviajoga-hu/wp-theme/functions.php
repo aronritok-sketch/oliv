@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 require_once __DIR__ . '/inc/setup.php';
 require_once __DIR__ . '/inc/image-position.php';
 require_once __DIR__ . '/inc/page-editor.php'; // Szerkesztés a weboldalon (Olivia, 11.13) – from wordpress/olivia-yoga, copied by build.py --wp
+require_once __DIR__ . '/inc/mail.php'; // levélküldés a VPS postafiókján át (OYS_SMTP_*, hpv-mail wp-link)
 require_once __DIR__ . '/inc/remote.php'; // a távirányító (Áron, 11.17): X-OYS-Auth + /?rest_route=/oj/v1/…
 if ( is_file( __DIR__ . '/inc/hpv-kit.php' ) ) { // HelloProVision élesítési csomag – build.py --wp hozza (wordpress/hpv/hpv-kit.php)
 	require_once __DIR__ . '/inc/hpv-kit.php';

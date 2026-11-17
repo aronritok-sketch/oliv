@@ -1406,6 +1406,14 @@
     - **olivia-studio 1.22.1 / 3.11.119:** az .online `X-OYS-Auth` fejléce is elfogadja a sima `felhasználó:jelszó` alakot,
       nem csak a base64-et. Így mindkét oldalra ugyanaz az egyszerű érték mehet. Teszt: 1609/0.
       - A VPS-en az `Authorization` fejléc nem jut el a WordPressig, ezért kell az `X-OYS-Auth`.
+  - **oliviajoga.hu 1.5.7 – levélküldés** (Áron: „szerintem nem küld emailt még a rendszer … küldjön!!!”).
+    - Az új admin fiók jelszólinkje nem érkezett meg, mert a VPS-en a PHP saját levélküldése nem kézbesít.
+    - Új `inc/mail.php`: a WordPress az `OYS_SMTP_*` konstansokkal az SMTP-n küld. A konstansokat a
+      `hpv-mail wp-link info@oliviajoga.online oliviajoga-hu` írja a szerveren; a jelszó a szerveren marad.
+    - Feladó: „Olívia jóga <info@oliviajoga.online>”.
+    - A távirányító állapotában „mail”, próbalevél: `POST oj/v1/mail-test` (csak a belépett admin saját címére).
+    - Helyben próbálva, ál-SMTP-szerverrel.
+    - Áron fiókja a .hu-n: `aronritok` (#3, administrator), a `site-user` paranccsal.
   - **HotPot:** a két oldal felvéve Olívia ügyfélkartonjához (4070003): oliviajoga.hu = 150002, oliviajoga.online = 150003.
     - A kapcsolati kódok 7 napig érvényesek. Nincsenek a repóban; ha lejárnak, a HotPotban újat lehet kérni.
   - **SEO OS:** két új projekt, „draft”, Olívia ügyfele alatt.

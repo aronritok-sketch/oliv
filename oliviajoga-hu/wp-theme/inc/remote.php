@@ -18,6 +18,7 @@
  *   szerkesztő saját mentésén át (az előző állapot az adminban visszaállítható).
  * - POST oj/v1/setup  – a téma beállító lépése újra: oldalak a kódból, de csak ott, ahol senki nem szerkesztette.
  * - POST oj/v1/kit    – a HelloProVision élesítési csomag most (inc/hpv-kit.php: varázsló, Ads és HotPot Connect, mu-pluginok).
+ * - POST oj/v1/mail-test – próbalevél a belépett admin saját címére (inc/mail.php).
  * - POST oj/v1/flush  – gyorsítótár és az állandó hivatkozások ürítése.
  * A csomag után a HelloProVision szabványos távirányítója is itt van: hpv-setup/v1/remote/… (kulcsok, párosítás, mentés).
  *
@@ -57,6 +58,12 @@ add_action( 'rest_api_init', function () {
 	) );
 	register_rest_route( 'oj/v1', '/setup', array( 'methods' => 'POST', 'permission_callback' => $admin, 'callback' => fn() => array( 'ok' => true, 'log' => oj_setup() ) ) );
 	register_rest_route( 'oj/v1', '/flush', array( 'methods' => 'POST', 'permission_callback' => $admin, 'callback' => 'oj_remote_flush' ) );
+	// próbalevél a belépett admin saját címére (máshová nem küld)
+	register_rest_route( 'oj/v1', '/mail-test', array( 'methods' => 'POST', 'permission_callback' => $admin, 'callback' => function () {
+		$to = wp_get_current_user()->user_email;
+		$ok = wp_mail( $to, 'Próbalevél – oliviajoga.hu', "Ha ez megérkezett (nem a spambe), az oliviajoga.hu levélküldése működik.\n" );
+		return array( 'sent' => (bool) $ok, 'mail' => oj_mail_status() );
+	} ) );
 	register_rest_route( 'oj/v1', '/kit', array( 'methods' => 'POST', 'permission_callback' => $admin, 'callback' => fn() => function_exists( 'hpv_kit_run' ) ? array( 'log' => hpv_kit_run(), 'kit' => hpv_kit_status() ) : new WP_Error( 'oj_remote', 'A csomag nincs a témában.', array( 'status' => 500 ) ) ) );
 } );
 
@@ -115,6 +122,7 @@ function oj_remote_status() {
 		'pages'    => $pages,
 		'editor'   => array( 'texts' => count( $edits['t'] ?? array() ), 'images' => count( $edits['i'] ?? array() ) ),
 		'kit'      => function_exists( 'hpv_kit_status' ) ? hpv_kit_status() : null,
+		'mail'     => function_exists( 'oj_mail_status' ) ? oj_mail_status() : null,
 	);
 }
 
