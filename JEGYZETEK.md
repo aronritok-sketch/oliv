@@ -1346,6 +1346,15 @@
     2. **„Rólam”: telefonon oldalra görgethető volt** (a fotó mögötti ecsetvonás kilógott). Most `body { overflow-x: clip }`.
     3. **„Bejelentkezés online” gomb:** 37 px magas volt. Érintőképernyőn minden gomb legalább 44 px.
   - Téma 1.5.3; a `tools/check.py` 2288/0.
+  - **Teljes futás az 1.5.3-on: 4033 ellenőrzés, 4025 sikeres.** A főoldal iPhone-on már nem omlik össze.
+    - A „Rólam” oldalon a `body` levágása mellett a dokumentum még szélesebb volt (az ecsetvonás 118%). iPhone-on ujjal
+      ez még elhúzható.
+    - **1.5.4:** `html, body { overflow-x: clip }`, és 900 px alatt a bal oldali ecsetvonás a képernyő bal szélétől a
+      fotó jobb széléig ér. Öt telefonon (iPhone SE/13/15 Pro Max, Pixel 7, Galaxy S9+) pontosan képernyőszélességű.
+    - **Külső hibák (nem a mieink):**
+      - a kapcsolat oldalon a Google Maps-kártya hálózati hibája (Safari, a proxy miatt);
+      - Firefoxban a Motibro-widget süti-figyelmeztetése (nov. 26-tól a Motibro kikerül);
+      - a terhelt tesztfutás alatt egyszer 503 a főoldalon (utána háromszor 200).
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
