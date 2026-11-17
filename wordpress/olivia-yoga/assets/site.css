@@ -154,7 +154,7 @@ abbr[title] { text-decoration: none; }
 .btn--line-light:hover { background: var(--paper); color: var(--ink); }
 .btn--sm { padding: .78em 1.25em; font-size: .78rem; }
 /* Áron, 17 November („ezeket a gombokat kurvára teszteld”): on a touch screen every button is at least 44 px high */
-@media (pointer: coarse), (max-width: 759px) { .btn, .btn--sm { min-height: 44px; } }
+@media (pointer: coarse), (max-width: 759px) { .btn, .btn--sm { min-height: 44px; } .oys-waiver > summary { display: flex; align-items: center; min-height: 44px; } }
 .btn-row { display: flex; flex-wrap: wrap; align-items: center; gap: .85rem 1.1rem; margin: 2rem 0 0; }
 .text-link { font-weight: 700; color: var(--ink); text-decoration: underline; text-decoration-color: var(--orchid); text-decoration-thickness: 2px; text-underline-offset: .35em; }
 .text-link:hover { color: var(--orchid); }

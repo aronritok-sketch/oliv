@@ -1308,6 +1308,18 @@
     hibával áll le, és a `pin.sh OLD NEW` csak a rögzítést ismétli meg a friss ágon.
   - Tesztek: 1605/0.
 
+- **téma 3.11.116 – az eszközös tesztsor első teljes futása élesben (3.11.115)** (Áron, 11.17: „utolsó kör, utána zárjuk
+  a fejlesztést”).
+  - **Eredmény:** 2693 ellenőrzés, 2603 sikeres; telefonokon (iPhone SE/13/15 Pro Max, Pixel 7, Galaxy S9+) egy hiba
+    sem, a 91 link mind válaszol.
+  - **Egy valódi hiba volt:** iPaden és tableten a „Részvételi nyilatkozat” lenyíló címe 26 px magas volt. Most
+    érintőképernyőn mindenhol legalább 44 px.
+  - **A többi a tesztsor tévedése volt:**
+    - tableten és gépen a kártyák címe nem kapcsoló (a szöveg nyitva van, nincs plusz jel);
+    - a páros árkártyák ott mindig nyitva vannak;
+    - a Firefox által megszakított képletöltés nem hibás fájl.
+  - Tesztek: 1605/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

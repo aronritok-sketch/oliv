@@ -4889,7 +4889,7 @@ test( 'Olívia and Áron, 17 November: stretching and relaxation explain how it 
 	$js  = (string) file_get_contents( get_template_directory() . '/assets/site.js' );
 	ok( str_contains( $js, "closest('details > summary')" ) && str_contains( $js, 'pinned.el.getBoundingClientRect().top - pinned.top' ), 'a tapped folding title stays where it was when the open one above closes' );
 	$css = (string) file_get_contents( get_template_directory() . '/assets/site.css' );
-	ok( str_contains( $css, '@media (pointer: coarse), (max-width: 759px) { .btn, .btn--sm { min-height: 44px; } }' ), 'buttons at least 44 px high on a touch screen' );
+	ok( str_contains( $css, '@media (pointer: coarse), (max-width: 759px) { .btn, .btn--sm { min-height: 44px; } .oys-waiver > summary { display: flex; align-items: center; min-height: 44px; } }' ), 'buttons and the agreement\'s title at least 44 px high on a touch screen (tablets too)' );
 } );
 
 $t = $GLOBALS['oys_t'];
