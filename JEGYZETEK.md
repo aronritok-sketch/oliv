@@ -1250,6 +1250,20 @@
   - **Az órakártyán** (következő órák, órarend): a pipás „Lefoglaltad” mellett ugyanez a gomb.
   - A lezárt óránál is egyszer áll a „Foglalás lezárva” (csak a kapszula, a kis sor nem).
   - Tesztek: 1578/0.
+- **téma 3.11.112 – Olívia 11.17-i chatje** (három üzenet a portálon).
+  - **„a lemondásnál az egyéni órát írjuk új sorba”:** a „Lemondás:” sor az órarendek alatt és az árak oldal „Lemondás”
+    bekezdése: az egyéni óráról szóló mondat új sorban.
+  - **A csoportos flow óra lépései** („toljunk egy lépéssel mindent”):
+    1. Ráhangolódunk az órára: pár percet beszél a jógafilozófiából hozott témáról, ez köszön vissza az ászanákban.
+    2. Megérkezünk: néhány perc légzés. A többi változatlan, csak a relaxáció elől kikerült a „rövid”.
+  - **„minden pózhoz” helyett „minden ászanához”.**
+  - **Olívia saját szövegei:** a flow-bekezdést élesben a szerkesztővel átírta (a saját soraival, „talajgyakorlatok
+    segítségével”). A szerkesztő az eredeti szöveg kulcsán tárolja, ezért a frissítés (`oy_migrate_1117`) az ő változatát
+    is átviszi az új kulcsra, és ugyanazt a változtatást írja bele. Az ő sorain a ráhangolódás külön sor, külön lépés.
+  - Az oldal saját szövege is soronként tagolt, így a hullámon öt lépés marad akkor is, ha nincs saját változat.
+  - Tesztek: 1592/0. (Új konténer: a MariaDB-t újra kellett indítani; a tesztfuttató adatbázis nélkül is 0-val lépett ki,
+    ezért a kiadás előtt az „N passed, 0 failed” sort is ellenőrzöm.)
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -51,6 +51,7 @@ add_action( 'hpv_child_setup', function ( $from, $to, $slug ) {
 	$log = array_merge( $log, oy_migrate_1114c() ); // 2015 on her timeline, names for the web copies of her photos (once)
 	$log = array_merge( $log, oy_migrate_1114d() ); // 2018 on her timeline, the general kit list, „charge your device” (once)
 	$log = array_merge( $log, oy_migrate_1116() ); // the thank-you page of the requests (once)
+	$log = array_merge( $log, oy_migrate_1117() ); // Olívia's chat of 17 November: the flow class's steps, „ászana”, the one-to-one rule on its own line (once; her editor texts kept)
 	$log = array_merge( $log, oy_migrate_ga4() ); // the privacy page: Google Analytics with consent (once)
 	kses_remove_filters();
 	$log = array_merge( $log, oy_import_all( false ) );

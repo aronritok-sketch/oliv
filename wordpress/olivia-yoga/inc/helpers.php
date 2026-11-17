@@ -601,7 +601,16 @@ function oy_cancel_note( $cls = '', $kind = '' ) {
 		$pick  = array_filter( $parts, fn( $p ) => ( false !== mb_stripos( $p, 'egyéni' ) ) === ( 'private' === $kind ) );
 		$text  = $pick ? implode( ' ', $pick ) : $text;
 	}
-	return '' === $text ? '' : '<p class="oj-policy' . ( $cls ? ' ' . esc_attr( $cls ) : '' ) . '">' . oy_icon( 'calendar' ) . '<span><b>' . esc_html__( 'Cancellation:', 'olivia-yoga' ) . '</b> ' . esc_html( $text ) . '</span></p>';
+	// Olívia, 17 November: „a lemondásnál az egyéni órát írjuk új sorba” – where the whole rule shows, the sentences about
+	// one-to-one sessions start a new line
+	$lines = array( $text );
+	if ( '' === $kind && '' !== $text ) {
+		$parts = preg_split( '/(?<=[.!?])\s+/u', $text );
+		$own   = array_filter( $parts, fn( $p ) => false !== mb_stripos( $p, 'egyéni' ) );
+		$rest  = array_diff_key( $parts, $own );
+		$lines = $own && $rest ? array( implode( ' ', $rest ), implode( ' ', $own ) ) : $lines;
+	}
+	return '' === $text ? '' : '<p class="oj-policy' . ( $cls ? ' ' . esc_attr( $cls ) : '' ) . '">' . oy_icon( 'calendar' ) . '<span><b>' . esc_html__( 'Cancellation:', 'olivia-yoga' ) . '</b> ' . implode( '<br>', array_map( 'esc_html', $lines ) ) . '</span></p>';
 }
 
 /**

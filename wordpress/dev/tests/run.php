@@ -3246,7 +3246,7 @@ test( 'Olívia\'s doc of 14 November, late night: the group class – a short re
 	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
 	update_option( 'oy_edition', 'fort-myers' );
 	$hf = $data['classes']['hatha-flow'];
-	ok( ! str_contains( $hf['content'], 'hosszú relaxáció' ) && ! str_contains( $hf['excerpt'], 'hosszú relaxáció' ) && str_contains( $hf['content'], 'rövid relaxáció' ), 'the group class: the relaxation is not long („A relaxáció nem hosszú”)' );
+	ok( ! str_contains( $hf['content'], 'hosszú relaxáció' ) && ! str_contains( $hf['excerpt'], 'hosszú relaxáció' ) && str_contains( $hf['content'], 'csend és relaxáció' ), 'the group class: the relaxation is not long („A relaxáció nem hosszú”)' );
 	ok( ! str_contains( $data['pages']['classes']['content'], 'hosszú relaxáció' ) && ! str_contains( $data['pages']['about']['content'], 'hosszú relaxáció' ), '… nor on the classes page and the About page' );
 	ok( str_contains( $hf['content'], 'a vállra, a csípőre vagy a gerincre' ), '… every class focuses on one part of the body („pl. váll, csípő, gerinc”)' );
 	ok( ! str_contains( $hf['content'], 'december 16' ), '… the start dates out („ez a rész nem kell”)' );
@@ -3850,7 +3850,7 @@ test( 'online edition, Olívia\'s doc of 14 November, last points: one level for
 		ok( str_contains( $home, 'section--breath oj-breath-peach' ) && ! str_contains( $home, 'Egy perc a foglalás' ), 'the breathing lotus on peach; no line under „Heti élő órák”' );
 		ok( ! str_contains( $home, 'id="classes"' ), 'no „Online órák” list on the home page' );
 		$note = oy_cancel_note();
-		ok( str_contains( $note, 'oj-policy' ) && str_contains( $note, esc_html( (string) OYS_Settings::get( 'cancel_policy' ) ) ), 'the cancellation rule, from the booking settings' );
+		ok( str_contains( $note, 'oj-policy' ) && str_contains( str_replace( '<br>', ' ', $note ), esc_html( (string) OYS_Settings::get( 'cancel_policy' ) ) ), 'the cancellation rule, from the booking settings' );
 		ok( str_contains( do_shortcode( '[oy_schedule]' ), 'oj-policy' ) && str_contains( $home, 'oj-policy' ), '… under the timetables (home page, prices page)' );
 		$side = oy_page_aside( 'about' );
 		ok( str_contains( $side, 'aside-card--practice' ) && ! str_contains( $side, 'aside-list"><li>' . oy_icon( 'check' ) ), 'About side column: the next class and the services, not the trainings again' );
@@ -4752,6 +4752,71 @@ test( 'Áron, 16 November: Motibro valid passes and class visits → the custome
 	}
 	eq( 0, $mails, 'nobody was emailed' );
 	eq( 0, $pushes, 'no phone notification' );
+} );
+
+test( 'Olívia, 17 November (chat): the one-to-one rule on its own line; the flow class tunes in first, arrives second, no „rövid”; „minden ászanához”', function () {
+	require_once get_template_directory() . '/inc/demo-import.php';
+	$data = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content-hu-online.json' ), true );
+	$hf   = $data['classes']['hatha-flow']['content'];
+	$flow = oy_flows( $hf );
+	preg_match_all( '#<li><span class="oj-flow__n" aria-hidden="true">(\d)</span><p>([^<]*)#u', $flow, $st );
+	ok( str_contains( $flow, 'oj-flow--n5 oj-flow--wave' ) && 5 === count( $st[0] ), 'five steps on the wave' );
+	ok( str_starts_with( $st[2][0] ?? '', 'Ráhangolódunk az órára: pár percet beszélek arról a témáról, amit a jógafilozófiából hoztam' ) && str_contains( $st[2][0], 'ászanákban.' ), '1. tuning in: the theme she brings from yoga philosophy' );
+	ok( str_starts_with( $st[2][1] ?? '', 'Megérkezünk: néhány perc légzés' ), '2. arriving: a few minutes of breathing' );
+	ok( ! str_contains( $hf, 'rövid relaxáció' ) && str_contains( $hf, 'néhány pillanat csend és relaxáció.' ), 'no „rövid” before the relaxation' );
+	ok( ! str_contains( $hf, 'pózhoz' ) && str_contains( $hf, 'minden ászanához adok könnyebb és erősebb változatot' ), '„minden ászanához”' );
+	ok( str_contains( $data['pages']['schedule-pricing']['content'], 'visszakapod az alkalmat.<br>Az egyéni órát 24 órával' ), 'prices page: the one-to-one rule on its own line' );
+	// the live site: the old text changes, and her own version of the paragraph (her lines, her words) follows it
+	update_option( 'oy_edition', 'hu-online' );
+	$p1   = 'Megérkezéssel kezdünk: néhány perc légzés, hogy a napot a nappali ajtaján kívül hagyd. Aztán fokozatosan melegítünk be: talajgyakorlatokkal.';
+	$p2   = 'Az óra utolsó része lelassul: nyújtás, néhány pillanat csend és egy rövid relaxáció.';
+	$p3   = 'Az óráimra kezdőket is szeretettel várok: minden pózhoz adok könnyebb és erősebb változatot.';
+	$hers = 'Megérkezéssel kezdünk: néhány perc légzés, hogy a napot a nappali ajtaján kívül hagyd.<br>Aztán fokozatosan melegítünk be: talajgyakorlatok segítségével.';
+	$post = get_page_by_path( 'hatha-flow', OBJECT, 'oy_class' );
+	$id   = $post ? $post->ID : wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Csoportos online flow jóga', 'post_name' => 'hatha-flow' ) );
+	$was  = $post ? $post->post_content : null;
+	$e0   = get_option( 'oye_edits' );
+	$m0   = get_option( 'oye_edits_meta' );
+	try {
+		wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => "<h2>Mi történik egy online flow jógaórán</h2>\n<p>$p1</p>\n<p>$p2</p>\n<h2>Kinek szól</h2>\n<p>$p3</p>" ) ) );
+		update_option( 'oye_edits', array( 't' => array( oye_text_key( $p1 ) => $hers ), 'i' => array() ) );
+		update_option( 'oye_edits_meta', array( oye_text_key( $p1 ) => array( 'def' => $p1, 'user' => 'Olívia' ) ) );
+		delete_option( 'oy_1117_rev' );
+		oy_migrate_1117();
+		$c  = get_post_field( 'post_content', $id );
+		$ed = oye_edits()['t'];
+		$k1 = oye_text_key( oy_1117_swap( oy_1117_pairs()['hatha-flow']['content'], $p1 ) );
+		ok( str_contains( $c, '<p>' . OY_1117_TUNE . '<br>Megérkezünk: néhány perc légzés' ) && str_contains( $c, 'csend és relaxáció.' ) && str_contains( $c, 'minden ászanához adok' ), 'live update: the page\'s own text changes' );
+		ok( 1 === count( $ed ) && isset( $ed[ $k1 ] ) && $ed[ $k1 ] === OY_1117_TUNE . '<br>Megérkezünk: néhány perc légzés, hogy a napot a nappali ajtaján kívül hagyd.<br>Aztán fokozatosan melegítünk be: talajgyakorlatok segítségével.', 'her own version follows the paragraph: tuning in on a line of its own, her words kept' );
+		ok( 'Olívia' === ( get_option( 'oye_edits_meta' )[ $k1 ]['user'] ?? '' ), '… and the editor still knows it as hers' );
+		$page = oy_lines( oye_pass( apply_filters( 'the_content', $c ) ) );
+		preg_match_all( '#<li><span class="oj-flow__n" aria-hidden="true">(\d)</span><p>([^<]*)#u', $page, $st2 );
+		ok( 4 === count( $st2[0] ) && str_starts_with( $st2[2][0], 'Ráhangolódunk' ) && str_starts_with( $st2[2][1], 'Megérkezünk' ) && str_contains( $st2[2][2], 'talajgyakorlatok segítségével' ), 'on the page: 1. tuning in, 2. arriving, then her steps' );
+		update_option( 'oye_edits', array( 't' => array(), 'i' => array() ) );
+		$own = oy_lines( oye_pass( apply_filters( 'the_content', $c ) ) );
+		preg_match_all( '#<li><span class="oj-flow__n" aria-hidden="true">(\\d)</span><p>([^<]*)#u', $own, $st3 );
+		ok( 4 === count( $st3[0] ) && str_starts_with( $st3[2][0], 'Ráhangolódunk' ) && str_starts_with( $st3[2][1], 'Megérkezünk' ), 'without her version: the page\'s own lines, 1. tuning in, 2. arriving' );
+		update_option( 'oye_edits', array( 't' => $ed, 'i' => array() ) );
+		$n = count( $ed );
+		oy_migrate_1117();
+		ok( count( oye_edits()['t'] ) === $n && get_post_field( 'post_content', $id ) === $c, 'once only' );
+	} finally {
+		null === $was ? wp_delete_post( $id, true ) : wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => $was ) ) );
+		false === $e0 ? delete_option( 'oye_edits' ) : update_option( 'oye_edits', $e0 );
+		false === $m0 ? delete_option( 'oye_edits_meta' ) : update_option( 'oye_edits_meta', $m0 );
+		delete_option( 'oy_1117_rev' );
+		delete_option( 'oy_edition' );
+	}
+	update_option( 'oy_edition', 'hu-online' );
+	$keep = OYS_Settings::get( 'cancel_policy' );
+	try {
+		OYS_Settings::update( array( 'cancel_policy' => 'A csoportos órát 12 órával előtte lemondhatod. A később lemondott óra elhasználódik. Az egyéni órát 24 órával előtte lehet áttenni vagy lemondani.' ) );
+		ok( str_contains( oy_cancel_note(), 'elhasználódik.<br>Az egyéni órát 24 órával' ), '„Lemondás:” under the timetable: the one-to-one rule starts a new line' );
+		ok( ! str_contains( oy_cancel_note( 'x', 'private' ), '<br>' ) && ! str_contains( oy_cancel_note( 'x', 'group' ), 'egyéni' ), '… a class page still shows only its own rule' );
+	} finally {
+		OYS_Settings::update( array( 'cancel_policy' => $keep ) );
+		delete_option( 'oy_edition' );
+	}
 } );
 
 $t = $GLOBALS['oys_t'];

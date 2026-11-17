@@ -1697,3 +1697,118 @@ function oy_migrate_1116() {
 	$id = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Köszönöm!', 'post_name' => 'koszonjuk', 'post_content' => '[oy_thanks]', 'comment_status' => 'closed' ) );
 	return $id && ! is_wp_error( $id ) ? array( 'thank-you page' ) : array();
 }
+
+/**
+ * Olívia, 17 November (chat): „a lemondásnál az egyéni órát írjuk új sorba”; on the flow class „szedjük ki a rövid szót
+ * …, toljunk egy lépéssel mindent és írjuk be 1. lépésként azt, hogy ráhangolódunk az órára …, utána jöhet 2. lépésként,
+ * hogy megérkezünk: néhány perc légzés”; „minden pózhoz helyett … minden ászanához”.
+ *
+ * She has rewritten some of these paragraphs herself in the page editor (her lines, her words). The editor keeps her text
+ * under the original text's key, so a paragraph whose original changes would lose her version: here her version follows
+ * the paragraph to its new key and gets the same change (on her lines the tuning in is a line, a step, of its own).
+ */
+const OY_1117_TUNE = 'Ráhangolódunk az órára: pár percet beszélek arról a témáról, amit a jógafilozófiából hoztam, és ez fog visszaköszönni az adott órán az ászanákban.';
+
+/**
+ * The changes: the page's own text („content”: the flow paragraph also gets its lines, so the steps stay five on the wave)
+ * and her own versions in the editor („edit”).
+ */
+function oy_1117_pairs() {
+	$pose  = array( 'minden pózhoz adok', 'minden ászanához adok' );
+	$relax = array( 'néhány pillanat csend és egy rövid relaxáció.', 'néhány pillanat csend és relaxáció.' );
+	return array(
+		'hatha-flow'       => array(
+			'content' => array(
+				array( 'Megérkezéssel kezdünk: néhány perc légzés, hogy a napot a nappali ajtaján kívül hagyd. Aztán', OY_1117_TUNE . '<br>Megérkezünk: néhány perc légzés, hogy a napot a nappali ajtaján kívül hagyd.<br>Aztán' ),
+				array( 'egyensúlyozó pózokkal. Van, ami', 'egyensúlyozó pózokkal.<br>Van, ami' ),
+				$relax,
+				$pose,
+			),
+			'edit'    => array( array( 'Megérkezéssel kezdünk: néhány perc légzés', OY_1117_TUNE . ' Megérkezünk: néhány perc légzés' ), $relax, $pose ),
+		),
+		'schedule-pricing' => array(
+			'content' => array( array( ' visszakapod az alkalmat. Az egyéni órát 24 órával', ' visszakapod az alkalmat.<br>Az egyéni órát 24 órával' ) ),
+			'edit'    => array( array( ' visszakapod az alkalmat. Az egyéni órát 24 órával', ' visszakapod az alkalmat.<br>Az egyéni órát 24 órával' ) ),
+		),
+	);
+}
+
+function oy_1117_swap( array $pairs, $s ) {
+	return str_replace( array_column( $pairs, 0 ), array_column( $pairs, 1 ), (string) $s );
+}
+
+/** The same change on her own text: on her lines (line breaks) the tuning in goes on a line of its own. */
+function oy_1117_edit( $v, array $pairs ) {
+	foreach ( $pairs as $p ) {
+		$to = $p[1];
+		if ( str_starts_with( $to, OY_1117_TUNE . ' ' ) && preg_match( '#<br\s*/?>#', $v ) ) {
+			$to = OY_1117_TUNE . '<br>' . substr( $to, strlen( OY_1117_TUNE ) + 1 );
+		}
+		$v = str_replace( $p[0], $to, $v );
+	}
+	return $v;
+}
+
+/** Changes a post's text and moves her editor versions of the changed paragraphs along. Returns how many it moved. */
+function oy_1117_apply( WP_Post $post, array $set ) {
+	$content = $post->post_content;
+	$moved   = 0;
+	if ( function_exists( 'oye_edits' ) ) {
+		$e    = oye_edits();
+		$meta = get_option( 'oye_edits_meta', array() );
+		$meta = is_array( $meta ) ? $meta : array();
+		preg_match_all( '#<(p|li|h[1-4]|dd|blockquote)(?:\s[^>]*)?>((?:(?!</\1>).)*)</\1>#su', $content, $ms, PREG_SET_ORDER );
+		foreach ( $ms as $m ) {
+			$old = trim( $m[2] );
+			$new = oy_1117_swap( $set['content'], $old );
+			if ( $new === $old ) {
+				continue;
+			}
+			// the key is taken from the text as the page shows it (typographic quotes): both forms are tried
+			foreach ( array_unique( array( $old, wptexturize( $old ) ) ) as $i => $def ) {
+				$k = oye_text_key( $def );
+				if ( ! isset( $e['t'][ $k ] ) ) {
+					continue;
+				}
+				$k2            = oye_text_key( 0 === $i ? $new : wptexturize( $new ) );
+				$v             = oy_1117_edit( (string) $e['t'][ $k ], $set['edit'] );
+				unset( $e['t'][ $k ] );
+				$e['t'][ $k2 ] = $v;
+				$meta[ $k2 ]   = array_merge( (array) ( $meta[ $k ] ?? array() ), array( 'def' => oye_kses( $new ) ) );
+				if ( $k2 !== $k ) {
+					unset( $meta[ $k ] );
+				}
+				++$moved;
+				break;
+			}
+		}
+		if ( $moved ) {
+			update_option( 'oye_edits', $e, true );
+			update_option( 'oye_edits_meta', $meta, false );
+		}
+	}
+	$content = oy_1117_swap( $set['content'], $content );
+	if ( $content !== $post->post_content ) {
+		kses_remove_filters();
+		wp_update_post( wp_slash( array( 'ID' => $post->ID, 'post_content' => $content ) ) );
+		kses_init_filters();
+	}
+	return $moved;
+}
+
+function oy_migrate_1117() {
+	$rev = '2026-11-17a';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1117_rev' ) === $rev ) {
+		return array();
+	}
+	update_option( 'oy_1117_rev', $rev );
+	$log = array();
+	foreach ( oy_1117_pairs() as $key => $set ) {
+		$post = 'hatha-flow' === $key ? get_page_by_path( $key, OBJECT, 'oy_class' ) : get_page_by_path( oy_page_slug( OY_PAGE_SLUGS[ $key ] ?? $key ) );
+		if ( $post ) {
+			$moved = oy_1117_apply( $post, $set );
+			$log[] = $key . ': Olívia, 17 November' . ( $moved ? ' (' . $moved . ' of her own texts kept)' : '' );
+		}
+	}
+	return $log;
+}
