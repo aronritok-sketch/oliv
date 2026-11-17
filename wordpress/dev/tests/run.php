@@ -4028,6 +4028,21 @@ test( 'going live: the manager can check the site from outside (X-OYS-Auth, /sta
 	$_SERVER['HTTPS']           = 'on';
 	$_SERVER['REQUEST_URI']     = '/wp-json/oys/v1/status';
 	eq( 0, OYS_Ops::header_auth( 0 ), 'a wrong application password lets nobody in' );
+	// The right one, base64 or plain "user:pass" (11.17: the same simple value on both sites), only for the REST API.
+	$admin = get_users( array( 'role' => 'administrator', 'number' => 1 ) )[0];
+	list( $pw ) = WP_Application_Passwords::create_new_application_password( $admin->ID, array( 'name' => 'header test' ) );
+	add_filter( 'application_password_is_api_request', '__return_true' );
+	$_SERVER['HTTP_X_OYS_AUTH'] = base64_encode( $admin->user_login . ':' . $pw );
+	eq( $admin->ID, OYS_Ops::header_auth( 0 ), 'base64(user:pass) logs the admin in' );
+	$_SERVER['HTTP_X_OYS_AUTH'] = $admin->user_login . ':' . $pw;
+	eq( $admin->ID, OYS_Ops::header_auth( 0 ), 'plain user:pass too' );
+	$_SERVER['HTTP_X_OYS_AUTH'] = $admin->user_login . ':nope';
+	eq( 0, OYS_Ops::header_auth( 0 ), 'plain with a wrong password: nobody' );
+	$_SERVER['HTTP_X_OYS_AUTH'] = $admin->user_login . ':' . $pw;
+	$_SERVER['REQUEST_URI']     = '/fiokom/';
+	eq( 0, OYS_Ops::header_auth( 0 ), 'not outside the REST API' );
+	$_SERVER['REQUEST_URI']     = '/wp-json/oys/v1/status';
+	remove_filter( 'application_password_is_api_request', '__return_true' );
 	unset( $_SERVER['HTTP_X_OYS_AUTH'], $_SERVER['HTTPS'] );
 	OYS_Settings::update( array( 'stripe_secret_key' => 'sk_test_hidden_123' ) );
 	$st   = OYS_Ops::status();

@@ -1403,6 +1403,9 @@
       - A csomag azóta minden bővítményt közvetlenül a GitHub-címkéjéről tesz fel.
       - Ha egy kör félbeszakad, az újrapróba akkor is megmarad.
       - Naponta egyszer megnézi, hiányzik-e valami, és ha igen, visszateszi.
+    - **olivia-studio 1.22.1 / 3.11.119:** az .online `X-OYS-Auth` fejléce is elfogadja a sima `felhasználó:jelszó` alakot,
+      nem csak a base64-et. Így mindkét oldalra ugyanaz az egyszerű érték mehet. Teszt: 1609/0.
+      - A VPS-en az `Authorization` fejléc nem jut el a WordPressig, ezért kell az `X-OYS-Auth`.
   - **HotPot:** a két oldal felvéve Olívia ügyfélkartonjához (4070003): oliviajoga.hu = 150002, oliviajoga.online = 150003.
     - A kapcsolati kódok 7 napig érvényesek. Nincsenek a repóban; ha lejárnak, a HotPotban újat lehet kérni.
   - **SEO OS:** két új projekt, „draft”, Olívia ügyfele alatt.

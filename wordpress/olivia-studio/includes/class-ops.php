@@ -26,7 +26,7 @@ class OYS_Ops {
 		} );
 	}
 
-	/** X-OYS-Auth: base64(user:application password) → the user, when the Authorization header did not arrive. */
+	/** X-OYS-Auth: base64(user:application password) or plain user:password → the user, when the Authorization header did not arrive. */
 	public static function header_auth( $user_id ) {
 		if ( $user_id || empty( $_SERVER['HTTP_X_OYS_AUTH'] ) || ! is_ssl() || ! function_exists( 'wp_authenticate_application_password' ) ) {
 			return $user_id;
@@ -35,7 +35,9 @@ class OYS_Ops {
 		if ( ! str_contains( $uri, '/wp-json/' ) && ! str_contains( $uri, 'rest_route=' ) ) {
 			return $user_id;
 		}
-		$raw = base64_decode( (string) wp_unslash( $_SERVER['HTTP_X_OYS_AUTH'] ), true ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		// base64(user:pass), or plainly "user:pass" (Áron, 2026-11-17: the same simple value on both Olívia sites)
+		$given = trim( (string) wp_unslash( $_SERVER['HTTP_X_OYS_AUTH'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$raw   = str_contains( $given, ':' ) ? $given : base64_decode( $given, true );
 		if ( ! $raw || ! str_contains( $raw, ':' ) ) {
 			return $user_id;
 		}
