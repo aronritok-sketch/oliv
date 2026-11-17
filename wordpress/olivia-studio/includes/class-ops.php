@@ -26,24 +26,72 @@ class OYS_Ops {
 		} );
 	}
 
-	/** X-OYS-Auth: base64(user:application password) or plain user:password → the user, when the Authorization header did not arrive. */
+	/**
+	 * X-OJ-Remote or X-OYS-Auth: an application password → the user, when the Authorization header did not arrive. Two
+	 * names, because a saved network secret can override X-OYS-Auth (Áron, 2026-11-17). Any form: user:pass,
+	 * email:pass, base64, a "Bearer"/"Basic" prefix, or the application password alone (matched among the admins'). Always
+	 * WordPress's own application-password check; only for the REST API, only over HTTPS.
+	 */
 	public static function header_auth( $user_id ) {
-		if ( $user_id || empty( $_SERVER['HTTP_X_OYS_AUTH'] ) || ! is_ssl() || ! function_exists( 'wp_authenticate_application_password' ) ) {
+		if ( $user_id || ( empty( $_SERVER['HTTP_X_OJ_REMOTE'] ) && empty( $_SERVER['HTTP_X_OYS_AUTH'] ) ) || ! is_ssl() || ! function_exists( 'wp_authenticate_application_password' ) ) {
 			return $user_id;
 		}
 		$uri = (string) ( $_SERVER['REQUEST_URI'] ?? '' );
-		if ( ! str_contains( $uri, '/wp-json/' ) && ! str_contains( $uri, 'rest_route=' ) ) {
+		if ( ! str_contains( $uri, '/' . rest_get_url_prefix() . '/' ) && ! str_contains( $uri, '/wp-json/' ) && ! str_contains( $uri, 'rest_route=' ) ) {
 			return $user_id;
 		}
-		// base64(user:pass), or plainly "user:pass" (Áron, 2026-11-17: the same simple value on both Olívia sites)
-		$given = trim( (string) wp_unslash( $_SERVER['HTTP_X_OYS_AUTH'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-		$raw   = str_contains( $given, ':' ) ? $given : base64_decode( $given, true );
-		if ( ! $raw || ! str_contains( $raw, ':' ) ) {
-			return $user_id;
+		foreach ( array( 'HTTP_X_OJ_REMOTE', 'HTTP_X_OYS_AUTH' ) as $h ) {
+			$id = empty( $_SERVER[ $h ] ) ? 0 : self::header_try( trim( (string) wp_unslash( $_SERVER[ $h ] ) ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+			if ( $id ) {
+				return $id;
+			}
 		}
-		list( $login, $pass ) = explode( ':', $raw, 2 );
-		$user = wp_authenticate_application_password( null, $login, $pass );
-		return $user instanceof WP_User ? $user->ID : $user_id;
+		return $user_id;
+	}
+
+	/** One header value → the user ID, or 0. */
+	private static function header_try( string $given ): int {
+		$given = trim( (string) preg_replace( '/^(bearer|basic|token)\s+/i', '', $given ) );
+		if ( '' === $given ) {
+			return 0;
+		}
+		if ( ! str_contains( $given, ':' ) ) {
+			$dec = base64_decode( $given, true );
+			if ( is_string( $dec ) && str_contains( $dec, ':' ) ) {
+				$given = $dec;
+			}
+		}
+		if ( str_contains( $given, ':' ) ) {
+			list( $login, $pass ) = explode( ':', $given, 2 );
+			$login = trim( $login );
+			if ( is_email( $login ) ) {
+				$by    = get_user_by( 'email', $login );
+				$login = $by ? $by->user_login : $login;
+			}
+			$user = self::app_password( $login, $pass );
+			return $user ? $user->ID : 0;
+		}
+		foreach ( get_users( array( 'role' => 'administrator', 'number' => 10, 'orderby' => 'ID' ) ) as $admin ) {
+			if ( ! WP_Application_Passwords::get_user_application_passwords( $admin->ID ) ) {
+				continue;
+			}
+			$user = self::app_password( $admin->user_login, $given );
+			if ( $user ) {
+				return $user->ID;
+			}
+		}
+		return 0;
+	}
+
+	/** WordPress's application-password check, as a REST request (the address already says it is one). */
+	private static function app_password( string $login, string $pass ) {
+		add_filter( 'application_password_is_api_request', '__return_true', 99 );
+		try {
+			$user = wp_authenticate_application_password( null, $login, $pass );
+		} finally {
+			remove_filter( 'application_password_is_api_request', '__return_true', 99 );
+		}
+		return $user instanceof WP_User ? $user : null;
 	}
 
 	/** What a manager needs to know before going live. Secrets only as set / missing. */

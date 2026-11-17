@@ -4038,6 +4038,16 @@ test( 'going live: the manager can check the site from outside (X-OYS-Auth, /sta
 	eq( $admin->ID, OYS_Ops::header_auth( 0 ), 'plain user:pass too' );
 	$_SERVER['HTTP_X_OYS_AUTH'] = $admin->user_login . ':nope';
 	eq( 0, OYS_Ops::header_auth( 0 ), 'plain with a wrong password: nobody' );
+	$_SERVER['HTTP_X_OYS_AUTH'] = 'Bearer ' . $admin->user_login . ':' . $pw;
+	eq( $admin->ID, OYS_Ops::header_auth( 0 ), 'a Bearer prefix is fine' );
+	$_SERVER['HTTP_X_OYS_AUTH'] = $pw;
+	eq( $admin->ID, OYS_Ops::header_auth( 0 ), 'the application password alone: found among the admins' );
+	$_SERVER['HTTP_X_OYS_AUTH'] = $admin->user_email . ':' . $pw;
+	eq( $admin->ID, OYS_Ops::header_auth( 0 ), 'email:pass' );
+	$_SERVER['HTTP_X_OYS_AUTH'] = 'stale saved secret';
+	$_SERVER['HTTP_X_OJ_REMOTE'] = $pw;
+	eq( $admin->ID, OYS_Ops::header_auth( 0 ), 'X-OJ-Remote wins when X-OYS-Auth is overridden by a stale value' );
+	unset( $_SERVER['HTTP_X_OJ_REMOTE'] );
 	$_SERVER['HTTP_X_OYS_AUTH'] = $admin->user_login . ':' . $pw;
 	$_SERVER['REQUEST_URI']     = '/fiokom/';
 	eq( 0, OYS_Ops::header_auth( 0 ), 'not outside the REST API' );

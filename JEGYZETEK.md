@@ -1425,6 +1425,11 @@
   - **oliviajoga.hu 1.5.10 → 1.5.11:** a távirányító az `X-OJ-Remote` fejlécet is elfogadja.
     - Az 1.5.10-ből kimaradt egy segédfüggvény: fejléces REST-kérésnél hibával állt le, de kiadás nem készült belőle.
     - Az 1.5.11 javítja. Helyben 5 helyes alak beenged, a rossz és a hiányzó nem; hibanapló üres.
+  - **A .hu párosítva a HotPotban** (11.17, 16:08): a képernyőképről levett jelszóval, `X-OJ-Remote` fejléccel.
+    - A 4. olvasat volt a jó: egy „0” valójában „O”.
+    - A HotPot jelentése: WordPress 7.1.4, állapot 86%, 2 bővítmény-frissítés vár.
+  - **olivia-studio 1.22.2 / 3.11.120:** az .online ugyanazt a fejléc-belépést kapta, mint a .hu (`X-OJ-Remote`, bármilyen
+    alak, REST-kérésként). Teszt: 1613/0.
     - A munkamenet hálózati titka az `X-OYS-Auth`-ot felülírja, és az űrlap a szóközös alkalmazásjelszót nem fogadta el.
     - Áron a jelszót képernyőképen küldte; csak a scratchpadben van (600-as jogosultsággal), a repóban nincs.
   - **HotPot:** a két oldal felvéve Olívia ügyfélkartonjához (4070003): oliviajoga.hu = 150002, oliviajoga.online = 150003.
