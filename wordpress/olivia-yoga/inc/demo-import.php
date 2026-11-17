@@ -1797,7 +1797,7 @@ function oy_1117_apply( WP_Post $post, array $set ) {
 }
 
 function oy_migrate_1117() {
-	$rev = '2026-11-17a';
+	$rev = '2026-11-17b';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1117_rev' ) === $rev ) {
 		return array();
 	}
@@ -1809,6 +1809,15 @@ function oy_migrate_1117() {
 			$moved = oy_1117_apply( $post, $set );
 			$log[] = $key . ': Olívia, 17 November' . ( $moved ? ' (' . $moved . ' of her own texts kept)' : '' );
 		}
+	}
+	// „A csoportos óra aloldalára is tegyük be az árakat” – „Árak” before the group class's booking button
+	$post = get_page_by_path( 'hatha-flow', OBJECT, 'oy_class' );
+	if ( $post && ! preg_match( '~<h2[^>]*>\s*Árak\s*</h2>~u', $post->post_content ) && false !== strpos( $post->post_content, '[oy_booking_link]' ) ) {
+		$content = preg_replace( '~\[oy_booking_link\]~', "<h2>Árak</h2>\n[oy_prices service=\"group\"]\n[oy_booking_link]", $post->post_content, 1 );
+		kses_remove_filters();
+		wp_update_post( wp_slash( array( 'ID' => $post->ID, 'post_content' => $content ) ) );
+		kses_init_filters();
+		$log[] = 'hatha-flow: prices';
 	}
 	return $log;
 }

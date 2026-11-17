@@ -1982,3 +1982,6 @@ msgstr "Naptár"
 #: inc/shortcodes.php
 msgid "More classes in the calendar"
 msgstr "További órák a naptárban"
+
+msgid "In a group"
+msgstr "Csoportban"

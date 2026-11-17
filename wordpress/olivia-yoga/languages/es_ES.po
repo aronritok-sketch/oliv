@@ -1351,3 +1351,6 @@ msgstr "empieza con al menos 3 personas"
 
 msgid "beginners welcome"
 msgstr "principiantes bienvenidos"
+
+msgid "In a group"
+msgstr "En grupo"

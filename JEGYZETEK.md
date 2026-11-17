@@ -1264,6 +1264,17 @@
   - Tesztek: 1592/0. (Új konténer: a MariaDB-t újra kellett indítani; a tesztfuttató adatbázis nélkül is 0-val lépett ki,
     ezért a kiadás előtt az „N passed, 0 failed” sort is ellenőrzöm.)
 
+- **téma 3.11.113 – árak a csoportos óra aloldalán, „-tól” nélkül** (Olívia, 11.17, chat: „A csoportos óra aloldalára is
+  tegyük be az árakat, ugyanúgy ahogy a többi óránál, illetve ez a -tól nem kell egyiknél se”).
+  - **A csoportos flow óra oldalán** a foglalás gomb előtt „Árak” rész, ugyanolyan kártyával, mint az egyéni óráknál:
+    - fejléc: Csoportban, 90 perc, 3 000 Ft;
+    - sorok: 1 alkalom 3 000 Ft; 5 alkalom 13 000 Ft (alkalmanként 2 600 Ft);
+    - gombok: „Óra foglalása” és „Bérletet veszek (5 alkalom)”.
+  - Az adatok a csoportos bérletekből jönnek (az egyalkalmas jegy és a legnagyobb bérlet), az ár tehát egy helyen él.
+  - **Az élő oldalra** a frissítés (`oy_migrate_1117`, rev b) egyszer teszi be, csak ha még nincs „Árak” az oldalon.
+  - **Minden árkártya fejlécében** maga az ár áll, „-tól” nélkül.
+  - Tesztek: 1597/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

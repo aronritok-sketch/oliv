@@ -4819,6 +4819,42 @@ test( 'Olívia, 17 November (chat): the one-to-one rule on its own line; the flo
 	}
 } );
 
+test( 'Olívia, 17 November (chat): the group class page has its prices like the others; no „-tól” on any price', function () {
+	require_once get_template_directory() . '/inc/demo-import.php';
+	$keep = get_option( OYS_Products::OPTION );
+	update_option( 'oy_edition', 'hu-online' );
+	try {
+		$all = array(); // only these: the group card picks the single ticket and the biggest pass on sale
+		$all['t-group-1'] = array( 'name' => '1 alkalmas online jóga jegy', 'kind' => 'online_pack', 'credits' => 1, 'validity_days' => 56, 'price_cents' => 300000, 'duration_min' => 90, 'active' => 1, 'sort' => 1 );
+		$all['t-group-5'] = array( 'name' => '5 alkalmas bérlet', 'kind' => 'online_pack', 'credits' => 5, 'validity_days' => 56, 'price_cents' => 1300000, 'duration_min' => 90, 'active' => 1, 'sort' => 2 );
+		$all['t-solo-60'] = array( 'name' => 'Egyéni 60', 'kind' => 'private_single', 'service' => 't-solo', 'people' => 1, 'credits' => 1, 'price_cents' => 800000, 'duration_min' => 60, 'active' => 1, 'sort' => 3 );
+		update_option( OYS_Products::OPTION, $all );
+		$g = do_shortcode( '[oy_prices service="group"]' );
+		ok( str_contains( $g, 'oj-price oj-price--solo' ) && str_contains( $g, esc_html( oys_money( 300000 ) ) ) && str_contains( $g, esc_html( oys_money( 1300000 ) ) ) && str_contains( $g, esc_html( oys_money( 260000 ) ) ), 'the group card: one class, the 5-class pass and its price per class' );
+		ok( str_contains( $g, 'product=t-group-5' ) && str_contains( $g, esc_url( oy_book_url() ) ) && str_contains( $g, esc_html__( 'In a group', 'olivia-yoga' ) ), '… book a class or buy the pass, „Csoportban”' );
+		$solo = oy_price_cards( 't-solo' );
+		ok( str_contains( $solo, '<span class="oj-price__from">' . esc_html( oys_money( 800000 ) ) . '</span>' ), 'the price in a card\'s head: the price itself, no „-tól”' );
+		$data = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content-hu-online.json' ), true );
+		ok( str_contains( $data['classes']['hatha-flow']['content'], "<h2>Árak</h2>\n[oy_prices service=\"group\"]\n[oy_booking_link]" ), 'the group class page: „Árak” before the booking button' );
+		$post = get_page_by_path( 'hatha-flow', OBJECT, 'oy_class' );
+		$id   = $post ? $post->ID : wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Csoportos online flow jóga', 'post_name' => 'hatha-flow' ) );
+		$was  = $post ? $post->post_content : null;
+		try {
+			wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => "<h2>Online, élőben</h2>\n<p>Élő.</p>\n[oy_booking_link]" ) ) );
+			delete_option( 'oy_1117_rev' );
+			oy_migrate_1117();
+			$c = get_post_field( 'post_content', $id );
+			ok( 1 === substr_count( $c, '<h2>Árak</h2>' ) && strpos( $c, '[oy_prices service="group"]' ) < strpos( $c, '[oy_booking_link]' ), 'live update: the prices on the group class page, once' );
+		} finally {
+			null === $was ? wp_delete_post( $id, true ) : wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => $was ) ) );
+			delete_option( 'oy_1117_rev' );
+		}
+	} finally {
+		false === $keep ? delete_option( OYS_Products::OPTION ) : update_option( OYS_Products::OPTION, $keep );
+		delete_option( 'oy_edition' );
+	}
+} );
+
 $t = $GLOBALS['oys_t'];
 echo "\n{$t['pass']} assertions passed, {$t['fail']} failed\n";
 exit( $t['fail'] ? 1 : 0 );

@@ -65,6 +65,9 @@ function oy_price_cards( $service ) {
 	if ( '' === (string) $service || ! class_exists( 'OYS_Products' ) || ! function_exists( 'oys_money' ) ) {
 		return '';
 	}
+	if ( 'group' === $service ) {
+		return oy_group_price_card();
+	}
 	$groups = array();
 	foreach ( OYS_Products::all( true ) as $p ) {
 		if ( $p['service'] !== $service || ! in_array( $p['kind'], array( 'private_single', 'private_pack' ), true ) ) {
@@ -93,7 +96,8 @@ function oy_price_cards( $service ) {
 		$from = (int) ( $g['single'] ?? $g['pack'] )['price_cents']; // one session, or the pass where there is no single
 		$head = '<span class="oj-price__who">' . ( $pair ? esc_html__( 'As a pair', 'olivia-yoga' ) : esc_html__( 'Alone', 'olivia-yoga' ) ) . '</span>'
 			. ( $len ? '<span class="oj-price__len">' . oy_icon( 'clock' ) . esc_html( sprintf( __( '%d minutes', 'olivia-yoga' ), $len ) ) . '</span>' : '' )
-			. '<span class="oj-price__from">' . esc_html( sprintf( __( 'from %s', 'olivia-yoga' ), oys_money( $from ) ) ) . '</span>';
+			// Olívia, 17 November: „ez a -tól nem kell egyiknél se” – the price itself
+			. '<span class="oj-price__from">' . esc_html( oys_money( $from ) ) . '</span>';
 		// Áron, 16 November: „ahol van, mennyibe kerül egy-egy óra, ott legyen egy közvetlen foglalás gomb, vagy kérés küldése
 		// gomb, mert így haszontalanok az árak” – ask for a time with this service, length and number of people filled in,
 		// or buy the 5-session pass straight away
@@ -106,6 +110,44 @@ function oy_price_cards( $service ) {
 			: '<div class="oj-price oj-price--solo"><div class="oj-price__head">' . $head . '</div>' . $body . '</div>';
 	}
 	return '' === $out ? '' : '<div class="oj-prices">' . $out . '</div>';
+}
+
+/**
+ * Olívia, 17 November: „A csoportos óra aloldalára is tegyük be az árakat, ugyanúgy ahogy a többi óránál” – the group class's
+ * card in the same form as the one-to-one ones: one class (the single ticket) and the pass, with the price per class; book
+ * a class, or buy the pass straight away. From the passes for the group classes on sale (no service of their own).
+ */
+function oy_group_price_card() {
+	$single = null;
+	$pack   = null;
+	foreach ( OYS_Products::all( true ) as $p ) {
+		if ( ! in_array( $p['kind'], array( 'online_pack', 'pack' ), true ) || '' !== (string) ( $p['service'] ?? '' ) || empty( $p['active'] ) ) {
+			continue;
+		}
+		if ( 1 === (int) $p['credits'] ) {
+			$single = $single ?: $p;
+		} elseif ( ! $pack || (int) $p['credits'] > (int) $pack['credits'] ) {
+			$pack = $p;
+		}
+	}
+	if ( ! $single && ! $pack ) {
+		return '';
+	}
+	$rows = '';
+	if ( $single ) {
+		$rows .= '<div><dt>' . esc_html__( '1 session', 'olivia-yoga' ) . '</dt><dd>' . esc_html( oys_money( (int) $single['price_cents'] ) ) . '</dd></div>';
+	}
+	if ( $pack ) {
+		$n     = max( 1, (int) $pack['credits'] );
+		$rows .= '<div><dt>' . esc_html( sprintf( __( '%d sessions', 'olivia-yoga' ), $n ) ) . '<small>' . esc_html( sprintf( __( '%s per session', 'olivia-yoga' ), oys_money( (int) round( (int) $pack['price_cents'] / $n ) ) ) ) . '</small></dt><dd>' . esc_html( oys_money( (int) $pack['price_cents'] ) ) . '</dd></div>';
+	}
+	$len  = (int) ( $single ?: $pack )['duration_min'];
+	$head = '<span class="oj-price__who">' . esc_html__( 'In a group', 'olivia-yoga' ) . '</span>'
+		. ( $len ? '<span class="oj-price__len">' . oy_icon( 'clock' ) . esc_html( sprintf( __( '%d minutes', 'olivia-yoga' ), $len ) ) . '</span>' : '' )
+		. '<span class="oj-price__from">' . esc_html( oys_money( (int) ( $single ?: $pack )['price_cents'] ) ) . '</span>';
+	$act  = '<p class="oj-price__act"><a class="btn btn--orchid btn--sm" href="' . esc_url( oy_book_url() ) . '">' . esc_html__( 'Book a class', 'olivia-yoga' ) . '</a>'
+		. ( $pack && function_exists( 'oys_page_url' ) ? '<a class="btn btn--ghost btn--sm" href="' . esc_url( oys_page_url( 'book', array( 'product' => $pack['id'] ) ) ) . '">' . esc_html( sprintf( __( 'Buy %d sessions', 'olivia-yoga' ), max( 1, (int) $pack['credits'] ) ) ) . '</a>' : '' ) . '</p>';
+	return '<div class="oj-prices oj-prices--group"><div class="oj-price oj-price--solo"><div class="oj-price__head">' . $head . '</div><dl class="oj-price__rows">' . $rows . '</dl>' . $act . '</div></div>';
 }
 
 function oy_class_cards( $exclude = '' ) {
