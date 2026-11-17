@@ -41,7 +41,7 @@ ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.5.11'
+VERSION = '1.6.0'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -806,6 +806,9 @@ def logo():
 
 def footer():
     links = ''.join(f'<li><a href="{esc(h)}">{esc(n)}</a></li>' for h, n in nav_items())
+    # WordPress theme: the privacy notice and the cookie settings (the bar is the theme's, inc/consent.php)
+    legal = (f' · <a href="{esc(link(PRIVACY_PATH))}">Adatkezelési tájékoztató</a> · <a href="#cookie-settings">Sütibeállítások</a>'
+             if WP else '')
     return f'''<footer class="site-footer">
 	<div class="container">
 		<div class="footer__grid">
@@ -818,7 +821,7 @@ def footer():
 				<ul class="footer__contact"><li>{icon("mail")}<a href="mailto:{EMAIL}">{EMAIL}</a></li><li>{icon("ig")}<a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a></li><li>{icon("fb")}<a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a></li></ul>
 			</div>
 		</div>
-		<div class="footer__bottom"><p>&copy; 2026 Kovács Olívia</p></div>
+		<div class="footer__bottom"><p>&copy; 2026 Kovács Olívia{legal}</p></div>
 	</div>
 </footer>
 <a class="book-fab" href="{esc(book_url())}" target="_blank" rel="noopener" data-book-fab>{icon("cal")}Bejelentkezés</a>'''
@@ -1627,6 +1630,40 @@ def write(path, content):
     open(target, 'w', encoding='utf-8').write(content)
 
 
+# Adatkezelési tájékoztató (Áron, 11.17: „Az Arovia legyen minden”): only in the WordPress theme, with the cookie bar and
+# Google Analytics (wp-theme/inc/consent.php). The facts are the online site's own notice (wordpress/olivia-yoga, privacy).
+PRIVACY_PATH = 'adatkezelési-tájékoztató'
+PRIVACY_EMAIL = 'info@oliviajoga.online'
+
+
+def privacy_page():
+    m = f'<a href="mailto:{PRIVACY_EMAIL}">{PRIVACY_EMAIL}</a>'
+    body = f"""<p>Ez a tájékoztató arról szól, milyen adataidat kezeljük, amikor az oliviajoga.hu oldalt nézed, vagy írsz nekünk.</p>
+<h2>Ki kezeli az adataidat?</h2>
+<p>Az adatkezelő az Arovia Group LLC (HelloProVision), 9813 Quinta Artesa Way, Unit 105, Fort Myers, FL 33908, USA: az oldal üzemeltetője. Az órákat Kovács Olívia tartja. Kérdésed vagy kérésed van az adataiddal kapcsolatban? Írj a {m} címre.</p>
+<h2>Milyen adatokat kezelünk, és miért?</h2>
+<ul>
+<li><strong>Ha írsz nekünk</strong> (e-mailben, Instagramon vagy Facebookon): a neved, az elérhetőséged és az üzeneted, csak hogy válaszolni tudjunk.</li>
+<li><strong>Foglalás:</strong> ezen az oldalon nem nyitsz fiókot és nem fizetsz. A „Bejelentkezés” 2026. november 25-ig a Motibro foglalórendszerébe visz (oliviajoga.motibro.com), ott a Motibro tájékoztatója érvényes; november 26-tól az oliviajoga.online oldalra, ahol az <a href="https://oliviajoga.online/adatvedelem/">ottani adatvédelmi tájékoztató</a> érvényes.</li>
+</ul>
+<h2>Sütik</h2>
+<p>A működéshez szükséges sütik (például hogy megjegyezzük, mit döntöttél a sütikről) mindig működnek, ezekhez nem kell hozzájárulás.</p>
+<p>Ha az oldal alján megjelenő sávon hozzájárulsz, a Google Analytics (Google Ireland Limited) is méri, hogyan használják az oldalt: melyik oldalakat nézik meg, honnan érkeznek a látogatók, és milyen eszközről. Ehhez a <code>_ga</code> kezdetű sütiket használja, legfeljebb 2 évig. Ugyanez a mérés fut az oliviajoga.online oldalon is, így látjuk, ha onnan ide vagy innen oda lépsz át. Az eredményt csak összesítve, név nélkül látjuk. A Google az adatokat az Egyesült Államokban is kezelheti. Ha nem járulsz hozzá, a Google Analytics be sem töltődik. Reklámsütit nem használunk.</p>
+<p>A döntésedet bármikor megváltoztathatod az oldal alján, a <a href="#cookie-settings">Sütibeállítások</a> linkkel.</p>
+<h2>Adataid az Egyesült Államokban</h2>
+<p>Az Arovia Group LLC amerikai cég, ezért az adataid egy részét ott is kezeljük. Csak a fenti célokra és ideig használjuk őket, ugyanazzal a gondossággal, mint az Európai Unióban.</p>
+<h2>Kik férnek hozzá?</h2>
+<p>Az oktató, valamint azok a szolgáltatók, akik nélkül az oldal nem működne: a weboldal üzemeltetője és tárhelye (HelloProVision), valamint ha hozzájárulsz, a Google Analytics (az oldal látogatottságának mérése). Adatot nem adunk el, és reklámcélra nem adunk át senkinek.</p>
+<h2>A jogaid</h2>
+<p>Kérheted, hogy megmutassuk, milyen adatot tárolunk rólad, kijavítsuk vagy töröljük őket, korlátozzuk a kezelésüket, vagy géppel olvasható formában kiadjuk neked. Írj a {m} címre, és válaszolunk.</p>
+<p>Ha úgy érzed, hogy nem jól kezeljük az adataidat, panaszt tehetsz a Nemzeti Adatvédelmi és Információszabadság Hatóságnál (NAIH, <a href="https://naih.hu">naih.hu</a>).</p>"""
+    head = page_head({'t': 'h1', 'html': 'Adatkezelési tájékoztató'}, PRIVACY_PATH, [('', 'Főoldal')], '', '', 'lilac')
+    return {'name': 'Adatkezelési tájékoztató', 'title': f'Adatkezelési tájékoztató | {SITE_TITLE}',
+            'desc': 'Milyen adataidat kezeljük az oliviajoga.hu oldalon, mire használjuk őket, milyen sütiket használunk, és milyen jogaid vannak.',
+            'cls': 'is-page', 'schema': '', 'content': head + f'<div class="container"><div class="entry oj-prose oj-legal">{body}</div></div>',
+            'prefooter': '', 'image': ''}
+
+
 def wp_entry(p, body, cls, schema):
     """One page for the WordPress theme: the editable content (main) and what the theme puts around it."""
     path = p['path']
@@ -1778,6 +1815,7 @@ def main():
     if WP:  # both versions: until 25 November and from 26 November (the theme switches by the date, Olivia 11.12)
         AFTER = False
         wp_pages = {path: wp_entry(pg, body, cls, schema) for path, pg, body, cls, schema in render_all(journal_cards)}
+        wp_pages[PRIVACY_PATH] = privacy_page()
         chrome = {'header': header(''), 'footer': footer()}
         AFTER = True
         after = {path: {'content': body, 'prefooter': prefooter(pg), 'desc': description(pg)} for path, pg, body, cls, schema in render_all(journal_cards)}

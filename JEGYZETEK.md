@@ -1435,6 +1435,24 @@
       jelszó-visszaállító linket küldtünk.
     - **olivia-studio 1.22.3 / 3.11.121:** a jelszócsere azonnal feloldja a belépési zárat (6 hibás próba után 15 perc).
       A hibaüzenet eddig is ezt ígérte, de nem így működött. Teszt: 1615/0.
+  - **Sütisáv, GA4, adatkezelési tájékoztató a .hu-n – oliviajoga.hu 1.6.0, oliviajoga.online 3.11.122** (Áron, 11.17:
+    „Az Arovia legyen minden, igen. A GA4 oké, most beküldtem a sitemapet a .hu-ra is.”).
+    - Új `wp-theme/inc/consent.php`, ugyanúgy, mint az .online-on:
+      - Consent Mode v2, a mérés G-WM1P5R67VJ, a `gtag.js` csak az „Elfogadom” után töltődik be;
+      - a döntés az `oy_consent` sütiben; ha az Ads Connect saját sávot mutat, a miénk félreáll;
+      - a „Sütibeállítások” újranyitja a sávot.
+    - Átjárás a két oldal között (`linker`): mindkét oldalon.
+    - Új oldal: `/adatkezelési-tájékoztató`.
+      - Adatkezelő az Arovia Group LLC, kapcsolat: info@oliviajoga.online.
+      - Csak az .online tájékoztatójának tényei kerültek bele, plusz: a .hu-n nincs fiók és fizetés; a Bejelentkezés
+        november 25-ig a Motibróba visz, utána az .online-ra.
+      - A téma beállító lépése WordPress-adatvédelmi oldalnak jelöli.
+    - A láblécben (csak a WordPress-témában): „Adatkezelési tájékoztató · Sütibeállítások”.
+    - Helyben próbálva:
+      - a sáv megjelenik, „Elfogadom” előtt nincs Google-kérés, utána van;
+      - a süti `stats`, a link újranyitja a sávot;
+      - a tájékoztató oldal 200-zal jön, Aroviával.
+    - Search Console: Áron beküldte a .hu sitemapjét.
     - A munkamenet hálózati titka az `X-OYS-Auth`-ot felülírja, és az űrlap a szóközös alkalmazásjelszót nem fogadta el.
     - Áron a jelszót képernyőképen küldte; csak a scratchpadben van (600-as jogosultsággal), a repóban nincs.
   - **HotPot:** a két oldal felvéve Olívia ügyfélkartonjához (4070003): oliviajoga.hu = 150002, oliviajoga.online = 150003.

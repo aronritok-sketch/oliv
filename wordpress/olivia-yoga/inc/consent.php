@@ -86,7 +86,7 @@ gtag('consent', 'default', { ad_storage: 'denied', ad_user_data: 'denied', ad_pe
 		w.oyGaLoaded = true;
 		gtag('consent', 'update', { analytics_storage: 'granted' });
 		gtag('js', new Date());
-		gtag('config', ga);
+		gtag('config', ga, { linker: { domains: ['oliviajoga.online', 'oliviajoga.hu'] } }); // a két oldal egy mérés (11.17)
 		var s = d.createElement('script'); s.async = true; s.src = 'https://www.googletagmanager.com/gtag/js?id=' + encodeURIComponent(ga);
 		d.head.appendChild(s);
 	};

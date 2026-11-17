@@ -97,6 +97,12 @@ function oj_setup() {
 			$log[] = 'removed: ' . $gone;
 		}
 	}
+	// az adatkezelési tájékoztató a WordPress „adatvédelmi oldala” (a sütisáv és a WordPress maga is ide linkel)
+	$privacy = get_page_by_path( 'adatkezelési-tájékoztató' );
+	if ( $privacy && (int) get_option( 'wp_page_for_privacy_policy' ) !== $privacy->ID ) {
+		update_option( 'wp_page_for_privacy_policy', $privacy->ID );
+		$log[] = 'privacy page: adatkezelési-tájékoztató';
+	}
 	$log[] = oj_sync_media();
 	flush_rewrite_rules( false );
 	update_option( 'oj_setup_log', array( 'version' => $data['version'] ?? '', 'log' => $log, 'time' => time() ), false );
