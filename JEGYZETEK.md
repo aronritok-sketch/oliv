@@ -1414,6 +1414,11 @@
     - A távirányító állapotában „mail”, próbalevél: `POST oj/v1/mail-test` (csak a belépett admin saját címére).
     - Helyben próbálva, ál-SMTP-szerverrel.
     - Áron fiókja a .hu-n: `aronritok` (#3, administrator), a `site-user` paranccsal.
+  - **oliviajoga.hu 1.5.8:** a távirányító `X-OYS-Auth` fejléce bármilyen alakot elfogad:
+    - `felhasználó:jelszó`, `e-mail:jelszó`, base64, `Bearer`/`Basic` előtaggal;
+    - vagy csak az alkalmazásjelszót (ilyenkor az adminok alkalmazásjelszavai között keres).
+    - Mindig a WordPress saját ellenőrzésével. Helyben próbálva: 6 helyes alak beenged, a rossz jelszó nem.
+    - Ok: Áron elmentette a jelszót, de az 1.5.7 nem fogadta el; az érték pontos alakját nem látjuk.
   - **HotPot:** a két oldal felvéve Olívia ügyfélkartonjához (4070003): oliviajoga.hu = 150002, oliviajoga.online = 150003.
     - A kapcsolati kódok 7 napig érvényesek. Nincsenek a repóban; ha lejárnak, a HotPotban újat lehet kérni.
   - **SEO OS:** két új projekt, „draft”, Olívia ügyfele alatt.

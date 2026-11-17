@@ -27,7 +27,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-/** X-OYS-Auth: „felhasználó:alkalmazásjelszó” (vagy base64-ben) → a felhasználó, ha az Authorization fejléc nem jött meg. */
+/** X-OYS-Auth: alkalmazásjelszó (lásd lent, milyen alakban) → a felhasználó, ha az Authorization fejléc nem jött meg. */
 function oj_remote_header_auth( $user_id ) {
 	if ( $user_id || empty( $_SERVER['HTTP_X_OYS_AUTH'] ) || ! is_ssl() || ! function_exists( 'wp_authenticate_application_password' ) ) {
 		return $user_id;
@@ -38,14 +38,40 @@ function oj_remote_header_auth( $user_id ) {
 	if ( ! str_contains( $uri, '/' . rest_get_url_prefix() . '/' ) && ! str_contains( $uri, 'rest_route=' ) ) {
 		return $user_id;
 	}
+	// Bármelyik alak jó (Áron, 11.17 – az űrlapba nem mindig pontosan ez kerül): „felhasználó:jelszó”, „e-mail:jelszó”,
+	// base64-ben, „Bearer …” / „Basic …” előtaggal, vagy csak maga az alkalmazásjelszó (akkor az adminisztrátorok
+	// alkalmazásjelszavai közül az egyezőé). Mindig a WordPress saját alkalmazásjelszó-ellenőrzésével.
 	$given = trim( (string) wp_unslash( $_SERVER['HTTP_X_OYS_AUTH'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
-	$raw   = str_contains( $given, ':' ) ? $given : base64_decode( $given, true );
-	if ( ! $raw || ! str_contains( $raw, ':' ) ) {
+	$given = trim( (string) preg_replace( '/^(bearer|basic|token)\s+/i', '', $given ) );
+	if ( '' === $given ) {
 		return $user_id;
 	}
-	list( $login, $pass ) = explode( ':', $raw, 2 );
-	$user = wp_authenticate_application_password( null, $login, $pass );
-	return $user instanceof WP_User ? $user->ID : $user_id;
+	if ( ! str_contains( $given, ':' ) ) {
+		$dec = base64_decode( $given, true );
+		if ( is_string( $dec ) && str_contains( $dec, ':' ) ) {
+			$given = $dec;
+		}
+	}
+	if ( str_contains( $given, ':' ) ) {
+		list( $login, $pass ) = explode( ':', $given, 2 );
+		$login = trim( $login );
+		if ( is_email( $login ) ) {
+			$by    = get_user_by( 'email', $login );
+			$login = $by ? $by->user_login : $login;
+		}
+		$user = wp_authenticate_application_password( null, $login, $pass );
+		return $user instanceof WP_User ? $user->ID : $user_id;
+	}
+	foreach ( get_users( array( 'role' => 'administrator', 'number' => 10, 'orderby' => 'ID' ) ) as $admin ) {
+		if ( ! WP_Application_Passwords::get_user_application_passwords( $admin->ID ) ) {
+			continue;
+		}
+		$user = wp_authenticate_application_password( null, $admin->user_login, $given );
+		if ( $user instanceof WP_User ) {
+			return $user->ID;
+		}
+	}
+	return $user_id;
 }
 add_filter( 'determine_current_user', 'oj_remote_header_auth', 25 );
 
