@@ -1355,6 +1355,16 @@
       - a kapcsolat oldalon a Google Maps-kártya hálózati hibája (Safari, a proxy miatt);
       - Firefoxban a Motibro-widget süti-figyelmeztetése (nov. 26-tól a Motibro kikerül);
       - a terhelt tesztfutás alatt egyszer 503 a főoldalon (utána háromszor 200).
+  - **Záró futás az 1.5.4-en: 4033 ellenőrzés, 4032 sikeres.**
+    - Mind a 8 telefon/tablet 383/383, a gépek 290/290 (a Firefox 289/290), a 99 link mind válaszol.
+    - Az egyetlen hiba a Motibro-widget saját süti-figyelmeztetése Firefoxban.
+    - A főoldal iPhone-on végig görgetve sem omlik össze.
+  - **Nyitva (Áron/Olívia):**
+    - Search Console-ban az oliviajoga.hu oldaltérképe: `https://oliviajoga.hu/wp-sitemap.xml` (a domain a DNS-ben már
+      hitelesítve).
+    - A régi Google Site (`sites.google.com/view/oliviajoga`) még nyilvános; leállítható, vagy átirányítható az új
+      oldalra.
+    - Az ELIN-en csak a levelezés maradt: a webtárhely lemondható, a levelezés nem.
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
