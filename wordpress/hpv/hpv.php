@@ -8,6 +8,12 @@
 
 defined( 'ABSPATH' ) || exit;
 
+// HelloProVision élesítési csomag (Áron, 2026-11-17: „Történjen mindig ugyanaz”): az éles oldalon a varázsló, az Ads és a
+// HotPot Connect, a Leads és a SEO mu-plugin – magától, minden kiadásnál (inc/hpv-kit.php, a forrás: wordpress/hpv/).
+if ( is_file( __DIR__ . '/hpv-kit.php' ) ) {
+	require_once __DIR__ . '/hpv-kit.php';
+}
+
 // The design is this theme's own: the parent's base styles stay off (they reset type and spacing).
 add_action( 'wp_enqueue_scripts', function () {
 	wp_dequeue_style( 'parent-style' );

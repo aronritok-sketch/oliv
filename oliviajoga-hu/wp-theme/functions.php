@@ -13,6 +13,26 @@ defined( 'ABSPATH' ) || exit;
 require_once __DIR__ . '/inc/setup.php';
 require_once __DIR__ . '/inc/image-position.php';
 require_once __DIR__ . '/inc/page-editor.php'; // Szerkesztés a weboldalon (Olivia, 11.13) – from wordpress/olivia-yoga, copied by build.py --wp
+require_once __DIR__ . '/inc/remote.php'; // a távirányító (Áron, 11.17): X-OYS-Auth + /?rest_route=/oj/v1/…
+if ( is_file( __DIR__ . '/inc/hpv-kit.php' ) ) { // HelloProVision élesítési csomag – build.py --wp hozza (wordpress/hpv/hpv-kit.php)
+	require_once __DIR__ . '/inc/hpv-kit.php';
+}
+
+/*
+ * A régi oldal eltüntetése a böngészőkből (Áron, 2026-11-17: „ha megnyitom, már olyan eszközről, ahol a cookie-k betöltenek,
+ * akkor még a régi oldalt nyitja meg”). A régi oliviajoga.hu (ELIN) 301-gyel – „végleges” átirányítással – küldött a
+ * Google Site-ra, és a böngészők ezt megjegyzik: aki járt ott, annál a böngésző meg sem kérdezi az új szervert. Amint a
+ * böngésző az új oldal bármelyik címét eléri (pl. https://oliviajoga.hu/?uj), egyszer kiürítjük nála ennek az oldalnak a
+ * tárolt adatait (Clear-Site-Data: "cache" – a sütik és a belépés maradnak), így a régi átirányítást is elfelejti; a HSTS
+ * (a szerver küldi) innentől a http-s régi bejegyzést is megkerüli. Böngészőnként egyszer: az oj_fresh technikai süti jelzi.
+ */
+add_action( 'send_headers', function () {
+	if ( headers_sent() || ! is_ssl() || is_admin() || wp_doing_ajax() || isset( $_COOKIE['oj_fresh'] ) ) {
+		return;
+	}
+	header( 'Clear-Site-Data: "cache"' );
+	setcookie( 'oj_fresh', '1', array( 'expires' => time() + 2 * YEAR_IN_SECONDS, 'path' => '/', 'secure' => true, 'httponly' => true, 'samesite' => 'Lax' ) );
+} );
 
 /** The theme's data: pages (title, description, schema, prefooter, content), header, footer, menu. */
 function oj_data() {

@@ -106,6 +106,7 @@ def build_variant(slug, v, hlprv):
             "require_once get_stylesheet_directory() . '/inc/hpv.php';\n\n")
     open(fn, 'w', encoding='utf-8').write(head + body)
     shutil.copy(HPV, os.path.join(dst, 'inc', 'hpv.php'))
+    shutil.copy(os.path.join(os.path.dirname(HPV), 'hpv-kit.php'), os.path.join(dst, 'inc', 'hpv-kit.php'))  # HelloProVision csomag
     if v.get('plugin'):
         # The booking plugin rides along (Áron, 2026-11-13: „tedd fel te az élesre”): a live site updates only its
         # theme (iu_theme, pinned in deploy/sites.json); the theme's setup installs this zip when it is newer.

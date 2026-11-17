@@ -1385,6 +1385,43 @@
     - A szövegben egyszer-kétszer a „privát” és a „magánóra” is szerepeljen.
     - Az árak maradjanak kint.
 
+- **HelloProVision-csomag + HotPot + távirányító – oliviajoga.hu 1.5.5, oliviajoga.online 3.11.117** (Áron, 2026-11-17:
+  „Csináljunk az oliviajoga.hu-ra egy távirányítót …”; „rakjuk be … az összes HelloProVision-os marketing eszközt, hogy
+  elérjük ezeket az oldalakat, meg a hotpotot is kössük be. … Történjen mindig ugyanaz.”).
+  - **Élesítési csomag (`wordpress/hpv/hpv-kit.php`, mindkét témában `inc/hpv-kit.php`).**
+    - Az éles oldalon, a téma minden beállító körében (minden kiadásnál) magától felteszi ezeket:
+      - a beállító varázslót (`helloprovision-setup`, GitHub-kiadás, „weboldal” mód);
+      - az Ads Connectet és a HotPot Connectet;
+      - a Leads és a SEO mu-plugint.
+    - Ami fent van, ahhoz nem nyúl. Hibánál óránként újrapróbál (legfeljebb 24-szer).
+    - Az admin nem ugrik át a varázslóba.
+    - Kulcsot nem tartalmaz. A HotPot-kapcsolati kód a varázsló távirányítóján megy be (`hpv-setup/v1/remote/keys`).
+    - Dev és staging oldalon nem fut.
+    - Próba: `WP_DIR=… HPV_SETUP_SRC=<hlprv> php wordpress/dev/tests/kit.php` → 20/20.
+  - **HotPot:** a két oldal felvéve Olívia ügyfélkartonjához (4070003): oliviajoga.hu = 150002, oliviajoga.online = 150003.
+    - A kapcsolati kódok 7 napig érvényesek. Nincsenek a repóban; ha lejárnak, a HotPotban újat lehet kérni.
+  - **SEO OS:** két új projekt, „draft”, Olívia ügyfele alatt.
+    - 22: oliviajoga.hu, élesítés 11.17.
+    - 23: oliviajoga.online, élesítés 11.12.
+    - Kezdő kulcsszónak csak a 16-os kutatásban mért kifejezések kerültek be.
+  - **.hu távirányító (`inc/remote.php`):**
+    - A cím `https://oliviajoga.hu/?rest_route=/oj/v1/…`, mert az iu_theme szándékosan elrejti a `/wp-json/` előtagot.
+    - Belépés: `X-OYS-Auth` fejléc, admin alkalmazásjelszóval, csak HTTPS-en.
+    - Útvonalak: `status` (a csomag állapotával), `edits`, `setup`, `kit`, `flush`.
+    - Helyben kipróbálva: mindkét címalak beenged, jelszó nélkül és rossz jelszóval 401.
+  - **Nyitva (Áron):**
+    - Egy-egy admin alkalmazásjelszó a két éles oldalon. Ezzel párosítom a HotPotot, és ez a távirányító is.
+    - Az Ads hubban Olívia profilja, ha lesz hirdetés.
+    - GA4 és Search Console: Google-hozzáférés kell. A .hu-hoz sütisáv és adatkezelési tájékoztató is.
+  - **A fő ágnak:** hogy minden ügyféloldalon így legyen, a csomagot az iu_theme-be vagy a `hpv-migrate`-be kell tenni
+    (DONTESEK 2026-11-17).
+  - **„Még a régi oldalt nyitja meg”** (Áron, 11.17). A régi oliviajoga.hu (ELIN) 301-gyel, végleges átirányítással
+    küldött a Google Site-ra, és a böngészők ezt megjegyzik.
+    - Az 1.5.5-től az új oldal az első látogatáskor egyszer kiüríti a böngésző tárolt adatait erre az oldalra
+      (`Clear-Site-Data: "cache"`, `oj_fresh` technikai süti).
+    - Ehhez a böngészőnek egyszer el kell érnie egy új címet, pl. `https://oliviajoga.hu/?uj`.
+    - A régi Google Site-ra kell egy gomb erre a címre (Áron vagy Olívia).
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
