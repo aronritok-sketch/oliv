@@ -20,6 +20,18 @@ class OYS_Security {
 		add_filter( 'authenticate', array( __CLASS__, 'block_if_locked' ), 99, 2 );
 		add_action( 'wp_login_failed', array( __CLASS__, 'record_failure' ) );
 		add_action( 'wp_login', array( __CLASS__, 'clear_on_success' ), 10, 1 );
+		// The lock message says "or reset your password" – so a reset really unlocks (Áron, 2026-11-17: locked out of
+		// the admin, the reset link alone did not let him in for 15 minutes).
+		add_action( 'after_password_reset', array( __CLASS__, 'clear_on_reset' ), 10, 1 );
+	}
+
+	/** A new password: the account's and this connection's failures are forgotten (login name and email both count). */
+	public static function clear_on_reset( $user ) {
+		if ( $user instanceof WP_User ) {
+			delete_transient( self::key( 'user', $user->user_login ) );
+			delete_transient( self::key( 'user', $user->user_email ) );
+		}
+		delete_transient( self::key( 'ip', self::ip() ) );
 	}
 
 	public static function ip() {

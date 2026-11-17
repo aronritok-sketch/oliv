@@ -1430,6 +1430,11 @@
     - A HotPot jelentése: WordPress 7.1.4, állapot 86%, 2 bővítmény-frissítés vár.
   - **olivia-studio 1.22.2 / 3.11.120:** az .online ugyanazt a fejléc-belépést kapta, mint a .hu (`X-OJ-Remote`, bármilyen
     alak, REST-kérésként). Teszt: 1613/0.
+  - **Áron nem tudott belépni az .online-ra** (11.17).
+    - A `site-user oliviajoga-online aronritok@gmail.com administrator` paranccsal: a fiók (#219) megvan, admin;
+      jelszó-visszaállító linket küldtünk.
+    - **olivia-studio 1.22.3 / 3.11.121:** a jelszócsere azonnal feloldja a belépési zárat (6 hibás próba után 15 perc).
+      A hibaüzenet eddig is ezt ígérte, de nem így működött. Teszt: 1615/0.
     - A munkamenet hálózati titka az `X-OYS-Auth`-ot felülírja, és az űrlap a szóközös alkalmazásjelszót nem fogadta el.
     - Áron a jelszót képernyőképen küldte; csak a scratchpadben van (600-as jogosultsággal), a repóban nincs.
   - **HotPot:** a két oldal felvéve Olívia ügyfélkartonjához (4070003): oliviajoga.hu = 150002, oliviajoga.online = 150003.

@@ -424,6 +424,14 @@ test( 'rate limiting: login locks after repeated failures', function () {
 	}
 	ok( OYS_Security::login_locked( 'someone@example.test' ), 'locked after the limit' );
 	ok( is_wp_error( OYS_Security::block_if_locked( null, 'someone@example.test' ) ), 'authentication blocked' );
+	// The lock message says "or reset your password": a new password unlocks the account at once (11.17).
+	$u = get_userdata( make_user( 'Lock' ) );
+	for ( $i = 0; $i < OYS_Security::MAX_LOGIN_FAILS; $i++ ) {
+		OYS_Security::record_failure( $u->user_email );
+	}
+	ok( OYS_Security::login_locked( $u->user_email ), 'this account is locked too' );
+	do_action( 'after_password_reset', $u, 'new-pass-123' );
+	ok( ! OYS_Security::login_locked( $u->user_email ) && ! OYS_Security::login_locked( $u->user_login ), 'a password reset unlocks it at once' );
 } );
 
 test( 'stripe checkout: party receipt has a guest line with quantity', function () {
