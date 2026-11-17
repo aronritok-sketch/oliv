@@ -87,6 +87,21 @@ function oj_remote_try( string $given ): int {
 	return 0;
 }
 
+/**
+ * A WordPress alkalmazásjelszó-ellenőrzése, REST-kérésként. A mag csak akkor fogadja el, ha a REST_REQUEST már áll – ha
+ * egy bővítmény a kérés elején (még a REST előtt) lekéri az aktuális felhasználót, a mag „nem API-kérés”-nek venné. A cím
+ * alapján itt már tudjuk, hogy REST-kérés, ezért erre az egy hívásra kimondjuk.
+ */
+function oj_remote_app_password( string $login, string $pass ) {
+	add_filter( 'application_password_is_api_request', '__return_true', 99 );
+	try {
+		$user = wp_authenticate_application_password( null, $login, $pass );
+	} finally {
+		remove_filter( 'application_password_is_api_request', '__return_true', 99 );
+	}
+	return $user instanceof WP_User ? $user : null;
+}
+
 add_filter( 'determine_current_user', 'oj_remote_header_auth', 25 );
 
 add_action( 'rest_api_init', function () {

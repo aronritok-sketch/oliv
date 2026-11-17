@@ -1422,7 +1422,9 @@
   - **oliviajoga.hu 1.5.9:** az alkalmazásjelszó-ellenőrzés REST-kérésként fut akkor is, ha egy bővítmény a kérés elején
     lekéri a felhasználót (`application_password_is_api_request` erre az egy hívásra). Helyben a hibát nem sikerült
     előidézni, ez csak óvatosság.
-  - **oliviajoga.hu 1.5.10:** a távirányító az `X-OJ-Remote` fejlécet is elfogadja.
+  - **oliviajoga.hu 1.5.10 → 1.5.11:** a távirányító az `X-OJ-Remote` fejlécet is elfogadja.
+    - Az 1.5.10-ből kimaradt egy segédfüggvény: fejléces REST-kérésnél hibával állt le, de kiadás nem készült belőle.
+    - Az 1.5.11 javítja. Helyben 5 helyes alak beenged, a rossz és a hiányzó nem; hibanapló üres.
     - A munkamenet hálózati titka az `X-OYS-Auth`-ot felülírja, és az űrlap a szóközös alkalmazásjelszót nem fogadta el.
     - Áron a jelszót képernyőképen küldte; csak a scratchpadben van (600-as jogosultsággal), a repóban nincs.
   - **HotPot:** a két oldal felvéve Olívia ügyfélkartonjához (4070003): oliviajoga.hu = 150002, oliviajoga.online = 150003.
