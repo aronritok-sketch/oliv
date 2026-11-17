@@ -4855,6 +4855,42 @@ test( 'Olívia, 17 November (chat): the group class page has its prices like the
 	}
 } );
 
+test( 'Olívia and Áron, 17 November: stretching and relaxation explain how it works (payment too); the questions keep the tapped one in place; touch buttons 44 px', function () {
+	require_once get_template_directory() . '/inc/demo-import.php';
+	$data = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content-hu-online.json' ), true );
+	foreach ( oy_1117_how() as $slug => $text ) {
+		ok( str_contains( $data['classes'][ $slug ]['content'], '<p>' . $text . '</p>' ) && str_contains( $text, 'kifizetheted' ) && str_contains( $text, 'javaslattal' ), $slug . ': the steps with the answer, accepting and paying, in her word („javaslattal”)' );
+	}
+	update_option( 'oy_edition', 'hu-online' );
+	$made = array();
+	$e0   = get_option( 'oye_edits' );
+	try {
+		foreach ( array_keys( oy_1117_how() ) as $slug ) {
+			$p = get_page_by_path( $slug, OBJECT, 'oy_class' );
+			$made[ $slug ] = $p ? array( $p->ID, $p->post_content ) : array( wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => $slug, 'post_name' => $slug ) ), null );
+			wp_update_post( wp_slash( array( 'ID' => $made[ $slug ][0], 'post_content' => "<h2>Hogyan működik?</h2>\n<p>" . OY_1117_HOW_OLD . "</p>\n[oy_private_link]" ) ) );
+		}
+		update_option( 'oye_edits', array( 't' => array( oye_text_key( OY_1117_HOW_OLD ) => 'Kérj időpontot a fiókodban, és visszaírok egy javaslattal.' ), 'i' => array() ) );
+		delete_option( 'oy_1117_rev' );
+		oy_migrate_1117();
+		foreach ( oy_1117_how() as $slug => $text ) {
+			ok( str_contains( get_post_field( 'post_content', $made[ $slug ][0] ), '<p>' . $text . '</p>' ), 'live update: ' . $slug );
+		}
+		ok( ! isset( oye_edits()['t'][ oye_text_key( OY_1117_HOW_OLD ) ] ), '… and her edit of the old shared text goes' );
+	} finally {
+		foreach ( $made as $m ) {
+			null === $m[1] ? wp_delete_post( $m[0], true ) : wp_update_post( wp_slash( array( 'ID' => $m[0], 'post_content' => $m[1] ) ) );
+		}
+		false === $e0 ? delete_option( 'oye_edits' ) : update_option( 'oye_edits', $e0 );
+		delete_option( 'oy_1117_rev' );
+		delete_option( 'oy_edition' );
+	}
+	$js  = (string) file_get_contents( get_template_directory() . '/assets/site.js' );
+	ok( str_contains( $js, "closest('details > summary')" ) && str_contains( $js, 'pinned.el.getBoundingClientRect().top - pinned.top' ), 'a tapped folding title stays where it was when the open one above closes' );
+	$css = (string) file_get_contents( get_template_directory() . '/assets/site.css' );
+	ok( str_contains( $css, '@media (pointer: coarse), (max-width: 759px) { .btn, .btn--sm { min-height: 44px; } }' ), 'buttons at least 44 px high on a touch screen' );
+} );
+
 $t = $GLOBALS['oys_t'];
 echo "\n{$t['pass']} assertions passed, {$t['fail']} failed\n";
 exit( $t['fail'] ? 1 : 0 );

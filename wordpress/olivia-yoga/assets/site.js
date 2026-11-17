@@ -253,6 +253,32 @@
 
 	/* The questions: only one open at a time (Olívia: „egyszerre csak 1 legyen megnyitva, a többi csukódjon vissza”). Newer
 	   browsers do it from the shared name; this covers the older ones. */
+	/* Áron, 17 November: „főoldali gyiknél, hogyha lenyitom, leugrik az olvass a jógáról részhez” – opening a question
+	   closes the open one above it, its answer folds away and the page used to stay where it was, so the tapped question
+	   flew up out of sight and the next section showed. Now the tapped title stays exactly where it was on the screen
+	   (the correction happens at once, unseen: the page otherwise scrolls smoothly). Any folding title: the questions,
+	   the price cards. */
+	var pinned = null;
+	function settle() {
+		if (!pinned || !document.contains(pinned.el)) return;
+		var moved = pinned.el.getBoundingClientRect().top - pinned.top;
+		if (Math.abs(moved) < 1) return;
+		var root = document.documentElement, was = root.style.scrollBehavior;
+		root.style.scrollBehavior = 'auto';
+		window.scrollTo(0, window.scrollY + moved);
+		root.style.scrollBehavior = was;
+	}
+	document.addEventListener('click', function (e) {
+		var s = e.target.closest && e.target.closest('details > summary');
+		if (!s) return;
+		pinned = { el: s, top: s.getBoundingClientRect().top };
+		var mine = pinned;
+		// after the browser has opened it and closed the others (at once, or in the toggle events of older browsers)
+		setTimeout(settle, 0);
+		if (window.requestAnimationFrame) requestAnimationFrame(function () { settle(); requestAnimationFrame(settle); });
+		setTimeout(function () { if (pinned === mine) pinned = null; }, 350); // later on the reader's own scrolling is left alone
+	}, true);
+
 	document.addEventListener('toggle', function (e) {
 		var d = e.target;
 		if (!d || d.tagName !== 'DETAILS' || !d.open || !d.parentElement) return;
@@ -260,6 +286,7 @@
 		if (!d.parentElement.classList.contains('faq') && !name) return;
 		// the questions, and anything else that shares a name (the price cards of a class page)
 		Array.prototype.forEach.call(d.parentElement.children, function (o) { if (o !== d && o.tagName === 'DETAILS' && o.open && o.getAttribute('name') === name) o.open = false; });
+		settle();
 	}, true);
 
 	/* Olívia, 15 November, the price cards of a class page: „a két egyedüli maradhat kinyitva, a párosok maradjanak csak

@@ -1275,6 +1275,30 @@
   - **Minden árkártya fejlécében** maga az ár áll, „-tól” nélkül.
   - Tesztek: 1597/0.
 
+- **téma 3.11.114 – a lenyílók nem ugranak el; nagyobb gombok; részletesebb „Hogyan működik?”** (Áron, 11.17: „főoldali
+  gyiknél, hogyha lenyitom, leugrik az olvass a jógáról részhez … csinálj egy 1000-1200 tesztet minden eszközről”;
+  Olívia, chat, képernyőfelvétellel: „Ellenőrizd az összes ilyet, nem jó hogy így felugrik”).
+  - **Az ok:** egy kérdés lenyitásakor a fölötte nyitott válasz becsukódik, a lap rövidül, a görgetés helye viszont marad.
+    A megérintett kérdés így kicsúszott felül, és a következő rész (élesben „Olvass a jógáról”) látszott. iPhone-on
+    (WebKit) és Androidon (Chromium) egyaránt előjött.
+  - **Javítás (`site.js`):** minden lenyíló címnél (`details > summary`) a megérintett cím pontosan ott marad a képernyőn,
+    ahol volt. A korrekció azonnali és láthatatlan, csak az érintés utáni két képkockában; utána az olvasó saját
+    görgetéséhez nem nyúl.
+  - **Gombok érintőképernyőn legalább 44 px magasak** (az árkártyák kis gombjai 37 px-esek voltak).
+  - **Olívia, chat:** „A mobilizáció és a relaxáció aloldalon a hogyan működik résznél legyen kicsit részletesebb … pl a
+    fizetés nincs benne”.
+    - Mindkét oldalon ugyanaz a három lépés, mint az egyéni óránál: mit írj meg; visszaírok egy javaslattal, egy
+      kattintással elfogadhatod, kifizetheted vagy a bérletedből foglalhatod; élő óra, mi kell hozzá.
+    - A „javaslattal” az ő szava a szerkesztőből. A régi közös szövegre tett szerkesztése törlődött, mert már semmi sem
+      mutatja.
+  - **Eszközös tesztsor** (scratchpad `qa/suite.js` + `qa/report.js`, Playwright):
+    - 11 eszköz (WebKit: iPhone SE/13/15 Pro Max, iPad Mini/Pro 11, Safari 1440; Chromium: Pixel 7, Galaxy S9+,
+      Galaxy Tab S4, Chrome 1366; Firefox 1920) × 19 oldal.
+    - Oldalanként: betöltés, szkripthiba, hibás fájl, oldalirányú görgetés, képek és alt, 40 px-es érintési célok,
+      minden lenyíló (a képernyő 60%-ánál megérintve a helyén marad-e és vált-e), menü, naptár, sütisáv, linkek.
+    - Minden talált link egyszer, HTTP-válaszra.
+  - Tesztek: 1604/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

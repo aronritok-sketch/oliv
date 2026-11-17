@@ -1796,8 +1796,23 @@ function oy_1117_apply( WP_Post $post, array $set ) {
 	return $moved;
 }
 
+/**
+ * Olívia, 17 November: „A mobilizáció és a relaxáció aloldalon a hogyan működik résznél legyen kicsit részletesebb,
+ * ugyanúgy ahogy az egyéni jógánál és a kismamatornánál. pl a fizetés nincs benne” – the two pages shared one short text,
+ * which she had changed in the page editor to „visszaírok egy javaslattal”; the new texts keep her word, and her edit of
+ * the old shared text goes (nothing shows it any more).
+ */
+const OY_1117_HOW_OLD = 'Kérj időpontot a fiókodban, és visszaírok egy időponttal. Az óra élő, itt az oldalon, a böngésződben.';
+
+function oy_1117_how() {
+	return array(
+		'stretching'       => 'Kérj időpontot a fiókodban: írd meg, mikor érsz rá, és hol érzed feszesnek vagy merevnek a tested, például a vállad, a csípőd vagy a hátad. Hamarosan visszaírok egy javaslattal: egy kattintással elfogadhatod, aztán kifizetheted, vagy lefoglalhatod a bérletedből. Az óra élő, itt az oldalon, a böngésződben; csak egy jógamatracnyi hely és egy kamerás telefon vagy laptop kell hozzá.',
+		'relaxacio-legzes' => 'Kérj időpontot a fiókodban: írd meg, mikor érsz rá, és mire van most szükséged: kevesebb stresszre, jobb alvásra vagy csak egy kis nyugalomra. Hamarosan visszaírok egy javaslattal: egy kattintással elfogadhatod, aztán kifizetheted, vagy lefoglalhatod a bérletedből. Az óra élő, itt az oldalon, a böngésződben; elég hozzá egy csendes, kényelmes hely, ahol le tudsz feküdni, és egy kamerás telefon vagy laptop.',
+	);
+}
+
 function oy_migrate_1117() {
-	$rev = '2026-11-17b';
+	$rev = '2026-11-17c';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1117_rev' ) === $rev ) {
 		return array();
 	}
@@ -1809,6 +1824,31 @@ function oy_migrate_1117() {
 			$moved = oy_1117_apply( $post, $set );
 			$log[] = $key . ': Olívia, 17 November' . ( $moved ? ' (' . $moved . ' of her own texts kept)' : '' );
 		}
+	}
+	// „legyen kicsit részletesebb … pl a fizetés nincs benne” – the two short „Hogyan működik?” texts
+	$how = 0;
+	foreach ( oy_1117_how() as $slug => $text ) {
+		$post = get_page_by_path( $slug, OBJECT, 'oy_class' );
+		if ( $post && str_contains( $post->post_content, '<p>' . OY_1117_HOW_OLD . '</p>' ) ) {
+			kses_remove_filters();
+			wp_update_post( wp_slash( array( 'ID' => $post->ID, 'post_content' => str_replace( '<p>' . OY_1117_HOW_OLD . '</p>', '<p>' . $text . '</p>', $post->post_content ) ) ) );
+			kses_init_filters();
+			$log[] = $slug . ': how it works, in detail';
+			++$how;
+		}
+	}
+	if ( $how && function_exists( 'oye_edits' ) ) {
+		$e    = oye_edits();
+		$meta = get_option( 'oye_edits_meta', array() );
+		$meta = is_array( $meta ) ? $meta : array();
+		foreach ( array_unique( array( oye_text_key( OY_1117_HOW_OLD ), oye_text_key( wptexturize( OY_1117_HOW_OLD ) ) ) ) as $k ) {
+			unset( $e['t'][ $k ] );
+			if ( is_array( $meta ) ) {
+				unset( $meta[ $k ] );
+			}
+		}
+		update_option( 'oye_edits', $e, true );
+		update_option( 'oye_edits_meta', $meta, false );
 	}
 	// „A csoportos óra aloldalára is tegyük be az árakat” – „Árak” before the group class's booking button
 	$post = get_page_by_path( 'hatha-flow', OBJECT, 'oy_class' );
