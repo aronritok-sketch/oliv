@@ -1,0 +1,5 @@
+ffprofile/
+ffprofile-run-*/
+r-*.json
+log-*.txt
+report-*.txt
