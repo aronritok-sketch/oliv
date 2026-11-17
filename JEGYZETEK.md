@@ -1419,6 +1419,9 @@
     - vagy csak az alkalmazásjelszót (ilyenkor az adminok alkalmazásjelszavai között keres).
     - Mindig a WordPress saját ellenőrzésével. Helyben próbálva: 6 helyes alak beenged, a rossz jelszó nem.
     - Ok: Áron elmentette a jelszót, de az 1.5.7 nem fogadta el; az érték pontos alakját nem látjuk.
+  - **oliviajoga.hu 1.5.9:** az alkalmazásjelszó-ellenőrzés REST-kérésként fut akkor is, ha egy bővítmény a kérés elején
+    lekéri a felhasználót (`application_password_is_api_request` erre az egy hívásra). Helyben a hibát nem sikerült
+    előidézni, ez csak óvatosság.
   - **HotPot:** a két oldal felvéve Olívia ügyfélkartonjához (4070003): oliviajoga.hu = 150002, oliviajoga.online = 150003.
     - A kapcsolati kódok 7 napig érvényesek. Nincsenek a repóban; ha lejárnak, a HotPotban újat lehet kérni.
   - **SEO OS:** két új projekt, „draft”, Olívia ügyfele alatt.

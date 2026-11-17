@@ -59,19 +59,35 @@ function oj_remote_header_auth( $user_id ) {
 			$by    = get_user_by( 'email', $login );
 			$login = $by ? $by->user_login : $login;
 		}
-		$user = wp_authenticate_application_password( null, $login, $pass );
-		return $user instanceof WP_User ? $user->ID : $user_id;
+		$user = oj_remote_app_password( $login, $pass );
+		return $user ? $user->ID : $user_id;
 	}
 	foreach ( get_users( array( 'role' => 'administrator', 'number' => 10, 'orderby' => 'ID' ) ) as $admin ) {
 		if ( ! WP_Application_Passwords::get_user_application_passwords( $admin->ID ) ) {
 			continue;
 		}
-		$user = wp_authenticate_application_password( null, $admin->user_login, $given );
-		if ( $user instanceof WP_User ) {
+		$user = oj_remote_app_password( $admin->user_login, $given );
+		if ( $user ) {
 			return $user->ID;
 		}
 	}
 	return $user_id;
+}
+
+/**
+ * A WordPress alkalmazásjelszó-ellenőrzése, REST-kérésként. A mag csak akkor fogadja el, ha a REST_REQUEST már áll – ha
+ * egy bővítmény a kérés elején (még a REST előtt) lekéri az aktuális felhasználót, a mag „nem API-kérés”-nek veszi, és a
+ * belépés elmarad (élesen így járt az 1.5.8 a HelloProVision-csomag bővítményeivel). A cím alapján itt már tudjuk, hogy
+ * REST-kérés, ezért erre az egy hívásra kimondjuk.
+ */
+function oj_remote_app_password( string $login, string $pass ) {
+	add_filter( 'application_password_is_api_request', '__return_true', 99 );
+	try {
+		$user = wp_authenticate_application_password( null, $login, $pass );
+	} finally {
+		remove_filter( 'application_password_is_api_request', '__return_true', 99 );
+	}
+	return $user instanceof WP_User ? $user : null;
 }
 add_filter( 'determine_current_user', 'oj_remote_header_auth', 25 );
 
