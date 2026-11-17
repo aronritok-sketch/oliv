@@ -27,9 +27,12 @@
 
 defined( 'ABSPATH' ) || exit;
 
-/** X-OYS-Auth: alkalmazásjelszó (lásd lent, milyen alakban) → a felhasználó, ha az Authorization fejléc nem jött meg. */
+/**
+ * X-OJ-Remote vagy X-OYS-Auth: alkalmazásjelszó → a felhasználó, ha az Authorization fejléc nem jött meg. Két név, mert
+ * a munkamenet hálózati titka az X-OYS-Auth-ot felülírja (Áron, 11.17: az űrlap a szóközös jelszót nem fogadta el).
+ */
 function oj_remote_header_auth( $user_id ) {
-	if ( $user_id || empty( $_SERVER['HTTP_X_OYS_AUTH'] ) || ! is_ssl() || ! function_exists( 'wp_authenticate_application_password' ) ) {
+	if ( $user_id || ( empty( $_SERVER['HTTP_X_OJ_REMOTE'] ) && empty( $_SERVER['HTTP_X_OYS_AUTH'] ) ) || ! is_ssl() || ! function_exists( 'wp_authenticate_application_password' ) ) {
 		return $user_id;
 	}
 	// Csak a REST-hez. Az iu_theme elrejti a /wp-json/ előtagot (rest_url_prefix), ezért a valódi előtagot nézzük, és a
@@ -38,13 +41,23 @@ function oj_remote_header_auth( $user_id ) {
 	if ( ! str_contains( $uri, '/' . rest_get_url_prefix() . '/' ) && ! str_contains( $uri, 'rest_route=' ) ) {
 		return $user_id;
 	}
+	foreach ( array( 'HTTP_X_OJ_REMOTE', 'HTTP_X_OYS_AUTH' ) as $h ) {
+		$id = empty( $_SERVER[ $h ] ) ? 0 : oj_remote_try( trim( (string) wp_unslash( $_SERVER[ $h ] ) ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		if ( $id ) {
+			return $id;
+		}
+	}
+	return $user_id;
+}
+
+/** Egy fejléc értéke → a felhasználó azonosítója, vagy 0. */
+function oj_remote_try( string $given ): int {
 	// Bármelyik alak jó (Áron, 11.17 – az űrlapba nem mindig pontosan ez kerül): „felhasználó:jelszó”, „e-mail:jelszó”,
 	// base64-ben, „Bearer …” / „Basic …” előtaggal, vagy csak maga az alkalmazásjelszó (akkor az adminisztrátorok
 	// alkalmazásjelszavai közül az egyezőé). Mindig a WordPress saját alkalmazásjelszó-ellenőrzésével.
-	$given = trim( (string) wp_unslash( $_SERVER['HTTP_X_OYS_AUTH'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
 	$given = trim( (string) preg_replace( '/^(bearer|basic|token)\s+/i', '', $given ) );
 	if ( '' === $given ) {
-		return $user_id;
+		return 0;
 	}
 	if ( ! str_contains( $given, ':' ) ) {
 		$dec = base64_decode( $given, true );
@@ -60,7 +73,7 @@ function oj_remote_header_auth( $user_id ) {
 			$login = $by ? $by->user_login : $login;
 		}
 		$user = oj_remote_app_password( $login, $pass );
-		return $user ? $user->ID : $user_id;
+		return $user ? $user->ID : 0;
 	}
 	foreach ( get_users( array( 'role' => 'administrator', 'number' => 10, 'orderby' => 'ID' ) ) as $admin ) {
 		if ( ! WP_Application_Passwords::get_user_application_passwords( $admin->ID ) ) {
@@ -71,24 +84,9 @@ function oj_remote_header_auth( $user_id ) {
 			return $user->ID;
 		}
 	}
-	return $user_id;
+	return 0;
 }
 
-/**
- * A WordPress alkalmazásjelszó-ellenőrzése, REST-kérésként. A mag csak akkor fogadja el, ha a REST_REQUEST már áll – ha
- * egy bővítmény a kérés elején (még a REST előtt) lekéri az aktuális felhasználót, a mag „nem API-kérés”-nek veszi, és a
- * belépés elmarad (élesen így járt az 1.5.8 a HelloProVision-csomag bővítményeivel). A cím alapján itt már tudjuk, hogy
- * REST-kérés, ezért erre az egy hívásra kimondjuk.
- */
-function oj_remote_app_password( string $login, string $pass ) {
-	add_filter( 'application_password_is_api_request', '__return_true', 99 );
-	try {
-		$user = wp_authenticate_application_password( null, $login, $pass );
-	} finally {
-		remove_filter( 'application_password_is_api_request', '__return_true', 99 );
-	}
-	return $user instanceof WP_User ? $user : null;
-}
 add_filter( 'determine_current_user', 'oj_remote_header_auth', 25 );
 
 add_action( 'rest_api_init', function () {
