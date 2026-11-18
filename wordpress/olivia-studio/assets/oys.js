@@ -127,3 +127,13 @@
 	});
 })();
 
+
+/* „More classes in the calendar” on the booking page (Olívia, 18 Nov): a link to #naptar opens it. */
+(function () {
+	var open = function () {
+		var d = document.getElementById('naptar');
+		if (d && 'DETAILS' === d.tagName && '#naptar' === location.hash) d.open = true;
+	};
+	open();
+	window.addEventListener('hashchange', open);
+})();

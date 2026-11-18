@@ -1556,6 +1556,15 @@
     - A GSC-ben „Indexelés kérése” a fő oldalakra.
     - Google Cégprofil Olíviának; ez kell a Google-értékelésekhez is.
 
+- **2026-11-18 – Foglalás oldal (/foglalas/): bevezető mondat és lenyíló naptár (oliviajoga.online 3.12.2, olivia-studio 1.23.1).**
+  Olívia a portálon (9148907): „írd át ezt a mondatot, hogy Ha csoportosan jógáznál, válassz órát az alábbi órarendből. A
+  kezdős mondat nem kell, majd a foglalás alá tedd be a további órák a naptárban cta-t, amire nyíljon le a naptár, alatta
+  meg maradjon az egyéni órás szekció”.
+  - A mondat: „Ha csoportosan jógáznál, válassz órát az alábbi órarendből.”, a kezdőkről szóló rész nélkül.
+  - Az órák alatt egy „További órák a naptárban” gomb (`<details id="naptar">`): koppintásra ott helyben lenyílik a lapozható
+    havi naptár, a nyíl megfordul. A `/foglalas/#naptar` link nyitva hozza. Az egyéni órák doboza alatta marad.
+  - Tesztek: 1647/0. Telefonon (390 px) csukva és nyitva is próbálva, oldalra nem csúszik.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

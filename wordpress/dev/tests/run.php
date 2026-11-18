@@ -1134,6 +1134,23 @@ test( 'one-to-one in two lengths (60 / 90 minutes): own credits, own cards, the 
 	}
 } );
 
+test( 'booking page: the group class line, „More classes in the calendar” opening the calendar, the one-to-one box under it (Olívia, 18 Nov)', function () {
+	$s = make_session( array( 'format' => 'online', 'online_capacity' => 10, 'in_hours' => 24 * 3 ) );
+	OYS_Settings::update( array( 'schedule_empty_days' => 'no' ) );
+	try {
+		$html = OYS_Frontend::sc_book();
+	} finally {
+		OYS_Settings::update( array( 'schedule_empty_days' => 'yes' ) );
+		OYS_Schedule::cancel_session( $s->id, 'test' );
+	}
+	$cal = strpos( $html, '<details class="oys-more-cal" id="naptar">' );
+	ok( str_contains( $html, 'Joining a group class? Choose one from the timetable below.' ) && ! str_contains( $html, 'Beginners are welcome' ), 'the line above the timetable is about group classes, without the beginners sentence' );
+	ok( false !== $cal && $cal > strpos( $html, '<li class="session ' ) && str_contains( substr( $html, $cal ), 'data-oys-cal' ) && str_contains( $html, 'More classes in the calendar' ), 'under the classes a button that opens the calendar in place' );
+	ok( false === strpos( $html, 'oys-private-box' ) || strpos( $html, 'oys-private-box' ) > $cal, 'the one-to-one box stays under it' );
+	$hu = (string) file_get_contents( OYS_DIR . 'languages/olivia-studio-hu_HU.po' );
+	ok( str_contains( $hu, "msgid \"Joining a group class? Choose one from the timetable below.\"\nmsgstr \"Ha csoportosan jógáznál, válassz órát az alábbi órarendből.\"" ) && str_contains( $hu, "msgid \"More classes in the calendar\"\nmsgstr \"További órák a naptárban\"" ), 'in Hungarian her words: „Ha csoportosan jógáznál, válassz órát az alábbi órarendből.”' );
+} );
+
 test( 'timetable with only the days that have a class: the next ones, however far, and the one-to-one box (Olivia, 13 Nov)', function () {
 	$far = make_session( array( 'format' => 'online', 'online_capacity' => 10, 'in_hours' => 24 * 30 ) );
 	$all = do_shortcode( '[oys_schedule days="7"]' );

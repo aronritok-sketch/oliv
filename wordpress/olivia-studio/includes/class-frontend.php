@@ -522,8 +522,21 @@ class OYS_Frontend {
 		if ( ! empty( $_GET['product'] ) ) {
 			return $out . self::render_product_checkout( sanitize_key( $_GET['product'] ) );
 		}
-		return $out . '<div class="oys-intro"><p class="lead">' . esc_html__( 'Choose a class from the timetable below. Beginners are welcome in every class.', 'olivia-studio' ) . '</p></div>' . self::sc_schedule( array( 'days' => 21 ) )
+		return $out . '<div class="oys-intro"><p class="lead">' . esc_html__( 'Joining a group class? Choose one from the timetable below.', 'olivia-studio' ) . '</p></div>' . self::sc_schedule( array( 'days' => 21 ) )
+			. self::more_calendar()
 			. ( 'no' === OYS_Settings::get( 'schedule_empty_days' ) ? self::sc_private_box() : '' );
+	}
+
+	/**
+	 * Under the timetable of the booking page: „More classes in the calendar”, which opens the calendar of every bookable
+	 * week right there (Olívia, 18 November: „a foglalás alá tedd be a további órák a naptárban cta-t, amire nyíljon le a
+	 * naptár, alatta meg maradjon az egyéni órás szekció”).
+	 */
+	public static function more_calendar() {
+		$icon = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>';
+		$chev = '<svg class="oys-more-cal__chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
+		return '<details class="oys-more-cal" id="naptar"><summary class="btn btn--ghost">' . $icon . '<span>' . esc_html__( 'More classes in the calendar', 'olivia-studio' ) . '</span>' . $chev . '</summary>'
+			. '<div class="oys-more-cal__body">' . self::sc_calendar( array() ) . '</div></details>';
 	}
 
 	/**

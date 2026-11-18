@@ -1299,8 +1299,8 @@ msgid "Most popular"
 msgstr "Legnépszerűbb"
 
 #: includes/class-frontend.php:263
-msgid "Choose a class from the timetable below. Beginners are welcome in every class."
-msgstr "Válassz órát az alábbi órarendből. Kezdőket minden órára szeretettel várok."
+msgid "Joining a group class? Choose one from the timetable below."
+msgstr "Ha csoportosan jógáznál, válassz órát az alábbi órarendből."
 
 #: includes/class-frontend.php:272
 msgid "Online, live. The link is in your confirmation email and your account."
@@ -8050,3 +8050,6 @@ msgstr "Vélemény:"
 
 msgid "only if you write one – its text, the name you chose to show (full name, first name or none) and when you agreed to it. It appears on the site after the studio has read it; you can change or withdraw it at any time."
 msgstr "csak ha írsz: a szövege, a választott megjelenés (teljes név, keresztnév vagy név nélkül), és hogy mikor járultál hozzá. Az oldalon azután jelenik meg, hogy átolvastam; bármikor módosíthatod vagy visszavonhatod."
+
+msgid "More classes in the calendar"
+msgstr "További órák a naptárban"
