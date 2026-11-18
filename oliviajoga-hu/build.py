@@ -41,7 +41,7 @@ ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.6.0'
+VERSION = '1.7.0'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -906,13 +906,110 @@ def document(p, body, cls, schema, image=None):
 '''
 
 
+# Kovács Olívia – the same facts as on the online site (wordpress/olivia-yoga/inc/seo.php, Person), so the language models
+# and search engines see one person on both domains (Áron, 11.18: „az AI-ok … ajánlják Oliviát”).
+OLIVIA = {
+    'job': 'Jógaoktató, pre- és postnatális tréner',
+    'desc': ('Hatha jógaoktató (Yoga Alliance International, 2023), pre- és postnatális tréner (Fitmummy), tibeti hangtál- és '
+             'hangmasszázs-terapeuta; 2015-től főállású edző, 2018-tól masszőr. Élő online jógaórákat és online kismamatornát '
+             'tart magyarul.'),
+    'knows': ['Online jóga', 'Hatha jóga', 'Flow jóga', 'Kismamatorna', 'Várandós torna', 'Gátizomtorna', 'Stretching',
+              'Mobilizáció', 'Légzőgyakorlatok', 'Relaxáció', 'Meditáció', 'Yoga', 'Prenatal fitness'],
+    'cred': [{'@type': 'EducationalOccupationalCredential', 'name': 'Hatha jógaoktató (2023)', 'credentialCategory': 'certificate',
+              'recognizedBy': {'@type': 'Organization', 'name': 'Yoga Alliance International'}},
+             {'@type': 'EducationalOccupationalCredential', 'name': 'Pre- és postnatális tréner', 'credentialCategory': 'certificate',
+              'recognizedBy': {'@type': 'Organization', 'name': 'Fitmummy'}},
+             {'@type': 'EducationalOccupationalCredential', 'name': 'Tibeti hangtál- és hangmasszázs-terapeuta', 'credentialCategory': 'certificate'}],
+}
+# The classes (all on the online site); name → address there.
+SERVICES = [('Csoportos online flow jóga', 'yoga'), ('Egyéni online jóga', 'private'), ('Online kismamatorna', 'prenatal'),
+            ('Online stretching és mobilizáció', 'stretching'), ('Relaxáció és légzés', 'relax')]
+BUSINESS_DESC = ('Kovács Olívia jógaórái: élő, magyar nyelvű online jógaórák az oliviajoga.online oldalon (csoportos online flow '
+                 'jóga, egyéni online jóga, online kismamatorna, stretching és mobilizáció, relaxáció és légzés); 2026. november '
+                 '25-ig csoportos hatha flow jóga Budapest XVIII. és XXI. kerületében.')
+
+
 def schema_base(p, extra=None):
-    person = {'@type': 'Person', '@id': ORIGIN + '/#olivia', 'name': 'Kovács Olívia', 'jobTitle': 'jógaoktató',
-              'url': ORIGIN + '/', 'email': EMAIL, 'sameAs': [INSTAGRAM, FACEBOOK]}
-    graph = [{'@type': 'WebSite', '@id': ORIGIN + '/#website', 'url': ORIGIN + '/', 'name': SITE_TITLE, 'inLanguage': 'hu-HU'}, person]
+    person = {'@type': 'Person', '@id': ORIGIN + '/#olivia', 'name': 'Kovács Olívia', 'jobTitle': OLIVIA['job'],
+              'description': OLIVIA['desc'], 'knowsAbout': OLIVIA['knows'], 'hasCredential': OLIVIA['cred'],
+              'url': ORIGIN + '/' + urllib.parse.quote('rólam'), 'email': EMAIL, 'knowsLanguage': 'hu',
+              'sameAs': [INSTAGRAM, FACEBOOK, ONLINE + '/rolam/'], 'worksFor': {'@id': ORIGIN + '/#business'}}
+    business = {'@type': 'Organization', '@id': ORIGIN + '/#business', 'name': 'Olívia jóga', 'url': ORIGIN + '/',
+                'email': EMAIL, 'description': BUSINESS_DESC, 'founder': {'@id': ORIGIN + '/#olivia'},
+                'areaServed': {'@type': 'Country', 'name': 'Hungary'}, 'knowsLanguage': 'hu',
+                'sameAs': [ONLINE + '/', INSTAGRAM, FACEBOOK],
+                'hasOfferCatalog': {'@type': 'OfferCatalog', 'name': 'Jógaórák', 'itemListElement': [
+                    {'@type': 'Offer', 'itemOffered': {'@type': 'Service', 'name': n, 'url': ONLINE.rstrip('/') + ONLINE_PATHS[k],
+                                                        'provider': {'@id': ORIGIN + '/#olivia'}, 'availableChannel': {
+                                                            '@type': 'ServiceChannel', 'serviceUrl': ONLINE.rstrip('/') + ONLINE_PATHS[k]}}}
+                    for n, k in SERVICES]}}
+    graph = [{'@type': 'WebSite', '@id': ORIGIN + '/#website', 'url': ORIGIN + '/', 'name': SITE_TITLE, 'inLanguage': 'hu-HU',
+              'publisher': {'@id': ORIGIN + '/#business'}}, business, person]
+    path = (p or {}).get('path', '')
+    if path not in ('', 'főoldal', '404'):
+        t = (p or {}).get('title', '')
+        own = re.search(r'Kovács Olívia\s*[-–]\s*(.+)$', t)  # „Jóga 18. és 21. kerület | Kovács Olívia - Pránajáma”: the page's own part
+        name = dict(NAV).get(path) or norm(re.sub(r'\s+\?$', '?', own.group(1)) if own else re.sub(r'\s*\|.*$', '', t))
+        graph.append({'@type': 'BreadcrumbList', 'itemListElement': [
+            {'@type': 'ListItem', 'position': 1, 'name': 'Főoldal', 'item': ORIGIN + '/'},
+            {'@type': 'ListItem', 'position': 2, 'name': name, 'item': ORIGIN + '/' + urllib.parse.quote(path)}]})
     if extra:
         graph.append(extra)
     return {'@context': 'https://schema.org', '@graph': graph}
+
+
+def llms_txt(journal_cards):
+    """/llms.txt for the WordPress theme (llmstxt.org; iu_theme's iu_llms_txt filter): who Olivia is, the facts, the pages
+    with their own descriptions, the articles once each, the online site's classes. Placeholders: the theme fills them in.
+    Only facts that are on the two sites."""
+    t = norm(BUSINESS_DESC)
+    lines = ['# Olívia jóga – Kovács Olívia jógaoktató', '',
+             '> Kovács Olívia hatha flow jógaoktató és pre- és postnatális tréner. Élő, magyar nyelvű online jógaórákat tart '
+             'az oliviajoga.online oldalon.' + ('' if AFTER else ' 2026. november 25-ig csoportos hatha flow jógaórákat tart '
+                                                 'Budapest XVIII. és XXI. kerületében.'), '',
+             '- Végzettség: hatha jógaoktató (Yoga Alliance International, 2023), pre- és postnatális tréner (Fitmummy), tibeti '
+             'hangtál- és hangmasszázs-terapeuta.',
+             '- Órák (online, magyarul): ' + ', '.join(n.lower() if i else n for i, (n, _) in enumerate(SERVICES)) + '. Foglalás: '
+             + online('home'),
+             ('- Csoportos online flow jóga: ' + ONLINE_TIME + '.'),
+             ]
+    if not AFTER:
+        lines.append('- Termes órák 2026. november 25-ig: Budapest XVIII. kerület (Prána Jóga és Életmód Központ) és XXI. kerület '
+                     '(Korall Sportsziget).')
+    lines += ['- Kapcsolat: ' + EMAIL + ' · Instagram: ' + INSTAGRAM + ' · Facebook: ' + FACEBOOK, '- Nyelv: magyar.', '',
+              '## Oldalak']
+    line = lambda title, url, desc: f'- [{title.replace("[", "(").replace("]", ")")}]({url}): {desc}'.rstrip(': ')
+    for path, name in NAV:
+        if path == '' or path in DELETED_PAGES or path not in PAGES:
+            continue
+        pg = dict(PAGES[path], path=path)
+        lines.append(line(name, link(path), description(pg) or ''))
+    lines += ['', '## Online órák (oliviajoga.online)']
+    for n, k in SERVICES:
+        lines.append(line(n, online(k), ''))
+    lines += [line('Bejelentkezés és árak', online('prices'), ''), line('Kapcsolat', online('contact'), ''), '',
+              '## Jógáról – cikkek']
+    seen = {}
+    for path, head, _ in journal_cards:
+        if path not in PAGES or path in DELETED_PAGES:
+            continue
+        pg = dict(PAGES[path], path=path)
+        title = norm(head) or norm(re.sub(r'\s*\|.*$', '', pg['title']))
+        part = re.search(r'<strong>(\d+\.\s[^<]+?)\s*</strong>', json.dumps(PAGES[path], ensure_ascii=False))
+        if part and norm(part.group(1)) not in title:  # a series part („1. Milyen elemekből…”, „A jóga 8 ága ॐ”): its topic too
+            title = re.sub(r'^\d+\.\s*', '', title) + ' ' + norm(part.group(1))
+        seen[title] = seen.get(title, 0) + 1
+        lines.append((path, title, description(pg) or ''))
+    out = []
+    for item in lines:
+        if isinstance(item, tuple):
+            path, title, desc = item
+            if seen[title] > 1:  # the same title on several articles (A jóga 8 ága …): the address tells them apart
+                title += ' – ' + path.replace('-', ' ').capitalize()
+            item = line(title, link(path), desc)
+        out.append(item)
+    out += ['', '## Optional', line('Adatkezelési tájékoztató', link(PRIVACY_PATH), '')]
+    return '\n'.join(out) + '\n'
 
 
 def wrap(inner, cls='section'):
@@ -1691,7 +1788,7 @@ def wp_theme(pages, versions):
         'header': versions['header'], 'footer': versions['footer'], 'after': versions['after'],
         '404': page_head({'t': 'h1', 'html': 'Az oldal nem található'}, '404', [('', 'Főoldal')], '', '', 'lilac')
                + f'<div class="container oj-flow"><p class="btn-row"><a class="btn btn--orchid" href="{esc(link(""))}">Főoldal</a></p></div>',
-        '404_title': nf['title'], 'pages': pages,
+        '404_title': nf['title'], 'pages': pages, 'llms': versions.get('llms', ''),
     }
     os.makedirs(os.path.join(OUT, 'data'), exist_ok=True)
     json.dump(chrome, open(os.path.join(OUT, 'data', 'site.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
@@ -1816,10 +1913,12 @@ def main():
         AFTER = False
         wp_pages = {path: wp_entry(pg, body, cls, schema) for path, pg, body, cls, schema in render_all(journal_cards)}
         wp_pages[PRIVACY_PATH] = privacy_page()
+        llms_before = llms_txt(journal_cards)
         chrome = {'header': header(''), 'footer': footer()}
         AFTER = True
         after = {path: {'content': body, 'prefooter': prefooter(pg), 'desc': description(pg)} for path, pg, body, cls, schema in render_all(journal_cards)}
-        chrome['after'] = {'from': AFTER_FROM, 'header': header(''), 'footer': footer(), 'pages': after,
+        chrome['llms'] = llms_before
+        chrome['after'] = {'from': AFTER_FROM, 'header': header(''), 'footer': footer(), 'pages': after, 'llms': llms_txt(journal_cards),
                            'redirect': {'bejelentkezés-jóga-bérlet': online('prices'), 'kapcsolat': online('contact')}}
         AFTER = False
         return wp_theme(wp_pages, chrome)

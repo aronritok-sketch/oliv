@@ -3665,8 +3665,12 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	$full = oy_llms_full();
 	$robots = apply_filters( 'robots_txt', "User-agent: *\nDisallow: /wp-admin/\n", true );
 	$lgraph = oy_seo_online_graph( array( array( '@type' => 'Person', '@id' => 'x#olivia' ), array( '@type' => 'Organization', '@id' => 'x#business', 'makesOffer' => array() ) ), home_url( '/' ) );
+	$iu_on  = apply_filters( 'iu_llms_enabled', true );
 	update_option( 'oy_edition', 'fort-myers' );
+	$iu_us  = apply_filters( 'iu_llms_enabled', true );
 	oy_llms_flush();
+	ok( false === $iu_on && true === $iu_us, 'the parent theme\'s AI files stay off where the online site serves its own (the head links and robots groups came twice), and run on the US site' );
+	ok( in_array( 'https://oliviajoga.hu/', $lgraph[0]['sameAs'], true ) && in_array( 'https://oliviajoga.hu/r%C3%B3lam', $lgraph[0]['sameAs'], true ) && in_array( 'https://oliviajoga.hu/', $lgraph[1]['sameAs'], true ), 'the schema ties the two sites to one person: oliviajoga.hu in Olívia\'s and the studio\'s sameAs („az AI-ok ajánlják Oliviát”)' );
 	$sections = preg_split( '/^## .*$/m', $llms );
 	$listed   = true;
 	foreach ( array_slice( $sections, 1 ) as $sec ) {

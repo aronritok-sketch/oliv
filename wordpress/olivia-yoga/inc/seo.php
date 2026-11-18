@@ -240,12 +240,14 @@ function oy_seo_online_graph( array $graph, $site ) {
 				array( '@type' => 'EducationalOccupationalCredential', 'name' => 'Tibeti hangtál- és hangmasszázs-terapeuta', 'credentialCategory' => 'certificate' ),
 			);
 			$node['worksFor']      = array( '@id' => $site . '#business' );
+			$node['sameAs']        = array_values( array_unique( array_merge( (array) ( $node['sameAs'] ?? array() ), array( OY_HU_SITE, OY_HU_SITE . 'r%C3%B3lam' ) ) ) ); // a két oldal egy ember (Áron, 11.18: „az AI-ok ajánlják Oliviát”)
 		}
 		if ( 'Organization' === ( $node['@type'] ?? '' ) ) {
 			$node['description']       = 'Élő, magyar nyelvű online jógaórák Kovács Olíviával: csoportos online flow jóga szerdánként 18:30–20:00, egyéni online jóga, online kismamatorna, online stretching és mobilizáció, relaxáció és légzőgyakorlatok otthonról, a böngészőben.';
 			$node['logo']              = get_template_directory_uri() . '/assets/img/logo-online.svg';
 			$node['knowsAbout']        = array( 'Online jóga', 'Online kismamatorna', 'Flow jóga', 'Egyéni jógaóra', 'Stretching', 'Légzőgyakorlatok', 'Relaxáció' );
 			$node['availableLanguage'] = 'hu';
+			$node['sameAs']            = array_values( array_unique( array_merge( (array) ( $node['sameAs'] ?? array() ), array( OY_HU_SITE ) ) ) );
 			$catalog                   = array();
 			foreach ( oy_classes() as $c ) {
 				$catalog[] = array( '@type' => 'Offer', 'itemOffered' => array( '@id' => get_permalink( $c ) . '#service' ) );

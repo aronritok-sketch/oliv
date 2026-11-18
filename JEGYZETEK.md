@@ -1522,6 +1522,40 @@
   - Az adatvédelmi oldalon a hírlevél után egy „Vélemény” sor jelenik meg, futás közben hozzáadva, az oldal szövegéhez nem nyúl.
   - Tesztek: 1641/0. Helyben próbálva telefonnézetben: 3 kártya, az űrlap 3 névválasztással, a küldés köszönő oldalra visz.
 
+- **2026-11-18 – AI-ajánlás mindkét Olívia-oldalon (oliviajoga.hu 1.7.0, oliviajoga.online 3.12.1).** Áron: „az AI-ok
+  szeretném, hogy ajánlják Oliviát … csináld meg ugyanazt … mint a Hello Provision-nél”.
+  - **Az alap:** ugyanaz az MI-láthatósági csomag, mint a helloprovision.com-on és az aronritok.com-on: llms.txt,
+    llms-full.txt, .md tükrök, MI-robotok a robots.txt-ben, IndexNow és schema.
+  - **oliviajoga.hu:**
+    - Az llms.txt eddig az iu_theme alapja volt, összefolyt morzsamenüs leírásokkal és ismétlődő címekkel.
+    - Most a build.py kézzel válogatott szövege jön (`inc/ai.php`, `iu_llms_txt` szűrő); november 26-tól az „after” változat.
+    - Tartalma:
+      - ki Olívia, és a végzettségei;
+      - az órák és a szerdai időpont;
+      - a termes órák 11.25-ig;
+      - a kapcsolat;
+      - az oldalak a saját leírásukkal;
+      - az online oldal órái;
+      - a cikkek, a sorozatok részcímével („Milyen elemekből áll … 1. Nyújtó gyakorlatok”, „A jóga 8 ága ॐ 4. Pránajáma”).
+    - llms-full.txt: az oldalak szövege a morzsamenü nélkül (`iu_llms_page_html`).
+    - Schema:
+      - WebSite (publisher);
+      - Organization (sameAs: az online oldal, Instagram, Facebook; a szolgáltatások katalógusa, a linkek az online oldalra);
+      - Person (jobTitle, 3 végzettség, knowsAbout, sameAs: az online Rólam is, worksFor);
+      - BreadcrumbList minden aloldalon, az oldal saját nevével.
+    - `tools/check.py`: JSON-LD-ellenőrzés minden oldalon (2383/0, az „after” változat 1219/0).
+  - **oliviajoga.online:**
+    - Az iu_theme és a téma saját llms-e egyszerre futott, ezért a `<head>` linkjei és a robots.txt MI-csoportja kétszer
+      szerepelt.
+    - Ahol a téma sajátja fut, ott az iu_theme-é ki van kapcsolva (`iu_llms_enabled`); a US oldalon és a demón az iu_theme-é fut.
+    - A schemában Olívia és a stúdió sameAs-ában ott van az oliviajoga.hu, így a két oldal egy embernek látszik.
+    - Tesztek: 1643/0.
+  - **Áron teendői (kézi):**
+    - Bing Webmaster Tools → „Importálás a Google Search Console-ból” mindkét oldalra; a ChatGPT-keresés és a Copilot a
+      Bingből dolgozik.
+    - A GSC-ben „Indexelés kérése” a fő oldalakra.
+    - Google Cégprofil Olíviának; ez kell a Google-értékelésekhez is.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

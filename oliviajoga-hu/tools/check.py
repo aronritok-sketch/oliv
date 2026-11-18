@@ -109,6 +109,27 @@ def main():
             rel = urllib.parse.unquote(h[len(base):]).strip('/')
             target = os.path.join(out, rel, 'index.html') if rel else os.path.join(out, 'index.html')
             ok(os.path.isfile(target), f'/{path}: broken link {h}')
+    # structured data for search engines and AI assistants (Áron, 11.18: „az AI-ok ajánlják Oliviát”)
+    crumbs = {}
+    for path, doc in files.items():
+        nodes = []
+        for b in re.findall(r'<script type="application/ld\+json"[^>]*>(.*?)</script>', doc, re.S):
+            try:
+                nodes += json.loads(b).get('@graph', [])
+            except ValueError:
+                ok(False, f'/{path}: JSON-LD does not parse')
+        types = {n.get('@type') if isinstance(n.get('@type'), str) else 'x' for n in nodes}
+        ok({'WebSite', 'Organization', 'Person'} <= types, f'/{path}: JSON-LD without WebSite / Organization / Person')
+        person = next((n for n in nodes if n.get('@type') == 'Person'), {})
+        ok(len(person.get('hasCredential', [])) >= 3 and person.get('jobTitle') and 'https://oliviajoga.online/rolam/' in person.get('sameAs', []),
+           f'/{path}: Person without her credentials or the online site')
+        if path not in ('', 'főoldal', '404'):  # /főoldal is the old address of the front page
+            bc = next((n for n in nodes if n.get('@type') == 'BreadcrumbList'), None)
+            ok(bc is not None, f'/{path}: no BreadcrumbList')
+            if bc:
+                crumbs[path] = bc['itemListElement'][-1]['name']
+    ok(len(set(crumbs.values())) == len(crumbs) and not any('kerület' in v for v in crumbs.values() if v not in ('Kapcsolat',)),
+       'breadcrumb names: each page its own (not the shared „Jóga 18. és 21. kerület” title start)')
     for f in fails[:40]:
         print('FAIL', f)
     print(f'{checks - len(fails)} checks passed, {len(fails)} failed')

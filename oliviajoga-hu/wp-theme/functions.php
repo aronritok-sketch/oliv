@@ -13,6 +13,7 @@ defined( 'ABSPATH' ) || exit;
 require_once __DIR__ . '/inc/setup.php';
 require_once __DIR__ . '/inc/image-position.php';
 require_once __DIR__ . '/inc/page-editor.php'; // Szerkesztés a weboldalon (Olivia, 11.13) – from wordpress/olivia-yoga, copied by build.py --wp
+require_once __DIR__ . '/inc/ai.php'; // MI-ajánlás: saját llms.txt és tiszta oldalszöveg (Áron, 11.18)
 require_once __DIR__ . '/inc/consent.php'; // sütisáv + GA4 hozzájárulással (Arovia, 11.17)
 require_once __DIR__ . '/inc/mail.php'; // levélküldés a VPS postafiókján át (OYS_SMTP_*, hpv-mail wp-link)
 require_once __DIR__ . '/inc/remote.php'; // a távirányító (Áron, 11.17): X-OYS-Auth + /?rest_route=/oj/v1/…

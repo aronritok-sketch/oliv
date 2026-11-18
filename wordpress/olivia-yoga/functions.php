@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OY_VERSION', '3.12.0' );
+define( 'OY_VERSION', '3.12.1' );
 
 require_once get_template_directory() . '/inc/edition.php';
 
@@ -13,6 +13,7 @@ require_once get_template_directory() . '/inc/edition.php';
 defined( 'OY_EMAIL' ) || define( 'OY_EMAIL', oy_brand( 'email' ) );
 defined( 'OY_INSTAGRAM' ) || define( 'OY_INSTAGRAM', oy_brand( 'instagram' ) );
 defined( 'OY_FACEBOOK' ) || define( 'OY_FACEBOOK', oy_brand( 'facebook' ) );
+defined( 'OY_HU_SITE' ) || define( 'OY_HU_SITE', 'https://oliviajoga.hu/' ); // Olivia's in-person site; the same person in the schema (11.18)
 require_once get_template_directory() . '/inc/i18n.php';
 require_once get_template_directory() . '/inc/helpers.php';
 require_once get_template_directory() . '/inc/content-types.php';

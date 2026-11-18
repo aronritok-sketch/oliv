@@ -32,6 +32,10 @@ function oy_llms_enabled() {
 	return oy_online_only() && ! oy_is_demo();
 }
 
+// Where this file serves the AI files, the parent theme's same package (iu_theme 0.4+, inc/llms.php) stays off: otherwise
+// the <head> links and the robots.txt groups come twice (live 11.18). Elsewhere (US site, demo) the parent's runs.
+add_filter( 'iu_llms_enabled', fn( $on ) => $on && ! oy_llms_enabled() );
+
 /* ---------------------------------------------------------------------------------------------------------------- *
  * Routing: /llms.txt, /llms-full.txt, the IndexNow key file, and „.md” mirrors of the pages.
  * ---------------------------------------------------------------------------------------------------------------- */
