@@ -1487,6 +1487,16 @@
       (`Clear-Site-Data: "cache"`, `oj_fresh` technikai süti).
     - Ehhez a böngészőnek egyszer el kell érnie egy új címet, pl. `https://oliviajoga.hu/?uj`.
     - A régi Google Site-ra kell egy gomb erre a címre (Áron vagy Olívia).
+    - **11.18, a Google Site törlése után** („nem található az oldal”):
+      - A DNS jó (@ és www → 37.148.205.64), mind a négy címforma az új oldalra visz; az oliviayoga.hu (y-nal) nem létezik.
+      - A hiba a böngészők megjegyzett 301-es átirányítása a már törölt Google Site-ra.
+      - Próbával mérve:
+        - Chromium: a DNS-csere után is a régi helyre megy, egy `/?uj` látogatás végleg megjavítja;
+        - Firefox: nem jegyzi meg, rendben van;
+        - WebKit: a `Clear-Site-Data` nem törli, de a böngésző újraindítása után már az új oldal jön.
+      - Valódi iPhone-Safarin nem próbáltuk: ott a Beállítások → Safari → Haladó → Webhelyadatok → oliviajoga törlése biztos.
+      - Mindenki másnak: a törölt Google Site visszaállítása (Olívia fiókja, Drive → Kuka) egyetlen gombbal:
+        https://oliviajoga.hu/?uj
 
 - **Vendégvélemények – olivia-studio 1.23.0, oliviajoga.online 3.12.0** (Olívia, 11.17: „szeretnék valamilyen formában
   véleménykérést … Lehessen névvel és név nélkül véleményezni. Szólj Áronnak …”; Áron: „Mindkettő” – saját vélemények és
