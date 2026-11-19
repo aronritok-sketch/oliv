@@ -1663,6 +1663,18 @@ test( 'Áron 19 Nov: the emails in the site\'s colours („Az emailek színe iga
 	ok( str_contains( (string) ( $log[0]['html'] ?? '' ), 'background:#FFDF22;border:2px solid #072624' ), '… also in an email written elsewhere (sent ready-made): the gift code Bright Gold' );
 } );
 
+test( 'Áron 19 Nov: on a phone one button at the start of every class page and one at the end; the prices page without the day/time and length chips', function () {
+	$tpl = (string) file_get_contents( get_template_directory() . '/single-oy_class.php' );
+	$oc  = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
+	ok( str_contains( $tpl, "oy_class_facts( \$id, 'chips page-head__chips' ) . \$head_cta" ) && str_contains( $tpl, '<p class="page-head__cta">' ) && str_contains( $tpl, 'echo $cta;' ), 'the class page: the side card\'s button also in the page head (the same target)' );
+	ok( str_contains( $oc, ".page-head__cta { display: none; }\n@media (max-width: 999px) {\n\t.page-head__cta { display: block;" ) && str_contains( $oc, '.aside-card--class > .btn { display: none; }' ), '… shown below the two-column width (first screen), the side card then without a second button; the text\'s button stays at the end (Áron: „az egyik cta … legyen az elején! a másik maradjon a végén”)' );
+	require_once get_template_directory() . '/inc/helpers.php';
+	update_option( 'oy_edition', 'hu-online' );
+	$html = OYS_I18n::with( 'hu', fn() => oy_pricing_design( '<h2>Online flow jóga szerdánként</h2><p>Szerdánként 18:30-tól 20:00-ig, élőben. Kezdőket is szeretettel várok.</p>' ) );
+	update_option( 'oy_edition', 'fort-myers' );
+	ok( str_contains( $html, '<ul class="oj-info__facts">' ) && ! str_contains( $html, 'Szerdánként 18:30–20:00</span>' ) && ! preg_match( '#<span>\d+ perc</span>#', $html ) && str_contains( $html, 'élőben, a böngésződben' ), 'prices page: no „Szerdánként 18:30–20:00” and „90 perc” chips (Áron: „ott van az infó más módon”), the others stay' );
+} );
+
 test( 'test mode: every process with one tap, the emails to the teacher\'s own mailbox (+teszt), test classes hidden, everything deleted after (Áron, 19 Nov)', function () {
 	$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0];
 	wp_set_current_user( (int) $admin );

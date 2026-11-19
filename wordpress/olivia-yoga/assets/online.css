@@ -1789,3 +1789,18 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 	.site-header .nav a { font-size: clamp(.84rem, .5rem + .62vw, 1.02rem); }
 	.site-header .header-cta { padding-inline: clamp(.9rem, 1.6vw, 1.35rem); }
 }
+
+/* ==========================================================================
+   Áron, 19 November (a phone photo of the prenatal page): „mobilon az egyik cta minden szolgáltatás aloldalon legyen az
+   elején! a másik maradjon a végén” – below the two-column width the side card's button is in the page head, under the
+   lead (on the first screen, a bright Bright Gold button on every head colour); at the end only the button in the text
+   („Időpontot kérek”) stays, the side card under the text keeps its rules (cancellation, replay) without a second button.
+   ========================================================================== */
+.page-head__cta { display: none; }
+@media (max-width: 999px) {
+	.page-head__cta { display: block; margin: 1.15rem 0 0; }
+	.page-head__cta .btn { display: inline-flex; justify-content: center; min-height: 52px; padding-inline: 1.6rem; background: var(--sun); color: var(--ink); box-shadow: 0 14px 28px -16px rgba(0, 0, 0, .45); }
+	.page-head__cta .btn:hover, .page-head__cta .btn:active { background: #fff; color: var(--ink); }
+	.aside-card--class > .btn { display: none; }
+	.aside-card--class > .oj-policy--aside:first-of-type, .aside-card--class > .oj-replay--aside { margin-top: .9rem; }
+}

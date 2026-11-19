@@ -9,12 +9,18 @@ while ( have_posts() ) :
 	the_post();
 	$id   = get_the_ID();
 	$slug = get_post_field( 'post_name' );
-	echo oy_page_head( get_the_title(), get_the_excerpt(), array( array( __( 'Classes', 'olivia-yoga' ), oy_page_link( 'yoga-classes' ) ), array( get_the_title(), get_permalink() ) ), 'c' . $slug, oy_class_facts( $id, 'chips page-head__chips' ), oy_post_photo( $id, '', '(min-width: 960px) 36vw, 90vw', true ) ); // phpcs:ignore
 	$aside_photo = (int) get_post_meta( $id, 'oy_aside_photo', true );
 	$prenatal    = oy_prenatal_slug() === $slug;
 	// one-to-one services of the booking plugin (online site: individual yoga, prenatal, stretching, relaxation): asked for
 	$service     = class_exists( 'OYS_Services' ) ? OYS_Services::for_class( $slug ) : null;
 	$private     = $prenatal || $service || 'singing-bowl-massage' === $slug;
+	// the online site books a prenatal session through the request form (the booking plugin), the others ask by message
+	$ask = ( $service || $prenatal && oy_online_only() ) && function_exists( 'oys_account_url' ) ? add_query_arg( 'topic', $service ? $service[0] : 'prenatal', oy_private_url() ) : oy_contact_url( $prenatal ? 'prenatal' : 'massage' );
+	$cta = $private ? oy_btn( $ask, __( 'Ask for a session', 'olivia-yoga' ), 'orchid' ) : oy_btn( oy_book_url(), __( 'Book this class', 'olivia-yoga' ), 'orchid' );
+	// Áron, 19 November: „mobilon az egyik cta minden szolgáltatás aloldalon legyen az elején! a másik maradjon a végén” – on
+	// a phone the side card's button is in the page head, under the lead (online.css); the button in the text stays last
+	$head_cta = oy_online_only() ? '<p class="page-head__cta">' . ( $private ? oy_btn( $ask, __( 'Ask for a session', 'olivia-yoga' ), 'sun' ) : oy_btn( oy_book_url(), __( 'Book this class', 'olivia-yoga' ), 'sun' ) ) . '</p>' : '';
+	echo oy_page_head( get_the_title(), get_the_excerpt(), array( array( __( 'Classes', 'olivia-yoga' ), oy_page_link( 'yoga-classes' ) ), array( get_the_title(), get_permalink() ) ), 'c' . $slug, oy_class_facts( $id, 'chips page-head__chips' ) . $head_cta, oy_post_photo( $id, '', '(min-width: 960px) 36vw, 90vw', true ) ); // phpcs:ignore
 	?>
 	<div class="container">
 		<div class="layout layout--aside">
@@ -38,9 +44,7 @@ while ( have_posts() ) :
 				<?php echo oy_class_facts( $id, 'aside-facts' ); // phpcs:ignore ?>
 				<?php if ( $prenatal && $aside_pics ) : ?><?php echo oy_fitmummy( 'credential--aside' ); // phpcs:ignore ?><?php endif; ?>
 				<?php
-				// the online site books a prenatal session through the request form (the booking plugin), the others ask by message
-				$ask = ( $service || $prenatal && oy_online_only() ) && function_exists( 'oys_account_url' ) ? add_query_arg( 'topic', $service ? $service[0] : 'prenatal', oy_private_url() ) : oy_contact_url( $prenatal ? 'prenatal' : 'massage' );
-				echo $private ? oy_btn( $ask, __( 'Ask for a session', 'olivia-yoga' ), 'orchid' ) : oy_btn( oy_book_url(), __( 'Book this class', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore
+				echo $cta; // phpcs:ignore
 				echo $private ? '' : oy_replay_note( 'oj-replay--aside' ); // phpcs:ignore
 				echo oy_cancel_note( 'oj-policy--aside', $private ? 'private' : 'group' ); // phpcs:ignore
 				?>

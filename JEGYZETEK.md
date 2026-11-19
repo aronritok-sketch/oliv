@@ -1935,6 +1935,21 @@
   - Más oldalakon marad a régi.
   - Tesztek: 1807/0. Mintalevelek (foglalás, ajándék, egyéni ajánlat) helyben renderelve, rendben.
 
+- **2026-11-19 – Óraoldalak telefonon: egy gomb az elején, egy a végén; árak oldal: két címke ki (oliviajoga.online 3.12.20).**
+  Áron (telefonos fotó a kismamatorna oldalról):
+  - „mobilon az egyik cta minden szolgáltatás aloldalon legyen az elején! a másik maradjon a végén.”;
+  - „ezt a 2-t szedd ki a bejelentkezés és áraknál mert ott van az infó más módon”.
+  - **Telefonon és tableten (1000 px alatt)** eddig mindkét gomb a lap alján volt (a szövegé és az oldalsáv kártyájáé).
+    - Most a kártya gombja a fejlécben van, a leírás és a hossz alatt, sárga gombként, az első képernyőn: „Kérj időpontot”,
+      a csoportos órán „Foglald le ezt az órát”.
+    - A végén csak a szöveg gombja marad („Időpontot kérek” / „Óra foglalása”).
+    - A kártya alul a szabályokkal (lemondás, visszanézés) megmarad, de második gomb nélkül.
+    - Nagy kijelzőn minden a régi (oldalsó kártya a gombbal).
+    - Ellenőrizve mind az 5 óraoldalon 360, 390, 768 és 1280 px-en.
+  - **Bejelentkezés és árak:** az információs dobozból kikerült a „Szerdánként 18:30–20:00” és a „90 perc” címke (a nap és
+    az idő az órarendben és a naptárban, a hossz az árkártyákon látszik); a többi címke marad.
+  - Tesztek: 1810/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

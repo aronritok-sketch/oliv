@@ -283,12 +283,10 @@ function oy_kicker( $text ) {
 function oy_pricing_design( $html ) {
 	// 1. the group class's facts
 	if ( preg_match( '#^(\s*<h2[^>]*>.*?</h2>)((?:\s*<p(?:\s[^>]*)?>.*?</p>)+)#s', $html, $m ) ) {
-		$class = get_page_by_path( 'hatha-flow', OBJECT, 'oy_class' );
-		$len   = $class ? (string) oy_class_meta( $class->ID, 'oy_duration' ) : '';
 		$facts = array_filter(
 			array(
-				array( 'calendar', __( 'Wednesdays, 18:30–20:00', 'olivia-yoga' ) ),
-				array( 'clock', $len ),
+				// Áron, 19 November: „ezt a 2-t szedd ki a bejelentkezés és áraknál mert ott van az infó más módon” – the day and time
+				// are on the timetable and in the calendar, the length on the price cards: no „Szerdánként 18:30–20:00”, „90 perc”
 				array( 'globe', __( 'live, in your browser', 'olivia-yoga' ) ),
 				array( 'user', __( 'camera optional', 'olivia-yoga' ) ),
 				// Olívia, 15 November: „ezek az infók is jöhetnek ide … a kamera nem kötelező mellé még fér” – what the note under
