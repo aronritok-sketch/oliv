@@ -176,6 +176,7 @@ class OYS_Frontend {
 					// Olívia, 19 November: „…és foglald le a helyed!”; Áron, the same day: „az »itt látod az órát« vegyük ki”
 					? '<p class="oys-cal__pick">' . esc_html__( 'Tap a day in the calendar and book your spot!', 'olivia-studio' ) . '</p><ol class="oys-cal__list">' . $list . '</ol>'
 					: '<p class="oys-cal__empty">' . esc_html__( 'No group classes this month.', 'olivia-studio' ) . ( $ask_on ? ' ' . esc_html__( 'You can still ask for a one-to-one session: tap a day.', 'olivia-studio' ) : '' ) . '</p>' )
+				// Áron, 19 November: „Ezen a napon nincs csoportos óra.” (not „Erre a napra …”)
 				. ( $ask_on ? '<p class="oys-cal__none" hidden>' . esc_html__( 'No group class on this day.', 'olivia-studio' ) . '</p>' : '' )
 				. '</section>';
 		}

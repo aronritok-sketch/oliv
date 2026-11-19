@@ -1363,6 +1363,7 @@ test( 'Áron 19 Nov: a one-to-one session asked for from the calendar (any comin
 		$hu_cal = OYS_I18n::with( 'hu', fn() => OYS_Frontend::sc_calendar( array() ) );
 		ok( str_contains( $hu_cal, '<span class="oys-times__part">Délután</span>' ) && str_contains( $hu_cal, '<span class="oys-times__part">Este</span>' ) && ! str_contains( $hu_cal, 'Délelőtt' ) && str_contains( $hu_cal, 'Melyik időpont lenne jó?' ) && str_contains( $hu_cal, 'data-ask-time="" aria-pressed="true">Bármikor jó 14 és 21 óra között</button>' ) && str_contains( $hu_cal, 'data-label="Időpontot kérek: %s"' ), '… by afternoon and evening, „Bármikor jó 14 és 21 óra között” chosen until a time is tapped, the button says the day and the time' );
 		ok( str_contains( $hu_cal, 'Koppints egy napra a naptárban, és foglald le a helyed!' ) && ! str_contains( $hu_cal, 'itt látod az órát' ), 'the hint without „itt látod az órát” (Áron: „vegyük ki”)' );
+		ok( str_contains( $hu_cal, '<p class="oys-cal__none" hidden>Ezen a napon nincs csoportos óra.</p>' ), 'a day without a class: „Ezen a napon nincs csoportos óra.” (Áron)' );
 		ok( str_contains( $cal, 'oys-cal__none' ) && str_contains( $cal, 'Tap a day in the calendar and book your spot!' ), '… a chosen day without a class says it has none' );
 		add_filter( 'oys_calendar_private', '__return_false' );
 		$cal2 = OYS_Frontend::sc_calendar( array() );

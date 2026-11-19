@@ -1815,7 +1815,7 @@
   - **Naptár-tipp:** „Koppints egy napra a naptárban, itt látod az órát, és foglald le a helyed!”
   - Tesztek: 1739/0.
 
-- **2026-11-19 – Profilkép, kötelező adatok, magyar Adatlap; koppintós időpontválasztó (oliviajoga.online 3.12.14, olivia-studio 1.26.0).**
+- **2026-11-19 – Profilkép, kötelező adatok, magyar Adatlap; koppintós időpontválasztó (oliviajoga.online 3.12.14–3.12.15, olivia-studio 1.26.0–1.26.1).**
   Áron: „lehessen profilképet feltölteni, az adatok kitöltése kötelező legyen és magyarosíts, pl a környék nem jó”; „a
   bal oldali »A« időpont választó legyen”; „az »itt látod az órát« vegyük ki”.
   - **Profilkép:**
@@ -1844,7 +1844,9 @@
     - a gomb azt írja: „Időpontot kérek: nov. 20., 18:30”;
     - a link a napot és az időt is átadja a kérőűrlapnak.
   - **Naptár-tipp:** „Koppints egy napra a naptárban, és foglald le a helyed!” (az „itt látod az órát” kikerült).
-  - Tesztek: 1773/0. Helyben telefonon: regisztráció, Adatlap, képfeltöltés/-törlés, időpont-koppintás.
+  - **Óra nélküli nap (3.12.15, olivia-studio 1.26.1):** „Ezen a napon nincs csoportos óra.” (Áron; eddig „Erre a
+    napra …”).
+  - Tesztek: 1774/0. Helyben telefonon: regisztráció, Adatlap, képfeltöltés/-törlés, időpont-koppintás.
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).

@@ -8377,7 +8377,7 @@ msgid "You can still ask for a one-to-one session: tap a day."
 msgstr "Egyéni órát így is kérhetsz: koppints egy napra."
 
 msgid "No group class on this day."
-msgstr "Erre a napra nincs csoportos óra."
+msgstr "Ezen a napon nincs csoportos óra."
 
 msgid "Any time"
 msgstr "Bármikor jó"
