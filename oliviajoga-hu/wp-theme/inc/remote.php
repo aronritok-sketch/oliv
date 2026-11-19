@@ -113,6 +113,7 @@ add_action( 'rest_api_init', function () {
 	) );
 	register_rest_route( 'oj/v1', '/setup', array( 'methods' => 'POST', 'permission_callback' => $admin, 'callback' => fn() => array( 'ok' => true, 'log' => oj_setup() ) ) );
 	register_rest_route( 'oj/v1', '/flush', array( 'methods' => 'POST', 'permission_callback' => $admin, 'callback' => 'oj_remote_flush' ) );
+	register_rest_route( 'oj/v1', '/indexnow', array( 'methods' => 'POST', 'permission_callback' => $admin, 'callback' => fn() => function_exists( 'oj_indexnow_heal' ) ? oj_indexnow_heal() : new WP_Error( 'oj_remote', 'Nincs IndexNow.', array( 'status' => 500 ) ) ) );
 	// próbalevél a belépett admin saját címére (máshová nem küld)
 	register_rest_route( 'oj/v1', '/mail-test', array( 'methods' => 'POST', 'permission_callback' => $admin, 'callback' => function () {
 		$to = wp_get_current_user()->user_email;
@@ -178,6 +179,7 @@ function oj_remote_status() {
 		'editor'   => array( 'texts' => count( $edits['t'] ?? array() ), 'images' => count( $edits['i'] ?? array() ) ),
 		'kit'      => function_exists( 'hpv_kit_status' ) ? hpv_kit_status() : null,
 		'mail'     => function_exists( 'oj_mail_status' ) ? oj_mail_status() : null,
+		'indexnow' => function_exists( 'oj_indexnow_status' ) ? oj_indexnow_status() : null,
 	);
 }
 

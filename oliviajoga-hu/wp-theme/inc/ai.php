@@ -35,3 +35,44 @@ add_filter( 'iu_llms_page_html', function ( $html, $post ) {
 	$body = preg_replace( '/<!-- \/?wp:html -->\s*/', '', (string) $body );
 	return oj_fill( $body );
 }, 10, 2 );
+
+/*
+ * IndexNow önjavítás (2026-11-19). A Bing (és vele a ChatGPT-keresés, a Copilot) az iu_theme beküldését 403-mal
+ * („UserForbiddedToAccessSite”) utasította el, pedig a kulcsfájl jó: a domain addig a Google Sites-ra mutatott, és a
+ * Bing a sikertelen kulcs-ellenőrzést megjegyezte. Új kulcs → új ellenőrzés. Ha az utolsó beküldés 403 volt, új kulcs és
+ * újraküldés; naponta legfeljebb egyszer, összesen 3 kulcscsere (utána csak naponta újrapróbál). Kézzel: POST oj/v1/indexnow.
+ */
+add_action( 'oj_indexnow_heal', 'oj_indexnow_heal' );
+add_action( 'init', function () {
+	if ( ! wp_next_scheduled( 'oj_indexnow_heal' ) ) {
+		wp_schedule_event( time() + 15 * MINUTE_IN_SECONDS, 'daily', 'oj_indexnow_heal' ); // a verzióváltás utáni beküldés után
+	}
+} );
+
+function oj_indexnow_heal() {
+	if ( ! class_exists( '\IUTheme\Llms' ) || ! \IUTheme\Llms::live() ) {
+		return oj_indexnow_status();
+	}
+	$code = (int) ( get_option( 'iu_indexnow_last', array() )['http'] ?? 0 );
+	if ( 200 === $code || 202 === $code ) {
+		return oj_indexnow_status();
+	}
+	$n = (int) get_option( 'oj_indexnow_rotations', 0 );
+	if ( 403 === $code && $n < 3 ) {
+		delete_option( 'iu_indexnow_key' ); // Llms::key() újat készít; a kulcsfájl (/<kulcs>.txt) az iu_theme-é, azonnal él
+		update_option( 'oj_indexnow_rotations', $n + 1, false );
+	}
+	\IUTheme\Llms::indexnow_all();
+	return oj_indexnow_status();
+}
+
+function oj_indexnow_status() {
+	$on = class_exists( '\IUTheme\Llms' );
+	return array(
+		'live'      => $on && \IUTheme\Llms::live(),
+		'key'       => $on ? home_url( '/' . \IUTheme\Llms::key() . '.txt' ) : '',
+		'last'      => get_option( 'iu_indexnow_last' ),
+		'rotations' => (int) get_option( 'oj_indexnow_rotations', 0 ),
+		'next'      => wp_next_scheduled( 'oj_indexnow_heal' ),
+	);
+}

@@ -1565,6 +1565,26 @@
     havi naptár, a nyíl megfordul. A `/foglalas/#naptar` link nyitva hozza. Az egyéni órák doboza alatta marad.
   - Tesztek: 1647/0. Telefonon (390 px) csukva és nyitva is próbálva, oldalra nem csúszik.
 
+- **2026-11-19 – Indexelés: IndexNow-javítás a .hu-n (1.7.1), Search Console állapot.** Áron: „Kész az llm csomag?
+  Automata indexálás gscbe?”
+  - **IndexNow (Bing → ChatGPT-keresés, Copilot; Yandex):**
+    - A .online beküldése rendben (43 cím, 200).
+    - A .hu-é 403 („UserForbiddedToAccessSite”) volt, pedig a kulcsfájl jó. A DNS tiszta: nincs AAAA rekord, az IP
+      ugyanaz, mint a .online-é. A domain addig a Google Sites-ra mutatott, és a Bing a sikertelen kulcs-ellenőrzést
+      megjegyezte.
+    - Javítás (`inc/ai.php`): ha az utolsó beküldés 403, a téma új kulcsot készít és újraküld. Naponta legfeljebb egyszer
+      csinálja, összesen 3 kulcscserével. Kézzel: `POST oj/v1/indexnow`; állapot: `oj/v1/status` → `indexnow`.
+    - Helyben a Bing válaszát szimulálva próbálva.
+  - **Google:**
+    - Google-nél nincs IndexNow. Az Indexing API csak állásajánlatra és élő közvetítésre való, általános oldalra nem.
+    - A legitim automata út a sitemap: a CRM napi `hpv_gsc_manage` köre a bekötött Google-fiókok tulajdonain újraküldi a
+      sitemapeket.
+    - Olívia két oldala nincs köztük: a bekötött fiókok nem látják őket, és az ügyfélkartonon (4070003) üres a
+      `gsc_property`.
+    - Teendő Áronnak: a CRM-ben adja hozzá Google-fiókként azt a fiókot, amelyikben Olívia Search Console-ja van, vagy a
+      GSC-ben adja hozzá a CRM-be bekötött fiókot felhasználóként (Teljes joggal). Utána a kör magától viszi, és a
+      kartonra beírjuk a tulajdont.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
