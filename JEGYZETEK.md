@@ -1815,6 +1815,37 @@
   - **Naptár-tipp:** „Koppints egy napra a naptárban, itt látod az órát, és foglald le a helyed!”
   - Tesztek: 1739/0.
 
+- **2026-11-19 – Profilkép, kötelező adatok, magyar Adatlap; koppintós időpontválasztó (oliviajoga.online 3.12.14, olivia-studio 1.26.0).**
+  Áron: „lehessen profilképet feltölteni, az adatok kitöltése kötelező legyen és magyarosíts, pl a környék nem jó”; „a
+  bal oldali »A« időpont választó legyen”; „az »itt látod az órát« vegyük ki”.
+  - **Profilkép:**
+    - az Adatlapon feltölthető (JPG, PNG vagy WebP, legfeljebb 5 MB), mentés előtt látszik az előnézet;
+    - cserélhető és törölhető (a régi kép törlődik);
+    - a köszöntés mellett is ott van (rákoppintva az Adatlapra visz), és mindenhol látszik, ahol a WordPress profilképet
+      mutat (Hub, névsor, admin);
+    - csak a böngészőből valóban feltöltött képet fogadja el;
+    - nem kerül Olívia médiatárába, és a fiók törlésekor vele együtt törlődik.
+  - **Kötelező:** vezetéknév, keresztnév, telefonszám, település – a regisztrációnál és az Adatlapon is.
+    - Amíg valami hiányzik, a fiók minden lapján sárga sáv jelzi („Kérlek, töltsd ki az adataidat: …”, „Kitöltöm” link).
+    - Üresen hagyott kötelező mező nem törli a meglévő adatot.
+    - A vészhelyzeti kapcsolattartó, az egészségügyi megjegyzés és a születésnap szándékosan nem kötelező
+      (egészségügyi adatot csak önként adhat meg).
+    - Foglalást nem tiltunk le hiányzó adat miatt, csak emlékeztetünk.
+  - **Magyarosítás:**
+    - Vezetéknév elöl, a megjelenő név „Kovács Olívia”;
+    - „Környék” helyett „Település”, továbbá „Telefonszám”;
+    - „Kit értesítsünk vészhelyzetben? (nem kötelező)” / „Az ő telefonszáma”.
+  - **Adatkezelési tájékoztató:** a fiókadatok között a település és (ha van) a profilkép. Élesen ez is
+    `oy_migrate_privacy_1119` (rev `2026-11-19b`, egy új mondatpár).
+  - **Időpontválasztó (Áron „A” terve):**
+    - a naptár alatt nincs legördülő menü, 14:00 és 21:00 között félóránként koppintható gombok vannak, „Délután” és
+      „Este” bontásban (a sáv az `oys_calendar_ask_hours` szűrővel állítható);
+    - a „Bármikor jó 14 és 21 óra között” az alapértelmezett;
+    - a gomb azt írja: „Időpontot kérek: nov. 20., 18:30”;
+    - a link a napot és az időt is átadja a kérőűrlapnak.
+  - **Naptár-tipp:** „Koppints egy napra a naptárban, és foglald le a helyed!” (az „itt látod az órát” kikerült).
+  - Tesztek: 1773/0. Helyben telefonon: regisztráció, Adatlap, képfeltöltés/-törlés, időpont-koppintás.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

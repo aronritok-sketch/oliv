@@ -1356,8 +1356,14 @@ test( 'Áron 19 Nov: a one-to-one session asked for from the calendar (any comin
 		$g   = make_session( array( 'in_hours' => 24 * 3 ) );
 		$cal = OYS_Frontend::sc_calendar( array() );
 		$tomorrow = wp_date( 'Y-m-d', time() + DAY_IN_SECONDS );
-		ok( (bool) preg_match( '#class="oys-cal__day[^"]*is-free[^"]*"[^>]*data-day="\d{4}-\d{2}-\d{2}" data-label="[^"]+" tabindex="0"#', $cal ) && str_contains( $cal, 'data-oys-cal-ask' ) && str_contains( $cal, 'data-ask-time' ) && str_contains( $cal, '<option value="18:00">18:00</option>' ), 'calendar: a day without a class can be chosen too; under the calendar a quiet offer with a time (Olívia: „kiválasztani napot, időpontot és úgy privát órát kérni”)' );
-		ok( str_contains( $cal, 'oys-cal__none' ) && str_contains( $cal, 'Tap a day in the calendar to see its class here, and book your spot!' ), '… the hint (Olívia: „…és foglald le a helyed!”); a chosen day without a class says it has none' );
+		ok( (bool) preg_match( '#class="oys-cal__day[^"]*is-free[^"]*"[^>]*data-day="\d{4}-\d{2}-\d{2}" data-label="[^"]+" data-short="[^"]+" tabindex="0"#', $cal ) && str_contains( $cal, 'data-oys-cal-ask' ) && str_contains( $cal, 'data-ask-time' ), 'calendar: a day without a class can be chosen too; under the calendar a quiet offer with a time (Olívia: „kiválasztani napot, időpontot és úgy privát órát kérni”)' );
+		// the time: no drop-down, the half hours from 14:00 to 21:00 to tap, by afternoon and evening (Áron: „a bal oldali »A«”)
+		preg_match_all( '#<button type="button" class="oys-time" data-ask-time="(\d\d:\d\d)" aria-pressed="false">#', $cal, $tm );
+		ok( ! str_contains( $cal, '<select data-ask-time' ) && array( '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00' ) === $tm[1], 'the time: half hours from 14:00 to 21:00 as buttons, no drop-down (Áron: „ne legördülős … 14:00-től 21:00-ig”)' );
+		$hu_cal = OYS_I18n::with( 'hu', fn() => OYS_Frontend::sc_calendar( array() ) );
+		ok( str_contains( $hu_cal, '<span class="oys-times__part">Délután</span>' ) && str_contains( $hu_cal, '<span class="oys-times__part">Este</span>' ) && ! str_contains( $hu_cal, 'Délelőtt' ) && str_contains( $hu_cal, 'Melyik időpont lenne jó?' ) && str_contains( $hu_cal, 'data-ask-time="" aria-pressed="true">Bármikor jó 14 és 21 óra között</button>' ) && str_contains( $hu_cal, 'data-label="Időpontot kérek: %s"' ), '… by afternoon and evening, „Bármikor jó 14 és 21 óra között” chosen until a time is tapped, the button says the day and the time' );
+		ok( str_contains( $hu_cal, 'Koppints egy napra a naptárban, és foglald le a helyed!' ) && ! str_contains( $hu_cal, 'itt látod az órát' ), 'the hint without „itt látod az órát” (Áron: „vegyük ki”)' );
+		ok( str_contains( $cal, 'oys-cal__none' ) && str_contains( $cal, 'Tap a day in the calendar and book your spot!' ), '… a chosen day without a class says it has none' );
 		add_filter( 'oys_calendar_private', '__return_false' );
 		$cal2 = OYS_Frontend::sc_calendar( array() );
 		remove_filter( 'oys_calendar_private', '__return_false' );
@@ -1365,7 +1371,7 @@ test( 'Áron 19 Nov: a one-to-one session asked for from the calendar (any comin
 		OYS_Schedule::cancel_session( $g->id, 'test' );
 		$js  = (string) file_get_contents( OYS_DIR . 'assets/oys.js' );
 		$css = (string) file_get_contents( OYS_DIR . 'assets/oys.css' );
-		ok( str_contains( $js, "u.searchParams.set('pday', ask.getAttribute('data-day') || '');" ) && str_contains( $js, "u.searchParams.set('ptime', t)" ) && str_contains( $css, '.oys-cal__ask[hidden], .oys-cal__none[hidden], .oys-partner[hidden] { display: none; }' ), '… the link takes the day and the time to the request form' );
+		ok( str_contains( $js, "u.searchParams.set('pday', ask.getAttribute('data-day') || '');" ) && str_contains( $js, "u.searchParams.set('ptime', t)" ) && str_contains( $js, "x.setAttribute('aria-pressed', x === b ? 'true' : 'false');" ) && str_contains( $js, "label.replace('%s', ask.getAttribute('data-short') + (t ? ', ' + on.textContent : ''))" ) && str_contains( $css, '.oys-time[aria-pressed="true"] { background: var(--oys-ink);' ) && str_contains( $css, '.oys-cal__ask[hidden], .oys-cal__none[hidden], .oys-partner[hidden] { display: none; }' ), '… the link takes the day and the time to the request form' );
 		$_GET['pday'] = $tomorrow;
 		$_GET['ptime'] = '18:00';
 		$pref = OYS_Frontend::preferred_from_calendar();
@@ -1445,6 +1451,90 @@ test( 'Áron 19 Nov: a one-to-one session asked for from the calendar (any comin
 	false === $r0 ? delete_option( 'oy_privacy_1119_rev' ) : update_option( 'oy_privacy_1119_rev', $r0 );
 	update_option( 'oy_edition', 'fort-myers' );
 	ok( $log && ! $log2 && str_contains( $new, '<p>Saját bekezdés.</p>' ) && str_contains( $new, 'GoDaddy virtuális szerverén (VPS) fut' ) && str_contains( $new, 'Vendégek és társ' ) && ! str_contains( $new, 'üzemeltetője és tárhelye (HelloProVision)' ), 'live privacy page: the three parts change once, her own text stays' );
+} );
+
+test( 'Áron 19 Nov: a profile photo, the required details (name, phone number, town), Hungarian order and words on the profile', function () {
+	$u = make_user( 'Profil' );
+	// what is still missing, in the order the form asks it
+	$miss = OYS_I18n::with( 'hu', fn() => OYS_Customers::missing( $u ) );
+	eq( array( 'last_name', 'oys_phone', 'oys_area' ), array_keys( $miss ), 'a customer with only a first name: the last name, the phone number and the town are missing' );
+	eq( 'Település', $miss['oys_area'], '… in Hungarian „Település” (not „Környék”)' );
+	eq( 'Kovács Olívia', OYS_I18n::with( 'hu', fn() => OYS_Customers::full_name( 'Olívia', 'Kovács' ) ), 'the name as it is said: family name first in Hungarian' );
+	eq( 'Olivia Kovacs', OYS_I18n::with( 'en', fn() => OYS_Customers::full_name( 'Olivia', 'Kovacs' ) ), '… given name first in English' );
+	// sign-up: name, phone number and town required
+	$errs = OYS_I18n::with( 'en', fn() => OYS_Customers::register_errors( 'Anna', '', 'anna.reg@example.test', '', '', 'x-12345678' ) );
+	ok( in_array( 'Enter your first and last name.', $errs, true ) && in_array( 'Enter your phone number.', $errs, true ) && in_array( 'Enter your town or city.', $errs, true ), 'sign-up: the last name, the phone number and the town are required' );
+	eq( array(), OYS_Customers::register_errors( 'Anna', 'Kiss', 'anna.reg@example.test', '+36 30 123 4567', 'Budapest', 'x-12345678' ), '… with them all it goes through' );
+	$reg = OYS_I18n::with( 'hu', fn() => OYS_Frontend::auth_forms( home_url( '/' ) ) );
+	$pl  = strpos( $reg, 'id="oys-reg-last"' );
+	$pf  = strpos( $reg, 'id="oys-reg-first"' );
+	ok( $pl && $pf && $pl < $pf && str_contains( $reg, '<span>Vezetéknév</span>' ) && str_contains( $reg, '<span>Keresztnév</span>' ), 'the sign-up form in Hungarian: Vezetéknév first, then Keresztnév' );
+	ok( (bool) preg_match( '#name="phone" id="oys-reg-phone" required#', $reg ) && (bool) preg_match( '#name="area" id="oys-reg-area" required#', $reg ) && str_contains( $reg, '<span>Telefonszám</span>' ) && str_contains( $reg, '<span>Település</span>' ), '… the phone number and the town, both required' );
+	// the account: until the details are there, every tab says so
+	wp_set_current_user( $u );
+	try {
+		$acc = OYS_I18n::with( 'hu', fn() => OYS_Frontend::sc_account() );
+		ok( str_contains( $acc, 'oys-notice--todo' ) && str_contains( $acc, 'Kérlek, töltsd ki az adataidat: Vezetéknév, Telefonszám, Település.' ) && str_contains( $acc, 'Kitöltöm' ), 'account: a note of what is missing, with a link to the profile' );
+		ok( str_contains( $acc, 'class="oys-avatar"' ) && str_contains( $acc, 'oys-avatar__initial' ), '… beside the greeting the photo (or the initial), a link to change it' );
+		$_GET['tab'] = 'profile';
+		$prof = OYS_I18n::with( 'hu', fn() => OYS_Frontend::sc_account() );
+		unset( $_GET['tab'] );
+		ok( str_contains( $prof, 'enctype="multipart/form-data"' ) && str_contains( $prof, 'name="oys_avatar"' ) && str_contains( $prof, 'accept="image/jpeg,image/png,image/webp"' ) && str_contains( $prof, 'Profilkép feltöltése' ), 'profile: a photo can be uploaded' );
+		ok( (bool) preg_match( '#name="oys_phone" id="oys-p-phone"[^>]*required#', $prof ) && (bool) preg_match( '#name="oys_area" id="oys-p-area"[^>]*required#', $prof ) && strpos( $prof, 'id="oys-p-last"' ) < strpos( $prof, 'id="oys-p-first"' ), '… the phone number and the town required, the family name first' );
+		ok( str_contains( $prof, 'Település' ) && ! str_contains( $prof, 'Környék' ) && str_contains( $prof, 'Kit értesítsünk vészhelyzetben? (nem kötelező)' ) && str_contains( $prof, 'Az ő telefonszáma' ), '… in natural Hungarian (Település, not „Környék”; the emergency contact optional)' );
+		// saving: an empty required field does not wipe what was there, and says what is missing
+		update_user_meta( $u, 'oys_phone', '+36 30 111 2222' );
+		$left = OYS_I18n::with( 'hu', fn() => OYS_Customers::save_profile( $u, array( 'first_name' => 'Olívia', 'last_name' => 'Kovács', 'oys_phone' => '', 'oys_area' => '' ) ) );
+		eq( '+36 30 111 2222', get_user_meta( $u, 'oys_phone', true ), 'saving with the phone number left empty keeps the earlier one' );
+		eq( array( 'oys_area' ), array_keys( $left ), '… and the town is still asked for' );
+		eq( 'Kovács Olívia', get_userdata( $u )->display_name, '… the name shown as it is said' );
+		eq( array(), OYS_Customers::save_profile( $u, array( 'first_name' => 'Olívia', 'last_name' => 'Kovács', 'oys_phone' => '+36 30 111 2222', 'oys_area' => 'Budapest' ) ), 'everything there: nothing missing' );
+		ok( ! str_contains( OYS_Frontend::sc_account(), 'oys-notice--todo' ), '… and the note is gone' );
+		// the photo
+		require_once ABSPATH . 'wp-admin/includes/file.php';
+		$png = wp_tempnam( 'oys-avatar.png' );
+		$im  = imagecreatetruecolor( 40, 40 );
+		imagefill( $im, 0, 0, imagecolorallocate( $im, 255, 172, 129 ) );
+		imagepng( $im, $png );
+		$file = array( 'name' => 'en.png', 'type' => 'image/png', 'tmp_name' => $png, 'error' => 0, 'size' => filesize( $png ) );
+		ok( is_wp_error( OYS_Customers::set_avatar( $u, $file ) ), 'only a file the browser really uploaded is taken' );
+		add_filter( 'oys_avatar_trust_file', '__return_true' );
+		$txt = wp_tempnam( 'oys-avatar.txt' );
+		file_put_contents( $txt, 'not an image' );
+		ok( is_wp_error( OYS_Customers::set_avatar( $u, array( 'name' => 'x.png', 'type' => 'image/png', 'tmp_name' => $txt, 'error' => 0, 'size' => 12 ) ) ), 'a file that is not a photo is refused' );
+		ok( is_wp_error( OYS_Customers::set_avatar( $u, array_merge( $file, array( 'size' => OYS_Customers::AVATAR_MAX + 1 ) ) ) ), '… and one over 5 MB' );
+		$aid = OYS_Customers::set_avatar( $u, $file );
+		ok( is_int( $aid ) && $aid === OYS_Customers::avatar_id( $u ) && (int) get_post_field( 'post_author', $aid ) === $u, 'a JPG, PNG or WebP photo is saved as the customer\'s' );
+		ok( wp_get_attachment_image_url( $aid, 'thumbnail' ) === get_avatar_url( $u ) && get_avatar_url( get_userdata( $u )->user_email ) === get_avatar_url( $u ), '… and shows wherever an avatar is shown (the Hub, the rosters, the admin)' );
+		ok( str_contains( OYS_Frontend::avatar_html( $u ), 'oys-avatar__img' ), '… beside the greeting too' );
+		$q = OYS_Customers::hide_avatars( array( 'post_type' => 'attachment' ) );
+		ok( (int) get_post_meta( $aid, '_oys_avatar', true ) === $u && in_array( array( 'key' => '_oys_avatar', 'compare' => 'NOT EXISTS' ), $q['meta_query'], true ), 'the customers\' photos stay out of the media library' );
+		$im2 = wp_tempnam( 'oys-avatar2.png' );
+		imagepng( $im, $im2 );
+		$aid2 = OYS_Customers::set_avatar( $u, array_merge( $file, array( 'tmp_name' => $im2, 'size' => filesize( $im2 ) ) ) );
+		ok( $aid2 !== $aid && ! get_post( $aid ), 'a new photo replaces the earlier one (that one is deleted)' );
+		OYS_Customers::save_profile( $u, array( 'first_name' => 'Olívia', 'last_name' => 'Kovács', 'oys_phone' => '+36 30 111 2222', 'oys_area' => 'Budapest', 'oys_avatar_remove' => '1' ) );
+		ok( 0 === OYS_Customers::avatar_id( $u ) && ! get_post( $aid2 ), '„Kép törlése”: the photo goes for good' );
+		$im3 = wp_tempnam( 'oys-avatar3.png' );
+		imagepng( $im, $im3 );
+		$aid3 = OYS_Customers::set_avatar( $u, array_merge( $file, array( 'tmp_name' => $im3, 'size' => filesize( $im3 ) ) ) );
+		remove_filter( 'oys_avatar_trust_file', '__return_true' );
+		require_once ABSPATH . 'wp-admin/includes/user.php';
+		wp_set_current_user( 0 );
+		wp_delete_user( $u );
+		ok( $aid3 && ! get_post( $aid3 ), 'a deleted customer\'s photo goes with them' );
+	} finally {
+		remove_filter( 'oys_avatar_trust_file', '__return_true' );
+		wp_set_current_user( 0 );
+		unset( $_GET['tab'] );
+	}
+	$js  = (string) file_get_contents( OYS_DIR . 'assets/oys.js' );
+	ok( str_contains( $js, 'data-oys-avatar' ), 'the chosen photo is shown before saving' );
+	// the privacy notice names the town and the photo
+	require_once get_template_directory() . '/inc/demo-import.php';
+	$data = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content-hu-online.json' ), true );
+	ok( str_contains( $data['privacy']['content'], 'telefonszámod, a településed,' ) && str_contains( $data['privacy']['content'], 'ha feltöltesz, a profilképed' ), 'privacy notice: the town and the profile photo among the account data' );
+	ok( 4 === count( oy_privacy_1119_pairs() ) && str_contains( oy_privacy_1119_pairs()[3][1], 'a profilképed' ), '… on the live page too (once)' );
 } );
 
 test( 'test mode: every process with one tap, the emails to the teacher\'s own mailbox (+teszt), test classes hidden, everything deleted after (Áron, 19 Nov)', function () {
@@ -4156,7 +4246,7 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	ok( str_contains( $ft16, '<nav class="tabbar" aria-label="Gyors menü" data-action-bar data-tabbar>' ) && str_contains( $ft16, "array( oy_book_url(), 'calendar', 'Foglalás', 'book' === \$oy_here, true )" ) && str_contains( $ft16, 'class="tabbar__item tabbar__menu" type="button" aria-expanded="false" aria-controls="drawer" data-nav-toggle' ) && str_contains( $js16, "document.querySelectorAll('[data-nav-toggle]')" ) && str_contains( $oc17, '.site-header .nav-toggle, .site-header .header-cta { display: none; }' ) && str_contains( $oc17, '.tabbar__item--main { margin-top: -26px; }' ), 'on a phone the online site works like an app: only the logo on top, one bar at the bottom – Órák · Foglalás (raised) · Fiók · Menü, the menu opens and closes from there (Áron: „App-szerű legyen”)' );
 	$fe2  = (string) file_get_contents( WP_PLUGIN_DIR . '/olivia-studio/includes/class-frontend.php' );
 	$oc18 = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
-	ok( str_contains( $fe2, '<div class="oys-account__hello"><h2>' ) && ! str_contains( $fe2, "'</a></nav><div class=\"oys-account__body\">'" ) && str_contains( (string) file_get_contents( get_template_directory() . '/page.php' ), "'account' === \$studio && is_user_logged_in()" ) && str_contains( $oc18, '.entry .oys-account__nav { display: flex; flex-wrap: nowrap; gap: .3rem; overflow-x: auto;' ) && str_contains( $oc18, '.entry .oys-card { border: 0; border-radius: 24px; background: #fff;' ) && ! preg_match( '/\.entry \.oys-[a-z_-]+[^{]*\{[^}]*box-shadow: \d+px \d+px 0 /', $oc18 ), 'the account in the site\'s look: a greeting card with „Kilépés” and the numbers, the tabs in one row, white rounded cards – no black frames or hard shadows in the booking screens (Áron: „Ez így csúnya nagyon … illeszkedjen mindenhez”)' );
+	ok( str_contains( $fe2, '<div class="oys-account__hello"><div class="oys-account__me"><a class="oys-avatar"' ) && str_contains( $fe2, "self::avatar_html( \$user_id ) . '</a><h2>'" ) && ! str_contains( $fe2, "'</a></nav><div class=\"oys-account__body\">'" ) && str_contains( (string) file_get_contents( get_template_directory() . '/page.php' ), "'account' === \$studio && is_user_logged_in()" ) && str_contains( $oc18, '.entry .oys-account__nav { display: flex; flex-wrap: nowrap; gap: .3rem; overflow-x: auto;' ) && str_contains( $oc18, '.entry .oys-card { border: 0; border-radius: 24px; background: #fff;' ) && ! preg_match( '/\.entry \.oys-[a-z_-]+[^{]*\{[^}]*box-shadow: \d+px \d+px 0 /', $oc18 ), 'the account in the site\'s look: a greeting card with „Kilépés” and the numbers, the tabs in one row, white rounded cards – no black frames or hard shadows in the booking screens (Áron: „Ez így csúnya nagyon … illeszkedjen mindenhez”)' );
 	switch_to_locale( 'hu_HU' );
 	$done_fmt = oys_date_format( 'l, F j \a\t g:i a' );
 	restore_previous_locale();

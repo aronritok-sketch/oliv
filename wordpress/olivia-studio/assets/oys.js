@@ -114,16 +114,26 @@
 			months.forEach(function (m, j) { m.hidden = j !== i; });
 			if (ask) ask.hidden = true;
 		};
-		// a one-to-one session on the chosen day: the link carries the day and the time (Olívia, 19 Nov)
+		// a one-to-one session on the chosen day: the link carries the day and the time (Olívia, 19 Nov); the time is a
+		// tap on one of the half hours, „any time” among them (Áron, 19 Nov: no drop-down)
 		var askLink = function () {
 			if (!ask) return;
 			var u = new URL(ask.getAttribute('data-url'), location.href);
 			u.searchParams.set('pday', ask.getAttribute('data-day') || '');
-			var t = ask.querySelector('[data-ask-time]').value;
+			var on = ask.querySelector('[data-ask-time][aria-pressed="true"]');
+			var t = on ? on.getAttribute('data-ask-time') : '';
 			if (t) u.searchParams.set('ptime', t); else u.searchParams.delete('ptime');
-			ask.querySelector('[data-ask-go]').href = u.toString();
+			var go = ask.querySelector('[data-ask-go]');
+			go.href = u.toString();
+			var label = go.getAttribute('data-label');
+			if (label && ask.getAttribute('data-short')) go.textContent = label.replace('%s', ask.getAttribute('data-short') + (t ? ', ' + on.textContent : ''));
 		};
-		if (ask) ask.querySelector('[data-ask-time]').addEventListener('change', askLink);
+		if (ask) ask.addEventListener('click', function (e) {
+			var b = e.target.closest('[data-ask-time]');
+			if (!b) return;
+			ask.querySelectorAll('[data-ask-time]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
+			askLink();
+		});
 		cal.classList.add('is-paged');
 		show(start < 0 ? 0 : start);
 		cal.addEventListener('click', function (e) {
@@ -160,6 +170,7 @@
 			if (none) none.hidden = !!first;
 			if (ask) {
 				ask.setAttribute('data-day', day.getAttribute('data-day'));
+				ask.setAttribute('data-short', day.getAttribute('data-short') || '');
 				ask.querySelector('[data-ask-day]').textContent = day.getAttribute('data-label') || '';
 				ask.hidden = false;
 				askLink();
@@ -182,4 +193,21 @@
 	};
 	open();
 	window.addEventListener('hashchange', open);
+})();
+
+/* Profile photo: the chosen picture shows in the circle before saving (Áron, 19 Nov). */
+(function () {
+	document.querySelectorAll('[data-oys-avatar]').forEach(function (input) {
+		input.addEventListener('change', function () {
+			var f = input.files && input.files[0];
+			var box = document.querySelector('[data-oys-avatar-preview]');
+			if (!f || !box || !/^image\//.test(f.type)) return;
+			var img = document.createElement('img');
+			img.className = 'oys-avatar__img';
+			img.alt = '';
+			img.src = URL.createObjectURL(f);
+			box.innerHTML = '';
+			box.appendChild(img);
+		});
+	});
 })();

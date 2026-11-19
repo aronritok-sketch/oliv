@@ -1820,7 +1820,7 @@ msgstr "Jelszó (legalább 8 karakter)"
 
 #: includes/class-frontend.php:1000
 msgid "Email me the newsletter: new classes and events (a few times a month at most)."
-msgstr "Kérem a hírlevelet: új órák és események (legfeljebb havonta néhányszor)."
+msgstr "Kérem a hírlevelet az új órákról és eseményekről (legfeljebb havonta néhányszor)."
 
 #: includes/class-frontend.php:1001
 #: includes/class-frontend.php:1316
@@ -2161,7 +2161,7 @@ msgstr "Sérülés, várandósság vagy egészségügyi megjegyzés (csak Olívi
 
 #: includes/class-frontend.php:1315
 msgid "Email me the newsletter: new classes and events"
-msgstr "Kérem a hírlevelet: új órák és események"
+msgstr "Kérem a hírlevelet az új órákról és eseményekről"
 
 #: includes/class-frontend.php:1317
 msgid "New password (leave empty to keep the current one)"
@@ -8393,3 +8393,78 @@ msgstr "Neked megfelelő időpont"
 
 msgid "Ask for this time"
 msgstr "Időpontot kérek"
+
+msgid "Phone number"
+msgstr "Telefonszám"
+
+msgid "Town or city"
+msgstr "Település"
+
+msgid "Profile photo"
+msgstr "Profilkép"
+
+msgid "Change photo"
+msgstr "Kép cseréje"
+
+msgid "Upload a profile photo"
+msgstr "Profilkép feltöltése"
+
+msgid "Remove photo"
+msgstr "Kép törlése"
+
+msgid "JPG, PNG or WebP, at most 5 MB. Optional; Olivia sees it next to your name."
+msgstr "JPG, PNG vagy WebP, legfeljebb 5 MB. Nem kötelező; Olívia a neved mellett látja."
+
+msgid "Who to tell in an emergency (optional)"
+msgstr "Kit értesítsünk vészhelyzetben? (nem kötelező)"
+
+msgid "Their phone number"
+msgstr "Az ő telefonszáma"
+
+msgid "Injuries, pregnancy or health notes (optional, only Olivia sees this)"
+msgstr "Sérülés, várandósság vagy más egészségügyi tudnivaló (nem kötelező, csak Olívia látja)"
+
+msgid "Please fill in: %s."
+msgstr "Kérlek, töltsd ki: %s."
+
+msgid "Please fill in your details: %s."
+msgstr "Kérlek, töltsd ki az adataidat: %s."
+
+msgid "Fill them in"
+msgstr "Kitöltöm"
+
+msgid "Enter your first and last name."
+msgstr "Add meg a vezeték- és a keresztneved."
+
+msgid "Enter your phone number."
+msgstr "Add meg a telefonszámod."
+
+msgid "Enter your town or city."
+msgstr "Add meg, melyik településen élsz."
+
+msgid "The photo is too large (5 MB at most)."
+msgstr "A kép túl nagy (legfeljebb 5 MB lehet)."
+
+msgid "The profile photo must be a JPG, PNG or WebP image."
+msgstr "A profilkép JPG, PNG vagy WebP kép lehet."
+
+msgid "Morning"
+msgstr "Délelőtt"
+
+msgid "Afternoon"
+msgstr "Délután"
+
+msgid "Evening"
+msgstr "Este"
+
+msgid "Which time would suit you?"
+msgstr "Melyik időpont lenne jó?"
+
+msgid "Any time between %1$s and %2$s"
+msgstr "Bármikor jó %1$s és %2$s óra között"
+
+msgid "Ask for a time: %s"
+msgstr "Időpontot kérek: %s"
+
+msgid "Tap a day in the calendar and book your spot!"
+msgstr "Koppints egy napra a naptárban, és foglald le a helyed!"

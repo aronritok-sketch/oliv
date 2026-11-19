@@ -159,7 +159,7 @@ class OYS_Frontend {
 				$has_mine = in_array( 'is-mine', array_column( $states, 0 ), true );
 				$free     = ! $day_s && ! $other && $ask_on && $day > $today;
 				$pickable = ( $day_s && ! $other ) || $free;
-				$grid .= '<div class="oys-cal__day' . esc_attr( $state ) . ( $day_s ? ' has-class' : '' ) . ( $free ? ' is-free' : '' ) . ( $has_mine ? ' has-mine' : '' ) . '" role="listitem"' . ( $other ? ' aria-hidden="true"' : ' aria-label="' . esc_attr( $label ) . '"' ) . ( $day_s || $free ? ' data-day="' . esc_attr( $key ) . '" data-label="' . esc_attr( wp_date( oys_date_format( 'l, F j' ), $ts ) ) . '"' . ( $pickable ? ' tabindex="0"' : '' ) : '' ) . '>'
+				$grid .= '<div class="oys-cal__day' . esc_attr( $state ) . ( $day_s ? ' has-class' : '' ) . ( $free ? ' is-free' : '' ) . ( $has_mine ? ' has-mine' : '' ) . '" role="listitem"' . ( $other ? ' aria-hidden="true"' : ' aria-label="' . esc_attr( $label ) . '"' ) . ( $day_s || $free ? ' data-day="' . esc_attr( $key ) . '" data-label="' . esc_attr( wp_date( oys_date_format( 'l, F j' ), $ts ) ) . '" data-short="' . esc_attr( wp_date( oys_date_format( 'M j' ), $ts ) ) . '"' . ( $pickable ? ' tabindex="0"' : '' ) : '' ) . '>'
 					. '<span class="oys-cal__num">' . esc_html( $day->format( 'j' ) ) . '</span>'
 					. ( $day_s ? '<span class="oys-cal__dots" aria-hidden="true">' . implode( '', array_map( fn( $st ) => 'is-mine' === $st[0] ? '<i class="is-mine"></i>' : '<i></i>', array_slice( $states, 0, 3 ) ) ) . '</span><div class="oys-cal__chips">' . $chips . '</div>' : '' ) . '</div>';
 			}
@@ -173,8 +173,8 @@ class OYS_Frontend {
 				// only the day she taps shows under the calendar, not every class again (Olívia, 19 November: „a naptár alatt ne
 				// legyen felsorolva az összes következő óra újra, csak amit kiválasztok a naptárban”)
 				. ( $list
-					// Olívia, 19 November: „…és foglald le a helyed!”
-					? '<p class="oys-cal__pick">' . esc_html__( 'Tap a day in the calendar to see its class here, and book your spot!', 'olivia-studio' ) . '</p><ol class="oys-cal__list">' . $list . '</ol>'
+					// Olívia, 19 November: „…és foglald le a helyed!”; Áron, the same day: „az »itt látod az órát« vegyük ki”
+					? '<p class="oys-cal__pick">' . esc_html__( 'Tap a day in the calendar and book your spot!', 'olivia-studio' ) . '</p><ol class="oys-cal__list">' . $list . '</ol>'
 					: '<p class="oys-cal__empty">' . esc_html__( 'No group classes this month.', 'olivia-studio' ) . ( $ask_on ? ' ' . esc_html__( 'You can still ask for a one-to-one session: tap a day.', 'olivia-studio' ) : '' ) . '</p>' )
 				. ( $ask_on ? '<p class="oys-cal__none" hidden>' . esc_html__( 'No group class on this day.', 'olivia-studio' ) . '</p>' : '' )
 				. '</section>';
@@ -184,18 +184,36 @@ class OYS_Frontend {
 	}
 
 	/** Under the calendar, once a day is chosen: a one-to-one session on that day, at a time (or any time). */
+	/**
+	 * Under the calendar: a one-to-one session on the chosen day, the time chosen with a tap (Áron, 19 November: „nem
+	 * tetszik, hogy ilyen legördülős az időpontválasztó … 14:00-től 21:00-ig lehessen időpontot választani” – his „A”:
+	 * the half hours as buttons, by afternoon and evening, and „any time” among them).
+	 */
 	private static function calendar_ask() {
 		$url   = oys_account_url( 'private' );
-		$times = '<option value="">' . esc_html__( 'Any time', 'olivia-studio' ) . '</option>';
-		for ( $h = 7; $h <= 20; $h++ ) {
-			foreach ( array( '00', '30' ) as $mm ) {
-				$times .= '<option value="' . sprintf( '%02d:%s', $h, $mm ) . '">' . sprintf( '%d:%s', $h, $mm ) . '</option>';
-			}
+		$hours = array_values( array_map( 'intval', (array) apply_filters( 'oys_calendar_ask_hours', array( 14, 21 ) ) ) );
+		$from  = max( 0, min( 23, $hours[0] ?? 14 ) );
+		$to    = max( $from, min( 23, $hours[1] ?? 21 ) );
+		$parts = array(
+			'morning'   => array( __( 'Morning', 'olivia-studio' ), '' ),
+			'afternoon' => array( __( 'Afternoon', 'olivia-studio' ), '' ),
+			'evening'   => array( __( 'Evening', 'olivia-studio' ), '' ),
+		);
+		for ( $m = $from * 60; $m <= $to * 60; $m += 30 ) {
+			$t    = sprintf( '%02d:%02d', intdiv( $m, 60 ), $m % 60 );
+			$part = $m < 12 * 60 ? 'morning' : ( $m < 18 * 60 ? 'afternoon' : 'evening' );
+			$parts[ $part ][1] .= '<button type="button" class="oys-time" data-ask-time="' . esc_attr( $t ) . '" aria-pressed="false">' . esc_html( oys_is_hu() ? $t : gmdate( 'g:i a', $m * 60 ) ) . '</button>';
 		}
+		$times = '';
+		foreach ( $parts as $part ) {
+			$times .= '' !== $part[1] ? '<span class="oys-times__part">' . esc_html( $part[0] ) . '</span><div class="oys-times__grid">' . $part[1] . '</div>' : '';
+		}
+		$hour = fn( $h ) => oys_is_hu() ? (string) $h : gmdate( 'g a', $h * HOUR_IN_SECONDS );
 		return '<div class="oys-cal__ask" data-oys-cal-ask data-url="' . esc_url( $url ) . '" hidden>'
 			. '<p><b>' . esc_html__( 'Another time would suit you?', 'olivia-studio' ) . '</b> ' . esc_html__( 'If you would come on your own or as a pair, ask for a one-to-one session on this day:', 'olivia-studio' ) . ' <b data-ask-day></b></p>'
-			. '<div class="oys-cal__ask-row"><label class="field"><span>' . esc_html__( 'Time that suits you', 'olivia-studio' ) . '</span><select data-ask-time>' . $times . '</select></label>'
-			. '<a class="btn btn--ghost oys-cal__ask-go" data-ask-go href="' . esc_url( $url ) . '">' . esc_html__( 'Ask for this time', 'olivia-studio' ) . '</a></div></div>';
+			. '<div class="oys-times" role="group" aria-labelledby="oys-times-q"><p class="oys-times__q" id="oys-times-q">' . esc_html__( 'Which time would suit you?', 'olivia-studio' ) . '</p>' . $times
+			. '<button type="button" class="oys-time oys-time--any" data-ask-time="" aria-pressed="true">' . esc_html( sprintf( __( 'Any time between %1$s and %2$s', 'olivia-studio' ), $hour( $from ), $hour( $to ) ) ) . '</button></div>'
+			. '<a class="btn btn--primary oys-cal__ask-go" data-ask-go data-label="' . esc_attr__( 'Ask for a time: %s', 'olivia-studio' ) . '" href="' . esc_url( $url ) . '">' . esc_html__( 'Ask for this time', 'olivia-studio' ) . '</a></div>';
 	}
 
 	public static function sc_schedule( $atts ) {
@@ -1337,6 +1355,9 @@ class OYS_Frontend {
 		$view  = sanitize_key( $_GET['oys_view'] ?? 'register' );
 		$email = sanitize_email( wp_unslash( $_GET['oys_email'] ?? '' ) );
 		$first = sanitize_text_field( wp_unslash( $_GET['oys_first'] ?? '' ) );
+		$last  = sanitize_text_field( wp_unslash( $_GET['oys_last'] ?? '' ) );
+		$phone = sanitize_text_field( wp_unslash( $_GET['oys_phone'] ?? '' ) );
+		$area  = sanitize_text_field( wp_unslash( $_GET['oys_area'] ?? '' ) );
 		$login = self::form_open( 'oys_login', 'class="oys-form" id="oys-login"' )
 			. '<input type="hidden" name="redirect_to" value="' . esc_attr( $redirect ) . '">'
 			. '<label class="field"><span>' . esc_html__( 'Email', 'olivia-studio' ) . '</span><input type="email" name="email" id="oys-login-email" required autocomplete="email" value="' . esc_attr( $email ) . '"></label>'
@@ -1346,10 +1367,10 @@ class OYS_Frontend {
 		$register = self::form_open( 'oys_register', 'class="oys-form" id="oys-register"' )
 			. '<input type="hidden" name="redirect_to" value="' . esc_attr( $redirect ) . '">'
 			. '<div class="oys-hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></div>'
-			. '<div class="form__row"><label class="field"><span>' . esc_html__( 'First name', 'olivia-studio' ) . '</span><input type="text" name="first_name" id="oys-reg-first" required autocomplete="given-name" value="' . esc_attr( $first ) . '"></label>'
-			. '<label class="field"><span>' . esc_html__( 'Last name', 'olivia-studio' ) . '</span><input type="text" name="last_name" id="oys-reg-last" autocomplete="family-name"></label></div>'
+			. self::name_row( $first, $last, 'oys-reg' )
 			. '<div class="form__row"><label class="field"><span>' . esc_html__( 'Email', 'olivia-studio' ) . '</span><input type="email" name="email" id="oys-reg-email" required autocomplete="email" value="' . esc_attr( $email ) . '"></label>'
-			. '<label class="field"><span>' . esc_html__( 'Phone (optional)', 'olivia-studio' ) . '</span><input type="tel" name="phone" id="oys-reg-phone" autocomplete="tel"></label></div>'
+			. '<label class="field"><span>' . esc_html__( 'Phone number', 'olivia-studio' ) . '</span><input type="tel" name="phone" id="oys-reg-phone" required autocomplete="tel" value="' . esc_attr( $phone ) . '"></label></div>'
+			. '<label class="field"><span>' . esc_html__( 'Town or city', 'olivia-studio' ) . '</span><input type="text" name="area" id="oys-reg-area" required autocomplete="address-level2" value="' . esc_attr( $area ) . '"></label>'
 			. '<label class="field"><span>' . esc_html__( 'Password (8+ characters)', 'olivia-studio' ) . '</span><input type="password" name="password" id="oys-reg-password" required minlength="8" autocomplete="new-password"></label>'
 			. '<details class="oys-waiver"><summary>' . esc_html__( 'Participation agreement', 'olivia-studio' ) . '</summary><p>' . esc_html( OYS_Settings::get( 'waiver_text' ) ) . '</p></details>'
 			. '<label class="oys-check"><input type="checkbox" name="waiver" value="1" required> <span>' . esc_html__( 'I have read and accept the participation agreement.', 'olivia-studio' ) . '</span></label>'
@@ -1405,7 +1426,7 @@ class OYS_Frontend {
 		$member  = OYS_Memberships::current_for( $user_id );
 		$next    = OYS_Bookings::for_user( $user_id, 'upcoming', array( 'confirmed' ) );
 		// the greeting with „Log out” beside it (not as the last of the tabs: Áron, 16 November – „Ez így csúnya nagyon”)
-		$out     = $flash . '<div class="oys-account"><header class="oys-account__head"><div class="oys-account__hello"><h2>' . sprintf( esc_html__( 'Hi, %s', 'olivia-studio' ), esc_html( $user->first_name ?: $user->display_name ) ) . '</h2><a href="' . esc_url( wp_logout_url( home_url( '/' ) ) ) . '" class="oys-logout">' . esc_html__( 'Log out', 'olivia-studio' ) . '</a></div><dl class="oys-stats">';
+		$out     = $flash . '<div class="oys-account"><header class="oys-account__head"><div class="oys-account__hello"><div class="oys-account__me"><a class="oys-avatar" href="' . esc_url( oys_account_url( 'profile' ) ) . '#oys-avatar" title="' . esc_attr__( 'Profile photo', 'olivia-studio' ) . '">' . self::avatar_html( $user_id ) . '</a><h2>' . sprintf( esc_html__( 'Hi, %s', 'olivia-studio' ), esc_html( $user->first_name ?: $user->display_name ) ) . '</h2></div><a href="' . esc_url( wp_logout_url( home_url( '/' ) ) ) . '" class="oys-logout">' . esc_html__( 'Log out', 'olivia-studio' ) . '</a></div><dl class="oys-stats">';
 		if ( $member ) {
 			$left = (int) $member->classes_per_period ? OYS_Memberships::remaining( $member ) . ' / ' . (int) $member->classes_per_period : '∞';
 			$out .= '<div class="oys-stat oys-stat--sun"><dt>' . esc_html__( 'Membership', 'olivia-studio' ) . '</dt><dd>' . esc_html( $left ) . '</dd></div>';
@@ -1422,6 +1443,11 @@ class OYS_Frontend {
 			$out  .= '<a href="' . esc_url( oys_account_url( $k ) ) . '"' . ( $k === $tab ? ' aria-current="page"' : '' ) . '>' . esc_html( $label ) . $badge . '</a>';
 		}
 		$out .= '</nav><div class="oys-account__body">';
+		// Áron, 19 November: „az adatok kitöltése kötelező legyen” – until they are there, every tab says so
+		$missing = OYS_Customers::missing( $user_id );
+		if ( $missing ) {
+			$out .= '<p class="oys-notice oys-notice--todo">' . esc_html( sprintf( __( 'Please fill in your details: %s.', 'olivia-studio' ), implode( ', ', $missing ) ) ) . ( 'profile' !== $tab ? ' <a class="text-link" href="' . esc_url( oys_account_url( 'profile' ) ) . '">' . esc_html__( 'Fill them in', 'olivia-studio' ) . '</a>' : '' ) . '</p>';
+		}
 		$out .= call_user_func( array( __CLASS__, 'tab_' . $tab ), $user_id );
 		return $out . '</div>' . oys_fb_group_link() . '</div>';
 	}
@@ -1783,6 +1809,24 @@ class OYS_Frontend {
 		return wp_date( oys_date_format( 'l, F j' ), $ts ) . ( preg_match( '/^([01]\d|2[0-3]):[0-5]\d$/', $time ) ? ', ' . $time : '' );
 	}
 
+	/** First and last name, in the order of the language: „Vezetéknév, Keresztnév” in Hungarian. Both required. */
+	private static function name_row( $first, $last, $id ) {
+		$f = '<label class="field"><span>' . esc_html__( 'First name', 'olivia-studio' ) . '</span><input type="text" name="first_name" id="' . esc_attr( $id ) . '-first" required autocomplete="given-name" value="' . esc_attr( $first ) . '"></label>';
+		$l = '<label class="field"><span>' . esc_html__( 'Last name', 'olivia-studio' ) . '</span><input type="text" name="last_name" id="' . esc_attr( $id ) . '-last" required autocomplete="family-name" value="' . esc_attr( $last ) . '"></label>';
+		return '<div class="form__row">' . ( oys_is_hu() ? $l . $f : $f . $l ) . '</div>';
+	}
+
+	/** The customer's photo, or their initial in a circle. */
+	public static function avatar_html( $user_id, $size = 96 ) {
+		$aid = OYS_Customers::avatar_id( $user_id );
+		if ( $aid ) {
+			return wp_get_attachment_image( $aid, $size > 150 ? 'medium' : 'thumbnail', false, array( 'class' => 'oys-avatar__img', 'alt' => '', 'loading' => 'lazy' ) );
+		}
+		$u    = get_userdata( (int) $user_id );
+		$name = $u ? ( $u->first_name ?: $u->display_name ) : '';
+		return '<span class="oys-avatar__initial" aria-hidden="true">' . esc_html( mb_strtoupper( mb_substr( (string) $name, 0, 1 ) ) ?: '·' ) . '</span>';
+	}
+
 	/** Optional birthday (month and day), for the birthday gift. */
 	private static function birthday_field( $user_id ) {
 		[ $m, $d ] = array_map( 'intval', array_pad( explode( '-', OYS_Rewards::birthday( $user_id ) ), 2, 0 ) );
@@ -1802,15 +1846,19 @@ class OYS_Frontend {
 	private static function tab_profile( $user_id ) {
 		$u   = get_userdata( $user_id );
 		$m   = fn( $k ) => esc_attr( get_user_meta( $user_id, $k, true ) );
-		$out = self::form_open( 'oys_profile', 'class="oys-form oys-card"' ) . '<h3>' . esc_html__( 'Your details', 'olivia-studio' ) . '</h3>'
-			. '<div class="form__row"><label class="field"><span>' . esc_html__( 'First name', 'olivia-studio' ) . '</span><input type="text" name="first_name" id="oys-p-first" value="' . esc_attr( $u->first_name ) . '" autocomplete="given-name"></label>'
-			. '<label class="field"><span>' . esc_html__( 'Last name', 'olivia-studio' ) . '</span><input type="text" name="last_name" id="oys-p-last" value="' . esc_attr( $u->last_name ) . '" autocomplete="family-name"></label></div>'
+		$out = self::form_open( 'oys_profile', 'class="oys-form oys-card" enctype="multipart/form-data"' ) . '<h3>' . esc_html__( 'Your details', 'olivia-studio' ) . '</h3>'
+			// Áron, 19 November: „lehessen profilképet feltölteni”
+			. '<div class="oys-avatar-field" id="oys-avatar"><span class="oys-avatar oys-avatar--lg" data-oys-avatar-preview>' . self::avatar_html( $user_id, 160 ) . '</span><div class="oys-avatar-field__do">'
+			. '<label class="btn btn--ghost oys-avatar-pick"><input type="file" name="oys_avatar" id="oys-p-avatar" accept="image/jpeg,image/png,image/webp" class="oys-avatar-input" data-oys-avatar><span>' . esc_html( OYS_Customers::avatar_id( $user_id ) ? __( 'Change photo', 'olivia-studio' ) : __( 'Upload a profile photo', 'olivia-studio' ) ) . '</span></label>'
+			. ( OYS_Customers::avatar_id( $user_id ) ? '<label class="oys-check"><input type="checkbox" name="oys_avatar_remove" value="1"> <span>' . esc_html__( 'Remove photo', 'olivia-studio' ) . '</span></label>' : '' )
+			. '<p class="oys-small">' . esc_html__( 'JPG, PNG or WebP, at most 5 MB. Optional; Olivia sees it next to your name.', 'olivia-studio' ) . '</p></div></div>'
+			. self::name_row( $u->first_name, $u->last_name, 'oys-p' )
 			. '<div class="form__row"><label class="field"><span>' . esc_html__( 'Email', 'olivia-studio' ) . '</span><input type="email" id="oys-p-email" value="' . esc_attr( $u->user_email ) . '" disabled></label>'
-			. '<label class="field"><span>' . esc_html__( 'Phone', 'olivia-studio' ) . '</span><input type="tel" name="oys_phone" id="oys-p-phone" value="' . $m( 'oys_phone' ) . '" autocomplete="tel"></label></div>'
-			. '<label class="field"><span>' . esc_html__( 'Your area', 'olivia-studio' ) . '</span><input type="text" name="oys_area" id="oys-p-area" value="' . $m( 'oys_area' ) . '"></label>'
-			. '<div class="form__row"><label class="field"><span>' . esc_html__( 'Emergency contact', 'olivia-studio' ) . '</span><input type="text" name="oys_emergency_name" id="oys-p-ename" value="' . $m( 'oys_emergency_name' ) . '"></label>'
-			. '<label class="field"><span>' . esc_html__( 'Emergency phone', 'olivia-studio' ) . '</span><input type="tel" name="oys_emergency_phone" id="oys-p-ephone" value="' . $m( 'oys_emergency_phone' ) . '"></label></div>'
-			. '<label class="field"><span>' . esc_html__( 'Injuries, pregnancy or health notes (only Olivia sees this)', 'olivia-studio' ) . '</span><textarea name="oys_health_notes" id="oys-p-health" rows="4">' . esc_textarea( get_user_meta( $user_id, 'oys_health_notes', true ) ) . '</textarea></label>'
+			. '<label class="field"><span>' . esc_html__( 'Phone number', 'olivia-studio' ) . '</span><input type="tel" name="oys_phone" id="oys-p-phone" value="' . $m( 'oys_phone' ) . '" autocomplete="tel" required></label></div>'
+			. '<label class="field"><span>' . esc_html__( 'Town or city', 'olivia-studio' ) . '</span><input type="text" name="oys_area" id="oys-p-area" value="' . $m( 'oys_area' ) . '" autocomplete="address-level2" required></label>'
+			. '<div class="form__row"><label class="field"><span>' . esc_html__( 'Who to tell in an emergency (optional)', 'olivia-studio' ) . '</span><input type="text" name="oys_emergency_name" id="oys-p-ename" value="' . $m( 'oys_emergency_name' ) . '"></label>'
+			. '<label class="field"><span>' . esc_html__( 'Their phone number', 'olivia-studio' ) . '</span><input type="tel" name="oys_emergency_phone" id="oys-p-ephone" value="' . $m( 'oys_emergency_phone' ) . '"></label></div>'
+			. '<label class="field"><span>' . esc_html__( 'Injuries, pregnancy or health notes (optional, only Olivia sees this)', 'olivia-studio' ) . '</span><textarea name="oys_health_notes" id="oys-p-health" rows="4">' . esc_textarea( get_user_meta( $user_id, 'oys_health_notes', true ) ) . '</textarea></label>'
 			. self::birthday_field( $user_id )
 			. '<label class="oys-check"><input type="checkbox" name="oys_marketing" value="1"' . checked( '1', get_user_meta( $user_id, 'oys_marketing', true ), false ) . '> <span>' . esc_html__( 'Email me the newsletter: new classes and events', 'olivia-studio' ) . '</span></label>'
 			. oys_fb_group_link( __( 'And join our Facebook group', 'olivia-studio' ) )

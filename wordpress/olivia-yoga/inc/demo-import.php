@@ -861,11 +861,13 @@ function oy_privacy_1119_pairs() {
 		array( '<li><strong>Vendégek:</strong> ha valakit magaddal hozol, az általad megadott nevét és (ha megadod) e-mail-címét, csak hogy felkerüljön az óra névsorára és megkapja a foglalás részleteit.</li>', '<li><strong>Vendégek és társ:</strong> ha valakit magaddal hozol egy csoportos órára, vagy párban kérsz egyéni órát, az általad megadott nevét és e-mail-címét (csoportos órán az e-mail-cím nem kötelező), csak hogy felkerüljön az óra névsorára, és megkapja a foglalás részleteit és a saját belépőlinkjét.</li>' ),
 		array( '<h2>Adataid az Egyesült Államokban</h2>' . "\n" . '<p>Az Arovia Group LLC amerikai cég,', '<h2>Hol vannak az adataid?</h2>' . "\n" . '<p>Az oldal és az adatbázisa a GoDaddy virtuális szerverén (VPS) fut, európai uniós adatközpontban; a szervert a HelloProVision üzemelteti.</p>' . "\n" . '<h2>Adataid az Egyesült Államokban</h2>' . "\n" . '<p>Az Arovia Group LLC amerikai cég,' ),
 		array( 'a weboldal üzemeltetője és tárhelye (HelloProVision), a Stripe', 'a weboldal üzemeltetője (HelloProVision), a tárhely (GoDaddy virtuális szerver), a Stripe' ),
+		// b – Áron: „lehessen profilképet feltölteni, az adatok kitöltése kötelező legyen” (the town and the photo)
+		array( '<li><strong>Fiók és foglalás:</strong> neved, e-mail-címed, telefonszámod, a foglalásaid, a bérleteid és a fizetéseid. Ezek kellenek', '<li><strong>Fiók és foglalás:</strong> neved, e-mail-címed, telefonszámod, a településed, a foglalásaid, a bérleteid és a fizetéseid, és ha feltöltesz, a profilképed (ezt csak a fiókodban és a stúdió kezelőfelületén látjuk, és bármikor törölheted). Ezek kellenek' ),
 	);
 }
 
 function oy_migrate_privacy_1119() {
-	$rev = '2026-11-19';
+	$rev = '2026-11-19b';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_privacy_1119_rev' ) === $rev ) {
 		return array();
 	}
@@ -888,7 +890,7 @@ function oy_migrate_privacy_1119() {
 	kses_remove_filters();
 	wp_update_post( wp_slash( array( 'ID' => $page->ID, 'post_content' => $html ) ) );
 	kses_init_filters();
-	return array( sprintf( 'privacy: the GoDaddy server, the pair\'s partner (%d parts)', $n ) );
+	return array( sprintf( 'privacy: the GoDaddy server, the pair\'s partner, the profile photo (%d parts)', $n ) );
 }
 
 function oy_migrate_1113() {
