@@ -489,6 +489,9 @@ add_action( 'init', function () {
 	// Olívia, 19 November: „itt mindig 3 következő óra látszon és azért nyit további órákat a naptárban, hogy ott meg a
 	// következő 6 hét látszódhasson … minden oldalon ahol van” – every timetable list of the online site shows the next 3
 	add_filter( 'oys_schedule_next', fn( $n ) => oy_online_only() ? 3 : $n );
+	// the birthday on the profile (Áron, 19 November: „a születésnaphoz írd le megjegyzésbe, hogy érdemes kitölteni, mert
+	// születésnapodkor egy kis ajándékkal fogok kedveskedni”)
+	add_filter( 'oys_birthday_note', fn( $t ) => oy_online_only() ? __( 'Optional, but worth filling in: on your birthday I will treat you to a little gift.', 'olivia-yoga' ) : $t );
 	add_shortcode( 'oy_schedule', fn() => '<div class="block-wide">' . $studio( 'oys_schedule', '<p>' . esc_html__( 'The timetable is coming soon.', 'olivia-yoga' ) . '</p>' )
 		// Olívia, 19 November: the calendar here opens like on the booking page (it stayed open once opened); the cancellation
 		// rule is at the bottom of the page, so not here too

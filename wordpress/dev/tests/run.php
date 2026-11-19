@@ -1534,6 +1534,18 @@ test( 'Áron 19 Nov: a profile photo, the required details (name, phone number, 
 		wp_set_current_user( 0 );
 		unset( $_GET['tab'] );
 	}
+	// the birthday: optional, with a note why it is worth giving (Áron: „érdemes kitölteni, mert születésnapodkor egy kis ajándékkal fogok kedveskedni”)
+	$bf = new ReflectionMethod( 'OYS_Frontend', 'birthday_field' );
+	$bf->setAccessible( true );
+	update_option( 'oy_edition', 'hu-online' );
+	$bday = OYS_I18n::with( 'hu', fn() => $bf->invoke( null, 1 ) );
+	update_option( 'oy_edition', 'fort-myers' );
+	$bday_us = OYS_I18n::with( 'en', fn() => $bf->invoke( null, 1 ) );
+	ok( str_contains( $bday, 'Nem kötelező, de érdemes kitölteni, mert születésnapodkor egy kis ajándékkal fogok kedveskedni.' ) && ! str_contains( $bday_us, 'worth filling in' ), 'profile: the birthday note on the online site (other sites keep theirs)' );
+	// the site's menu on every screen (Áron: „az oldal főmenüjére gondoltam … férjen bele minden kijelzőn egyben”)
+	$oc = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
+	ok( str_contains( $oc, "@media (min-width: 760px) and (max-width: 1279px) {\n\t.site-header .nav { display: block; }\n\t.site-header .nav-toggle, .drawer { display: none; }" ), 'tablets and small laptops: the whole menu in the header, no menu hidden behind a button' );
+	ok( str_contains( $oc, '.drawer { --dr-sub: clamp(44px, 6dvh, 50px); --dr-tile: clamp(46px, 7dvh, 56px); display: flex;' ) && str_contains( $oc, '.drawer > nav > ul > li { order: 3; flex: 1 1 28%; min-width: 0; }' ) && str_contains( $oc, "@media (max-width: 759px) and (max-height: 620px) {\n\t.drawer { z-index: 65;" ), 'phones: the menu on one screen, the smallest too – the pages three to a row, the rows by the screen\'s height, tap targets of 44 px' );
 	$js  = (string) file_get_contents( OYS_DIR . 'assets/oys.js' );
 	ok( str_contains( $js, 'data-oys-avatar' ), 'the chosen photo is shown before saving' );
 	// the privacy notice names the town and the photo

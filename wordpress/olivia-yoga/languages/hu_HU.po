@@ -2000,3 +2000,6 @@ msgstr "%d napig visszanézhető"
 
 msgid "we can talk later in the class chat too"
 msgstr "később is kapcsolódhatunk a közös chatben"
+
+msgid "Optional, but worth filling in: on your birthday I will treat you to a little gift."
+msgstr "Nem kötelező, de érdemes kitölteni, mert születésnapodkor egy kis ajándékkal fogok kedveskedni."

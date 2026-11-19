@@ -1843,6 +1843,7 @@ class OYS_Frontend {
 			$days .= '<option value="' . $i . '"' . selected( $d, $i, false ) . '>' . $i . '</option>';
 		}
 		$gift = (int) OYS_Settings::get( 'birthday_on' ) ? sprintf( __( 'Optional. On your birthday you get a %d%% gift code.', 'olivia-studio' ), (int) OYS_Settings::get( 'birthday_percent' ) ) : __( 'Optional.', 'olivia-studio' );
+		$gift = (string) apply_filters( 'oys_birthday_note', $gift ); // a site can say it in its own words
 		return '<fieldset class="oys-birthday"><legend>' . esc_html__( 'Birthday', 'olivia-studio' ) . '</legend><div class="form__row"><label class="field"><span class="sr-only">' . esc_html__( 'Month', 'olivia-studio' ) . '</span><select name="bday_month" id="oys-p-bmonth">' . $months . '</select></label>'
 			. '<label class="field"><span class="sr-only">' . esc_html__( 'Day', 'olivia-studio' ) . '</span><select name="bday_day" id="oys-p-bday">' . $days . '</select></label></div><p class="oys-small">' . esc_html( $gift ) . '</p></fieldset>';
 	}

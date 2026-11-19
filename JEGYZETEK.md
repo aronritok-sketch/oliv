@@ -1860,6 +1860,28 @@
   - Ellenőrizve 320–1440 px között, 8 szélességen: mind a 7 fül látszik, nincs oldalgörgetés, minden fül legalább 62 px
     magas, és egy felirat sincs levágva. Tesztek: 1776/0.
 
+- **2026-11-19 – A főmenü minden kijelzőn egyben; születésnapi megjegyzés (oliviajoga.online 3.12.17, olivia-studio 1.27.1).**
+  Áron: „az oldal főmenüjére gondoltam”; „a vészhelyzeti kapcsolattartó, az egészségügyi megjegyzés és a születésnap nem
+  kell, hogy kötelező legyen. a születésnaphoz írd le megjegyzésbe, hogy érdemes kitölteni, mert születésnapodkor egy kis
+  ajándékkal fogok kedveskedni.”
+  - **Tablet és kisebb laptop (760–1279 px):** eddig csak a „Fiókom” gomb és egy hamburger-ikon látszott, a menüpontok el
+    voltak rejtve. Most az egész menü kint van a fejlécben, egy sorban, jobbra igazítva. A betű és a közök a szélességgel
+    nőnek. Az „Online órák” almenü koppintásra (tablet) és egérre (laptop) is lenyílik, és a képernyőn marad.
+  - **Telefon (az alsó sáv „Menü” gombja):** kis kijelzőn (320×568, 375×667, például iPhone SE) a „Jógáról” és a
+    „Kapcsolat” az alsó sáv mögé csúszott. Most minden telefonon egy képernyőn elfér, görgetés nélkül:
+    - felül az órák listája, alatta a sárga „Bejelentkezés és árak”;
+    - utána az oldalak hármasával (Főoldal, Rólam, GYIK / Jógáról, Kapcsolat);
+    - a sorok magassága a kijelzőhöz igazodik, minden gomb legalább 44 px;
+    - nagyon alacsony kijelzőn (≤ 620 px) a menü a logót is eltakarja.
+  - Ellenőrizve:
+    - a fejléc 8 szélességen (320–1920 px);
+    - a telefonos menü 6 méretben (320×568-tól 700×1000-ig).
+  - **Születésnap:** az Adatlapon „Nem kötelező, de érdemes kitölteni, mert születésnapodkor egy kis ajándékkal fogok
+    kedveskedni.” (`oys_birthday_note` szűrő, a téma az online kiadásban állítja).
+    - A bővítmény automatikus születésnapi kódja (20%, 30 napig) élesben ki van kapcsolva; ezt Áron dönti el.
+    - A vészhelyzeti kapcsolattartó, az egészségügyi megjegyzés és a születésnap nem kötelező (Áron döntése).
+  - Tesztek: 1779/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
