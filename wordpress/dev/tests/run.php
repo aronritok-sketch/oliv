@@ -1304,6 +1304,15 @@ test( 'Olívia 19 Nov: renamed class types – an address she types becomes the 
 		$names = oy_class_service_names( array( 'zz-key-b' => array( 'title_prev' => 'Csoportos online zz jóga' ), 'zz-key-c' => array( 'title_prev' => 'Online zz' ) ) );
 		$sv    = get_option( 'oys_services' );
 		ok( $names && 'Csoportos zz jóga' === $sv['zz-s1']['label'] && 'Saját név' === $sv['zz-s2']['label'], 'a one-to-one service takes its class\'s new name; a name she gave it herself stays' );
+		// „Melyik órát válasszam?”: the boxes say the new names
+		$cp   = get_page_by_path( oy_page_slug( OY_PAGE_SLUGS['classes'] ) );
+		$cpid = $cp ? $cp->ID : wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Online órák', 'post_name' => oy_page_slug( OY_PAGE_SLUGS['classes'] ) ) );
+		$cpw  = $cp ? $cp->post_content : null;
+		wp_update_post( wp_slash( array( 'ID' => $cpid, 'post_content' => '<a class="oj-guide__box"><span class="oj-guide__name">Csoportos online zz jóga</span></a><a class="oj-guide__box"><span class="oj-guide__name">Más név</span></a>' ) ) );
+		$gl = oy_class_guide_names( array( 'zz-key-b' => array( 'title_prev' => 'Csoportos online zz jóga' ), 'zz-key-c' => array( 'title_prev' => 'Online zz' ) ) );
+		$gc = get_post_field( 'post_content', $cpid );
+		null === $cpw ? wp_delete_post( $cpid, true ) : wp_update_post( wp_slash( array( 'ID' => $cpid, 'post_content' => $cpw ) ) );
+		ok( $gl && str_contains( $gc, '<span class="oj-guide__name">Csoportos zz jóga</span>' ) && str_contains( $gc, '<span class="oj-guide__name">Más név</span>' ), '„Melyik órát válasszam?”: the box says the class\'s new name; other names stay' );
 	} finally {
 		foreach ( $made as $id ) {
 			wp_delete_post( $id, true );

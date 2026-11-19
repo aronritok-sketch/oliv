@@ -758,13 +758,37 @@ function oy_migrate_classes_1119b() {
  * where they still had the old class names.
  */
 function oy_migrate_classes_1119c() {
-	$rev = '2026-11-19c';
+	// rev d: the boxes of „Melyik órát válasszam?” say the new names too (the steps before do nothing the second time)
+	$rev = '2026-11-19d';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_classes_1119c_rev' ) === $rev ) {
 		return array();
 	}
 	update_option( 'oy_classes_1119c_rev', $rev );
 	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
-	return array_merge( oy_class_copies_fix( array_keys( (array) ( $data['classes'] ?? array() ) ) ), oy_class_service_names( (array) ( $data['classes'] ?? array() ) ) );
+	return array_merge( oy_class_copies_fix( array_keys( (array) ( $data['classes'] ?? array() ) ) ), oy_class_service_names( (array) ( $data['classes'] ?? array() ) ), oy_class_guide_names( (array) ( $data['classes'] ?? array() ) ) );
+}
+
+/** The class names in the boxes of „Melyik órát válasszam?” (classes page): the class's own title, where the old one stands. */
+function oy_class_guide_names( array $classes ) {
+	$page = get_page_by_path( oy_page_slug( OY_PAGE_SLUGS['classes'] ?? 'classes' ) );
+	if ( ! $page ) {
+		return array();
+	}
+	$content = $page->post_content;
+	foreach ( $classes as $key => $c ) {
+		$post = get_page_by_path( (string) $key, OBJECT, 'oy_class' );
+		$was  = (string) ( $c['title_prev'] ?? '' );
+		if ( $post && '' !== $was && $post->post_title !== $was ) {
+			$content = str_replace( '<span class="oj-guide__name">' . $was . '</span>', '<span class="oj-guide__name">' . esc_html( $post->post_title ) . '</span>', $content );
+		}
+	}
+	if ( $content === $page->post_content ) {
+		return array();
+	}
+	kses_remove_filters();
+	wp_update_post( wp_slash( array( 'ID' => $page->ID, 'post_content' => $content ) ) );
+	kses_init_filters();
+	return array( 'classes page: the new class names in „Melyik órát válasszam?”' );
 }
 
 /**

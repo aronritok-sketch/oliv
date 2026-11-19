@@ -1755,6 +1755,8 @@
       (`wp_insert_post_data` szűrő). A korábbi címek mind átirányítanak (`oy_class_paths_old`).
     - Az import a nyilvános cím alapján is megtalálja az órát (`oy_import_target`).
   - **A tartalomfájlban is az ő nevei vannak** (óratípusok és egyéni szolgáltatások).
+  - **3.12.10:** az órák oldal „Melyik órát válasszam?” dobozaiban is az új nevek állnak (`oy_class_guide_names`; a javítás
+    `d` revízióval még egyszer fut, a korábbi lépései ilyenkor már nem csinálnak semmit). Tesztek: 1720/0.
   - **Főoldal, „Így működik” 1. lépés:** „Foglald le az időpontot alkalmi jeggyel vagy bérlettel.”
   - **Bejelentkezés és árak, a csoportos óra dobozában:**
     - kikerült „A csoportos gyakorlás alatt részed lesz …” mondat („ez a mondat nem is kell ide”);
