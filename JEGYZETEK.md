@@ -1848,6 +1848,18 @@
     napra …”).
   - Tesztek: 1774/0. Helyben telefonon: regisztráció, Adatlap, képfeltöltés/-törlés, időpont-koppintás.
 
+- **2026-11-19 – A fiók menüje minden kijelzőn egyben (oliviajoga.online 3.12.16, olivia-studio 1.27.0).**
+  Áron: „a menü férjen bele minden kijelzőn egyben és legyen felhasználóbarát!”
+  - **Fiókmenü:** eddig telefonon oldalra görgetett, és az első fül levágódott. Most minden fül ikonnal és névvel látszik:
+    - telefonon (≤ 640 px) csempék, soronként 4, a második sor középre igazítva;
+    - nagyobb kijelzőn egy sorban;
+    - az aktív fül sötétzöld, sárga ikonnal;
+    - az Üzenetek olvasatlan-jelvénye az ikonon ül.
+  - Ikonok: Foglalások (naptár), Bérletek (jegy), Tagság (szív), Egyéni órák (két ember), Üzenetek (buborék),
+    Előzmények (óra visszafelé), Fizetések (kártya), Adatlap (ember).
+  - Ellenőrizve 320–1440 px között, 8 szélességen: mind a 7 fül látszik, nincs oldalgörgetés, minden fül legalább 62 px
+    magas, és egy felirat sincs levágva. Tesztek: 1776/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -299,6 +299,8 @@ function oys_icon( $name ) {
 		'mail'     => '<rect x="3.5" y="5.5" width="17" height="13" rx="1.5"/><path d="m4 7 8 6 8-6"/>',
 		'camera'   => '<path d="M4 8.5h3.2l1.6-2.3h6.4l1.6 2.3H20v10.5H4z"/><circle cx="12" cy="13.4" r="3.3"/>',
 		'chat'     => '<path d="M4.5 6.5h15v9.5H10l-4 3.5V16H4.5z"/>',
+		'card'     => '<rect x="3.5" y="6" width="17" height="12.5" rx="2"/><path d="M3.5 10.2h17M7 15h3.5"/>',
+		'history'  => '<path d="M4.6 12a7.4 7.4 0 1 0 2.2-5.2"/><path d="M4.3 4.6v3.3h3.3M12 8.2V12l2.6 1.6"/>',
 	);
 	return '<svg class="oys-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' . ( $icons[ $name ] ?? '' ) . '</svg>';
 }

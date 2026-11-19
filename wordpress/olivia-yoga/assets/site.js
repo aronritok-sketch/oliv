@@ -48,12 +48,6 @@
 		}
 	});
 
-	/* The account's tabs scroll sideways on a phone: the open one is brought into view */
-	var tabNow = document.querySelector('.oys-account__nav [aria-current="page"]');
-	if (tabNow && tabNow.parentNode.scrollWidth > tabNow.parentNode.clientWidth) {
-		tabNow.parentNode.scrollLeft = tabNow.offsetLeft - (tabNow.parentNode.clientWidth - tabNow.offsetWidth) / 2;
-	}
-
 	/* Reveal on scroll + brush underline drawing */
 	var io = 'IntersectionObserver' in window ? new IntersectionObserver(function (entries) {
 		entries.forEach(function (en) {

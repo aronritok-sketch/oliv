@@ -1437,11 +1437,14 @@ class OYS_Frontend {
 			. ( $private ? '<div class="oys-stat oys-stat--sun"><dt>' . esc_html__( 'Private sessions', 'olivia-studio' ) . '</dt><dd>' . (int) $private . '</dd></div>' : '' )
 			. $services
 			. '<div class="oys-stat oys-stat--pink"><dt>' . esc_html__( 'Upcoming', 'olivia-studio' ) . '</dt><dd>' . count( $next ) . '</dd></div></dl></header>';
-		$out .= '<nav class="oys-account__nav" aria-label="' . esc_attr__( 'Account', 'olivia-studio' ) . '">';
+		$out .= '<nav class="oys-account__nav" data-tabs="' . count( $tabs ) . '" aria-label="' . esc_attr__( 'Account', 'olivia-studio' ) . '">';
 		$unread = 'messages' !== $tab ? OYS_Hub::customer_unread( $user_id ) : 0;
+		// Áron, 19 November: „a menü férjen bele minden kijelzőn egyben és legyen felhasználóbarát” – every tab with its
+		// icon, all of them in view (tiles on a phone, one row on a wider screen), no sideways scrolling
+		$icons = array( 'bookings' => 'calendar', 'passes' => 'ticket', 'membership' => 'heart', 'private' => 'users', 'messages' => 'chat', 'history' => 'history', 'payments' => 'card', 'profile' => 'user' );
 		foreach ( $tabs as $k => $label ) {
 			$badge = 'messages' === $k && $unread ? ' <span class="oys-badge" aria-label="' . esc_attr__( 'new', 'olivia-studio' ) . '">' . (int) $unread . '</span>' : '';
-			$out  .= '<a href="' . esc_url( oys_account_url( $k ) ) . '"' . ( $k === $tab ? ' aria-current="page"' : '' ) . '>' . esc_html( $label ) . $badge . '</a>';
+			$out  .= '<a href="' . esc_url( oys_account_url( $k ) ) . '"' . ( $k === $tab ? ' aria-current="page"' : '' ) . '><span class="oys-account__ico">' . oys_icon( $icons[ $k ] ?? 'check' ) . $badge . '</span><span class="oys-account__lbl">' . esc_html( $label ) . '</span></a>';
 		}
 		$out .= '</nav><div class="oys-account__body">';
 		// Áron, 19 November: „az adatok kitöltése kötelező legyen” – until they are there, every tab says so

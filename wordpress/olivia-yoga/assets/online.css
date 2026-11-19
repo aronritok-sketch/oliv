@@ -1628,11 +1628,11 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .entry .oys-stat--sun dt::before { background: var(--sun); }
 .entry .oys-stat dd { margin-top: .35rem; color: #fff; font-size: 2.5rem; }
 /* the tabs: one row, sideways on a phone */
-.entry .oys-account__nav { display: flex; flex-wrap: nowrap; gap: .3rem; overflow-x: auto; margin: 0 0 1.8rem; padding: .35rem; border: 0; border-radius: 999px; background: #fff; box-shadow: 0 14px 30px -24px rgba(0, 46, 44, .55); scrollbar-width: none; -webkit-overflow-scrolling: touch; }
-.entry .oys-account__nav::-webkit-scrollbar { display: none; }
-.entry .oys-account__nav a { flex: none; display: inline-flex; align-items: center; min-height: 44px; padding: 0 1.05rem; border: 0; border-radius: 999px; color: var(--forest); font-size: .74rem; white-space: nowrap; }
+.entry .oys-account__nav { display: flex; flex-wrap: wrap; justify-content: center; gap: .3rem; margin: 0 0 1.8rem; padding: .4rem; border: 0; border-radius: 22px; background: #fff; box-shadow: 0 14px 30px -24px rgba(0, 46, 44, .55); }
+.entry .oys-account__nav a { min-height: 62px; padding: .55rem .25rem; border: 0; border-radius: 16px; color: var(--forest); font-size: .74rem; font-weight: 700; letter-spacing: 0; text-transform: none; white-space: normal; }
 .entry .oys-account__nav a:hover { border: 0; background: var(--paper); color: var(--forest); }
 .entry .oys-account__nav a[aria-current="page"] { background: var(--forest); color: #fff; }
+.entry .oys-account__nav a[aria-current="page"] .oys-icon { color: var(--sun); }
 .entry .oys-account__nav .oys-logout { display: none; }
 /* the content of the tabs */
 @media (min-width: 760px) { .entry .oys-stats { grid-template-columns: repeat(auto-fill, minmax(170px, 230px)); } }
