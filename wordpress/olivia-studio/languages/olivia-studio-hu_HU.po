@@ -8345,3 +8345,6 @@ msgstr "Bekapcsolva: vannak tesztvendégek és -órák"
 
 msgid "Try every process, for real"
 msgstr "Minden folyamat kipróbálása, élesben"
+
+msgid "Tap a day with a class in the calendar to see it here."
+msgstr "Koppints egy napra a naptárban, és itt látod az órát."

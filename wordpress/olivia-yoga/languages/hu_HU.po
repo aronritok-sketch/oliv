@@ -1985,3 +1985,9 @@ msgstr "További órák a naptárban"
 
 msgid "In a group"
 msgstr "Csoportban"
+
+msgid "If you paid for the group class but cannot be there, you can still watch it again for a week and join the conversation afterwards."
+msgstr "Ha befizetted a csoportos órát, de nem tudsz ott lenni, ugyanúgy visszanézheted egy hétig, és utólag a közös beszélgetésbe is bekapcsolódhatsz."
+
+msgid "If you paid for the group class but cannot be there, you can still watch it again for %d days and join the conversation afterwards."
+msgstr "Ha befizetted a csoportos órát, de nem tudsz ott lenni, ugyanúgy visszanézheted %d napig, és utólag a közös beszélgetésbe is bekapcsolódhatsz."

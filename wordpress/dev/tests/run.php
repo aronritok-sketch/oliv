@@ -1134,6 +1134,45 @@ test( 'one-to-one in two lengths (60 / 90 minutes): own credits, own cards, the 
 	}
 } );
 
+test( 'Olívia 19 Nov: the calendar shows only the day she taps, opens like on the booking page (prices, the group class page), the missed-class sentence on the cancellation notes, Home in the phone menu', function () {
+	$s = make_session( array( 'format' => 'online', 'online_capacity' => 10, 'in_hours' => 24 * 2 ) );
+	$cal = OYS_Frontend::sc_calendar( array() );
+	ok( str_contains( $cal, '<p class="oys-cal__pick">' ) && (bool) preg_match( '#class="oys-cal__day[^"]*has-class[^"]*"[^>]*data-day="[^"]+" tabindex="0"#', $cal ), 'calendar: a hint until a day is chosen, the days with a class can be chosen with the keyboard too' );
+	$css = (string) file_get_contents( OYS_DIR . 'assets/oys.css' );
+	$js  = (string) file_get_contents( OYS_DIR . 'assets/oys.js' );
+	ok( str_contains( $css, '.oys-cal.is-paged .oys-cal__list .oys-cal__item:not(.is-hl) { display: none; }' ) && str_contains( $js, "m.classList.add('has-pick');" ) && str_contains( $js, "e.key !== 'Enter'" ), '… under it only the chosen day\'s classes („csak amit kiválasztok a naptárban”), not every class again' );
+	ok( str_contains( OYS_Frontend::more_calendar( array( 'class' => 'zzz-none' ) ), 'No group classes this month.' ) || ! str_contains( OYS_Frontend::more_calendar( array( 'class' => 'zzz-none' ) ), 'oys-cal__item' ), '„More classes in the calendar” on a class page: that class\'s calendar' );
+	OYS_Schedule::cancel_session( $s->id, 'test' );
+	update_option( 'oy_edition', 'hu-online' );
+	$keep_cp = OYS_Settings::get( 'cancel_policy' );
+	OYS_Settings::update( array( 'cancel_policy' => 'A csoportos órát 12 órával előtte lemondhatod. A később lemondott óra elhasználódik. Az egyéni órát 24 órával előtte lehet áttenni.' ) );
+	$sched = do_shortcode( '[oy_schedule]' );
+	$note  = oy_cancel_note( '', 'group' );
+	$all   = oy_cancel_note();
+	$priv  = oy_cancel_note( '', 'private' );
+	OYS_Settings::update( array( 'cancel_policy' => $keep_cp ) );
+	$menu  = oy_menu( true );
+	$top   = oy_menu( false );
+	update_option( 'oy_edition', 'fort-myers' );
+	ok( str_contains( $sched, '<details class="oys-more-cal" id="naptar">' ) && ! str_contains( $sched, 'oj-cal-wrap' ) && ! str_contains( $sched, 'class="oj-policy' ) && str_contains( $sched, 'oj-replay' ), 'prices page: the calendar opens like on the booking page (the home page\'s button opens it), no cancellation note under the replay line' );
+	ok( str_contains( $note, 'watch it again for a week and join the conversation afterwards' ) && str_contains( $all, 'afterwards.<br>' ) && ! str_contains( $priv, 'watch it again' ), 'cancellation notes: a paid but missed group class can still be watched and talked about (not on the one-to-one note)' );
+	ok( (bool) preg_match( '#^<ul[^>]*><li class="menu-item menu-item--home[^"]*"><a href="' . preg_quote( home_url( '/' ), '#' ) . '"[^>]*>Home</a></li>#', $menu ) && ! str_contains( $top, 'menu-item--home' ), 'the phone menu starts with the home page („Mobilon nem tudok a menüből a főoldalra menni”); the wide menu stays as it was' );
+	require_once get_template_directory() . '/inc/demo-import.php';
+	$faq = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => 'Mi a lemondási szabály?', 'post_content' => '<p>A csoportos órát 12 órával előtte lemondhatod. Az egyéni órát 24 órával előtte lehet áttenni.</p>' ) );
+	update_option( 'oy_edition', 'hu-online' );
+	$nrev = get_option( 'oy_noshow_rev' );
+	delete_option( 'oy_noshow_rev' );
+	$nl  = oy_migrate_noshow_1119();
+	$nl2 = oy_migrate_noshow_1119();
+	update_option( 'oy_edition', 'fort-myers' );
+	$fc = get_post( $faq )->post_content;
+	wp_delete_post( $faq, true );
+	false === $nrev ? delete_option( 'oy_noshow_rev' ) : update_option( 'oy_noshow_rev', $nrev );
+	ok( $nl && ! $nl2 && str_contains( $fc, 'előtte lemondhatod. If you paid for the group class but cannot be there, you can still watch it again for a week and join the conversation afterwards. Az egyéni órát' ), 'the FAQ answer gets the sentence before the one-to-one rule, once' );
+	$po = (string) file_get_contents( get_template_directory() . '/languages/hu_HU.po' );
+	ok( str_contains( $po, 'msgstr "Ha befizetted a csoportos órát, de nem tudsz ott lenni, ugyanúgy visszanézheted egy hétig, és utólag a közös beszélgetésbe is bekapcsolódhatsz."' ), 'in Hungarian: „Ha befizetted a csoportos órát, de nem tudsz ott lenni, ugyanúgy visszanézheted egy hétig …”' );
+} );
+
 test( 'test mode: every process with one tap, the emails to the teacher\'s own mailbox (+teszt), test classes hidden, everything deleted after (Áron, 19 Nov)', function () {
 	$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0];
 	wp_set_current_user( (int) $admin );
@@ -3542,6 +3581,7 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	update_option( 'oy_edition', 'hu-online' );
 	$pd = oy_pricing_design( '<h2>Csoportos online flow jóga szerdánként</h2><p>Szerdánként 18:30-tól 20:00-ig, 90 percben. A gyakorlás alatt részed lesz légzésben.</p><p>Minden óra élő, itt az oldalon, a böngésződben. Nem kötelező kamerát kapcsolnod, de ha kapcsolsz, csak én látlak.</p><div class="block-wide">x</div>' );
 	$pd2 = oy_pricing_design( '<h2>Csoportos</h2><p>A gyakorlás.</p><h2 id="gift-cards">Ajándékutalványok</h2><p>Ajándékozz jógát.</p><p class="btn-row"><a class="btn btn--primary" href="/ajandekutalvany/">Ajándékutalvány vásárlása</a></p><h2>Jó tudni</h2><p><strong>Lemondás:</strong> 12 órával előtte.</p>' . "\n" . '<p><strong>Új vagy a jógában?</strong> Olvasd el.</p>' );
+	$pd3 = oy_pricing_design( '<h2>Csoportos</h2><p>A gyakorlás.</p><h2>Jó tudni</h2><p><strong>Lemondás:</strong> a csoportos órát 12 órával előtte még ingyen lemondhatod.<br>Az egyéni órát 24 órával előtte.</p>' );
 	$ln2 = oy_lines( '<p>Egy.<br>Kettő.</p><p>Három.<br>Négy.</p><div class="oj-secret"><p>Titok.</p></div>' );
 	$fa  = wp_insert_post( array( 'post_type' => 'oy_faq', 'post_status' => 'publish', 'post_title' => 'Mit kell előkészítenem az órára? (teszt)', 'post_content' => "Jóga: szőnyeg.\n\nKismamatorna: párna." ) );
 	$fah = do_shortcode( '[oy_faq_answer q="Mit kell előkészítenem az órára? (teszt)"]' );
@@ -3559,7 +3599,9 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	ok( str_starts_with( $ln, '<div class="oj-lines oj-lines--lilac"><p>Egy.</p><p>Kettő.</p></div><div class="oj-note"><p>A.<br>B.</p></div><p class="btn-row">x<br>y</p><p>Csak egy.</p><div class="oj-lines oj-lines--pink"><p>Három.</p><p>Négy.</p></div>' ), 'her sentences on lines of their own: a soft box per paragraph, the colour changing; inside a designed box or a button row they stay („Szépítsd ezeket, akár új boxxal”)' );
 	ok( str_contains( $fl, '<h2>Hogyan működik?</h2><ol class="oj-flow oj-flow--n3"><li><span class="oj-flow__n" aria-hidden="true">1</span><p>Kérj időpontot.</p></li>' ) && str_contains( $fl, '<p>Az óra élő.</p></li></ol><p class="btn-row">gomb</p>' ) && str_contains( $fl, '<p>Átmelegítéssel kezdünk</p></li><li><span class="oj-flow__n" aria-hidden="true">2</span><p>Utána nyújtunk</p></li><li><span class="oj-flow__n" aria-hidden="true">3</span><p>Végül relaxáció.</p></li></ol><p class="oj-flow__note">Minden alkalom az előzőre épít.</p>' ) && str_contains( $fl, 'oj-flow--n3"><li><span class="oj-flow__n" aria-hidden="true">1</span><p>Megérkezünk.</p>' ) && str_contains( $fl, '<p>Lelassulunk.</p></li></ol><h2>Mire lesz szükséged?</h2>' ) && str_contains( $fl, '<h2>Hogyan zajlik egy élő online óra?</h2><ol class="oj-flow oj-flow--n5">' ) && 5 === substr_count( substr( $fl, (int) strpos( $fl, 'Hogyan zajlik' ) ), '<li>' ), '… „Hogyan működik?”, „Mit csinálunk…”, „Mi történik…”: numbered steps from her lines or sentences („folyamatábra vagy lépésről lépésre ábra az összes aloldalra”)' );
 	ok( str_contains( $an, '<p>A tapasztalataim alapján is:</p><ul class="oj-dashes"><li>alvászavarok</li><li>túlgondolás</li></ul>' ) && str_contains( $an, '<p>Előbb az orvos.</p><p>Aztán szólj.</p>' ), '… in the FAQ answers the dashed lines are a list, the other lines paragraphs' );
-	ok( str_contains( $pd2, '<div class="oj-keynotes"><div class="oj-keynote oj-keynote--sun"><span class="oj-keynote__icon" aria-hidden="true">' ) && str_contains( $pd2, '<p class="oj-keynote__label">Lemondás</p><p>12 órával előtte.</p>' ) && str_contains( $pd2, 'oj-keynote--lilac' ) && str_contains( $pd2, '<p class="oj-keynote__label">Új vagy a jógában?</p><p>Olvasd el.</p></div></div></div>' ), '… „Lemondás”, „Új vagy a jógában?” as cards of their own, side by side („ezek is külön legyenek szebben kiemelve”)' );
+	ok( str_contains( $pd2, '<div class="oj-keynotes"><div class="oj-keynote oj-keynote--sun"><span class="oj-keynote__icon" aria-hidden="true">' ) && str_contains( $pd2, '<p class="oj-keynote__label">Új vagy a jógában?</p><p>Olvasd el.</p></div></div></div>' ), '… „Új vagy a jógában?” and the like as cards of their own („ezek is külön legyenek szebben kiemelve”)' );
+	ok( (bool) preg_match( '#<p class="oj-policy"><svg[^>]*>.*?</svg><span><b>Lemondás:</b> 12 órával előtte\. If you paid for the group class but cannot be there, you can still watch it again for a week and join the conversation afterwards\.</span></p>#s', $pd2 ) && ! str_contains( $pd2, 'oj-keynote__label">Lemondás' ), '… „Lemondás” in the design of the note under the replay line, with a capital, and the missed-class sentence (Olívia, 19 Nov)' );
+	ok( str_contains( $pd3, '<b>Lemondás:</b> A csoportos órát 12 órával előtte még ingyen lemondhatod. If you paid' ) && str_contains( $pd3, 'afterwards.<br>Az egyéni órát' ), '… the capital A, and the sentence goes with the group class, before the one-to-one line' );
 	ok( str_contains( $ln2, '<div class="oj-lines oj-lines--lilac">' ) && str_contains( $ln2, '<div class="oj-lines oj-lines--sage"><p>Három.</p>' ) && ! str_contains( $ln2, 'oj-lines--pink' ), '… a line box right before the pink note is not pink („ez legyen más színű”)' );
 	ok( str_contains( $cb, 'name="action" value="oy_callback"' ) && str_contains( $cb, 'type="tel" name="phone"' ) && 1 === substr_count( $cb, '<input type="tel"' ) && '' === oy_callback_form(), 'contact: a „Visszahívást kérek” box with only a phone field, on the online site only' );
 	update_option( 'oy_edition', 'hu-online' );
@@ -3948,7 +3990,7 @@ test( 'online edition, Olívia\'s doc of 14 November, last points: one level for
 		ok( ! str_contains( $home, 'id="classes"' ), 'no „Online órák” list on the home page' );
 		$note = oy_cancel_note();
 		ok( str_contains( $note, 'oj-policy' ) && str_contains( str_replace( '<br>', ' ', $note ), esc_html( (string) OYS_Settings::get( 'cancel_policy' ) ) ), 'the cancellation rule, from the booking settings' );
-		ok( str_contains( do_shortcode( '[oy_schedule]' ), 'oj-policy' ) && str_contains( $home, 'oj-policy' ), '… under the timetables (home page, prices page)' );
+		ok( ! str_contains( do_shortcode( '[oy_schedule]' ), 'oj-policy' ) && str_contains( $home, 'oj-policy' ), '… under the timetable on the home page (on the prices page it is at the bottom only, Olívia 19 Nov)' );
 		$side = oy_page_aside( 'about' );
 		ok( str_contains( $side, 'aside-card--practice' ) && ! str_contains( $side, 'aside-list"><li>' . oy_icon( 'check' ) ), 'About side column: the next class and the services, not the trainings again' );
 		$duo = do_shortcode( '[oy_figures photos="korall-stretching-circuit,outdoor-group-bands"]' );
@@ -5011,7 +5053,7 @@ test( 'Olívia, 17 November (chat): the one-to-one rule on its own line; the flo
 	$keep = OYS_Settings::get( 'cancel_policy' );
 	try {
 		OYS_Settings::update( array( 'cancel_policy' => 'A csoportos órát 12 órával előtte lemondhatod. A később lemondott óra elhasználódik. Az egyéni órát 24 órával előtte lehet áttenni vagy lemondani.' ) );
-		ok( str_contains( oy_cancel_note(), 'elhasználódik.<br>Az egyéni órát 24 órával' ), '„Lemondás:” under the timetable: the one-to-one rule starts a new line' );
+		ok( str_contains( oy_cancel_note(), 'elhasználódik. If you paid for the group class' ) && str_contains( oy_cancel_note(), 'afterwards.<br>Az egyéni órát 24 órával' ), '„Lemondás:” under the timetable: the one-to-one rule starts a new line (the missed-class sentence stays with the group rule)' );
 		ok( ! str_contains( oy_cancel_note( 'x', 'private' ), '<br>' ) && ! str_contains( oy_cancel_note( 'x', 'group' ), 'egyéni' ), '… a class page still shows only its own rule' );
 	} finally {
 		OYS_Settings::update( array( 'cancel_policy' => $keep ) );

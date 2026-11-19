@@ -153,7 +153,7 @@ class OYS_Frontend {
 				}
 				$label = wp_date( oys_date_format( 'l, F j' ), $ts ) . ( $day_s ? ': ' . implode( ', ', array_map( fn( $s ) => oys_time( $s->starts_at ) . ' ' . apply_filters( 'oys_card_title', oys_session_title( $s ), $s ), $day_s ) ) : '' );
 				$has_mine = in_array( 'is-mine', array_column( $states, 0 ), true );
-				$grid .= '<div class="oys-cal__day' . esc_attr( $state ) . ( $day_s ? ' has-class' : '' ) . ( $has_mine ? ' has-mine' : '' ) . '" role="listitem"' . ( $other ? ' aria-hidden="true"' : ' aria-label="' . esc_attr( $label ) . '"' ) . ( $day_s ? ' data-day="' . esc_attr( $key ) . '"' : '' ) . '>'
+				$grid .= '<div class="oys-cal__day' . esc_attr( $state ) . ( $day_s ? ' has-class' : '' ) . ( $has_mine ? ' has-mine' : '' ) . '" role="listitem"' . ( $other ? ' aria-hidden="true"' : ' aria-label="' . esc_attr( $label ) . '"' ) . ( $day_s ? ' data-day="' . esc_attr( $key ) . '"' . ( $other ? '' : ' tabindex="0"' ) : '' ) . '>'
 					. '<span class="oys-cal__num">' . esc_html( $day->format( 'j' ) ) . '</span>'
 					. ( $day_s ? '<span class="oys-cal__dots" aria-hidden="true">' . implode( '', array_map( fn( $st ) => 'is-mine' === $st[0] ? '<i class="is-mine"></i>' : '<i></i>', array_slice( $states, 0, 3 ) ) ) . '</span><div class="oys-cal__chips">' . $chips . '</div>' : '' ) . '</div>';
 			}
@@ -164,7 +164,9 @@ class OYS_Frontend {
 			$panels .= '<section class="oys-cal__month" data-month="' . esc_attr( $m->format( 'Y-m' ) ) . '"' . ( $m->format( 'Y-m' ) === $first_class ? ' data-start' : '' ) . ' aria-label="' . esc_attr( $name ) . '">'
 				. '<header class="oys-cal__bar">' . $arrow( 'prev', $prev, $mi - 1 ) . '<h3 class="oys-cal__title">' . esc_html( $name ) . '</h3>' . $arrow( 'next', $next, $mi + 1 ) . '</header>'
 				. '<div class="oys-cal__grid" role="list">' . $heads . $grid . '</div>'
-				. ( $list ? '<ol class="oys-cal__list">' . $list . '</ol>' : '<p class="oys-cal__empty">' . esc_html__( 'No group classes this month.', 'olivia-studio' ) . '</p>' )
+				// only the day she taps shows under the calendar, not every class again (Olívia, 19 November: „a naptár alatt ne
+				// legyen felsorolva az összes következő óra újra, csak amit kiválasztok a naptárban”)
+				. ( $list ? '<p class="oys-cal__pick">' . esc_html__( 'Tap a day with a class in the calendar to see it here.', 'olivia-studio' ) . '</p><ol class="oys-cal__list">' . $list . '</ol>' : '<p class="oys-cal__empty">' . esc_html__( 'No group classes this month.', 'olivia-studio' ) . '</p>' )
 				. '</section>';
 		}
 		$note = sprintf( _n( 'You can book up to %d week ahead.', 'You can book up to %d weeks ahead.', (int) round( $window / 7 ), 'olivia-studio' ), (int) round( $window / 7 ) );
@@ -532,11 +534,11 @@ class OYS_Frontend {
 	 * week right there (Olívia, 18 November: „a foglalás alá tedd be a további órák a naptárban cta-t, amire nyíljon le a
 	 * naptár, alatta meg maradjon az egyéni órás szekció”).
 	 */
-	public static function more_calendar() {
+	public static function more_calendar( array $atts = array() ) {
 		$icon = '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>';
 		$chev = '<svg class="oys-more-cal__chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>';
 		return '<details class="oys-more-cal" id="naptar"><summary class="btn btn--ghost">' . $icon . '<span>' . esc_html__( 'More classes in the calendar', 'olivia-studio' ) . '</span>' . $chev . '</summary>'
-			. '<div class="oys-more-cal__body">' . self::sc_calendar( array() ) . '</div></details>';
+			. '<div class="oys-more-cal__body">' . self::sc_calendar( $atts ) . '</div></details>';
 	}
 
 	/**

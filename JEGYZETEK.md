@@ -1682,6 +1682,30 @@
     - Egyszer fut (`oy_migrate_titles_1119`), a tartalomfájlban `seo_title`. Tesztek: 1676/0.
   - **Olívia Instagram/Facebook-bio linkje:** Áron kéri meg rá Olíviát (a CRM-feladat szerint).
 
+- **2026-11-19 – Olívia 9148956: naptár, lemondás, mobil Főoldal (oliviajoga.online 3.12.6, olivia-studio 1.24.1).**
+  Olívia portálüzenete (9148956), hat pont.
+  - **Flow-oldal:** a csoportos online flow jóga oldalán is ott a „További órák a naptárban” lenyíló az órák alatt
+    (`OYS_Frontend::more_calendar()` az óra slugjával).
+  - **Csak a kiválasztott nap:** a naptár alatt nem ismétlődik az összes következő óra. Előbb egy rövid tipp látszik
+    („Koppints egy napra a naptárban, és itt látod az órát.”), a napra koppintva csak annak a napnak az órája jelenik meg
+    (billentyűzettel is: Enter/szóköz). Mindenhol így működik, ahol a naptár van.
+  - **Bejelentkezés és árak:** a naptár ott is lenyíló (`details#naptar`), alapból csukva. A főoldali gomb
+    (`/bejelentkezes-es-arak/#naptar`) nyitva hozza.
+  - **Lemondás:**
+    - a „visszanézheted egy hétig” alatti lemondási sor kikerült (alul úgyis ott van);
+    - az alsó lemondási szabály nagy betűvel kezdődik, és ugyanolyan dizájnt kapott, mint a visszanézés-sor (ikon +
+      félkövér „Lemondás:”).
+  - **Mindenhol a lemondás mellé:** „Ha befizetted a csoportos órát, de nem tudsz ott lenni, ugyanúgy visszanézheted egy
+    hétig, és utólag a közös beszélgetésbe is bekapcsolódhatsz.” (`oy_noshow_text()`, `oy_with_noshow()`):
+    - árak oldal (alsó lemondási szabály), főoldal, csoportos óraoldalak lemondási doboza;
+    - GYIK „Mi a lemondási szabály?” válasza (egyszer futó migráció: `oy_migrate_noshow_1119`).
+    - Az egyéni órára nem vonatkozik, ott nincs közös felvétel.
+    - Az ÁSZF jogi szöveg, azt nem írtuk át: Áron dönt róla.
+  - **Mobil menü:** a menü első eleme „Főoldal”.
+  - **Áronnak továbbítva, döntésre:** privát óra kérése a naptárban kiválasztott napra/időpontra; páros privát óránál
+    meghívó a társnak. Amíg Áron nem dönt, nem épül.
+  - Tesztek: 1686/0. Helyben telefonnézetben próbálva (naptár, lemondás, menü, nincs vízszintes görgetés).
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

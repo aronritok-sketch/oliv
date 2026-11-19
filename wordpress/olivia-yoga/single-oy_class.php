@@ -25,7 +25,9 @@ while ( have_posts() ) :
 				?>
 				<?php if ( shortcode_exists( 'oys_schedule' ) && ! $private ) : ?>
 					<h2><?php esc_html_e( 'Next dates', 'olivia-yoga' ); ?></h2>
-					<div class="block-wide"><?php echo do_shortcode( '[oys_schedule days="21" class="' . esc_attr( $slug ) . '" empty_days="no"]' ); // phpcs:ignore ?></div>
+					<div class="block-wide"><?php echo do_shortcode( '[oys_schedule days="21" class="' . esc_attr( $slug ) . '" empty_days="no"]' ); // phpcs:ignore ?>
+					<?php // Olívia, 19 November: „csoportos online flow jóga aloldalon még hiányzik az órák alatt a további órák a naptárban gomb”
+					echo oy_online_only() && method_exists( 'OYS_Frontend', 'more_calendar' ) ? OYS_Frontend::more_calendar( array( 'class' => $slug ) ) : ''; // phpcs:ignore ?></div>
 				<?php endif; ?>
 			</div>
 			<aside class="aside-sticky"><div class="aside-card aside-card--class">

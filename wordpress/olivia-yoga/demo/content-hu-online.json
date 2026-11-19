@@ -936,7 +936,7 @@
 		{
 			"home": "",
 			"q": "Mi a lemondási szabály?",
-			"a": "A csoportos órát 12 órával a kezdés előtt még ingyen lemondhatod, és az alkalom visszakerül a bérletedre; ha alkalmi jeggyel foglaltál, egy órakreditet kapsz helyette. Az órák legalább 3 fővel indulnak: ha 3 órával a kezdés előtt kevesebben vagytok, a rendszer automatikusan lemondja az órát, e-mailben értesít, és visszakapod az alkalmat. Az egyéni órát 24 órával előtte lehet áttenni vagy lemondani.",
+			"a": "A csoportos órát 12 órával a kezdés előtt még ingyen lemondhatod, és az alkalom visszakerül a bérletedre; ha alkalmi jeggyel foglaltál, egy órakreditet kapsz helyette. Az órák legalább 3 fővel indulnak: ha 3 órával a kezdés előtt kevesebben vagytok, a rendszer automatikusan lemondja az órát, e-mailben értesít, és visszakapod az alkalmat. Ha befizetted a csoportos órát, de nem tudsz ott lenni, ugyanúgy visszanézheted egy hétig, és utólag a közös beszélgetésbe is bekapcsolódhatsz. Az egyéni órát 24 órával előtte lehet áttenni vagy lemondani.",
 			"_prev": {
 				"q": "Mi a lemondási szabály?",
 				"a": "A csoportos órát 12 órával a kezdés előtt még ingyen lemondhatod, és az alkalom visszakerül a bérletedre; ha alkalmi jeggyel foglaltál, egy órakreditet kapsz helyette. Az órák legalább 3 fővel indulnak: ha kevesebben jelentkeznek, szólok, és visszakapod az alkalmat. Az egyéni órát 24 órával előtte lehet áttenni vagy lemondani."

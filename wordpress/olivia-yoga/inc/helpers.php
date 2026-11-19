@@ -338,12 +338,24 @@ function oy_pricing_design( $html ) {
 			preg_match_all( '#<p><strong>([^<]{2,40})</strong>\s*((?:(?!</p>).)+)</p>#s', $g[0], $ps, PREG_SET_ORDER );
 			$tones = array( 'sun', 'lilac', 'sage', 'pink' );
 			$out   = '';
+			$policy = '';
 			foreach ( $ps as $i => $p ) {
+				$label = rtrim( trim( $p[1] ), ':' );
+				// Olívia, 19 November: the cancellation rule looks like the note under „Egy hétig visszanézheted”, starts
+				// with a capital, and says that a paid but missed group class can still be watched
+				if ( preg_match( '#^lemondás$#iu', $label ) ) {
+					$body   = trim( $p[2] );
+					$body   = mb_strtoupper( mb_substr( $body, 0, 1 ) ) . mb_substr( $body, 1 );
+					$policy = '<p class="oj-policy">' . oy_icon( 'calendar' ) . '<span><b>' . esc_html( $label ) . ':</b> ' . oy_with_noshow( $body ) . '</span></p>';
+					unset( $ps[ $i ] );
+				}
+			}
+			foreach ( array_values( $ps ) as $i => $p ) {
 				$label = rtrim( trim( $p[1] ), ':' );
 				$icon  = preg_match( '#lemond|bérlet#iu', $label ) ? 'calendar' : ( preg_match( '#\?$#u', $label ) ? 'leaf' : 'check' );
 				$out  .= '<div class="oj-keynote oj-keynote--' . $tones[ $i % 4 ] . '"><span class="oj-keynote__icon" aria-hidden="true">' . oy_icon( $icon ) . '</span><div><p class="oj-keynote__label">' . $label . '</p><p>' . trim( $p[2] ) . '</p></div></div>';
 			}
-			return "\n" . '<div class="oj-keynotes">' . $out . '</div>';
+			return "\n" . $policy . ( '' !== $out ? '<div class="oj-keynotes">' . $out . '</div>' : '' );
 		},
 		$html
 	);
@@ -610,7 +622,41 @@ function oy_cancel_note( $cls = '', $kind = '' ) {
 		$rest  = array_diff_key( $parts, $own );
 		$lines = $own && $rest ? array( implode( ' ', $rest ), implode( ' ', $own ) ) : $lines;
 	}
+	if ( '' !== $text && 'private' !== $kind ) {
+		$lines[0] = oy_with_noshow( $lines[0], false );
+	}
 	return '' === $text ? '' : '<p class="oj-policy' . ( $cls ? ' ' . esc_attr( $cls ) : '' ) . '">' . oy_icon( 'calendar' ) . '<span><b>' . esc_html__( 'Cancellation:', 'olivia-yoga' ) . '</b> ' . implode( '<br>', array_map( 'esc_html', $lines ) ) . '</span></p>';
+}
+
+/**
+ * Olívia, 19 November: „Mindenhova, az egész oldalon írjuk oda a lemondáshoz, hogy ha nem jelenik meg a csoportos órán, de
+ * befizette, ugyanúgy visszanézheti 1 hétig és részt tud venni a közös beszélgetésben is utólag.” '' when not recorded.
+ */
+function oy_noshow_text() {
+	$days = oy_replay_days();
+	if ( ! $days ) {
+		return '';
+	}
+	return 7 === $days
+		? __( 'If you paid for the group class but cannot be there, you can still watch it again for a week and join the conversation afterwards.', 'olivia-yoga' )
+		: sprintf( __( 'If you paid for the group class but cannot be there, you can still watch it again for %d days and join the conversation afterwards.', 'olivia-yoga' ), $days );
+}
+
+/**
+ * A cancellation text with that sentence after the group class part (before a line break that starts the one-to-one
+ * part); unchanged when it already says so. $html: the text is markup (the sentence is escaped), else plain.
+ */
+function oy_with_noshow( $text, $html = true ) {
+	$add = oy_noshow_text();
+	if ( '' === $add || false !== mb_stripos( wp_strip_all_tags( (string) $text ), 'visszanéz' ) || false !== mb_stripos( wp_strip_all_tags( (string) $text ), 'watch it again' ) ) {
+		return $text;
+	}
+	$add = $html ? esc_html( $add ) : $add;
+	if ( $html && preg_match( '#<br\s*/?>#i', $text, $m, PREG_OFFSET_CAPTURE ) ) {
+		$at = $m[0][1];
+		return rtrim( substr( $text, 0, $at ) ) . ' ' . $add . substr( $text, $at );
+	}
+	return rtrim( $text ) . ' ' . $add;
 }
 
 /**

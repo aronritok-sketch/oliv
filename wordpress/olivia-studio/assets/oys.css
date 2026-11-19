@@ -578,3 +578,9 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 .oys-more-cal[open] > summary .oys-more-cal__chev { transform: rotate(180deg); }
 .oys-more-cal__body { margin-top: 1.1rem; }
 @media (prefers-reduced-motion: reduce) { .oys-more-cal__chev { transition: none; } }
+
+/* The calendar: under it only the day she tapped, not every class again (Olívia, 19 Nov). Without JS everything shows. */
+.oys-cal.is-paged .oys-cal__list .oys-cal__item:not(.is-hl) { display: none; }
+.oys-cal__pick { margin: .9rem 0 0; font-size: .92rem; opacity: .75; }
+.oys-cal.is-paged .oys-cal__month.has-pick .oys-cal__pick, .oys-cal:not(.is-paged) .oys-cal__pick { display: none; }
+.oys-cal__day[tabindex]:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }

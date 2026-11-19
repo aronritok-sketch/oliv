@@ -114,8 +114,20 @@
 			}
 			var day = e.target.closest('.oys-cal__day[data-day]');
 			if (!day || e.target.closest('a')) return;
+			pick(day);
+		});
+		// Enter or space on a day with a class (the days are focusable)
+		cal.addEventListener('keydown', function (e) {
+			var day = e.target.closest && e.target.closest('.oys-cal__day[data-day]');
+			if (!day || (e.key !== 'Enter' && e.key !== ' ')) return;
+			e.preventDefault();
+			pick(day);
+		});
+		// only the chosen day's classes show under the calendar (Olívia, 19 Nov)
+		function pick(day) {
 			var m = day.closest('.oys-cal__month');
 			m.querySelectorAll('.oys-cal__item.is-hl, .oys-cal__day.is-hl').forEach(function (x) { x.classList.remove('is-hl'); });
+			m.classList.add('has-pick');
 			day.classList.add('is-hl');
 			var first = null;
 			m.querySelectorAll('.oys-cal__item[data-day="' + day.getAttribute('data-day') + '"]').forEach(function (x) { x.classList.add('is-hl'); first = first || x; });
@@ -123,7 +135,7 @@
 				var r = first.getBoundingClientRect();
 				if (r.bottom > window.innerHeight - 90 || r.top < 80) first.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
 			}
-		});
+		}
 	});
 })();
 

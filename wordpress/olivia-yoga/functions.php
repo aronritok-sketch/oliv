@@ -5,7 +5,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OY_VERSION', '3.12.5' );
+define( 'OY_VERSION', '3.12.6' );
 
 require_once get_template_directory() . '/inc/edition.php';
 
@@ -149,10 +149,13 @@ function oy_fallback_menu() {
 }
 
 function oy_menu( $drawer = false ) {
-	if ( has_nav_menu( 'primary' ) ) {
-		return wp_nav_menu( array( 'theme_location' => 'primary', 'container' => false, 'echo' => false, 'depth' => 2 ) );
+	$menu = has_nav_menu( 'primary' ) ? wp_nav_menu( array( 'theme_location' => 'primary', 'container' => false, 'echo' => false, 'depth' => 2 ) ) : oy_fallback_menu();
+	// the phone menu starts with the home page (Olívia, 19 November: „Mobilon nem tudok a menüből a főoldalra menni”)
+	if ( $drawer ) {
+		$home = '<li class="menu-item menu-item--home' . ( is_front_page() ? ' current-menu-item' : '' ) . '"><a href="' . esc_url( home_url( '/' ) ) . '"' . ( is_front_page() ? ' aria-current="page"' : '' ) . '>' . esc_html__( 'Home', 'olivia-yoga' ) . '</a></li>';
+		$menu = (string) preg_replace( '#(<ul\b[^>]*>)#', '$1' . $home, (string) $menu, 1 );
 	}
-	return oy_fallback_menu();
+	return $menu;
 }
 
 // Sub-menu toggle button for keyboard and touch users.

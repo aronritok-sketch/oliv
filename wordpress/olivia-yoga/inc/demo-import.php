@@ -647,6 +647,32 @@ function oy_migrate_titles_1119() {
 	return $done ? array( sprintf( '%d shorter article titles for the search results', $done ) ) : array();
 }
 
+/**
+ * The cancellation question of the FAQ says that a paid but missed group class can still be watched and talked about
+ * (Olívia, 19 November: „Mindenhova, az egész oldalon írjuk oda a lemondáshoz …”); the notes on the pages get it as they
+ * are drawn (oy_with_noshow). Once; an answer that already says so stays.
+ */
+function oy_migrate_noshow_1119() {
+	$rev = '2026-11-19';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_noshow_rev' ) === $rev || '' === oy_noshow_text() ) {
+		return array();
+	}
+	update_option( 'oy_noshow_rev', $rev );
+	$add  = oy_noshow_text();
+	$done = 0;
+	foreach ( get_posts( array( 'post_type' => 'oy_faq', 'post_status' => array( 'publish', 'draft', 'pending', 'private' ), 'numberposts' => -1, 'title' => 'Mi a lemondási szabály?' ) ) as $faq ) {
+		$html = (string) $faq->post_content;
+		if ( false !== mb_stripos( wp_strip_all_tags( $html ), 'visszanéz' ) ) {
+			continue;
+		}
+		$at   = mb_strpos( $html, 'Az egyéni órát' );
+		$html = false !== $at ? mb_substr( $html, 0, $at ) . esc_html( $add ) . ' ' . mb_substr( $html, $at ) : (string) preg_replace( '#</p>\s*$#', ' ' . esc_html( $add ) . '</p>', $html, 1 );
+		wp_update_post( wp_slash( array( 'ID' => $faq->ID, 'post_content' => $html ) ) );
+		$done++;
+	}
+	return $done ? array( 'the cancellation FAQ: a paid but missed group class can still be watched' ) : array();
+}
+
 function oy_migrate_1113() {
 	// b: + ÁSZF, Impresszum, the privacy notice with Arovia as the controller
 	// c: her 20:17 notes – „Olívia” with a long í, the prenatal modules and why each one matters, the yogic-life sentence

@@ -487,8 +487,10 @@ add_action( 'init', function () {
 	add_shortcode( 'oy_moments', fn() => '<div class="block-wide">' . oy_moments_grid() . '</div>' );
 	// Áron, 16 November: after the list a real calendar of the bookable weeks (the home page's „Heti élő órák” links here)
 	add_shortcode( 'oy_schedule', fn() => '<div class="block-wide">' . $studio( 'oys_schedule', '<p>' . esc_html__( 'The timetable is coming soon.', 'olivia-yoga' ) . '</p>' )
-		. ( shortcode_exists( 'oys_calendar' ) && oy_online_only() ? '<section class="oj-cal-wrap" id="naptar" aria-labelledby="naptar-title"><h3 id="naptar-title">' . esc_html__( 'Calendar', 'olivia-yoga' ) . '</h3>' . do_shortcode( '[oys_calendar]' ) . '</section>' : '' )
-		. oy_replay_note() . oy_cancel_note() . '</div>' );
+		// Olívia, 19 November: the calendar here opens like on the booking page (it stayed open once opened); the cancellation
+		// rule is at the bottom of the page, so not here too
+		. ( oy_online_only() && method_exists( 'OYS_Frontend', 'more_calendar' ) ? OYS_Frontend::more_calendar() : ( shortcode_exists( 'oys_calendar' ) && oy_online_only() ? '<section class="oj-cal-wrap" id="naptar" aria-labelledby="naptar-title"><h3 id="naptar-title">' . esc_html__( 'Calendar', 'olivia-yoga' ) . '</h3>' . do_shortcode( '[oys_calendar]' ) . '</section>' : '' ) )
+		. oy_replay_note() . '</div>' );
 	add_shortcode( 'oy_pricing', fn() => '<div class="block-wide">' . $studio( 'oys_pricing', '' ) . '</div>' );
 	add_shortcode( 'oy_events', fn() => '<div class="block-wide oy-events-dark">' . $studio( 'oys_events', '' ) . '</div>' );
 	add_shortcode( 'oy_booking_link', fn( $a ) => oy_btn_row( oy_btn( oy_book_url(), oy_t( $a['label'] ?? '' ) ?: __( 'Book a class', 'olivia-yoga' ) ) ) );
