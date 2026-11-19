@@ -173,7 +173,8 @@ class OYS_Frontend {
 				// only the day she taps shows under the calendar, not every class again (Olívia, 19 November: „a naptár alatt ne
 				// legyen felsorolva az összes következő óra újra, csak amit kiválasztok a naptárban”)
 				. ( $list
-					? '<p class="oys-cal__pick">' . esc_html( $ask_on ? __( 'Tap a day in the calendar: you see its classes here, and you can ask for a one-to-one session on it.', 'olivia-studio' ) : __( 'Tap a day with a class in the calendar to see it here.', 'olivia-studio' ) ) . '</p><ol class="oys-cal__list">' . $list . '</ol>'
+					// Olívia, 19 November: „…és foglald le a helyed!”
+					? '<p class="oys-cal__pick">' . esc_html__( 'Tap a day in the calendar to see its class here, and book your spot!', 'olivia-studio' ) . '</p><ol class="oys-cal__list">' . $list . '</ol>'
 					: '<p class="oys-cal__empty">' . esc_html__( 'No group classes this month.', 'olivia-studio' ) . ( $ask_on ? ' ' . esc_html__( 'You can still ask for a one-to-one session: tap a day.', 'olivia-studio' ) : '' ) . '</p>' )
 				. ( $ask_on ? '<p class="oys-cal__none" hidden>' . esc_html__( 'No group class on this day.', 'olivia-studio' ) . '</p>' : '' )
 				. '</section>';
@@ -202,7 +203,9 @@ class OYS_Frontend {
 		// Without days that have no class (setting `schedule_empty_days`), the timetable lists the next classes however
 		// far they are (`next`, 6 by default), so a timetable never stands empty while the next class is weeks away.
 		$atts['empty_days'] = in_array( $atts['empty_days'], array( 'yes', 'no' ), true ) ? $atts['empty_days'] : ( 'no' === OYS_Settings::get( 'schedule_empty_days' ) ? 'no' : 'yes' );
-		$next  = 'no' === $atts['empty_days'] ? ( (int) $atts['next'] ?: 6 ) : 0;
+		// how many when not said: 6, or what the site wants (Olívia, 19 November: „itt mindig 3 következő óra látszon … minden
+		// oldalon ahol van” – the rest is in the calendar, 6 weeks ahead)
+		$next  = 'no' === $atts['empty_days'] ? ( (int) $atts['next'] ?: max( 1, (int) apply_filters( 'oys_schedule_next', 6, $atts ) ) ) : 0;
 		$kinds = array_filter( array_map( 'trim', explode( ',', $atts['kind'] ) ) );
 		$items = OYS_Schedule::query( array(
 			'kind'       => $kinds,

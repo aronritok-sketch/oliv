@@ -486,6 +486,9 @@ add_action( 'init', function () {
 	add_shortcode( 'oy_thanks', fn() => oy_thanks() );
 	add_shortcode( 'oy_moments', fn() => '<div class="block-wide">' . oy_moments_grid() . '</div>' );
 	// Áron, 16 November: after the list a real calendar of the bookable weeks (the home page's „Heti élő órák” links here)
+	// Olívia, 19 November: „itt mindig 3 következő óra látszon és azért nyit további órákat a naptárban, hogy ott meg a
+	// következő 6 hét látszódhasson … minden oldalon ahol van” – every timetable list of the online site shows the next 3
+	add_filter( 'oys_schedule_next', fn( $n ) => oy_online_only() ? 3 : $n );
 	add_shortcode( 'oy_schedule', fn() => '<div class="block-wide">' . $studio( 'oys_schedule', '<p>' . esc_html__( 'The timetable is coming soon.', 'olivia-yoga' ) . '</p>' )
 		// Olívia, 19 November: the calendar here opens like on the booking page (it stayed open once opened); the cancellation
 		// rule is at the bottom of the page, so not here too

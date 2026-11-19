@@ -1357,7 +1357,7 @@ test( 'Áron 19 Nov: a one-to-one session asked for from the calendar (any comin
 		$cal = OYS_Frontend::sc_calendar( array() );
 		$tomorrow = wp_date( 'Y-m-d', time() + DAY_IN_SECONDS );
 		ok( (bool) preg_match( '#class="oys-cal__day[^"]*is-free[^"]*"[^>]*data-day="\d{4}-\d{2}-\d{2}" data-label="[^"]+" tabindex="0"#', $cal ) && str_contains( $cal, 'data-oys-cal-ask' ) && str_contains( $cal, 'data-ask-time' ) && str_contains( $cal, '<option value="18:00">18:00</option>' ), 'calendar: a day without a class can be chosen too; under the calendar a quiet offer with a time (Olívia: „kiválasztani napot, időpontot és úgy privát órát kérni”)' );
-		ok( str_contains( $cal, 'oys-cal__none' ) && str_contains( $cal, 'you can ask for a one-to-one session on it' ), '… the hint says so; a chosen day without a class says it has none' );
+		ok( str_contains( $cal, 'oys-cal__none' ) && str_contains( $cal, 'Tap a day in the calendar to see its class here, and book your spot!' ), '… the hint (Olívia: „…és foglald le a helyed!”); a chosen day without a class says it has none' );
 		add_filter( 'oys_calendar_private', '__return_false' );
 		$cal2 = OYS_Frontend::sc_calendar( array() );
 		remove_filter( 'oys_calendar_private', '__return_false' );
@@ -1401,6 +1401,24 @@ test( 'Áron 19 Nov: a one-to-one session asked for from the calendar (any comin
 		update_option( OYS_Products::OPTION, $products );
 		false === $services ? delete_option( OYS_Services::OPTION ) : update_option( OYS_Services::OPTION, $services );
 	}
+	// every timetable list of the online site: the next 3 (Olívia, 19 November: „itt mindig 3 következő óra látszon … minden oldalon ahol van”)
+	$six = array();
+	for ( $i = 1; $i <= 5; $i++ ) {
+		$six[] = make_session( array( 'in_hours' => 24 * ( 30 + 7 * $i ) ) );
+	}
+	$sed0 = OYS_Settings::get( 'schedule_empty_days' );
+	OYS_Settings::update( array( 'schedule_empty_days' => 'no' ) );
+	$count = fn( $h ) => substr_count( $h, 'class="session ' );
+	$def   = $count( OYS_Frontend::sc_schedule( array() ) );
+	update_option( 'oy_edition', 'hu-online' );
+	$on    = $count( OYS_Frontend::sc_schedule( array() ) );
+	$cls   = $count( OYS_Frontend::sc_schedule( array( 'days' => 21, 'class' => 'hatha-flow', 'empty_days' => 'no' ) ) );
+	update_option( 'oy_edition', 'fort-myers' );
+	foreach ( $six as $x ) {
+		OYS_Schedule::cancel_session( $x->id, 'test' );
+	}
+	OYS_Settings::update( array( 'schedule_empty_days' => $sed0 ) );
+	ok( 3 === $on && 3 === $cls && $def > 3, 'online site: the timetable lists show the next 3 (prices page, booking page, class pages), the rest in the calendar; other sites keep 6' );
 	// the terms: replay; the privacy notice: the GoDaddy server, the partner
 	$data = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content-hu-online.json' ), true );
 	$aszf = array_values( array_filter( $data['legal'], fn( $l ) => 'aszf' === $l['slug'] ) )[0]['content'];

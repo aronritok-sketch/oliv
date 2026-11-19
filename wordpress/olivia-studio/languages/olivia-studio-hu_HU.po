@@ -8370,8 +8370,8 @@ msgstr "Társ"
 msgid "With their partner (paid as a pair)"
 msgstr "A társával (párban fizetve)"
 
-msgid "Tap a day in the calendar: you see its classes here, and you can ask for a one-to-one session on it."
-msgstr "Koppints egy napra a naptárban: itt látod az aznapi órát, és egyéni órát is kérhetsz arra a napra."
+msgid "Tap a day in the calendar to see its class here, and book your spot!"
+msgstr "Koppints egy napra a naptárban, itt látod az órát, és foglald le a helyed!"
 
 msgid "You can still ask for a one-to-one session: tap a day."
 msgstr "Egyéni órát így is kérhetsz: koppints egy napra."

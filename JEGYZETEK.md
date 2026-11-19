@@ -1806,6 +1806,15 @@
   - Tesztek: 1738/0. A .hu ellenőrzés: 2408/0, `--after` 1219/0. Helyben telefonon végigpróbálva: napválasztás,
     időpont, előtöltött kérőűrlap, páros társ-mezők.
 
+- **2026-11-19 – Mindenhol a következő 3 óra, „…és foglald le a helyed!” (oliviajoga.online 3.12.13, olivia-studio 1.25.1).**
+  Olívia, 9148980–9148982.
+  - **„itt mindig 3 következő óra látszon … minden oldalon ahol van”:** az órarend-listák mindenhol a következő 3 órát
+    mutatják: árak oldal, foglalás oldal, óraoldalak (a főoldal eddig is). A többi a „További órák a naptárban” alatt, 6
+    hétre előre. Ehhez a bővítményben az `oys_schedule_next` szűrő kell, a téma az online kiadásban 3-ra állítja; más
+    oldalon marad 6.
+  - **Naptár-tipp:** „Koppints egy napra a naptárban, itt látod az órát, és foglald le a helyed!”
+  - Tesztek: 1739/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
