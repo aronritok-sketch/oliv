@@ -92,6 +92,10 @@ class OYS_Frontend {
 			$by_day[ wp_date( 'Y-m-d', oys_ts( $s->starts_at ) ) ][] = $s;
 		}
 		$user_id = get_current_user_id();
+		// Olívia, 19 November (Áron: „Lehet privát időpontot kérni a naptárból”): any coming day can be chosen, and under the
+		// calendar a quiet offer asks for a one-to-one session on it, with a time – only an offer, the calendar is about the
+		// group classes
+		$ask_on  = in_array( 'group', array_map( 'trim', explode( ',', $atts['kind'] ) ), true ) && ( OYS_Services::offered() || OYS_Products::has_plain_private() ) && (bool) apply_filters( 'oys_calendar_private', true );
 		$link    = function ( $s ) use ( $user_id ) {
 			$mine = $user_id ? OYS_Bookings::active_for( $user_id, $s->id ) : null;
 			$left = OYS_Schedule::spots_left( $s );
@@ -153,7 +157,9 @@ class OYS_Frontend {
 				}
 				$label = wp_date( oys_date_format( 'l, F j' ), $ts ) . ( $day_s ? ': ' . implode( ', ', array_map( fn( $s ) => oys_time( $s->starts_at ) . ' ' . apply_filters( 'oys_card_title', oys_session_title( $s ), $s ), $day_s ) ) : '' );
 				$has_mine = in_array( 'is-mine', array_column( $states, 0 ), true );
-				$grid .= '<div class="oys-cal__day' . esc_attr( $state ) . ( $day_s ? ' has-class' : '' ) . ( $has_mine ? ' has-mine' : '' ) . '" role="listitem"' . ( $other ? ' aria-hidden="true"' : ' aria-label="' . esc_attr( $label ) . '"' ) . ( $day_s ? ' data-day="' . esc_attr( $key ) . '"' . ( $other ? '' : ' tabindex="0"' ) : '' ) . '>'
+				$free     = ! $day_s && ! $other && $ask_on && $day > $today;
+				$pickable = ( $day_s && ! $other ) || $free;
+				$grid .= '<div class="oys-cal__day' . esc_attr( $state ) . ( $day_s ? ' has-class' : '' ) . ( $free ? ' is-free' : '' ) . ( $has_mine ? ' has-mine' : '' ) . '" role="listitem"' . ( $other ? ' aria-hidden="true"' : ' aria-label="' . esc_attr( $label ) . '"' ) . ( $day_s || $free ? ' data-day="' . esc_attr( $key ) . '" data-label="' . esc_attr( wp_date( oys_date_format( 'l, F j' ), $ts ) ) . '"' . ( $pickable ? ' tabindex="0"' : '' ) : '' ) . '>'
 					. '<span class="oys-cal__num">' . esc_html( $day->format( 'j' ) ) . '</span>'
 					. ( $day_s ? '<span class="oys-cal__dots" aria-hidden="true">' . implode( '', array_map( fn( $st ) => 'is-mine' === $st[0] ? '<i class="is-mine"></i>' : '<i></i>', array_slice( $states, 0, 3 ) ) ) . '</span><div class="oys-cal__chips">' . $chips . '</div>' : '' ) . '</div>';
 			}
@@ -166,11 +172,29 @@ class OYS_Frontend {
 				. '<div class="oys-cal__grid" role="list">' . $heads . $grid . '</div>'
 				// only the day she taps shows under the calendar, not every class again (Olívia, 19 November: „a naptár alatt ne
 				// legyen felsorolva az összes következő óra újra, csak amit kiválasztok a naptárban”)
-				. ( $list ? '<p class="oys-cal__pick">' . esc_html__( 'Tap a day with a class in the calendar to see it here.', 'olivia-studio' ) . '</p><ol class="oys-cal__list">' . $list . '</ol>' : '<p class="oys-cal__empty">' . esc_html__( 'No group classes this month.', 'olivia-studio' ) . '</p>' )
+				. ( $list
+					? '<p class="oys-cal__pick">' . esc_html( $ask_on ? __( 'Tap a day in the calendar: you see its classes here, and you can ask for a one-to-one session on it.', 'olivia-studio' ) : __( 'Tap a day with a class in the calendar to see it here.', 'olivia-studio' ) ) . '</p><ol class="oys-cal__list">' . $list . '</ol>'
+					: '<p class="oys-cal__empty">' . esc_html__( 'No group classes this month.', 'olivia-studio' ) . ( $ask_on ? ' ' . esc_html__( 'You can still ask for a one-to-one session: tap a day.', 'olivia-studio' ) : '' ) . '</p>' )
+				. ( $ask_on ? '<p class="oys-cal__none" hidden>' . esc_html__( 'No group class on this day.', 'olivia-studio' ) . '</p>' : '' )
 				. '</section>';
 		}
 		$note = sprintf( _n( 'You can book up to %d week ahead.', 'You can book up to %d weeks ahead.', (int) round( $window / 7 ), 'olivia-studio' ), (int) round( $window / 7 ) );
-		return '<div class="oys-cal" data-oys-cal>' . $panels . '<p class="oys-cal__note">' . esc_html( $note ) . '</p></div>';
+		return '<div class="oys-cal" data-oys-cal>' . $panels . ( $ask_on ? self::calendar_ask() : '' ) . '<p class="oys-cal__note">' . esc_html( $note ) . '</p></div>';
+	}
+
+	/** Under the calendar, once a day is chosen: a one-to-one session on that day, at a time (or any time). */
+	private static function calendar_ask() {
+		$url   = oys_account_url( 'private' );
+		$times = '<option value="">' . esc_html__( 'Any time', 'olivia-studio' ) . '</option>';
+		for ( $h = 7; $h <= 20; $h++ ) {
+			foreach ( array( '00', '30' ) as $mm ) {
+				$times .= '<option value="' . sprintf( '%02d:%s', $h, $mm ) . '">' . sprintf( '%d:%s', $h, $mm ) . '</option>';
+			}
+		}
+		return '<div class="oys-cal__ask" data-oys-cal-ask data-url="' . esc_url( $url ) . '" hidden>'
+			. '<p><b>' . esc_html__( 'Another time would suit you?', 'olivia-studio' ) . '</b> ' . esc_html__( 'If you would come on your own or as a pair, ask for a one-to-one session on this day:', 'olivia-studio' ) . ' <b data-ask-day></b></p>'
+			. '<div class="oys-cal__ask-row"><label class="field"><span>' . esc_html__( 'Time that suits you', 'olivia-studio' ) . '</span><select data-ask-time>' . $times . '</select></label>'
+			. '<a class="btn btn--ghost oys-cal__ask-go" data-ask-go href="' . esc_url( $url ) . '">' . esc_html__( 'Ask for this time', 'olivia-studio' ) . '</a></div></div>';
 	}
 
 	public static function sc_schedule( $atts ) {
@@ -1720,16 +1744,40 @@ class OYS_Frontend {
 		}
 		$people = $plain || array_filter( $offered, fn( $sv ) => $sv['duo'] )
 			? '<label class="field" data-oys-people><span>' . esc_html__( 'How many people', 'olivia-studio' ) . '</span><input type="number" name="people" id="oys-pr-people" min="1" max="' . ( $plain ? 10 : 2 ) . '" value="' . max( 1, min( $plain ? 10 : 2, (int) ( $_GET['people'] ?? 1 ) ) ) . '"></label>' : ''; // phpcs:ignore WordPress.Security.NonceVerification
+		// a pair: the partner's name and email (they get their own invite and link when the session is booked)
+		$partner = $people ? '<fieldset class="oys-guests oys-partner" data-oys-partner><legend>' . esc_html__( 'Your partner', 'olivia-studio' ) . '</legend>'
+			. '<p class="oys-small">' . esc_html__( 'When the session is booked, they get their own confirmation and their own link to join, like a guest at a group class.', 'olivia-studio' ) . '</p>'
+			. '<div class="form__row"><label class="field"><span>' . esc_html__( 'Their name', 'olivia-studio' ) . '</span><input type="text" name="partner_name" id="oys-pr-pname" maxlength="100" autocomplete="off"></label>'
+			. '<label class="field"><span>' . esc_html__( 'Their email', 'olivia-studio' ) . '</span><input type="email" name="partner_email" id="oys-pr-pemail" autocomplete="off"></label></div></fieldset>' : '';
 		return self::form_open( 'oys_private_request', 'class="oys-form oys-card" data-oys-private' )
 			. self::private_note() . $topic
 			. ( $length || $people ? '<div class="form__row">' . $length . $people . '</div>' : '' )
+			. $partner
 			. ( $online_only ? '<input type="hidden" name="location_type" value="online"><input type="hidden" name="address" value="">' : '<div class="form__row"><label class="field"><span>' . esc_html__( 'Where', 'olivia-studio' ) . '</span><select name="location_type" id="oys-pr-type">' . $opts . '</select></label>'
 			. '<label class="field"><span>' . esc_html__( 'Address or area', 'olivia-studio' ) . '</span><input type="text" name="address" id="oys-pr-address" placeholder="' . esc_attr__( 'e.g. McGregor Blvd, Fort Myers Beach', 'olivia-studio' ) . '"></label></div>' )
-			. '<label class="field"><span>' . esc_html__( 'Days and times that suit you', 'olivia-studio' ) . '</span><textarea name="preferred" id="oys-pr-preferred" rows="3" required placeholder="' . esc_attr( $online_only ? __( 'e.g. weekday evenings after 6, or Saturday afternoon', 'olivia-studio' ) : __( 'e.g. Tuesday or Thursday mornings, or Saturday at sunrise', 'olivia-studio' ) ) . '"></textarea></label>'
+			. '<label class="field"><span>' . esc_html__( 'Days and times that suit you', 'olivia-studio' ) . '</span><textarea name="preferred" id="oys-pr-preferred" rows="3" required placeholder="' . esc_attr( $online_only ? __( 'e.g. weekday evenings after 6, or Saturday afternoon', 'olivia-studio' ) : __( 'e.g. Tuesday or Thursday mornings, or Saturday at sunrise', 'olivia-studio' ) ) . '">' . esc_textarea( self::preferred_from_calendar() ) . '</textarea></label>'
 			. '<label class="field"><span>' . esc_html__( 'Anything I should know? (goals, injuries, experience)', 'olivia-studio' ) . '</span><textarea name="notes" id="oys-pr-notes" rows="4"></textarea></label>'
 			. ( OYS_Settings::cancel_policy() ? '<p class="oys-policy">' . esc_html( OYS_Settings::cancel_policy() ) . '</p>' : '' ) // the rule before asking, too (Olívia, 14 November)
 			. '<button class="btn btn--primary" type="submit">' . esc_html__( 'Send request', 'olivia-studio' ) . '</button>'
 			. '<p class="oys-small">' . esc_html__( 'Nothing is charged now. You\'ll get a suggested time and price to confirm.', 'olivia-studio' ) . '</p></form>';
+	}
+
+	/**
+	 * The day (and time) chosen in the calendar for a one-to-one session (?pday=Y-m-d&ptime=H:i), as the request's first line:
+	 * „december 18., csütörtök, 18:00”. Olívia, 19 November: „a naptárba … kiválasztani napot, időpontot és úgy privát órát
+	 * kérni”. '' without a day, or for a day in the past.
+	 */
+	public static function preferred_from_calendar() {
+		// pday / ptime: „day” is WordPress's own date archive variable (?day=… on a page is a 404)
+		$day  = sanitize_text_field( wp_unslash( $_GET['pday'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification
+		$time = sanitize_text_field( wp_unslash( $_GET['ptime'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification
+		$tz   = wp_timezone();
+		$d    = preg_match( '/^\d{4}-\d{2}-\d{2}$/', $day ) ? DateTimeImmutable::createFromFormat( '!Y-m-d', $day, $tz ) : false;
+		if ( ! $d || $d < new DateTimeImmutable( 'today', $tz ) ) {
+			return '';
+		}
+		$ts = $d->setTime( 12, 0 )->getTimestamp();
+		return wp_date( oys_date_format( 'l, F j' ), $ts ) . ( preg_match( '/^([01]\d|2[0-3]):[0-5]\d$/', $time ) ? ', ' . $time : '' );
 	}
 
 	/** Optional birthday (month and day), for the birthday gift. */

@@ -819,6 +819,7 @@ class OYS_Bookings {
 			'free'       => __( 'Free', 'olivia-studio' ),
 			'cash'       => __( 'Cash', 'olivia-studio' ),
 			'comp'       => __( 'Complimentary', 'olivia-studio' ),
+			'pair'       => __( 'With their partner (paid as a pair)', 'olivia-studio' ),
 			'admin'      => __( 'Added by studio', 'olivia-studio' ),
 			'import'     => __( 'Earlier system', 'olivia-studio' ),
 		);

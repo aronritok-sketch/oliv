@@ -1139,7 +1139,7 @@ test( 'one-to-one in two lengths (60 / 90 minutes): own credits, own cards, the 
 test( 'Olívia 19 Nov: the calendar shows only the day she taps, opens like on the booking page (prices, the group class page), the missed-class sentence on the cancellation notes, Home in the phone menu', function () {
 	$s = make_session( array( 'format' => 'online', 'online_capacity' => 10, 'in_hours' => 24 * 2 ) );
 	$cal = OYS_Frontend::sc_calendar( array() );
-	ok( str_contains( $cal, '<p class="oys-cal__pick">' ) && (bool) preg_match( '#class="oys-cal__day[^"]*has-class[^"]*"[^>]*data-day="[^"]+" tabindex="0"#', $cal ), 'calendar: a hint until a day is chosen, the days with a class can be chosen with the keyboard too' );
+	ok( str_contains( $cal, '<p class="oys-cal__pick">' ) && (bool) preg_match( '#class="oys-cal__day[^"]*has-class[^"]*"[^>]*data-day="[^"]+"[^>]* tabindex="0"#', $cal ), 'calendar: a hint until a day is chosen, the days with a class can be chosen with the keyboard too' );
 	$css = (string) file_get_contents( OYS_DIR . 'assets/oys.css' );
 	$js  = (string) file_get_contents( OYS_DIR . 'assets/oys.js' );
 	ok( str_contains( $css, '.oys-cal.is-paged .oys-cal__list .oys-cal__item:not(.is-hl) { display: none; }' ) && str_contains( $js, "m.classList.add('has-pick');" ) && str_contains( $js, "e.key !== 'Enter'" ), '… under it only the chosen day\'s classes („csak amit kiválasztok a naptárban”), not every class again' );
@@ -1334,6 +1334,99 @@ test( 'Olívia 19 Nov: renamed class types – an address she types becomes the 
 	$oc = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
 	ok( str_contains( $oc, '.entry .oys-guests .field input, .entry .oys-guests .field select, .entry .oys-waiver .field input { background: #fff; border-color: var(--line); }' ) && str_contains( $oc, '.entry form .oys-policy { margin-bottom: 1.3rem; }' ) && str_contains( $oc, '.entry .oys-terms { margin-top: .9rem; }' ), 'booking form: the guests\' fields are white with a line („nem látszanak a rublikák”), room between the rule, the button and the terms line („egybelóg”)' );
 	ok( str_contains( $po, "msgid \"Book from the timetable with a drop-in or a class pass.\"\nmsgstr \"Foglald le az időpontot alkalmi jeggyel vagy bérlettel.\"" ) && str_contains( $po, 'msgstr "1 hétig visszanézhető"' ) && str_contains( $po, 'msgstr "később is kapcsolódhatunk a közös chatben"' ), 'in Hungarian: „Foglald le az időpontot alkalmi jeggyel vagy bérlettel.”, „1 hétig visszanézhető”, „később is kapcsolódhatunk a közös chatben”' );
+} );
+
+test( 'Áron 19 Nov: a one-to-one session asked for from the calendar (any coming day, a time), the partner of a pair session invited by email like a group guest, replay in the terms, the GoDaddy server in the privacy notice', function () {
+	global $wpdb;
+	$products = get_option( OYS_Products::OPTION );
+	$services = get_option( OYS_Services::OPTION );
+	$sent     = array();
+	$spy      = function ( $r, $atts ) use ( &$sent ) {
+		$sent[] = array( is_array( $atts['to'] ) ? implode( ',', $atts['to'] ) : (string) $atts['to'], (string) $atts['subject'] );
+		return true;
+	};
+	try {
+		update_option( OYS_Services::OPTION, array( 'pairz' => array( 'label' => 'Pair yoga', 'class' => 'egyeni', 'duration' => 60, 'duo' => 1, 'sort' => 1 ) ) );
+		update_option( OYS_Products::OPTION, array(
+			'pz-1' => array( 'name' => 'Pair 1', 'kind' => 'private_single', 'service' => 'pairz', 'people' => 1, 'credits' => 1, 'validity_days' => 30, 'price_cents' => 500000, 'minutes' => 60, 'active' => 1 ),
+			'pz-2' => array( 'name' => 'Pair 2', 'kind' => 'private_single', 'service' => 'pairz', 'people' => 2, 'credits' => 1, 'validity_days' => 30, 'price_cents' => 800000, 'minutes' => 60, 'active' => 1 ),
+		) );
+		ok( (bool) OYS_Services::offered(), 'a one-to-one service is offered' );
+		// the calendar: any coming day can be chosen, and under it the offer with a time
+		$g   = make_session( array( 'in_hours' => 24 * 3 ) );
+		$cal = OYS_Frontend::sc_calendar( array() );
+		$tomorrow = wp_date( 'Y-m-d', time() + DAY_IN_SECONDS );
+		ok( (bool) preg_match( '#class="oys-cal__day[^"]*is-free[^"]*"[^>]*data-day="\d{4}-\d{2}-\d{2}" data-label="[^"]+" tabindex="0"#', $cal ) && str_contains( $cal, 'data-oys-cal-ask' ) && str_contains( $cal, 'data-ask-time' ) && str_contains( $cal, '<option value="18:00">18:00</option>' ), 'calendar: a day without a class can be chosen too; under the calendar a quiet offer with a time (Olívia: „kiválasztani napot, időpontot és úgy privát órát kérni”)' );
+		ok( str_contains( $cal, 'oys-cal__none' ) && str_contains( $cal, 'you can ask for a one-to-one session on it' ), '… the hint says so; a chosen day without a class says it has none' );
+		add_filter( 'oys_calendar_private', '__return_false' );
+		$cal2 = OYS_Frontend::sc_calendar( array() );
+		remove_filter( 'oys_calendar_private', '__return_false' );
+		ok( ! str_contains( $cal2, 'data-oys-cal-ask' ) && ! str_contains( $cal2, 'is-free' ), '… a site can turn it off' );
+		OYS_Schedule::cancel_session( $g->id, 'test' );
+		$js  = (string) file_get_contents( OYS_DIR . 'assets/oys.js' );
+		$css = (string) file_get_contents( OYS_DIR . 'assets/oys.css' );
+		ok( str_contains( $js, "u.searchParams.set('pday', ask.getAttribute('data-day') || '');" ) && str_contains( $js, "u.searchParams.set('ptime', t)" ) && str_contains( $css, '.oys-cal__ask[hidden], .oys-cal__none[hidden], .oys-partner[hidden] { display: none; }' ), '… the link takes the day and the time to the request form' );
+		$_GET['pday'] = $tomorrow;
+		$_GET['ptime'] = '18:00';
+		$pref = OYS_Frontend::preferred_from_calendar();
+		$_GET['pday'] = '2020-01-01';
+		$past = OYS_Frontend::preferred_from_calendar();
+		unset( $_GET['pday'], $_GET['ptime'] );
+		ok( str_ends_with( $pref, ', 18:00' ) && str_contains( $pref, wp_date( 'j', time() + DAY_IN_SECONDS ) ) && '' === $past, 'the request form starts with the chosen day and time; a day in the past is not taken' );
+		// the form: two people → the partner's name and email
+		$m    = new ReflectionMethod( 'OYS_Frontend', 'private_form' );
+		$m->setAccessible( true );
+		$form = OYS_I18n::with( 'en', fn() => $m->invoke( null ) );
+		ok( str_contains( $form, 'data-oys-partner' ) && str_contains( $form, 'name="partner_name"' ) && str_contains( $form, 'name="partner_email"' ) && str_contains( $js, 'partner.hidden = n !== 2;' ) && str_contains( $js, 'i.required = n === 2;' ), 'request form: for two, the partner\'s name and email (required then)' );
+		// the request for two, offered and booked: the partner joins as the booking's guest and gets the guest's invite
+		$u = make_user( 'Pairhost' );
+		$wpdb->insert( OYS_Install::table( 'private_requests' ), array( 'user_id' => $u, 'topic' => 'pairz', 'duration_min' => 60, 'people' => 2, 'partner_name' => 'Pár Petra', 'partner_email' => 'petra.partner@example.test', 'location_type' => 'online', 'preferred' => 'evenings', 'status' => 'new', 'created_at' => oys_now() ) );
+		$rid = (int) $wpdb->insert_id;
+		$sum = OYS_Privates::summary( OYS_Privates::get( $rid ) );
+		ok( 'Pár Petra <petra.partner@example.test>' === ( $sum['Partner'] ?? '' ), 'the request shows the partner (emails, Hub, account)' );
+		add_filter( 'pre_wp_mail', $spy, 10, 2 );
+		$sid = OYS_Privates::offer( $rid, wp_date( 'Y-m-d', time() + 4 * DAY_IN_SECONDS ) . 'T10:00', 60, 800000, '', 'https://meet.example/p' );
+		$s   = OYS_Schedule::get( $sid );
+		$sent = array();
+		$host = OYS_Bookings::book_party( $u, $s, array( 'method' => 'admin', 'force' => true, 'mode' => 'online' ) );
+		$gs   = OYS_Bookings::guests_of( $host );
+		ok( ! is_wp_error( $host ) && 1 === count( $gs ) && 'Pár Petra' === $gs[0]->guest_name && 'petra.partner@example.test' === $gs[0]->guest_email && 'pair' === $gs[0]->paid_with, 'booked: the partner is on the roster as the booking\'s guest, paid as a pair' );
+		ok( in_array( 'petra.partner@example.test', array_column( $sent, 0 ), true ), '… and gets their own email with the details and the link to join (the group guest\'s invite)' );
+		do_action( 'oys_booking_confirmed', $host );
+		eq( 1, count( OYS_Bookings::guests_of( $host ) ), '… only once' );
+		eq( 'booked', OYS_Privates::get( $rid )->status, 'the request is booked' );
+		ok( isset( OYS_Bookings::paid_with_labels()['pair'] ), 'the roster names how the partner paid' );
+	} finally {
+		remove_filter( 'pre_wp_mail', $spy, 10 );
+		update_option( OYS_Products::OPTION, $products );
+		false === $services ? delete_option( OYS_Services::OPTION ) : update_option( OYS_Services::OPTION, $services );
+	}
+	// the terms: replay; the privacy notice: the GoDaddy server, the partner
+	$data = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content-hu-online.json' ), true );
+	$aszf = array_values( array_filter( $data['legal'], fn( $l ) => 'aszf' === $l['slug'] ) )[0]['content'];
+	$imp  = array_values( array_filter( $data['legal'], fn( $l ) => 'impresszum' === $l['slug'] ) )[0]['content'];
+	ok( str_contains( $aszf, 'Hatályos 2026. november 19-től.' ) && str_contains( $aszf, '<h2>8. Felvételek, visszanézés, szerzői jog</h2>' ) && str_contains( $aszf, 'visszanézheti a fiókjában, aki az órára foglalt, akkor is, ha nem tudott ott lenni' ) && str_contains( $aszf, 'Ha befizetted a csoportos órát, de nem tudsz ott lenni, a felvételét ugyanúgy visszanézheted egy hétig' ) && str_contains( $aszf, 'Egyéni óráról nem készül felvétel.' ), 'ÁSZF: replay for a week, also for a booked but missed group class, no recording of one-to-one sessions (Áron: „kerüljön be … a visszanézhetőség”)' );
+	ok( str_contains( $aszf, 'Ha párban kérsz egyéni órát, a társad nevét és e-mail-címét is megadod.' ) && str_contains( $imp, 'GoDaddy virtuális szervere (VPS), európai uniós adatközpontban' ), '… the pair\'s partner; the imprint: the GoDaddy server' );
+	$pv = $data['privacy']['content'];
+	ok( str_contains( $pv, 'Az adatkezelő az Arovia Group LLC' ) && str_contains( $pv, '<h2>Hol vannak az adataid?</h2>' ) && str_contains( $pv, 'a tárhely (GoDaddy virtuális szerver)' ) && str_contains( $pv, '<strong>Vendégek és társ:</strong>' ), 'privacy notice: Arovia Group LLC the controller, the GoDaddy server (EU), the hosting among who sees data, the partner' );
+	// the live page: only the theme's sentences change
+	require_once get_template_directory() . '/inc/demo-import.php';
+	update_option( 'oy_edition', 'hu-online' );
+	$pp0 = get_option( 'wp_page_for_privacy_policy' );
+	$r0  = get_option( 'oy_privacy_1119_rev' );
+	$old = '<p>Saját bekezdés.</p>' . implode( "\n", array_column( oy_privacy_1119_pairs(), 0 ) );
+	$pid = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Adatvédelem (teszt)', 'post_content' => $old ) );
+	update_post_meta( $pid, 'oy_privacy', 1 );
+	update_option( 'wp_page_for_privacy_policy', $pid );
+	delete_option( 'oy_privacy_1119_rev' );
+	$log  = oy_migrate_privacy_1119();
+	$new  = get_post_field( 'post_content', $pid );
+	$log2 = oy_migrate_privacy_1119();
+	wp_delete_post( $pid, true );
+	update_option( 'wp_page_for_privacy_policy', $pp0 );
+	false === $r0 ? delete_option( 'oy_privacy_1119_rev' ) : update_option( 'oy_privacy_1119_rev', $r0 );
+	update_option( 'oy_edition', 'fort-myers' );
+	ok( $log && ! $log2 && str_contains( $new, '<p>Saját bekezdés.</p>' ) && str_contains( $new, 'GoDaddy virtuális szerverén (VPS) fut' ) && str_contains( $new, 'Vendégek és társ' ) && ! str_contains( $new, 'üzemeltetője és tárhelye (HelloProVision)' ), 'live privacy page: the three parts change once, her own text stays' );
 } );
 
 test( 'test mode: every process with one tap, the emails to the teacher\'s own mailbox (+teszt), test classes hidden, everything deleted after (Áron, 19 Nov)', function () {

@@ -8348,3 +8348,48 @@ msgstr "Minden folyamat kipróbálása, élesben"
 
 msgid "Tap a day with a class in the calendar to see it here."
 msgstr "Koppints egy napra a naptárban, és itt látod az órát."
+
+msgid "Your partner"
+msgstr "Társad"
+
+msgid "When the session is booked, they get their own confirmation and their own link to join, like a guest at a group class."
+msgstr "Amikor lefoglalod az órát, ő is külön visszaigazolást és saját belépőlinket kap, ugyanúgy, mint a vendégek a csoportos órákon."
+
+msgid "Their name"
+msgstr "Neve"
+
+msgid "Their email"
+msgstr "E-mail-címe"
+
+msgid "Add your partner's name and email, so they get their own confirmation and link to join."
+msgstr "Add meg a társad nevét és e-mail-címét, hogy ő is megkapja a saját visszaigazolását és belépőlinkjét."
+
+msgid "Partner"
+msgstr "Társ"
+
+msgid "With their partner (paid as a pair)"
+msgstr "A társával (párban fizetve)"
+
+msgid "Tap a day in the calendar: you see its classes here, and you can ask for a one-to-one session on it."
+msgstr "Koppints egy napra a naptárban: itt látod az aznapi órát, és egyéni órát is kérhetsz arra a napra."
+
+msgid "You can still ask for a one-to-one session: tap a day."
+msgstr "Egyéni órát így is kérhetsz: koppints egy napra."
+
+msgid "No group class on this day."
+msgstr "Erre a napra nincs csoportos óra."
+
+msgid "Any time"
+msgstr "Bármikor jó"
+
+msgid "Another time would suit you?"
+msgstr "Más időpont lenne jó?"
+
+msgid "If you would come on your own or as a pair, ask for a one-to-one session on this day:"
+msgstr "Ha egyénileg vagy párban jönnél, kérj egyéni órát erre a napra:"
+
+msgid "Time that suits you"
+msgstr "Neked megfelelő időpont"
+
+msgid "Ask for this time"
+msgstr "Időpontot kérek"

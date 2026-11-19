@@ -1771,6 +1771,41 @@
   - „ez picit egybelóg foglalásnál”: a lemondási doboz, a „Tovább” gomb és az ÁSZF-sor között most van hely.
   - Tesztek: 1721/0. Helyben telefonnézetben próbálva.
 
+- **2026-11-19 – Privát időpont a naptárból, páros meghívó, ÁSZF: visszanézés, GoDaddy-tárhely (oliviajoga.online 3.12.12,
+  olivia-studio 1.25.0, oliviajoga.hu 1.7.4).**
+  Áron döntései Olívia két kérdésére, és a jogi szövegek.
+  - **Privát időpont a naptárból:**
+    - a naptárban minden jövőbeli nap kiválasztható, nem csak az, amelyiken csoportos óra van;
+    - alatta egy visszafogott ajánlat jelenik meg: „Más időpont lenne jó? Ha egyénileg vagy párban jönnél, kérj egyéni órát
+      erre a napra”, időpontválasztóval (7:00–20:30, félóránként, vagy „Bármikor jó”);
+    - a gomb a kérőűrlapra visz (`?tab=private&pday=…&ptime=…`), ahol a „Neked megfelelő napok és időpontok” mező már
+      így kezdődik: „november 20., péntek, 18:00”;
+    - óra nélküli napon: „Erre a napra nincs csoportos óra.”;
+    - kikapcsolható az `oys_calendar_private` szűrővel.
+    - **Csapda:** a `day` paraméter a WordPress dátum-archívuma (`?day=…` egy oldalon 404), ezért `pday` / `ptime`.
+  - **Páros meghívó (e-mail alapján, mint a csoportos vendégeknél):**
+    - két főnél a kérőűrlapon kötelező a társ neve és e-mail-címe (DB 15: `partner_name`, `partner_email`);
+    - amikor a foglalás megtörténik (kártya vagy bérlet), a társ a foglalás vendégsora lesz („párban fizetve”, `pair`);
+    - ugyanúgy megkapja a vendégmeghívót (részletek, kellékek, saját belépőlink, naptárfájl, nyilatkozat), és ugyanígy kap
+      emlékeztetőt;
+    - a kérés összefoglalójában (e-mail, Hub, fiók) ott a társ;
+    - egyszer fut, nem duplikál.
+  - **ÁSZF (hatályos 11.19-től):**
+    - 3. pont: a páros óra társa;
+    - 5. pont: befizetett, de kihagyott csoportos óra: egy hétig visszanézhető, utólag a chatbe is be lehet szállni;
+    - 8. pont „Felvételek, visszanézés, szerzői jog”: csak az oktató van a felvételen, a foglalók 7 napig nézhetik vissza
+      (akkor is, ha nem voltak ott), ugyaneddig írhatnak a chatbe, a felvétel 30 nap után törlődik, egyéni óráról nincs
+      felvétel.
+    - Élesen a meglévő módon (`oy_migrate_legal`, új revízió) cserélődik.
+  - **Adatkezelés:**
+    - az adatkezelő mindkét oldalon eddig is az Arovia Group LLC volt;
+    - új „Hol vannak az adataid?”: GoDaddy virtuális szerver (VPS), EU-s adatközpont, a HelloProVision üzemelteti. A cím
+      mindkét domainnél a GoDaddy secureserver.net-re (Host Europe, Strasbourg) mutat.
+    - A „Kik férnek hozzá?” között ott a tárhely; a vendégek mellett a páros óra társa is.
+    - Élesen csak a téma saját mondatai cserélődnek (`oy_migrate_privacy_1119`). Az impresszum tárhely-sora is pontosabb.
+  - Tesztek: 1738/0. A .hu ellenőrzés: 2408/0, `--after` 1219/0. Helyben telefonon végigpróbálva: napválasztás,
+    időpont, előtöltött kérőűrlap, páros társ-mezők.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

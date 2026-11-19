@@ -597,3 +597,14 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 .oys-cal__pick { margin: .9rem 0 0; font-size: .92rem; opacity: .75; }
 .oys-cal.is-paged .oys-cal__month.has-pick .oys-cal__pick, .oys-cal:not(.is-paged) .oys-cal__pick { display: none; }
 .oys-cal__day[tabindex]:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+/* A one-to-one session on a chosen day (Olívia, 19 November): free days can be tapped too; under the calendar a quiet
+   offer with a time */
+.oys-cal__day.is-free { cursor: pointer; }
+.oys-cal__day.is-free:hover { box-shadow: inset 0 0 0 1.5px var(--cal-ink, #072624); }
+.oys-cal__day.is-free.is-hl { box-shadow: inset 0 0 0 2px var(--cal-ink, #072624); }
+.oys-cal__none { margin: .9rem 0 0; color: var(--oys-muted); }
+.oys-cal__ask { margin: 1rem 0 0; padding: 1rem 1.1rem; border: 1.5px dashed var(--oys-line); border-radius: 16px; }
+.oys-cal__ask p { margin: 0 0 .75rem; }
+.oys-cal__ask-row { display: flex; flex-wrap: wrap; gap: .6rem .8rem; align-items: flex-end; }
+.oys-cal__ask-row .field { margin: 0; flex: 1 1 10rem; max-width: 16rem; }
+.oys-cal__ask[hidden], .oys-cal__none[hidden], .oys-partner[hidden] { display: none; }

@@ -31,7 +31,15 @@
 		var length = form.querySelector('[data-oys-length]');
 		var people = form.querySelector('[data-oys-people]');
 		var prices = form.querySelectorAll('.oys-pr-services > li[data-topic]');
-		if (!topics.length) return;
+		var partner = form.querySelector('[data-oys-partner]');
+		var pair = function () {
+			if (!partner) return;
+			var n = people && !people.hidden ? parseInt(people.querySelector('input').value || '1', 10) : 1;
+			partner.hidden = n !== 2;
+			partner.querySelectorAll('input').forEach(function (i) { i.required = n === 2; });
+		};
+		if (people) people.querySelector('input').addEventListener('input', pair);
+		if (!topics.length) { pair(); return; }
 		function sync() {
 			var o = form.querySelector('input[name="topic"]:checked') || topics[0];
 			// only the chosen class's prices under the cards (Olívia, 19 November)
@@ -48,6 +56,7 @@
 				people.hidden = o.getAttribute('data-duo') !== '1';
 				if (people.hidden) people.querySelector('input').value = 1;
 			}
+			pair();
 		}
 		Array.prototype.forEach.call(topics, function (t) { t.addEventListener('change', sync); });
 		sync();
@@ -100,9 +109,21 @@
 		var months = Array.prototype.slice.call(cal.querySelectorAll('.oys-cal__month'));
 		if (months.length < 1) return;
 		var start = months.findIndex(function (m) { return m.hasAttribute('data-start'); });
+		var ask = cal.querySelector('[data-oys-cal-ask]');
 		var show = function (i) {
 			months.forEach(function (m, j) { m.hidden = j !== i; });
+			if (ask) ask.hidden = true;
 		};
+		// a one-to-one session on the chosen day: the link carries the day and the time (Olívia, 19 Nov)
+		var askLink = function () {
+			if (!ask) return;
+			var u = new URL(ask.getAttribute('data-url'), location.href);
+			u.searchParams.set('pday', ask.getAttribute('data-day') || '');
+			var t = ask.querySelector('[data-ask-time]').value;
+			if (t) u.searchParams.set('ptime', t); else u.searchParams.delete('ptime');
+			ask.querySelector('[data-ask-go]').href = u.toString();
+		};
+		if (ask) ask.querySelector('[data-ask-time]').addEventListener('change', askLink);
 		cal.classList.add('is-paged');
 		show(start < 0 ? 0 : start);
 		cal.addEventListener('click', function (e) {
@@ -135,6 +156,15 @@
 			day.classList.add('is-hl');
 			var first = null;
 			m.querySelectorAll('.oys-cal__item[data-day="' + day.getAttribute('data-day') + '"]').forEach(function (x) { x.classList.add('is-hl'); first = first || x; });
+			var none = m.querySelector('.oys-cal__none');
+			if (none) none.hidden = !!first;
+			if (ask) {
+				ask.setAttribute('data-day', day.getAttribute('data-day'));
+				ask.querySelector('[data-ask-day]').textContent = day.getAttribute('data-label') || '';
+				ask.hidden = false;
+				askLink();
+				if (!first) first = none || ask;
+			}
 			if (first && first.offsetParent) {
 				var r = first.getBoundingClientRect();
 				if (r.bottom > window.innerHeight - 90 || r.top < 80) first.scrollIntoView({ block: 'nearest', behavior: 'smooth' });

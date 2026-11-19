@@ -77,6 +77,7 @@ class OYS_Privates {
 			__( 'Service', 'olivia-studio' )         => self::topic_label( $r->topic ?? '', (int) $r->people ),
 			__( 'Length', 'olivia-studio' )          => (int) $r->duration_min . ' ' . __( 'min', 'olivia-studio' ),
 			__( 'Group size', 'olivia-studio' )      => max( 1, (int) $r->people ) . ' ' . __( 'people', 'olivia-studio' ),
+			__( 'Partner', 'olivia-studio' )         => ! empty( $r->partner_email ) ? trim( $r->partner_name . ' <' . $r->partner_email . '>' ) : '',
 			__( 'Location', 'olivia-studio' )        => trim( ( $types[ $r->location_type ] ?? (string) $r->location_type ) . ( '' !== (string) $r->address ? ' – ' . $r->address : '' ) ),
 			__( 'Preferred times', 'olivia-studio' ) => (string) $r->preferred,
 			__( 'Notes', 'olivia-studio' )           => (string) $r->notes,
@@ -139,6 +140,17 @@ class OYS_Privates {
 		if ( ! $row['preferred'] ) {
 			oys_flash( __( 'Tell me a few days and times that suit you.', 'olivia-studio' ), 'error' );
 			oys_redirect( wp_get_referer() ?: oys_account_url( 'private' ) );
+		}
+		// Olívia, 19 November: „ha párban jönnének … a párnak is kötelező kitölteni a saját adatait … külön visszaigazoló
+		// e-mailt kapjanak” (Áron: „e-mail cím alapján, hasonló legyen, mint a csoportos óráknál”) – two people: the partner's
+		// name and email; when the session is booked, they become the booking's guest and get their own invite and link
+		if ( 2 === (int) $row['people'] ) {
+			$row['partner_name']  = mb_substr( sanitize_text_field( wp_unslash( $_POST['partner_name'] ?? '' ) ), 0, 100 );
+			$row['partner_email'] = sanitize_email( wp_unslash( $_POST['partner_email'] ?? '' ) );
+			if ( '' === $row['partner_name'] || ! is_email( $row['partner_email'] ) ) {
+				oys_flash( __( 'Add your partner\'s name and email, so they get their own confirmation and link to join.', 'olivia-studio' ), 'error' );
+				oys_redirect( wp_get_referer() ?: oys_account_url( 'private' ) );
+			}
 		}
 		global $wpdb;
 		$wpdb->insert( OYS_Install::table( 'private_requests' ), $row );
@@ -218,14 +230,25 @@ class OYS_Privates {
 		self::update( $request_id, array( 'status' => 'booked', 'order_id' => $order_id ) );
 	}
 
-	/** Booked with a private credit: mark the request as booked too. */
+	/**
+	 * Booked with a private credit: mark the request as booked too. A session for two: the partner from the request joins the
+	 * booking as its guest (once), and gets the guest's invite with their own link to join, like at a group class.
+	 */
 	public static function on_booking_confirmed( $booking_id ) {
 		$b = OYS_Bookings::get( $booking_id );
-		$s = $b ? OYS_Schedule::get( $b->session_id ) : null;
+		$s = $b && ! (int) $b->guest_of ? OYS_Schedule::get( $b->session_id ) : null;
 		if ( $s && 'private' === $s->kind ) {
 			$r = self::for_session( $s->id );
 			if ( $r && 'offered' === $r->status ) {
 				self::update( $r->id, array( 'status' => 'booked' ) );
+			}
+			if ( $r && (int) $r->people > 1 && is_email( (string) ( $r->partner_email ?? '' ) ) && (int) $r->user_id === (int) $b->user_id && ! OYS_Bookings::guests_of( $b->id ) ) {
+				OYS_Bookings::book_party( (int) $b->user_id, $s, array(
+					'host_booking' => (int) $b->id,
+					'guests'       => array( array( 'name' => (string) $r->partner_name, 'email' => (string) $r->partner_email ) ),
+					'guest_method' => 'pair',
+					'force'        => true,
+				) );
 			}
 		}
 	}

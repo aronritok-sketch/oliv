@@ -850,6 +850,47 @@ function oy_class_service_names( array $classes ) {
 	return $done ? array( sprintf( '%d one-to-one services named like their classes', $done ) ) : array();
 }
 
+/**
+ * Áron, 19 November: „az adatkezelő mindenhol az Arovia Group LLC, ami a GoDaddy-n van VPS szerverünk, szóval ezt is írd
+ * bele” – the privacy notice on a live site: where the server is (GoDaddy VPS, an EU data centre: the site's address
+ * resolves to GoDaddy's secureserver.net in Strasbourg), the hosting among who sees data, and the pair's partner with the
+ * guests. Only the theme's own sentences change; anything else on the page stays.
+ */
+function oy_privacy_1119_pairs() {
+	return array(
+		array( '<li><strong>Vendégek:</strong> ha valakit magaddal hozol, az általad megadott nevét és (ha megadod) e-mail-címét, csak hogy felkerüljön az óra névsorára és megkapja a foglalás részleteit.</li>', '<li><strong>Vendégek és társ:</strong> ha valakit magaddal hozol egy csoportos órára, vagy párban kérsz egyéni órát, az általad megadott nevét és e-mail-címét (csoportos órán az e-mail-cím nem kötelező), csak hogy felkerüljön az óra névsorára, és megkapja a foglalás részleteit és a saját belépőlinkjét.</li>' ),
+		array( '<h2>Adataid az Egyesült Államokban</h2>' . "\n" . '<p>Az Arovia Group LLC amerikai cég,', '<h2>Hol vannak az adataid?</h2>' . "\n" . '<p>Az oldal és az adatbázisa a GoDaddy virtuális szerverén (VPS) fut, európai uniós adatközpontban; a szervert a HelloProVision üzemelteti.</p>' . "\n" . '<h2>Adataid az Egyesült Államokban</h2>' . "\n" . '<p>Az Arovia Group LLC amerikai cég,' ),
+		array( 'a weboldal üzemeltetője és tárhelye (HelloProVision), a Stripe', 'a weboldal üzemeltetője (HelloProVision), a tárhely (GoDaddy virtuális szerver), a Stripe' ),
+	);
+}
+
+function oy_migrate_privacy_1119() {
+	$rev = '2026-11-19';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_privacy_1119_rev' ) === $rev ) {
+		return array();
+	}
+	update_option( 'oy_privacy_1119_rev', $rev );
+	$page = get_post( (int) get_option( 'wp_page_for_privacy_policy' ) ) ?: get_page_by_path( 'adatvedelem' );
+	if ( ! $page || ! get_post_meta( $page->ID, 'oy_privacy', true ) ) {
+		return array();
+	}
+	$html = (string) $page->post_content;
+	$n    = 0;
+	foreach ( oy_privacy_1119_pairs() as $pair ) {
+		if ( str_contains( $html, $pair[0] ) ) {
+			$html = str_replace( $pair[0], $pair[1], $html );
+			++$n;
+		}
+	}
+	if ( ! $n ) {
+		return array();
+	}
+	kses_remove_filters();
+	wp_update_post( wp_slash( array( 'ID' => $page->ID, 'post_content' => $html ) ) );
+	kses_init_filters();
+	return array( sprintf( 'privacy: the GoDaddy server, the pair\'s partner (%d parts)', $n ) );
+}
+
 function oy_migrate_1113() {
 	// b: + ÁSZF, Impresszum, the privacy notice with Arovia as the controller
 	// c: her 20:17 notes – „Olívia” with a long í, the prenatal modules and why each one matters, the yogic-life sentence
@@ -885,7 +926,9 @@ function oy_migrate_1113() {
  */
 function oy_migrate_legal() {
 	// b: „Olívia” with a long í in the booking plugin's texts too (the participation agreement: „szólok Oliviának”)
-	$rev = '2026-11-14b';
+	// 2026-11-19: Áron – „kerüljön be az általános szerződési feltételekbe a visszanézhetőség”, the pair's partner, the
+	// GoDaddy server in the imprint (the privacy notice: oy_migrate_privacy_1119)
+	$rev = '2026-11-19';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_legal_rev' ) === $rev ) {
 		return array();
 	}

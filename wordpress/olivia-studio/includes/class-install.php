@@ -218,6 +218,8 @@ class OYS_Install {
 			user_id bigint(20) unsigned NOT NULL,
 			duration_min smallint(5) unsigned NOT NULL DEFAULT 60,
 			people tinyint(3) unsigned NOT NULL DEFAULT 1,
+			partner_name varchar(100) NOT NULL DEFAULT '',
+			partner_email varchar(190) NOT NULL DEFAULT '',
 			topic varchar(20) NOT NULL DEFAULT 'yoga',
 			location_type varchar(30) NOT NULL DEFAULT '',
 			address varchar(255) NOT NULL DEFAULT '',

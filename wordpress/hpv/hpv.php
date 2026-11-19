@@ -64,6 +64,7 @@ add_action( 'hpv_child_setup', function ( $from, $to, $slug ) {
 	$log = array_merge( $log, oy_migrate_classes_1119() ); // the classes page: no „Kezdőket is…” in the group box, the one-to-one start among the steps, the recording lines (once; her editor texts kept)
 	$log = array_merge( $log, oy_migrate_classes_1119b() ); // … where she had already written the week in herself, her own words as she wrote them (once)
 	$log = array_merge( $log, oy_migrate_classes_1119c() ); // her renamed class types: the copies the update put in go, her classes keep their names inside, the addresses she gave them are public (once; before the import below)
+	$log = array_merge( $log, oy_migrate_privacy_1119() ); // the privacy notice: the GoDaddy server (EU), the pair's partner (once; only the theme's sentences)
 	kses_remove_filters();
 	$log = array_merge( $log, oy_import_all( false ) );
 	kses_init_filters();

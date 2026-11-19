@@ -41,7 +41,7 @@ ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.7.3'
+VERSION = '1.7.4'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -1758,10 +1758,12 @@ def privacy_page():
 <p>A működéshez szükséges sütik (például hogy megjegyezzük, mit döntöttél a sütikről) mindig működnek, ezekhez nem kell hozzájárulás.</p>
 <p>Ha az oldal alján megjelenő sávon hozzájárulsz, a Google Analytics (Google Ireland Limited) is méri, hogyan használják az oldalt: melyik oldalakat nézik meg, honnan érkeznek a látogatók, és milyen eszközről. Ehhez a <code>_ga</code> kezdetű sütiket használja, legfeljebb 2 évig. Ugyanez a mérés fut az oliviajoga.online oldalon is, így látjuk, ha onnan ide vagy innen oda lépsz át. Az eredményt csak összesítve, név nélkül látjuk. A Google az adatokat az Egyesült Államokban is kezelheti. Ha nem járulsz hozzá, a Google Analytics be sem töltődik. Reklámsütit nem használunk.</p>
 <p>A döntésedet bármikor megváltoztathatod az oldal alján, a <a href="#cookie-settings">Sütibeállítások</a> linkkel.</p>
+<h2>Hol vannak az adataid?</h2>
+<p>Az oldal a GoDaddy virtuális szerverén (VPS) fut, európai uniós adatközpontban; a szervert a HelloProVision üzemelteti.</p>
 <h2>Adataid az Egyesült Államokban</h2>
 <p>Az Arovia Group LLC amerikai cég, ezért az adataid egy részét ott is kezeljük. Csak a fenti célokra és ideig használjuk őket, ugyanazzal a gondossággal, mint az Európai Unióban.</p>
 <h2>Kik férnek hozzá?</h2>
-<p>Az oktató, valamint azok a szolgáltatók, akik nélkül az oldal nem működne: a weboldal üzemeltetője és tárhelye (HelloProVision), valamint ha hozzájárulsz, a Google Analytics (az oldal látogatottságának mérése). Adatot nem adunk el, és reklámcélra nem adunk át senkinek.</p>
+<p>Az oktató, valamint azok a szolgáltatók, akik nélkül az oldal nem működne: a weboldal üzemeltetője (HelloProVision), a tárhely (GoDaddy virtuális szerver), valamint ha hozzájárulsz, a Google Analytics (az oldal látogatottságának mérése). Adatot nem adunk el, és reklámcélra nem adunk át senkinek.</p>
 <h2>A jogaid</h2>
 <p>Kérheted, hogy megmutassuk, milyen adatot tárolunk rólad, kijavítsuk vagy töröljük őket, korlátozzuk a kezelésüket, vagy géppel olvasható formában kiadjuk neked. Írj a {m} címre, és válaszolunk.</p>
 <p>Ha úgy érzed, hogy nem jól kezeljük az adataidat, panaszt tehetsz a Nemzeti Adatvédelmi és Információszabadság Hatóságnál (NAIH, <a href="https://naih.hu">naih.hu</a>).</p>"""
