@@ -491,6 +491,24 @@ add_action( 'init', function () {
 	add_filter( 'oys_schedule_next', fn( $n ) => oy_online_only() ? 3 : $n );
 	// the birthday on the profile (Áron, 19 November: „a születésnaphoz írd le megjegyzésbe, hogy érdemes kitölteni, mert
 	// születésnapodkor egy kis ajándékkal fogok kedveskedni”)
+	// the emails in the site's palette (Áron, 19 November: „Az emailek színe igazodjon a jelenlegi oldal színeihez”):
+	// Evergreen for the green, Bright Gold for the lilac stripe and buttons and the gift code, the soft tangerine and
+	// gold for the boxes, the site's ink and grey for the text
+	add_filter( 'oys_email_palette', fn( $m ) => oy_online_only() ? array(
+		'#2B5036' => '#002E2C', // forest → Evergreen: the header, buttons, links
+		'#F3F2EC' => '#F0EDEE', // paper → Platinum: the background, the text on dark
+		'#FBFBF8' => '#FFFFFF', // the card
+		'#12231A' => '#072624', // ink
+		'#26352B' => '#1E3432', // text
+		'#53635A' => '#4D5F5D', // muted
+		'#C6A3EE' => '#FFDF22', // lilac → Bright Gold: the stripe under the header, the „join” button
+		'#FF72B6' => '#FFDF22', // pink → Bright Gold: the gift code
+		'#ECE1FA' => '#FFF4C2', // soft lilac → soft gold: the gift message
+		'#F3EDFB' => '#FFF4C2',
+		'#DEE7D6' => '#FFE2CC', // pale green → soft tangerine: to pay at the studio, coupon codes
+		'#FBEBDD' => '#FFE2CC',
+		'#d8d8d0' => '#E4DEE0', // the rules
+	) : $m );
 	// „Choose more in the calendar” on the request form: the calendar on the prices page
 	add_filter( 'oys_calendar_url', fn( $u ) => oy_online_only() ? oy_page_link( 'schedule-pricing', 'naptar' ) : $u );
 	add_filter( 'oys_birthday_note', fn( $t ) => oy_online_only() ? __( 'Optional, but worth filling in: on your birthday I will treat you to a little gift.', 'olivia-yoga' ) : $t );

@@ -1651,6 +1651,18 @@ test( 'Áron 19 Nov (evening): the chosen times survive signing up and logging i
 	}
 } );
 
+test( 'Áron 19 Nov: the emails in the site\'s colours („Az emailek színe igazodjon a jelenlegi oldal színeihez”)', function () {
+	$us = OYS_Emails::wrap_public( 'Hello', '<p style="background:#DEE7D6;color:#53635A">x</p>', array( 'Go', home_url( '/' ) ) );
+	update_option( 'oy_edition', 'hu-online' );
+	$on  = OYS_Emails::wrap_public( 'Hello', '<p style="background:#DEE7D6;color:#53635A">x</p><p style="border:1px solid #d8d8d0">y</p>', array( 'Go', home_url( '/' ) ) );
+	$log = sent_mails( fn() => OYS_Emails::send_raw( 'palette@example.test', 'Palette', '<p style="background:#FF72B6;border:2px solid #12231A">GIFT</p>' ) );
+	update_option( 'oy_edition', 'fort-myers' );
+	ok( str_contains( $us, 'background:#2B5036' ) && str_contains( $us, 'background:#C6A3EE' ), 'other sites keep their own colours' );
+	ok( str_contains( $on, '<td style="background:#002E2C;padding:18px 24px;color:#F0EDEE' ) && str_contains( $on, 'height:8px;background:#FFDF22' ) && str_contains( $on, 'style="display:inline-block;background:#002E2C;color:#F0EDEE' ) && str_contains( $on, 'background:#F0EDEE;font-family' ), 'online site: the header and the button Evergreen, the stripe Bright Gold, the background Platinum' );
+	ok( str_contains( $on, 'background:#FFE2CC;color:#4D5F5D' ) && str_contains( $on, 'border:1px solid #E4DEE0' ) && ! preg_match( '/#(2B5036|C6A3EE|FF72B6|ECE1FA|DEE7D6|12231A|53635A|F3F2EC|d8d8d0)\b/i', $on ), '… the boxes, the text and the rules in the site\'s palette, none of the first one left' );
+	ok( str_contains( (string) ( $log[0]['html'] ?? '' ), 'background:#FFDF22;border:2px solid #072624' ), '… also in an email written elsewhere (sent ready-made): the gift code Bright Gold' );
+} );
+
 test( 'test mode: every process with one tap, the emails to the teacher\'s own mailbox (+teszt), test classes hidden, everything deleted after (Áron, 19 Nov)', function () {
 	$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0];
 	wp_set_current_user( (int) $admin );

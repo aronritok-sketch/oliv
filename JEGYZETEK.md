@@ -1920,6 +1920,21 @@
     - a következő látogatónál ezek a sávok áthúzva jelennek meg;
     - visszatérő vendég: időpont → belépés → kérőűrlap az időponttal.
 
+- **2026-11-19 – Az e-mailek az oldal színeiben (oliviajoga.online 3.12.19, olivia-studio 1.28.1).**
+  Áron: „Az emailek színe igazodjon a jelenlegi oldal színeihez”.
+  - Az e-mailek eddig a stúdió első palettáját használták (erdőzöld #2B5036, lila csík #C6A3EE, rózsaszín ajándékkód
+    #FF72B6, halványzöld és lila dobozok).
+  - Most egy közös lépés (`OYS_Emails::recolor`, `oys_email_palette` szűrő) küldés előtt egy menetben átszínez minden
+    e-mailt: a keretet, a gombokat, a dobozokat, az ajándékkódot, a hírlevelet és a próbaleveleket is.
+  - Az online kiadás palettája:
+    - Evergreen (#002E2C): fejléc, gombok, linkek;
+    - Bright Gold (#FFDF22): a csík a fejléc alatt, a „Belépés az órára” gomb, az ajándékkód;
+    - Platinum (#F0EDEE): háttér; fehér kártya;
+    - halvány mandarin (#FFE2CC) és halvány arany (#FFF4C2): dobozok;
+    - az oldal tinta- és szürke színei a szövegben.
+  - Más oldalakon marad a régi.
+  - Tesztek: 1807/0. Mintalevelek (foglalás, ajándék, egyéni ajánlat) helyben renderelve, rendben.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

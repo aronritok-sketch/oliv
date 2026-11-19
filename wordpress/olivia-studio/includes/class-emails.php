@@ -69,6 +69,7 @@ class OYS_Emails {
 
 	/** Send ready HTML (already wrapped) with the studio as the sender. */
 	public static function send_raw( $to, $subject, $html, array $extra_headers = array(), $attachments = array() ) {
+		$html    = self::recolor( $html );
 		$headers = array_merge( array( 'Content-Type: text/html; charset=UTF-8' ), $extra_headers, OYS_Mailer::headers() );
 		$sent    = wp_mail( $to, $subject, $html, $headers, $attachments );
 		foreach ( $attachments as $file ) {
@@ -92,7 +93,25 @@ class OYS_Emails {
 		return self::wrap( $heading, $body, $cta );
 	}
 
+	/**
+	 * The emails in the site's own colours (Áron, 19 November: „Az emailek színe igazodjon a jelenlegi oldal színeihez”): the
+	 * emails are written in the studio's first palette; a site gives its palette as old colour => new (filter
+	 * `oys_email_palette`) and every email – frame, buttons, boxes, gift codes – is recoloured in one pass.
+	 */
+	public static function recolor( $html ) {
+		$map = array();
+		foreach ( (array) apply_filters( 'oys_email_palette', array() ) as $old => $new ) {
+			$map[ strtoupper( (string) $old ) ] = (string) $new;
+			$map[ strtolower( (string) $old ) ] = (string) $new;
+		}
+		return $map ? strtr( (string) $html, $map ) : (string) $html;
+	}
+
 	private static function wrap( $heading, $body, $cta, $footer_extra = '', $preheader = '' ) {
+		return self::recolor( self::frame( $heading, $body, $cta, $footer_extra, $preheader ) );
+	}
+
+	private static function frame( $heading, $body, $cta, $footer_extra = '', $preheader = '' ) {
 		$button = '';
 		if ( $cta ) {
 			$button = '<p style="margin:28px 0 8px"><a href="' . esc_url( $cta[1] ) . '" style="display:inline-block;background:#2B5036;color:#F3F2EC;text-decoration:none;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:13px;padding:14px 22px;border-radius:999px">' . esc_html( $cta[0] ) . '</a></p>';
