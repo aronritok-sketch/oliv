@@ -120,6 +120,10 @@ function oy_import_translations( $id, array $item, array $fields, $resolve = fal
 /** Find a theme-managed post by slug; on refresh it is updated, otherwise left alone. */
 function oy_import_target( $slug, $type ) {
 	$post = get_page_by_path( $slug, OBJECT, $type );
+	// a class whose name was changed to the address it is shown at (oy_class_paths) is still that class: never a second one
+	if ( ! $post && 'oy_class' === $type && function_exists( 'oy_class_paths' ) && isset( oy_class_paths()[ $slug ] ) ) {
+		$post = get_page_by_path( oy_class_paths()[ $slug ], OBJECT, $type );
+	}
 	return $post ? (int) $post->ID : 0;
 }
 
@@ -743,6 +747,83 @@ function oy_migrate_classes_1119b() {
 		update_option( 'oye_edits', $e, true );
 	}
 	return $fixed ? array( 'classes page: her own recording lines back as she wrote them' ) : array();
+}
+
+/**
+ * Olívia, 19 November: „átneveztem az óratípusokat és nagyon sok duplikáció lett. Szeretnék mindent vissza, csak az új
+ * nevekkel és keresőbarát kifejezésekkel, amit írtam”. Two of her classes got addresses of her own as their names
+ * (hatha-flow → hatha-flow-joga-online, stretching → stretching-mobility); the update then missed those names and put the old
+ * classes in again. Here: the copy goes, her class (her title, text and photos) gets its name back, and the address she gave
+ * it becomes its public address (oy_class_paths; the earlier ones lead there). The one-to-one services take her new names
+ * where they still had the old class names.
+ */
+function oy_migrate_classes_1119c() {
+	$rev = '2026-11-19c';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_classes_1119c_rev' ) === $rev ) {
+		return array();
+	}
+	update_option( 'oy_classes_1119c_rev', $rev );
+	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+	return array_merge( oy_class_copies_fix( array_keys( (array) ( $data['classes'] ?? array() ) ) ), oy_class_service_names( (array) ( $data['classes'] ?? array() ) ) );
+}
+
+/**
+ * The classes named $keys: where one of them is a copy the update made because the real one had been given another name, the
+ * copy goes and the real one (made earlier, in the same place in the list) gets its name back; the name it had becomes its
+ * public address.
+ */
+function oy_class_copies_fix( array $keys ) {
+	global $wpdb;
+	$all   = get_posts( array( 'post_type' => 'oy_class', 'post_status' => array( 'publish', 'draft', 'private', 'pending', 'future' ), 'numberposts' => -1, 'orderby' => 'ID', 'order' => 'ASC' ) );
+	$hers  = array_values( array_filter( $all, fn( $p ) => ! in_array( $p->post_name, $keys, true ) ) );
+	$paths = get_option( 'oy_class_paths', array() );
+	$paths = is_array( $paths ) ? $paths : array();
+	$log   = array();
+	foreach ( $keys as $key ) {
+		$copy = get_page_by_path( $key, OBJECT, 'oy_class' );
+		if ( ! $copy ) {
+			continue;
+		}
+		foreach ( $hers as $i => $own ) {
+			if ( (int) $own->menu_order !== (int) $copy->menu_order || (int) $own->ID >= (int) $copy->ID ) {
+				continue;
+			}
+			wp_delete_post( $copy->ID, true );
+			$paths[ $key ] = $own->post_name;
+			$wpdb->update( $wpdb->posts, array( 'post_name' => $key ), array( 'ID' => $own->ID ) );
+			clean_post_cache( $own->ID );
+			$log[] = sprintf( 'class %s: the copy removed, „%s” keeps its name, shown at /%s/', $key, $own->post_title, $own->post_name );
+			unset( $hers[ $i ] );
+			break;
+		}
+	}
+	if ( $log ) {
+		update_option( 'oy_class_paths', $paths, true );
+	}
+	return $log;
+}
+
+/** The one-to-one services take their class's new name where they still had its old one (the content file's title_prev). */
+function oy_class_service_names( array $classes ) {
+	if ( ! class_exists( 'OYS_Services' ) ) {
+		return array();
+	}
+	$sv   = get_option( OYS_Services::OPTION, array() );
+	$sv   = is_array( $sv ) ? $sv : array();
+	$done = 0;
+	foreach ( $sv as $k => $row ) {
+		$class = (string) ( $row['class'] ?? '' );
+		$was   = (string) ( $classes[ $class ]['title_prev'] ?? '' );
+		$post  = '' !== $class ? get_page_by_path( $class, OBJECT, 'oy_class' ) : null;
+		if ( $post && '' !== $was && ( $row['label'] ?? '' ) === $was && $post->post_title !== $was ) {
+			$sv[ $k ]['label'] = $post->post_title;
+			++$done;
+		}
+	}
+	if ( $done ) {
+		update_option( OYS_Services::OPTION, $sv );
+	}
+	return $done ? array( sprintf( '%d one-to-one services named like their classes', $done ) ) : array();
 }
 
 function oy_migrate_1113() {

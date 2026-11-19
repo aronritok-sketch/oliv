@@ -198,6 +198,7 @@ function oy_icon( $name, $cls = 'icon' ) {
 	static $ui = array(
 		'clock'     => '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
 		'play'      => '<circle cx="12" cy="12" r="8.5"/><path d="M10.2 8.6v6.8l5.3-3.4z"/>',
+		'chat'      => '<path d="M20 15.5a2 2 0 0 1-2 2H9l-4.5 3.5V6.5a2 2 0 0 1 2-2H18a2 2 0 0 1 2 2z"/><path d="M8.5 9.5h7M8.5 12.5h4.5"/>',
 		'gift'      => '<rect x="3.5" y="8.5" width="17" height="12" rx="1.5"/><path d="M3.5 12.5h17M12 8.5v12M12 8.5C10.6 5 6.5 4.6 6.5 7c0 1.6 2.7 1.5 5.5 1.5zm0 0c1.4-3.5 5.5-3.9 5.5-1.5 0 1.6-2.7 1.5-5.5 1.5z"/>',
 		'pin'       => '<path d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 0 1 13 0C18.5 15.4 12 21 12 21z"/><circle cx="12" cy="10" r="2.3"/>',
 		'mail'      => '<rect x="3" y="5.5" width="18" height="13" rx="2"/><path d="m3.5 7 8.5 6.3L20.5 7"/>',
@@ -295,6 +296,10 @@ function oy_pricing_design( $html ) {
 				array( 'check', __( 'book ahead', 'olivia-yoga' ) ),
 				array( 'group', __( 'starts with at least 3 people', 'olivia-yoga' ) ),
 				array( 'leaf', __( 'beginners welcome', 'olivia-yoga' ) ),
+				// Olívia, 19 November: „a piktogramokhoz még írjuk, hogy 1 hétig visszanézhető és hogy tudunk kapcsolódni később is
+				// a közös chatben”
+				array( 'play', oy_replay_days() ? ( 7 === oy_replay_days() ? __( 'can be watched again for a week', 'olivia-yoga' ) : sprintf( __( 'can be watched again for %d days', 'olivia-yoga' ), oy_replay_days() ) ) : '' ),
+				array( 'chat', oy_replay_days() ? __( 'we can talk later in the class chat too', 'olivia-yoga' ) : '' ),
 			),
 			fn( $f ) => '' !== $f[1]
 		);
@@ -309,8 +314,9 @@ function oy_pricing_design( $html ) {
 			$keep = array();
 			foreach ( preg_split( '#(?<=[.!?])\s+#u', trim( $inner ) ) as $sentence ) {
 				$plain = wp_strip_all_tags( $sentence );
-				// what the chips say already: the time (only at the start), live in the browser, the camera
-				if ( ( 0 === $i && ! $keep && preg_match( '#\d{1,2}:\d{2}#', $plain ) ) || preg_match( '#böngész|browser|kamer|camera#iu', $plain ) ) {
+				// what the chips say already: the time (only at the start), live in the browser, the camera; and what happens in
+				// a class (Olívia, 19 November: „ez a mondat nem is kell ide” – the class page tells it)
+				if ( ( 0 === $i && ! $keep && preg_match( '#\d{1,2}:\d{2}#', $plain ) ) || preg_match( '#böngész|browser|kamer|camera|gyakorlás alatt részed lesz#iu', $plain ) ) {
 					continue;
 				}
 				$keep[] = $sentence;

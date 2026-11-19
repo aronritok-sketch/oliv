@@ -1264,6 +1264,67 @@ test( 'Olívia 19 Nov (chat, later): the class cards of the request form, the mi
 	ok( array() === oy_migrate_classes_1119() || 'fort-myers' !== oy_edition(), 'only on the online edition' );
 } );
 
+test( 'Olívia 19 Nov: renamed class types – an address she types becomes the public one, the name inside stays; the copies an update made go; the one-to-one services take the new names; the replay and chat chips; „Foglald le az időpontot”', function () {
+	require_once get_template_directory() . '/inc/demo-import.php';
+	update_option( 'oy_edition', 'hu-online' );
+	$p0 = get_option( 'oy_class_paths' );
+	$h0 = get_option( 'oy_class_paths_old' );
+	$sv0 = get_option( 'oys_services' );
+	$made = array();
+	try {
+		delete_option( 'oy_class_paths' );
+		delete_option( 'oy_class_paths_old' );
+		// the editor: she types an address of her own
+		$a = wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Zz óra', 'post_name' => 'zz-key-a', 'menu_order' => 40 ) );
+		$made[] = $a;
+		wp_update_post( array( 'ID' => $a, 'post_title' => 'Zz óra új néven', 'post_name' => 'zz-kereso-barat' ) );
+		ok( 'zz-key-a' === get_post_field( 'post_name', $a ) && 'Zz óra új néven' === get_the_title( $a ) && 'zz-kereso-barat' === ( get_option( 'oy_class_paths' )['zz-key-a'] ?? '' ), 'her new address is kept as the public one, the class keeps its name inside (the bookings know it by that), her title stays' );
+		ok( str_contains( get_permalink( $a ), '/zz-kereso-barat/' ), '… the links go to her address' );
+		eq( 'zz-key-a', oy_class_key_for_path( 'zz-kereso-barat' ), '… which opens the class' );
+		wp_update_post( array( 'ID' => $a, 'post_name' => 'zz-meg-egy' ) );
+		eq( 'zz-key-a', oy_class_key_for_path( 'zz-kereso-barat' ), '… and a second change keeps the first address working (it leads to the new one)' );
+		ok( str_contains( get_permalink( $a ), '/zz-meg-egy/' ) && 'zz-key-a' === get_post_field( 'post_name', $a ), '… the newest address is the public one' );
+		eq( $a, oy_import_target( 'zz-key-a', 'oy_class' ), 'an update finds the class by its name' );
+		// the live site: two of her classes had their addresses as names, and the update had put the old classes in again
+		$own1 = wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Csoportos zz jóga', 'post_name' => 'zz-own-one', 'menu_order' => 41, 'post_content' => '<p>Az ő szövege.</p>' ) );
+		$own2 = wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Egyéni zz', 'post_name' => 'zz-own-two', 'menu_order' => 42 ) );
+		$c1   = wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Csoportos online zz jóga', 'post_name' => 'zz-key-b', 'menu_order' => 41 ) );
+		$c2   = wp_insert_post( array( 'post_type' => 'oy_class', 'post_status' => 'publish', 'post_title' => 'Online zz', 'post_name' => 'zz-key-c', 'menu_order' => 42 ) );
+		$made = array_merge( $made, array( $own1, $own2, $c1, $c2 ) );
+		$log  = oy_class_copies_fix( array( 'zz-key-a', 'zz-key-b', 'zz-key-c' ) );
+		ok( 2 === count( $log ) && null === get_post( $c1 ) && null === get_post( $c2 ), 'the two copies go' );
+		ok( 'zz-key-b' === get_post_field( 'post_name', $own1 ) && 'zz-key-c' === get_post_field( 'post_name', $own2 ) && 'Csoportos zz jóga' === get_the_title( $own1 ) && '<p>Az ő szövege.</p>' === get_post_field( 'post_content', $own1 ), '… her classes keep her titles and texts and get their names back' );
+		ok( str_contains( get_permalink( $own1 ), '/zz-own-one/' ) && str_contains( get_permalink( $own2 ), '/zz-own-two/' ), '… shown at the addresses she gave them' );
+		ok( array() === oy_class_copies_fix( array( 'zz-key-a', 'zz-key-b', 'zz-key-c' ) ), '… nothing more to do the second time' );
+		// the one-to-one services: her new names where they still had the old ones
+		update_option( 'oys_services', array(
+			'zz-s1' => array( 'label' => 'Csoportos online zz jóga', 'class' => 'zz-key-b', 'duration' => 60 ),
+			'zz-s2' => array( 'label' => 'Saját név', 'class' => 'zz-key-c', 'duration' => 60 ),
+		) );
+		$names = oy_class_service_names( array( 'zz-key-b' => array( 'title_prev' => 'Csoportos online zz jóga' ), 'zz-key-c' => array( 'title_prev' => 'Online zz' ) ) );
+		$sv    = get_option( 'oys_services' );
+		ok( $names && 'Csoportos zz jóga' === $sv['zz-s1']['label'] && 'Saját név' === $sv['zz-s2']['label'], 'a one-to-one service takes its class\'s new name; a name she gave it herself stays' );
+	} finally {
+		foreach ( $made as $id ) {
+			wp_delete_post( $id, true );
+		}
+		false === $p0 ? delete_option( 'oy_class_paths' ) : update_option( 'oy_class_paths', $p0 );
+		false === $h0 ? delete_option( 'oy_class_paths_old' ) : update_option( 'oy_class_paths_old', $h0 );
+		false === $sv0 ? delete_option( 'oys_services' ) : update_option( 'oys_services', $sv0 );
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+	$data = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content-hu-online.json' ), true );
+	eq( array( 'Csoportos flow jóga', 'Egyéni jóga', 'Privát kismamatorna', 'Egyéni stretching és mobilizáció', 'Privát relaxáció és légzés' ), array_values( array_column( $data['classes'], 'title' ) ), 'the content file: her new class names, without „online” (the menu says „Online órák”)' );
+	eq( array( 'Egyéni jóga', 'Privát kismamatorna', 'Egyéni stretching és mobilizáció', 'Privát relaxáció és légzés' ), array_values( array_column( $data['setup']['services'], 'label' ) ), '… and the one-to-one services the same' );
+	// the prices page: the replay and chat chips, not the sentence about what happens in a class
+	update_option( 'oy_edition', 'hu-online' );
+	$html = oy_pricing_design( '<h2>Csoportos flow jóga</h2><p>Szerdánként 18:30-tól 20:00-ig. A csoportos gyakorlás alatt részed lesz légzőgyakorlatban és relaxációban.</p>' );
+	update_option( 'oy_edition', 'fort-myers' );
+	ok( str_contains( $html, '<span>can be watched again for a week</span>' ) && str_contains( $html, '<span>we can talk later in the class chat too</span>' ) && ! str_contains( $html, 'részed lesz' ), 'prices page: „1 hétig visszanézhető” and „később is kapcsolódhatunk a közös chatben” as chips; the sentence about the class is not needed there' );
+	$po = (string) file_get_contents( get_template_directory() . '/languages/hu_HU.po' );
+	ok( str_contains( $po, "msgid \"Book from the timetable with a drop-in or a class pass.\"\nmsgstr \"Foglald le az időpontot alkalmi jeggyel vagy bérlettel.\"" ) && str_contains( $po, 'msgstr "1 hétig visszanézhető"' ) && str_contains( $po, 'msgstr "később is kapcsolódhatunk a közös chatben"' ), 'in Hungarian: „Foglald le az időpontot alkalmi jeggyel vagy bérlettel.”, „1 hétig visszanézhető”, „később is kapcsolódhatunk a közös chatben”' );
+} );
+
 test( 'test mode: every process with one tap, the emails to the teacher\'s own mailbox (+teszt), test classes hidden, everything deleted after (Áron, 19 Nov)', function () {
 	$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0];
 	wp_set_current_user( (int) $admin );
@@ -3682,7 +3743,7 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	$an  = oy_answer_lines( '<div class="answer"><p>A tapasztalataim alapján is:<br>– alvászavarok<br>– túlgondolás</p></div><div class="answer"><p>Előbb az orvos.<br>Aztán szólj.</p></div>' );
 	$cb = oy_callback_form();
 	update_option( 'oy_edition', 'fort-myers' );
-	ok( str_contains( $pd, '<div class="oj-info"><ul class="oj-info__facts">' ) && str_contains( $pd, '<p>A gyakorlás alatt részed lesz légzésben.</p></div><div class="block-wide">' ) && ! str_contains( $pd, 'csak én látlak' ) && ! str_contains( $pd, '18:30-tól' ), 'Bejelentkezés és árak: the group facts as chips, her text under them, without what the chips repeat („ezek az infok is legyenek már kicsit megdesignolva”)' );
+	ok( str_contains( $pd, '<div class="oj-info"><ul class="oj-info__facts">' ) && str_contains( $pd, '</ul></div><div class="block-wide">' ) && ! str_contains( $pd, 'részed lesz' ) && ! str_contains( $pd, 'csak én látlak' ) && ! str_contains( $pd, '18:30-tól' ), 'Bejelentkezés és árak: the group facts as chips, without what the chips repeat („ezek az infok is legyenek már kicsit megdesignolva”); since 19 November without the sentence about the class either („ez a mondat nem is kell ide”)' );
 	$hupo = (string) file_get_contents( get_template_directory() . '/languages/hu_HU.po' );
 	ok( str_contains( $pd2, '<span>book ahead</span>' ) && str_contains( $pd2, '<span>starts with at least 3 people</span>' ) && str_contains( $pd2, '<span>beginners welcome</span>' ) && str_contains( $hupo, "msgid \"book ahead\"\nmsgstr \"foglalj előre\"" ) && str_contains( $hupo, "msgstr \"legalább 3 fővel indul\"" ) && str_contains( $hupo, "msgstr \"kezdőket is szeretettel várok\"" ), 'prices page: the note under the timetable as chips next to „a kamera nem kötelező” („ezek az infók is jöhetnek ide”)' );
 	ok( str_contains( $pd2, '</h2><div class="oj-gift"><span class="oj-gift__icon" aria-hidden="true">' ) && str_contains( $pd2, '<p>Ajándékozz jógát.</p><p class="btn-row">' ) && str_contains( $pd2, '</a></p></div></div><h2>Jó tudni</h2>' ), '… the gift vouchers as a card of their own, her words and the button inside („szebben feltüntetve”)' );

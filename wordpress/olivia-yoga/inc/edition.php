@@ -64,17 +64,48 @@ const OY_ONLINE_CLASS_PATHS = array(
 	'relaxacio-legzes' => 'relaxacio-es-legzes',
 );
 
+/**
+ * Olívia, 19 November: she renamed the class types and gave two of them addresses of her own („keresőbarát kifejezésekkel”).
+ * Inside, a class keeps its name (the timetable, the bookings and the booking plugin know it by that, and a missing name made
+ * the update put the old class in again: „nagyon sok duplikáció lett”). So an address she types in the editor becomes the
+ * class's public address (option oy_class_paths); every earlier address leads there.
+ */
+function oy_class_paths() {
+	$own = get_option( 'oy_class_paths', array() );
+	return array_merge( OY_ONLINE_CLASS_PATHS, is_array( $own ) ? array_filter( $own, 'is_string' ) : array() );
+}
+
+/** The class an address belongs to (its public address now, the theme's, or one it had before); '' when none. */
+function oy_class_key_for_path( $path ) {
+	$path = (string) $path;
+	$key  = array_search( $path, oy_class_paths(), true );
+	if ( false === $key ) {
+		$key = array_search( $path, OY_ONLINE_CLASS_PATHS, true );
+	}
+	if ( false === $key ) {
+		$old = get_option( 'oy_class_paths_old', array() );
+		foreach ( is_array( $old ) ? $old : array() as $k => $list ) {
+			if ( in_array( $path, (array) $list, true ) ) {
+				$key = $k;
+				break;
+			}
+		}
+	}
+	return false === $key ? '' : (string) $key;
+}
+
 add_filter( 'post_type_link', function ( $link, $post ) {
-	if ( 'oy_class' === $post->post_type && oy_online_only() && isset( OY_ONLINE_CLASS_PATHS[ $post->post_name ] ) ) {
-		$link = str_replace( '/' . $post->post_name . '/', '/' . OY_ONLINE_CLASS_PATHS[ $post->post_name ] . '/', $link );
+	$paths = oy_online_only() && 'oy_class' === $post->post_type ? oy_class_paths() : array();
+	if ( isset( $paths[ $post->post_name ] ) && $paths[ $post->post_name ] !== $post->post_name ) {
+		$link = str_replace( '/' . $post->post_name . '/', '/' . $paths[ $post->post_name ] . '/', $link );
 	}
 	return $link;
 }, 10, 2 );
 
 add_filter( 'request', function ( $vars ) {
 	if ( ! empty( $vars['oy_class'] ) && is_string( $vars['oy_class'] ) && oy_online_only() ) {
-		$key = array_search( $vars['oy_class'], OY_ONLINE_CLASS_PATHS, true );
-		if ( false !== $key ) {
+		$key = oy_class_key_for_path( $vars['oy_class'] );
+		if ( '' !== $key && $key !== $vars['oy_class'] ) {
 			$vars['oy_class'] = $key;
 			$vars['name']     = $key;
 		}
@@ -87,13 +118,47 @@ add_action( 'template_redirect', function () {
 		return;
 	}
 	$name = (string) get_post_field( 'post_name', get_queried_object_id() );
+	$want = oy_class_paths()[ $name ] ?? $name;
 	$path = (string) wp_parse_url( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_PATH );
-	if ( isset( OY_ONLINE_CLASS_PATHS[ $name ] ) && str_contains( $path, '/' . $name . '/' ) ) {
-		$query = (string) wp_parse_url( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_QUERY );
-		wp_safe_redirect( get_permalink() . ( '' !== $query ? '?' . $query : '' ), 301 );
-		exit;
+	if ( $want === $name || str_contains( $path, '/' . $want . '/' ) ) {
+		return;
+	}
+	$old   = get_option( 'oy_class_paths_old', array() );
+	$alias = array_merge( array( $name ), isset( OY_ONLINE_CLASS_PATHS[ $name ] ) ? array( OY_ONLINE_CLASS_PATHS[ $name ] ) : array(), (array) ( is_array( $old ) ? ( $old[ $name ] ?? array() ) : array() ) );
+	foreach ( $alias as $a ) {
+		if ( '' !== (string) $a && str_contains( $path, '/' . $a . '/' ) ) {
+			$query = (string) wp_parse_url( (string) ( $_SERVER['REQUEST_URI'] ?? '' ), PHP_URL_QUERY );
+			wp_safe_redirect( get_permalink() . ( '' !== $query ? '?' . $query : '' ), 301 );
+			exit;
+		}
 	}
 }, 1 );
+
+/** A class's address changed in the editor: the new one becomes its public address, the name inside stays. */
+add_filter( 'wp_insert_post_data', function ( $data, $postarr ) {
+	if ( 'oy_class' !== ( $data['post_type'] ?? '' ) || empty( $postarr['ID'] ) || ! empty( $GLOBALS['oy_class_rename_ok'] ) || ! oy_online_only() ) {
+		return $data;
+	}
+	$id  = (int) $postarr['ID'];
+	$old = (string) get_post_field( 'post_name', $id );
+	$new = (string) ( $data['post_name'] ?? '' );
+	if ( '' === $old || '' === $new || $old === $new || 'publish' !== get_post_status( $id ) ) {
+		return $data;
+	}
+	$paths = get_option( 'oy_class_paths', array() );
+	$paths = is_array( $paths ) ? $paths : array();
+	$now   = oy_class_paths()[ $old ] ?? $old;
+	if ( $now !== $new ) {
+		$hist         = get_option( 'oy_class_paths_old', array() );
+		$hist         = is_array( $hist ) ? $hist : array();
+		$hist[ $old ] = array_values( array_unique( array_merge( (array) ( $hist[ $old ] ?? array() ), array( $now ) ) ) );
+		update_option( 'oy_class_paths_old', $hist, false );
+	}
+	$paths[ $old ] = $new;
+	update_option( 'oy_class_paths', $paths, true );
+	$data['post_name'] = $old;
+	return $data;
+}, 99, 2 );
 
 // The journal posts of the online edition first had their English addresses (2026-11-12, first day live): the
 // Hungarian ones are better for search, the old ones redirect.

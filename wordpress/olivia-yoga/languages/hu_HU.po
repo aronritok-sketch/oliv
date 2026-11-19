@@ -1171,7 +1171,7 @@ msgid "Choose a class"
 msgstr "Válassz órát"
 
 msgid "Book from the timetable with a drop-in or a class pass."
-msgstr "Foglalj az órarendből alkalmi jeggyel vagy bérlettel."
+msgstr "Foglald le az időpontot alkalmi jeggyel vagy bérlettel."
 
 msgid "Get the link"
 msgstr "Megkapod a linket"
@@ -1991,3 +1991,12 @@ msgstr "Ha befizetted a csoportos órát, de nem tudsz ott lenni, ugyanúgy viss
 
 msgid "If you paid for the group class but cannot be there, you can still watch it again for %d days and join the conversation afterwards."
 msgstr "Ha befizetted a csoportos órát, de nem tudsz ott lenni, ugyanúgy visszanézheted %d napig, és utólag a közös beszélgetésbe is bekapcsolódhatsz."
+
+msgid "can be watched again for a week"
+msgstr "1 hétig visszanézhető"
+
+msgid "can be watched again for %d days"
+msgstr "%d napig visszanézhető"
+
+msgid "we can talk later in the class chat too"
+msgstr "később is kapcsolódhatunk a közös chatben"

@@ -387,7 +387,7 @@
 		"locations": [],
 		"services": {
 			"egyeni-joga": {
-				"label": "Egyéni online jóga",
+				"label": "Egyéni jóga",
 				"class": "egyeni-online-joga",
 				"duration": 60,
 				"duo": 1,
@@ -395,21 +395,21 @@
 				"durations": "60,90"
 			},
 			"prenatal": {
-				"label": "Online kismamatorna",
+				"label": "Privát kismamatorna",
 				"class": "kismamatorna",
 				"duration": 60,
 				"duo": 1,
 				"sort": 20
 			},
 			"stretching": {
-				"label": "Online stretching és mobilizáció",
+				"label": "Egyéni stretching és mobilizáció",
 				"class": "stretching",
 				"duration": 60,
 				"duo": 1,
 				"sort": 30
 			},
 			"relax": {
-				"label": "Relaxáció és légzés",
+				"label": "Privát relaxáció és légzés",
 				"class": "relaxacio-legzes",
 				"duration": 30,
 				"duo": 1,
@@ -624,7 +624,8 @@
 	},
 	"classes": {
 		"hatha-flow": {
-			"title": "Csoportos online flow jóga",
+			"title": "Csoportos flow jóga",
+			"title_prev": "Csoportos online flow jóga",
 			"excerpt": "Szerdánként 18:30-tól 20:00-ig, élőben: légzés vezette flow, erősítés, nyújtás, egyensúly és relaxáció, egy kis jógafilozófiával fűszerezve.",
 			"_excerpt_prev": "Szerdánként 18:30-tól 20:00-ig, élőben: légzés vezette flow, erősítés, nyújtás, egyensúly és relaxáció. Kezdőket is szeretettel várok.",
 			"duration": "90 perc",
@@ -682,7 +683,8 @@
 			"_kit": "<h2>Mire lesz szükséged?</h2>\n<ul class=\"oj-kit\">\n<li><b>Jógaszőnyeg</b><span>ez mindenképp kell</span></li>\n<li><b>Kényelmes ruha</b><span>mezítláb gyakorlunk</span></li>\n<li><b>Víz</b><span>ha megszomjaznál</span></li>\n<li><b>Pléd és párna</b><span>a relaxációhoz</span></li>\n<li><b>Jógaheveder</b><span>ha nincs, egy nagyobb, vékony törölköző is jó</span></li>\n<li><b>Jógatégla</b><span>nem kötelező, egy könyv is pótolja</span></li>\n</ul>\n<p class=\"oj-kit-device\">Kell még egy kamerás telefon, tablet vagy laptop is. Becsatlakozás előtt töltsd fel, vagy tedd töltőre, hogy ne merüljön le óra közben.</p>"
 		},
 		"egyeni-online-joga": {
-			"title": "Egyéni online jóga",
+			"title": "Egyéni jóga",
+			"title_prev": "Egyéni online jóga",
 			"excerpt": "Négyszemközti, 60 vagy 90 perces online jógaóra arra fókuszálva, amire neked szükséged van: fáj a hátad vagy a derekad, kezdőként tanulnál, gyorsabban fejlődnél vagy a stresszből keresel kiutat. Kezdőket is szeretettel várok.",
 			"_excerpt_prev": "Négyszemközti, 60 vagy 90 perces online jógaóra arra fókuszálva, amire neked szükséged van: fáj a hátad vagy a derekad, kezdőként tanulnál, vagy a stresszből keresel kiutat.",
 			"duration": "60 vagy 90 perc",
@@ -756,7 +758,8 @@
 			"_kit": "<h2>Mire lesz szükséged?</h2>\n<ul class=\"oj-kit\">\n<li><b>Jógaszőnyeg</b><span>ez mindenképp kell</span></li>\n<li><b>Kényelmes ruha</b><span>mezítláb gyakorlunk</span></li>\n<li><b>Víz</b><span>ha megszomjaznál</span></li>\n<li><b>Pléd és párna</b><span>a relaxációhoz</span></li>\n<li><b>Jógaheveder</b><span>ha nincs, egy nagyobb, vékony törölköző is jó</span></li>\n<li><b>Jógatégla</b><span>nem kötelező, egy könyv is pótolja</span></li>\n</ul>\n<p class=\"oj-kit-device\">Kell még egy kamerás telefon, tablet vagy laptop is. Becsatlakozás előtt töltsd fel, vagy tedd töltőre, hogy ne merüljön le óra közben.</p>"
 		},
 		"kismamatorna": {
-			"title": "Online kismamatorna",
+			"title": "Privát kismamatorna",
+			"title_prev": "Online kismamatorna",
 			"excerpt": "Egyéni, 60 perces online kismama torna, akár a barátnőddel: légzőtorna, gátizomtorna, keringésjavítás, kardiótréning, izomerősítés és súlyzós edzés, gerinctréning, mobilizáció és stretching, jóga és relaxáció kombinációja a trimeszteredhez és az aznapi állapotodhoz igazítva.",
 			"_excerpt_prev": "Egyéni, 60 perces online kismama torna, akár a barátnőddel: légzőtorna, gátizomtorna, keringésjavítás, kardiótréning, izomerősítés és súlyzós edzés, gerinctréning, mobilizáció és stretching, jóga és relaxáció, ezek kombinációja a trimeszteredhez és az aznapi állapotodhoz igazítva.",
 			"duration": "60 perc",
@@ -786,7 +789,8 @@
 			]
 		},
 		"stretching": {
-			"title": "Online stretching és mobilizáció",
+			"title": "Egyéni stretching és mobilizáció",
+			"title_prev": "Online stretching és mobilizáció",
 			"excerpt": "Egyéni, 60 perces online dinamikus nyújtás és mobilizáció: nyújtó gyakorlatok és mobility edzés a merev csípőnek, vállnak és gerincnek, a te tempódban.",
 			"_excerpt_prev": "Egyéni, 60 perces online nyújtás és mobilizáció: nyújtó gyakorlatok és mobility edzés a merev csípőnek, vállnak és gerincnek, a te tempódban.",
 			"duration": "60 perc",
@@ -816,7 +820,8 @@
 			"_kit": "<h2>Mire lesz szükséged?</h2>\n<ul class=\"oj-kit\">\n<li><b>Jóga- vagy edzőszőnyeg</b><span>ez mindenképp kell</span></li>\n<li><b>Jógaheveder</b><span>ha nincs, egy nagyobb, vékony törölköző is jó</span></li>\n<li><b>Víz</b><span>ha megszomjaznál</span></li>\n<li><b>Kényelmes ruha</b><span>amiben szabadon mozogsz</span></li>\n<li><b>Jógatégla</b><span>ha van; egy könyv is pótolja</span></li>\n</ul>\n<p class=\"oj-kit-device\">Kell még egy kamerás telefon, tablet vagy laptop is. Becsatlakozás előtt töltsd fel, vagy tedd töltőre, hogy ne merüljön le óra közben.</p>"
 		},
 		"relaxacio-legzes": {
-			"title": "Relaxáció és légzés",
+			"title": "Privát relaxáció és légzés",
+			"title_prev": "Relaxáció és légzés",
 			"excerpt": "Egyéni, 30 perces online óra a túlpörgött idegrendszernek: légzőgyakorlatok és vezetett relaxáció, akár egy hosszú nap végén.",
 			"_excerpt_prev": "Egyéni, 30 perces online óra a túlpörgött idegrendszernek: légzőgyakorlatok, kíméletes nyújtás és vezetett relaxáció, akár egy hosszú nap végén.",
 			"duration": "30 perc",

@@ -1733,6 +1733,35 @@
   - Tesztek: 1704/0 (a 3.12.7 előtt 1702/0, háromszor egymás után). Helyben telefonnézetben próbálva (kártyák, csak a választott ár, 6 lépés,
     nincs vízszintes görgetés).
 
+- **2026-11-19 – Átnevezett óratípusok: a duplikátumok eltűnnek, az ő nevei és webcímei maradnak (oliviajoga.online 3.12.9).**
+  Olívia, 9148967–9148972 (11:58–12:12 magyar idő szerint).
+  - **Mi történt:**
+    - 10:44 körül átnevezte az öt óratípust: Csoportos flow jóga, Egyéni jóga, Privát kismamatorna, Egyéni stretching és
+      mobilizáció, Privát relaxáció és légzés („az online nem kellett bele, mert a főmenüben úgy nyílik le, hogy online
+      órák”).
+    - Kettőnek a webcímét is átírta: `hatha-flow` → `hatha-flow-joga-online`, `stretching` → `stretching-mobility`.
+    - Belül azonban ez a név a kulcs: az órarend, a foglalások és a bővítmény ezen ismeri az órát.
+    - A 3.12.6-os frissítés (`oy_import_all`) ezért hiányzónak látta ezt a kettőt, és újra létrehozta őket a régi
+      címekkel. Így lett 7 kártya.
+  - **Javítás, egyszer fut (`oy_migrate_classes_1119c` → `oy_class_copies_fix`):**
+    - a két másolat törlődik;
+    - az ő órái (címük, szövegük, képeik) visszakapják a belső nevüket;
+    - az általa adott webcím lesz a nyilvános cím (`oy_class_paths` opció);
+    - a régi címek (`csoportos-online-flow-joga`, `online-stretching-es-mobilizacio`, a belső név) 301-gyel átirányítanak.
+    - Az egyéni óra szolgáltatásai (kérőűrlap, árak) felveszik az új óraneveket, ha még a régit viselték
+      (`oy_class_service_names`, a tartalomfájl `title_prev` mezője alapján).
+  - **Hogy ne forduljon elő újra:**
+    - ha egy óratípus webcímét a szerkesztőben átírja, az új cím lesz a nyilvános, a belső név marad
+      (`wp_insert_post_data` szűrő). A korábbi címek mind átirányítanak (`oy_class_paths_old`).
+    - Az import a nyilvános cím alapján is megtalálja az órát (`oy_import_target`).
+  - **A tartalomfájlban is az ő nevei vannak** (óratípusok és egyéni szolgáltatások).
+  - **Főoldal, „Így működik” 1. lépés:** „Foglald le az időpontot alkalmi jeggyel vagy bérlettel.”
+  - **Bejelentkezés és árak, a csoportos óra dobozában:**
+    - kikerült „A csoportos gyakorlás alatt részed lesz …” mondat („ez a mondat nem is kell ide”);
+    - két új piktogram: „1 hétig visszanézhető” és „később is kapcsolódhatunk a közös chatben”.
+  - Tesztek: 1719/0. Helyben lejátszva az élő helyzet (átnevezés + régi frissítés → 7 óra), a javítás után 5 óra, a
+    címek és átirányítások jók, egy újabb frissítés nem hoz létre semmit.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
