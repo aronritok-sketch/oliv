@@ -115,6 +115,16 @@ class OYS_Settings {
 		return $all[ $key ] ?? null;
 	}
 
+	/**
+	 * The cancellation rule as guests read it (booking form, account, private request, emails). A theme can add to it
+	 * (filter oys_cancel_policy): Olívia, 19 November – „Mindenhova … írjuk oda a lemondáshoz”, that a paid but missed
+	 * group class can still be watched again.
+	 */
+	public static function cancel_policy() {
+		$text = trim( (string) self::get( 'cancel_policy' ) );
+		return '' === $text ? '' : trim( (string) apply_filters( 'oys_cancel_policy', $text ) );
+	}
+
 	public static function update( array $values ) {
 		update_option( self::OPTION, array_merge( self::all(), $values ) );
 	}

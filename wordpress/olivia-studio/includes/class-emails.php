@@ -276,7 +276,7 @@ class OYS_Emails {
 	}
 
 	private static function policy_html() {
-		return '<p style="font-size:14px;color:#53635A">' . esc_html( OYS_Settings::get( 'cancel_policy' ) ) . '</p>';
+		return '<p style="font-size:14px;color:#53635A">' . esc_html( OYS_Settings::cancel_policy() ) . '</p>';
 	}
 
 	/**

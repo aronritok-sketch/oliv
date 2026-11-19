@@ -1706,6 +1706,29 @@
     meghívó a társnak. Amíg Áron nem dönt, nem épül.
   - Tesztek: 1686/0. Helyben telefonnézetben próbálva (naptár, lemondás, menü, nincs vízszintes görgetés).
 
+- **2026-11-19 – Olívia további kérései aznap délelőtt (oliviajoga.online 3.12.7, olivia-studio 1.24.2).**
+  Portálüzenetek 9148960–9148966, képernyőképekkel.
+  - **„Mire jelentkezel?” (egyéni óra kérése, „itt ez lehetne picit szebb?”):** a lenyíló helyett koppintható kártyák
+    (egy-egy óra), a kiválasztott sötétzöld, sárga pipával. Alatta csak a kiválasztott óra árai látszanak, az időtartam
+    és a létszám is ehhez igazodik. JavaScript nélkül minden ár látszik, és ugyanúgy működik.
+  - **Órák oldal, „Melyik órát válasszam?”:** a csoportos flow jóga dobozából kikerült a „Kezdőket is szeretettel
+    várok.” (máshol marad, ott nem kérte).
+  - **„Hogyan zajlik egy élő online óra?”:**
+    - új 5. lépés a „Pár perccel a kezdés előtt lépj be…” után: „Az egyéni óra mindig egy rövid felméréssel,
+      beszélgetéssel kezdődik.” (Olívia szavaival, kicsit simítva);
+    - a felvétel-doboz első sora: „A csoportos óráról felvétel készül, amit egy hétig visszanézhetsz, de azon csak én
+      látszom és hallatszom.”, a második: „Az óra chatje az óra után is megmarad: …”.
+    - Élesen egyszer futó migráció (`oy_migrate_classes_1119`). Olívia szerkesztőben átírt bekezdései ugyanígy
+      változnak és az övéi maradnak (`oy_1117_apply`; a mentett nem törő szóközöket is kezeli).
+  - **Lemondás a foglalási bővítmény saját helyein is:** foglalási űrlap, fiók, egyéni óra kérése, e-mailek.
+    - A „Ha befizetted a csoportos órát, … visszanézheted egy hétig …” mondat az egyéni órás rész elé kerül.
+    - Ehhez a bővítményben `OYS_Settings::cancel_policy()` és az `oys_cancel_policy` szűrő kell, amire a téma ráköt.
+  - **Távoli állapotlekérés javítása (`OYS_Ops::header_try`):** egy puszta alkalmazásjelszó kb. tizenötből egyszer
+    base64-ként „valami:valami”-nak olvasódott, és ilyenkor nem engedett be. Ha így nem megy, most magában, jelszóként is
+    kipróbálja. Ezt egy véletlenszerűen elbukó teszt hozta elő; az új teszt mindig ilyen jelszóval próbál.
+  - Tesztek: 1702/0, háromszor egymás után. Helyben telefonnézetben próbálva (kártyák, csak a választott ár, 6 lépés,
+    nincs vízszintes görgetés).
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

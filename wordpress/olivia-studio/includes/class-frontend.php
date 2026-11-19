@@ -908,7 +908,7 @@ class OYS_Frontend {
 			$out .= '<p class="oys-notice">' . esc_html__( 'Online payment is being set up. To book now, send a message and I\'ll hold your spot.', 'olivia-studio' ) . '</p>';
 		}
 		$out .= self::waiver_field()
-			. '<p class="oys-policy">' . esc_html( OYS_Settings::get( 'cancel_policy' ) ) . '</p>'
+			. '<p class="oys-policy">' . esc_html( OYS_Settings::cancel_policy() ) . '</p>'
 			. '<button class="btn btn--primary oys-submit" type="submit">' . esc_html__( 'Continue', 'olivia-studio' ) . '</button>'
 			. self::terms_note()
 			. '<p class="oys-secure">' . esc_html__( 'Card payments are processed securely by Stripe. Apple Pay and Google Pay are accepted.', 'olivia-studio' ) . '</p></form>' . self::party_script();
@@ -1448,7 +1448,7 @@ class OYS_Frontend {
 			}
 			$out .= '</ul>';
 		}
-		$out .= '<p class="oys-policy">' . esc_html( OYS_Settings::get( 'cancel_policy' ) ) . '</p>';
+		$out .= '<p class="oys-policy">' . esc_html( OYS_Settings::cancel_policy() ) . '</p>';
 		return $out;
 	}
 
@@ -1668,7 +1668,9 @@ class OYS_Frontend {
 			$opt  = '';
 			foreach ( $topics as $k => $v ) {
 				$lens = isset( $offered[ $k ] ) ? OYS_Services::lengths( $k ) : array();
-				$opt .= '<option value="' . esc_attr( $k ) . '"' . selected( $want, $k, false ) . ' data-lengths="' . esc_attr( implode( ',', $lens ) ) . '" data-duo="' . ( ! empty( $offered[ $k ]['duo'] ) ? 1 : 0 ) . '">' . esc_html( $v ) . '</option>';
+				// Olívia, 19 November, on the drop-down: „itt ez lehetne picit szebb?” – one card per class to tap instead of a
+				// select; the chosen one is dark with a tick
+				$opt .= '<label class="oys-topic"><input type="radio" name="topic" value="' . esc_attr( $k ) . '"' . checked( $want, $k, false ) . ' data-lengths="' . esc_attr( implode( ',', $lens ) ) . '" data-duo="' . ( ! empty( $offered[ $k ]['duo'] ) ? 1 : 0 ) . '"><span>' . esc_html( $v ) . '</span></label>';
 			}
 			// every length on a line of its own, then the 5-session passes (Olívia, 14 November: „frissítsd az árakat, nézd
 			// át újra, pl. az egyéni jógánál nincs ott a 90 perc” – it was there, lost in one long line); two people are
@@ -1695,9 +1697,10 @@ class OYS_Frontend {
 				if ( $packs ) {
 					$rows[] = esc_html( __( '5-session pass:', 'olivia-studio' ) ) . ' ' . implode( ', ', $packs );
 				}
-				$info .= '<li><b>' . esc_html( OYS_Services::label( $k ) ) . '</b><ul>' . implode( '', array_map( fn( $r ) => '<li>' . $r . '</li>', $rows ) ) . '</ul></li>';
+				$info .= '<li data-topic="' . esc_attr( $k ) . '"><b>' . esc_html( OYS_Services::label( $k ) ) . '</b><ul>' . implode( '', array_map( fn( $r ) => '<li>' . $r . '</li>', $rows ) ) . '</ul></li>';
 			}
-			$topic = '<label class="field"><span>' . esc_html__( 'What would you like?', 'olivia-studio' ) . '</span><select name="topic" id="oys-pr-topic">' . $opt . '</select></label>'
+			// under the cards only the prices of the chosen class (oys.js; all of them without JavaScript)
+			$topic = '<fieldset class="oys-topics" id="oys-pr-topic"><legend>' . esc_html__( 'What would you like?', 'olivia-studio' ) . '</legend><div class="oys-topics__list">' . $opt . '</div></fieldset>'
 				. '<ul class="oys-small oys-pr-services">' . $info . '</ul>';
 		}
 		$length = $plain ? '<label class="field"><span>' . esc_html__( 'Length', 'olivia-studio' ) . ( $offered ? ' (' . esc_html__( 'private yoga', 'olivia-studio' ) . ')' : '' ) . '</span><select name="duration_min" id="oys-pr-duration">' . $dur . '</select></label>' : '';
@@ -1724,7 +1727,7 @@ class OYS_Frontend {
 			. '<label class="field"><span>' . esc_html__( 'Address or area', 'olivia-studio' ) . '</span><input type="text" name="address" id="oys-pr-address" placeholder="' . esc_attr__( 'e.g. McGregor Blvd, Fort Myers Beach', 'olivia-studio' ) . '"></label></div>' )
 			. '<label class="field"><span>' . esc_html__( 'Days and times that suit you', 'olivia-studio' ) . '</span><textarea name="preferred" id="oys-pr-preferred" rows="3" required placeholder="' . esc_attr( $online_only ? __( 'e.g. weekday evenings after 6, or Saturday afternoon', 'olivia-studio' ) : __( 'e.g. Tuesday or Thursday mornings, or Saturday at sunrise', 'olivia-studio' ) ) . '"></textarea></label>'
 			. '<label class="field"><span>' . esc_html__( 'Anything I should know? (goals, injuries, experience)', 'olivia-studio' ) . '</span><textarea name="notes" id="oys-pr-notes" rows="4"></textarea></label>'
-			. ( trim( (string) OYS_Settings::get( 'cancel_policy' ) ) ? '<p class="oys-policy">' . esc_html( OYS_Settings::get( 'cancel_policy' ) ) . '</p>' : '' ) // the rule before asking, too (Olívia, 14 November)
+			. ( OYS_Settings::cancel_policy() ? '<p class="oys-policy">' . esc_html( OYS_Settings::cancel_policy() ) . '</p>' : '' ) // the rule before asking, too (Olívia, 14 November)
 			. '<button class="btn btn--primary" type="submit">' . esc_html__( 'Send request', 'olivia-studio' ) . '</button>'
 			. '<p class="oys-small">' . esc_html__( 'Nothing is charged now. You\'ll get a suggested time and price to confirm.', 'olivia-studio' ) . '</p></form>';
 	}

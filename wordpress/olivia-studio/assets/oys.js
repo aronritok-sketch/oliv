@@ -27,12 +27,16 @@
 		show();
 	});
 	document.querySelectorAll('form[data-oys-private]').forEach(function (form) {
-		var topic = form.querySelector('select[name="topic"]');
+		var topics = form.querySelectorAll('input[name="topic"]');
 		var length = form.querySelector('[data-oys-length]');
 		var people = form.querySelector('[data-oys-people]');
-		if (!topic) return;
+		var prices = form.querySelectorAll('.oys-pr-services > li[data-topic]');
+		if (!topics.length) return;
 		function sync() {
-			var o = topic.options[topic.selectedIndex];
+			var o = form.querySelector('input[name="topic"]:checked') || topics[0];
+			// only the chosen class's prices under the cards (Olívia, 19 November)
+			var has = Array.prototype.some.call(prices, function (li) { return li.getAttribute('data-topic') === o.value; });
+			Array.prototype.forEach.call(prices, function (li) { li.hidden = has && li.getAttribute('data-topic') !== o.value; });
 			var lens = (o && o.getAttribute('data-lengths') || '').split(',').filter(Boolean);
 			if (length) {
 				length.hidden = lens.length < 2;
@@ -45,7 +49,7 @@
 				if (people.hidden) people.querySelector('input').value = 1;
 			}
 		}
-		topic.addEventListener('change', sync);
+		Array.prototype.forEach.call(topics, function (t) { t.addEventListener('change', sync); });
 		sync();
 	});
 

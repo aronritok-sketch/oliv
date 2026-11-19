@@ -673,6 +673,51 @@ function oy_migrate_noshow_1119() {
 	return $done ? array( 'the cancellation FAQ: a paid but missed group class can still be watched' ) : array();
 }
 
+/**
+ * Olívia, 19 November (chat), on the classes page: „innen a kezdőket is szeretettel várok mondatot szedjük ki” (the group
+ * class box of „Melyik órát válasszam?”); „itt még a lépések között legyen, hogy egyéni óra esetén minden óra egy rövid
+ * felméréssel, beszélgetéssel kezdődik. Alatta pedig az első mondat után legyen, hogy felvétel készül, amit 1 hétig
+ * visszanézhetsz, de azon.. Második mondat pedig: »Az óra chatje az óra után is megmarad..«”. Her own versions in the page
+ * editor get the same change (oy_1117_apply).
+ */
+const OY_1119_ASSESS = 'Az egyéni óra mindig egy rövid felméréssel, beszélgetéssel kezdődik.';
+
+function oy_1119_pairs() {
+	$rec  = array( 'felvétel készül, de azon csak én látszom', 'felvétel készül, amit egy hétig visszanézhetsz, de azon csak én látszom' );
+	$chat = array( 'Egy hétig visszanézheted, az óra chatje pedig az óra után is megmarad', 'Az óra chatje az óra után is megmarad' );
+	return array(
+		'content' => array(
+			array( 'együtt a többiekkel. Kezdőket is szeretettel várok.</span>', 'együtt a többiekkel.</span>' ),
+			array( 'beállítsuk a kamerát. Ha bekapcsolod a kamerádat', 'beállítsuk a kamerát. ' . OY_1119_ASSESS . ' Ha bekapcsolod a kamerádat' ),
+			$rec,
+			$chat,
+		),
+		'edit'    => array(
+			array( 'beállítsuk a kamerát. Ha bekapcsolod a kamerádat', 'beállítsuk a kamerát. ' . OY_1119_ASSESS . ' Ha bekapcsolod a kamerádat' ),
+			array( 'beállítsuk a kamerát.<br>Ha bekapcsolod a kamerádat', 'beállítsuk a kamerát.<br>' . OY_1119_ASSESS . '<br>Ha bekapcsolod a kamerádat' ),
+			$rec,
+			$chat,
+		),
+	);
+}
+
+function oy_migrate_classes_1119() {
+	$rev = '2026-11-19';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_classes_1119_rev' ) === $rev ) {
+		return array();
+	}
+	update_option( 'oy_classes_1119_rev', $rev );
+	$post = get_page_by_path( oy_page_slug( OY_PAGE_SLUGS['classes'] ?? 'classes' ) );
+	if ( ! $post ) {
+		return array();
+	}
+	$before = $post->post_content;
+	$moved  = oy_1117_apply( $post, oy_1119_pairs() );
+	return $before !== get_post( $post->ID )->post_content || $moved
+		? array( 'classes page: Olívia, 19 November' . ( $moved ? ' (' . $moved . ' of her own texts kept)' : '' ) )
+		: array();
+}
+
 function oy_migrate_1113() {
 	// b: + ÁSZF, Impresszum, the privacy notice with Arovia as the controller
 	// c: her 20:17 notes – „Olívia” with a long í, the prenatal modules and why each one matters, the yogic-life sentence
@@ -1794,6 +1839,12 @@ function oy_1117_swap( array $pairs, $s ) {
 
 /** The same change on her own text: on her lines (line breaks) the tuning in goes on a line of its own. */
 function oy_1117_edit( $v, array $pairs ) {
+	// her text may keep the page's non-breaking spaces (the editor saves what the page showed): plain ones, so the change
+	// finds its words; the page puts them back when it is shown
+	$plain = str_replace( array( '&nbsp;', '&#160;', "\xC2\xA0" ), ' ', (string) $v );
+	if ( oy_1117_swap( $pairs, $plain ) !== $plain ) {
+		$v = $plain;
+	}
 	foreach ( $pairs as $p ) {
 		$to = $p[1];
 		if ( str_starts_with( $to, OY_1117_TUNE . ' ' ) && preg_match( '#<br\s*/?>#', $v ) ) {

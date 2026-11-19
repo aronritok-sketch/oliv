@@ -1128,6 +1128,8 @@ test( 'one-to-one in two lengths (60 / 90 minutes): own credits, own cards, the 
 			return $out;
 		} );
 		ok( str_contains( $form, 'data-lengths="60,90"' ) && str_contains( $form, 'id="oys-pr-length"' ) && str_contains( $form, '<option value="90" selected' ), 'the request form asks for the length, 90 minutes chosen' );
+		ok( str_contains( $form, '<fieldset class="oys-topics" id="oys-pr-topic"><legend>What would you like?</legend>' ) && str_contains( $form, '<label class="oys-topic"><input type="radio" name="topic" value="yoga1" checked=\'checked\' data-lengths="60,90" data-duo="0"><span>One-to-one yoga</span></label>' ) && str_contains( $form, 'value="pn" data-lengths="60" data-duo="1">' ) && ! str_contains( $form, '<select name="topic"' ), 'the class to ask for: cards to tap, the chosen one marked (Olívia, 19 Nov: „itt ez lehetne picit szebb?”)' );
+		ok( str_contains( $form, '<li data-topic="yoga1"><b>One-to-one yoga</b>' ) && str_contains( $form, '<li data-topic="pn"><b>Prenatal</b>' ), '… each class\'s prices marked, so only the chosen one\'s show under the cards' );
 	} finally {
 		update_option( OYS_Products::OPTION, $products );
 		false === $services ? delete_option( OYS_Services::OPTION ) : update_option( OYS_Services::OPTION, $services );
@@ -1171,6 +1173,80 @@ test( 'Olívia 19 Nov: the calendar shows only the day she taps, opens like on t
 	ok( $nl && ! $nl2 && str_contains( $fc, 'előtte lemondhatod. If you paid for the group class but cannot be there, you can still watch it again for a week and join the conversation afterwards. Az egyéni órát' ), 'the FAQ answer gets the sentence before the one-to-one rule, once' );
 	$po = (string) file_get_contents( get_template_directory() . '/languages/hu_HU.po' );
 	ok( str_contains( $po, 'msgstr "Ha befizetted a csoportos órát, de nem tudsz ott lenni, ugyanúgy visszanézheted egy hétig, és utólag a közös beszélgetésbe is bekapcsolódhatsz."' ), 'in Hungarian: „Ha befizetted a csoportos órát, de nem tudsz ott lenni, ugyanúgy visszanézheted egy hétig …”' );
+} );
+
+test( 'Olívia 19 Nov (chat, later): the class cards of the request form, the missed-class sentence by the booking plugin\'s cancellation rule too, the classes page (no „Kezdőket is…” in the group box, the one-to-one start among the steps, the recording lines)', function () {
+	$css = (string) file_get_contents( OYS_DIR . 'assets/oys.css' );
+	$js  = (string) file_get_contents( OYS_DIR . 'assets/oys.js' );
+	ok( str_contains( $css, '.oys-topic input:checked + span { background: var(--oys-ink); color: #fff; }' ) && str_contains( $css, '.oys-topic input:focus-visible + span' ) && str_contains( $css, '.oys-pr-services > li[hidden] { display: none; }' ), 'request form: the chosen card dark with a tick, a focus ring, the other prices hidden' );
+	ok( str_contains( $js, "form.querySelector('input[name=\"topic\"]:checked')" ) && str_contains( $js, "li.hidden = has && li.getAttribute('data-topic') !== o.value;" ), '… the length, the people and the prices follow the tapped card' );
+	// the plugin's own places (booking form, account, private request, emails) say it as well, before the one-to-one rule
+	$keep = OYS_Settings::get( 'cancel_policy' );
+	try {
+		OYS_Settings::update( array( 'cancel_policy' => 'A csoportos órát 12 órával előtte lemondhatod. A később lemondott óra elhasználódik. Az egyéni órát 24 órával előtte lehet áttenni.' ) );
+		update_option( 'oy_edition', 'hu-online' );
+		$hu = OYS_Settings::cancel_policy();
+		update_option( 'oy_edition', 'fort-myers' );
+		$en = OYS_Settings::cancel_policy();
+		OYS_Settings::update( array( 'cancel_policy' => 'A csoportos órát 12 órával előtte lemondhatod, és a felvételt egy hétig visszanézheted. Az egyéni órát 24 órával előtte lehet áttenni.' ) );
+		update_option( 'oy_edition', 'hu-online' );
+		$said = OYS_Settings::cancel_policy();
+		OYS_Settings::update( array( 'cancel_policy' => '' ) );
+		$none = OYS_Settings::cancel_policy();
+	} finally {
+		OYS_Settings::update( array( 'cancel_policy' => $keep ) );
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+	eq( 'A csoportos órát 12 órával előtte lemondhatod. A később lemondott óra elhasználódik. If you paid for the group class but cannot be there, you can still watch it again for a week and join the conversation afterwards. Az egyéni órát 24 órával előtte lehet áttenni.', $hu, 'the booking plugin\'s cancellation rule: the missed-class sentence after the group part (Olívia: „Mindenhova, az egész oldalon”)' );
+	ok( ! str_contains( $en, 'watch it again' ) && ! str_contains( $said, 'If you paid' ) && '' === $none, '… not on the other sites, not twice, nothing when there is no rule' );
+	$src = (string) file_get_contents( OYS_DIR . 'includes/class-frontend.php' ) . (string) file_get_contents( OYS_DIR . 'includes/class-emails.php' );
+	ok( 0 === substr_count( $src, "esc_html( OYS_Settings::get( 'cancel_policy' ) )" ) && 4 === substr_count( $src, 'esc_html( OYS_Settings::cancel_policy() )' ), '… on the booking form, the account, the request form and in the emails' );
+	// the content file
+	require_once get_template_directory() . '/inc/demo-import.php';
+	$data = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content-hu-online.json' ), true );
+	$cl   = $data['pages']['classes']['content'];
+	ok( str_contains( $cl, 'egyensúly és relaxáció, együtt a többiekkel.</span>' ) && ! str_contains( $cl, 'Kezdőket' ) && ! str_contains( $data['pages']['classes']['_replace'][2][1], 'Kezdőket' ), 'classes page, „Melyik órát válasszam?”: no „Kezdőket is szeretettel várok.” in the group class box' );
+	$flow = oy_flows( $cl );
+	preg_match_all( '#<li><span class="oj-flow__n" aria-hidden="true">(\d)</span><p>((?:(?!</p>).)*)#u', $flow, $st );
+	ok( 6 === count( $st[0] ) && str_starts_with( $st[2][3], 'Pár perccel a kezdés előtt' ) && OY_1119_ASSESS === $st[2][4] && str_starts_with( $st[2][5], 'Ha bekapcsolod a kamerádat' ), '„Hogyan zajlik egy élő online óra?”: 5. the one-to-one class starts with a short assessment and a talk, after arriving' );
+	ok( str_contains( $cl, '<p>A csoportos óráról felvétel készül, amit egy hétig visszanézhetsz, de azon csak én látszom és hallatszom. Az óra chatje az óra után is megmarad: ott tovább beszélgethetünk' ), '… under it: „felvétel készül, amit egy hétig visszanézhetsz, de azon…”, then „Az óra chatje az óra után is megmarad…”' );
+	// the live site: the page's text changes, her own version of a paragraph (if she has one) follows it, once
+	update_option( 'oy_edition', 'hu-online' );
+	$steps = 'Lefoglalod az órát. Pár perccel a kezdés előtt lépj be, hogy köszönhessünk egymásnak, és ha kell, beállítsuk a kamerát. Ha bekapcsolod a kamerádat, látlak, és jobban tudlak korrigálni és segíteni.';
+	$rec   = 'A csoportos óráról felvétel készül, de azon csak én látszom és hallatszom. Egy hétig visszanézheted, az óra chatje pedig az óra után is megmarad: ott tovább beszélgethetünk.';
+	$hers  = 'Lefoglalod az órát.<br>Pár perccel előtte lépj be, és ha&nbsp;kell, beállítsuk a&nbsp;kamerát.<br>Ha bekapcsolod a kamerádat, látlak.';
+	$hrec  = 'A csoportos óráról felvétel készül, de&nbsp;azon csak én látszom és hallatszom.<br>Egy&nbsp;hétig visszanézheted, az óra chatje pedig az&nbsp;óra után is megmarad: ott tovább beszélgethetünk.';
+	$box   = '<div class="oj-guide"><a class="oj-guide__box"><span class="oj-guide__text">Szerdánként, élőben: relaxáció, együtt a többiekkel. Kezdőket is szeretettel várok.</span></a></div>';
+	$post  = get_page_by_path( oy_page_slug( OY_PAGE_SLUGS['classes'] ) );
+	$id    = $post ? $post->ID : wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Online órák', 'post_name' => oy_page_slug( OY_PAGE_SLUGS['classes'] ) ) );
+	$was   = $post ? $post->post_content : null;
+	$e0    = get_option( 'oye_edits' );
+	$m0    = get_option( 'oye_edits_meta' );
+	$r0    = get_option( 'oy_classes_1119_rev' );
+	try {
+		wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => "$box\n<h2>Hogyan zajlik egy élő online óra?</h2>\n<p>$steps</p>\n<p>$rec</p>" ) ) );
+		update_option( 'oye_edits', array( 't' => array( oye_text_key( $steps ) => $hers, oye_text_key( $rec ) => $hrec ), 'i' => array() ) );
+		update_option( 'oye_edits_meta', array( oye_text_key( $steps ) => array( 'def' => $steps, 'user' => 'Olívia' ), oye_text_key( $rec ) => array( 'def' => $rec, 'user' => 'Olívia' ) ) );
+		delete_option( 'oy_classes_1119_rev' );
+		$log = oy_migrate_classes_1119();
+		$c   = get_post_field( 'post_content', $id );
+		$ed  = oye_edits()['t'];
+		$k   = oye_text_key( str_replace( 'kamerát. Ha', 'kamerát. ' . OY_1119_ASSESS . ' Ha', $steps ) );
+		ok( $log && str_contains( $c, 'együtt a többiekkel.</span>' ) && ! str_contains( $c, 'Kezdőket' ) && str_contains( $c, 'beállítsuk a kamerát. ' . OY_1119_ASSESS . ' Ha bekapcsolod' ) && str_contains( $c, '<p>A csoportos óráról felvétel készül, amit egy hétig visszanézhetsz, de azon csak én látszom és hallatszom. Az óra chatje az óra után is megmarad: ott tovább beszélgethetünk.</p>' ), 'live update: the classes page\'s own text changes' );
+		$kr  = oye_text_key( 'A csoportos óráról felvétel készül, amit egy hétig visszanézhetsz, de azon csak én látszom és hallatszom. Az óra chatje az óra után is megmarad: ott tovább beszélgethetünk.' );
+		ok( 2 === count( $ed ) && ( $ed[ $k ] ?? '' ) === 'Lefoglalod az órát.<br>Pár perccel előtte lépj be, és ha kell, beállítsuk a kamerát.<br>' . OY_1119_ASSESS . '<br>Ha bekapcsolod a kamerádat, látlak.', '… her own version of the steps keeps her words and gets the new step on a line of its own' );
+		eq( 'A csoportos óráról felvétel készül, amit egy hétig visszanézhetsz, de azon csak én látszom és hallatszom.<br>Az óra chatje az óra után is megmarad: ott tovább beszélgethetünk.', $ed[ $kr ] ?? '', '… and her two recording lines (saved with the page\'s non-breaking spaces) read the new way, still two lines' );
+		$n = count( $ed );
+		ok( array() === oy_migrate_classes_1119() && get_post_field( 'post_content', $id ) === $c && count( oye_edits()['t'] ) === $n, 'once only' );
+	} finally {
+		null === $was ? wp_delete_post( $id, true ) : wp_update_post( wp_slash( array( 'ID' => $id, 'post_content' => $was ) ) );
+		false === $e0 ? delete_option( 'oye_edits' ) : update_option( 'oye_edits', $e0 );
+		false === $m0 ? delete_option( 'oye_edits_meta' ) : update_option( 'oye_edits_meta', $m0 );
+		false === $r0 ? delete_option( 'oy_classes_1119_rev' ) : update_option( 'oy_classes_1119_rev', $r0 );
+		update_option( 'oy_edition', 'fort-myers' );
+	}
+	update_option( 'oy_edition', 'fort-myers' );
+	ok( array() === oy_migrate_classes_1119() || 'fort-myers' !== oy_edition(), 'only on the online edition' );
 } );
 
 test( 'test mode: every process with one tap, the emails to the teacher\'s own mailbox (+teszt), test classes hidden, everything deleted after (Áron, 19 Nov)', function () {
@@ -4183,6 +4259,26 @@ test( 'going live: the manager can check the site from outside (X-OYS-Auth, /sta
 	eq( $admin->ID, OYS_Ops::header_auth( 0 ), 'the application password alone: found among the admins' );
 	$_SERVER['HTTP_X_OYS_AUTH'] = $admin->user_email . ':' . $pw;
 	eq( $admin->ID, OYS_Ops::header_auth( 0 ), 'email:pass' );
+	// a bare password that happens to read as base64 with a „:” in it (one in about fifteen) still works
+	$tricky = '';
+	for ( $i = 0; $i < 4000 && '' === $tricky; $i++ ) {
+		$c      = wp_generate_password( 24, false );
+		$dec    = base64_decode( $c, true );
+		$tricky = is_string( $dec ) && str_contains( $dec, ':' ) ? $c : '';
+	}
+	$apw  = WP_Application_Passwords::USERMETA_KEY_APPLICATION_PASSWORDS;
+	$keep = get_user_meta( $admin->ID, $apw, true );
+	$set  = function ( $plain ) use ( $admin, $apw, $keep ) {
+		$rows = $keep;
+		$last = count( $rows ) - 1;
+		$rows[ $last ]['password'] = method_exists( 'WP_Application_Passwords', 'hash_password' ) ? WP_Application_Passwords::hash_password( $plain ) : wp_hash_password( $plain );
+		update_user_meta( $admin->ID, $apw, $rows );
+	};
+	$set( $tricky );
+	$_SERVER['HTTP_X_OYS_AUTH'] = $tricky;
+	$got = OYS_Ops::header_auth( 0 );
+	update_user_meta( $admin->ID, $apw, $keep );
+	ok( '' !== $tricky && $admin->ID === $got, 'a bare password that reads as base64 with a „:” in it is still tried as the password' );
 	$_SERVER['HTTP_X_OYS_AUTH'] = 'stale saved secret';
 	$_SERVER['HTTP_X_OJ_REMOTE'] = $pw;
 	eq( $admin->ID, OYS_Ops::header_auth( 0 ), 'X-OJ-Remote wins when X-OYS-Auth is overridden by a stale value' );

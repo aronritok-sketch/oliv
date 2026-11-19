@@ -656,8 +656,20 @@ function oy_with_noshow( $text, $html = true ) {
 		$at = $m[0][1];
 		return rtrim( substr( $text, 0, $at ) ) . ' ' . $add . substr( $text, $at );
 	}
+	// plain text with the one-to-one rule in it too: the sentence goes in front of that part
+	if ( ! $html ) {
+		$parts = preg_split( '/(?<=[.!?])\s+/u', trim( (string) $text ) );
+		foreach ( $parts as $i => $p ) {
+			if ( $i > 0 && false !== mb_stripos( $p, 'egyéni' ) ) {
+				array_splice( $parts, $i, 0, array( $add ) );
+				return implode( ' ', $parts );
+			}
+		}
+	}
 	return rtrim( $text ) . ' ' . $add;
 }
+// the booking plugin's own places (booking form, account, private request, emails) say it as well
+add_filter( 'oys_cancel_policy', fn( $t ) => oy_with_noshow( $t, false ) );
 
 /**
  * How many days a group class can be watched again (the booking plugin's setting, so the number is written in one place);

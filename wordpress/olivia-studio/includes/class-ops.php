@@ -55,6 +55,7 @@ class OYS_Ops {
 		if ( '' === $given ) {
 			return 0;
 		}
+		$raw = $given;
 		if ( ! str_contains( $given, ':' ) ) {
 			$dec = base64_decode( $given, true );
 			if ( is_string( $dec ) && str_contains( $dec, ':' ) ) {
@@ -69,7 +70,12 @@ class OYS_Ops {
 				$login = $by ? $by->user_login : $login;
 			}
 			$user = self::app_password( $login, $pass );
-			return $user ? $user->ID : 0;
+			if ( $user || $raw === $given ) {
+				return $user ? $user->ID : 0;
+			}
+			// a bare application password can itself read as base64 with a „:” in it (24 letters → 18 random bytes, about
+			// one in fifteen): not a user:pass, so it is tried as the password alone below
+			$given = $raw;
 		}
 		foreach ( get_users( array( 'role' => 'administrator', 'number' => 10, 'orderby' => 'ID' ) ) as $admin ) {
 			if ( ! WP_Application_Passwords::get_user_application_passwords( $admin->ID ) ) {
