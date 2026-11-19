@@ -1245,6 +1245,21 @@ test( 'Olívia 19 Nov (chat, later): the class cards of the request form, the mi
 		false === $r0 ? delete_option( 'oy_classes_1119_rev' ) : update_option( 'oy_classes_1119_rev', $r0 );
 		update_option( 'oy_edition', 'fort-myers' );
 	}
+	// where she had already written the week in herself, the change put it in twice: her own words come back
+	update_option( 'oy_edition', 'hu-online' );
+	$e0 = get_option( 'oye_edits' );
+	$r0 = get_option( 'oy_classes_1119b_rev' );
+	try {
+		update_option( 'oye_edits', array( 't' => array( 'tx1' => 'A csoportos óráról felvétel készül, amit egy hétig visszanézhetsz, de&nbsp;azon csak én látszom és hallatszom. Ezt egy hétig visszanézheted.<br>Az órák chatje az óra után is megmarad.', 'tx2' => 'Más szöveg.' ), 'i' => array() ) );
+		delete_option( 'oy_classes_1119b_rev' );
+		$log = oy_migrate_classes_1119b();
+		$t   = oye_edits()['t'];
+		ok( $log && 'A csoportos óráról felvétel készül, de azon csak én látszom és hallatszom. Ezt egy hétig visszanézheted.<br>Az órák chatje az óra után is megmarad.' === $t['tx1'] && 'Más szöveg.' === $t['tx2'], 'her own recording lines as she wrote them, the week once' );
+		ok( array() === oy_migrate_classes_1119b(), '… once only' );
+	} finally {
+		false === $e0 ? delete_option( 'oye_edits' ) : update_option( 'oye_edits', $e0 );
+		false === $r0 ? delete_option( 'oy_classes_1119b_rev' ) : update_option( 'oy_classes_1119b_rev', $r0 );
+	}
 	update_option( 'oy_edition', 'fort-myers' );
 	ok( array() === oy_migrate_classes_1119() || 'fort-myers' !== oy_edition(), 'only on the online edition' );
 } );

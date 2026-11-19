@@ -718,6 +718,33 @@ function oy_migrate_classes_1119() {
 		: array();
 }
 
+/**
+ * The same day: she had already rewritten the recording lines herself in the page editor („… hallatszom. Ezt egy hétig
+ * visszanézheted.” / „Az órák chatje …”), so the change above put the week in twice. Her own words stay, as she wrote them.
+ */
+function oy_migrate_classes_1119b() {
+	$rev = '2026-11-19b';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_classes_1119b_rev' ) === $rev || ! function_exists( 'oye_edits' ) ) {
+		return array();
+	}
+	update_option( 'oy_classes_1119b_rev', $rev );
+	$from  = 'felvétel készül, amit egy hétig visszanézhetsz, de azon csak én látszom és hallatszom. Ezt egy hétig visszanézheted.';
+	$to    = 'felvétel készül, de azon csak én látszom és hallatszom. Ezt egy hétig visszanézheted.';
+	$e     = oye_edits();
+	$fixed = 0;
+	foreach ( (array) ( $e['t'] ?? array() ) as $k => $v ) {
+		$plain = str_replace( array( '&nbsp;', '&#160;', "\xC2\xA0" ), ' ', (string) $v );
+		if ( str_contains( $plain, $from ) ) {
+			$e['t'][ $k ] = str_replace( $from, $to, $plain );
+			++$fixed;
+		}
+	}
+	if ( $fixed ) {
+		update_option( 'oye_edits', $e, true );
+	}
+	return $fixed ? array( 'classes page: her own recording lines back as she wrote them' ) : array();
+}
+
 function oy_migrate_1113() {
 	// b: + ÁSZF, Impresszum, the privacy notice with Arovia as the controller
 	// c: her 20:17 notes – „Olívia” with a long í, the prenatal modules and why each one matters, the yogic-life sentence

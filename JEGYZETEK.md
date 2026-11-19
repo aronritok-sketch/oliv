@@ -1723,10 +1723,14 @@
   - **Lemondás a foglalási bővítmény saját helyein is:** foglalási űrlap, fiók, egyéni óra kérése, e-mailek.
     - A „Ha befizetted a csoportos órát, … visszanézheted egy hétig …” mondat az egyéni órás rész elé kerül.
     - Ehhez a bővítményben `OYS_Settings::cancel_policy()` és az `oys_cancel_policy` szűrő kell, amire a téma ráköt.
+  - **3.12.8 – Olívia saját felvétel-sorai:** élesen kiderült, hogy a felvétel-dobozt közben a szerkesztőben maga is
+    átírta („… hallatszom. Ezt egy hétig visszanézheted.” / „Az órák chatje az óra után is megmarad …”). A migráció erre
+    rátette az „amit egy hétig visszanézhetsz” részt, így a hét kétszer szerepelt. Egy egyszer futó javítás
+    (`oy_migrate_classes_1119b`) pontosan az ő szövegét állítja vissza.
   - **Távoli állapotlekérés javítása (`OYS_Ops::header_try`):** egy puszta alkalmazásjelszó kb. tizenötből egyszer
     base64-ként „valami:valami”-nak olvasódott, és ilyenkor nem engedett be. Ha így nem megy, most magában, jelszóként is
     kipróbálja. Ezt egy véletlenszerűen elbukó teszt hozta elő; az új teszt mindig ilyen jelszóval próbál.
-  - Tesztek: 1702/0, háromszor egymás után. Helyben telefonnézetben próbálva (kártyák, csak a választott ár, 6 lépés,
+  - Tesztek: 1704/0 (a 3.12.7 előtt 1702/0, háromszor egymás után). Helyben telefonnézetben próbálva (kártyák, csak a választott ár, 6 lépés,
     nincs vízszintes görgetés).
 
 ## Következő kör – nyitott pontok / ötletek
