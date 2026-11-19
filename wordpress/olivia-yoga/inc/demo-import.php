@@ -314,6 +314,9 @@ function oy_import_all( $refresh = false ) {
 			set_post_thumbnail( $id, oy_import_image( $p['photo'] ) );
 		}
 		update_post_meta( $id, 'oy_art', $p['art'] ?? '' );
+		if ( ! empty( $p['seo_title'] ) ) { // a shorter title for the search results (≤ 60 characters), the page keeps its own
+			update_post_meta( $id, 'oy_seo_title', $p['seo_title'] );
+		}
 		oy_import_translations( $id, $p, array( 'title' => 'title', 'excerpt' => 'excerpt', 'content' => 'content' ), true );
 		$posts++;
 	}
@@ -618,6 +621,32 @@ function oy_mail_setup() {
  * is rebuilt. Bookings, the timetable, prices and pages someone added are not touched. Olivia had no admin login on
  * the live site before this, so there is nothing of hers to overwrite.
  */
+/**
+ * Shorter titles in the search results for the articles whose title did not fit (over 55 characters with the site name;
+ * SEO OS, 16 November; CRM task 186228556, Áron 19 November). The page keeps its own title; a title Olívia set herself
+ * (SEO title field) stays. Once.
+ */
+function oy_migrate_titles_1119() {
+	$rev = '2026-11-19';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_titles_rev' ) === $rev ) {
+		return array();
+	}
+	update_option( 'oy_titles_rev', $rev );
+	$data = json_decode( (string) file_get_contents( oy_content_file() ), true );
+	$done = 0;
+	foreach ( (array) ( $data['posts'] ?? array() ) as $slug => $p ) {
+		if ( empty( $p['seo_title'] ) ) {
+			continue;
+		}
+		$id = oy_import_target( $slug, 'post' );
+		if ( $id && '' === (string) get_post_meta( $id, 'oy_seo_title', true ) ) {
+			update_post_meta( $id, 'oy_seo_title', $p['seo_title'] );
+			$done++;
+		}
+	}
+	return $done ? array( sprintf( '%d shorter article titles for the search results', $done ) ) : array();
+}
+
 function oy_migrate_1113() {
 	// b: + ÁSZF, Impresszum, the privacy notice with Arovia as the controller
 	// c: her 20:17 notes – „Olívia” with a long í, the prenatal modules and why each one matters, the yogic-life sentence

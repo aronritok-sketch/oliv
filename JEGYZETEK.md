@@ -1672,6 +1672,15 @@
     - November 26. után is így marad.
   - `check.py`: 2408/0 (az „after” változat 1219/0); telefonon próbálva.
   - **„Indexelés kérése”:** API-ból nem megy; Áronnak a listát a jelentés adja.
+  - **8 túl hosszú cikkcím (oliviajoga.online 3.12.5):** a keresőcím (`<title>`) 55 karakternél hosszabb volt:
+    - a hatha-sorozat 1., 2., 3. és 5. része;
+    - „Zene a jóga órán”;
+    - „A jóga 8 ága” Ászana, Pránájáma és Pratyahara része.
+    - Rövidebb SEO-címet kapnak (`oy_seo_title`, legfeljebb 60 karakter), például „Hatha jógaóra elemei 3: vinyásza,
+      napüdvözlet | Olívia Jóga”. A hatha-sorozat 4. része az egységesség miatt kap ilyet.
+    - Az oldalon látható cím nem változik. Ha Olívia már adott meg saját SEO-címet, az marad.
+    - Egyszer fut (`oy_migrate_titles_1119`), a tartalomfájlban `seo_title`. Tesztek: 1676/0.
+  - **Olívia Instagram/Facebook-bio linkje:** Áron kéri meg rá Olíviát (a CRM-feladat szerint).
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).

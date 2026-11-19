@@ -3787,6 +3787,22 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	wp_delete_post( $priv_id, true );
 	update_option( 'wp_page_for_privacy_policy', $priv_was );
 	false === $ga_rev ? delete_option( 'oy_ga4_rev' ) : update_option( 'oy_ga4_rev', $ga_rev );
+	// shorter titles in the search results for the 8 long article titles (CRM task 186228556, 19 Nov); hers stay
+	$tdata  = json_decode( (string) file_get_contents( oy_content_file() ), true );
+	$tlong  = array_filter( (array) $tdata['posts'], fn( $p ) => ! empty( $p['seo_title'] ) );
+	$t_zene = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'Zene a jóga órán: te hogy szereted?', 'post_name' => 'zene-a-jogaoran' ) );
+	$t_own  = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'Ászana', 'post_name' => 'a-joga-8-aga-aszana' ) );
+	update_post_meta( $t_own, 'oy_seo_title', 'Olívia saját címe' );
+	$t_rev = get_option( 'oy_titles_rev' );
+	delete_option( 'oy_titles_rev' );
+	$tlog  = oy_migrate_titles_1119();
+	$tlog2 = oy_migrate_titles_1119();
+	$t_m1  = get_post_meta( $t_zene, 'oy_seo_title', true );
+	$t_m2  = get_post_meta( $t_own, 'oy_seo_title', true );
+	wp_delete_post( $t_zene, true );
+	wp_delete_post( $t_own, true );
+	false === $t_rev ? delete_option( 'oy_titles_rev' ) : update_option( 'oy_titles_rev', $t_rev );
+	ok( count( $tlong ) >= 8 && ! array_filter( $tlong, fn( $p ) => mb_strlen( $p['seo_title'] ) > 60 ) && 'Zene a jóga órán: te hogy szereted? | Olívia Jóga' === $t_m1 && 'Olívia saját címe' === $t_m2 && $tlog && ! $tlog2, 'the long article titles get a search title of at most 60 characters, once; a title she set herself stays' );
 	update_option( 'oy_edition', 'fort-myers' );
 	$ga_other = oy_ga4_id();
 	ok( 'G-WM1P5R67VJ' === $ga_on && '' === $ga_other, 'GA4 only where it was set up: the online site\'s measurement ID, nothing on the other editions' );

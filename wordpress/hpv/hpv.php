@@ -59,6 +59,7 @@ add_action( 'hpv_child_setup', function ( $from, $to, $slug ) {
 	$log = array_merge( $log, oy_migrate_1116() ); // the thank-you page of the requests (once)
 	$log = array_merge( $log, oy_migrate_1117() ); // Olívia's chat of 17 November: the flow class's steps, „ászana”, the one-to-one rule on its own line (once; her editor texts kept)
 	$log = array_merge( $log, oy_migrate_ga4() ); // the privacy page: Google Analytics with consent (once)
+	$log = array_merge( $log, oy_migrate_titles_1119() ); // shorter article titles in the search results (once)
 	kses_remove_filters();
 	$log = array_merge( $log, oy_import_all( false ) );
 	kses_init_filters();
