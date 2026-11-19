@@ -128,6 +128,11 @@ def main():
             ok(bc is not None, f'/{path}: no BreadcrumbList')
             if bc:
                 crumbs[path] = bc['itemListElement'][-1]['name']
+    # where to practise with her now: the articles and Rólam link to the online site's class pages (Áron, 11.19)
+    for path, doc in files.items():
+        if path == 'rólam' or 'class="aside-sticky oj-more"' in doc:  # Rólam and every article
+            ok('class="oj-online-note"' in doc and doc.count('href="https://oliviajoga.online/online-orak/') >= 3,
+               f'/{path}: no „Gyakorolj velem online” note with links to the online classes')
     ok(len(set(crumbs.values())) == len(crumbs) and not any('kerület' in v for v in crumbs.values() if v not in ('Kapcsolat',)),
        'breadcrumb names: each page its own (not the shared „Jóga 18. és 21. kerület” title start)')
     for f in fails[:40]:

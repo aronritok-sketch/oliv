@@ -1659,6 +1659,20 @@
       semmi.
     - Helyben telefonnézetben próbálva: 18 kártya, magyarul; a bérletvásárlás és a foglalás ✅.
 
+- **2026-11-19 – Linkek az oliviajoga.hu-ról az oliviajoga.online-ra (1.7.3), a .online sitemapje a Search Console-ban.**
+  A főchat végrehajtó-sorából (Áron: „5. mehet”, CRM-feladat 186228556).
+  - **Sitemap:** az `sc-domain:oliviajoga.online` sitemapje (`wp-sitemap.xml`, 40 cím) be van küldve, a Google 11.19-én
+    letöltötte, 0 hiba. A CRM napi köre (`hpv_gsc_manage`) innentől magától újraküldi.
+  - **Linkek:**
+    - Eddig a .hu 32 oldala a .online-ra szinte csak a lábléc gombjával linkelt; tartalmi link csak a főoldalon és az
+      Árakban volt.
+    - Most a 24 cikk végén és a Rólam alján egy rövid „Gyakorolj velem online” bekezdés áll (`online_note()`), Olívia
+      hangján, a .online valós tényeivel. Linkjei: csoportos online flow jóga (szerdánként 18:30–20:00), egyéni online
+      jóga, online kismamatorna, oliviajoga.online.
+    - November 26. után is így marad.
+  - `check.py`: 2408/0 (az „after” változat 1219/0); telefonon próbálva.
+  - **„Indexelés kérése”:** API-ból nem megy; Áronnak a listát a jelentés adja.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

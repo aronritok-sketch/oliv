@@ -41,7 +41,7 @@ ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.7.2'
+VERSION = '1.7.3'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -258,6 +258,17 @@ def online(key='home'):
 def book_url():
     """Where „Bejelentkezés” goes: Motibro until 25 November, the online site after (Olivia)."""
     return online('home') if AFTER else MOTIBRO
+
+
+def online_note():
+    """Under the articles and the Rólam page: a few words, in her voice, on where to practise with her now – with links to
+    the online site's class pages (Áron, 11.19: „linkek az oliviajoga.hu-ról az .online-ra, ahol természetes”; the facts are
+    the online site's own)."""
+    a = lambda key, text: f'<a href="{esc(online(key))}"{ext_attr(online(key))}>{text}</a>'
+    return (f'<aside class="oj-online-note" data-reveal><p class="kicker">Gyakorolj velem online</p>'
+            f'<p>Élő, magyar nyelvű online órákat tartok, a saját otthonodból: {a("yoga", "csoportos online flow jóga")} {ONLINE_TIME}, '
+            f'egyéni időpontban pedig {a("private", "egyéni online jóga")} és {a("prenatal", "online kismamatorna")}. '
+            f'Időpontok, bérletek és foglalás: {a("home", "oliviajoga.online")}.</p></aside>')
 
 
 def asset(rel):
@@ -1541,7 +1552,7 @@ def rolam_page(p):
                                  f'{new_pic("korszak-03", "(min-width: 960px) 28vw, 92vw", pos="50% 35%")}</div></div></aside>', ol)
     out = [f'<div class="oj-read{" oj-read--first" if x[0] else ""}{" oj-read--end" if x[1] and not x[0] else ""}">{x[1]}{x[2]}</div>' if isinstance(x, tuple) else x for x in out]
     btn = ''.join(f'<p class="btn-row oj-read__go">{button(*only_link(b), "orchid", " btn--lg")}</p>' for b in tail)
-    return head + f'<div class="container oj-flow oj-about">{"".join(out)}{btn}</div>'
+    return head + f'<div class="container oj-flow oj-about">{"".join(out)}{btn}{online_note()}</div>'
 
 
 def prices_after(head):
@@ -1715,7 +1726,7 @@ def post_page(p, journal_cards):
     more = ''.join(f'<li><a href="{esc(link(path))}"><span class="oj-more__photo">{img}</span><span class="oj-more__title">{esc(t)}</span></a></li>' for path, t, img in pick)
     aside = (f'<aside class="aside-sticky oj-more"><p class="kicker">Jógáról</p><ul>{more}</ul>'
              f'<p class="btn-row"><a class="btn btn--ghost" href="{esc(link("jógáról"))}">A jógáról - Tőlem</a></p></aside>')
-    return head + f'<div class="container"><article class="layout layout--aside"><div class="entry oj-prose">{blocks_html(body_blocks)}{"".join(extra)}</div>{aside}</article></div>'
+    return head + f'<div class="container"><article class="layout layout--aside"><div class="entry oj-prose">{blocks_html(body_blocks)}{"".join(extra)}{online_note()}</div>{aside}</article></div>'
 
 
 # ---------------------------------------------------------------- build

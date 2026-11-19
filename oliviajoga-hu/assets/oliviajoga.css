@@ -772,3 +772,10 @@ html, body { overflow-x: clip; }
 /* on a phone the brush behind a photo on the left reaches the screen's left edge and stops at the photo's right edge */
 @media (max-width: 899px) { .oj-waved > .oj-blob--left { width: calc(100% + var(--oj-bleed)); } }
 @media (pointer: coarse), (max-width: 759px) { .btn, .btn--sm { min-height: 44px; } }
+
+/* „Gyakorolj velem online” under the articles and Rólam: where to practise with her now (Áron, 11.19) */
+.oj-online-note { margin-top: 2.4rem; padding: 1.2rem 1.4rem; border-radius: var(--radius); background: var(--lilac-soft); border-left: 4px solid var(--orchid); max-width: 62ch; }
+.oj-online-note .kicker { margin: 0 0 .35rem; }
+.oj-online-note p:last-child { margin: 0; }
+.oj-online-note a { font-weight: 700; }
+.oj-about > .oj-online-note { justify-self: start; margin-top: 0; }
