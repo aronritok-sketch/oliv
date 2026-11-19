@@ -1356,12 +1356,12 @@ test( 'Áron 19 Nov: a one-to-one session asked for from the calendar (any comin
 		$g   = make_session( array( 'in_hours' => 24 * 3 ) );
 		$cal = OYS_Frontend::sc_calendar( array() );
 		$tomorrow = wp_date( 'Y-m-d', time() + DAY_IN_SECONDS );
-		ok( (bool) preg_match( '#class="oys-cal__day[^"]*is-free[^"]*"[^>]*data-day="\d{4}-\d{2}-\d{2}" data-label="[^"]+" data-short="[^"]+" tabindex="0"#', $cal ) && str_contains( $cal, 'data-oys-cal-ask' ) && str_contains( $cal, 'data-ask-time' ), 'calendar: a day without a class can be chosen too; under the calendar a quiet offer with a time (Olívia: „kiválasztani napot, időpontot és úgy privát órát kérni”)' );
+		ok( (bool) preg_match( '#class="oys-cal__day[^"]*is-free[^"]*"[^>]*data-day="\d{4}-\d{2}-\d{2}" data-label="[^"]+" data-short="[^"]+" data-busy="[^"]*" tabindex="0"#', $cal ) && str_contains( $cal, 'data-oys-cal-ask' ) && str_contains( $cal, 'data-ask-time' ), 'calendar: a day without a class can be chosen too; under the calendar a quiet offer with a time (Olívia: „kiválasztani napot, időpontot és úgy privát órát kérni”)' );
 		// the time: no drop-down, the half hours from 14:00 to 21:00 to tap, by afternoon and evening (Áron: „a bal oldali »A«”)
 		preg_match_all( '#<button type="button" class="oys-time" data-ask-time="(\d\d:\d\d)" aria-pressed="false">#', $cal, $tm );
 		ok( ! str_contains( $cal, '<select data-ask-time' ) && array( '14:00', '14:30', '15:00', '15:30', '16:00', '16:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00' ) === $tm[1], 'the time: half hours from 14:00 to 21:00 as buttons, no drop-down (Áron: „ne legördülős … 14:00-től 21:00-ig”)' );
 		$hu_cal = OYS_I18n::with( 'hu', fn() => OYS_Frontend::sc_calendar( array() ) );
-		ok( str_contains( $hu_cal, '<span class="oys-times__part">Délután</span>' ) && str_contains( $hu_cal, '<span class="oys-times__part">Este</span>' ) && ! str_contains( $hu_cal, 'Délelőtt' ) && str_contains( $hu_cal, 'Melyik időpont lenne jó?' ) && str_contains( $hu_cal, 'data-ask-time="" aria-pressed="true">Bármikor jó 14 és 21 óra között</button>' ) && str_contains( $hu_cal, 'data-label="Időpontot kérek: %s"' ), '… by afternoon and evening, „Bármikor jó 14 és 21 óra között” chosen until a time is tapped, the button says the day and the time' );
+		ok( str_contains( $hu_cal, '<span class="oys-times__part">Délután</span>' ) && str_contains( $hu_cal, '<span class="oys-times__part">Este</span>' ) && ! str_contains( $hu_cal, 'Délelőtt' ) && str_contains( $hu_cal, 'Melyik időpontok lennének jók?' ) && str_contains( $hu_cal, 'data-ask-time="" aria-pressed="false">Bármikor jó 14 és 21 óra között</button>' ) && str_contains( $hu_cal, 'data-label="Időpontot kérek: %s"' ), '… by afternoon and evening, „Bármikor jó 14 és 21 óra között” among them, the button says the day and the time' );
 		ok( str_contains( $hu_cal, 'Koppints egy napra a naptárban, és foglald le a helyed!' ) && ! str_contains( $hu_cal, 'itt látod az órát' ), 'the hint without „itt látod az órát” (Áron: „vegyük ki”)' );
 		ok( str_contains( $hu_cal, '<p class="oys-cal__none" hidden>Ezen a napon nincs csoportos óra.</p>' ), 'a day without a class: „Ezen a napon nincs csoportos óra.” (Áron)' );
 		ok( str_contains( $cal, 'oys-cal__none' ) && str_contains( $cal, 'Tap a day in the calendar and book your spot!' ), '… a chosen day without a class says it has none' );
@@ -1372,7 +1372,7 @@ test( 'Áron 19 Nov: a one-to-one session asked for from the calendar (any comin
 		OYS_Schedule::cancel_session( $g->id, 'test' );
 		$js  = (string) file_get_contents( OYS_DIR . 'assets/oys.js' );
 		$css = (string) file_get_contents( OYS_DIR . 'assets/oys.css' );
-		ok( str_contains( $js, "u.searchParams.set('pday', ask.getAttribute('data-day') || '');" ) && str_contains( $js, "u.searchParams.set('ptime', t)" ) && str_contains( $js, "x.setAttribute('aria-pressed', x === b ? 'true' : 'false');" ) && str_contains( $js, "label.replace('%s', ask.getAttribute('data-short') + (t ? ', ' + on.textContent : ''))" ) && str_contains( $css, '.oys-time[aria-pressed="true"] { background: var(--oys-ink);' ) && str_contains( $css, '.oys-cal__ask[hidden], .oys-cal__none[hidden], .oys-partner[hidden] { display: none; }' ), '… the link takes the day and the time to the request form' );
+		ok( str_contains( $js, "u.searchParams.set('pslots', picked.length ? picked.map(keyOf).join(',') : day);" ) && str_contains( $js, "b.setAttribute('aria-pressed', on ? 'true' : 'false');" ) && str_contains( $js, "go.textContent = label.replace('%s', picked[0].short + (picked[0].time ? ', ' + picked[0].time : ''));" ) && str_contains( $css, '.oys-time[aria-pressed="true"] { background: var(--oys-ink);' ) && str_contains( $css, '.oys-cal__ask[hidden], .oys-cal__none[hidden], .oys-partner[hidden] { display: none; }' ), '… the link takes the day and the time to the request form' );
 		$_GET['pday'] = $tomorrow;
 		$_GET['ptime'] = '18:00';
 		$pref = OYS_Frontend::preferred_from_calendar();
@@ -1553,6 +1553,102 @@ test( 'Áron 19 Nov: a profile photo, the required details (name, phone number, 
 	$data = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content-hu-online.json' ), true );
 	ok( str_contains( $data['privacy']['content'], 'telefonszámod, a településed,' ) && str_contains( $data['privacy']['content'], 'ha feltöltesz, a profilképed' ), 'privacy notice: the town and the profile photo among the account data' );
 	ok( 4 === count( oy_privacy_1119_pairs() ) && str_contains( oy_privacy_1119_pairs()[3][1], 'a profilképed' ), '… on the live page too (once)' );
+} );
+
+test( 'Áron 19 Nov (evening): the chosen times survive signing up and logging in; several times in one go; a taken time can\'t be chosen', function () {
+	global $wpdb;
+	$products = get_option( OYS_Products::OPTION );
+	$services = get_option( OYS_Services::OPTION );
+	$tz       = wp_timezone();
+	$day      = fn( $n ) => ( new DateTimeImmutable( 'today', $tz ) )->modify( sprintf( '%+d days', $n ) )->format( 'Y-m-d' );
+	$d1       = $day( 23 );
+	$d2       = $day( 24 );
+	$made     = array();
+	try {
+		update_option( OYS_Services::OPTION, array( 'pairz' => array( 'label' => 'Pair yoga', 'class' => 'egyeni', 'duration' => 60, 'durations' => array( 60, 90 ), 'duo' => 1, 'sort' => 1 ) ) );
+		update_option( OYS_Products::OPTION, array( 'pz-1' => array( 'name' => 'Pair 1', 'kind' => 'private_single', 'service' => 'pairz', 'people' => 1, 'credits' => 1, 'validity_days' => 30, 'price_cents' => 500000, 'minutes' => 60, 'active' => 1 ) ) );
+		// the chosen times
+		$dp = $day( -1 );
+		$sl = OYS_Privates::slots_from( "{$d2}T18:00,{$d1}T18:30,{$d1},{$dp}T18:00,bad,{$d1}T18:30" );
+		eq( array( array( 'day' => $d1, 'time' => '18:30' ), array( 'day' => $d2, 'time' => '18:00' ) ), $sl, 'the chosen times: in order, each once, a day with times is not also „any time”, no past days or nonsense' );
+		eq( array( array( 'day' => $d1, 'time' => '17:00' ) ), OYS_Privates::slots_from( '', $d1, '17:00' ), '… the older pday + ptime still work' );
+		eq( OYS_Privates::MAX_SLOTS, count( OYS_Privates::slots_from( implode( ',', array_map( fn( $i ) => $day( 3 + $i ) . 'T15:00', range( 1, 14 ) ) ) ) ), '… at most 10 in one go' );
+		ok( str_ends_with( OYS_I18n::with( 'hu', fn() => OYS_Privates::slot_label( array( 'day' => $d1, 'time' => '' ) ) ), 'bármikor 14:00 és 21:00 között' ), 'a day alone: „… bármikor 14:00 és 21:00 között”' );
+		// a class 18:00–19:30 takes the half hours a 60-minute session would overlap
+		$g      = make_session( array( 'in_hours' => 24 * 23 ) );
+		$made[] = $g->id;
+		$start  = ( new DateTimeImmutable( $d1 . ' 18:00', $tz ) )->getTimestamp();
+		$wpdb->update( OYS_Install::table( 'sessions' ), array( 'starts_at' => gmdate( 'Y-m-d H:i:s', $start ), 'ends_at' => gmdate( 'Y-m-d H:i:s', $start + 90 * MINUTE_IN_SECONDS ) ), array( 'id' => $g->id ) );
+		$tk = OYS_Privates::taken_times( $d1, $d2 );
+		ok( ! array_diff( array( '17:30', '18:00', '18:30', '19:00' ), $tk[ $d1 ] ?? array() ) && ! in_array( '17:00', $tk[ $d1 ] ?? array(), true ) && ! in_array( '19:30', $tk[ $d1 ] ?? array(), true ), 'taken on a class day (18:00–19:30): 17:30–19:00; 17:00 and 19:30 stay free (Áron: „ha be van foglalva egy idősáv, ott az ne legyen foglalható”)' );
+		ok( ! in_array( '15:00', $tk[ $d2 ] ?? array(), true ), '… the next day 15:00 is free' );
+		$cal = OYS_Frontend::sc_calendar( array() );
+		ok( (bool) preg_match( '#data-day="' . $d1 . '"[^>]*data-busy="[^"]*17:30 18:00 18:30 19:00#', $cal ), 'the calendar knows each day\'s taken half hours (crossed out, not choosable)' );
+		$js  = (string) file_get_contents( OYS_DIR . 'assets/oys.js' );
+		$css = (string) file_get_contents( OYS_DIR . 'assets/oys.css' );
+		ok( str_contains( $js, "var taken = t !== '' && busy.indexOf(t) > -1;" ) && str_contains( $js, 'Math.abs(mins(p.time) - mins(t)) < 60' ) && str_contains( $css, '.oys-time.is-taken { text-decoration: line-through;' ), '… and a time overlapping one already chosen can\'t be chosen either' );
+		ok( str_contains( $cal, 'data-max="' . OYS_Privates::MAX_SLOTS . '"' ) && str_contains( $cal, 'data-ask-picked' ) && str_contains( $js, "picked.push({ day: day, time: t, short: ask.getAttribute('data-short') || day });" ), 'several times in one go, on any days, listed under the times (Áron: „lehessen egyszerre több időpontot befoglalni”)' );
+		// what is wrong with chosen times
+		$both = array( array( 'day' => $d2, 'time' => '15:00' ), array( 'day' => $d2, 'time' => '16:00' ) );
+		eq( '', OYS_Privates::slots_problem( $both, 60 ), 'free times, an hour apart: fine for 60 minutes' );
+		ok( '' !== OYS_Privates::slots_problem( $both, 90 ), '… for 90 minutes they overlap' );
+		ok( str_contains( OYS_Privates::slots_problem( array( array( 'day' => $d1, 'time' => '18:30' ) ), 60 ), '18:30' ), 'a time taken in the meantime is refused, by name' );
+		// sent: one request each, one batch, one email to the customer
+		$u   = make_user( 'Slots' );
+		$row = array( 'user_id' => $u, 'topic' => 'pairz', 'duration_min' => 60, 'people' => 1, 'location_type' => 'online', 'address' => '', 'preferred' => 'Hétvégén is jó.', 'notes' => '', 'status' => 'new', 'created_at' => oys_now() );
+		$ask = array( array( 'day' => $d2, 'time' => '15:00' ), array( 'day' => $d2, 'time' => '18:00' ), array( 'day' => $day( 25 ), 'time' => '' ) );
+		$req = null;
+		$log = sent_mails( function () use ( $row, $ask, &$req ) { $req = OYS_Privates::create( $row, $ask ); } );
+		$all = $wpdb->get_results( $wpdb->prepare( 'SELECT * FROM ' . OYS_Install::table( 'private_requests' ) . ' WHERE user_id = %d ORDER BY id', $u ) );
+		ok( 3 === count( $all ) && count( array_unique( array_map( fn( $r ) => (int) $r->batch_id, $all ) ) ) === 1 && (int) $all[0]->batch_id === (int) $all[0]->id, 'three times: three requests (each offered and paid on its own), one batch' );
+		ok( $all[0]->slot_at && $all[1]->slot_at && null === $all[2]->slot_at && str_starts_with( (string) $all[0]->preferred, OYS_Privates::slot_label( $ask[0] ) ) && str_contains( (string) $all[0]->preferred, 'Hétvégén is jó.' ), '… each with its time (a day alone has none), her own words kept' );
+		$to_customer = array_filter( $log, fn( $m ) => get_userdata( $u )->user_email === $m['to'] );
+		ok( 1 === count( $to_customer ) && str_contains( (string) reset( $to_customer )['html'], OYS_Privates::slot_label( $ask[1] ) ), 'one email to the customer listing every time' );
+		$tk2 = OYS_Privates::taken_times( $d2, $d2 );
+		ok( in_array( '15:00', $tk2[ $d2 ] ?? array(), true ) && in_array( '14:30', $tk2[ $d2 ] ?? array(), true ), 'a time asked for is held for others until it is answered' );
+		// Olívia: the offer starts at the asked time
+		eq( oys_utc_to_local_input( $all[0]->slot_at ), wp_date( 'Y-m-d\TH:i', OYS_Privates::slot_ts( $ask[0] ) ), 'the offer form can start from the asked time' );
+		$adm = (string) file_get_contents( OYS_DIR . 'includes/admin/class-admin.php' );
+		ok( str_contains( $adm, "( ! empty( \$r->slot_at ) ? oys_utc_to_local_input( \$r->slot_at ) : '' )" ), '… and does (the date and time are filled in)' );
+		// signing up or logging in: back to the same address, the chosen times kept (Áron: „eltűnik a foglalni kívánt időpont”, „ha van fiókja és belép, akkor is mentse”)
+		$host = wp_parse_url( home_url(), PHP_URL_HOST ) . ( wp_parse_url( home_url(), PHP_URL_PORT ) ? ':' . wp_parse_url( home_url(), PHP_URL_PORT ) : '' );
+		$srv  = $_SERVER;
+		$get  = $_GET;
+		$_SERVER['HTTP_HOST']   = $host;
+		$_SERVER['REQUEST_URI'] = ( wp_parse_url( home_url(), PHP_URL_PATH ) ?: '' ) . '/fiokom/?tab=private&pslots=' . $d2 . 'T15%3A00%2C' . $d2 . 'T18%3A00&oys_view=register&oys_email=a%40b.c';
+		$here = OYS_Frontend::here();
+		ok( str_contains( $here, 'tab=private' ) && str_contains( $here, 'pslots=' ) && ! str_contains( $here, 'oys_view' ) && ! str_contains( $here, 'oys_email' ), 'back after signing up or logging in: this very address with the chosen times (the sign-up form\'s leftovers dropped)' );
+		wp_set_current_user( 0 );
+		$_GET = array( 'tab' => 'private', 'pslots' => "{$d2}T16:00,{$d2}T19:00" );
+		$page = OYS_I18n::with( 'hu', fn() => OYS_Frontend::sc_account() );
+		preg_match_all( '#name="redirect_to" value="([^"]*)"#', $page, $rt );
+		ok( 2 === count( $rt[1] ) && 2 === count( array_filter( $rt[1], fn( $v ) => str_contains( html_entity_decode( $v ), 'pslots=' ) ) ), '… both forms (sign-up and log-in) come back to it' );
+		ok( str_contains( $page, 'oys-asked' ) && str_contains( $page, 'ezekre az időpontokra' ) && str_contains( $page, OYS_I18n::with( 'hu', fn() => esc_html( OYS_Privates::slot_label( array( 'day' => $d2, 'time' => '19:00' ) ) ) ) ), '… and says which times are waiting' );
+		wp_set_current_user( $u );
+		$m    = new ReflectionMethod( 'OYS_Frontend', 'private_form' );
+		$m->setAccessible( true );
+		$form = OYS_I18n::with( 'hu', fn() => $m->invoke( null ) );
+		ok( str_contains( $form, 'name="slots[]" value="' . $d2 . 'T16:00"' ) && str_contains( $form, 'name="slots[]" value="' . $d2 . 'T19:00"' ) && str_contains( $form, 'data-oys-slot-x' ) && str_contains( $form, 'A választott időpontjaid' ), 'logged in: the request form has the chosen times, each can be taken off' );
+		ok( ! preg_match( '#id="oys-pr-preferred" rows="3" required#', $form ) && str_contains( $form, 'Más napok és időpontok, amik még jók neked (nem kötelező)' ), '… other days and times are optional then' );
+		$_SERVER = $srv;
+		$_GET    = $get;
+		// the home-screen icon without a background (Áron, a photo of Chrome's new tab: „csináld meg hogy itt háttér nélküli legyen a logó”)
+		update_option( 'oy_edition', 'hu-online' );
+		$touch = get_site_icon_url( 180 );
+		update_option( 'oy_edition', 'fort-myers' );
+		$png = imagecreatefrompng( get_template_directory() . '/assets/img/apple-touch-icon-online-clear.png' );
+		ok( str_ends_with( $touch, '/assets/img/apple-touch-icon-online-clear.png' ) && 127 === ( imagecolorat( $png, 0, 0 ) >> 24 ) && 0 === ( imagecolorat( $png, 90, 90 ) >> 24 ), 'the home-screen icon: only the circle with the dot, the corners transparent (no light square behind it)' );
+	} finally {
+		wp_set_current_user( 0 );
+		foreach ( $made as $id ) {
+			OYS_Schedule::cancel_session( $id, 'test' );
+		}
+		if ( isset( $u ) ) {
+			$wpdb->delete( OYS_Install::table( 'private_requests' ), array( 'user_id' => $u ) );
+		}
+		update_option( OYS_Products::OPTION, $products );
+		false === $services ? delete_option( OYS_Services::OPTION ) : update_option( OYS_Services::OPTION, $services );
+	}
 } );
 
 test( 'test mode: every process with one tap, the emails to the teacher\'s own mailbox (+teszt), test classes hidden, everything deleted after (Áron, 19 Nov)', function () {
@@ -4180,7 +4276,7 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	$icon  = get_site_icon_url( 32 );
 	$thx   = oy_thanks();
 	update_option( 'oy_edition', 'fort-myers' );
-	ok( str_ends_with( $icon, '/assets/img/favicon-online-32.png' ) && is_file( get_template_directory() . '/assets/img/og-online.jpg' ) && is_file( get_template_directory() . '/assets/img/apple-touch-icon-online.png' ), 'the online site has real icon files (not WordPress\'s logo at /favicon.ico) and a 1200×630 share picture' );
+	ok( str_ends_with( $icon, '/assets/img/favicon-online-32.png' ) && is_file( get_template_directory() . '/assets/img/og-online.jpg' ) && is_file( get_template_directory() . '/assets/img/apple-touch-icon-online-clear.png' ), 'the online site has real icon files (not WordPress\'s logo at /favicon.ico) and a 1200×630 share picture' );
 	$was = get_current_user_id();
 	wp_set_current_user( 0 );
 	$eps = apply_filters( 'rest_endpoints', array( '/wp/v2/users' => array(), '/wp/v2/users/(?P<id>[\d]+)' => array(), '/wp/v2/pages' => array() ) );

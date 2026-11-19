@@ -8468,3 +8468,57 @@ msgstr "Időpontot kérek: %s"
 
 msgid "Tap a day in the calendar and book your spot!"
 msgstr "Koppints egy napra a naptárban, és foglald le a helyed!"
+
+msgid "any time between %1$s and %2$s"
+msgstr "bármikor %1$s és %2$s között"
+
+msgid "This time is no longer free: %s. Please choose another one."
+msgid_plural "These times are no longer free: %s. Please choose others."
+msgstr[0] "Ez az időpont már nem szabad: %s. Kérlek, válassz másikat."
+msgstr[1] "Ezek az időpontok már nem szabadok: %s. Kérlek, válassz másikat."
+
+msgid "Two of your times overlap for a %1$d-minute session: %2$s and %3$s. Please keep only one of them."
+msgstr "Két időpontod átfedi egymást egy %1$d perces órához: %2$s és %3$s. Kérlek, csak az egyiket hagyd meg."
+
+msgid "Your %d requests are sent. I'll confirm the times within one working day, then you can pay for them."
+msgstr "Elküldted a %d kérésedet. Egy munkanapon belül visszaigazolom az időpontokat, utána ki tudod fizetni őket."
+
+msgid "Log in or create an account, then your request for this time is ready to send:"
+msgid_plural "Log in or create an account, then your request for these times is ready to send:"
+msgstr[0] "Lépj be, vagy hozz létre egy fiókot, és utána már csak el kell küldened a kérésedet erre az időpontra:"
+msgstr[1] "Lépj be, vagy hozz létre egy fiókot, és utána már csak el kell küldened a kérésedet ezekre az időpontokra:"
+
+msgid "The time you chose"
+msgid_plural "The times you chose"
+msgstr[0] "A választott időpontod"
+msgstr[1] "A választott időpontjaid"
+
+msgid "Remove this time"
+msgstr "Időpont törlése"
+
+msgid "Each time is a session of its own: you get a confirmation and can pay for each."
+msgstr "Mindegyik időpont külön óra: mindegyikről kapsz visszaigazolást, és külön tudod kifizetni."
+
+msgid "I confirm the time, then you can pay for it."
+msgstr "Visszaigazolom az időpontot, utána ki tudod fizetni."
+
+msgid "Choose more in the calendar"
+msgstr "Még több időpont a naptárban"
+
+msgid "Other days and times that also suit you (optional)"
+msgstr "Más napok és időpontok, amik még jók neked (nem kötelező)"
+
+msgid "Which times would suit you?"
+msgstr "Melyik időpontok lennének jók?"
+
+msgid "You can choose more than one, on other days too."
+msgstr "Többet is választhatsz, más napokon is."
+
+msgid "The crossed-out times are already taken."
+msgstr "Az áthúzott időpontok már foglaltak."
+
+msgid "Chosen:"
+msgstr "Kiválasztva:"
+
+msgid "Ask for these times (%d)"
+msgstr "Időpontokat kérek (%d)"

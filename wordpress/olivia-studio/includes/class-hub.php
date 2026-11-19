@@ -634,7 +634,7 @@ class OYS_Hub {
 					'type'    => 'request',
 					'title'   => $name,
 					'initial' => self::initials( $name ),
-					'sub'     => OYS_Privates::topic_label( $r->topic ?? '', (int) $r->people ) . ', ' . (int) $r->duration_min . ' min',
+					'sub'     => OYS_Privates::topic_label( $r->topic ?? '', (int) $r->people ) . ', ' . (int) $r->duration_min . ' min' . ( ! empty( $r->slot_at ) ? ' · ' . oys_date( $r->slot_at, 'M j, g:i a' ) : '' ),
 					'time'    => self::ago( $r->created_at ),
 					'ts'      => oys_ts( $r->created_at ) - 1,
 					'unread'  => 1,

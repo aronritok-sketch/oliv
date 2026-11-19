@@ -182,7 +182,7 @@ add_filter( 'get_site_icon_url', function ( $url, $size ) {
 	if ( get_option( 'site_icon' ) || ! oy_online_only() ) { // her own icon set in the Customizer wins; WordPress's logo (the fallback /favicon.ico gets) does not
 		return $url;
 	}
-	$file = $size <= 32 ? 'favicon-online-32.png' : ( $size <= 180 ? 'apple-touch-icon-online.png' : 'favicon-online-512.png' );
+	$file = $size <= 32 ? 'favicon-online-32.png' : ( $size <= 180 ? 'apple-touch-icon-online-clear.png' : 'favicon-online-512.png' );
 	return get_template_directory_uri() . '/assets/img/' . $file;
 }, 10, 2 );
 

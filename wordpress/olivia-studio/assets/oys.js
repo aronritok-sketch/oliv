@@ -39,6 +39,18 @@
 			partner.querySelectorAll('input').forEach(function (i) { i.required = n === 2; });
 		};
 		if (people) people.querySelector('input').addEventListener('input', pair);
+		// the times chosen in the calendar: one can be taken off; with none left, the days and times are asked in words
+		var slots = form.querySelector('[data-oys-slots]');
+		if (slots) slots.addEventListener('click', function (e) {
+			var x = e.target.closest('[data-oys-slot-x]');
+			if (!x) return;
+			x.closest('li').remove();
+			if (!slots.querySelector('li')) {
+				slots.hidden = true;
+				var pref = form.querySelector('[data-oys-preferred]');
+				if (pref) pref.required = true;
+			}
+		});
 		if (!topics.length) { pair(); return; }
 		function sync() {
 			var o = form.querySelector('input[name="topic"]:checked') || topics[0];
@@ -114,25 +126,90 @@
 			months.forEach(function (m, j) { m.hidden = j !== i; });
 			if (ask) ask.hidden = true;
 		};
-		// a one-to-one session on the chosen day: the link carries the day and the time (Olívia, 19 Nov); the time is a
-		// tap on one of the half hours, „any time” among them (Áron, 19 Nov: no drop-down)
-		var askLink = function () {
+		// one-to-one sessions from the calendar (Olívia, 19 Nov): the link carries the chosen times. Áron, 19 Nov: more than
+		// one in one go, on any days („lehessen egyszerre több időpontot befoglalni”); the taken half hours and the ones
+		// overlapping a chosen time can't be chosen („ha be van foglalva egy idősáv, ott az ne legyen foglalható”)
+		var picked = [], dayEl = null;
+		var max = ask ? parseInt(ask.getAttribute('data-max'), 10) || 10 : 10;
+		var mins = function (t) { var p = t.split(':'); return parseInt(p[0], 10) * 60 + parseInt(p[1], 10); };
+		var keyOf = function (p) { return p.day + (p.time ? 'T' + p.time : ''); };
+		var anyText = ask ? (ask.querySelector('.oys-time--any') || {}).textContent || '' : '';
+		var render = function () {
 			if (!ask) return;
-			var u = new URL(ask.getAttribute('data-url'), location.href);
-			u.searchParams.set('pday', ask.getAttribute('data-day') || '');
-			var on = ask.querySelector('[data-ask-time][aria-pressed="true"]');
-			var t = on ? on.getAttribute('data-ask-time') : '';
-			if (t) u.searchParams.set('ptime', t); else u.searchParams.delete('ptime');
+			var day = ask.getAttribute('data-day') || '';
+			var busy = ((dayEl && dayEl.getAttribute('data-busy')) || '').split(' ').filter(Boolean);
+			var full = picked.length >= max, shownTaken = false, timed = 0;
+			ask.querySelectorAll('[data-ask-time]').forEach(function (b) {
+				var t = b.getAttribute('data-ask-time');
+				var on = picked.some(function (p) { return p.day === day && p.time === t; });
+				var taken = t !== '' && busy.indexOf(t) > -1;
+				var clash = t !== '' && !on && picked.some(function (p) { return p.day === day && p.time && Math.abs(mins(p.time) - mins(t)) < 60; });
+				if (t !== '') timed++;
+				b.classList.toggle('is-taken', taken);
+				b.disabled = !on && (taken || clash || full);
+				b.setAttribute('aria-pressed', on ? 'true' : 'false');
+				if (taken) shownTaken = true;
+			});
+			var any = ask.querySelector('.oys-time--any');
+			if (any && busy.length >= timed && any.getAttribute('aria-pressed') !== 'true') any.disabled = true; // every time taken that day
+			var legend = ask.querySelector('[data-ask-taken]');
+			if (legend) legend.hidden = !shownTaken;
+			var box = ask.querySelector('[data-ask-picked]'), list = ask.querySelector('[data-ask-list]');
 			var go = ask.querySelector('[data-ask-go]');
+			if (box && list) {
+				list.innerHTML = '';
+				picked.forEach(function (p) {
+					var li = document.createElement('li');
+					li.className = 'oys-picked__item';
+					var span = document.createElement('span');
+					span.textContent = p.short + ', ' + (p.time || anyText);
+					var x = document.createElement('button');
+					x.type = 'button';
+					x.className = 'oys-picked__x';
+					x.setAttribute('data-ask-x', keyOf(p));
+					x.setAttribute('aria-label', (go.getAttribute('data-label-x') || '') + ': ' + span.textContent);
+					x.textContent = '×';
+					li.appendChild(span);
+					li.appendChild(x);
+					list.appendChild(li);
+				});
+				box.hidden = picked.length < 1;
+			}
+			var u = new URL(ask.getAttribute('data-url'), location.href);
+			u.searchParams.delete('pday');
+			u.searchParams.delete('ptime');
+			u.searchParams.set('pslots', picked.length ? picked.map(keyOf).join(',') : day);
 			go.href = u.toString();
-			var label = go.getAttribute('data-label');
-			if (label && ask.getAttribute('data-short')) go.textContent = label.replace('%s', ask.getAttribute('data-short') + (t ? ', ' + on.textContent : ''));
+			var label = go.getAttribute('data-label'), labelN = go.getAttribute('data-label-n');
+			if (picked.length > 1 && labelN) go.textContent = labelN.replace('%d', picked.length);
+			else if (picked.length === 1 && label) go.textContent = label.replace('%s', picked[0].short + (picked[0].time ? ', ' + picked[0].time : ''));
+			else if (label && ask.getAttribute('data-short')) go.textContent = label.replace('%s', ask.getAttribute('data-short'));
+			cal.querySelectorAll('.oys-cal__day[data-day]').forEach(function (d) {
+				d.classList.toggle('has-ask', picked.some(function (p) { return p.day === d.getAttribute('data-day'); }));
+			});
 		};
+		var askLink = render;
 		if (ask) ask.addEventListener('click', function (e) {
+			var x = e.target.closest('[data-ask-x]');
+			if (x) {
+				var k = x.getAttribute('data-ask-x');
+				picked = picked.filter(function (p) { return keyOf(p) !== k; });
+				render();
+				return;
+			}
 			var b = e.target.closest('[data-ask-time]');
-			if (!b) return;
-			ask.querySelectorAll('[data-ask-time]').forEach(function (x) { x.setAttribute('aria-pressed', x === b ? 'true' : 'false'); });
-			askLink();
+			if (!b || b.disabled) return;
+			var day = ask.getAttribute('data-day') || '', t = b.getAttribute('data-ask-time');
+			var had = picked.some(function (p) { return p.day === day && p.time === t; });
+			if (had) {
+				picked = picked.filter(function (p) { return !(p.day === day && p.time === t); });
+			} else {
+				// „any time” on a day stands for that day alone; a time replaces it
+				picked = picked.filter(function (p) { return p.day !== day || (t !== '' && p.time !== ''); });
+				if (picked.length < max) picked.push({ day: day, time: t, short: ask.getAttribute('data-short') || day });
+				picked.sort(function (p, q) { return keyOf(p) < keyOf(q) ? -1 : 1; });
+			}
+			render();
 		});
 		cal.classList.add('is-paged');
 		show(start < 0 ? 0 : start);
@@ -171,6 +248,7 @@
 			if (ask) {
 				ask.setAttribute('data-day', day.getAttribute('data-day'));
 				ask.setAttribute('data-short', day.getAttribute('data-short') || '');
+				dayEl = day;
 				ask.querySelector('[data-ask-day]').textContent = day.getAttribute('data-label') || '';
 				ask.hidden = false;
 				askLink();

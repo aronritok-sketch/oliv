@@ -112,6 +112,138 @@ class OYS_Privates {
 		return OYS_Services::credit_kind( $svc[0], $svc[1], $request ? (int) $request->duration_min : 0 );
 	}
 
+	/** At most this many times in one go from the calendar (Áron, 19 November: „lehessen egyszerre több időpontot … ne csak egyet”). */
+	const MAX_SLOTS = 10;
+
+	/** The hours a one-to-one session can be asked for in the calendar: 14:00–21:00 (filter `oys_calendar_ask_hours`). */
+	public static function ask_hours() {
+		$hours = array_values( array_map( 'intval', (array) apply_filters( 'oys_calendar_ask_hours', array( 14, 21 ) ) ) );
+		$from  = max( 0, min( 23, $hours[0] ?? 14 ) );
+		return array( $from, max( $from, min( 23, $hours[1] ?? 21 ) ) );
+	}
+
+	/** The half hours to choose from: „14:00” … „21:00”. */
+	public static function ask_times() {
+		[ $from, $to ] = self::ask_hours();
+		$out = array();
+		for ( $m = $from * 60; $m <= $to * 60; $m += 30 ) {
+			$out[] = sprintf( '%02d:%02d', intdiv( $m, 60 ), $m % 60 );
+		}
+		return $out;
+	}
+
+	/**
+	 * The times chosen in the calendar: `pslots` („2026-12-18T18:30,2026-12-20” – a day alone is any time that day) or the
+	 * older `pday` + `ptime`. Only coming days, each once, a day either at given times or at any time, at most MAX_SLOTS.
+	 * @return array of array( 'day' => 'Y-m-d', 'time' => 'H:i' or '' )
+	 */
+	public static function slots_from( $raw, $day = '', $time = '' ) {
+		$items = array_filter( array_map( 'trim', explode( ',', (string) $raw ) ) );
+		if ( ! $items && '' !== (string) $day ) {
+			$items = array( $day . ( '' !== (string) $time ? 'T' . $time : '' ) );
+		}
+		$tz    = wp_timezone();
+		$today = new DateTimeImmutable( 'today', $tz );
+		$out   = array();
+		foreach ( $items as $it ) {
+			if ( ! preg_match( '/^(\d{4}-\d{2}-\d{2})(?:T((?:[01]\d|2[0-3]):[0-5]\d))?$/', (string) $it, $m ) ) {
+				continue;
+			}
+			$d = DateTimeImmutable::createFromFormat( '!Y-m-d', $m[1], $tz );
+			if ( ! $d || $d->format( 'Y-m-d' ) !== $m[1] || $d < $today ) {
+				continue;
+			}
+			$t = $m[2] ?? '';
+			$out[ $m[1] . ( '' !== $t ? 'T' . $t : '' ) ] = array( 'day' => $m[1], 'time' => $t );
+		}
+		// a day with given times is not also „any time”
+		$timed = array_unique( array_column( array_filter( $out, fn( $x ) => '' !== $x['time'] ), 'day' ) );
+		$out   = array_filter( $out, fn( $x ) => '' !== $x['time'] || ! in_array( $x['day'], $timed, true ) );
+		ksort( $out );
+		return array_slice( array_values( $out ), 0, self::MAX_SLOTS );
+	}
+
+	/** „2026-12-18T18:30” (the key of a chosen time). */
+	public static function slot_key( array $slot ) {
+		return $slot['day'] . ( '' !== $slot['time'] ? 'T' . $slot['time'] : '' );
+	}
+
+	/** When a chosen time starts (a timestamp), 0 for a day at any time. */
+	public static function slot_ts( array $slot ) {
+		return '' === $slot['time'] ? 0 : ( new DateTimeImmutable( $slot['day'] . ' ' . $slot['time'], wp_timezone() ) )->getTimestamp();
+	}
+
+	/** „december 18., péntek, 18:30”, or „december 18., péntek, bármikor 14:00 és 21:00 között”. */
+	public static function slot_label( array $slot ) {
+		$day = wp_date( oys_date_format( 'l, F j' ), DateTimeImmutable::createFromFormat( '!Y-m-d', $slot['day'], wp_timezone() )->setTime( 12, 0 )->getTimestamp() );
+		if ( '' !== $slot['time'] ) {
+			return $day . ', ' . $slot['time'];
+		}
+		[ $from, $to ] = self::ask_hours();
+		return $day . ', ' . sprintf( __( 'any time between %1$s and %2$s', 'olivia-studio' ), sprintf( '%d:00', $from ), sprintf( '%d:00', $to ) );
+	}
+
+	/**
+	 * What already takes the teacher's time between two moments (timestamps): every scheduled class and one-to-one session,
+	 * and the one-to-one times asked for and not answered yet. @return array of array( start, end ) timestamps
+	 */
+	public static function busy( $from_ts, $to_ts ) {
+		global $wpdb;
+		$out = array();
+		foreach ( OYS_Schedule::query( array( 'from' => gmdate( 'Y-m-d H:i:s', $from_ts - DAY_IN_SECONDS ), 'to' => gmdate( 'Y-m-d H:i:s', $to_ts ), 'status' => 'scheduled' ) ) as $s ) {
+			$a = oys_ts( $s->starts_at );
+			$b = max( oys_ts( $s->ends_at ?: $s->starts_at ), $a + 30 * MINUTE_IN_SECONDS );
+			if ( $b > $from_ts ) {
+				$out[] = array( $a, $b );
+			}
+		}
+		$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT slot_at, duration_min FROM ' . OYS_Install::table( 'private_requests' ) . " WHERE status = 'new' AND slot_at IS NOT NULL AND slot_at >= %s AND slot_at < %s", gmdate( 'Y-m-d H:i:s', $from_ts - DAY_IN_SECONDS ), gmdate( 'Y-m-d H:i:s', $to_ts ) ) );
+		foreach ( (array) $rows as $r ) {
+			$a     = oys_ts( $r->slot_at );
+			$out[] = array( $a, $a + max( 30, (int) $r->duration_min ) * MINUTE_IN_SECONDS );
+		}
+		return $out;
+	}
+
+	/** Is the time free for a session this long, and far enough ahead (2 hours; filter `oys_private_lead_hours`)? */
+	public static function is_free( $start_ts, $minutes, array $busy ) {
+		if ( $start_ts < time() + max( 0, (float) apply_filters( 'oys_private_lead_hours', 2 ) ) * HOUR_IN_SECONDS ) {
+			return false;
+		}
+		$end = $start_ts + max( 30, (int) $minutes ) * MINUTE_IN_SECONDS;
+		foreach ( $busy as $b ) {
+			if ( $start_ts < $b[1] && $end > $b[0] ) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * The calendar's taken half hours, day by day (Áron, 19 November: „érzékelje azt, hogyha be van foglalva egy idősáv, ott
+	 * az ne legyen foglalható”): array( 'Y-m-d' => array( '18:00', … ) ) for a session of $minutes.
+	 */
+	public static function taken_times( $first_day, $last_day, $minutes = 60 ) {
+		$tz   = wp_timezone();
+		$d    = DateTimeImmutable::createFromFormat( '!Y-m-d', $first_day, $tz );
+		$e    = DateTimeImmutable::createFromFormat( '!Y-m-d', $last_day, $tz );
+		$out  = array();
+		if ( ! $d || ! $e ) {
+			return $out;
+		}
+		$busy  = self::busy( $d->getTimestamp(), $e->modify( '+1 day' )->getTimestamp() );
+		$times = self::ask_times();
+		for ( ; $d <= $e; $d = $d->modify( '+1 day' ) ) {
+			foreach ( $times as $t ) {
+				[ $h, $mi ] = array_map( 'intval', explode( ':', $t ) );
+				if ( ! self::is_free( $d->setTime( $h, $mi )->getTimestamp(), $minutes, $busy ) ) {
+					$out[ $d->format( 'Y-m-d' ) ][] = $t;
+				}
+			}
+		}
+		return $out;
+	}
+
 	public static function handle_request() {
 		check_admin_referer( 'oys_private_request' );
 		$user_id = get_current_user_id();
@@ -137,7 +269,9 @@ class OYS_Privates {
 			'status'        => 'new',
 			'created_at'    => oys_now(),
 		);
-		if ( ! $row['preferred'] ) {
+		// the times chosen in the calendar (Áron, 19 November: „lehessen egyszerre több időpontot befoglalni ne csak egyet”)
+		$slots = self::slots_from( implode( ',', array_map( 'sanitize_text_field', array_map( 'strval', (array) wp_unslash( $_POST['slots'] ?? array() ) ) ) ) );
+		if ( ! $row['preferred'] && ! $slots ) {
 			oys_flash( __( 'Tell me a few days and times that suit you.', 'olivia-studio' ), 'error' );
 			oys_redirect( wp_get_referer() ?: oys_account_url( 'private' ) );
 		}
@@ -152,13 +286,78 @@ class OYS_Privates {
 				oys_redirect( wp_get_referer() ?: oys_account_url( 'private' ) );
 			}
 		}
-		global $wpdb;
-		$wpdb->insert( OYS_Install::table( 'private_requests' ), $row );
-		$request = self::get( (int) $wpdb->insert_id );
-		OYS_Emails::private_request_received( $request );
-		do_action( 'oys_private_requested', $request ); // the Hub: the summary goes into the customer's conversation
-		oys_flash( __( 'Request sent. I\'ll reply within one working day with a time and price.', 'olivia-studio' ) );
+		$problem = self::slots_problem( $slots, (int) $row['duration_min'] );
+		if ( $problem ) {
+			oys_flash( $problem, 'error' );
+			oys_redirect( wp_get_referer() ?: oys_account_url( 'private' ) );
+		}
+		$request = self::create( $row, $slots );
+		oys_flash( count( $slots ) > 1
+			? sprintf( __( 'Your %d requests are sent. I\'ll confirm the times within one working day, then you can pay for them.', 'olivia-studio' ), count( $slots ) )
+			: __( 'Request sent. I\'ll reply within one working day with a time and price.', 'olivia-studio' ) );
 		oys_redirect( oys_account_url( 'private' ) );
+	}
+
+	/**
+	 * What is wrong with the chosen times for a session this long: one taken in the meantime (a class, a one-to-one session,
+	 * a time someone else asked for), too soon, or two of them overlapping. '' when they are fine.
+	 */
+	public static function slots_problem( array $slots, $minutes ) {
+		$timed = array_values( array_filter( $slots, fn( $x ) => '' !== $x['time'] ) );
+		if ( ! $timed ) {
+			return '';
+		}
+		$ts    = array_map( array( __CLASS__, 'slot_ts' ), $timed );
+		$busy  = self::busy( min( $ts ), max( $ts ) + DAY_IN_SECONDS );
+		$taken = array();
+		foreach ( $timed as $i => $sl ) {
+			if ( ! self::is_free( $ts[ $i ], $minutes, $busy ) ) {
+				$taken[] = self::slot_label( $sl );
+			}
+		}
+		if ( $taken ) {
+			return sprintf( _n( 'This time is no longer free: %s. Please choose another one.', 'These times are no longer free: %s. Please choose others.', count( $taken ), 'olivia-studio' ), implode( '; ', $taken ) );
+		}
+		$len = max( 30, (int) $minutes ) * MINUTE_IN_SECONDS;
+		foreach ( $ts as $i => $a ) {
+			foreach ( $ts as $j => $b ) {
+				if ( $i < $j && abs( $a - $b ) < $len ) {
+					return sprintf( __( 'Two of your times overlap for a %1$d-minute session: %2$s and %3$s. Please keep only one of them.', 'olivia-studio' ), (int) $minutes, self::slot_label( $timed[ $i ] ), self::slot_label( $timed[ $j ] ) );
+				}
+			}
+		}
+		return '';
+	}
+
+	/**
+	 * Saves a request – one for each time chosen in the calendar, together as one batch (each can be offered, paid and held
+	 * on its own; a time is held for others until it is answered) – and tells the customer and the studio once.
+	 * @return object the (first) request
+	 */
+	public static function create( array $row, array $slots = array() ) {
+		global $wpdb;
+		$extra = (string) ( $row['preferred'] ?? '' );
+		$ids   = array();
+		foreach ( $slots ?: array( null ) as $sl ) {
+			$one = $row;
+			if ( $sl ) {
+				$one['preferred'] = self::slot_label( $sl ) . ( '' !== $extra ? "\n" . $extra : '' );
+				$one['slot_at']   = '' !== $sl['time'] ? gmdate( 'Y-m-d H:i:s', self::slot_ts( $sl ) ) : null;
+				$one['batch_id']  = $ids ? $ids[0] : 0;
+			}
+			$wpdb->insert( OYS_Install::table( 'private_requests' ), $one );
+			$ids[] = (int) $wpdb->insert_id;
+		}
+		if ( count( $ids ) > 1 ) {
+			$wpdb->update( OYS_Install::table( 'private_requests' ), array( 'batch_id' => $ids[0] ), array( 'id' => $ids[0] ) );
+		}
+		$request = self::get( $ids[0] );
+		// one email and one note in the conversation for all of them, with every time listed
+		$all            = clone $request;
+		$all->preferred = $slots ? implode( "\n", array_map( array( __CLASS__, 'slot_label' ), $slots ) ) . ( '' !== $extra ? "\n" . $extra : '' ) : $request->preferred;
+		OYS_Emails::private_request_received( $all );
+		do_action( 'oys_private_requested', $all ); // the Hub: the summary goes into the customer's conversation
+		return $request;
 	}
 
 	/**

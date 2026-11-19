@@ -1882,6 +1882,44 @@
     - A vészhelyzeti kapcsolattartó, az egészségügyi megjegyzés és a születésnap nem kötelező (Áron döntése).
   - Tesztek: 1779/0.
 
+- **2026-11-19 – Privát időpontok a naptárból: megmaradnak regisztrációnál és belépésnél, több egyszerre, a foglalt sávok nem választhatók; háttér nélküli ikon (oliviajoga.online 3.12.18, olivia-studio 1.28.0, DB 16).**
+  Áron:
+  - „privát naptárfoglalás esetén, ha új fiókot hozok létre … eltűnik a foglalni kívánt időpont és nem tudok kicheckoutolni”;
+  - „ugyanez ha van fiókja és belép, akkor is mentse”;
+  - „lehessen egyszerre több időpontot befoglalni ne csak egyet”;
+  - „érzékelje azt, hogyha be van foglalva egy idősáv, ott az ne legyen foglalható”;
+  - „csináld meg hogy itt háttér nélküli legyen a logó” (a Chrome kezdőlapja).
+  - **Megmarad az időpont:** a fiókoldal regisztráció és belépés után ugyanarra a címre visz vissza (`OYS_Frontend::here()`,
+    az űrlap maradványai nélkül), így a kérőűrlapon ott vannak a választott időpontok.
+    - Belépés előtt egy sárga doboz mutatja, melyik időpontok várnak elküldésre.
+    - Eddig a fiókoldal a sima `/fiokom/`-ra irányított vissza, és ott elveszett minden.
+  - **Több időpont egyszerre:** a naptárban több időpont kijelölhető, akár több napon is (legfeljebb 10).
+    - „Bármikor jó 14 és 21 óra között” is választható egy napra.
+    - A kijelöltek alul egy listában látszanak (×-szel törölhetők), a kijelölt napokon sárga pötty jelzi őket.
+    - A gomb: „Időpontokat kérek (3)”. A link: `?tab=private&pslots=2026-11-21T15:00,…`; a régi `pday`/`ptime` is működik.
+    - A kérőűrlapon „A választott időpontjaid” lista (egyenként levehető, „Még több időpont a naptárban” link). Ilyenkor a
+      „Más napok és időpontok” mező nem kötelező.
+    - Küldéskor minden időpont külön kérés lesz, közös `batch_id`-vel: Olívia egyenként igazolja vissza, a vendég egyenként
+      fizeti ki.
+    - A vendég és a stúdió egy-egy e-mailt kap, benne minden időponttal, és a Hubban is egy bejegyzés lesz.
+  - **Foglalt sávok:** áthúzva, nem választható minden félóra, amelyikre egy 60 perces óra ráfedne:
+    - bármely meghirdetett óra (csoportos vagy egyéni);
+    - más vendég még meg nem válaszolt időpontkérése;
+    - a 2 órán belüli időpontok.
+    - A naptár naponként kapja a foglalt időket (`data-busy`).
+    - A már kijelölt időpontra ráfedő időket sem lehet választani.
+    - Küldéskor a szerver újra ellenőrzi a választott hosszal: ha közben foglalt lett, vagy két választott időpont egymásra
+      lóg, név szerint szól.
+  - **Olívia:** az admin ajánlat-űrlapján a dátum és az idő a kérésből előre ki van töltve (`slot_at`), a Hub listájában is
+    látszik az időpont.
+  - **Ikon:** az Apple-ikon (amit a Chrome a kezdőlapi csempén mutat) eddig világos négyzeten ült. Most háttér nélküli: csak
+    a sötétzöld kör a pöttyel (`apple-touch-icon-online-clear.png`, új név, hogy a böngészők ne a régit mutassák).
+  - **Ellenőrzés:**
+    - tesztek: 1803/0;
+    - helyben telefonon végigvitt út: 3 időpont 2 napon → regisztráció → a kérőűrlapon mind a 3 → elküldve → 3 kérés;
+    - a következő látogatónál ezek a sávok áthúzva jelennek meg;
+    - visszatérő vendég: időpont → belépés → kérőűrlap az időponttal.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

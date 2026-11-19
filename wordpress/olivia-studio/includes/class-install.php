@@ -224,6 +224,8 @@ class OYS_Install {
 			location_type varchar(30) NOT NULL DEFAULT '',
 			address varchar(255) NOT NULL DEFAULT '',
 			preferred text NULL,
+			slot_at datetime NULL,
+			batch_id bigint(20) unsigned NOT NULL DEFAULT 0,
 			notes text NULL,
 			status varchar(20) NOT NULL DEFAULT 'new',
 			session_id bigint(20) unsigned NOT NULL DEFAULT 0,
@@ -234,7 +236,8 @@ class OYS_Install {
 			updated_at datetime NULL,
 			PRIMARY KEY  (id),
 			KEY user_id (user_id),
-			KEY status (status)
+			KEY status (status),
+			KEY slot_at (slot_at)
 		) $c;" );
 
 		// Recurring memberships (Stripe subscriptions). Periods mirror the subscription.

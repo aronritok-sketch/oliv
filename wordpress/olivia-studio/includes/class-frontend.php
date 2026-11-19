@@ -96,6 +96,8 @@ class OYS_Frontend {
 		// calendar a quiet offer asks for a one-to-one session on it, with a time – only an offer, the calendar is about the
 		// group classes
 		$ask_on  = in_array( 'group', array_map( 'trim', explode( ',', $atts['kind'] ) ), true ) && ( OYS_Services::offered() || OYS_Products::has_plain_private() ) && (bool) apply_filters( 'oys_calendar_private', true );
+		// the half hours already taken, day by day (a class, a one-to-one session, a time someone asked for): not choosable
+		$taken   = $ask_on ? OYS_Privates::taken_times( $today->format( 'Y-m-d' ), $last->format( 'Y-m-d' ) ) : array();
 		$link    = function ( $s ) use ( $user_id ) {
 			$mine = $user_id ? OYS_Bookings::active_for( $user_id, $s->id ) : null;
 			$left = OYS_Schedule::spots_left( $s );
@@ -159,7 +161,7 @@ class OYS_Frontend {
 				$has_mine = in_array( 'is-mine', array_column( $states, 0 ), true );
 				$free     = ! $day_s && ! $other && $ask_on && $day > $today;
 				$pickable = ( $day_s && ! $other ) || $free;
-				$grid .= '<div class="oys-cal__day' . esc_attr( $state ) . ( $day_s ? ' has-class' : '' ) . ( $free ? ' is-free' : '' ) . ( $has_mine ? ' has-mine' : '' ) . '" role="listitem"' . ( $other ? ' aria-hidden="true"' : ' aria-label="' . esc_attr( $label ) . '"' ) . ( $day_s || $free ? ' data-day="' . esc_attr( $key ) . '" data-label="' . esc_attr( wp_date( oys_date_format( 'l, F j' ), $ts ) ) . '" data-short="' . esc_attr( wp_date( oys_date_format( 'M j' ), $ts ) ) . '"' . ( $pickable ? ' tabindex="0"' : '' ) : '' ) . '>'
+				$grid .= '<div class="oys-cal__day' . esc_attr( $state ) . ( $day_s ? ' has-class' : '' ) . ( $free ? ' is-free' : '' ) . ( $has_mine ? ' has-mine' : '' ) . '" role="listitem"' . ( $other ? ' aria-hidden="true"' : ' aria-label="' . esc_attr( $label ) . '"' ) . ( $day_s || $free ? ' data-day="' . esc_attr( $key ) . '" data-label="' . esc_attr( wp_date( oys_date_format( 'l, F j' ), $ts ) ) . '" data-short="' . esc_attr( wp_date( oys_date_format( 'M j' ), $ts ) ) . '"' . ( $ask_on ? ' data-busy="' . esc_attr( implode( ' ', $taken[ $key ] ?? array() ) ) . '"' : '' ) . ( $pickable ? ' tabindex="0"' : '' ) : '' ) . '>'
 					. '<span class="oys-cal__num">' . esc_html( $day->format( 'j' ) ) . '</span>'
 					. ( $day_s ? '<span class="oys-cal__dots" aria-hidden="true">' . implode( '', array_map( fn( $st ) => 'is-mine' === $st[0] ? '<i class="is-mine"></i>' : '<i></i>', array_slice( $states, 0, 3 ) ) ) . '</span><div class="oys-cal__chips">' . $chips . '</div>' : '' ) . '</div>';
 			}
@@ -192,29 +194,31 @@ class OYS_Frontend {
 	 */
 	private static function calendar_ask() {
 		$url   = oys_account_url( 'private' );
-		$hours = array_values( array_map( 'intval', (array) apply_filters( 'oys_calendar_ask_hours', array( 14, 21 ) ) ) );
-		$from  = max( 0, min( 23, $hours[0] ?? 14 ) );
-		$to    = max( $from, min( 23, $hours[1] ?? 21 ) );
+		[ $from, $to ] = OYS_Privates::ask_hours();
 		$parts = array(
 			'morning'   => array( __( 'Morning', 'olivia-studio' ), '' ),
 			'afternoon' => array( __( 'Afternoon', 'olivia-studio' ), '' ),
 			'evening'   => array( __( 'Evening', 'olivia-studio' ), '' ),
 		);
-		for ( $m = $from * 60; $m <= $to * 60; $m += 30 ) {
-			$t    = sprintf( '%02d:%02d', intdiv( $m, 60 ), $m % 60 );
-			$part = $m < 12 * 60 ? 'morning' : ( $m < 18 * 60 ? 'afternoon' : 'evening' );
-			$parts[ $part ][1] .= '<button type="button" class="oys-time" data-ask-time="' . esc_attr( $t ) . '" aria-pressed="false">' . esc_html( oys_is_hu() ? $t : gmdate( 'g:i a', $m * 60 ) ) . '</button>';
+		foreach ( OYS_Privates::ask_times() as $t ) {
+			[ $h, $mi ] = array_map( 'intval', explode( ':', $t ) );
+			$part       = $h < 12 ? 'morning' : ( $h < 18 ? 'afternoon' : 'evening' );
+			$parts[ $part ][1] .= '<button type="button" class="oys-time" data-ask-time="' . esc_attr( $t ) . '" aria-pressed="false">' . esc_html( oys_is_hu() ? $t : gmdate( 'g:i a', ( $h * 60 + $mi ) * 60 ) ) . '</button>';
 		}
 		$times = '';
 		foreach ( $parts as $part ) {
 			$times .= '' !== $part[1] ? '<span class="oys-times__part">' . esc_html( $part[0] ) . '</span><div class="oys-times__grid">' . $part[1] . '</div>' : '';
 		}
 		$hour = fn( $h ) => oys_is_hu() ? (string) $h : gmdate( 'g a', $h * HOUR_IN_SECONDS );
-		return '<div class="oys-cal__ask" data-oys-cal-ask data-url="' . esc_url( $url ) . '" hidden>'
+		// Áron, 19 November: more than one time in one go („lehessen egyszerre több időpontot befoglalni”), on this day or on
+		// others; the taken ones are crossed out („ha be van foglalva egy idősáv, ott az ne legyen foglalható”)
+		return '<div class="oys-cal__ask" data-oys-cal-ask data-url="' . esc_url( $url ) . '" data-max="' . (int) OYS_Privates::MAX_SLOTS . '" hidden>'
 			. '<p><b>' . esc_html__( 'Another time would suit you?', 'olivia-studio' ) . '</b> ' . esc_html__( 'If you would come on your own or as a pair, ask for a one-to-one session on this day:', 'olivia-studio' ) . ' <b data-ask-day></b></p>'
-			. '<div class="oys-times" role="group" aria-labelledby="oys-times-q"><p class="oys-times__q" id="oys-times-q">' . esc_html__( 'Which time would suit you?', 'olivia-studio' ) . '</p>' . $times
-			. '<button type="button" class="oys-time oys-time--any" data-ask-time="" aria-pressed="true">' . esc_html( sprintf( __( 'Any time between %1$s and %2$s', 'olivia-studio' ), $hour( $from ), $hour( $to ) ) ) . '</button></div>'
-			. '<a class="btn btn--primary oys-cal__ask-go" data-ask-go data-label="' . esc_attr__( 'Ask for a time: %s', 'olivia-studio' ) . '" href="' . esc_url( $url ) . '">' . esc_html__( 'Ask for this time', 'olivia-studio' ) . '</a></div>';
+			. '<div class="oys-times" role="group" aria-labelledby="oys-times-q"><p class="oys-times__q" id="oys-times-q">' . esc_html__( 'Which times would suit you?', 'olivia-studio' ) . ' <span class="oys-times__hint">' . esc_html__( 'You can choose more than one, on other days too.', 'olivia-studio' ) . '</span></p>' . $times
+			. '<p class="oys-times__taken" data-ask-taken hidden>' . esc_html__( 'The crossed-out times are already taken.', 'olivia-studio' ) . '</p>'
+			. '<button type="button" class="oys-time oys-time--any" data-ask-time="" aria-pressed="false">' . esc_html( sprintf( __( 'Any time between %1$s and %2$s', 'olivia-studio' ), $hour( $from ), $hour( $to ) ) ) . '</button></div>'
+			. '<div class="oys-picked" data-ask-picked hidden><p class="oys-picked__q">' . esc_html__( 'Chosen:', 'olivia-studio' ) . '</p><ul class="oys-picked__list" data-ask-list></ul></div>'
+			. '<a class="btn btn--primary oys-cal__ask-go" data-ask-go data-label="' . esc_attr__( 'Ask for a time: %s', 'olivia-studio' ) . '" data-label-n="' . esc_attr__( 'Ask for these times (%d)', 'olivia-studio' ) . '" data-label-x="' . esc_attr__( 'Remove', 'olivia-studio' ) . '" href="' . esc_url( $url ) . '">' . esc_html__( 'Ask for this time', 'olivia-studio' ) . '</a></div>';
 	}
 
 	public static function sc_schedule( $atts ) {
@@ -1352,6 +1356,14 @@ class OYS_Frontend {
 	   Account
 	   ====================================================================== */
 
+	/** This page's own address without the sign-up form's leftovers (where to come back after logging in or signing up). */
+	public static function here() {
+		$uri = wp_unslash( $_SERVER['REQUEST_URI'] ?? '/' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$url = set_url_scheme( 'http://' . wp_unslash( $_SERVER['HTTP_HOST'] ?? wp_parse_url( home_url(), PHP_URL_HOST ) ) . $uri ); // phpcs:ignore
+		$url = remove_query_arg( array( 'oys_view', 'oys_email', 'oys_first', 'oys_last', 'oys_phone', 'oys_area', 'oys_reset' ), $url );
+		return wp_validate_redirect( $url, oys_account_url() );
+	}
+
 	public static function auth_forms( $redirect ) {
 		$view  = sanitize_key( $_GET['oys_view'] ?? 'register' );
 		$email = sanitize_email( wp_unslash( $_GET['oys_email'] ?? '' ) );
@@ -1394,7 +1406,11 @@ class OYS_Frontend {
 			return $flash . OYS_Live::page();
 		}
 		if ( ! is_user_logged_in() ) {
-			return $flash . '<div class="oys-card oys-auth oys-auth--page"><p class="lead">' . esc_html__( 'Book and cancel classes, bring guests, see your passes, membership and receipts, and request private sessions.', 'olivia-studio' ) . '</p>' . self::auth_forms( oys_account_url() ) . '</div>';
+			// Áron, 19 November: „ha új fiókot hozok létre … eltűnik a foglalni kívánt időpont”; „ha van fiókja és belép, akkor
+			// is mentse” – after signing up or logging in, back to this very address (the private tab, the chosen times)
+			$asked = isset( $_GET['pslots'] ) || isset( $_GET['pday'] ) ? OYS_Privates::slots_from( wp_unslash( $_GET['pslots'] ?? '' ), wp_unslash( $_GET['pday'] ?? '' ), wp_unslash( $_GET['ptime'] ?? '' ) ) : array(); // phpcs:ignore
+			$note  = $asked ? '<div class="oys-notice oys-asked"><p>' . esc_html( _n( 'Log in or create an account, then your request for this time is ready to send:', 'Log in or create an account, then your request for these times is ready to send:', count( $asked ), 'olivia-studio' ) ) . '</p><ul>' . implode( '', array_map( fn( $sl ) => '<li>' . esc_html( OYS_Privates::slot_label( $sl ) ) . '</li>', $asked ) ) . '</ul></div>' : '';
+			return $flash . '<div class="oys-card oys-auth oys-auth--page">' . $note . '<p class="lead">' . esc_html__( 'Book and cancel classes, bring guests, see your passes, membership and receipts, and request private sessions.', 'olivia-studio' ) . '</p>' . self::auth_forms( self::here() ) . '</div>';
 		}
 		$user_id = get_current_user_id();
 		$user    = wp_get_current_user();
@@ -1782,13 +1798,22 @@ class OYS_Frontend {
 			. '<p class="oys-small">' . esc_html__( 'When the session is booked, they get their own confirmation and their own link to join, like a guest at a group class.', 'olivia-studio' ) . '</p>'
 			. '<div class="form__row"><label class="field"><span>' . esc_html__( 'Their name', 'olivia-studio' ) . '</span><input type="text" name="partner_name" id="oys-pr-pname" maxlength="100" autocomplete="off"></label>'
 			. '<label class="field"><span>' . esc_html__( 'Their email', 'olivia-studio' ) . '</span><input type="email" name="partner_email" id="oys-pr-pemail" autocomplete="off"></label></div></fieldset>' : '';
+		// the times chosen in the calendar, each a session of its own (Áron, 19 November: „lehessen egyszerre több időpontot
+		// befoglalni”); a time can be taken off here, more can be chosen in the calendar
+		$slots  = OYS_Privates::slots_from( wp_unslash( $_GET['pslots'] ?? '' ), wp_unslash( $_GET['pday'] ?? '' ), wp_unslash( $_GET['ptime'] ?? '' ) ); // phpcs:ignore
+		$cal    = (string) apply_filters( 'oys_calendar_url', '' );
+		$chosen = $slots ? '<fieldset class="oys-slots" data-oys-slots><legend>' . esc_html( _n( 'The time you chose', 'The times you chose', count( $slots ), 'olivia-studio' ) ) . '</legend><ul class="oys-slots__list">'
+			. implode( '', array_map( fn( $sl ) => '<li class="oys-slot"><input type="hidden" name="slots[]" value="' . esc_attr( OYS_Privates::slot_key( $sl ) ) . '"><span>' . esc_html( OYS_Privates::slot_label( $sl ) ) . '</span>' . ( count( $slots ) > 1 ? '<button type="button" class="oys-slot__x" data-oys-slot-x aria-label="' . esc_attr__( 'Remove this time', 'olivia-studio' ) . '">' . oys_icon( 'close' ) . '</button>' : '' ) . '</li>', $slots ) )
+			. '</ul><p class="oys-small">' . esc_html( count( $slots ) > 1 ? __( 'Each time is a session of its own: you get a confirmation and can pay for each.', 'olivia-studio' ) : __( 'I confirm the time, then you can pay for it.', 'olivia-studio' ) )
+			. ( '' !== $cal ? ' <a class="text-link" href="' . esc_url( $cal ) . '">' . esc_html__( 'Choose more in the calendar', 'olivia-studio' ) . '</a>' : '' ) . '</p></fieldset>' : '';
 		return self::form_open( 'oys_private_request', 'class="oys-form oys-card" data-oys-private' )
 			. self::private_note() . $topic
 			. ( $length || $people ? '<div class="form__row">' . $length . $people . '</div>' : '' )
 			. $partner
 			. ( $online_only ? '<input type="hidden" name="location_type" value="online"><input type="hidden" name="address" value="">' : '<div class="form__row"><label class="field"><span>' . esc_html__( 'Where', 'olivia-studio' ) . '</span><select name="location_type" id="oys-pr-type">' . $opts . '</select></label>'
 			. '<label class="field"><span>' . esc_html__( 'Address or area', 'olivia-studio' ) . '</span><input type="text" name="address" id="oys-pr-address" placeholder="' . esc_attr__( 'e.g. McGregor Blvd, Fort Myers Beach', 'olivia-studio' ) . '"></label></div>' )
-			. '<label class="field"><span>' . esc_html__( 'Days and times that suit you', 'olivia-studio' ) . '</span><textarea name="preferred" id="oys-pr-preferred" rows="3" required placeholder="' . esc_attr( $online_only ? __( 'e.g. weekday evenings after 6, or Saturday afternoon', 'olivia-studio' ) : __( 'e.g. Tuesday or Thursday mornings, or Saturday at sunrise', 'olivia-studio' ) ) . '">' . esc_textarea( self::preferred_from_calendar() ) . '</textarea></label>'
+			. $chosen
+			. '<label class="field"><span>' . esc_html( $slots ? __( 'Other days and times that also suit you (optional)', 'olivia-studio' ) : __( 'Days and times that suit you', 'olivia-studio' ) ) . '</span><textarea name="preferred" id="oys-pr-preferred" rows="3"' . ( $slots ? '' : ' required' ) . ' data-oys-preferred placeholder="' . esc_attr( $online_only ? __( 'e.g. weekday evenings after 6, or Saturday afternoon', 'olivia-studio' ) : __( 'e.g. Tuesday or Thursday mornings, or Saturday at sunrise', 'olivia-studio' ) ) . '"></textarea></label>'
 			. '<label class="field"><span>' . esc_html__( 'Anything I should know? (goals, injuries, experience)', 'olivia-studio' ) . '</span><textarea name="notes" id="oys-pr-notes" rows="4"></textarea></label>'
 			. ( OYS_Settings::cancel_policy() ? '<p class="oys-policy">' . esc_html( OYS_Settings::cancel_policy() ) . '</p>' : '' ) // the rule before asking, too (Olívia, 14 November)
 			. '<button class="btn btn--primary" type="submit">' . esc_html__( 'Send request', 'olivia-studio' ) . '</button>'
@@ -1801,16 +1826,9 @@ class OYS_Frontend {
 	 * kérni”. '' without a day, or for a day in the past.
 	 */
 	public static function preferred_from_calendar() {
-		// pday / ptime: „day” is WordPress's own date archive variable (?day=… on a page is a 404)
-		$day  = sanitize_text_field( wp_unslash( $_GET['pday'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification
-		$time = sanitize_text_field( wp_unslash( $_GET['ptime'] ?? '' ) ); // phpcs:ignore WordPress.Security.NonceVerification
-		$tz   = wp_timezone();
-		$d    = preg_match( '/^\d{4}-\d{2}-\d{2}$/', $day ) ? DateTimeImmutable::createFromFormat( '!Y-m-d', $day, $tz ) : false;
-		if ( ! $d || $d < new DateTimeImmutable( 'today', $tz ) ) {
-			return '';
-		}
-		$ts = $d->setTime( 12, 0 )->getTimestamp();
-		return wp_date( oys_date_format( 'l, F j' ), $ts ) . ( preg_match( '/^([01]\d|2[0-3]):[0-5]\d$/', $time ) ? ', ' . $time : '' );
+		// pday / ptime: „day” is WordPress's own date archive variable (?day=… on a page is a 404); pslots: several times
+		$slots = OYS_Privates::slots_from( wp_unslash( $_GET['pslots'] ?? '' ), wp_unslash( $_GET['pday'] ?? '' ), wp_unslash( $_GET['ptime'] ?? '' ) ); // phpcs:ignore
+		return implode( "\n", array_map( fn( $sl ) => '' !== $sl['time'] ? OYS_Privates::slot_label( $sl ) : wp_date( oys_date_format( 'l, F j' ), DateTimeImmutable::createFromFormat( '!Y-m-d', $sl['day'], wp_timezone() )->setTime( 12, 0 )->getTimestamp() ), $slots ) );
 	}
 
 	/** First and last name, in the order of the language: „Vezetéknév, Keresztnév” in Hungarian. Both required. */
