@@ -1764,6 +1764,13 @@
   - Tesztek: 1719/0. Helyben lejátszva az élő helyzet (átnevezés + régi frissítés → 7 óra), a javítás után 5 óra, a
     címek és átirányítások jók, egy újabb frissítés nem hoz létre semmit.
 
+- **2026-11-19 – Foglalási űrlap: látható vendégmezők, levegő a gomb körül (oliviajoga.online 3.12.11).**
+  Olívia, 9148973–9148975.
+  - „nem látszanak a rublikák”: a „Hozol barátokat?” szürke dobozában a vendégek név- és e-mail-mezője ugyanolyan szürke
+    volt, mint a doboz. Most fehérek, vékony kerettel (a nyilatkozat mezője is).
+  - „ez picit egybelóg foglalásnál”: a lemondási doboz, a „Tovább” gomb és az ÁSZF-sor között most van hely.
+  - Tesztek: 1721/0. Helyben telefonnézetben próbálva.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

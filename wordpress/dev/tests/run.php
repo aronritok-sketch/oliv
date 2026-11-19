@@ -1331,6 +1331,8 @@ test( 'Olívia 19 Nov: renamed class types – an address she types becomes the 
 	update_option( 'oy_edition', 'fort-myers' );
 	ok( str_contains( $html, '<span>can be watched again for a week</span>' ) && str_contains( $html, '<span>we can talk later in the class chat too</span>' ) && ! str_contains( $html, 'részed lesz' ), 'prices page: „1 hétig visszanézhető” and „később is kapcsolódhatunk a közös chatben” as chips; the sentence about the class is not needed there' );
 	$po = (string) file_get_contents( get_template_directory() . '/languages/hu_HU.po' );
+	$oc = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
+	ok( str_contains( $oc, '.entry .oys-guests .field input, .entry .oys-guests .field select, .entry .oys-waiver .field input { background: #fff; border-color: var(--line); }' ) && str_contains( $oc, '.entry form .oys-policy { margin-bottom: 1.3rem; }' ) && str_contains( $oc, '.entry .oys-terms { margin-top: .9rem; }' ), 'booking form: the guests\' fields are white with a line („nem látszanak a rublikák”), room between the rule, the button and the terms line („egybelóg”)' );
 	ok( str_contains( $po, "msgid \"Book from the timetable with a drop-in or a class pass.\"\nmsgstr \"Foglald le az időpontot alkalmi jeggyel vagy bérlettel.\"" ) && str_contains( $po, 'msgstr "1 hétig visszanézhető"' ) && str_contains( $po, 'msgstr "később is kapcsolódhatunk a közös chatben"' ), 'in Hungarian: „Foglald le az időpontot alkalmi jeggyel vagy bérlettel.”, „1 hétig visszanézhető”, „később is kapcsolódhatunk a közös chatben”' );
 } );
 

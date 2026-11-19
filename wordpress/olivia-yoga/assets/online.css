@@ -1648,6 +1648,10 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .entry .oys-item__main h4 .badge { margin-left: .2rem; }
 .entry .oys-item__actions .btn { min-height: 40px; }
 .entry .oys-policy { margin: 1.4rem 0 0; padding: 1rem 1.15rem; border: 0; border-radius: 18px; background: var(--sun-soft); color: var(--forest); }
+/* Olívia, 19 November, on the booking form: „ez picit egybelóg foglalásnál” – room between the rule, the button and the
+   terms line */
+.entry form .oys-policy { margin-bottom: 1.3rem; }
+.entry .oys-terms { margin-top: .9rem; }
 .entry .oys-empty { padding: 1.1rem 1.2rem; border-radius: 18px; background: #fff; }
 .entry .oys-passes { gap: .75rem; }
 .entry .oys-pass { border: 0; border-radius: 22px; background: #fff; box-shadow: 0 18px 34px -30px rgba(0, 46, 44, .65); }
@@ -1675,6 +1679,9 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 .entry .oys-notice--error { background: var(--pink-soft); }
 .entry .oys-guests, .entry .oys-waiver { border: 0; border-radius: 18px; background: var(--paper); }
 .entry .oys-guests { padding: 1rem 1.1rem 1.1rem; }
+/* Olívia, 19 November: „nem látszanak a rublikák” – the fields on the grey box are white, with a line around them */
+.entry .oys-guests .field input, .entry .oys-guests .field select, .entry .oys-waiver .field input { background: #fff; border-color: var(--line); }
+.entry .oys-guests .field input:focus, .entry .oys-waiver .field input:focus { background: #fff; border-color: var(--orchid); }
 .entry .oys-guests legend { float: left; width: 100%; margin: 0 0 .2rem; padding: 0; }
 .entry .oys-guests legend + * { clear: both; }
 .entry .oys-option__price { font-size: 1.3rem; line-height: 1.1; text-align: right; }
