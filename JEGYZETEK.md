@@ -1604,6 +1604,14 @@
     - Mellékes: az `olivia.ideastyle.hu@gmail.com` extra fiókon (9 tulajdon, pl. helloprovision.com, mandala.hu) a
       sitemap-újraküldés nem megy; ehhez a fiókot írási (webmasters) joggal újra kell kötni (`reconnect: true`).
 
+- **2026-11-19 – Lábléc: „Készítette: HelloProVision” mindkét oldalon (oliviajoga.online 3.12.3, oliviajoga.hu 1.7.2).**
+  Áron: „mindkét webe cseréld a footerbe: helloprovision csinálta a webet, a megszokott módon helyezd el”.
+  - .online: az alsó sor végén „Készítette: HelloProVision” (helloprovision.com, új ablakban), Áron neve helyett; a
+    demón nincs.
+  - .hu: ugyanez az alsó sor végén (`© 2026 Kovács Olívia · Adatkezelési tájékoztató · Sütibeállítások · Készítette:
+    HelloProVision`), november 26. után is.
+  - Tesztek: 1647/0, .hu 2383/0 (után: 1219/0).
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

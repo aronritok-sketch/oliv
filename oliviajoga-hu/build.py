@@ -41,7 +41,7 @@ ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.7.1'
+VERSION = '1.7.2'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -821,7 +821,7 @@ def footer():
 				<ul class="footer__contact"><li>{icon("mail")}<a href="mailto:{EMAIL}">{EMAIL}</a></li><li>{icon("ig")}<a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a></li><li>{icon("fb")}<a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a></li></ul>
 			</div>
 		</div>
-		<div class="footer__bottom"><p>&copy; 2026 Kovács Olívia{legal}</p></div>
+		<div class="footer__bottom"><p>&copy; 2026 Kovács Olívia{legal} · <span class="footer__credit">Készítette: <a href="https://helloprovision.com/" target="_blank" rel="noopener">HelloProVision</a></span></p></div>
 	</div>
 </footer>
 <a class="book-fab" href="{esc(book_url())}" target="_blank" rel="noopener" data-book-fab>{icon("cal")}Bejelentkezés</a>'''

@@ -3810,7 +3810,7 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	ok( str_contains( $sj, "window.matchMedia('(max-width: 699px)')" ) && str_contains( $sj, "ul.classList.add('oj-modules--fold')" ) && str_contains( $oc2, '.oj-modules--fold li > span { display: none; }' ), 'the prenatal cards fold on a phone, a tap opens one („ezek legyenek lenyithatóak mert mobilon így túl hosszú lesz”)' );
 	ok( preg_match( '/prefers-reduced-motion: no-preference\) \{[^@]*\.hatha__orb--sun \{[^}]*animation: oj-ha 12s/', $oc2 ) && str_contains( $oc2, '@keyframes oj-ha {' ) && str_contains( $oc2, '@keyframes oj-tha-fill {' ) && str_contains( $fr, '<span class="hatha__word" aria-hidden="true">Hatha</span>' ), 'Ha–Tha: the sun and the moon drift into one circle with HATHA across it, and part again („egyik átmegy a másikba és oda-vissza”); only with motion allowed' );
 	$ft = (string) file_get_contents( get_template_directory() . '/footer.php' );
-	ok( str_contains( $ft, '<a href="https://aronritok.com/" target="_blank" rel="noopener">Ritók-Filip Áron</a>' ) && ! str_contains( $ft, '>HelloProVision</a>' ), 'online footer: made by Áron, linked to his own page („itt Áron neve legyen és Áron egyéni oldala legyen belinkelve”), in a new window (Olívia, 16 November)' );
+	ok( str_contains( $ft, '<a href="https://helloprovision.com/" target="_blank" rel="noopener">HelloProVision</a>' ) && ! str_contains( $ft, 'aronritok.com' ), 'footer: „Készítette: HelloProVision”, linked, in a new window (Áron, 19 November: „helloprovision csinálta a webet, a megszokott módon”)' );
 	ok( str_contains( $ft, '<a href="<?php echo esc_url( $oy_l[1] ); ?>" target="_blank" rel="noopener">' ) && str_contains( $ft, "oy_page_link( 'privacy-policy' ) ); ?>\" target=\"_blank\" rel=\"noopener\">" ) && str_contains( (string) file_get_contents( get_template_directory() . '/inc/helpers.php' ), "add_action( 'wp_footer', 'oy_new_window_script', 99 );" ), 'the ÁSZF, impresszum and privacy links open in a new window, in the footer and in page texts (Olívia, 16 November)' );
 	update_option( 'oy_edition', 'hu-online' );
 	$cd = json_decode( (string) file_get_contents( oy_content_file() ), true );
@@ -3872,7 +3872,7 @@ test( 'online edition, Olívia\'s doc of 14 November, last points: one level for
 		ob_start();
 		load_template( get_template_directory() . '/footer.php', false );
 		$foot = (string) ob_get_clean();
-		ok( str_contains( $foot, 'href="https://aronritok.com/"' ), 'footer: who made the site, linked (Áron\'s own page)' );
+		ok( str_contains( $foot, '<span class="footer__credit">Készítette <a href="https://helloprovision.com/" target="_blank" rel="noopener">HelloProVision</a></span>' ) || str_contains( $foot, 'href="https://helloprovision.com/" target="_blank" rel="noopener">HelloProVision</a>' ), 'footer: who made the site, linked (HelloProVision)' );
 		$css = (string) file_get_contents( get_template_directory() . '/assets/online.css' );
 		ok( ! str_contains( $css, '.ways--five .way:nth-child(2), .ways--five .way:nth-child(5) { top' ), 'the five boxes in straight lines' );
 		ok( 9 === preg_match_all( '/\.oj-modules li:nth-child\(\d\) \{ --dot: (#[0-9A-F]{6}); \}/', $css, $m ) && 9 === count( array_unique( $m[1] ) ), 'nine modules, nine colours' );
