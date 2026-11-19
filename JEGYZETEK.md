@@ -1581,9 +1581,20 @@
       sitemapeket.
     - Olívia két oldala nincs köztük: a bekötött fiókok nem látják őket, és az ügyfélkartonon (4070003) üres a
       `gsc_property`.
-    - Teendő Áronnak: a CRM-ben adja hozzá Google-fiókként azt a fiókot, amelyikben Olívia Search Console-ja van, vagy a
-      GSC-ben adja hozzá a CRM-be bekötött fiókot felhasználóként (Teljes joggal). Utána a kör magától viszi, és a
-      kartonra beírjuk a tulajdont.
+    - Áron 11.19-én újrakötötte a Google-t a CRM-ben, és a fő fiók most látja az `sc-domain:oliviajoga.hu`-t és az
+      `sc-domain:oliviajoga.online`-t.
+    - Az ügyfélkartonra (4070003) beírtam: `gsc_property = sc-domain:oliviajoga.hu`.
+    - A `hpv_gsc_manage` kör (`POST hpv/v1/pm/gsc-manage`) mindkettőn sikeresen újraküldte a sitemapet:
+      - .online: `wp-sitemap.xml`, 40 cím;
+      - .hu: `www.oliviajoga.hu/wp-sitemap.xml`, 31 cím.
+    - Ezentúl naponta magától fut.
+  - **Még Áronnál:**
+    - A .hu GSC-jében van egy hibás „sitemap”: `https://www.oliviajoga.hu/rolam` (oldal, nem sitemap; 1 hiba). Törölni
+      kell, és felvenni a `https://oliviajoga.hu/wp-sitemap.xml`-t (www nélkül).
+    - A GA4 (`G-WM1P5R67VJ`) egyik bekötött fiókból sem látszik: Admin → Tulajdon hozzáférés-kezelése → a CRM fő fiókja
+      (Megtekintő), utána a kartonra a `ga4_property`.
+    - Mellékes: az `olivia.ideastyle.hu@gmail.com` extra fiókon (9 tulajdon, pl. helloprovision.com, mandala.hu) a
+      sitemap-újraküldés nem megy; ehhez a fiókot írási (webmasters) joggal újra kell kötni (`reconnect: true`).
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
