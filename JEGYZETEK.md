@@ -1591,8 +1591,16 @@
   - **Még Áronnál:**
     - A .hu GSC-jében van egy hibás „sitemap”: `https://www.oliviajoga.hu/rolam` (oldal, nem sitemap; 1 hiba). Törölni
       kell, és felvenni a `https://oliviajoga.hu/wp-sitemap.xml`-t (www nélkül).
-    - A GA4 (`G-WM1P5R67VJ`) egyik bekötött fiókból sem látszik: Admin → Tulajdon hozzáférés-kezelése → a CRM fő fiókja
-      (Megtekintő), utána a kartonra a `ga4_property`.
+    - A GA4 (`G-WM1P5R67VJ`, mindkét oldal ezt használja) egyik bekötött fiókból sem látszik. Áron kérésére feladat
+      Olíviának a portálon (projekt 7350003, feladat 186228610, „Ügyfélre vár”, határidő 11.24., 7 pontos lista):
+      - hozzáférés: aronritok@gmail.com Megtekintőként;
+      - 14 hónapos adatmegőrzés;
+      - a két domain;
+      - `checkout.stripe.com` nem kívánt hivatkozásnak;
+      - `generate_lead` kulcseseménynek;
+      - Search Console-kapcsolat;
+      - időzóna és HUF.
+      Ha kész, a kartonra a `ga4_property`.
     - Mellékes: az `olivia.ideastyle.hu@gmail.com` extra fiókon (9 tulajdon, pl. helloprovision.com, mandala.hu) a
       sitemap-újraküldés nem megy; ehhez a fiókot írási (webmasters) joggal újra kell kötni (`reconnect: true`).
 
