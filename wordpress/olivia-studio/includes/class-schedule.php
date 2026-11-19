@@ -171,6 +171,11 @@ class OYS_Schedule {
 			$where[] = 'teacher_id = %d';
 			$vals[]  = (int) $args['teacher'];
 		}
+		// Sessions only the studio sees (the test mode's classes): not on the public timetable, in llms.txt or the schema.
+		$hide = array_filter( array_map( 'intval', (array) apply_filters( 'oys_hidden_session_ids', array(), $args ) ) );
+		if ( $hide ) {
+			$where[] = 'id NOT IN (' . implode( ',', $hide ) . ')';
+		}
 		$order = ! empty( $args['desc'] ) ? 'DESC' : 'ASC';
 		$limit = ! empty( $args['limit'] ) ? ' LIMIT ' . (int) $args['limit'] : '';
 		$sql   = "SELECT * FROM $s WHERE " . implode( ' AND ', $where ) . " ORDER BY starts_at $order" . $limit;

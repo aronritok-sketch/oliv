@@ -123,13 +123,14 @@ class OYS_Reviews {
 	}
 
 	private static function token( $user_id ) {
-		return (int) $user_id . '-' . substr( hash_hmac( 'sha256', 'oys-review|' . (int) $user_id, wp_salt( 'auth' ) ), 0, 20 );
+		return (int) $user_id . '-' . oys_sig( 'oys-review|' . (int) $user_id ); // bound to the site (a network has one salt)
 	}
 
 	/** The person the form is for: the signed link's, or the logged-in user. 0 when nobody. */
 	public static function who() {
 		$t = isset( $_REQUEST['t'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['t'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
-		if ( preg_match( '/^(\d+)-[a-f0-9]{20}$/', $t, $m ) && hash_equals( self::token( (int) $m[1] ), $t ) && get_userdata( (int) $m[1] ) ) {
+		$legacy = fn( $id ) => $id . '-' . substr( hash_hmac( 'sha256', 'oys-review|' . $id, wp_salt( 'auth' ) ), 0, 20 ); // links sent with 1.23.x
+		if ( preg_match( '/^(\d+)-[a-f0-9]{20}$/', $t, $m ) && ( hash_equals( self::token( (int) $m[1] ), $t ) || ( ! is_multisite() && hash_equals( $legacy( (int) $m[1] ), $t ) ) ) && get_userdata( (int) $m[1] ) ) {
 			return (int) $m[1];
 		}
 		return get_current_user_id();

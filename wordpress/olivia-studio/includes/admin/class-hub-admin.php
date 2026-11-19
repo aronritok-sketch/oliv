@@ -101,6 +101,7 @@ class OYS_Hub_Admin {
 			array( 'chart', __( 'Overview', 'olivia-studio' ), $a( 'oys-today' ), __( 'Numbers, next 7 days', 'olivia-studio' ) ),
 			array( 'teacher', __( 'Teachers', 'olivia-studio' ), $a( 'oys-teachers' ), '' ),
 			array( 'gear', __( 'Settings', 'olivia-studio' ), $a( 'oys-settings' ), '' ),
+			array( 'check', __( 'Test mode', 'olivia-studio' ), $a( 'oys-test' ), class_exists( 'OYS_Testbench' ) && OYS_Testbench::on() ? __( 'On: test guests and classes exist', 'olivia-studio' ) : __( 'Try every process, for real', 'olivia-studio' ) ),
 			// the website's content, so that the app needs no WordPress menu (Áron: „appnak tűnjön 100%-ban”)
 			array( 'note', __( 'Edit the website', 'olivia-studio' ), home_url( '/?szerkesztes=1' ), __( 'Texts and photos, on the page', 'olivia-studio' ) ),
 			array( 'book', __( 'Articles', 'olivia-studio' ), admin_url( 'edit.php' ), '' ),

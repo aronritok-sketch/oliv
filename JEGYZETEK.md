@@ -1612,6 +1612,53 @@
     HelloProVision`), november 26. után is.
   - Tesztek: 1647/0, .hu 2383/0 (után: 1219/0).
 
+- **2026-11-19 – Tesztüzem az oliviajoga.online-on (olivia-studio 1.24.0, téma 3.12.4).** Áron: „minden egyes funkcióra
+  egy teszt gombot … indítható Olivia által … kapcsolható legyen, és élesben menjenek ki az üzenetek, induljon a live
+  kit, induljon minden”.
+  - **Hol:** Stúdió → Tesztüzem (`admin.php?page=oys-test`); a telefonos appban: Több → Tesztüzem.
+  - **Működés:**
+    - Bekapcsoló, és egy mező, hogy melyik postafiókba menjenek a tesztlevelek (alapból a stúdió értesítési címe).
+    - A tesztvendégek ugyanaz a postafiók `+teszt1`, `+teszt2` … címmel, `oys_test` jelöléssel és „TESZT Vendég”
+      névvel.
+  - **18 gomb, mindegyik ugyanazon a kódon fut, mint az igazi vendégnél:**
+    1. regisztráció és üdvözlő levél;
+    2. elfelejtett jelszó;
+    3. bérletvásárlás;
+    4. foglalás;
+    5. emlékeztetők és élő link;
+    6. élő óra (LiveKit, oktatói és vendéglinkkel);
+    7. telt ház és várólista;
+    8. lemondás és „felszabadult egy hely”;
+    9. Olívia lemond egy órát;
+    10. egyéni óra: kérés és ajánlat;
+    11. ajándékutalvány;
+    12. véleménykérés;
+    13. „Hiányzol” és a heti levél;
+    14. születésnapi kupon;
+    15. lejáró bérlet;
+    16. hírlevél;
+    17. push és reggeli összefoglaló;
+    18. ügyfélimport (Motibro-formátum).
+    - Külön gomb: „Minden lefuttatása sorban”.
+  - **Pénz nem mozdul:** a fizetés szimulált, a rendelés „kifizetve” lesz kártya nélkül, a levelek és a bérlet ugyanazok.
+  - **Napló:** minden futás után a kártyán látszanak a lépések (✓/✗), a kiment levelek (tárgy → cím) és a push-ok.
+    - Ha egy levél ki van kapcsolva az E-mailek alatt, ezt kiírja, nem küldi ki erőből.
+  - **A tesztórák:**
+    - „élő”: pár perc múlva kezdődik, az élő terem rögtön nyitva;
+    - „egyhelyes”: 3 nap múlva, várólistához és lemondáshoz;
+    - „elmúlt”: a véleménylinkhez.
+    - Csak a stúdió látja őket: a nyilvános órarendben, az llms.txt-ben és a schemában nincsenek
+      (`oys_hidden_session_ids` szűrő az `OYS_Schedule::query`-ben).
+  - **Takarítás:** a „Tesztadatok törlése” és a kikapcsolás mindent visz (vendégek, foglalások, bérletek, rendelések,
+    ajándékkártyák, kérések, kuponok, vélemények, beszélgetések, órák).
+  - **HathaFlow (több tanáros hálózat):** a véleménylink is oldalhoz kötött aláírást kapott (`oys_sig`, mint 1.7.2 óta a
+    belépő- és rendeléslinkek, a LiveKit-teremnév pedig a `home_url` hash-ét tartalmazza). A régi linkek egy oldalas
+    telepítésen továbbra is működnek.
+  - **Tesztek és helyi próba:**
+    - 1675/0: minden gomb lefut, a levelek a `+teszt` címekre mennek, a tesztóra rejtett, a takarítás után nem marad
+      semmi.
+    - Helyben telefonnézetben próbálva: 18 kártya, magyarul; a bérletvásárlás és a foglalás ✅.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

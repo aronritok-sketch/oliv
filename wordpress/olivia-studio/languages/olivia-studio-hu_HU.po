@@ -8053,3 +8053,295 @@ msgstr "csak ha írsz: a szövege, a választott megjelenés (teljes név, keres
 
 msgid "More classes in the calendar"
 msgstr "További órák a naptárban"
+
+msgid "Test class (Studio → Test mode): only the studio sees it."
+msgstr "Tesztóra (Stúdió → Tesztüzem): csak a stúdió látja."
+
+msgid "There is no active class pass to buy (Studio → Prices & passes)."
+msgstr "Nincs megvásárolható bérlet (Stúdió → Árak és bérletek)."
+
+msgid "Bought: %1$s (%2$s), payment simulated – no card was charged."
+msgstr "Megvéve: %1$s (%2$s), a fizetés szimulált – kártyát nem terheltünk."
+
+msgid "No pass to book with."
+msgstr "Nincs bérlet, amivel foglalni lehetne."
+
+msgid "Sign-up"
+msgstr "Regisztráció"
+
+msgid "A new guest account (TESZT Vendég 1) and the welcome email, as after signing up on the site."
+msgstr "Új vendégfiók (TESZT Vendég 1) és az üdvözlő levél, mint az oldalon való regisztráció után."
+
+msgid "Forgotten password"
+msgstr "Elfelejtett jelszó"
+
+msgid "The „new password” email of the test guest, with the link to the site's own password page."
+msgstr "A tesztvendég „új jelszó” levele, benne a link az oldal saját jelszóoldalára."
+
+msgid "Buying a pass"
+msgstr "Bérletvásárlás"
+
+msgid "The test guest buys a pass: the receipt email to them, the „new order” email and push to you. The payment is simulated, no card is charged."
+msgstr "A tesztvendég bérletet vesz: neki a visszaigazoló levél, neked az „új rendelés” levél és értesítés. A fizetés szimulált, kártyát nem terhel."
+
+msgid "Booking a class"
+msgstr "Órafoglalás"
+
+msgid "The test guest books the test class (it starts in a few minutes) with a class from the pass: the confirmation email with the calendar file, the push to you."
+msgstr "A tesztvendég a bérletéből lefoglalja a tesztórát (pár perc múlva kezdődik): a visszaigazoló levél a naptárfájllal, neked az értesítés."
+
+msgid "The reminder email and the „join the live class” email with the guest's own link to the live room."
+msgstr "Az emlékeztető levél és a „Lépj be az élő órára” levél, benne a vendég saját linkje az élő terembe."
+
+msgid "Live class (LiveKit)"
+msgstr "Élő óra (LiveKit)"
+
+msgid "Opens the live room of the test class: your link (the teacher) and the test guest's link. Open one on your phone, the other on a computer."
+msgstr "Megnyitja a tesztóra élő termét: a te linked (oktató) és a tesztvendégé. Az egyiket nyisd meg telefonon, a másikat gépen."
+
+msgid "Full class, waitlist"
+msgstr "Telt ház, várólista"
+
+msgid "A one-seat test class in three days: guest 1 books it, guest 2 joins the waitlist (push to you)."
+msgstr "Egy egyhelyes tesztóra három nap múlva: az 1. vendég lefoglalja, a 2. vendég várólistára kerül (neked értesítés)."
+
+msgid "Cancelling a booking"
+msgstr "Foglalás lemondása"
+
+msgid "Guest 1 cancels in time: the cancellation email, the class back on the pass, the push to you, and guest 2 gets the „a spot opened up” email."
+msgstr "Az 1. vendég időben lemondja: a lemondó levél, az alkalom visszakerül a bérletre, neked értesítés, a 2. vendég pedig megkapja a „felszabadult egy hely” levelet."
+
+msgid "You cancel a class"
+msgstr "Te mondasz le egy órát"
+
+msgid "You call off the one-seat test class: everyone booked gets the „class cancelled” email, the class goes back on their pass."
+msgstr "Lemondod az egyhelyes tesztórát: aki foglalt, megkapja az „elmarad az óra” levelet, az alkalom visszakerül a bérletére."
+
+msgid "One-to-one session"
+msgstr "Egyéni óra"
+
+msgid "The test guest asks for a one-to-one session (the request reaches you), and you send an offer for tomorrow at 10:00 (the offer email with the payment link)."
+msgstr "A tesztvendég egyéni órát kér (a kérés hozzád fut be), te pedig ajánlatot küldesz holnap 10:00-ra (az ajánlat levele a fizetési linkkel)."
+
+msgid "Guest 1 buys a gift card for guest 2: the gift email with the code, the receipt to the buyer, the „new order” email to you. Payment simulated."
+msgstr "Az 1. vendég ajándékutalványt vesz a 2. vendégnek: az ajándék levél a kóddal, a vevőnek a visszaigazolás, neked az „új rendelés” levél. A fizetés szimulált."
+
+msgid "Asking for a review"
+msgstr "Véleménykérés"
+
+msgid "The review request email after a class (the guest came to a test class four hours ago). Write a review with the link: it waits for your approval in Studio → Reviews."
+msgstr "A véleménykérő levél egy óra után (a vendég négy órája volt egy tesztórán). Írj véleményt a linkkel: a Stúdió → Vélemények alatt vár a jóváhagyásodra."
+
+msgid "„We miss you” and the week"
+msgstr "„Hiányzol” és a heti levél"
+
+msgid "The email to guests who haven't come for a while, and the weekly „this week's classes” email."
+msgstr "A levél azoknak, akik egy ideje nem jöttek, és a heti „ezen a héten” levél."
+
+msgid "Birthday coupon"
+msgstr "Születésnapi kupon"
+
+msgid "The birthday email with a personal, one-time discount code."
+msgstr "A születésnapi levél egy személyes, egyszer használható kedvezménykóddal."
+
+msgid "Pass running out"
+msgstr "Lejáró bérlet"
+
+msgid "The „your pass expires soon” email."
+msgstr "A „hamarosan lejár a bérleted” levél."
+
+msgid "Your latest newsletter to the test guest's mailbox (with the unsubscribe link)."
+msgstr "A legutóbbi hírleveled a tesztvendég postafiókjába (a leiratkozó linkkel)."
+
+msgid "Phone notifications"
+msgstr "Telefonos értesítések"
+
+msgid "A test push and your morning summary to your phone (the Studio app, with notifications allowed)."
+msgstr "Egy tesztértesítés és a reggeli összefoglalód a telefonodra (a Stúdió app, engedélyezett értesítésekkel)."
+
+msgid "Customer import"
+msgstr "Ügyfélimport"
+
+msgid "Two test customers imported the way a Motibro export is: name, email, phone, birthday. They are marked as imported."
+msgstr "Két tesztügyfél importja úgy, mint egy Motibro-exportból: név, e-mail, telefon, születésnap. Importáltként jelennek meg."
+
+msgid "Guest account: %s"
+msgstr "Vendégfiók: %s"
+
+msgid "Password email requested."
+msgstr "A jelszólevél elindult."
+
+msgid "Classes on the test guest's pass: %d"
+msgstr "Alkalmak a tesztvendég bérletén: %d"
+
+msgid "The booking did not go through."
+msgstr "A foglalás nem sikerült."
+
+msgid "Booked: %1$s, %2$s"
+msgstr "Lefoglalva: %1$s, %2$s"
+
+msgid "Reminders sent for the test class."
+msgstr "Az emlékeztetők elmentek a tesztórához."
+
+msgid "The live room is not set up (Settings → Live online)."
+msgstr "Az élő terem nincs beállítva (Beállítások → Élő online)."
+
+msgid "LiveKit answers: the room can start."
+msgstr "A LiveKit válaszol: a terem indulhat."
+
+msgid "Your link (teacher):"
+msgstr "A te linked (oktató):"
+
+msgid "The test guest's link:"
+msgstr "A tesztvendég linkje:"
+
+msgid "The one-seat class is full."
+msgstr "Az egyhelyes óra betelt."
+
+msgid "Cancelled (%s)."
+msgstr "Lemondva (%s)."
+
+msgid "Test: the teacher calls off the class."
+msgstr "Teszt: az oktató lemondja az órát."
+
+msgid "The one-seat test class is cancelled."
+msgstr "Az egyhelyes tesztóra lemondva."
+
+msgid "Test: weekday mornings"
+msgstr "Teszt: hétköznap délelőtt"
+
+msgid "This is a test request from Studio → Test mode."
+msgstr "Ez egy tesztkérés a Stúdió → Tesztüzem oldalról."
+
+msgid "Request sent (it is in your conversations too)."
+msgstr "A kérés elment (a beszélgetéseid között is ott van)."
+
+msgid "Test offer from Studio → Test mode."
+msgstr "Tesztajánlat a Stúdió → Tesztüzem oldalról."
+
+msgid "Offer sent: tomorrow 10:00, %s."
+msgstr "Az ajánlat elment: holnap 10:00, %s."
+
+msgid "No gift card is on sale (Studio → Prices & passes: „Can be given as a gift”)."
+msgstr "Nincs megvásárolható ajándékutalvány (Stúdió → Árak és bérletek: „Ajándékba adható”)."
+
+msgid "Happy practice! (test gift)"
+msgstr "Jó gyakorlást! (tesztajándék)"
+
+msgid "Gift card: %1$s for %2$s, payment simulated."
+msgstr "Ajándékutalvány: %1$s, %2$s részére, a fizetés szimulált."
+
+msgid "Reviews are not available."
+msgstr "A vélemények nem érhetők el."
+
+msgid "Review link:"
+msgstr "Véleménylink:"
+
+msgid "Both emails sent to the test guest."
+msgstr "Mindkét levél elment a tesztvendégnek."
+
+msgid "Coupon: %s"
+msgstr "Kupon: %s"
+
+msgid "Sent for the test guest's pass."
+msgstr "Elment a tesztvendég bérletéhez."
+
+msgid "There is no newsletter yet (Studio → Newsletter): write one, then try again."
+msgstr "Még nincs hírlevél (Stúdió → Hírlevél): írj egyet, aztán próbáld újra."
+
+msgid "Sent: %s"
+msgstr "Elküldve: %s"
+
+msgid "The newsletter did not go out."
+msgstr "A hírlevél nem ment ki."
+
+msgid "Test mode"
+msgstr "Tesztüzem"
+
+msgid "No device of yours allows notifications: open the Studio app on your phone and allow them (Hub → Notifications)."
+msgstr "Egyik eszközödön sincs engedélyezve az értesítés: nyisd meg a telefonodon a Stúdió appot, és engedélyezd (Hub → Értesítések)."
+
+msgid "Morning summary sent."
+msgstr "A reggeli összefoglaló elment."
+
+msgid "Import: %1$d new, %2$d updated, %3$d unchanged, %4$d skipped."
+msgstr "Import: %1$d új, %2$d frissítve, %3$d változatlan, %4$d kihagyva."
+
+msgid "An email did not go out: %s"
+msgstr "Egy levél nem ment ki: %s"
+
+msgid "on"
+msgstr "be"
+
+msgid "Test mode is on: test guests and test classes exist (only you see them)."
+msgstr "A tesztüzem be van kapcsolva: vannak tesztvendégek és tesztórák (csak te látod őket)."
+
+msgid "Test mode is off. Test data deleted (%d test guests)."
+msgstr "A tesztüzem kikapcsolva. A tesztadatok törölve (%d tesztvendég)."
+
+msgid "Test mode is on."
+msgstr "A tesztüzem bekapcsolva."
+
+msgid "Test data deleted (%d test guests)."
+msgstr "A tesztadatok törölve (%d tesztvendég)."
+
+msgid "Everything ran: see the results below and your mailbox."
+msgstr "Minden lefutott: az eredményt lent látod, a leveleket a postafiókodban."
+
+msgid "Done: see the result below."
+msgstr "Kész: az eredményt lent látod."
+
+msgid "Something did not work: see below."
+msgstr "Valami nem működött: lent látod, mi."
+
+msgid "Every process of the site with one tap, for real: the emails go out, the pushes arrive, the live room starts. The test guests are your own mailbox with +teszt1, +teszt2 … in the address, so everything arrives to you. Money does not move: payments are simulated."
+msgstr "Az oldal minden folyamata egy koppintással, élesben: a levelek kimennek, az értesítések megjönnek, az élő terem elindul. A tesztvendégek a saját postafiókod, a címben +teszt1, +teszt2 …, így minden hozzád érkezik. Pénz nem mozdul: a fizetés szimulált."
+
+msgid "Test mode on"
+msgstr "Tesztüzem bekapcsolva"
+
+msgid "Test emails go to:"
+msgstr "A tesztlevelek ide mennek:"
+
+msgid "Test guests: %1$s, %2$s … Switching it off deletes all test data."
+msgstr "Tesztvendégek: %1$s, %2$s … Kikapcsoláskor minden tesztadat törlődik."
+
+msgid "Run everything in order"
+msgstr "Minden lefuttatása sorban"
+
+msgid "Delete the test data"
+msgstr "Tesztadatok törlése"
+
+msgid "Run again"
+msgstr "Újra"
+
+msgid "Run test"
+msgstr "Teszt indítása"
+
+msgid "No email went out: is this email switched off in Studio → Emails & reminders?"
+msgstr "Nem ment ki levél: ki van kapcsolva ez a levél a Stúdió → E-mailek és emlékeztetők alatt?"
+
+msgid "Sent to %d device."
+msgid_plural "Sent to %d devices."
+msgstr[0] "Elküldve %d eszközre."
+msgstr[1] "Elküldve %d eszközre."
+
+msgid "%d device"
+msgid_plural "%d devices"
+msgstr[0] "%d eszköz"
+msgstr[1] "%d eszköz"
+
+msgid "„%s” is switched off in Studio → Emails & reminders, so it does not go out on the site either."
+msgstr "„%s” ki van kapcsolva a Stúdió → E-mailek és emlékeztetők alatt, ezért az oldalon sem megy ki."
+
+msgid "There is no class next week, so the weekly email has nothing to show (on the site it does not go out either)."
+msgstr "Jövő héten nincs óra, így a heti levélben nincs mit mutatni (az oldalon sem megy ki)."
+
+msgid "The email did not go out."
+msgstr "A levél nem ment ki."
+
+msgid "On: test guests and classes exist"
+msgstr "Bekapcsolva: vannak tesztvendégek és -órák"
+
+msgid "Try every process, for real"
+msgstr "Minden folyamat kipróbálása, élesben"

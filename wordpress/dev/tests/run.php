@@ -1134,6 +1134,58 @@ test( 'one-to-one in two lengths (60 / 90 minutes): own credits, own cards, the 
 	}
 } );
 
+test( 'test mode: every process with one tap, the emails to the teacher\'s own mailbox (+teszt), test classes hidden, everything deleted after (Áron, 19 Nov)', function () {
+	$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0];
+	wp_set_current_user( (int) $admin );
+	update_option( OYS_Testbench::OPT, array( 'on' => 1, 'email' => 'olivia.studio@example.com' ) );
+	OYS_Email_Templates::save( 'we_miss_you', array( 'enabled' => 1 ) );
+	OYS_Email_Templates::save( 'weekly_digest', array( 'enabled' => 1 ) );
+	$next_week = make_session( array( 'in_hours' => 24 * 9 ) ); // the weekly email lists next week's classes
+	eq( 'olivia.studio+teszt1@example.com', OYS_Testbench::address( 1 ), 'test guests are the teacher\'s own mailbox with +teszt1, +teszt2 …' );
+	$keys = array_keys( OYS_Testbench::scenarios() );
+	ok( count( $keys ) >= 18 && in_array( 'live', $keys, true ) && in_array( 'import', $keys, true ) && in_array( 'gift', $keys, true ), 'a button for every process: sign-up, password, purchase, booking, reminders, live room, waitlist, cancelling, one-to-one, gift card, review, retention, birthday, newsletter, push, import …' );
+	$res = array();
+	$all = array();
+	foreach ( $keys as $k ) {
+		$mails     = sent_mails( function () use ( $k, &$res ) { $res[ $k ] = OYS_Testbench::run( $k ); } );
+		$all[ $k ] = $mails;
+	}
+	$to = function ( $k, $n ) use ( &$res ) { // the emails the run logged (every wp_mail, the WordPress password email too)
+		return array_values( array_filter( (array) ( $res[ $k ]['mails'] ?? array() ), fn( $m ) => str_contains( $m[0], '+teszt' . $n . '@' ) ) );
+	};
+	foreach ( array( 'account', 'password', 'buy', 'book', 'remind', 'waitlist', 'cancel', 'class_off', 'private', 'gift', 'review', 'retention', 'birthday', 'expiring', 'import' ) as $k ) {
+		ok( $res[ $k ] && $res[ $k ]['ok'], 'test mode „' . $k . '” runs: ' . wp_json_encode( $res[ $k ]['steps'] ?? null, JSON_UNESCAPED_UNICODE ) );
+	}
+	ok( count( $to( 'account', 1 ) ) >= 1 && count( $to( 'password', 1 ) ) >= 1 && count( $to( 'buy', 1 ) ) >= 1 && count( $to( 'book', 1 ) ) >= 1 && count( $to( 'remind', 1 ) ) >= 1, 'the welcome, password, receipt, booking and reminder emails really go out, to the test guest' );
+	ok( count( $to( 'cancel', 1 ) ) >= 1 && count( $to( 'cancel', 2 ) ) >= 1 && count( $to( 'class_off', 1 ) ) >= 1, 'cancelling: the cancellation to guest 1, „a spot opened up” to guest 2 on the waitlist; the teacher calling off the class: the email to the booked guest' );
+	ok( count( $to( 'gift', 2 ) ) >= 1 && count( $to( 'gift', 1 ) ) >= 1 && count( $to( 'private', 1 ) ) >= 1 && count( $to( 'review', 1 ) ) >= 1 && count( $to( 'retention', 1 ) ) >= 2 && count( $to( 'birthday', 1 ) ) >= 1, 'gift card (to the recipient and the buyer), one-to-one offer, review request, „we miss you” + the week, birthday coupon' );
+	ok( ! empty( $res['buy']['mails'] ) && str_contains( wp_json_encode( $res['buy']['steps'], JSON_UNESCAPED_UNICODE ), 'no card was charged' ), 'the result lists the emails it sent; the payment is simulated, said so' );
+	$st   = OYS_Testbench::state();
+	$live = OYS_Schedule::get( $st['sessions']['live'] );
+	ok( $live && str_starts_with( $live->title, 'TESZT – ' ) && oys_ts( $live->starts_at ) < time() + 15 * MINUTE_IN_SECONDS, 'the live test class starts in a few minutes (its room is open at once)' );
+	wp_set_current_user( 0 );
+	$pub = wp_list_pluck( OYS_Schedule::upcoming_public( 30 ), 'id' );
+	wp_set_current_user( (int) $admin );
+	$own = wp_list_pluck( OYS_Schedule::upcoming_public( 30 ), 'id' );
+	ok( ! in_array( (int) $live->id, array_map( 'intval', $pub ), true ) && in_array( (int) $live->id, array_map( 'intval', $own ), true ), 'test classes: not on the public timetable, the studio sees them' );
+	$guests = get_users( array( 'meta_key' => 'oys_test', 'meta_value' => 1, 'fields' => 'ID' ) );
+	ok( count( $guests ) >= 3, 'test guests (and the imported test customers) are marked' );
+	$n = OYS_Testbench::cleanup();
+	global $wpdb;
+	$left = (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . OYS_Install::table( 'sessions' ) . " WHERE title LIKE 'TESZT – %'" ) + count( get_users( array( 'meta_key' => 'oys_test', 'meta_value' => 1, 'fields' => 'ID' ) ) ) + (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . OYS_Install::table( 'orders' ) . " WHERE description LIKE 'TESZT – %'" );
+	ok( $n >= 3 && 0 === $left, '„Delete the test data”: test guests, classes, orders gone' );
+	ob_start();
+	OYS_Testbench::page();
+	$html = ob_get_clean();
+	ok( str_contains( $html, 'name="do" value="switch"' ) && str_contains( $html, 'name="do" value="all"' ) && str_contains( $html, 'name="do" value="live"' ), 'the page: the switch, „run everything”, a button per process' );
+	update_option( OYS_Testbench::OPT, array( 'on' => 0 ) );
+	ok( null === OYS_Testbench::run( 'account' ), 'switched off, nothing runs' );
+	OYS_Schedule::cancel_session( $next_week->id, 'test' );
+	$hu = (string) file_get_contents( OYS_DIR . 'languages/olivia-studio-hu_HU.po' );
+	ok( str_contains( $hu, "msgid \"Test mode\"\nmsgstr \"Tesztüzem\"" ), 'in Hungarian: Tesztüzem' );
+	wp_set_current_user( 0 );
+} );
+
 test( 'booking page: the group class line, „More classes in the calendar” opening the calendar, the one-to-one box under it (Olívia, 18 Nov)', function () {
 	$s = make_session( array( 'format' => 'online', 'online_capacity' => 10, 'in_hours' => 24 * 3 ) );
 	OYS_Settings::update( array( 'schedule_empty_days' => 'no' ) );
