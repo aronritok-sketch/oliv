@@ -1950,6 +1950,29 @@
     az idő az órarendben és a naptárban, a hossz az árkártyákon látszik); a többi címke marad.
   - Tesztek: 1810/0.
 
+- **2026-11-20 – Search Console: miért nem indexelt a két oldal, és javítás (oliviajoga.hu 1.7.5).**
+  Áron: „a Search Console-ba valamiért az aloldalakat nem sikerült a Google-nek indexáltatni, kérlek nézz utána, old meg”;
+  „.hu-t is ellenőrizd”.
+  - **oliviajoga.online (44 cím):** technikailag minden rendben, Googlebotként ellenőrizve:
+    - 200-as válasz, nincs noindex vagy X-Robots-Tag;
+    - a canonical saját magára mutat, a www/http/perjel nélküli cím 301-gyel átirányít;
+    - a sitemapben lastmod is van; a válaszidő 0,3–0,4 mp; a főoldal HTML-jében minden aloldal linkje benne van.
+    - Search Console (a CRM `pm/gsc-diag` URL-vizsgálatával): a sitemapet csak 11.19-én 18:22-kor küldtük be, a Google
+      letöltötte (40 cím, 0 hiba).
+    - 34 vizsgált címből 6 már indexelt (főoldal, Bejelentkezés és árak, Kapcsolat, Jógáról, Kismamatorna, egy cikk), a
+      többit a Google még nem dolgozta fel. Új domainnél (egy hét) ez a szokásos menet; a Google most is aktívan jár rajta.
+  - **oliviajoga.hu (32 cím): valódi hiba volt.**
+    - A WordPress az ékezetes címeket kisbetűs kódolással írta a sitemapbe és néhány linkbe (/r%c3%b3lam), a canonical és a
+      menü viszont nagybetűvel (/r%C3%B3lam), a Google is így indexeli őket.
+    - A Search Console a sitemap címeit „ismeretlennek” látta: 28/32 ismeretlen, 3 felfedezett, de nem indexelt.
+    - Javítás: `oj_upper_escapes` a .hu témában – az oldal- és cikklinkek, az adatkezelési link és a sitemap is a canonical
+      nagybetűs írásmódját kapja.
+    - Helyben ellenőrizve: 32 sitemap-cím, egy kisbetűs sem maradt. A .hu ellenőrzés: 2408/0.
+  - **A .hu Search Console-jában hibás bejegyzés:** egy oldalt (`https://www.oliviajoga.hu/rolam`) sitemapként küldtek be
+    (1 hiba), és a www-s sitemap is be van küldve. Ezt a felületen kell törölni (Sitemapek → a sor → Sitemap eltávolítása).
+  - Utána: a sitemapek újraküldése a CRM-ből (`pm/gsc-manage`), és az „Indexelés kérése” a kulcsoldalakra a Search
+    Console-ban (ezt az API nem tudja, csak kézzel).
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

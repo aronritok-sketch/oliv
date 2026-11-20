@@ -179,6 +179,24 @@ add_action( 'wp_enqueue_scripts', function () {
 
 // No author archives and no users in the sitemap: they would show the admin's login name.
 add_filter( 'wp_sitemaps_add_provider', fn( $provider, $name ) => 'users' === $name ? false : $provider, 10, 2 );
+
+/**
+ * One spelling for every address (Áron, 20 November: „a Search Console-ba … az aloldalakat nem sikerült a Google-nek
+ * indexáltatni”). WordPress writes the accented slugs with small hex digits (/r%c3%b3lam), the pages' canonical and the
+ * menu with capitals (/r%C3%B3lam – as the old site had them and as Google indexes them): Search Console took the
+ * sitemap's spelling for addresses it did not know. The permalinks – the sitemap, the links, the privacy link – now use
+ * the canonical's capitals.
+ */
+function oj_upper_escapes( $url ) {
+	return preg_replace_callback( '/%[0-9a-f]{2}/i', fn( $m ) => strtoupper( $m[0] ), (string) $url );
+}
+foreach ( array( 'page_link', 'post_link', 'post_type_link', 'privacy_policy_url' ) as $oj_hook ) {
+	add_filter( $oj_hook, 'oj_upper_escapes', 99 );
+}
+add_filter( 'wp_sitemaps_posts_entry', function ( $entry ) {
+	$entry['loc'] = oj_upper_escapes( $entry['loc'] ?? '' );
+	return $entry;
+} );
 add_action( 'template_redirect', function () {
 	if ( is_author() ) {
 		wp_safe_redirect( home_url( '/' ), 301 );
