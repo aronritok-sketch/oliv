@@ -1973,6 +1973,11 @@
   - Utána: a sitemapek újraküldése a CRM-ből (`pm/gsc-manage`), és az „Indexelés kérése” a kulcsoldalakra a Search
     Console-ban (ezt az API nem tudja, csak kézzel).
 
+- **2026-11-23 – „Jóga • Kismamatorna • Mobilizáció • Relaxáció és légzés” sor ki (oliviajoga.online 3.12.21).**
+  Áron (képernyőkép a sorról): „ez szedjük ki”. A képen a cikkek alján, a szerzői dobozban lévő sor volt; ugyanez a sor a
+  láblécben is ott volt a logó alatt. Az online kiadásban mindkét helyről kikerült (`oy_specialities()` üres, a sor nem
+  íródik ki); más oldalakon marad. Tesztek: 1811/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

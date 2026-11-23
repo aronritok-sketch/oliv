@@ -1675,6 +1675,14 @@ test( 'Áron 19 Nov: on a phone one button at the start of every class page and 
 	ok( str_contains( $html, '<ul class="oj-info__facts">' ) && ! str_contains( $html, 'Szerdánként 18:30–20:00</span>' ) && ! preg_match( '#<span>\d+ perc</span>#', $html ) && str_contains( $html, 'élőben, a böngésződben' ), 'prices page: no „Szerdánként 18:30–20:00” and „90 perc” chips (Áron: „ott van az infó más módon”), the others stay' );
 } );
 
+test( 'Áron 23 Nov: no „Jóga • Kismamatorna • Mobilizáció • Relaxáció és légzés” line on the online site („ez szedjük ki”)', function () {
+	update_option( 'oy_edition', 'hu-online' );
+	$on = oy_specialities_line( 'specialities specialities--small' );
+	update_option( 'oy_edition', 'fort-myers' );
+	$us = oy_specialities_line( 'specialities' );
+	ok( '' === $on && str_contains( $us, '<p class="specialities">' ), 'online site: the line is gone (the articles\' author box, the footer, the name card); other sites keep theirs' );
+} );
+
 test( 'test mode: every process with one tap, the emails to the teacher\'s own mailbox (+teszt), test classes hidden, everything deleted after (Áron, 19 Nov)', function () {
 	$admin = get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0];
 	wp_set_current_user( (int) $admin );

@@ -775,12 +775,17 @@ function oy_specialities() {
 		return array( __( 'Hatha flow', 'olivia-yoga' ), __( 'Slow flow', 'olivia-yoga' ), __( 'Private sessions', 'olivia-yoga' ), __( 'Online classes', 'olivia-yoga' ) );
 	}
 	if ( oy_online_only() ) {
-		return array( __( 'Yoga', 'olivia-yoga' ), __( 'Prenatal Fitness', 'olivia-yoga' ), __( 'Mobilization', 'olivia-yoga' ), __( 'Relaxation & breathing', 'olivia-yoga' ) ); // Olivia, 11.13
+		// Áron, 23 November (a screenshot of „Jóga • Kismamatorna • Mobilizáció • Relaxáció és légzés”): „ez szedjük ki” –
+		// not under her name in the articles, not in the footer
+		return array();
 	}
 	return array( __( 'Yoga', 'olivia-yoga' ), __( 'Mobility', 'olivia-yoga' ), __( 'Prenatal Fitness', 'olivia-yoga' ), __( 'Meditation', 'olivia-yoga' ), __( 'Private Singing Bowl Massage', 'olivia-yoga' ) );
 }
 
 function oy_specialities_line( $cls = 'specialities' ) {
+	if ( ! oy_specialities() ) {
+		return '';
+	}
 	return '<p class="' . esc_attr( $cls ) . '">' . implode( '<i aria-hidden="true">•</i>', array_map( 'esc_html', oy_specialities() ) ) . '</p>';
 }
 
