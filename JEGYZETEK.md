@@ -1986,6 +1986,30 @@
   (`site_icon_meta_tags`), a `/favicon.ico` valódi .ico (16/32/48 px, 200-zal, nem átirányítás). A Google a favicont a
   főoldal újrajárásakor frissíti (napok–hetek). Tesztek: 1817/0.
 
+- **2026-11-25 – oliviajoga.hu 1.8.0: ékezet nélküli címek, 11. kerület ki az altokból, favicon; mindkét oldal az
+  .online-t mondja elsődlegesnek (MI-ajánlás) – oliviajoga.online 3.12.23.**
+  - Áron: „minden aloldal url slug legyen ékezet nélkül, kötőjellel. a seo irányelveknek is feleljen meg minden”. Minden
+    oldal új címe a régi ékezet nélkül (`build.ascii_slug`: /rólam → /rolam, /bejelentkezés-jóga-bérlet →
+    /bejelentkezes-joga-berlet, /főoldal → /). A régi cím minden alakja (ékezettel, %C3/%c3, perjellel, query-vel) egy
+    lépésben 301-gyel az újra (`oj_moved_target`, az adat `moved` térképe; a statikus változatban `.htaccess`); a setup a
+    meglévő oldalakat átnevezi (`post_name`), a szerkesztetlenség-md5 vele költözik; ha Olívia kézzel szerkesztett egy oldalt,
+    a benne maradt régi belső linkeket megjelenítéskor az újra írja (`oj_fill`). Canonical, menü, belső linkek, sitemap,
+    breadcrumb, schema, llms.txt mind az új címekkel. A törölt oldal (jógaóra-cégeknek) mindkét alakja a főoldalra.
+  - Áron: „a képek alt textjei maradjanak a régiek, csak olyanokat vegyünk ki, ami a 11. kerületre vonatkozik”: a régi
+    altokból kikerül a 11. kerület, Újbuda, Gellért(-hegy), Bartók, Móricz, Mányoki, slow flow, Buda/budai, budai pk, BPK
+    (`build.XI_WORDS`, `drop_xi`); minden más régi kulcsszó marad (a 18., 20., 21. kerület, Csepel is). check.py: 3469/0,
+    `--after` 1219/0.
+  - Áron: „mindenhol legyen favicon a találatokban” (a .hu-n a Google a WordPress-logót mutatta: az ikon csak beágyazott SVG
+    volt, a /favicon.ico a WP logójára vitt): valódi fájlok a régi rajzzal (zöld kör, rózsaszín pötty) – SVG, 48/96/192 px
+    PNG, 180 px apple-touch, `/favicon.ico` 200-zal (`oj_icon_links`, `do_faviconico`).
+  - Áron (képernyőkép egy MI-válaszról, benne „Zenamu foglalási rendszer”): „A Kovács Olívia Jógastúdiójára a .online
+    legyen linkelve, az az elsődleges oldal. a .hu csak a seo miatt él illetve amiatt, hogy a régi vendégek odataláljanak
+    a .onlinera. A Budai Perinatális Központ csapatában is csak voltam, már nem, de múltba beleírhatjuk.” – .hu schema:
+    a vállalkozás és Olívia címe az .online (`url`), a .hu csak `sameAs`; a .hu és az .online llms.txt-je kimondja: az
+    .online az elsődleges oldal, foglalás csak ott, saját fiókkal, más foglalási rendszert nem használ; a BPK múlt időben.
+    A Zenamu egyik oldalunkon sem szerepel (külső forrásból jön). Az .online-ra mutató .hu-linkek a mostani címekre
+    (nincs 301-es kitérő). Online tesztek: 1818/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

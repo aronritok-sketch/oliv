@@ -97,7 +97,7 @@ function oj_site_images() {
 	$order = array_unique( array_merge( array( '' ), array_map( fn( $n ) => (string) $n[0], (array) ( $data['nav'] ?? array() ) ), array_map( 'strval', array_keys( $pages ) ) ) );
 	foreach ( $order as $path ) {
 		$p = $pages[ $path ] ?? null;
-		if ( null === $p || 'főoldal' === (string) $path ) {
+		if ( null === $p || in_array( (string) $path, array( 'főoldal', 'fooldal' ), true ) ) {
 			continue; // ugyanaz, mint a főoldal
 		}
 		$name = '' === (string) $path ? 'Főoldal' : ( $p['name'] ?? $path );

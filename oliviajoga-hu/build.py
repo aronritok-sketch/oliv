@@ -33,15 +33,15 @@ SITE_TITLE = 'Jóga 18. és 21. kerület | Kovács Olívia'
 NOTICE = 'Óráimat 2026. november 25-ig tartom!'  # the site's announcement banner
 # Olivia, „oliviajoga.hu módosítások 11.12.”: after 25 November she teaches live online yoga on oliviajoga.online (ours).
 ONLINE = 'https://oliviajoga.online'  # Olivia: the final domain, without www
-ONLINE_PATHS = {'home': '/', 'yoga': '/online-orak/csoportos-online-flow-joga/', 'prenatal': '/online-orak/online-kismamatorna/',
+ONLINE_PATHS = {'home': '/', 'yoga': '/online-orak/hatha-flow-joga-online/', 'prenatal': '/online-orak/online-kismamatorna/',
                 'account': '/fiokom/', 'gift': '/ajandekutalvany/', 'classes': '/online-orak/', 'request': '/fiokom/?tab=private',
-                'private': '/online-orak/egyeni-online-joga/', 'stretching': '/online-orak/online-stretching-es-mobilizacio/',
+                'private': '/online-orak/egyeni-online-joga/', 'stretching': '/online-orak/stretching-mobility/',
                 'relax': '/online-orak/relaxacio-es-legzes/', 'prices': '/bejelentkezes-es-arak/', 'contact': '/kapcsolat/'}
 ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.7.5'
+VERSION = '1.8.0'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -233,8 +233,19 @@ def norm(s):
 
 # ---------------------------------------------------------------- addresses
 
+HU_ASCII = str.maketrans('áéíóöőúüűÁÉÍÓÖŐÚÜŰ', 'aeiooouuuAEIOOOUUU')
+
+
+def ascii_slug(path):
+    """A page's address without accents, words joined by hyphens (Áron, 25 November: „minden aloldal url slug legyen ékezet
+    nélkül, kötőjellel”): /rólam → /rolam, /bejelentkezés-jóga-bérlet → /bejelentkezes-joga-berlet. The old accented
+    addresses answer with a 301 to these (wp-theme: the data's „moved” map)."""
+    s = unicodedata.normalize('NFKD', path.strip('/').translate(HU_ASCII).lower()).encode('ascii', 'ignore').decode()
+    return re.sub(r'[^a-z0-9]+', '-', s).strip('-')
+
+
 def link(path):
-    """The address of an old page: /rólam on oliviajoga.hu (the server serves rólam/index.html), …/rólam/ in a preview."""
+    """The address of a page: /rolam on oliviajoga.hu (no trailing slash, as before), …/rolam/ in a preview."""
     path = path.strip('/')
     if AFTER and path == 'bejelentkezés-jóga-bérlet':
         return online('prices')  # Olivia (16 Nov): from 26 November to „Bejelentkezés és árak” on the online site
@@ -244,7 +255,7 @@ def link(path):
         path = ''  # the same page as the home page
     if not path:
         return BASE
-    return BASE + urllib.parse.quote(path) + ('/' if PREVIEW else '')
+    return BASE + ascii_slug(path) + ('/' if PREVIEW else '')
 
 
 WP = False  # --wp: the WordPress theme (oliviayoga); addresses and files become placeholders the theme fills in
@@ -339,9 +350,25 @@ ALT_NAMES = [(r'\bkovács[- ]olívia\b', 'Kovács Olívia'), (r'\bkovacs olivia\
              (r'\bjóga-(?=\s)', 'jóga')]
 
 
+# Áron, 25 November: „a képek alt textjei maradjanak a régiek, csak olyanokat vegyünk ki, ami a 11. kerületre vonatkozik
+# (11. kerület, újbuda, gellért-hegy, bartók, móricz, slow flow, buda, budai pk stb)” – she no longer teaches there.
+XI_WORDS = [r'\b11\.\s*kerület\b', r'\bújbud(a|ai)?\b', r'\bgellért(-?hegy)?\b', r'\bbartók\b', r'\bmóri?cz\b',
+            r'\bmányoki\b', r'\bslow\s+flow\b', r'\bbudai\s+pk\b', r'\bbudai\s+perinatális(\s+központ)?\b', r'\bbudai\b',
+            r'\bbuda\b', r'\bbpk\b']
+
+
+def drop_xi(alt):
+    """An old alt without the words of the 11th district (the rest, in its order, stays)."""
+    s = alt or ''
+    for w in XI_WORDS:
+        s = re.sub(w, ' ', s, flags=re.I)
+    s = re.sub(r'\bjóga(\s+jóga\b)+', 'jóga', ' '.join(s.split()), flags=re.I)  # „jóga 11. kerület jóga csepel” → „jóga csepel”
+    return re.sub(r'\s*\bjóga\s*$', '', s).strip(' ,') if s.strip().lower() != 'jóga' else ''
+
+
 def alt_keywords(old):
     """The old alt's keywords, readable: names capitalised, the „jóga …” phrases once each, comma-separated."""
-    s = ' '.join(old.split())
+    s = ' '.join(drop_xi(old).split())
     for a, b in ALT_NAMES:
         s = re.sub(a, b, s, flags=re.I)
     seen = []
@@ -357,7 +384,7 @@ def better_alt(key, old):
     desc = ALT_DESC.get(key.split('/')[-1], '')
     kw = alt_keywords(old or '')
     if not desc:
-        return old
+        return drop_xi(old)
     if 'Kovács Olívia' in desc:
         kw = re.sub(r'\s*Kovács Olívia,?', '', kw).strip(' ,')
     return f'{desc} – {kw}' if kw else desc
@@ -877,7 +904,7 @@ def description(p):
 
 def document(p, body, cls, schema, image=None):
     path = p['path']
-    canon = ORIGIN + '/' + urllib.parse.quote(path if path != 'főoldal' else '')
+    canon = ORIGIN + '/' + ascii_slug(path if path != 'főoldal' else '')
     desc = description(p)
     robots = '<meta name="robots" content="noindex, nofollow">\n' if PREVIEW else ''
     image = image or first_image(body)
@@ -896,7 +923,7 @@ def document(p, body, cls, schema, image=None):
 {robots}<meta name="theme-color" content="#2B5036">
 <meta property="og:site_name" content="{esc(SITE_TITLE)}"><meta property="og:locale" content="hu_HU"><meta property="og:type" content="{"article" if cls == "is-post" else "website"}">
 <meta property="og:title" content="{esc(p["title"])}"><meta property="og:description" content="{esc(desc)}"><meta property="og:url" content="{esc(canon)}">
-{og_img}<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='20' fill='%232B5036'/%3E%3Ccircle cx='31' cy='16' r='5' fill='%23EE3F9A'/%3E%3C/svg%3E">
+{og_img}<link rel="icon" href="{asset("icons/favicon.svg")}" type="image/svg+xml"><link rel="icon" href="{asset("icons/favicon-48.png")}" sizes="48x48" type="image/png"><link rel="icon" href="{asset("icons/favicon-96.png")}" sizes="96x96" type="image/png"><link rel="icon" href="{asset("icons/favicon-192.png")}" sizes="192x192" type="image/png"><link rel="apple-touch-icon" href="{asset("icons/apple-touch-icon.png")}">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&amp;family=Quicksand:wght@400..700&amp;display=swap">
 <link rel="stylesheet" href="{asset("site.css")}?v={v}">
@@ -943,12 +970,16 @@ BUSINESS_DESC = ('Kovács Olívia jógaórái: élő, magyar nyelvű online jóg
 def schema_base(p, extra=None):
     person = {'@type': 'Person', '@id': ORIGIN + '/#olivia', 'name': 'Kovács Olívia', 'jobTitle': OLIVIA['job'],
               'description': OLIVIA['desc'], 'knowsAbout': OLIVIA['knows'], 'hasCredential': OLIVIA['cred'],
-              'url': ORIGIN + '/' + urllib.parse.quote('rólam'), 'email': EMAIL, 'knowsLanguage': 'hu',
-              'sameAs': [INSTAGRAM, FACEBOOK, ONLINE + '/rolam/'], 'worksFor': {'@id': ORIGIN + '/#business'}}
-    business = {'@type': 'Organization', '@id': ORIGIN + '/#business', 'name': 'Olívia jóga', 'url': ORIGIN + '/',
+              'url': ONLINE + '/rolam/', 'email': EMAIL, 'knowsLanguage': 'hu',
+              'sameAs': [INSTAGRAM, FACEBOOK, ORIGIN + '/' + ascii_slug('rólam')], 'worksFor': {'@id': ORIGIN + '/#business'}}
+    # Áron, 25 November (an AI answer linked her studio to the old site and to a booking system she does not use): „A Kovács
+    # Olívia Jógastúdiójára a .online legyen linkelve, az az elsődleges oldal. a .hu csak a seo miatt él illetve amiatt, hogy
+    # a régi vendégek odataláljanak a .onlinera” – the business's address is the online site, this one is its old site.
+    business = {'@type': 'Organization', '@id': ORIGIN + '/#business', 'name': 'Olívia jóga',
+                'alternateName': ['Kovács Olívia jóga', 'Olívia Jóga – Online'], 'url': ONLINE + '/',
                 'email': EMAIL, 'description': BUSINESS_DESC, 'founder': {'@id': ORIGIN + '/#olivia'},
                 'areaServed': {'@type': 'Country', 'name': 'Hungary'}, 'knowsLanguage': 'hu',
-                'sameAs': [ONLINE + '/', INSTAGRAM, FACEBOOK],
+                'sameAs': [ORIGIN + '/', INSTAGRAM, FACEBOOK],
                 'hasOfferCatalog': {'@type': 'OfferCatalog', 'name': 'Jógaórák', 'itemListElement': [
                     {'@type': 'Offer', 'itemOffered': {'@type': 'Service', 'name': n, 'url': ONLINE.rstrip('/') + ONLINE_PATHS[k],
                                                         'provider': {'@id': ORIGIN + '/#olivia'}, 'availableChannel': {
@@ -963,7 +994,7 @@ def schema_base(p, extra=None):
         name = dict(NAV).get(path) or norm(re.sub(r'\s+\?$', '?', own.group(1)) if own else re.sub(r'\s*\|.*$', '', t))
         graph.append({'@type': 'BreadcrumbList', 'itemListElement': [
             {'@type': 'ListItem', 'position': 1, 'name': 'Főoldal', 'item': ORIGIN + '/'},
-            {'@type': 'ListItem', 'position': 2, 'name': name, 'item': ORIGIN + '/' + urllib.parse.quote(path)}]})
+            {'@type': 'ListItem', 'position': 2, 'name': name, 'item': ORIGIN + '/' + ascii_slug(path)}]})
     if extra:
         graph.append(extra)
     return {'@context': 'https://schema.org', '@graph': graph}
@@ -978,6 +1009,13 @@ def llms_txt(journal_cards):
              '> Kovács Olívia hatha flow jógaoktató és pre- és postnatális tréner. Élő, magyar nyelvű online jógaórákat tart '
              'az oliviajoga.online oldalon.' + ('' if AFTER else ' 2026. november 25-ig csoportos hatha flow jógaórákat tart '
                                                  'Budapest XVIII. és XXI. kerületében.'), '',
+             # Áron, 25 November: „A Kovács Olívia Jógastúdiójára a .online legyen linkelve, az az elsődleges oldal. a .hu csak
+             # a seo miatt él illetve amiatt, hogy a régi vendégek odataláljanak a .onlinera.”
+             ('- Elsődleges, aktuális oldala: ' + ONLINE + '/ – az órák, az időpontok, a bérletek, a foglalás és a bejelentkezés '
+              'csak ott (saját fiókkal; más foglalási rendszert nem használ). Az oliviajoga.hu a korábbi oldala: a jógáról szóló '
+              'írásai és a régi vendégeinek útmutató az online oldalra.' if AFTER else
+              '- Elsődleges, aktuális oldala: ' + ONLINE + '/ – az online órák, időpontok, bérletek és a foglalás ott. Az '
+              'oliviajoga.hu a korábbi oldala: a jógáról szóló írásai és a régi vendégeinek útmutató az online oldalra.'),
              '- Végzettség: hatha jógaoktató (Yoga Alliance International, 2023), pre- és postnatális tréner (Fitmummy), tibeti '
              'hangtál- és hangmasszázs-terapeuta.',
              '- Órák (online, magyarul): ' + ', '.join(n.lower() if i else n for i, (n, _) in enumerate(SERVICES)) + '. Foglalás: '
@@ -987,6 +1025,11 @@ def llms_txt(journal_cards):
     if not AFTER:
         lines.append('- Termes órák 2026. november 25-ig: Budapest XVIII. kerület (Prána Jóga és Életmód Központ) és XXI. kerület '
                      '(Korall Sportsziget).')
+    # Áron, 25 November: „A Budai Perinatális Központ csapatában is csak voltam, már nem, de múltba beleírhatjuk.”
+    lines.append('- Korábban: termes csoportos órák Budapesten 2026. november 25-ig (XVIII. kerület: Prána Jóga és Életmód Központ, '
+                 'XXI. kerület: Korall Sportsziget); régebben a Budai Perinatális Központ csapatában is tanított. Ma csak online '
+                 'tanít, az oliviajoga.online-on.' if AFTER else
+                 '- Korábban a Budai Perinatális Központ csapatában is tanított.')
     lines += ['- Kapcsolat: ' + EMAIL + ' · Instagram: ' + INSTAGRAM + ' · Facebook: ' + FACEBOOK, '- Nyelv: magyar.', '',
               '## Oldalak']
     line = lambda title, url, desc: f'- [{title.replace("[", "(").replace("]", ")")}]({url}): {desc}'.rstrip(': ')
@@ -1732,7 +1775,7 @@ def post_page(p, journal_cards):
 # ---------------------------------------------------------------- build
 
 def write(path, content):
-    rel = path.strip('/')
+    rel = path if path == '404' else ascii_slug(path)
     target = os.path.join(OUT, rel, 'index.html') if rel else os.path.join(OUT, 'index.html')
     os.makedirs(os.path.dirname(target), exist_ok=True)
     open(target, 'w', encoding='utf-8').write(content)
@@ -1797,11 +1840,11 @@ def wp_theme(pages, versions):
     open(css, 'w', encoding='utf-8').write(head)
     nf = {'path': '404', 'title': f'Az oldal nem található | {SITE_TITLE}', 'sections': []}
     chrome = {
-        'version': VERSION, 'site_title': SITE_TITLE, 'nav': NAV, 'deleted': sorted(DELETED_PAGES),
+        'version': VERSION, 'site_title': SITE_TITLE, 'nav': NAV, 'deleted': sorted(DELETED_PAGES | {ascii_slug(x) for x in DELETED_PAGES}),
         'header': versions['header'], 'footer': versions['footer'], 'after': versions['after'],
         '404': page_head({'t': 'h1', 'html': 'Az oldal nem található'}, '404', [('', 'Főoldal')], '', '', 'lilac')
                + f'<div class="container oj-flow"><p class="btn-row"><a class="btn btn--orchid" href="{esc(link(""))}">Főoldal</a></p></div>',
-        '404_title': nf['title'], 'pages': pages, 'llms': versions.get('llms', ''),
+        '404_title': nf['title'], 'pages': pages, 'llms': versions.get('llms', ''), 'moved': versions.get('moved', {}),
     }
     os.makedirs(os.path.join(OUT, 'data'), exist_ok=True)
     json.dump(chrome, open(os.path.join(OUT, 'data', 'site.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
@@ -1810,6 +1853,7 @@ def wp_theme(pages, versions):
     shutil.copy(os.path.join(THEME, 'assets', 'site.js'), os.path.join(OUT, 'assets', 'site.js'))
     shutil.copy(os.path.join(HERE, 'assets', 'oliviajoga.css'), os.path.join(OUT, 'assets', 'oliviajoga.css'))
     shutil.copy(os.path.join(HERE, 'assets', 'oliviajoga.js'), os.path.join(OUT, 'assets', 'oliviajoga.js'))
+    shutil.copytree(os.path.join(HERE, 'assets', 'icons'), os.path.join(OUT, 'assets', 'icons'))  # favicon (Áron, 25 Nov)
     # Szerkesztés a weboldalon (Olivia, 11.13): the same editor as the online site (wordpress/olivia-yoga)
     shutil.copy(os.path.join(THEME, 'inc', 'page-editor.php'), os.path.join(OUT, 'inc', 'page-editor.php'))
     # HelloProVision élesítési csomag (Áron, 11.17: „Történjen mindig ugyanaz”) – a közös fájl, wordpress/hpv/hpv-kit.php
@@ -1868,7 +1912,7 @@ def render_all(journal_cards):
         if cls == 'is-post':
             t = only_heading(pg['sections'][0])
             extra = {'@type': 'BlogPosting', 'headline': norm(text_of(t['html'])) if t else pg['title'], 'inLanguage': 'hu-HU',
-                     'author': {'@id': ORIGIN + '/#olivia'}, 'mainEntityOfPage': ORIGIN + '/' + urllib.parse.quote(path)}
+                     'author': {'@id': ORIGIN + '/#olivia'}, 'mainEntityOfPage': ORIGIN + '/' + ascii_slug(path)}
         out.append((path, pg, fix_headings(body), cls, schema_base(pg, extra)))
     return out
 
@@ -1924,15 +1968,20 @@ def main():
 
     if WP:  # both versions: until 25 November and from 26 November (the theme switches by the date, Olivia 11.12)
         AFTER = False
-        wp_pages = {path: wp_entry(pg, body, cls, schema) for path, pg, body, cls, schema in render_all(journal_cards)}
-        wp_pages[PRIVACY_PATH] = privacy_page()
+        wp_pages = {ascii_slug(path): wp_entry(pg, body, cls, schema) for path, pg, body, cls, schema in render_all(journal_cards)}
+        wp_pages[ascii_slug(PRIVACY_PATH)] = privacy_page()
         llms_before = llms_txt(journal_cards)
         chrome = {'header': header(''), 'footer': footer()}
         AFTER = True
-        after = {path: {'content': body, 'prefooter': prefooter(pg), 'desc': description(pg)} for path, pg, body, cls, schema in render_all(journal_cards)}
+        after = {ascii_slug(path): {'content': body, 'prefooter': prefooter(pg), 'desc': description(pg)} for path, pg, body, cls, schema in render_all(journal_cards)}
         chrome['llms'] = llms_before
         chrome['after'] = {'from': AFTER_FROM, 'header': header(''), 'footer': footer(), 'pages': after, 'llms': llms_txt(journal_cards),
-                           'redirect': {'bejelentkezés-jóga-bérlet': online('prices'), 'kapcsolat': online('contact')}}
+                           'redirect': {ascii_slug('bejelentkezés-jóga-bérlet'): online('prices'), 'kapcsolat': online('contact')}}
+        # the old accented addresses → the new ones (301; the setup renames the pages; „főoldal” is the home page)
+        chrome['moved'] = {pth: ('' if pth == 'főoldal' else ascii_slug(pth)) for pth in list(PAGES) + [PRIVACY_PATH]
+                           if pth and ascii_slug(pth) != pth and pth not in DELETED_PAGES}
+        slugs = [ascii_slug(pth) for pth in PAGES if pth not in DELETED_PAGES]
+        assert len(slugs) == len(set(slugs)), "two pages would get the same address"
         AFTER = False
         return wp_theme(wp_pages, chrome)
     for path, pg, body, cls, schema in render_all(journal_cards):
@@ -1951,6 +2000,8 @@ def main():
     shutil.copytree(os.path.join(HERE, 'assets', 'img', 'new'), os.path.join(OUT, 'assets', 'img', 'new'))
     shutil.copy(os.path.join(HERE, 'assets', 'img', 'barion-fizetes.svg'), os.path.join(OUT, 'assets', 'img', 'barion-fizetes.svg'))
     shutil.copytree(os.path.join(HERE, 'assets', 'img', 'pay'), os.path.join(OUT, 'assets', 'img', 'pay'))
+    shutil.copytree(os.path.join(HERE, 'assets', 'icons'), os.path.join(OUT, 'assets', 'icons'))
+    shutil.copy(os.path.join(HERE, 'assets', 'icons', 'favicon.ico'), os.path.join(OUT, 'favicon.ico'))
 
     # 404, robots, sitemap, server rules
     nf = {'path': '404', 'title': f'Az oldal nem található | {SITE_TITLE}', 'sections': []}
@@ -1962,9 +2013,11 @@ def main():
         open(os.path.join(OUT, 'robots.txt'), 'w').write('User-agent: *\nDisallow: /\n')
     else:
         open(os.path.join(OUT, 'robots.txt'), 'w').write(f'User-agent: *\nAllow: /\n\nSitemap: {ORIGIN}/sitemap.xml\n')
-        urls = ''.join(f'<url><loc>{esc(ORIGIN + "/" + urllib.parse.quote(pth))}</loc></url>' for pth in PAGES if pth != 'főoldal' and pth not in DELETED_PAGES)
+        urls = ''.join(f'<url><loc>{esc(ORIGIN + "/" + ascii_slug(pth))}</loc></url>' for pth in PAGES if pth != 'főoldal' and pth not in DELETED_PAGES)
         open(os.path.join(OUT, 'sitemap.xml'), 'w', encoding='utf-8').write(f'<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
-        gone = ''.join(f'RedirectMatch 301 ^/{pth}/?$ /\n' for pth in sorted(DELETED_PAGES))
+        gone = ''.join(f'RedirectMatch 301 ^/{x}/?$ /\n' for pth in sorted(DELETED_PAGES) for x in sorted({pth, ascii_slug(pth)}))
+        gone += ''.join(f'RedirectMatch 301 ^/{pth}/?$ /{ascii_slug(pth) if pth != "főoldal" else ""}\n'
+                        for pth in sorted(PAGES) if pth and ascii_slug(pth) != pth and pth not in DELETED_PAGES)
         open(os.path.join(OUT, '.htaccess'), 'w', encoding='utf-8').write(HTACCESS + gone)
     print(f'{len(PAGES)} pages → {OUT} ({"preview " + BASE if PREVIEW else ORIGIN})')
 

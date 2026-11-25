@@ -14,7 +14,7 @@ if ( '404' === $oj_path ) {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Ccircle cx='24' cy='24' r='20' fill='%232B5036'/%3E%3Ccircle cx='31' cy='16' r='5' fill='%23EE3F9A'/%3E%3C/svg%3E">
+<?php echo oj_icon_links(); // phpcs:ignore -- built from the theme's own addresses ?>
 <?php wp_head(); ?>
 </head>
 <body <?php body_class( $oj_page['cls'] ); ?>>

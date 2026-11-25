@@ -2,10 +2,12 @@
 /**
  * Setup as code (hpv_child_setup – iu_theme runs it after every new version; by hand: wp hpv-site setup --force).
  *
- *   1. Settings: site name, Budapest time, Hungarian dates, addresses without a trailing slash (/rólam, as before).
- *   2. Pages: every page of the old site at its old address, with its content as an HTML block. A page is updated
- *      with a new version's content only if nobody has edited it since (md5 of what the setup last wrote).
- *   3. Home page: "főoldal" (its own address goes to the home page).
+ *   1. Settings: site name, Budapest time, Hungarian dates, addresses without a trailing slash (/rolam, as before).
+ *   2. Pages: every page of the old site, with its content as an HTML block. A page is updated with a new version's
+ *      content only if nobody has edited it since (md5 of what the setup last wrote). The addresses have no accents
+ *      (Áron, 25 November: /rólam → /rolam): a page still at its old accented address is renamed first; the old
+ *      address answers with a 301 (functions.php, the data's „moved” map).
+ *   3. Home page: "fooldal" (its own address goes to the home page).
  * Idempotent: a second run changes nothing.
  */
 
@@ -51,12 +53,26 @@ function oj_setup() {
 	}
 
 	kses_remove_filters();
-	// The old addresses keep their accents (/rólam, not /rolam): WordPress would strip them when it makes the slug.
-	$keep_accents = fn( $title, $raw, $context ) => 'save' === $context && '' !== (string) $raw ? sanitize_title_with_dashes( $raw, '', 'save' ) : $title;
-	add_filter( 'sanitize_title', $keep_accents, 11, 3 );
 	$md5     = (array) get_option( 'oj_setup_md5', array() );
 	$made    = 0;
 	$updated = 0;
+	$renamed = 0;
+	// the accented addresses → without accents (/rólam → /rolam); the setup's own md5 moves with the page
+	foreach ( (array) ( $data['moved'] ?? array() ) as $old => $new ) {
+		$old  = (string) $old;
+		$slug = '' === (string) $new ? 'fooldal' : (string) $new;
+		$page = get_page_by_path( $old );
+		if ( ! $page || $page->post_name === $slug || get_page_by_path( $slug ) ) {
+			continue;
+		}
+		wp_update_post( array( 'ID' => $page->ID, 'post_name' => $slug ) );
+		$key = 'főoldal' === $old ? 'fooldal' : $slug;
+		if ( isset( $md5[ $old ] ) ) {
+			$md5[ $key ] = $md5[ $old ];
+			unset( $md5[ $old ] );
+		}
+		$renamed++;
+	}
 	foreach ( (array) ( $data['pages'] ?? array() ) as $path => $p ) {
 		$path = (string) $path;
 		if ( '' === $path || in_array( $path, (array) ( $data['deleted'] ?? array() ), true ) ) {
@@ -80,15 +96,14 @@ function oj_setup() {
 		}
 	}
 	update_option( 'oj_setup_md5', $md5, false );
-	remove_filter( 'sanitize_title', $keep_accents, 11 );
 	kses_init_filters();
-	$log[] = sprintf( '%d new pages, %d updated', $made, $updated );
+	$log[] = sprintf( '%d new pages, %d updated, %d renamed (no accents)', $made, $updated, $renamed );
 
-	$home = get_page_by_path( 'főoldal' );
+	$home = get_page_by_path( 'fooldal' );
 	if ( $home ) {
 		update_option( 'show_on_front', 'page' );
 		update_option( 'page_on_front', $home->ID );
-		$log[] = 'home page: főoldal';
+		$log[] = 'home page: fooldal';
 	}
 	foreach ( (array) ( $data['deleted'] ?? array() ) as $gone ) { // pages Olivia had removed: to the bin
 		$pg = get_page_by_path( $gone );
@@ -98,10 +113,10 @@ function oj_setup() {
 		}
 	}
 	// az adatkezelési tájékoztató a WordPress „adatvédelmi oldala” (a sütisáv és a WordPress maga is ide linkel)
-	$privacy = get_page_by_path( 'adatkezelési-tájékoztató' );
+	$privacy = get_page_by_path( 'adatkezelesi-tajekoztato' );
 	if ( $privacy && (int) get_option( 'wp_page_for_privacy_policy' ) !== $privacy->ID ) {
 		update_option( 'wp_page_for_privacy_policy', $privacy->ID );
-		$log[] = 'privacy page: adatkezelési-tájékoztató';
+		$log[] = 'privacy page: adatkezelesi-tajekoztato';
 	}
 	do_action( 'iu_llms_flush' ); // az llms.txt / llms-full.txt az új kiadás szövegéből
 	$log[] = oj_sync_media();
@@ -146,7 +161,7 @@ function oj_sync_media() {
 	return sprintf( 'photos: %d fetched, %d left', $got, $left );
 }
 
-// Pages Olivia removed (Jógaóra cégeknek): the old address goes to the home page (301), as on the static site.
+// Pages Olivia removed (Jógaóra cégeknek): the old address – with or without accents – goes to the home page (301).
 add_action( 'template_redirect', function () {
 	if ( ! is_404() ) {
 		return;

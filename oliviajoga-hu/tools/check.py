@@ -57,8 +57,9 @@ def main():
         for s in p['sections']:  # what Olivia asked to take out (build.dropped_section, REMOVED_*)
             if build.dropped_section(p['path'], s):
                 s['columns'] = []
-        f = os.path.join(out, p['path'], 'index.html') if p['path'] else os.path.join(out, 'index.html')
-        ok(os.path.isfile(f), f'missing page: /{p["path"]}')
+        # the addresses without accents (Áron, 25 November): /rólam → /rolam
+        f = os.path.join(out, build.ascii_slug(p['path']), 'index.html') if p['path'] else os.path.join(out, 'index.html')
+        ok(os.path.isfile(f), f'missing page: /{build.ascii_slug(p["path"])} (/{p["path"]})')
         if not os.path.isfile(f):
             continue
         doc = open(f, encoding='utf-8').read()
@@ -94,8 +95,11 @@ def main():
                             ck = build.card_key(p['path'])
                             found = re.search(r'<img[^>]*' + re.escape(ck) + r'-[^>]*alt="' + re.escape(html.escape(build.better_alt(ck, old_alt), quote=True)) + '"', doc)
                         bare = lambda x: unicodedata.normalize('NFKD', x.lower()).encode('ascii', 'ignore').decode()  # noqa: E731 (kovacs = Kovács)
-                        words = [w for w in re.findall(r'\w+', bare(old_alt)) if len(w) > 2]
+                        # every old keyword stays – except the 11th district's (Áron, 25 November: build.drop_xi)
+                        words = [w for w in re.findall(r'\w+', bare(build.drop_xi(old_alt))) if len(w) > 2]
                         ok(all(w in bare(build.better_alt(src, old_alt)) for w in words), f'/{p["path"]}: an old alt keyword lost: {old_alt[:60]}')
+                        ok(not any(re.search(w, build.better_alt(src, old_alt), re.I) for w in build.XI_WORDS),
+                           f'/{p["path"]}: an 11th-district word in the alt: {build.better_alt(src, old_alt)[:80]}')
                         ok(found, f'/{p["path"]}: photo missing or alt changed: {t["file"]} "{t.get("alt", "")[:40]}"')
                     elif t['type'] == 'embed' and not any(r in t['src'] for r in build.REMOVED_EMBEDS):
                         ok(html.escape(t['src'], quote=True) in doc, f'/{p["path"]}: embed missing: {t["src"][:60]}')
@@ -106,6 +110,7 @@ def main():
             h = html.unescape(href)
             if not h.startswith(base) or h.startswith(base + 'assets/'):
                 continue
+            ok(re.fullmatch(r'[a-z0-9/-]*', h[len(base):]) is not None, f'/{path}: an address with accents or capitals: {h}')
             rel = urllib.parse.unquote(h[len(base):]).strip('/')
             target = os.path.join(out, rel, 'index.html') if rel else os.path.join(out, 'index.html')
             ok(os.path.isfile(target), f'/{path}: broken link {h}')
@@ -121,8 +126,10 @@ def main():
         types = {n.get('@type') if isinstance(n.get('@type'), str) else 'x' for n in nodes}
         ok({'WebSite', 'Organization', 'Person'} <= types, f'/{path}: JSON-LD without WebSite / Organization / Person')
         person = next((n for n in nodes if n.get('@type') == 'Person'), {})
-        ok(len(person.get('hasCredential', [])) >= 3 and person.get('jobTitle') and 'https://oliviajoga.online/rolam/' in person.get('sameAs', []),
-           f'/{path}: Person without her credentials or the online site')
+        ok(len(person.get('hasCredential', [])) >= 3 and person.get('jobTitle') and person.get('url') == 'https://oliviajoga.online/rolam/',
+           f'/{path}: Person without her credentials or the online site (her main address since 25 November)')
+        biz = next((n for n in nodes if n.get('@type') == 'Organization'), {})
+        ok(biz.get('url') == 'https://oliviajoga.online/', f'/{path}: the business is not linked to the online site (Áron, 25 Nov)')
         if path not in ('', 'főoldal', '404'):  # /főoldal is the old address of the front page
             bc = next((n for n in nodes if n.get('@type') == 'BreadcrumbList'), None)
             ok(bc is not None, f'/{path}: no BreadcrumbList')
@@ -153,8 +160,9 @@ def after_checks(data, out, base):
     for p in data['pages']:
         if p['path'] in build.DELETED_PAGES:
             continue
-        f = os.path.join(out, p['path'], 'index.html') if p['path'] else os.path.join(out, 'index.html')
-        ok(os.path.isfile(f), f'missing page: /{p["path"]}')
+        # the addresses without accents (Áron, 25 November): /rólam → /rolam
+        f = os.path.join(out, build.ascii_slug(p['path']), 'index.html') if p['path'] else os.path.join(out, 'index.html')
+        ok(os.path.isfile(f), f'missing page: /{build.ascii_slug(p["path"])} (/{p["path"]})')
         if not os.path.isfile(f):
             continue
         doc = files[p['path']] = open(f, encoding='utf-8').read()

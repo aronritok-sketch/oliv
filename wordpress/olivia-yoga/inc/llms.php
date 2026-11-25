@@ -397,6 +397,11 @@ function oy_llms_txt() {
 	$t  = '# ' . oy_site_name() . "\n\n";
 	$t .= '> Élő, magyar nyelvű online jógaórák és online kismamatorna Kovács Olívia jógaoktatóval, otthonról, a böngészőben: csoportos online flow jóga szerdánként 18:30–20:00 (magyar idő), egyéni online jóga, online kismamatorna, online stretching és mobilizáció, valamint relaxáció és légzőgyakorlatok. Kezdőknek is.' . "\n\n";
 	$t .= "- Oktató: Kovács Olívia, hatha jógaoktató (Yoga Alliance International, 2023), pre- és postnatális tréner (Fitmummy), 2015 óta edző.\n";
+	// Áron, 25 November (an AI answer sent her guests to the old site and to a booking system she does not use): „A Kovács
+	// Olívia Jógastúdiójára a .online legyen linkelve, az az elsődleges oldal” + „A Budai Perinatális Központ csapatában is
+	// csak voltam, már nem, de múltba beleírhatjuk.”
+	$t .= '- Ez Kovács Olívia elsődleges, aktuális oldala (' . home_url( '/' ) . "): az órák, az időpontok, a bérletek, a foglalás és a bejelentkezés csak itt, saját fiókkal; más foglalási rendszert nem használ. Korábbi oldala, a jógáról szóló írásaival: https://oliviajoga.hu/\n";
+	$t .= "- Korábban termes csoportos órákat tartott Budapesten (2026. november 25-ig a Prána Jóga és Életmód Központban és a Korall Sportszigeten), régebben a Budai Perinatális Központ csapatában is tanított; ma csak online tanít.\n";
 	$t .= "- Forma: élő, interaktív óra az oldalon, alkalmazás nélkül; ha a résztvevő bekapcsolja a kameráját, Olívia látja és korrigálja. A csoportos óra felvétele (csak Olívia látszik rajta) egy hétig visszanézhető.\n";
 	$t .= '- Árak forintban: csoportos óra ' . ( $group ? implode( ', ', $group ) : '' ) . ( $private ? '; egyéni órák ' . number_format( min( $private ) / 1, 0, ',', ' ' ) . ' Ft-tól, párban olcsóbb' : '' ) . '. Részletek és foglalás: ' . oy_page_link( 'schedule-pricing' ) . "\n";
 	if ( $next ) {

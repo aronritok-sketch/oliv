@@ -8,6 +8,10 @@ legyen, csak egy új UX-et kapjon”.
 
 ## Mi marad változatlan (SEO)
 
+> **2026-11-25 (1.8.0), Áron:** „minden aloldal url slug legyen ékezet nélkül, kötőjellel” – a címek azóta ékezet nélküliek
+> (`/rolam`, `/arak`, `/jogarol` …, `build.ascii_slug`); a régi ékezetes címek 301-gyel az újakra (a WordPress-témában
+> `oj_moved_target`, a statikus változatban `.htaccess`). Az alább „ugyanazon az útvonalon” leírt állapot ez előtt volt így.
+
 - **Címek:** mind a 33 oldal ugyanazon az útvonalon: `/rólam`, `/árak`, `/események`, `/jógáról`, `/jógaóra-cégeknek`,
   `/bejelentkezés-jóga-bérlet`, `/kapcsolat`, `/főoldal` és a 24 írás (`/a-nyújtás-hatása`, `/binge` …). Perjel nélkül, ahogy
   a Google Sites-on (a `.htaccess` átirányítás nélkül szolgálja ki a `rólam/index.html`-t).

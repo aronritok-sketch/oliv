@@ -37,6 +37,34 @@ add_action( 'send_headers', function () {
 	setcookie( 'oj_fresh', '1', array( 'expires' => time() + 2 * YEAR_IN_SECONDS, 'path' => '/', 'secure' => true, 'httponly' => true, 'samesite' => 'Lax' ) );
 } );
 
+/**
+ * The site's icon as real files (Áron, 25 November: „mindenhol legyen favicon a találatokban” – Google showed the
+ * WordPress logo: the icon was only an inline picture, and /favicon.ico went to WordPress's own logo). The same green
+ * circle with the pink dot; 48 / 96 / 192 px for search results, 180 px for phones' home screens.
+ */
+function oj_icon_links() {
+	$u = get_stylesheet_directory_uri() . '/assets/icons/';
+	return '<link rel="icon" href="' . esc_url( $u . 'favicon.svg' ) . '" type="image/svg+xml">' . "\n"
+		. '<link rel="icon" href="' . esc_url( $u . 'favicon-48.png' ) . '" sizes="48x48" type="image/png">' . "\n"
+		. '<link rel="icon" href="' . esc_url( $u . 'favicon-96.png' ) . '" sizes="96x96" type="image/png">' . "\n"
+		. '<link rel="icon" href="' . esc_url( $u . 'favicon-192.png' ) . '" sizes="192x192" type="image/png">' . "\n"
+		. '<link rel="apple-touch-icon" href="' . esc_url( $u . 'apple-touch-icon.png' ) . '">' . "\n";
+}
+
+/** /favicon.ico (browsers and search engines ask for it without reading the page): the icon itself, with 200. */
+add_action( 'do_faviconico', function () {
+	$file = get_stylesheet_directory() . '/assets/icons/favicon.ico';
+	if ( get_option( 'site_icon' ) || ! is_file( $file ) || headers_sent() ) {
+		return; // an icon chosen in the Customizer wins
+	}
+	status_header( 200 );
+	header( 'Content-Type: image/x-icon' );
+	header( 'Content-Length: ' . filesize( $file ) );
+	header( 'Cache-Control: public, max-age=604800' );
+	readfile( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+	exit;
+} );
+
 /** The theme's data: pages (title, description, schema, prefooter, content), header, footer, menu. */
 function oj_data() {
 	static $data = null;
@@ -124,6 +152,12 @@ function oj_fill( $html ) {
 			'%%MEDIA%%'  => oj_media_url(),
 			'%%ONLINE%%' => oj_online_url(),
 		);
+		// a page edited in WordPress before the addresses lost their accents still links to /r%C3%B3lam: straight to /rolam
+		foreach ( (array) ( oj_data()['moved'] ?? array() ) as $old => $new ) {
+			foreach ( array( '"', '#', '?' ) as $end ) {
+				$map[ '%%HOME%%/' . str_replace( '%2F', '/', rawurlencode( (string) $old ) ) . $end ] = untrailingslashit( home_url() ) . ( '' === (string) $new ? '/' : '/' . $new ) . $end;
+			}
+		}
 	}
 	return strtr( oj_apply_positions( (string) $html ), $map ); // a képek helye az adminból (inc/image-position.php)
 }
@@ -253,7 +287,7 @@ function oj_main() {
 	$path  = oj_path();
 	$after = oj_data()['after']['pages'][ $path ] ?? null;
 	$md5   = (array) get_option( 'oj_setup_md5', array() );
-	$key   = '' === $path ? 'főoldal' : $path;
+	$key   = '' === $path ? 'fooldal' : $path;
 	if ( oj_after() && $after && $post instanceof WP_Post && ( ! isset( $md5[ $key ] ) || md5( $post->post_content ) === $md5[ $key ] ) ) {
 		$html = $after['content'];
 	}
@@ -273,7 +307,34 @@ add_action( 'template_redirect', function () {
 	}
 } );
 
-// The old addresses have no trailing slash (/rólam): WordPress keeps them as they are.
+/**
+ * The old accented addresses (Áron, 25 November: „minden aloldal url slug legyen ékezet nélkül, kötőjellel”): /rólam,
+ * /r%C3%B3lam, /r%c3%b3lam, /rólam/ … → /rolam with a 301 (search engines move the page's history over); /főoldal → /.
+ * Before WordPress's own guess for an unknown address (redirect_canonical, priority 10).
+ */
+function oj_moved_target( $uri ) {
+	$req  = trim( rawurldecode( (string) wp_parse_url( (string) $uri, PHP_URL_PATH ) ), '/' );
+	$base = trim( (string) wp_parse_url( home_url(), PHP_URL_PATH ), '/' );
+	if ( '' !== $base && 0 === strpos( $req, $base . '/' ) ) {
+		$req = substr( $req, strlen( $base ) + 1 );
+	}
+	$moved = (array) ( oj_data()['moved'] ?? array() );
+	if ( '' === $req || ! array_key_exists( $req, $moved ) ) {
+		return null;
+	}
+	$to  = '' === (string) $moved[ $req ] ? home_url( '/' ) : untrailingslashit( home_url() ) . '/' . $moved[ $req ];
+	$qs  = (string) wp_parse_url( (string) $uri, PHP_URL_QUERY );
+	return '' !== $qs ? $to . '?' . $qs : $to;
+}
+add_action( 'template_redirect', function () {
+	$to = oj_moved_target( $_SERVER['REQUEST_URI'] ?? '' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+	if ( null !== $to ) {
+		wp_safe_redirect( $to, 301 );
+		exit;
+	}
+}, 1 );
+
+// The addresses have no trailing slash (/rolam): WordPress keeps them as they are.
 add_filter( 'user_trailingslashit', function ( $url, $type ) {
 	return 'page' === $type || 'single' === $type ? untrailingslashit( $url ) : $url;
 }, 10, 2 );
