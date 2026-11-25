@@ -1978,6 +1978,14 @@
   láblécben is ott volt a logó alatt. Az online kiadásban mindkét helyről kikerült (`oy_specialities()` üres, a sor nem
   íródik ki); más oldalakon marad. Tesztek: 1811/0.
 
+- **2026-11-25 – Lábléc: a szakterület-sor vissza szövegként; favicon a találatokban (oliviajoga.online 3.12.22).**
+  Áron: „footerben viszont maradjon szövegként az, amit legutóbb kivettünk” – a láblécben a címsor alatt újra ott a
+  „Jóga • Kismamatorna • Mobilizáció • Relaxáció és légzés”, sima szövegként (`oy_specialities_text()`, `.footer__spec`);
+  a cikkek szerzői dobozában és a főoldali névkártyán nincs. Áron: „mindenhol legyen favicon a találatokban” (a Google a
+  WordPress-logót mutatta): külön 48 / 96 / 192 px-es ikonfájl, a fejlécben a 48 és 96 px-es sor is
+  (`site_icon_meta_tags`), a `/favicon.ico` valódi .ico (16/32/48 px, 200-zal, nem átirányítás). A Google a favicont a
+  főoldal újrajárásakor frissíti (napok–hetek). Tesztek: 1817/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

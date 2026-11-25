@@ -765,7 +765,7 @@ function oy_title_line() {
 	return (string) apply_filters( 'oy_title_line', $line );
 }
 
-function oy_specialities() {
+function oy_specialities( $where = '' ) {
 	// On the HathaFlow platform every teacher's site lists what that teacher teaches (filter `oy_specialities`).
 	$custom = apply_filters( 'oy_specialities', null );
 	if ( is_array( $custom ) && $custom ) {
@@ -776,8 +776,9 @@ function oy_specialities() {
 	}
 	if ( oy_online_only() ) {
 		// Áron, 23 November (a screenshot of „Jóga • Kismamatorna • Mobilizáció • Relaxáció és légzés”): „ez szedjük ki” –
-		// not under her name in the articles, not in the footer
-		return array();
+		// not under her name in the articles or on the name card. 25 November: „footerben viszont maradjon szövegként” –
+		// the footer has it, as plain text (oy_specialities_text())
+		return 'footer' === $where ? array( __( 'Yoga', 'olivia-yoga' ), __( 'Prenatal Fitness', 'olivia-yoga' ), __( 'Mobilization', 'olivia-yoga' ), __( 'Relaxation & breathing', 'olivia-yoga' ) ) : array();
 	}
 	return array( __( 'Yoga', 'olivia-yoga' ), __( 'Mobility', 'olivia-yoga' ), __( 'Prenatal Fitness', 'olivia-yoga' ), __( 'Meditation', 'olivia-yoga' ), __( 'Private Singing Bowl Massage', 'olivia-yoga' ) );
 }
@@ -787,6 +788,12 @@ function oy_specialities_line( $cls = 'specialities' ) {
 		return '';
 	}
 	return '<p class="' . esc_attr( $cls ) . '">' . implode( '<i aria-hidden="true">•</i>', array_map( 'esc_html', oy_specialities() ) ) . '</p>';
+}
+
+/** The specialities as one plain line of text, like the title line above it (the online site's footer, Áron 25 Nov). */
+function oy_specialities_text( $cls = 'footer__spec' ) {
+	$list = oy_specialities( 'footer' );
+	return $list ? '<p class="' . esc_attr( $cls ) . '">' . esc_html( implode( ' • ', $list ) ) . '</p>' : '';
 }
 
 /** The theme's legal pages that exist (for the footer): slug → [title, url]. */

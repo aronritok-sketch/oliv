@@ -1680,7 +1680,37 @@ test( 'Áron 23 Nov: no „Jóga • Kismamatorna • Mobilizáció • Relaxác
 	$on = oy_specialities_line( 'specialities specialities--small' );
 	update_option( 'oy_edition', 'fort-myers' );
 	$us = oy_specialities_line( 'specialities' );
-	ok( '' === $on && str_contains( $us, '<p class="specialities">' ), 'online site: the line is gone (the articles\' author box, the footer, the name card); other sites keep theirs' );
+	ok( '' === $on && str_contains( $us, '<p class="specialities">' ), 'online site: the line is gone (the articles\' author box, the name card); other sites keep theirs' );
+} );
+
+test( 'Áron 25 Nov: „mindenhol legyen favicon a találatokban” – the online site\'s icon in the 48 px multiples, a real /favicon.ico', function () {
+	update_option( 'oy_edition', 'hu-online' );
+	$sizes = array();
+	foreach ( array( 32, 48, 96, 180, 192, 270 ) as $n ) {
+		$sizes[ $n ] = basename( get_site_icon_url( $n ) );
+	}
+	$tags = apply_filters( 'site_icon_meta_tags', array( '<link rel="icon" href="a" sizes="32x32" />', '<link rel="icon" href="b" sizes="192x192" />' ) );
+	update_option( 'oy_edition', 'fort-myers' );
+	$dir = get_template_directory() . '/assets/img/';
+	$ok  = true;
+	foreach ( array( 48, 96, 192 ) as $n ) {
+		$info = getimagesize( $dir . 'favicon-online-' . $n . '.png' );
+		$ok   = $ok && $info && $n === $info[0] && $n === $info[1];
+	}
+	ok( 'favicon-online-48.png' === $sizes[48] && 'favicon-online-96.png' === $sizes[96] && 'favicon-online-192.png' === $sizes[192] && 'apple-touch-icon-online-clear.png' === $sizes[180] && 'favicon-online-512.png' === $sizes[270] && $ok, 'each size its own square file (48, 96, 192 px exactly)' );
+	ok( 4 === count( $tags ) && str_contains( implode( '', $tags ), 'sizes="48x48"' ) && str_contains( implode( '', $tags ), 'sizes="96x96"' ), 'the page lists the 48 and 96 px icons too' );
+	ok( "\0\0\1\0" === substr( (string) file_get_contents( $dir . 'favicon-online.ico' ), 0, 4 ) && str_contains( (string) file_get_contents( get_template_directory() . '/inc/seo.php' ), "header( 'Content-Type: image/x-icon' )" ), '/favicon.ico is a real .ico (16, 32, 48 px), sent with 200' );
+} );
+
+test( 'Áron 25 Nov: „footerben viszont maradjon szövegként” – the online footer has the line again, as plain text', function () {
+	update_option( 'oy_edition', 'hu-online' );
+	$foot = oy_specialities_text();
+	$card = oy_name_card( 'hero__card' );
+	update_option( 'oy_edition', 'fort-myers' );
+	$tpl = file_get_contents( get_template_directory() . '/footer.php' );
+	ok( str_starts_with( $foot, '<p class="footer__spec">' ) && 3 === substr_count( $foot, ' • ' ) && ! str_contains( $foot, '<i' ), 'online footer: one plain line, four items with • between them (no markup) – ' . wp_strip_all_tags( $foot ) );
+	ok( str_contains( $tpl, 'oy_online_only() ? oy_specialities_text() : oy_specialities_line(' ), 'the footer template prints it on the online site, the other sites keep their own line' );
+	ok( ! str_contains( $card, 'namecard__spec' ), 'not back anywhere else on the online site: the name card has none' );
 } );
 
 test( 'test mode: every process with one tap, the emails to the teacher\'s own mailbox (+teszt), test classes hidden, everything deleted after (Áron, 19 Nov)', function () {

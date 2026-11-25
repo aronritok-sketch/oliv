@@ -11,7 +11,7 @@ $gift = function_exists( 'oys_page_url' ) ? oys_page_url( 'gifts' ) : oy_contact
 				<?php if ( oy_online_only() ) : ?><a class="oj-foot-logo" href="<?php echo esc_url( home_url( '/' ) ); ?>" aria-label="<?php echo esc_attr( oy_site_name() ); ?>"><?php echo oy_online_logo(); // phpcs:ignore ?></a><?php endif; ?>
 				<p class="footer__motto"><?php echo esc_html( oy_is_demo() ? __( 'Book, pay and practice in one place.', 'olivia-yoga' ) : __( 'Dynamic yet gentle. Just enough of everything.', 'olivia-yoga' ) ); ?></p>
 				<p><?php echo esc_html( oy_title_line() ); ?></p>
-				<?php echo oy_specialities_line( 'specialities specialities--footer' ); // phpcs:ignore ?>
+				<?php echo oy_online_only() ? oy_specialities_text() : oy_specialities_line( 'specialities specialities--footer' ); // phpcs:ignore ?>
 				<p class="btn-row"><?php echo oy_btn( oy_book_url(), __( 'Book a class', 'olivia-yoga' ), 'orchid' ); // phpcs:ignore ?></p>
 			</div>
 			<nav aria-label="<?php esc_attr_e( 'Practice', 'olivia-yoga' ); ?>"><h2><?php esc_html_e( 'Practice', 'olivia-yoga' ); ?></h2><ul>

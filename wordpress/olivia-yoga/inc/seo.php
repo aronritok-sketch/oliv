@@ -182,9 +182,22 @@ add_filter( 'get_site_icon_url', function ( $url, $size ) {
 	if ( get_option( 'site_icon' ) || ! oy_online_only() ) { // her own icon set in the Customizer wins; WordPress's logo (the fallback /favicon.ico gets) does not
 		return $url;
 	}
-	$file = $size <= 32 ? 'favicon-online-32.png' : ( $size <= 180 ? 'apple-touch-icon-online-clear.png' : 'favicon-online-512.png' );
+	// each size its own file (Áron, 25 November: „mindenhol legyen favicon a találatokban” – Google reads the 48 px
+	// multiples best: 48, 96, 192)
+	$file = $size <= 32 ? 'favicon-online-32.png' : ( $size <= 48 ? 'favicon-online-48.png' : ( $size <= 96 ? 'favicon-online-96.png' : ( 180 === (int) $size ? 'apple-touch-icon-online-clear.png' : ( $size <= 192 ? 'favicon-online-192.png' : 'favicon-online-512.png' ) ) ) );
 	return get_template_directory_uri() . '/assets/img/' . $file;
 }, 10, 2 );
+
+/** The icon in the 48 px multiples search engines prefer, next to WordPress's own 32 / 192 px lines. */
+add_filter( 'site_icon_meta_tags', function ( $tags ) {
+	if ( get_option( 'site_icon' ) || ! oy_online_only() ) {
+		return $tags;
+	}
+	foreach ( array( 96, 48 ) as $n ) {
+		array_splice( $tags, 1, 0, sprintf( '<link rel="icon" type="image/png" href="%s" sizes="%2$dx%2$d" />', esc_url( get_site_icon_url( $n ) ), $n ) );
+	}
+	return $tags;
+} );
 
 /**
  * Pages that don't belong in search results: account, booking and checkout-return; on the online site also the booking
@@ -317,9 +330,21 @@ function oy_seo_online_graph( array $graph, $site ) {
 	return array_values( array_map( fn( $n ) => array_filter( $n, fn( $v ) => null !== $v && '' !== $v ), $graph ) );
 }
 
-/** /favicon.ico (asked for by browsers and search engines without reading the page) → the online site's icon. */
+/**
+ * /favicon.ico (asked for by browsers and search engines without reading the page): the online site's icon itself
+ * (16, 32 and 48 px in one .ico, answered with 200 – not a redirect to an image of another type).
+ */
 add_action( 'do_faviconico', function () {
 	if ( oy_online_only() && ! get_option( 'site_icon' ) ) {
+		$file = get_template_directory() . '/assets/img/favicon-online.ico';
+		if ( is_file( $file ) && ! headers_sent() ) {
+			status_header( 200 );
+			header( 'Content-Type: image/x-icon' );
+			header( 'Content-Length: ' . filesize( $file ) );
+			header( 'Cache-Control: public, max-age=604800' );
+			readfile( $file ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+			exit;
+		}
 		wp_safe_redirect( get_template_directory_uri() . '/assets/img/favicon-online-512.png', 301 );
 		exit;
 	}
