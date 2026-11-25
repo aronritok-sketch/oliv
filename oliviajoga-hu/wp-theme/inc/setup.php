@@ -62,8 +62,18 @@ function oj_setup() {
 		$old  = (string) $old;
 		$slug = '' === (string) $new ? 'fooldal' : (string) $new;
 		$page = get_page_by_path( $old );
-		if ( ! $page || $page->post_name === $slug || get_page_by_path( $slug ) ) {
+		if ( ! $page || $page->post_name === $slug ) {
 			continue;
+		}
+		$taken = get_page_by_path( $slug, OBJECT, 'page' );
+		if ( $taken && $taken->ID !== $page->ID && 'publish' !== $taken->post_status ) {
+			// an unpublished page holds the new address – on the live site WordPress's own draft „Adatkezelési tájékoztató”
+			// (made at install, /adatkezelesi-tajekoztato): it steps aside, nothing of it is lost
+			wp_update_post( array( 'ID' => $taken->ID, 'post_name' => $slug . '-wp-vazlat' ) );
+			$taken = null;
+		}
+		if ( $taken && $taken->ID !== $page->ID ) {
+			continue; // a published page of the same address: left as it is
 		}
 		wp_update_post( array( 'ID' => $page->ID, 'post_name' => $slug ) );
 		$key = 'főoldal' === $old ? 'fooldal' : $slug;
@@ -114,7 +124,7 @@ function oj_setup() {
 	}
 	// az adatkezelési tájékoztató a WordPress „adatvédelmi oldala” (a sütisáv és a WordPress maga is ide linkel)
 	$privacy = get_page_by_path( 'adatkezelesi-tajekoztato' );
-	if ( $privacy && (int) get_option( 'wp_page_for_privacy_policy' ) !== $privacy->ID ) {
+	if ( $privacy && 'publish' === $privacy->post_status && (int) get_option( 'wp_page_for_privacy_policy' ) !== $privacy->ID ) {
 		update_option( 'wp_page_for_privacy_policy', $privacy->ID );
 		$log[] = 'privacy page: adatkezelesi-tajekoztato';
 	}

@@ -2009,6 +2009,10 @@
     .online az elsődleges oldal, foglalás csak ott, saját fiókkal, más foglalási rendszert nem használ; a BPK múlt időben.
     A Zenamu egyik oldalunkon sem szerepel (külső forrásból jön). Az .online-ra mutató .hu-linkek a mostani címekre
     (nincs 301-es kitérő). Online tesztek: 1818/0.
+  - **1.8.1 (javítás, élesben észrevéve):** az élő oldalon a WordPress telepítéskor készített egy „Adatkezelési tájékoztató”
+    vázlatot pont a /adatkezelesi-tajekoztato címen, ezért az átnevezés ott kimaradt, és a beállítás a vázlatra állt át
+    (az új cím 404, a sütisáv a régi címre linkelt). Most egy nem közzétett oldal félreáll (`…-wp-vazlat`), az adatvédelmi
+    oldal csak közzétett lehet, a sütisáv tartalék címe ékezet nélküli. Helyben az élő helyzettel kipróbálva.
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).

@@ -66,7 +66,7 @@ add_action( 'wp_footer', function () {
 	if ( '' === oj_ga4_id() || oj_consent_by_hpvac() || is_admin() ) {
 		return;
 	}
-	$privacy = get_privacy_policy_url() ?: home_url( '/adatkezelési-tájékoztató' );
+	$privacy = get_privacy_policy_url() ?: home_url( '/adatkezelesi-tajekoztato' );
 	?>
 <div class="oy-consent" id="oy-consent" role="dialog" aria-live="polite" aria-labelledby="oy-consent-title" hidden>
 	<p class="oy-consent__text"><b id="oy-consent-title">Sütik</b> A működéshez szükséges sütik mindig működnek. Ha hozzájárulsz, a Google Analytics is méri, hogyan használják az oldalt, hogy jobbá tehessük. <a href="<?php echo esc_url( $privacy ); ?>" target="_blank" rel="noopener">Adatkezelési tájékoztató</a></p>
