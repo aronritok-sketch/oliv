@@ -617,32 +617,66 @@ html.oys-app body.oys-hub-screen #wpcontent { margin-left: 0 !important; }
 }
 
 /* ==========================================================================
-   Áron, 26 November (a video from the iPhone app): „Nem lehet görgetni benne … optimalizáld 100%-ra telefonra a hubot”.
-   - The panel ran under the bottom bar: .hub-main had top + height: 100%, so its bottom inset was ignored and the last
-     ~70–100 px of every view could never be scrolled into sight („Latest payments” cut off, the list jumping back).
-   - iPhone: no rubber-banding page behind the app, no zoom on tapping a field (16 px), the status bar and the home bar
-     get their own space (viewport-fit=cover), the keyboard does not cover the message box (visualViewport, hub.js).
-   - Five tabs at the bottom; My settings is the first tile under More.
+   The Hub on a phone and in the iPhone app (Áron, 26 November: „Nem lehet görgetni benne … amikor átkattintunk egy új
+   fülre, akkor nem lehet görgetni … ez visszatérő probléma, szóval mindenhol javítsd”).
+   The page itself scrolls, like a native app: no fixed frame with inner scroll boxes on a phone. iOS loses the touch
+   scrolling of an inner box when it is shown again (a tab switch) or its content is replaced, and the end of a box under
+   a bar can never be reached – the document's own scrolling has neither problem. Only the full-screen layers (a
+   conversation, the customer card, a sheet) scroll inside, with the page behind them locked, and hub.js nudges them
+   after every render. The bottom bar is fixed; the status bar and the home bar get their own space (viewport-fit=cover);
+   the keyboard does not cover the message box (visualViewport → --hub-vv-*); no zoom on tapping a field (16 px).
+   Five tabs at the bottom; My settings is the first tile under More.
    ========================================================================== */
 .hub-tile--phone { display: none; }
 @media (max-width: 899px) {
-	html:has(body.oys-hub-screen), body.oys-hub-screen { height: 100%; overflow: hidden; overscroll-behavior: none; }
-	body.oys-hub-screen { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+	html:has(body.oys-hub-screen) { height: auto !important; overflow-y: auto; overscroll-behavior-y: none; }
+	body.oys-hub-screen { height: auto !important; min-height: 100%; overflow: visible; overscroll-behavior-y: none; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+	body.oys-hub-screen #wpwrap, body.oys-hub-screen #wpcontent, body.oys-hub-screen #wpbody, body.oys-hub-screen #wpbody-content, body.oys-hub-screen .oys-hub-wrap { height: auto !important; min-height: 0; overflow: visible !important; float: none; }
+	html.oys-hub-locked, html.oys-hub-locked body.oys-hub-screen { overflow: hidden !important; }
+
 	body.oys-hub-screen .hub {
-		top: var(--hub-vv-top, 0px);
-		bottom: auto;
-		height: var(--hub-vv-h, 100%);
-		padding-top: 0;
+		position: relative;
+		inset: auto;
+		z-index: auto;
+		display: block;
+		height: auto;
+		min-height: 100vh;
+		min-height: 100dvh;
+		padding: env(safe-area-inset-top, 0px) 0 calc(68px + env(safe-area-inset-bottom, 0px));
+		background: var(--hub-cream);
 		touch-action: manipulation;
 		-webkit-tap-highlight-color: transparent;
 	}
-	body.oys-hub-screen .hub::before { content: ""; position: absolute; top: 0; left: 0; right: 0; z-index: 9; height: env(safe-area-inset-top, 0px); background: var(--hub-cream); pointer-events: none; }
-	.hub-main { top: env(safe-area-inset-top, 0px); bottom: calc(68px + env(safe-area-inset-bottom, 0px)); height: auto; }
-	.hub.is-conv .hub-main { bottom: 0; }
-	.hub-view, .hub-items, .hub-msgs, .hub-ctx { overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
-	.hub input, .hub textarea, .hub select { font-size: 16px !important; }
+	/* the status bar keeps a calm strip of its own while the page scrolls under it */
+	body.oys-hub-screen .hub::after { content: ""; position: fixed; top: 0; left: 0; right: 0; z-index: 9989; height: env(safe-area-inset-top, 0px); background: var(--hub-cream); pointer-events: none; }
+	body.oys-hub-screen .hub-nav { position: fixed; left: 0; right: 0; bottom: 0; z-index: 9990; }
+	body.oys-hub-screen .hub-main { position: static; inset: auto; height: auto; min-height: 0; overflow: visible; }
+	body.oys-hub-screen .hub-view { height: auto; overflow: visible; }
+	body.oys-hub-screen .hub-inbox { display: block; position: static; overflow: visible; }
+	body.oys-hub-screen .hub-list { height: auto; min-height: 0; display: block; }
+	body.oys-hub-screen .hub-items { overflow: visible; }
+
+	/* full-screen layers: a conversation, the customer card – inside what is visible, even with the keyboard open */
+	body.oys-hub-screen .hub-conv,
+	body.oys-hub-screen .hub-ctx {
+		position: fixed;
+		left: 0;
+		right: 0;
+		top: var(--hub-vv-top, 0px);
+		bottom: auto;
+		height: var(--hub-vv-h, 100vh);
+		padding-top: env(safe-area-inset-top, 0px);
+		z-index: 9995;
+		background: var(--hub-cream);
+	}
+	body.oys-hub-screen .hub-ctx { background: #fff; padding-bottom: calc(30px + env(safe-area-inset-bottom, 0px)); }
+	body.oys-hub-screen .hub.is-info .hub-ctx { z-index: 9996; }
+	body.oys-hub-screen .hub-msgs, body.oys-hub-screen .hub-ctx, .hub-sheet__box, .hub-quick, .hub-found { overscroll-behavior: contain; -webkit-overflow-scrolling: touch; }
+
+	.hub input, .hub textarea, .hub select, .hub-sheet input, .hub-sheet textarea, .hub-sheet select { font-size: 16px !important; }
 	.hub-nav__tab--settings { display: none; }
 	.hub-tile--phone { display: grid; }
-	.hub-alerts { padding-bottom: 30px; }
-	.hub-today, .hub-more, .hub-settings, .hub-week, .hub-reports, .hub-alerts { padding-bottom: 40px; }
+	.hub-today, .hub-more, .hub-settings, .hub-week, .hub-reports, .hub-alerts { padding-bottom: 32px; }
+	.hub-toast { bottom: calc(84px + env(safe-area-inset-bottom, 0px)); }
+	.hub-sheet { padding-bottom: env(safe-area-inset-bottom, 0px); }
 }

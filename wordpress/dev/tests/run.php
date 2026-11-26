@@ -6715,19 +6715,45 @@ test( 'Áron 26 Nov: Notifications – „értesítések fület az adminba is, m
 	wp_set_current_user( 0 );
 } );
 
-test( 'Áron 26 Nov (video from the iPhone app): „Nem lehet görgetni benne … optimalizáld 100%-ra telefonra a hubot”', function () {
+test( 'Áron 26 Nov (video from the iPhone app): „nem lehet görgetni … amikor átkattintunk egy új fülre … mindenhol javítsd”', function () {
 	$css = (string) file_get_contents( OYS_DIR . 'assets/hub.css' );
 	$js  = (string) file_get_contents( OYS_DIR . 'assets/hub.js' );
-	ok( str_contains( $css, '.hub-main { top: env(safe-area-inset-top, 0px); bottom: calc(68px + env(safe-area-inset-bottom, 0px)); height: auto; }' ), 'the panel ends above the bottom bar (height: 100% no longer overrides the bottom inset)' );
-	ok( str_contains( $css, 'overscroll-behavior: none' ) && str_contains( $css, 'overscroll-behavior-y: contain' ), 'no rubber-banding page behind the app' );
-	ok( str_contains( $css, '.hub input, .hub textarea, .hub select { font-size: 16px !important; }' ), 'no zoom on tapping a field (16 px)' );
-	ok( str_contains( $js, "root.style.setProperty( '--hub-vv-h'" ) && str_contains( $css, 'height: var(--hub-vv-h, 100%)' ), 'the keyboard does not cover the message box (visualViewport)' );
-	ok( str_contains( $css, '.hub-nav__tab--settings { display: none; }' ) && str_contains( $js, 'hub-tile hub-tile--phone" data-goview="settings"' ), 'five tabs on a phone; My settings is the first tile under More' );
+	$ph  = substr( $css, (int) strpos( $css, 'The Hub on a phone and in the iPhone app' ) );
+	ok( str_contains( $ph, 'body.oys-hub-screen .hub-view { height: auto; overflow: visible; }' ) && str_contains( $ph, 'body.oys-hub-screen .hub-main { position: static;' ) && str_contains( $ph, 'body.oys-hub-screen .hub-items { overflow: visible; }' ), 'on a phone the page itself scrolls: no inner scroll boxes that iOS freezes after a tab switch' );
+	ok( str_contains( $ph, 'body.oys-hub-screen .hub-nav { position: fixed;' ) && str_contains( $ph, 'padding: env(safe-area-inset-top, 0px) 0 calc(68px + env(safe-area-inset-bottom, 0px));' ), 'the bottom bar is fixed, nothing ends up under it, the status bar and the home bar keep their space' );
+	ok( str_contains( $ph, 'height: var(--hub-vv-h, 100vh);' ) && str_contains( $js, "root.style.setProperty( '--hub-vv-h'" ), 'a conversation is a full-screen layer inside what is visible, the keyboard does not cover the message box' );
+	ok( str_contains( $js, "document.documentElement.classList.toggle( 'oys-hub-locked', layer )" ) && str_contains( $ph, 'html.oys-hub-locked' ) && str_contains( $js, "nudge( $( '[data-msgs]' ) );" ), 'behind a layer the page stays still, and the layer\'s own list scrolls at once (nudged after every render)' );
+	ok( str_contains( $ph, 'overscroll-behavior-y: none' ) && str_contains( $ph, '.hub input, .hub textarea, .hub select, .hub-sheet input, .hub-sheet textarea, .hub-sheet select { font-size: 16px !important; }' ), 'no rubber-banding, no zoom on tapping a field' );
+	ok( str_contains( $ph, '.hub-nav__tab--settings { display: none; }' ) && str_contains( $js, 'hub-tile hub-tile--phone" data-goview="settings"' ), 'five tabs on a phone; My settings is the first tile under More' );
 	ok( str_contains( $css, 'p.hub-more { margin: 10px 2px 0; }' ), 'the More view is no longer pushed down by the „more” link style' );
-	if ( ! class_exists( 'OYS_Hub_Admin' ) ) {
-		require_once OYS_DIR . 'includes/admin/class-hub-admin.php';
+	ok( str_contains( (string) file_get_contents( OYS_DIR . 'includes/admin/class-hub-admin.php' ), "admin_viewport_meta', fn( \$m ) => self::is_hub_screen() ? \$m . ',viewport-fit=cover'" ), 'the Hub uses the whole iPhone screen and keeps the bars free itself' );
+} );
+
+test( 'Áron 26 Nov: „Nincs helyszíni fizetés … online fizetés van csak. Meg a motibrós azonosítókat … szedjük ki”', function () {
+	if ( ! class_exists( 'OYS_Admin' ) ) {
+		require_once OYS_DIR . 'includes/admin/class-admin.php';
 	}
-	ok( str_contains( (string) file_get_contents( OYS_DIR . 'includes/admin/class-hub-admin.php' ), "admin_viewport_meta', fn( \$m ) => self::is_hub_screen() ? \$m . ',viewport-fit=cover'" ), 'the Hub uses the whole iPhone screen and keeps the status bar and the home bar free itself' );
+	$u = make_user( 'Adatlap' );
+	update_user_meta( $u, 'oys_ext_source', 'motibro' );
+	update_user_meta( $u, 'oys_ext_id', 'MB-998877' );
+	update_user_meta( $u, 'oys_billing_address', 'Minta utca 1.' );
+	update_user_meta( $u, 'oys_tax_number', '12345678-1-42' );
+	update_user_meta( $u, 'oys_first_visit', '2024-03-05 18:00' );
+	update_user_meta( $u, 'oys_note', 'Térdére figyelni' );
+	$keep = OYS_Settings::get( 'pay_later' );
+	$page = function () use ( $u ) {
+		ob_start();
+		( new ReflectionMethod( 'OYS_Admin', 'page_customer' ) )->invoke( null, $u );
+		return (string) ob_get_clean();
+	};
+	OYS_Settings::update( array( 'pay_later' => 'off' ) );
+	$html = $page();
+	ok( ! str_contains( $html, 'Pay at the studio' ) && ! str_contains( $html, 'Fizetés a helyszínen' ), 'online only: no „Pay at the studio: allowed” on the customer page' );
+	ok( ! str_contains( $html, 'MB-998877' ) && ! str_contains( $html, 'Minta utca 1.' ) && ! str_contains( $html, '12345678-1-42' ), '… no Motibro id, no billing data from Motibro' );
+	ok( str_contains( $html, '2024-03-05 18:00' ) && str_contains( $html, 'Térdére figyelni' ), '… what still helps stays: the first class, the note' );
+	OYS_Settings::update( array( 'pay_later' => 'all' ) );
+	ok( str_contains( $page(), 'pay_later_reset' ) || str_contains( $page(), 'Pay at the studio' ) || str_contains( $page(), 'Fizetés a helyszínen' ), 'a studio that takes payment on the spot still sees it' );
+	OYS_Settings::update( array( 'pay_later' => $keep ) );
 } );
 
 $t = $GLOBALS['oys_t'];

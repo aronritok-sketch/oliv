@@ -106,6 +106,13 @@
 		act: { cat: '', items: [], more: false, cats: {}, unread: B.activity || 0 },
 	};
 	const isPhone = () => window.matchMedia( '(max-width: 899px)' ).matches;
+	const nudge = ( el ) => {
+		if ( el && isPhone() ) {
+			el.style.overflowY = 'hidden';
+			void el.offsetHeight; // eslint-disable-line no-void
+			el.style.overflowY = '';
+		}
+	};
 
 	/* ---------- shell ---------- */
 	function shell() {
@@ -425,6 +432,7 @@
 				( p.due ? '<button type="button" class="hub-att__btn hub-att__btn--pay" data-collect="' + p.booking + '">' + icon( 'card' ) + '<span>' + esc( T.paidCash ) + '</span></button>' : '' ) +
 				'</div></li>';
 		};
+		requestAnimationFrame( () => nudge( $( '.hub-sheet__box', el ) ) );
 		el.innerHTML = '<div class="hub-sheet__box hub-sheet__box--wide">' +
 			'<header class="hub-sheet__head"><div><h2>' + esc( d.title ) + '</h2><p class="hub-muted">' + esc( d.when ) + '</p></div><button type="button" class="hub-btn hub-btn--icon" data-close aria-label="' + esc( T.close ) + '">' + icon( 'x' ) + '</button></header>' +
 			'<div class="hub-tally"><span class="is-here"><b>' + ( t.attended || 0 ) + '</b>' + esc( T.cameN ) + '</span><span class="is-miss"><b>' + ( t.no_show || 0 ) + '</b>' + esc( T.missedN ) + '</span><span><b>' + ( t.confirmed || 0 ) + '</b>' + esc( d.over ? T.unmarked : T.bookedN ) + '</span>' + ( d.waitlist ? '<span><b>' + d.waitlist + '</b>' + esc( T.waitingN ) + '</span>' : '' ) + '</div>' +
@@ -667,6 +675,8 @@
 			composer( isChat );
 		bindConv( conv );
 		renderCtx();
+		nudge( $( '[data-msgs]' ) );
+		nudge( $( '[data-ctx]' ) );
 		scrollDown( true );
 	}
 
@@ -1226,6 +1236,23 @@
 		vv.addEventListener( 'scroll', fit );
 		window.addEventListener( 'orientationchange', () => setTimeout( fit, 300 ) );
 		fit();
+	}
+
+	/* ---------- iPhone: a layer's scroll box scrolls at once, the page behind it stays still ----------
+	   On a phone the page itself scrolls (hub.css); only full-screen layers (a conversation, the customer card, a sheet)
+	   scroll inside. iOS can lose the touch scrolling of such a box when it is shown or refilled: a nudge (overflow off
+	   and on, with a layout in between) gives it back. Never while a list is just updating (that would stop a flick). */
+	const settle = () => {
+		const layer = isPhone() && ( root.classList.contains( 'is-conv' ) || root.classList.contains( 'is-info' ) || !! document.querySelector( '.hub-sheet' ) );
+		document.documentElement.classList.toggle( 'oys-hub-locked', layer );
+		if ( layer ) {
+			[ '[data-msgs]', '[data-ctx]', '.hub-sheet__box' ].forEach( ( s ) => document.querySelectorAll( s ).forEach( nudge ) );
+		}
+	};
+	if ( 'MutationObserver' in window ) {
+		const later = () => requestAnimationFrame( settle );
+		new MutationObserver( later ).observe( root, { attributes: true, attributeFilter: [ 'class' ], childList: true } );
+		new MutationObserver( later ).observe( document.body, { childList: true } );
 	}
 
 	/* ---------- start ---------- */

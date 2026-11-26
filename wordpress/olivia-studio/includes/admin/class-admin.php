@@ -257,7 +257,7 @@ class OYS_Admin {
 		echo '<tr><th>' . esc_html__( 'Online link (Zoom etc.)', 'olivia-studio' ) . '</th><td><input class="regular-text" type="url" name="online_url" value="' . esc_attr( $v->online_url ) . '"><p class="description">' . esc_html__( 'Only shown to people who booked.', 'olivia-studio' ) . '</p></td></tr>';
 		echo '<tr><th>' . esc_html__( 'Price', 'olivia-studio' ) . '</th><td><input name="price" value="' . esc_attr( $v->price_cents / 100 ) . '" class="small-text"> ' . esc_html( strtoupper( OYS_Settings::get( 'currency' ) ) ) . ' <label><input type="checkbox" name="credits_allowed" value="1"' . checked( 1, (int) $v->credits_allowed, false ) . '> ' . esc_html__( 'Class passes can be used', 'olivia-studio' ) . '</label>'
 			. '<br><label><input type="checkbox" name="donation" value="1"' . checked( 'donation', $v->pricing ?? 'fixed', false ) . '> ' . esc_html__( 'By donation (the price is the suggested amount)', 'olivia-studio' ) . '</label>'
-			. '<br><label><input type="checkbox" name="pay_later" value="1"' . checked( 1, (int) ( $v->pay_later ?? 1 ), false ) . '> ' . esc_html__( 'People can pay at the studio', 'olivia-studio' ) . '</label></td></tr>';
+			. ( self::pay_at_studio() ? '<br><label><input type="checkbox" name="pay_later" value="1"' . checked( 1, (int) ( $v->pay_later ?? 1 ), false ) . '> ' . esc_html__( 'People can pay at the studio', 'olivia-studio' ) . '</label>' : '' ) . '</td></tr>';
 		$teachers = OYS_Teachers::all();
 		if ( $teachers ) {
 			echo '<tr><th>' . esc_html__( 'Teacher', 'olivia-studio' ) . '</th><td><select name="teacher_id"><option value="0">' . esc_html( OYS_Settings::get( 'owner_name' ) ) . '</option>';
@@ -673,16 +673,15 @@ class OYS_Admin {
 			. '<p><b>' . esc_html__( 'Agreement', 'olivia-studio' ) . ':</b> ' . ( OYS_Customers::has_waiver( $user_id ) ? esc_html( sprintf( __( 'accepted %s', 'olivia-studio' ), oys_date( get_user_meta( $user_id, 'oys_waiver_at', true ) ) ) ) : esc_html__( 'not accepted (current version)', 'olivia-studio' ) ) . '</p>'
 			. '<p><b>' . esc_html__( 'Newsletter', 'olivia-studio' ) . ':</b> ' . ( get_user_meta( $user_id, 'oys_marketing', true ) ? esc_html__( 'yes', 'olivia-studio' ) : esc_html__( 'no', 'olivia-studio' ) ) . ' '
 			. self::form( 'customer_newsletter', 'class="oys-inline"' ) . '<input type="hidden" name="user" value="' . (int) $user_id . '"><input type="hidden" name="on" value="' . ( get_user_meta( $user_id, 'oys_marketing', true ) ? '0' : '1' ) . '"><button class="button button-small">' . esc_html( get_user_meta( $user_id, 'oys_marketing', true ) ? __( 'Switch it off', 'olivia-studio' ) : __( 'Switch it on (they asked for it)', 'olivia-studio' ) ) . '</button></form></p>'
-			. self::pay_later_status( $user_id ) . '</div>';
-		$imported = array_filter( array_map( fn( $k ) => (string) get_user_meta( $user_id, 'oys_' . $k, true ), array_combine( OYS_Import::FIELDS, OYS_Import::FIELDS ) ), 'strlen' );
+			. ( self::pay_at_studio() ? self::pay_later_status( $user_id ) : '' ) . '</div>';
+		// Áron, 26 November: „a motibrós azonosítókat, meg az ilyeneket szedjük ki, amik nem kellenek nekünk a jövőbe” – of
+		// the imported columns only what still helps: the birthday, the first and the last class, the note
+		$imported = array_filter( array_map( fn( $k ) => (string) get_user_meta( $user_id, 'oys_' . $k, true ), array_combine( self::CUSTOMER_KEEP, self::CUSTOMER_KEEP ) ), 'strlen' );
 		if ( $imported ) {
 			echo '<div class="oys-box"><h2>' . esc_html__( 'Customer data', 'olivia-studio' ) . '</h2><table class="widefat oys-table"><tbody>';
-			if ( '' !== (string) get_user_meta( $user_id, 'nickname', true ) ) {
-				echo '<tr><th>' . esc_html__( 'Nickname', 'olivia-studio' ) . '</th><td>' . esc_html( get_user_meta( $user_id, 'nickname', true ) ) . '</td></tr>';
-			}
 			foreach ( OYS_Import::labels() as $k => $label ) {
 				if ( isset( $imported[ $k ] ) ) {
-					echo '<tr><th>' . esc_html( $label ) . '</th><td>' . nl2br( esc_html( 'ext_source' === $k ? ucfirst( $imported[ $k ] ) : $imported[ $k ] ) ) . '</td></tr>';
+					echo '<tr><th>' . esc_html( $label ) . '</th><td>' . nl2br( esc_html( $imported[ $k ] ) ) . '</td></tr>';
 				}
 			}
 			echo '</tbody></table></div>';
@@ -721,6 +720,14 @@ class OYS_Admin {
 		echo '<h2>' . esc_html__( 'Payments', 'olivia-studio' ) . '</h2>';
 		self::orders_table( OYS_Orders::for_user( $user_id ) );
 		echo '</div>';
+	}
+
+	/** The imported customer data still shown (no ids, sources or billing data from Motibro). */
+	const CUSTOMER_KEEP = array( 'birth_date', 'first_visit', 'last_visit', 'note' );
+
+	/** Does anyone pay at the studio? On an online-only site (Áron, 26 November: „Nincs helyszíni fizetés”) nothing of it is shown. */
+	public static function pay_at_studio() {
+		return 'off' !== (string) OYS_Settings::get( 'pay_later' );
 	}
 
 	/** Customer page: missed pay-at-the-studio bookings, and the button to allow it again. */
@@ -1041,8 +1048,10 @@ class OYS_Admin {
 			. '<option value="first"' . selected( $s['pay_later'], 'first', false ) . '>' . esc_html__( 'Only for their first class', 'olivia-studio' ) . '</option>'
 			. '<option value="off"' . selected( $s['pay_later'], 'off', false ) . '>' . esc_html__( 'Nobody (pay in advance)', 'olivia-studio' ) . '</option></select>'
 			. '<p class="description">' . esc_html__( 'For in-person group classes and events. Each class can switch it off in the calendar (e.g. workshops). Mark the payment on the roster with "Paid: cash" or "Paid: other".', 'olivia-studio' ) . '</p></td></tr>';
-		echo '<tr><th>' . esc_html__( 'Pay in advance after this many missed classes', 'olivia-studio' ) . '</th><td>' . $f( 'pay_later_max_no_shows', 'number', 'small-text', 'min="0"' ) . '<p class="description">' . esc_html__( 'Classes they booked to pay at the studio and didn\'t come to (marked "No-show" on the roster). 0 = never. You can allow it again on the customer\'s page.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
-		echo '<tr><th>' . esc_html__( 'How to pay at the studio (shown when booking and in emails)', 'olivia-studio' ) . '</th><td>' . $f( 'pay_later_note', 'text', 'large-text' ) . '</td></tr>'; // phpcs:ignore
+		if ( self::pay_at_studio() ) {
+			echo '<tr><th>' . esc_html__( 'Pay in advance after this many missed classes', 'olivia-studio' ) . '</th><td>' . $f( 'pay_later_max_no_shows', 'number', 'small-text', 'min="0"' ) . '<p class="description">' . esc_html__( 'Classes they booked to pay at the studio and didn\'t come to (marked "No-show" on the roster). 0 = never. You can allow it again on the customer\'s page.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
+			echo '<tr><th>' . esc_html__( 'How to pay at the studio (shown when booking and in emails)', 'olivia-studio' ) . '</th><td>' . $f( 'pay_later_note', 'text', 'large-text' ) . '</td></tr>'; // phpcs:ignore
+		}
 		echo '<tr><th>' . esc_html__( 'Donation classes: minimum per person', 'olivia-studio' ) . '</th><td><input name="donation_min" class="small-text" value="' . esc_attr( $s['donation_min_cents'] / 100 ) . '"> ' . esc_html( strtoupper( $s['currency'] ) ) . '</td></tr>';
 		echo '<tr><th>' . esc_html__( 'Suggested donation amounts', 'olivia-studio' ) . '</th><td>' . $f( 'donation_suggestions', 'text', 'regular-text', 'placeholder="5,10,15,20"' ) . '<p class="description">' . esc_html__( 'Separated by commas. Make a class "by donation" in the calendar; people choose one of these or type their own amount, and pay by card or at the studio.', 'olivia-studio' ) . '</p></td></tr>'; // phpcs:ignore
 		echo '</table><h2>' . esc_html__( 'Private sessions', 'olivia-studio' ) . '</h2><table class="form-table">';

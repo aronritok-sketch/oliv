@@ -2423,6 +2423,32 @@
   - Ellenőrzés: iPhone 14 Pro emuláció, WebKit (Safari-motor). Minden nézet (Ma, Értesítések, Naptár, Több,
     Beállításaim, Kimutatások, Üzenetek, beszélgetés) legörgetve az alsó sáv fölött ér véget. Tesztek: 2080 sikeres,
     0 hibás.
+- **2026-11-26 – Hub telefonon: maga az oldal görög; helyszíni fizetés és Motibro-mezők ki (olivia-studio 1.34.2, oliviajoga.online 3.12.50).**
+  Áron: „amikor átkattintunk egy új fülre, akkor nem lehet görgetni … visszatérő probléma, szóval mindenhol javítsd” és
+  „Nincs helyszíni fizetés … online fizetés van csak. Meg a motibrós azonosítókat … szedjük ki”.
+  - **Ok:** telefonon a Hub fix keret volt belső görgetődobozokkal. Az iOS az ilyen dobozok érintéses görgetését
+    fülváltás vagy tartalomcsere után elveszti.
+  - **Új felépítés telefonon:**
+    - maga az oldal görög, az alsó menü fix, fülváltáskor az oldal tetejére ugrik;
+    - belső görgetés csak a teljes képernyős rétegekben van (beszélgetés, vendégkártya, lapok);
+    - réteg alatt a háttéroldal zárva, a réteg listája kirajzoláskor „nudge”-ot kap;
+    - a billentyűzet nem takar (visualViewport).
+  - **Ellenőrzés (iPhone 14 Pro, WebKit):**
+    - két kör fülváltás (Ma, Értesítések, Naptár, Több, Üzenetek), plus Beállításaim és Kimutatások: mindegyik a
+      tetején nyílik, legörgetve a menüsor fölött ér véget;
+    - a beszélgetés teljes képernyős, a háttér zárva, vissza után feloldva;
+    - a többi 10 Stúdió admin oldal is rendben (nincs belső görgetődoboz, a tartalom az alsó sáv fölött ér véget);
+    - az asztali nézet változatlan.
+  - **Vendég adatlapja:**
+    - ha a beállításban senki nem fizet a helyszínen (`pay_later` = off, így van élesben), eltűnik:
+      - a „Fizetés a helyszínen: engedélyezve” sor,
+      - az órán a „Lehet a helyszínen fizetni” pipa,
+      - a helyszíni fizetés részletei a Beállításokban;
+    - a Motibróból áthozott adatokból csak a születési dátum, az első és az utolsó óra és a megjegyzés látszik;
+    - nem látszik: Motibro-azonosító, forrás, ottani regisztráció, kurzusok, nem, számlázási adatok, adószám.
+    - Az adatok az adatbázisban megmaradtak, csak nem jelennek meg.
+  - A mobilos szabály felkerült a közös tudásbázisba (hlprv `DONTESEK.md`, 1. fejezet), minden projektre.
+  - Tesztek: 2085 sikeres, 0 hibás.
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
