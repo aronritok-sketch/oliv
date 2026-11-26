@@ -2298,6 +2298,26 @@
   - Az admin űrlapok többi angol alapértelmezése (az órák `lang` mezője) is az oldal nyelvére állt.
   - Élesben nem volt angolul elmentett egyedi szöveg, így semmit nem kellett áthozni. Teszt: 1986/0.
 
+- **2026-11-26 – Hírlevél-időzítés, jegyzetek és emlékeztetők, push Olíviának (olivia-studio 1.32.2–1.33.0,
+  oliviajoga.online 3.12.41–3.12.42).** Áron: „A hírlevelekhez kellene egy időzítés is … meg kellene emlékeztető neki …
+  hogy júliusban sorsolnia kell. Egy ilyen jegyzetszerű valami, ami utána küldi értesítést Oliviának. Dolgozz ki, legyen
+  jó.” és „küldj egy push üzenetet a telefonjára”.
+  - **Push:** új végpont `POST /oys/v1/hub/push/send` (`user`, `title`, `body`, `url`), csak az oldal gazdájának, és csak a
+    stúdió fiókjaira (`GET ?user=` megmondja, hány eszköze van). Áron nevében elment Olíviának, hogy kipróbálhatja a
+    Motibrós belépést (1 eszköz).
+  - **Hírlevél-időzítés:** a címzettválasztó alatt „Vagy később: nap + óra → Időzítem a kijelölteknek”.
+    - A szerkesztő tetején: „⏰ Időzítve: … N embernek” + „Időzítés törlése”. A listában: „⏰ Időzítve: …”.
+    - Addig szerkeszthető: abban a formában megy ki, ahogy akkor áll.
+    - Egy nappal előtte push („Holnap megy a hírlevél”), induláskor is push („Elindult a hírlevél”).
+    - Ha közben törlik vagy kézzel elküldik, az időzítés megszűnik. Tárolás: `oys_nl_schedule`; a cron 5 percenként nézi.
+  - **Jegyzetek és emlékeztetők** (Stúdió → Jegyzetek és emlékeztetők; a Hubban/appban a „Több” menüben és a kezdőlapon):
+    - Mezők: cím, jegyzet, nap + óra (alapból 9:00), ismétlés (egyszer / havonta / félévente / évente), kinek szóljon.
+    - A megadott időpontban push a telefonra és e-mail. Egy héttel előtte a Hub kezdőlapján is megjelenik
+      („Emlékeztetők”).
+    - Kész ✓, Módosítás, Törlés; a késznek jelöltek lenyitható listában maradnak. A nap nélküli jegyzet sima jegyzet marad.
+    - REST: `GET/POST /oys/v1/hub/notes`. Tárolás: `oys_notes`.
+  - Teszt: 2015/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -24,7 +24,7 @@ class OYS_Admin {
 			}
 		} );
 		$actions = array( 'save_session', 'cancel_session', 'roster', 'save_template', 'delete_template', 'generate', 'private_offer', 'private_decline',
-			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'live_test', 'live_test_open', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'smtp_test', 'hpv_register', 'message', 'pay_later_reset', 'customer_extend', 'customer_newsletter', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_delete', 'save_ai', 'import_customers', 'subscriber_add', 'subscriber_remove', 'subscribers_export' );
+			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'live_test', 'live_test_open', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'smtp_test', 'hpv_register', 'message', 'pay_later_reset', 'customer_extend', 'customer_newsletter', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_unschedule', 'newsletter_delete', 'save_ai', 'import_customers', 'subscriber_add', 'subscriber_remove', 'subscribers_export' );
 		foreach ( $actions as $a ) {
 			add_action( 'admin_post_oys_admin_' . $a, array( __CLASS__, 'guard' ) );
 		}
@@ -1307,7 +1307,8 @@ class OYS_Admin {
 		echo '<table class="widefat striped oys-table"><thead><tr><th>' . esc_html__( 'Subject', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Status', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Sent', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Date', 'olivia-studio' ) . '</th><th></th></tr></thead><tbody>';
 		$st = array( 'draft' => __( 'Draft', 'olivia-studio' ), 'sending' => __( 'Sending…', 'olivia-studio' ), 'sent' => __( 'Sent', 'olivia-studio' ) );
 		foreach ( $rows as $n ) {
-			echo '<tr><td><b>' . esc_html( $n->subject ?: __( '(no subject)', 'olivia-studio' ) ) . '</b></td><td>' . esc_html( $st[ $n->status ] ?? $n->status ) . '</td><td>' . ( 'draft' === $n->status ? '—' : (int) $n->sent . ' / ' . (int) $n->total ) . '</td><td>' . esc_html( oys_date( $n->sent_at ?: ( $n->queued_at ?: $n->created_at ), 'M j, Y g:i a' ) ) . '</td>'
+			$sch = 'draft' === $n->status ? OYS_Newsletter::scheduled( $n->id ) : null;
+			echo '<tr><td><b>' . esc_html( $n->subject ?: __( '(no subject)', 'olivia-studio' ) ) . '</b></td><td>' . esc_html( $sch ? '⏰ ' . sprintf( __( 'Scheduled: %s', 'olivia-studio' ), oys_date( $sch['at'], 'M j, Y g:i a' ) ) : ( $st[ $n->status ] ?? $n->status ) ) . '</td><td>' . ( 'draft' === $n->status ? '—' : (int) $n->sent . ' / ' . (int) $n->total ) . '</td><td>' . esc_html( oys_date( $n->sent_at ?: ( $n->queued_at ?: $n->created_at ), 'M j, Y g:i a' ) ) . '</td>'
 				. '<td><a class="button button-small" href="' . esc_url( admin_url( 'admin.php?page=oys-newsletter&edit=' . $n->id ) ) . '">' . esc_html( 'draft' === $n->status ? __( 'Edit', 'olivia-studio' ) : __( 'View', 'olivia-studio' ) ) . '</a></td></tr>';
 		}
 		if ( ! $rows ) {
@@ -1331,6 +1332,12 @@ class OYS_Admin {
 		$edit = 'draft' === $v->status;
 		self::header( $n ? ( $edit ? __( 'Edit newsletter', 'olivia-studio' ) : __( 'Newsletter', 'olivia-studio' ) ) : __( 'Write a newsletter', 'olivia-studio' ), ' <a class="page-title-action" href="' . esc_url( admin_url( 'admin.php?page=oys-newsletter' ) ) . '">' . esc_html__( 'All newsletters', 'olivia-studio' ) . '</a>' );
 		echo '<div class="oys-nl">';
+		$sched = $n && $edit ? OYS_Newsletter::scheduled( $n->id ) : null;
+		if ( $sched ) {
+			echo '<div class="oys-box oys-nl__sched"><p>⏰ <b>' . esc_html( sprintf( _n( 'Scheduled: %1$s, to %2$d person.', 'Scheduled: %1$s, to %2$d people.', (int) $sched['count'], 'olivia-studio' ), oys_date( $sched['at'], 'M j, Y g:i a' ), (int) $sched['count'] ) ) . '</b> '
+				. esc_html__( 'Until then you can still change the text and the people below.', 'olivia-studio' ) . '</p>'
+				. self::form( 'newsletter_unschedule', 'class="oys-inline"' ) . '<input type="hidden" name="id" value="' . (int) $n->id . '"><button class="button">' . esc_html__( 'Cancel the timing', 'olivia-studio' ) . '</button></form> <a class="button" href="#kinek">' . esc_html__( 'Change the day or the people', 'olivia-studio' ) . '</a></div>'; // phpcs:ignore
+		}
 		if ( $edit ) {
 			echo '<div class="oys-nl__ai oys-box"><h2>' . esc_html__( 'Write it with AI', 'olivia-studio' ) . '</h2>';
 			if ( OYS_AI::ready() ) {
@@ -1374,6 +1381,8 @@ class OYS_Admin {
 	 */
 	private static function newsletter_pick( $n ) {
 		$people = OYS_Newsletter::pick_list();
+		$sched  = OYS_Newsletter::scheduled( $n->id );
+		$spick  = is_array( $sched['pick'] ?? null ) ? $sched['pick'] : null;
 		$day    = fn( $ymd ) => $ymd ? wp_date( get_option( 'date_format' ), strtotime( $ymd . ' 12:00:00 UTC' ) ) : '';
 		$rows   = '';
 		$on     = 0;
@@ -1386,9 +1395,9 @@ class OYS_Admin {
 			if ( $p['held'] ) {
 				$parts[] = sprintf( __( 'from Motibro %d, to redeem', 'olivia-studio' ), (int) $p['held'] );
 			}
-			$on   += $p['subscribed'] ? 1 : 0;
+			$on   += ( $spick ? in_array( (int) $p['id'], array_map( 'intval', (array) ( $spick[ 'user' === $p['type'] ? 'users' : 'subs' ] ?? array() ) ), true ) : $p['subscribed'] ) ? 1 : 0;
 			$rows .= '<label class="oys-pick__row" data-sub="' . ( $p['subscribed'] ? 1 : 0 ) . '" data-sessions="' . $total . '" data-motibro="' . ( empty( $p['motibro'] ) ? 0 : 1 ) . '" data-q="' . esc_attr( mb_strtolower( remove_accents( $p['name'] . ' ' . $p['email'] ) ) ) . '">'
-				. '<input type="checkbox" name="' . ( 'user' === $p['type'] ? 'pick_users[]' : 'pick_subs[]' ) . '" value="' . (int) $p['id'] . '"' . checked( $p['subscribed'], true, false ) . '>'
+				. '<input type="checkbox" name="' . ( 'user' === $p['type'] ? 'pick_users[]' : 'pick_subs[]' ) . '" value="' . (int) $p['id'] . '"' . checked( $spick ? in_array( (int) $p['id'], array_map( 'intval', (array) ( $spick[ 'user' === $p['type'] ? 'users' : 'subs' ] ?? array() ) ), true ) : $p['subscribed'], true, false ) . '>'
 				. '<span class="oys-pick__who"><b>' . esc_html( $p['name'] ?: $p['email'] ) . '</b><small>' . esc_html( $p['email'] ) . '</small></span>'
 				. '<span class="oys-pick__nl' . ( $p['subscribed'] ? ' is-on' : '' ) . '">' . esc_html( $p['subscribed'] ? ( 'sub' === $p['type'] ? __( 'newsletter (signup form)', 'olivia-studio' ) : __( 'newsletter', 'olivia-studio' ) ) : __( 'no newsletter', 'olivia-studio' ) ) . '</span>'
 				. '<span class="oys-pick__n"><b>' . esc_html( $total ? sprintf( _n( '%d session', '%d sessions', $total, 'olivia-studio' ), $total ) : '—' ) . '</b>' . ( $parts ? '<small>' . esc_html( implode( ' · ', $parts ) ) . '</small>' : '' ) . '</span></label>';
@@ -1400,12 +1409,14 @@ class OYS_Admin {
 			echo '<p>' . esc_html__( 'No guests or subscribers yet.', 'olivia-studio' ) . '</p>';
 			return;
 		}
-		echo self::form( 'newsletter_send', 'class="oys-pick" data-oys-pick data-ask="' . esc_attr( __( 'Send this letter to %d people now?', 'olivia-studio' ) ) . '"' ) // phpcs:ignore
+		echo self::form( 'newsletter_send', 'class="oys-pick" data-oys-pick data-ask="' . esc_attr( __( 'Send this letter to %d people now?', 'olivia-studio' ) ) . '" data-later="' . esc_attr( __( 'Send this letter to %d people on %s?', 'olivia-studio' ) ) . '"' ) // phpcs:ignore
 			. '<input type="hidden" name="id" value="' . (int) $n->id . '"><input type="hidden" name="picked" value="1">'
 			. '<div class="oys-pick__tools"><input type="search" data-oys-pick-q placeholder="' . esc_attr__( 'Search by name or email', 'olivia-studio' ) . '"> '
 			. '<span class="oys-pick__quick">' . esc_html__( 'Tick:', 'olivia-studio' ) . ' <button type="button" class="button button-small" data-oys-pick-set="sub">' . esc_html__( 'who asked for the newsletter', 'olivia-studio' ) . '</button> <button type="button" class="button button-small" data-oys-pick-set="sessions">' . esc_html__( 'who has sessions left', 'olivia-studio' ) . '</button> <button type="button" class="button button-small" data-oys-pick-set="motibro-none">' . esc_html__( 'from Motibro, no sessions left', 'olivia-studio' ) . '</button> <button type="button" class="button button-small" data-oys-pick-set="all">' . esc_html__( 'everyone', 'olivia-studio' ) . '</button> <button type="button" class="button button-small" data-oys-pick-set="none">' . esc_html__( 'nobody', 'olivia-studio' ) . '</button></span></div>'
 			. '<div class="oys-pick__list">' . $rows . '</div>' // phpcs:ignore
-			. '<p class="oys-pick__go"><button class="button button-primary button-hero">' . esc_html__( 'Send to the people ticked', 'olivia-studio' ) . ' (<span data-oys-pick-n>' . (int) $on . '</span>)</button></p></form>';
+			. '<p class="oys-pick__go"><button class="button button-primary button-hero" name="now" value="1">' . esc_html__( 'Send to the people ticked', 'olivia-studio' ) . ' (<span data-oys-pick-n>' . (int) $on . '</span>)</button></p>'
+			// Áron, 26 November: „A hírlevelekhez kellene egy időzítés is” – or later, at a day and time
+			. '<p class="oys-pick__later"><b>' . esc_html__( 'Or later:', 'olivia-studio' ) . '</b> <input type="date" name="send_date" min="' . esc_attr( wp_date( 'Y-m-d' ) ) . '" value="' . esc_attr( $sched ? wp_date( 'Y-m-d', oys_ts( $sched['at'] ) ) : '' ) . '"> <input type="time" name="send_time" value="' . esc_attr( $sched ? wp_date( 'H:i', oys_ts( $sched['at'] ) ) : '09:00' ) . '"> <button class="button" name="schedule" value="1">' . esc_html( $sched ? __( 'Change the timing', 'olivia-studio' ) : __( 'Schedule it for the people ticked', 'olivia-studio' ) ) . '</button><br><span class="description">' . esc_html__( 'Until then you can still change the text: it goes out as it is at that moment. A day before, your phone reminds you.', 'olivia-studio' ) . '</span></p></form>';
 		?>
 		<script>
 		( function () {
@@ -1429,6 +1440,13 @@ class OYS_Admin {
 			} );
 			f.addEventListener( 'submit', function ( e ) {
 				var k = f.querySelectorAll( '.oys-pick__row input:checked' ).length;
+				var later = e.submitter && 'schedule' === e.submitter.name;
+				if ( later ) {
+					var d = f.querySelector( '[name=send_date]' ).value, t = f.querySelector( '[name=send_time]' ).value || '09:00';
+					if ( ! d ) { e.preventDefault(); f.querySelector( '[name=send_date]' ).focus(); return; }
+					if ( ! k || ! window.confirm( f.dataset.later.replace( '%d', k ).replace( '%s', d.replace( /-/g, '.' ) + '. ' + t ) ) ) { e.preventDefault(); }
+					return;
+				}
 				if ( ! k || ! window.confirm( f.dataset.ask.replace( '%d', k ) ) ) { e.preventDefault(); }
 			} );
 		} )();
@@ -1487,8 +1505,23 @@ class OYS_Admin {
 			'users' => array_map( 'intval', (array) wp_unslash( $_POST['pick_users'] ?? array() ) ), // phpcs:ignore
 			'subs'  => array_map( 'intval', (array) wp_unslash( $_POST['pick_subs'] ?? array() ) ), // phpcs:ignore
 		);
+		if ( ! empty( $_POST['schedule'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			$date = sanitize_text_field( wp_unslash( $_POST['send_date'] ?? '' ) ); // phpcs:ignore
+			$time = sanitize_text_field( wp_unslash( $_POST['send_time'] ?? '' ) ) ?: '09:00'; // phpcs:ignore
+			$utc  = $date ? OYS_Notes::utc( $date . ' ' . $time ) : '';
+			$res  = OYS_Newsletter::schedule( $id, $utc, $pick );
+			$s    = OYS_Newsletter::scheduled( $id );
+			self::back( 'oys-newsletter', array( 'edit' => $id ), is_wp_error( $res ) ? $res->get_error_message() : sprintf( _n( 'Scheduled: %1$s, to %2$d person. Until then you can still change it.', 'Scheduled: %1$s, to %2$d people. Until then you can still change it.', (int) $s['count'], 'olivia-studio' ), oys_date( $utc, 'M j, Y g:i a' ), (int) $s['count'] ), is_wp_error( $res ) ? 'error' : 'success' );
+		}
+		OYS_Newsletter::unschedule( $id ); // sent now: no later copy
 		$res  = OYS_Newsletter::send( $id, $pick );
 		self::back( 'oys-newsletter', array( 'edit' => $id ), is_wp_error( $res ) ? $res->get_error_message() : sprintf( _n( 'Sending to %d subscriber: it goes out over the next few minutes.', 'Sending to %d subscribers: it goes out over the next few minutes.', $res, 'olivia-studio' ), $res ) );
+	}
+
+	private static function do_newsletter_unschedule() {
+		$id = (int) $_POST['id'];
+		OYS_Newsletter::unschedule( $id );
+		self::back( 'oys-newsletter', array( 'edit' => $id ), __( 'The timing is off. The draft stays as it was.', 'olivia-studio' ) );
 	}
 
 	private static function do_newsletter_delete() {

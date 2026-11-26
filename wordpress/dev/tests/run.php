@@ -5912,6 +5912,100 @@ test( 'Áron 26 Nov: „rendszerüzenetek az összes angol … az adminba angol�
 	OYS_Settings::update( array( 'languages' => $wl, 'default_lang' => $was ) );
 } );
 
+test( 'Áron 26 Nov: notes and reminders – „legyen egy emlékeztető, hogy júliusban sorsolnia kell … ami utána küldi értesítést Oliviának”', function () {
+	$staff = wp_insert_user( array( 'user_login' => 'notes.staff.' . wp_rand(), 'user_email' => 'notes.staff.' . wp_rand() . '@example.test', 'user_pass' => wp_generate_password(), 'role' => 'administrator', 'display_name' => 'Olívia' ) );
+	wp_set_current_user( $staff );
+	delete_option( OYS_Notes::OPT );
+	$local = wp_date( 'Y-m-d', time() + 200 * DAY_IN_SECONDS ) . ' 09:00';
+	$id    = OYS_Notes::save( array( 'title' => 'Félévi sorsolás: privát óra', 'text' => "Akik a legtöbbet jártak.\nKimutatás a Hubban.", 'due' => $local, 'repeat' => 'half', 'user' => $staff ) );
+	$n     = OYS_Notes::get( $id );
+	eq( $local, wp_date( 'Y-m-d H:i', oys_ts( $n['due'] ) ), 'the time is kept in the site\'s time zone (9:00 stays 9:00)' );
+	ok( 'half' === $n['repeat'] && $staff === $n['user'] && '' === $n['sent'], 'every half year, for her' );
+	eq( '', OYS_Notes::save( array( 'title' => 'Csak jegyzet' ) ) ? OYS_Notes::get( 2 )['due'] : 'x', 'no day: a plain note' );
+	// due: push + email, once; a repeating one moves on half a year
+	$all = OYS_Notes::all();
+	$all[ $id ]['due'] = gmdate( 'Y-m-d H:i:s', time() - 60 );
+	update_option( OYS_Notes::OPT, $all, false );
+	$pushed = array();
+	$hook   = function ( $u, $t, $b ) use ( &$pushed ) { $pushed[] = array( $u, $t, $b ); };
+	add_action( 'oys_push_notified', $hook, 10, 3 );
+	$log = sent_mails( fn() => OYS_Notes::run() );
+	remove_action( 'oys_push_notified', $hook, 10 );
+	ok( 1 === count( $pushed ) && $staff === (int) $pushed[0][0] && str_contains( $pushed[0][1], 'Félévi sorsolás' ), 'at its time: on her phone' );
+	ok( 1 === count( $log ) && get_userdata( $staff )->user_email === $log[0]['to'] && str_contains( $log[0]['subject'], 'Félévi sorsolás' ) && str_contains( $log[0]['html'], 'Kimutatás a Hubban' ), '… and by email, with the note' );
+	$n = OYS_Notes::get( $id );
+	ok( $n['due'] > oys_utc_plus( 150 * DAY_IN_SECONDS ) && $n['due'] < oys_utc_plus( 200 * DAY_IN_SECONDS ) && '' === $n['done'], 'a half-yearly one moves on to its next time' );
+	eq( 0, count( sent_mails( fn() => OYS_Notes::run() ) ), 'and does not come again until then' );
+	// once: stays open as due, until ticked done
+	$one = OYS_Notes::save( array( 'title' => 'Egyszeri', 'due' => wp_date( 'Y-m-d H:i', time() + 3 * DAY_IN_SECONDS ) ) );
+	$soon = OYS_Notes::soon( $staff );
+	ok( in_array( $one, array_column( $soon, 'id' ), true ) && ! in_array( $id, array_column( $soon, 'id' ), true ), 'the Hub\'s first page: the ones in the next 7 days' );
+	OYS_Notes::done( $one );
+	ok( ! in_array( $one, array_column( OYS_Notes::soon( $staff ), 'id' ), true ), 'done: off the first page' );
+	// the page, the Hub, REST
+	ob_start();
+	OYS_Notes::page();
+	$page = ob_get_clean();
+	ok( str_contains( $page, 'Félévi sorsolás: privát óra' ) && str_contains( $page, 'name="due_date"' ) && str_contains( $page, 'name="repeat"' ) && str_contains( $page, 'Every half year' ), 'the page: write, when, repeat, the list' );
+	$hub = (string) file_get_contents( WP_PLUGIN_DIR . '/olivia-studio/assets/hub.js' );
+	ok( str_contains( $hub, 'T.notesTitle' ) && str_contains( $hub, "B.notes + '#note-'" ) && array_key_exists( 'notes', OYS_Hub::today() ), 'the Hub shows them and links to the page' );
+	$req = new WP_REST_Request( 'POST', '/oys/v1/hub/notes' );
+	$req->set_body_params( array( 'title' => 'REST jegyzet', 'due' => wp_date( 'Y-m-d', time() + 30 * DAY_IN_SECONDS ), 'user' => $staff ) );
+	$res = rest_do_request( $req );
+	ok( 200 === $res->get_status() && '09:00' === wp_date( 'H:i', oys_ts( $res->get_data()['due'] ) ), 'over REST too (a day alone: 9:00)' );
+	wp_set_current_user( 0 );
+	ok( in_array( rest_do_request( new WP_REST_Request( 'GET', '/oys/v1/hub/notes' ) )->get_status(), array( 401, 403 ), true ), '… for the studio only' );
+	delete_option( OYS_Notes::OPT );
+} );
+
+test( 'Áron 26 Nov: „A hírlevelekhez kellene egy időzítés is” – a draft goes out at its time to the people chosen, a word the day before', function () {
+	$staff = wp_insert_user( array( 'user_login' => 'sched.staff.' . wp_rand(), 'user_email' => 'sched.staff.' . wp_rand() . '@example.test', 'user_pass' => wp_generate_password(), 'role' => 'administrator' ) );
+	wp_set_current_user( $staff );
+	$a  = make_user( 'Anna' );
+	$b  = make_user( 'Bori' );
+	$id = OYS_Newsletter::save( array( 'subject' => 'Januári hírlevél', 'body' => "Szia {first_name}!\n\nBoldog új évet!" ) );
+	ok( is_wp_error( OYS_Newsletter::schedule( $id, gmdate( 'Y-m-d H:i:s', time() - 60 ), array( 'users' => array( $a ), 'subs' => array() ) ) ), 'not into the past' );
+	ok( is_wp_error( OYS_Newsletter::schedule( $id, oys_utc_plus( 3 * DAY_IN_SECONDS ), array( 'users' => array(), 'subs' => array() ) ) ), 'not to nobody' );
+	ok( true === OYS_Newsletter::schedule( $id, oys_utc_plus( 3 * DAY_IN_SECONDS ), array( 'users' => array( $a, $b ), 'subs' => array() ) ), 'scheduled' );
+	$s = OYS_Newsletter::scheduled( $id );
+	ok( 2 === $s['count'] && $staff === $s['by'] && empty( $s['warned'] ), '… for 2 people, by her' );
+	OYS_Newsletter::run_schedule();
+	ok( 'draft' === OYS_Newsletter::get( $id )->status, 'before the time: still a draft (and can still change)' );
+	OYS_Newsletter::save( array( 'subject' => 'Januári hírlevél', 'body' => "Szia {first_name}!\n\nBoldog új évet! Javított szöveg." ), $id );
+	// the day before: a word on her phone
+	$all = OYS_Newsletter::schedules();
+	$all[ $id ]['at'] = oys_utc_plus( 20 * HOUR_IN_SECONDS );
+	update_option( OYS_Newsletter::SCHEDULE, $all, false );
+	$pushed = array();
+	$hook   = function ( $u, $t ) use ( &$pushed ) { $pushed[] = array( $u, $t ); };
+	add_action( 'oys_push_notified', $hook, 10, 2 );
+	OYS_Newsletter::run_schedule();
+	OYS_Newsletter::run_schedule();
+	ok( 1 === count( $pushed ) && $staff === (int) $pushed[0][0] && 'Newsletter tomorrow' === $pushed[0][1], 'a day before: once, on her phone' );
+	// the time: queued for exactly those two, with the latest text
+	$all = OYS_Newsletter::schedules();
+	$all[ $id ]['at'] = gmdate( 'Y-m-d H:i:s', time() - 60 );
+	update_option( OYS_Newsletter::SCHEDULE, $all, false );
+	OYS_Newsletter::run_schedule();
+	remove_action( 'oys_push_notified', $hook, 10 );
+	$n = OYS_Newsletter::get( $id );
+	ok( 'sending' === $n->status && 2 === (int) $n->total && 'picked' === $n->audience && ! OYS_Newsletter::scheduled( $id ), 'at the time: in the queue, for the 2 chosen; the timing is gone' );
+	ok( 2 === count( $pushed ) && 'Newsletter on its way' === $pushed[1][1], '… and a word that it is on its way' );
+	$log = sent_mails( fn() => OYS_Newsletter::process_queue( 10 ) );
+	ok( 2 === count( $log ) && str_contains( $log[0]['html'], 'Javított szöveg' ), 'they get it, as it was at that moment' );
+	// a deleted draft's timing just goes away
+	$id2 = OYS_Newsletter::save( array( 'subject' => 'x', 'body' => 'y' ) );
+	OYS_Newsletter::schedule( $id2, oys_utc_plus( HOUR_IN_SECONDS ), array( 'users' => array( $a ), 'subs' => array() ) );
+	OYS_Newsletter::delete( $id2 );
+	OYS_Newsletter::run_schedule();
+	ok( ! OYS_Newsletter::scheduled( $id2 ), 'a deleted draft: its timing is gone too' );
+	$admin = (string) file_get_contents( WP_PLUGIN_DIR . '/olivia-studio/includes/admin/class-admin.php' );
+	ok( str_contains( $admin, 'name="send_date"' ) && str_contains( $admin, 'name="schedule" value="1"' ) && str_contains( $admin, "'newsletter_unschedule'" ) && str_contains( $admin, 'data-later=' ), 'the editor: a day and time, „Schedule it”, „Cancel the timing”' );
+	$cron = (string) file_get_contents( WP_PLUGIN_DIR . '/olivia-studio/includes/class-cron.php' );
+	ok( str_contains( $cron, 'OYS_Newsletter::run_schedule();' ) && str_contains( $cron, 'OYS_Notes::run();' ), 'every few minutes: the timed letters and the reminders' );
+	wp_set_current_user( 0 );
+} );
+
 test( 'Áron 26 Nov: „küldj egy push üzenetet a telefonjára” – a push to a member of the studio, by the site owner only', function () {
 	$routes = rest_get_server()->get_routes();
 	ok( isset( $routes['/oys/v1/hub/push/send'] ), 'the route' );

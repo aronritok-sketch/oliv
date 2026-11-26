@@ -9543,3 +9543,150 @@ msgstr "{password_button} (vagy {jelszo_gomb}) külön sorban = a „Jelszót á
 
 msgid "from Motibro, no sessions left"
 msgstr "Motibróból, alkalom nélkül"
+
+msgid "Once"
+msgstr "Egyszer"
+
+msgid "Every month"
+msgstr "Havonta"
+
+msgid "Every half year"
+msgstr "Félévente"
+
+msgid "Every year"
+msgstr "Évente"
+
+msgid "Your reminder is due."
+msgstr "Itt az emlékeztetőd ideje."
+
+msgid "Reminder you set for %s."
+msgstr "Ezt az emlékeztetőt erre az időpontra állítottad be: %s."
+
+msgid "Reminder: %s"
+msgstr "Emlékeztető: %s"
+
+msgid "Open my notes"
+msgstr "Megnyitom a jegyzeteimet"
+
+msgid "Notes & reminders"
+msgstr "Jegyzetek és emlékeztetők"
+
+msgid "Write down anything you want to remember. Give it a day and it reminds you then: a notification on your phone (the studio app) and an email. From a week before, it is also on the Hub's first page."
+msgstr "Írj le bármit, amire emlékezni szeretnél. Ha adsz meg napot, akkor szól: értesítés jön a telefonodra (a stúdió appban) és egy e-mail. Egy héttel előtte a Hub kezdőlapján is ott lesz."
+
+msgid "Change the note"
+msgstr "A jegyzet módosítása"
+
+msgid "New note"
+msgstr "Új jegyzet"
+
+msgid "e.g. The half-year draw: a private class"
+msgstr "pl. Félévi sorsolás: privát óra"
+
+msgid "Note (optional)"
+msgstr "Jegyzet (nem kötelező)"
+
+msgid "Remind me on"
+msgstr "Mikor szóljak?"
+
+msgid "at"
+msgstr "hánykor"
+
+msgid "Remind"
+msgstr "Kinek szóljak?"
+
+msgid "No day: it stays a note, without a reminder."
+msgstr "Ha nem adsz meg napot, sima jegyzet marad, emlékeztető nélkül."
+
+msgid "No reminders yet."
+msgstr "Még nincs emlékeztető."
+
+msgid "Done (%d)"
+msgstr "Kész (%d)"
+
+msgid "Delete this note?"
+msgstr "Törlöd ezt a jegyzetet?"
+
+msgid "Due"
+msgstr "Esedékes"
+
+msgid "for %s"
+msgstr "neki: %s"
+
+msgid "Open the link"
+msgstr "Link megnyitása"
+
+msgid "Back to open"
+msgstr "Vissza a nyitottak közé"
+
+msgid "Done ✓"
+msgstr "Kész ✓"
+
+msgid "Saved. It reminds you on %s."
+msgstr "Elmentve. Ekkor szól: %s."
+
+msgid "Choose a day and time in the future."
+msgstr "Válassz egy jövőbeli napot és időpontot."
+
+msgid "Newsletter tomorrow"
+msgstr "Holnap megy a hírlevél"
+
+msgid "„%1$s” goes out %2$s. If you want to change it, now is the time."
+msgstr "A(z) „%1$s” hírlevél ekkor megy ki: %2$s. Ha módosítanál rajta, most még tudsz."
+
+msgid "Newsletter on its way"
+msgstr "Elindult a hírlevél"
+
+msgid "Scheduled: %s"
+msgstr "Időzítve: %s"
+
+msgid "Until then you can still change the text and the people below."
+msgstr "Addig még módosíthatod a szöveget és lent a címzetteket."
+
+msgid "Cancel the timing"
+msgstr "Időzítés törlése"
+
+msgid "Change the day or the people"
+msgstr "Nap vagy címzettek módosítása"
+
+msgid "Send this letter to %d people on %s?"
+msgstr "Elküldöd ezt a levelet %d embernek ekkor: %s?"
+
+msgid "Or later:"
+msgstr "Vagy később:"
+
+msgid "Change the timing"
+msgstr "Időzítés módosítása"
+
+msgid "Schedule it for the people ticked"
+msgstr "Időzítem a kijelölteknek"
+
+msgid "Until then you can still change the text: it goes out as it is at that moment. A day before, your phone reminds you."
+msgstr "Addig még módosíthatod a szöveget: abban a formában megy ki, ahogy akkor áll. Előtte egy nappal a telefonod szól."
+
+msgid "The timing is off. The draft stays as it was."
+msgstr "Az időzítést töröltem. A piszkozat változatlanul megmaradt."
+
+msgid "Reminds you on your phone and by email"
+msgstr "Szól a telefonodon és e-mailben"
+
+msgid "Nothing to remember this week."
+msgstr "Ezen a héten nincs teendő-emlékeztető."
+
+msgid "„%1$s” is going out to %2$d person."
+msgid_plural "„%1$s” is going out to %2$d people."
+msgstr[0] "A(z) „%1$s” hírlevél most megy ki %2$d embernek."
+msgstr[1] "A(z) „%1$s” hírlevél most megy ki %2$d embernek."
+
+msgid "Scheduled: %1$s, to %2$d person."
+msgid_plural "Scheduled: %1$s, to %2$d people."
+msgstr[0] "Időzítve: %1$s, %2$d embernek."
+msgstr[1] "Időzítve: %1$s, %2$d embernek."
+
+msgid "Scheduled: %1$s, to %2$d person. Until then you can still change it."
+msgid_plural "Scheduled: %1$s, to %2$d people. Until then you can still change it."
+msgstr[0] "Időzítve: %1$s, %2$d embernek. Addig még módosíthatod."
+msgstr[1] "Időzítve: %1$s, %2$d embernek. Addig még módosíthatod."
+
+msgid "Notes without a day"
+msgstr "Jegyzetek (nap nélkül)"

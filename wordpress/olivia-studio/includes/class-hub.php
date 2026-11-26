@@ -761,6 +761,8 @@ class OYS_Hub {
 			);
 		}
 		$out = array( 'classes' => $classes, 'counts' => self::counts(), 'tomark' => class_exists( 'OYS_Hub_Classes' ) ? OYS_Hub_Classes::to_mark() : array() );
+		// the studio's reminders due now or this week (Áron, 26 November: „legyen egy emlékeztető, hogy júliusban sorsolnia kell”)
+		$out['notes'] = class_exists( 'OYS_Notes' ) && self::can_manage() ? OYS_Notes::soon( get_current_user_id() ) : array();
 		if ( null === $scope ) {
 			$o    = self::t( 'orders' );
 			$rev  = 0;

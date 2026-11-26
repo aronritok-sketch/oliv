@@ -136,3 +136,17 @@ body[class*="_page_oys"] .update-nag, body.toplevel_page_oys .update-nag { displ
 	.oys-pick__tools input[type="search"] { min-width: 0; width: 100%; }
 	.oys-pick__list { max-height: none; }
 }
+/* Notes & reminders; a scheduled newsletter (Áron, 26 November) */
+.oys-notes__form { max-width: 760px; }
+.oys-notes__when { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: flex-end; }
+.oys-notes__list { list-style: none; margin: 0 0 1.5rem; padding: 0; display: grid; gap: 10px; max-width: 760px; }
+.oys-notes__item { background: #fff; border: 1px solid #dcdcde; border-radius: 12px; padding: 12px 14px; }
+.oys-notes__item.is-due { border-color: #dba617; background: #fff8e1; }
+.oys-notes__item.is-done { opacity: .7; }
+.oys-notes__meta { color: #50575e; margin: 4px 0; }
+.oys-notes__text { margin: 6px 0; }
+.oys-notes__do { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 8px; }
+.oys-notes__do form { margin: 0; }
+.oys-pick__later { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.oys-pick__later .description { flex-basis: 100%; }
+.oys-nl__sched { background: #fff8e1; border-left: 4px solid #dba617; }

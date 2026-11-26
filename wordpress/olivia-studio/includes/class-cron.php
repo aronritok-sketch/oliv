@@ -40,7 +40,11 @@ class OYS_Cron {
 		self::send_reminders();
 		self::send_join_reminders();
 		OYS_Locations::run();
+		OYS_Newsletter::run_schedule(); // the letters timed for now (Áron, 26 November)
 		OYS_Newsletter::process_queue();
+		if ( class_exists( 'OYS_Notes' ) ) {
+			OYS_Notes::run(); // the studio's reminders
+		}
 	}
 
 	public static function hourly() {

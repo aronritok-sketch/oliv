@@ -577,3 +577,9 @@ html.oys-app body.oys-hub-screen #wpcontent { margin-left: 0 !important; }
 .hub-addp > summary::-webkit-details-marker { display: none; }
 .hub-addp[open] > summary { margin-bottom: 6px; }
 .hub-addp .hub-found { max-height: 240px; overflow: auto; }
+/* the studio's reminders on the first page (Áron, 26 November) */
+.hub-notes { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.hub-note a { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-radius: 14px; background: var(--hub-card, #fff); color: inherit; text-decoration: none; box-shadow: 0 1px 0 rgba(0,0,0,.04); }
+.hub-note span { display: grid; gap: 2px; }
+.hub-note small { opacity: .75; }
+.hub-note.is-due a { background: #FFF4C2; }

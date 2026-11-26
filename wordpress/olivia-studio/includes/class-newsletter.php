@@ -632,6 +632,83 @@ class OYS_Newsletter {
 		return $total;
 	}
 
+	/* ---------- Scheduling (Áron, 26 November: „A hírlevelekhez kellene egy időzítés is, mert már készített Olivia januári
+	   hírlevelet”) ---------- */
+
+	const SCHEDULE = 'oys_nl_schedule';
+
+	/** @return array id => [ at (UTC), pick (null = every subscriber), by, count, warned ] */
+	public static function schedules() {
+		$s = get_option( self::SCHEDULE, array() );
+		return is_array( $s ) ? $s : array();
+	}
+
+	public static function scheduled( $id ) {
+		return self::schedules()[ (int) $id ] ?? null;
+	}
+
+	/**
+	 * Send a draft later, to the people chosen now ($pick as in send(); null: every subscriber at that time). The text
+	 * stays editable until then: the letter goes out as it is at that moment. @return true|WP_Error
+	 */
+	public static function schedule( $id, $utc, $pick = null, $by = 0 ) {
+		$n = self::get( $id );
+		if ( ! $n || 'draft' !== $n->status ) {
+			return new WP_Error( 'oys_newsletter', __( 'This newsletter was already sent.', 'olivia-studio' ) );
+		}
+		if ( '' === trim( $n->subject ) || '' === trim( $n->body ) ) {
+			return new WP_Error( 'oys_newsletter', __( 'Write a subject and a message first.', 'olivia-studio' ) );
+		}
+		if ( ! $utc || $utc <= oys_now() ) {
+			return new WP_Error( 'oys_newsletter', __( 'Choose a day and time in the future.', 'olivia-studio' ) );
+		}
+		$count = null === $pick ? count( self::subscribers() ) + count( self::list_recipients() ) : count( (array) ( $pick['users'] ?? array() ) ) + count( (array) ( $pick['subs'] ?? array() ) );
+		if ( ! $count ) {
+			return new WP_Error( 'oys_newsletter', __( 'Choose at least one person to send it to.', 'olivia-studio' ) );
+		}
+		$all            = self::schedules();
+		$all[ (int) $id ] = array( 'at' => $utc, 'pick' => $pick, 'by' => (int) ( $by ?: get_current_user_id() ), 'count' => $count, 'warned' => oys_ts( $utc ) - time() < DAY_IN_SECONDS );
+		update_option( self::SCHEDULE, $all, false );
+		return true;
+	}
+
+	public static function unschedule( $id ) {
+		$all = self::schedules();
+		unset( $all[ (int) $id ] );
+		update_option( self::SCHEDULE, $all, false );
+	}
+
+	/**
+	 * Cron: a day before, a word on the phone („tomorrow at 9 it goes out – change it now if you want”); at the time, the
+	 * letter goes into the queue (sent in batches as usual) and a word that it is on its way.
+	 */
+	public static function run_schedule() {
+		foreach ( self::schedules() as $id => $e ) {
+			$n = self::get( $id );
+			if ( ! $n || 'draft' !== $n->status ) {
+				self::unschedule( $id ); // deleted or sent by hand meanwhile
+				continue;
+			}
+			$link = admin_url( 'admin.php?page=oys-newsletter&edit=' . (int) $id );
+			if ( empty( $e['warned'] ) && oys_ts( $e['at'] ) - time() <= DAY_IN_SECONDS && $e['at'] > oys_now() ) {
+				$all                       = self::schedules();
+				$all[ $id ]['warned']      = true;
+				update_option( self::SCHEDULE, $all, false );
+				if ( class_exists( 'OYS_Studio_App' ) && $e['by'] ) {
+					OYS_Studio_App::notify( (int) $e['by'], __( 'Newsletter tomorrow', 'olivia-studio' ), sprintf( __( '„%1$s” goes out %2$s. If you want to change it, now is the time.', 'olivia-studio' ), $n->subject, oys_date( $e['at'], 'D M j, g:i a' ) ), $link, 'nl-' . (int) $id );
+				}
+			}
+			if ( $e['at'] > oys_now() ) {
+				continue;
+			}
+			self::unschedule( $id ); // first, so it never goes twice
+			$res = self::send( $id, $e['pick'] );
+			if ( class_exists( 'OYS_Studio_App' ) && $e['by'] ) {
+				OYS_Studio_App::notify( (int) $e['by'], __( 'Newsletter on its way', 'olivia-studio' ), is_wp_error( $res ) ? $res->get_error_message() : sprintf( _n( '„%1$s” is going out to %2$d person.', '„%1$s” is going out to %2$d people.', (int) $res, 'olivia-studio' ), $n->subject, (int) $res ), $link, 'nl-' . (int) $id );
+			}
+		}
+	}
+
 	/** Cron: send the next batch. @return int emails sent */
 	public static function process_queue( $batch = null ) {
 		global $wpdb;

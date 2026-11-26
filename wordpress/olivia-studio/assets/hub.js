@@ -207,6 +207,14 @@
 		h += '<section class="hub-block"><h2 class="hub-h">' + esc( T.needsYou ) + '</h2>';
 		h += any ? '<div class="hub-wait">' + wait.map( ( w ) => '<button type="button" class="hub-wait__item' + ( w[ 1 ] ? ' is-hot' : '' ) + '" data-goto="' + w[ 0 ] + '">' + icon( w[ 3 ] ) + '<b>' + ( w[ 1 ] || 0 ) + '</b><span>' + esc( w[ 2 ] ) + '</span></button>' ).join( '' ) + '</div>' : '<p class="hub-clear">' + esc( T.allClear ) + '</p>';
 		h += '</section>';
+		if ( B.notes ) {
+			// Áron, 26 November: „legyen egy emlékeztető … ami utána küldi értesítést Oliviának”
+			const ns = d.notes || [];
+			h += '<section class="hub-block"><h2 class="hub-h">' + esc( T.notesTitle ) + '</h2>' + ( ns.length
+				? '<ul class="hub-notes">' + ns.map( ( n ) => '<li class="hub-note' + ( n.due ? ' is-due' : '' ) + '"><a href="' + esc( B.notes + '#note-' + n.id ) + '">' + icon( 'clock' ) + '<span><b>' + esc( n.title ) + '</b><small>' + ( n.due ? esc( T.notesDue ) + ' · ' : '' ) + esc( n.when ) + '</small></span></a></li>' ).join( '' ) + '</ul>'
+				: '<p class="hub-muted">' + esc( T.notesNone ) + '</p>' )
+				+ '<p class="hub-more"><a href="' + esc( B.notes ) + '">' + esc( T.notesAll ) + ' →</a></p></section>';
+		}
 		if ( d.tomark && d.tomark.length ) {
 			// Áron: „óra után nagyon egyszerűen … ki jött, ki nem jött el”
 			h += '<section class="hub-block"><h2 class="hub-h">' + esc( T.afterClass ) + '</h2><div class="hub-tomark">' + d.tomark.map( ( c ) => '<button type="button" class="hub-tomark__item" data-sheet="' + c.id + '">' + icon( 'check' ) + '<span><b>' + esc( c.title ) + '</b><small>' + esc( c.day + ' ' + c.time ) + ' · ' + esc( fmt( T.toMark, c.open ) ) + '</small></span>' + icon( 'back' ) + '</button>' ).join( '' ) + '</div></section>';
