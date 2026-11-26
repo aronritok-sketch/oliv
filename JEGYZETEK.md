@@ -2356,6 +2356,8 @@
     megadott nap érvényes.
   - REST (csak a stúdiónak): `GET /oys/v1/customers/passes/far?after=Y-m-d` (a túl messzi lejáratú bérletek) és
     `POST /oys/v1/customers/passes/<id>/expiry` (`until`). A Motibrós sor is megkapja az új napot.
+  - Élesben egyetlen ilyen bérlet volt (`…dce93b`, 2 alkalom). Átállítva 2027. január 27-re, arra a napra, amit Olívia a
+    többi áthozott bérletnél adott. Utána: 0 túl messzi bérlet.
   - Teszt: 2033/0.
 
 ## Következő kör – nyitott pontok / ötletek
