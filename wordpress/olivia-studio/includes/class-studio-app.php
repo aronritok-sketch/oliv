@@ -469,6 +469,29 @@ JS;
 				return self::state();
 			} ),
 		) );
+		// a message to a member of the studio's phone (Áron, 26 November: „küldj egy push üzenetet a telefonjára”) – the
+		// site owner only; GET says how many devices the person has switched on
+		register_rest_route( OYS_Hub::NS, '/hub/push/send', array(
+			array(
+				'methods'             => 'GET',
+				'permission_callback' => fn() => current_user_can( 'manage_options' ),
+				'callback'            => fn( WP_REST_Request $r ) => array( 'devices' => self::devices( (int) $r->get_param( 'user' ) ) ),
+			),
+			array(
+				'methods'             => 'POST',
+				'permission_callback' => fn() => current_user_can( 'manage_options' ),
+				'callback'            => function ( WP_REST_Request $r ) {
+					$u = get_userdata( (int) $r->get_param( 'user' ) );
+					if ( ! $u || ! user_can( $u, 'oys_manage' ) && ! user_can( $u, 'manage_options' ) ) {
+						return new WP_Error( 'oys_push', 'Only to the studio.', array( 'status' => 400 ) );
+					}
+					$title = sanitize_text_field( (string) $r->get_param( 'title' ) ) ?: self::app_name()['name'];
+					$body  = sanitize_textarea_field( (string) $r->get_param( 'body' ) );
+					$url   = esc_url_raw( (string) $r->get_param( 'url' ) ) ?: self::url();
+					return array( 'devices' => self::notify( $u->ID, $title, $body, $url, 'note' ) );
+				},
+			),
+		) );
 		register_rest_route( OYS_Hub::NS, '/hub/push/test', array(
 			'methods'             => 'POST',
 			'permission_callback' => $can,

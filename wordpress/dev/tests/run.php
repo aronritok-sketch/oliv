@@ -5912,6 +5912,25 @@ test( 'Áron 26 Nov: „rendszerüzenetek az összes angol … az adminba angol�
 	OYS_Settings::update( array( 'languages' => $wl, 'default_lang' => $was ) );
 } );
 
+test( 'Áron 26 Nov: „küldj egy push üzenetet a telefonjára” – a push to a member of the studio, by the site owner only', function () {
+	$routes = rest_get_server()->get_routes();
+	ok( isset( $routes['/oys/v1/hub/push/send'] ), 'the route' );
+	$guest = make_user( 'Pushguest' );
+	wp_set_current_user( $guest );
+	$res = rest_do_request( new WP_REST_Request( 'POST', '/oys/v1/hub/push/send' ) );
+	ok( in_array( $res->get_status(), array( 401, 403 ), true ), 'not for a guest' );
+	$admin = wp_insert_user( array( 'user_login' => 'push.admin.' . wp_rand(), 'user_email' => 'push.admin.' . wp_rand() . '@example.test', 'user_pass' => wp_generate_password(), 'role' => 'administrator' ) );
+	wp_set_current_user( $admin );
+	$req = new WP_REST_Request( 'POST', '/oys/v1/hub/push/send' );
+	$req->set_param( 'user', $guest );
+	eq( 400, rest_do_request( $req )->get_status(), 'only to the studio, never to a guest' );
+	$req->set_param( 'user', $admin );
+	$req->set_param( 'body', 'Szia!' );
+	$res = rest_do_request( $req );
+	ok( 200 === $res->get_status() && array_key_exists( 'devices', $res->get_data() ), 'to the studio: how many devices got it' );
+	wp_set_current_user( 0 );
+} );
+
 test( 'Áron 26 Nov: the newsletter to the Motibro guests – {password_button}: each guest\'s own one-tap link, a preview in the studio\'s test, the real link in a test to a guest test account', function () {
 	$mail = 'nl.motibro.' . wp_rand() . '@example.test';
 	$g    = wp_insert_user( array( 'user_login' => $mail, 'user_email' => $mail, 'user_pass' => wp_generate_password(), 'first_name' => 'Kata', 'role' => 'oys_customer' ) );
