@@ -101,7 +101,11 @@ class OYS_Studio_App {
 			}
 			$body = json_decode( (string) file_get_contents( 'php://input' ), true );
 			nocache_headers();
-			wp_send_json( array( 'items' => self::pull( (string) ( $body['endpoint'] ?? '' ) ) ) );
+			$ep    = (string) ( $body['endpoint'] ?? '' );
+			$items = self::pull( $ep );
+			// nothing new (an earlier push already took it): the latest again, quietly, under its own tag – it replaces
+			// itself instead of a vague „Someone wrote to you”
+			wp_send_json( array( 'items' => $items ?: self::recent( $ep ) ) );
 		}
 		nocache_headers();
 		$self = 'guide' === $what ? self::guide_url() : self::url( sanitize_text_field( wp_unslash( (string) ( $_GET['open'] ?? '' ) ) ) );
@@ -209,15 +213,18 @@ self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', (e) => e.waitUntil(self.clients.claim()));
 self.addEventListener('push', (e) => {
 	e.waitUntil((async () => {
-		let item = null;
+		let items = [];
 		try {
 			const sub = await self.registration.pushManager.getSubscription();
-			const res = await fetch(PULL, { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ endpoint: sub ? sub.endpoint : '' }) });
-			if (res.ok) item = ((await res.json()).items || [])[0] || null;
+			const res = await fetch(PULL, { method: 'POST', cache: 'no-store', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ endpoint: sub ? sub.endpoint : '' }) });
+			if (res.ok) items = (await res.json()).items || [];
 		} catch (err) { /* no network: a general notification */ }
-		item = item || { title: TITLE, body: FALLBACK, url: START };
-		// always shown: an iPhone switches off a device that gets a push without a notification
-		await self.registration.showNotification(item.title, { body: item.body, icon: ICON, badge: BADGE, tag: item.tag || undefined, renotify: !!item.tag, data: { url: item.url || START } });
+		if (!items.length) items = [{ title: TITLE, body: FALLBACK, url: START }];
+		// newest first from the server: the older ones first, so the newest ends on top. Always at least one is shown: an
+		// iPhone switches off a device that gets a push without a notification
+		for (const item of items.slice().reverse()) {
+			await self.registration.showNotification(item.title, { body: item.body, icon: ICON, badge: BADGE, tag: item.tag || undefined, renotify: !!item.tag && !item.quiet, silent: !!item.quiet, data: { url: item.url || START } });
+		}
 	})());
 });
 self.addEventListener('notificationclick', (e) => {
@@ -349,7 +356,7 @@ JS;
 				continue;
 			}
 			$q   = (array) ( $s['queue'] ?? array() );
-			$q[] = array( 'title' => mb_substr( (string) $title, 0, 120 ), 'body' => mb_substr( (string) $body, 0, 240 ), 'url' => (string) $url, 'tag' => (string) $tag, 'at' => time() );
+			$q[] = array( 'title' => mb_substr( (string) $title, 0, 120 ), 'body' => mb_substr( (string) $body, 0, 240 ), 'url' => (string) $url, 'tag' => (string) $tag ?: 'n' . substr( md5( $title . $body . microtime() ), 0, 10 ), 'at' => time() );
 			$subs[ $key ]['queue'] = array_slice( $q, -self::QUEUED );
 			self::$outbox[]        = $s['endpoint'];
 			$n++;
@@ -397,17 +404,31 @@ JS;
 		return $code;
 	}
 
-	/** The service worker takes the oldest waiting notification (one push = one notification). */
+	/**
+	 * Everything waiting for the device, newest first, and the queue emptied (Áron, 26 November: „mindig az előző
+	 * értesítő jön meg, nem az aktuális”). It used to hand over the oldest one per push: two notifications in one request
+	 * (one push) left one behind, and from then on every push showed the one before. The worker shows them all, the
+	 * newest on top; an older worker shows the first – the newest. Older than a day: dropped, no longer news.
+	 */
 	public static function pull( $endpoint ) {
 		$subs = self::subs();
 		$key  = md5( (string) $endpoint );
 		if ( '' === (string) $endpoint || empty( $subs[ $key ]['queue'] ) ) {
 			return array();
 		}
-		$item                 = array_shift( $subs[ $key ]['queue'] );
-		$subs[ $key ]['last'] = time();
+		$items                  = array_values( array_filter( (array) $subs[ $key ]['queue'], fn( $i ) => (int) ( $i['at'] ?? time() ) > time() - DAY_IN_SECONDS ) );
+		$subs[ $key ]['queue']  = array();
+		$subs[ $key ]['last']   = time();
+		$items                  = array_slice( array_reverse( $items ), 0, 5 );
+		$subs[ $key ]['recent'] = $items ? $items[0] : ( $subs[ $key ]['recent'] ?? null );
 		self::save_subs( $subs );
-		return array( array_intersect_key( $item, array_flip( array( 'title', 'body', 'url', 'tag' ) ) ) );
+		return array_map( fn( $i ) => array_intersect_key( $i, array_flip( array( 'title', 'body', 'url', 'tag' ) ) ), $items );
+	}
+
+	/** The last notification the device took, to show again quietly (same tag: it replaces itself). */
+	public static function recent( $endpoint ) {
+		$r = self::subs()[ md5( (string) $endpoint ) ]['recent'] ?? null;
+		return is_array( $r ) ? array( array_intersect_key( $r, array_flip( array( 'title', 'body', 'url', 'tag' ) ) ) + array( 'quiet' => true ) ) : array();
 	}
 
 	/* ---------- What makes a notification ---------- */

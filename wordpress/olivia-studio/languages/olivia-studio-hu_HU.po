@@ -9690,3 +9690,12 @@ msgstr[1] "Időzítve: %1$s, %2$d embernek. Addig még módosíthatod."
 
 msgid "Notes without a day"
 msgstr "Jegyzetek (nap nélkül)"
+
+msgid "Email to the guest: „%1$s” (%2$s)"
+msgstr "E-mail a vendégnek: „%1$s” (%2$s)"
+
+msgid "closed – not moved online"
+msgstr "lezárva – nem lett online"
+
+msgid "closed"
+msgstr "lezárva"

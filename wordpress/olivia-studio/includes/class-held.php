@@ -28,7 +28,24 @@ class OYS_Held {
 		add_action( 'rest_api_init', function () {
 			$can = fn() => current_user_can( 'oys_manage' ) || current_user_can( 'manage_options' );
 			register_rest_route( 'oys/v1', '/customers/held', array(
-				array( 'methods' => 'GET', 'permission_callback' => $can, 'callback' => fn() => rest_ensure_response( array_values( self::all() ) ) ),
+				array( 'methods' => 'GET', 'permission_callback' => $can, 'callback' => fn() => rest_ensure_response( array_values( self::with_passes() ) ) ),
+			) );
+			// a word to one guest from the studio, with the one-tap password button where {password_button} stands (Áron,
+			// 26 November: „a Bajzák-Faragó Viviennek 3 órája maradt … erről küldj neki egy e-mailt”); `test_to`: a copy to
+			// the studio first (the button only says it is a preview); `note_key`: noted on that Motibro row
+			register_rest_route( 'oys/v1', '/customers/(?P<id>\d+)/email', array(
+				'methods'             => 'POST',
+				'permission_callback' => $can,
+				'callback'            => function ( WP_REST_Request $r ) {
+					$p = (array) ( $r->get_json_params() ?: $r->get_params() );
+					$res = self::email_customer( (int) $r['id'], (string) ( $p['subject'] ?? '' ), (string) ( $p['heading'] ?? '' ), (string) ( $p['body'] ?? '' ), sanitize_key( (string) ( $p['note_key'] ?? '' ) ), sanitize_email( (string) ( $p['test_to'] ?? '' ) ) );
+					return is_wp_error( $res ) ? $res : rest_ensure_response( array( 'sent' => $res ) );
+				},
+			) );
+			register_rest_route( 'oys/v1', '/customers/held/close-rest', array(
+				'methods'             => 'POST',
+				'permission_callback' => $can,
+				'callback'            => fn() => rest_ensure_response( self::close_rest() ),
 			) );
 			register_rest_route( 'oys/v1', '/customers/held/from-passes', array(
 				'methods'             => 'POST',
@@ -44,6 +61,51 @@ class OYS_Held {
 				},
 			) );
 		} );
+	}
+
+	/** Everything not moved online is closed (Áron, 26 November: „akit nem hozott át most Olivia online-ra, azok kuka”). */
+	public static function close_rest() {
+		$closed = array();
+		foreach ( self::all() as $k => $e ) {
+			if ( 'held' === $e['status'] ) {
+				self::act( $k, 'close' );
+				$closed[] = $k;
+			}
+		}
+		return array( 'closed' => $closed );
+	}
+
+	/** The list with each online row's pass as it is now (to check that what was moved online is really there). */
+	public static function with_passes() {
+		global $wpdb;
+		$out = array();
+		foreach ( self::all() as $k => $e ) {
+			$p = 'online' === $e['status'] ? $wpdb->get_row( $wpdb->prepare( 'SELECT id, kind, credits_left, credits_total, expires_at FROM ' . OYS_Install::table( 'passes' ) . ' WHERE user_id = %d AND product_id = %s ORDER BY id DESC LIMIT 1', (int) $e['user'], (string) $k ) ) : null;
+			$u = get_userdata( (int) $e['user'] );
+			$out[ $k ] = $e + array( 'pass' => $p ? array( 'id' => (int) $p->id, 'kind' => $p->kind, 'left' => (int) $p->credits_left, 'total' => (int) $p->credits_total, 'expires' => $p->expires_at ) : null, 'guest' => $u ? $u->display_name : '' );
+		}
+		return $out;
+	}
+
+	/** A word to one guest (see the route). @return bool|WP_Error */
+	public static function email_customer( $user_id, $subject, $heading, $body, $note_key = '', $test_to = '' ) {
+		$u = get_userdata( (int) $user_id );
+		if ( ! $u || '' === trim( $subject ) || '' === trim( $body ) ) {
+			return new WP_Error( 'oys_email', 'A guest, a subject and a text are needed.', array( 'status' => 400 ) );
+		}
+		$to = $test_to ?: $u->user_email;
+		$ok = OYS_I18n::with( OYS_I18n::lang_for( $u->ID ), function () use ( $u, $to, $subject, $heading, $body, $test_to ) {
+			$vars = array( 'first_name' => $u->first_name ?: $u->display_name, 'studio' => OYS_Settings::get( 'email_from_name' ) );
+			$html = OYS_Newsletter::body_for( $body, $vars, $u->ID, '' === $test_to );
+			$subj = OYS_Email_Templates::fill( sanitize_text_field( $subject ), $vars );
+			return OYS_Emails::send( $to, ( $test_to ? __( '[Test]', 'olivia-studio' ) . ' ' : '' ) . $subj, OYS_Email_Templates::fill( sanitize_text_field( $heading ?: $subject ), $vars ), $html );
+		} );
+		if ( $ok && ! $test_to && $note_key && self::get( $note_key ) ) {
+			$all              = self::all();
+			$all[ $note_key ]['note'] = trim( $all[ $note_key ]['note'] . "\n" . sprintf( __( 'Email to the guest: „%1$s” (%2$s)', 'olivia-studio' ), sanitize_text_field( $subject ), wp_date( 'Y-m-d' ) ) );
+			self::save( $all );
+		}
+		return (bool) $ok;
 	}
 
 	/* ---------- the list ---------- */
@@ -197,8 +259,13 @@ class OYS_Held {
 			$all[ $key ]['note']   = trim( $all[ $key ]['note'] . "\n" . wp_date( 'Y-m-d' ) . ': ' . ( '' !== $note ? $note : __( 'redeemed', 'olivia-studio' ) ) );
 		} elseif ( 'hold' === $do ) {
 			$all[ $key ]['status'] = 'held';
+		} elseif ( 'close' === $do ) {
+			// Áron, 26 November: „akit nem hozott át most Olivia online-ra, azok kuka” – kept as a record, gone from every
+			// count, list and from the guest's account
+			$all[ $key ]['status'] = 'closed';
+			$all[ $key ]['note']   = trim( $all[ $key ]['note'] . "\n" . wp_date( 'Y-m-d' ) . ': ' . ( '' !== $note ? $note : __( 'closed – not moved online', 'olivia-studio' ) ) );
 		} else {
-			return new WP_Error( 'oys_held', 'do: redeem | online | hold', array( 'status' => 400 ) );
+			return new WP_Error( 'oys_held', 'do: redeem | online | hold | close', array( 'status' => 400 ) );
 		}
 		$all[ $key ]['updated'] = current_time( 'mysql', true );
 		self::save( $all );
@@ -300,6 +367,7 @@ class OYS_Held {
 			'held'     => __( 'to redeem', 'olivia-studio' ),
 			'online'   => __( 'moved online', 'olivia-studio' ),
 			'redeemed' => __( 'redeemed', 'olivia-studio' ),
+			'closed'   => __( 'closed', 'olivia-studio' ),
 		)[ $e['status'] ] ?? $e['status'];
 		$flags = ( $e['missing'] ? ' · <span class="oys-status oys-status--offered">' . esc_html__( 'not in the newer export – check in Motibro', 'olivia-studio' ) . '</span>' : '' )
 			. ( $e['expires'] && $e['expires'] < wp_date( 'Y-m-d' ) ? ' · ' . esc_html__( 'expired there', 'olivia-studio' ) : '' );
@@ -323,7 +391,7 @@ class OYS_Held {
 
 	/** On Studio → Customers: everything from the earlier system, what is still to redeem first. */
 	public static function admin_box() {
-		$all = array_filter( self::all(), fn( $e ) => (int) $e['left'] > 0 || 'held' !== $e['status'] );
+		$all = array_filter( self::all(), fn( $e ) => ( (int) $e['left'] > 0 || 'held' !== $e['status'] ) && 'closed' !== $e['status'] );
 		if ( ! $all ) {
 			return '';
 		}

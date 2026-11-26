@@ -496,6 +496,11 @@ class OYS_Newsletter {
 		return str_contains( $html, '<p>' . $mark . '</p>' ) ? str_replace( '<p>' . $mark . '</p>', $button(), $html ) : $html;
 	}
 
+	/** Any studio text in the newsletter's format, with the password button where {password_button} stands. */
+	public static function body_for( $text, array $vars, $user_id, $real ) {
+		return self::body_html( (object) array( 'body' => (string) $text ), $vars, fn() => self::password_button( (int) $user_id, (bool) $real ) );
+	}
+
 	/**
 	 * „Jelszót állítok be” (Áron, 26 November: „ez az egy kattintásos, jelszógenerálós gomb ez legyen benne”): a guest's
 	 * own link – one tap, a password, logged in (OYS_Welcome). $real false: a link that only says it is a preview (the

@@ -5233,6 +5233,23 @@ test( 'Áron, 16 November – the Studio app: notifications on the phone about m
 		OYS_Hub::add( $t, array( 'body' => 'Még egy kérdés.', 'from_studio' => false, 'author_id' => $u ) );
 		eq( array(), OYS_Studio_App::pull( 'https://push.example.test/send/teacher' ), 'a teacher hears only about their own conversations' );
 		eq( 1, count( OYS_Studio_App::pull( $ep ) ), 'the studio does' );
+		// Áron, 26 November: „mindig az előző értesítő jön meg, nem az aktuális” – two in one request (one push): both
+		// come, the newest first, and nothing is left behind for the next push
+		OYS_Studio_App::notify( $admin, 'Első', 'egy' );
+		OYS_Studio_App::notify( $admin, 'Második', 'kettő' );
+		$both = OYS_Studio_App::pull( $ep );
+		ok( 2 === count( $both ) && 'Második' === $both[0]['title'] && 'Első' === $both[1]['title'] && '' !== (string) $both[0]['tag'], 'two waiting: both, the newest first (an older worker shows the first: the current one)' );
+		OYS_Studio_App::notify( $admin, 'Harmadik', 'három' );
+		$next = OYS_Studio_App::pull( $ep );
+		ok( 1 === count( $next ) && 'Harmadik' === $next[0]['title'], 'the next push brings the next one, not the one before' );
+		$again = OYS_Studio_App::recent( $ep );
+		ok( 'Harmadik' === ( $again[0]['title'] ?? '' ) && ! empty( $again[0]['quiet'] ) && $again[0]['tag'] === $next[0]['tag'], 'a push with nothing new: the latest again, quietly, under its own tag (it replaces itself)' );
+		$subs = OYS_Studio_App::subs();
+		$subs[ md5( $ep ) ]['queue'] = array( array( 'title' => 'Régi', 'body' => '', 'url' => '', 'tag' => 'x', 'at' => time() - 2 * DAY_IN_SECONDS ) );
+		update_option( OYS_Studio_App::SUBS, $subs, false );
+		eq( array(), OYS_Studio_App::pull( $ep ), 'older than a day: no longer news' );
+		$sw = OYS_Studio_App::worker();
+		ok( str_contains( $sw, 'for (const item of items.slice().reverse())' ) && str_contains( $sw, "cache: 'no-store'" ), 'the worker shows every one, the newest on top' );
 		OYS_Studio_App::subscribe( $admin, 'https://push.example.test/send/gone' );
 		OYS_Studio_App::ping( 'https://push.example.test/send/gone' );
 		ok( ! isset( OYS_Studio_App::subs()[ md5( 'https://push.example.test/send/gone' ) ] ), 'a device the push service no longer knows is forgotten' );
@@ -5910,6 +5927,29 @@ test( 'Áron 26 Nov: „rendszerüzenetek az összes angol … az adminba angol�
 	$src = (string) file_get_contents( WP_PLUGIN_DIR . '/olivia-studio/includes/admin/class-admin.php' );
 	ok( ! str_contains( $src, "email_lang( wp_unslash( \$_POST['lang'] ?? 'en' ) )" ) && ! str_contains( $src, "email_lang( \$in['lang'] ?? 'en' )" ) && str_contains( $src, "esc_html( \$l['native'] )" ), 'saving, the test and „back to the original” follow it; the tabs say „Magyar”' );
 	OYS_Settings::update( array( 'languages' => $wl, 'default_lang' => $was ) );
+} );
+
+test( 'Áron 26 Nov: the Motibro past closed – „akit nem hozott át most Olivia online-ra, azok kuka”; the online passes checked; a word to one guest', function () {
+	$keep = get_option( OYS_Held::OPTION, array() );
+	update_option( OYS_Held::OPTION, array(), false );
+	$a = make_user( 'Holdon' );
+	$b = make_user( 'Holdoff' );
+	OYS_Held::put( 'motibro-t-on', $a, array( 'name' => '5 alkalmas', 'used' => 2, 'locked' => 0, 'left' => 3, 'expires' => '2027-02-03' ) );
+	OYS_Held::put( 'motibro-t-off', $b, array( 'name' => '5 alkalmas', 'used' => 3, 'locked' => 0, 'left' => 2, 'expires' => '2027-05-05' ) );
+	OYS_Held::to_online( 'motibro-t-on', '2027-02-03' );
+	$res = OYS_Held::close_rest();
+	eq( array( 'motibro-t-off' ), $res['closed'], 'only what was not moved online is closed' );
+	ok( 'closed' === OYS_Held::get( 'motibro-t-off' )['status'] && str_contains( OYS_Held::get( 'motibro-t-off' )['note'], 'closed' ) && ! OYS_Held::for_user( $b ) && 0 === OYS_Held::totals()[0], '… kept as a record, gone from the guest\'s account and the counts' );
+	ok( ! str_contains( OYS_Held::admin_box(), 'Holdoff' ), '… and from the list on the Customers page' );
+	$w = OYS_Held::with_passes();
+	ok( 3 === $w['motibro-t-on']['pass']['left'] && 'online' === $w['motibro-t-on']['pass']['kind'] && null === $w['motibro-t-off']['pass'], 'each online row with its pass as it is now' );
+	// a word to one guest: a test to the studio (preview button), then to the guest (her own link), noted on the row
+	$log = sent_mails( fn() => OYS_Held::email_customer( $a, 'Privát óra', 'Privát óra a bérletedből', "Szia {first_name}!\n\n{password_button}\n\nÖlelés", 'motibro-t-on', 'olivia@example.test' ) );
+	ok( 1 === count( $log ) && 'olivia@example.test' === $log[0]['to'] && str_starts_with( $log[0]['subject'], '[Test] ' ) && str_contains( html_entity_decode( $log[0]['html'] ), 'oys_welcome=preview' ) && ! str_contains( OYS_Held::get( 'motibro-t-on' )['note'], 'Privát óra' ), 'the test copy: to the studio, a preview button, not noted' );
+	$log = sent_mails( fn() => OYS_Held::email_customer( $a, 'Privát óra', 'Privát óra a bérletedből', "Szia {first_name}!\n\n{password_button}\n\nÖlelés", 'motibro-t-on' ) );
+	ok( 1 === count( $log ) && get_userdata( $a )->user_email === $log[0]['to'] && str_contains( $log[0]['html'], 'Szia Holdon!' ) && str_contains( html_entity_decode( $log[0]['html'] ), 'oys_welcome=' . $a . '.' ) && str_contains( OYS_Held::get( 'motibro-t-on' )['note'], '„Privát óra”' ), 'to the guest: her name, her own one-tap link, noted on the row' );
+	ok( isset( rest_get_server()->get_routes()['/oys/v1/customers/(?P<id>\d+)/email'], rest_get_server()->get_routes()['/oys/v1/customers/held/close-rest'] ), 'both over REST, for the studio' );
+	update_option( OYS_Held::OPTION, $keep, false );
 } );
 
 test( 'Áron 26 Nov: notes and reminders – „legyen egy emlékeztető, hogy júliusban sorsolnia kell … ami utána küldi értesítést Oliviának”', function () {

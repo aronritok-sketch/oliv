@@ -2320,6 +2320,24 @@
     eleji lendület” hírlevél ígérete szerint), a Hubra mutat.
   - Teszt: 2015/0.
 
+- **2026-11-26 – Push: mindig a mostani értesítés jön; a Motibrós múlt lezárva; egyedi levél egy vendégnek
+  (olivia-studio 1.33.1, oliviajoga.online 3.12.43).**
+  - **Push** (Áron: „mindig az előző értesítő jön meg, nem az aktuális”). Az ok: a telefon minden pushnál a sor
+    legrégebbi tételét vette ki. Ha egy kérésben két értesítés keletkezett (egy push), az egyik bent maradt, és onnantól
+    minden push egyet késett.
+    - Most a telefon minden várakozót megkap, a legújabb kerül felülre, és a sor kiürül. Egy napnál régebbi tétel már nem
+      jön.
+    - Ha nincs új: a legutóbbi csendben, ugyanazzal a címkével jön újra (felülírja önmagát), nem egy általános „Valaki
+      írt neked”.
+    - A régi service worker is az elsőt, vagyis a legújabbat mutatja.
+  - **Motibrós múlt** (Áron: „akit nem hozott át most Olivia online-ra, azok kuka”): új „lezárva” állapot. A tétel
+    megmarad nyomnak, de eltűnik a vendég fiókjából, a számlálókból és a Vendégek listájáról.
+    `POST /oys/v1/customers/held/close-rest` lezár minden nem áthozottat. A `GET /customers/held` mostantól az online
+    tételek mögötti bérletet is mutatja (ellenőrzéshez).
+  - **Egyedi levél egy vendégnek:** `POST /oys/v1/customers/<id>/email` (`subject`, `heading`, `body` hírlevél-formátumban,
+    `{password_button}`, `test_to`, `note_key`).
+  - Teszt: 2027/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
