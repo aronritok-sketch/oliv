@@ -41,7 +41,7 @@ ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.8.6'
+VERSION = '1.8.7'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -77,6 +77,7 @@ REMOVED_FILES = {
     'old/3cf216ddede1',  # Kapcsolat: the picture next to the form
     'old/d1f4ce0eccf6', 'old/ed90bdb67eca',  # home: the old round cut-outs, Olivia sent new photos for them
     'old/4242cda89684',  # the payment logos: blurry, replaced by Barion's official acceptance banner (SVG)
+    'old/85289ea5c413',  # the thyroid article's picture of the poses: her pose photos as cards instead (Áron, 26 Nov)
 }
 REMOVED_EMBEDS = {'docs.google.com/forms'}
 # Olivia (11.12): the gift card is an online one now, bought on the online site – the old steps (write to me, Motibro
@@ -98,7 +99,8 @@ SERVICES_LINE = ('Élő online, a saját otthonodból: csoportos hatha flow jóg
                  'időpontban egyéni online jóga, online kismamatorna, stretching és mobilizáció, relaxáció és légzés.')
 REPLACED_TEXT = {'csoportos hatha flow jóga órák Budapest 18. kerület Budapest 21. kerület', '1 órás vagy 5 alkalmas jóga ajándékutalvány', 'Ezekre az információkra lesz szükségem az ajándékutalvány kiállításához:'}
 REPLACED_TEXT_START = ('Vásárlás után kérlek, vedd fel velem a kapcsolatot', 'Ahhoz, hogy az ajándékozott tudjon online foglalni',
-                       'Ha szeretnéd megtapasztalni azt, hogy milyen az elfogadás')  # the last: fix_links, OLD_INVITE (Áron, 26 Nov)  # Kapcsolat: the message form
+                       'Ha szeretnéd megtapasztalni azt, hogy milyen az elfogadás',
+                       'A gyakorlás alatt ne erőlködj')  # the last: the thyroid article as on the online site (Áron, 26 Nov)  # the last: fix_links, OLD_INVITE (Áron, 26 Nov)  # Kapcsolat: the message form
 DROPPED_LENGTHS = {'90 perc'}  # Árak: there are no 90-minute classes any more
 # Photos from the theme (Olivia's own, round 8) for the page heads; Hungarian alt text.
 THEME_PHOTOS = {
@@ -1788,6 +1790,57 @@ def events_page(p):
     return head + f'<div class="container oj-flow"><div class="oj-events-all">{"".join(out)}</div></div>'
 
 
+# Áron, 26 November: „A .hu-n a pajzsmirigy harmonizálás aloldal legyen ugyanolyan mint az oliviajoga.online-on” – the
+# same lead, the same 14 pose cards in two groups (her photos, from the online theme: wordpress/olivia-yoga, oy_pose_sets),
+# the tips as a list, the medical note; the old picture of the poses and its extra sentence go, as there.
+THYROID_PATH = 'pajzsmirigy-harmonizálás'
+THYROID_LEAD = 'Szánj időt a tested, a lelked és a szellemed megfigyelésére, aztán az egyensúlyukra. A jóga erre kiváló eszköz.'
+THYROID_NOTE = 'A jóga nem helyettesíti az orvosi kezelést. Pajzsmirigy-problémával mindig egyeztess az orvosoddal.'
+THYROID_DROPPED = 'A gyakorlás alatt ne erőlködj'
+POSE_SETS = [
+    ('tul', 'Ha túlműködik a pajzsmirigy', 'Nyugodt, lassú légzőgyakorlatok és gyakorlatsorok, nyugtató és stresszoldó ászanák.', 'lilac',
+     [('halpoz', 'Halpóz', 'Matszjászana'), ('alacsony-kobra', 'Alacsony kobra póz', 'Budzsangászana'), ('macskapoz', 'Macskapóz', 'Mardzsari'),
+      ('babapoz', 'Babapóz', 'Sasankászana'), ('hullapoz', 'Hullapóz', 'Savászana'), ('napudvozlet-lassan', 'Napüdvözlet, lassan', 'Szúrjanamaszkár')]),
+    ('alul', 'Ha alulműködik a pajzsmirigy', 'Dinamikusabb, élénkítő, keringést fokozó ászanák és gyakorlatsorok, fordított testhelyzetek.', 'sun',
+     [('gyertyaallas', 'Gyertyaállás', 'Szarvangászana'), ('ekepoz', 'Ekepóz', 'Halászana'), ('fejenallas', 'Fejenállás', 'Sirsászana'),
+      ('kobra', 'Kobra póz', 'Budzsangászana'), ('felfele-nezo-kutya', 'Felfelé néző kutya', 'Úrdhva-mukha-svanászana'),
+      ('kis-jogahid', 'Kis jógahíd', 'Kandarászana'), ('tevepoz', 'Tevepóz', 'Ustrászana'), ('napudvozlet-gyorsan', 'Napüdvözlet, gyorsabban', 'Szúrjanamaszkár')]),
+]
+
+
+def pose_file(key, sanskrit):
+    """The same keyword name as on the online site (oy_pose_file): halpoz-matszjaszana-joga-pajzsmirigy-kovacs-olivia."""
+    return f'{key}-{ascii_slug(sanskrit)}-joga-pajzsmirigy-kovacs-olivia'
+
+
+def poses_html():
+    out = ''
+    for key, title, lead, tone, poses in POSE_SETS:
+        cards = ''
+        for k, name, skt in poses:
+            f = pose_file(k, skt)
+            alt = f'{name} ({skt}) – Kovács Olívia mutatja be, jógaászana ' + ('pajzsmirigy-túlműködésre' if key == 'tul' else 'pajzsmirigy-alulműködésre')
+            cards += (f'<li class="oj-pose"><img src="{asset("img/theme/poses/" + f + "-600.jpg")}" srcset="{asset("img/theme/poses/" + f + "-600.jpg")} 600w, '
+                      f'{asset("img/theme/poses/" + f + "-900.jpg")} 900w" sizes="(min-width: 960px) 260px, (min-width: 600px) 45vw, 92vw" width="900" '
+                      f'height="598" alt="{esc(alt)}" loading="lazy" decoding="async"><span class="oj-pose__name">{esc(name)}</span>'
+                      f'<span class="oj-pose__sanskrit">{esc(skt)}</span></li>')
+        out += (f'<section class="oj-poses oj-poses--{tone}"><h2 class="oj-poses__title">{esc(title)}</h2><p class="oj-poses__lead">{esc(lead)}</p>'
+                f'<ul class="oj-poses__list">{cards}</ul></section>')
+    return out
+
+
+def thyroid_body(blocks):
+    """The article's own paragraphs in the online site's order: three, the poses, one, the two tips as a list, the last one,
+    the medical note."""
+    ps = [b for b in blocks if b['t'] == 'p' and not norm(text_of(b['html'])).startswith(THYROID_DROPPED)]
+    tips = [b for b in ps if norm(text_of(b['html'])).startswith(('Minden esetben', 'Az ászanákat úgy'))]
+    rest = [b for b in ps if b not in tips]
+    para = lambda b: f'<p>{fix_links(b["html"])}</p>'  # noqa: E731
+    return (''.join(para(b) for b in rest[:3]) + poses_html() + ''.join(para(b) for b in rest[3:4])
+            + '<ul>' + ''.join(f'<li>{fix_links(b["html"])}</li>' for b in tips) + '</ul>'
+            + ''.join(para(b) for b in rest[4:]) + f'<p><em>{esc(THYROID_NOTE)}</em></p>')
+
+
 def post_page(p, journal_cards):
     secs = [s for s in p['sections'] if not is_prefooter(s) and not is_badges(s)]
     title = title_of(secs[0])
@@ -1804,14 +1857,17 @@ def post_page(p, journal_cards):
     raw = cover and card_key(p['path']) in NEW_META
     art = 'has-art-photo' if cover and cover['file'] in CUTOUTS and not raw else ''
     photo = (card_pic(p['path'], cover, '(min-width: 960px) 47vw, 100vw', eager=True) if raw else pic(cover, '(min-width: 960px) 36vw, 90vw', True)) if cover else ''
-    head = page_head(title, p['path'], [('', 'Főoldal'), ('jógáról', 'Jógáról')], '', photo, TONES[sum(map(ord, p['path'])) % 4], True, extra=art + (' oj-head--raw' if raw else ''))
+    thyroid = p['path'] == THYROID_PATH
+    lead = f'<p class="lead">{esc(THYROID_LEAD)}</p>' if thyroid else ''
+    head = page_head(title, p['path'], [('', 'Főoldal'), ('jógáról', 'Jógáról')], lead, photo, TONES[sum(map(ord, p['path'])) % 4], True, extra=art + (' oj-head--raw' if raw else ''))
     others = [c for c in journal_cards if c[0] != p['path']]
     k = [x[0] for x in journal_cards].index(p['path']) if p['path'] in [x[0] for x in journal_cards] else 0
     pick = (others[k % len(others):] + others)[:3] if others else []
     more = ''.join(f'<li><a href="{esc(link(path))}"><span class="oj-more__photo">{img}</span><span class="oj-more__title">{esc(t)}</span></a></li>' for path, t, img in pick)
     aside = (f'<aside class="aside-sticky oj-more"><p class="kicker">Jógáról</p><ul>{more}</ul>'
              f'<p class="btn-row"><a class="btn btn--ghost" href="{esc(link("jógáról"))}">A jógáról - Tőlem</a></p></aside>')
-    return head + f'<div class="container"><article class="layout layout--aside"><div class="entry oj-prose">{blocks_html(body_blocks)}{"".join(extra)}{online_note()}</div>{aside}</article></div>'
+    body = thyroid_body(body_blocks) if thyroid else blocks_html(body_blocks) + ''.join(extra)
+    return head + f'<div class="container"><article class="layout layout--aside"><div class="entry oj-prose">{body}{online_note()}</div>{aside}</article></div>'
 
 
 # ---------------------------------------------------------------- build
@@ -1897,6 +1953,7 @@ def wp_theme(pages, versions):
     shutil.copy(os.path.join(HERE, 'assets', 'oliviajoga.css'), os.path.join(OUT, 'assets', 'oliviajoga.css'))
     shutil.copy(os.path.join(HERE, 'assets', 'oliviajoga.js'), os.path.join(OUT, 'assets', 'oliviajoga.js'))
     shutil.copytree(os.path.join(HERE, 'assets', 'icons'), os.path.join(OUT, 'assets', 'icons'))  # favicon (Áron, 25 Nov)
+    shutil.copytree(os.path.join(THEME, 'assets', 'img', 'poses'), os.path.join(OUT, 'assets', 'img', 'theme', 'poses'))  # the thyroid article
     # Szerkesztés a weboldalon (Olivia, 11.13): the same editor as the online site (wordpress/olivia-yoga)
     shutil.copy(os.path.join(THEME, 'inc', 'page-editor.php'), os.path.join(OUT, 'inc', 'page-editor.php'))
     # HelloProVision élesítési csomag (Áron, 11.17: „Történjen mindig ugyanaz”) – a közös fájl, wordpress/hpv/hpv-kit.php
@@ -2045,6 +2102,7 @@ def main():
     shutil.copytree(os.path.join(HERE, 'assets', 'img', 'pay'), os.path.join(OUT, 'assets', 'img', 'pay'))
     shutil.copytree(os.path.join(HERE, 'assets', 'icons'), os.path.join(OUT, 'assets', 'icons'))
     shutil.copy(os.path.join(HERE, 'assets', 'icons', 'favicon.ico'), os.path.join(OUT, 'favicon.ico'))
+    shutil.copytree(os.path.join(THEME, 'assets', 'img', 'poses'), os.path.join(OUT, 'assets', 'img', 'theme', 'poses'))
 
     # 404, robots, sitemap, server rules
     nf = {'path': '404', 'title': f'Az oldal nem található | {SITE_TITLE}', 'sections': []}

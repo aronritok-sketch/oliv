@@ -2064,6 +2064,14 @@
     a .hu IndexNow-n beküldte mind a 33 új címet (Bing, Yandex). A hibás `www.oliviajoga.hu/rolam` sitemap-bejegyzést a
     CRM nem tudja törölni (ehhez a hub-bővítmény kiadása kellene) – az indexelést nem zavarja.
 
+- **2026-11-26 – oliviajoga.hu 1.8.7: a pajzsmirigy-cikk olyan, mint az .online-on.** Áron: „A .hu-n a pajzsmirigy
+  harmonizálás aloldal legyen ugyanolyan mint az oliviajoga.online-on.” A fejlécben ugyanaz a bevezető; az első három
+  bekezdés után a 14 pózkártya két csoportban („Ha túlműködik / alulműködik a pajzsmirigy”, Olívia fotóival, ugyanazokkal a
+  kulcsszavas fájlnevekkel és altokkal, mint az .online-on – `POSE_SETS`, `poses_html`, a fotók a téma `img/theme/poses`
+  mappájában); a két tipp listában; a végén az orvosi megjegyzés. A régi ászana-grafika és a „ne erőlködj” mondat kikerült,
+  ahogy az .online-on is (`REMOVED_FILES`, `REPLACED_TEXT_START`). Helyben 390 és 1280 px: 14 kártya, 0 törött kép, nincs
+  túlcsordulás. check.py: 4222/0, `--after` 1217/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
