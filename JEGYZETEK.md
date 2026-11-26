@@ -2033,6 +2033,12 @@
   `fix_links`). A két új fotó (miért jóga, gyakoroljunk) altjából is kikerült a 11. kerület / Újbuda / Móricz; check.py
   most minden kép altját nézi. check.py: 3735/0, `--after` 1217/0.
 
+- **2026-11-26 – oliviajoga.hu 1.8.4: az oldalak alján (előlábléc) is a privát jóga.** Áron (képernyőkép az „Online
+  kismamatorna – egyéni időpontban (60 perc)” dobozról): „ide is inkább a privát jógát tegyük, mellé bal oldalra pedig azt
+  írjuk címnek, hogy Online csoportos flow jóga” → bal: „Online csoportos flow jóga” (szerda 18:30 – 20:00, 90 perc,
+  „Online jóga bejelentkezés”), jobb: „Privát online jóga” (egyéni időpontban, 60 vagy 90 perc, gomb az .online privát
+  jóga oldalára). check.py: 3735/0, `--after` 1217/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

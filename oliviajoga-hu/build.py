@@ -41,7 +41,7 @@ ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.8.3'
+VERSION = '1.8.4'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -767,10 +767,12 @@ def prefooter(p):
         slots.append(f'<div class="oj-pre__slot">{heading(h)}{"".join(rows)}</div>')
     if AFTER:  # the weekly classes are online now; the old places stay in words
         was = ' · '.join(norm(text_of(re.search(r'<h\d[^>]*>(.*?)</h\d>', x).group(1))) for x in slots if re.search(r'<h\d', x))
-        slots = [f'<div class="oj-pre__slot"><h3>Élő online hatha flow jóga</h3><p class="oj-pre__time">{icon("clock")}<span>szerda 18:30 – 20:00 (90 perc)</span></p>'
+        # Áron, 26 November (the prenatal box here): „ide is inkább a privát jógát tegyük, mellé bal oldalra pedig azt írjuk
+        # címnek, hogy Online csoportos flow jóga”
+        slots = [f'<div class="oj-pre__slot"><h3>Online csoportos flow jóga</h3><p class="oj-pre__time">{icon("clock")}<span>szerda 18:30 – 20:00 (90 perc)</span></p>'
                  f'<p class="oj-pre__go">{button(online("yoga"), "Online jóga bejelentkezés", "dark", " btn--sm")}</p></div>',
-                 f'<div class="oj-pre__slot"><h3>Online kismamatorna</h3><p class="oj-pre__time">{icon("clock")}<span>egyéni időpontban (60 perc)</span></p>'
-                 f'<p class="oj-pre__go">{button(online("prenatal"), "Online kismamatorna", "dark", " btn--sm")}</p></div>']
+                 f'<div class="oj-pre__slot"><h3>Privát online jóga</h3><p class="oj-pre__time">{icon("clock")}<span>egyéni időpontban (60 vagy 90 perc)</span></p>'
+                 f'<p class="oj-pre__go">{button(online("private"), "Privát online jóga", "dark", " btn--sm")}</p></div>']
         if was:
             slots.append(f'<p class="oj-pre__was">2026. november 25-ig: {esc(was)}</p>')
     social = (f'<p class="social"><a href="{INSTAGRAM}" target="_blank" rel="noopener">{icon("ig")}<span class="sr-only">Instagram</span></a>'
