@@ -2338,6 +2338,13 @@
     `POST /oys/v1/customers/held/<key>` `do=private&credits=1`. Az online bérletből `private` típusú, 1 alkalmas bérlet
     lesz („1 privát óra (60 perc) – a Motibrós bérletedből”), ugyanazzal a lejárattal. Ebből fizethető egy 60 perces
     privát óra. A tétel állapota „privát órára váltva”.
+  - **Élesben (2026-11-26):**
+    - Ellenőrizve: mind a 9 online tétel mögött ott a működő online bérlet, annyi alkalommal, amennyi átment.
+    - Olívia 7 e-mailje mind ezek közé ment, mindegyik soron rögzítve; a levelező nem jelzett hibát.
+    - 2 online tételnél nem volt e-mail (az egyik Vivien).
+    - A 8 nem áthozott tétel lezárva.
+    - Vivien 3 alkalma → 1 privát óra (60 perc), 2027. február 3-ig. Levelet kapott a „Jelszót állítok be” gombbal és a
+      lépésekkel, a során rögzítve.
   - **Egyedi levél egy vendégnek:** `POST /oys/v1/customers/<id>/email` (`subject`, `heading`, `body` hírlevél-formátumban,
     `{password_button}`, `test_to`, `note_key`).
   - Teszt: 2027/0.
