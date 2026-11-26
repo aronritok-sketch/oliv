@@ -2316,6 +2316,8 @@
       („Emlékeztetők”).
     - Kész ✓, Módosítás, Törlés; a késznek jelöltek lenyitható listában maradnak. A nap nélküli jegyzet sima jegyzet marad.
     - REST: `GET/POST /oys/v1/hub/notes`. Tárolás: `oys_notes`.
+  - Élesben felvettem Olíviának: „Félévi sorsolás: privát óra” – 2027. július 1., 9:00, félévente ismétlődik (az „Év
+    eleji lendület” hírlevél ígérete szerint), a Hubra mutat.
   - Teszt: 2015/0.
 
 ## Következő kör – nyitott pontok / ötletek
