@@ -308,7 +308,7 @@ class OYS_Held {
 			? self::form( $e['key'], 'redeem', '<input name="note" placeholder="' . esc_attr__( 'What for, e.g. a private session on 3 Dec', 'olivia-studio' ) . '">', __( 'Redeemed', 'olivia-studio' ) )
 				. ' ' . self::form( $e['key'], 'online', '<input type="date" name="until" value="2027-01-27"> <label class="oys-held__mail"><input type="checkbox" name="notify" value="1"> ' . esc_html__( 'email the guest', 'olivia-studio' ) . '</label>', __( 'Make bookable online', 'olivia-studio' ), 'button', $test )
 			: ( 'online' === $e['status']
-				? self::form( $e['key'], 'notify', '<input type="hidden" name="until" value="' . esc_attr( $e['until'] ?? '' ) . '">', empty( $e['mailed'] ) ? __( 'Email the guest', 'olivia-studio' ) : __( 'Email the guest again', 'olivia-studio' ), 'button button-small', $test ) . ' '
+				? self::form( $e['key'], 'notify', '', empty( $e['mailed'] ) ? __( 'Email the guest', 'olivia-studio' ) : __( 'Email the guest again', 'olivia-studio' ), 'button button-small', $test ) . ' '
 				: '' )
 				. self::form( $e['key'], 'hold', '', __( 'Back to the list', 'olivia-studio' ), 'button-link' );
 		return '<tr><td>' . $who . esc_html( $e['name'] ) . '<br><small>' . esc_html( sprintf( __( 'as of %1$s: used %2$d, locked there %3$d · valid there until %4$s', 'olivia-studio' ), $e['snapshot'], (int) $e['used'], (int) $e['locked'], $e['expires'] ?: '—' ) ) . $flags . '</small></td>'

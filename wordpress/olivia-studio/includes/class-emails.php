@@ -472,11 +472,21 @@ class OYS_Emails {
 		if ( ! $to || ( ! $test_to && ! $t['enabled'] ) ) {
 			return false;
 		}
-		$day  = preg_match( '/^\d{4}-\d{2}-\d{2}$/', (string) $until ) ? $until : (string) ( $e['until'] ?? '' );
-		$day  = max( $day, (string) $e['expires'] );
+		// once online, the online pass itself says how many are left and until when (the passes moved by the import of
+		// 26 November have no day of their own on the list)
+		global $wpdb;
+		$pass = 'online' === $e['status'] ? $wpdb->get_row( $wpdb->prepare( 'SELECT credits_left, expires_at FROM ' . OYS_Install::table( 'passes' ) . ' WHERE user_id = %d AND product_id = %s ORDER BY id DESC LIMIT 1', (int) $e['user'], (string) $key ) ) : null;
+		if ( preg_match( '/^\d{4}-\d{2}-\d{2}$/', (string) $until ) ) {
+			$day = max( (string) $until, (string) $e['expires'] );
+		} elseif ( $pass && $pass->expires_at ) {
+			$day = wp_date( 'Y-m-d', oys_ts( $pass->expires_at ) );
+		} else {
+			$day = max( (string) ( $e['until'] ?? '' ), (string) $e['expires'] );
+		}
+		$left = $pass ? (int) $pass->credits_left : (int) $e['left'];
 		$vars = array_merge( OYS_Email_Templates::vars_for( (int) $e['user'] ), array(
 			'pass'     => (string) $e['name'],
-			'sessions' => sprintf( _n( '%d session', '%d sessions', (int) $e['left'], 'olivia-studio' ), (int) $e['left'] ),
+			'sessions' => sprintf( _n( '%d session', '%d sessions', $left, 'olivia-studio' ), $left ),
 			'until'    => $day ? wp_date( get_option( 'date_format' ), strtotime( $day . ' 12:00:00 UTC' ) ) : '—',
 		) );
 		$body    = OYS_Email_Templates::paragraphs( $t['message'], $vars ) . OYS_Email_Templates::paragraphs( $t['closing'], $vars );

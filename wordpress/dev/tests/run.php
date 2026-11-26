@@ -5877,6 +5877,18 @@ test( 'Áron 26 Nov: „Online foglalhatóvá” – what it does, the email to 
 	$log = sent_mails( fn() => OYS_Held::notify( 'motibro-test-on' ) );
 	ok( 1 === count( $log ) && get_userdata( $c )->user_email === $log[0]['to'] && ! str_starts_with( $log[0]['subject'], '[Test]' ), 'then the email to the guest' );
 	ok( str_contains( OYS_Held::get( 'motibro-test-on' )['note'], 'Email sent to the guest' ), 'noted on the row' );
+	// the passes moved online by the import (before the list kept the day): the email takes the day and the sessions from the online pass
+	$c2 = make_user( 'Erika' );
+	OYS_Held::put( 'motibro-test-imp', $c2, array( 'name' => '5 alkalmas bérlet', 'used' => 1, 'locked' => 0, 'left' => 4, 'expires' => '2026-12-05' ) );
+	OYS_Held::to_online( 'motibro-test-imp', '2027-01-27' );
+	$all = OYS_Held::all();
+	unset( $all['motibro-test-imp']['until'] );
+	update_option( OYS_Held::OPTION, $all, false );
+	global $wpdb;
+	$wpdb->query( $wpdb->prepare( 'UPDATE ' . OYS_Install::table( 'passes' ) . " SET credits_left = 3 WHERE product_id = 'motibro-test-imp' AND user_id = %d", $c2 ) ); // she booked one since
+	$log  = sent_mails( fn() => OYS_Held::notify( 'motibro-test-imp' ) );
+	$want = wp_date( get_option( 'date_format' ), strtotime( '2027-01-27 12:00:00 UTC' ) );
+	ok( 1 === count( $log ) && str_contains( $log[0]['html'], $want ) && str_contains( $log[0]['html'], '3 sessions' ), 'an imported pass: until 27 January, the 3 sessions left now (' . $want . ')' );
 	ok( OYS_Email_Templates::in_use( 'held_online' ), 'listed on the Emails page while there are Motibro passes' );
 	$box = OYS_Held::admin_box();
 	ok( str_contains( $box, 'name="test" value="1"' ) && str_contains( $box, 'Email the guest' ) && str_contains( $box, 'No email goes out unless you tick' ), 'each row: a test to me, the email to the guest, and what the button does' );

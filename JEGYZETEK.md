@@ -2166,6 +2166,11 @@
   - Egy helyi LiveKit-szervert lefordítottam a végponttól végpontig tartó próbához, de az indítását a biztonsági
     ellenőrzés nem engedte. A teszteket ezért a LiveKit válaszainak utánzásával futtattam (1926/0).
 
+- **2026-11-26 – A Motibro-értesítő dátuma (olivia-studio 1.30.1, oliviajoga.online 3.12.31).** A 7 bérletet még az import
+  tette online foglalhatóvá, ezért a listán nem volt saját „eddig” napjuk. Az „E-mail a vendégnek” levél emiatt a régi
+  Motibro-lejáratot írta volna 2027. január 27. helyett. Mostantól a levél a valódi online bérletből veszi a napot és a még
+  meglévő alkalmakat. Teszt: 1927/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
