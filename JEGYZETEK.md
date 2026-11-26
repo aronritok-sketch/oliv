@@ -2366,6 +2366,8 @@
   - Új művelet: `POST /oys/v1/customers/held/<key>` `do=revoke`. Törli az online bérletet és lezárja a sort („bérlet
     visszavonva – nem ment neki e-mail”). Ha már foglaltak vele, nem változtat semmit, és ezt jelzi.
   - Vivien sora marad (ő privát órát kapott, Áron kérésére). Teszt: 2035/0.
+  - Élesben: a `…ffa8a1` sor bérlete (4 online alkalom) nem volt foglalásra használva, így törölve, a sor lezárva.
+    Utána: 7 online (mind kapott e-mailt), 1 privát (Vivien), 9 lezárva.
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
