@@ -3347,6 +3347,7 @@ test( 'photos on the online edition: Hungarian names and texts with the keywords
 		ok( str_contains( oy_photo( $att ), 'alt="Olívia saját leírása"' ), 'a text someone wrote stays' );
 		update_post_meta( $att, '_wp_attachment_image_alt', 'Kovács Olívia - jóga' );
 		ok( str_contains( oy_photo( $att ), 'alt="' . esc_attr( $imgs['journal-19']['hu']['alt'] ) . '"' ) || ! preg_match( '/kovács|olívia/iu', $imgs['journal-19']['hu']['alt'] ), 'Áron 26 Nov: a thinner text whose words are all in ours („Kovács Olívia - online jóga otthonról”) gives way to the one that describes the photo' );
+		ok( oye_thinner( 'Kovács Olívia - online jóga otthonról', 'Kovács Olívia táncos pózban otthon, a nappaliban – online jóga otthonról' ) && ! oye_thinner( 'Olívia saját leírása', 'Kovács Olívia táncos pózban otthon' ), '… the page editor too: her chosen photo keeps a text of its own, a thinner copy of the place\'s description gives way' );
 		update_post_meta( $att, '_wp_attachment_image_alt', 'Olívia saját leírása' );
 	} finally {
 		update_option( 'oy_edition', 'fort-myers' );

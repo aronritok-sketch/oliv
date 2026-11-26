@@ -208,9 +208,11 @@ function oye_pass( $html ) {
 					$img->setAttribute( 'width', (string) (int) $meta['width'] );
 					$img->setAttribute( 'height', (string) (int) $meta['height'] );
 				}
-				$alt = trim( (string) get_post_meta( $id, '_wp_attachment_image_alt', true ) );
-				if ( '' !== $alt ) {
-					$img->setAttribute( 'alt', $alt );
+				$own = trim( (string) get_post_meta( $id, '_wp_attachment_image_alt', true ) );
+				// Áron, 26 November (the alt describes the photo and has the keywords): a thinner text whose every word is in the
+				// place's own description (the same photo, described less) leaves that one
+				if ( '' !== $own && ! oye_thinner( $own, $alt ) ) {
+					$img->setAttribute( 'alt', $own );
 				}
 				if ( $img->parentNode instanceof DOMElement && 'picture' === strtolower( $img->parentNode->tagName ) ) {
 					foreach ( iterator_to_array( $img->parentNode->getElementsByTagName( 'source' ) ) as $s ) {
@@ -359,6 +361,12 @@ function oye_slug( $text, $words = 9 ) {
 	$s = strtolower( remove_accents( wp_strip_all_tags( html_entity_decode( (string) $text, ENT_QUOTES, 'UTF-8' ) ) ) );
 	$w = array_values( array_filter( preg_split( '/[^a-z0-9]+/', $s ), fn( $x ) => '' !== $x && ! in_array( $x, OYE_STOPWORD, true ) ) );
 	return implode( '-', array_slice( $w, 0, $words ) );
+}
+
+/** Is $a a thinner text than $b, all its words in $b („Kovács Olívia - online jóga otthonról” in „Kovács Olívia táncos pózban otthon … – online jóga otthonról”)? */
+function oye_thinner( $a, $b ) {
+	$words = fn( $t ) => array_filter( preg_split( '/[^\p{L}\p{N}]+/u', mb_strtolower( (string) $t ) ), fn( $w ) => mb_strlen( $w ) > 2 );
+	return '' !== trim( (string) $b ) && mb_strlen( (string) $a ) < mb_strlen( (string) $b ) && ! array_diff( $words( $a ), $words( $b ) );
 }
 
 /** Egy képhely leírása: amit a lap mutatott, vagy amit a téma tud róla (oye_slot_alt szűrő). */

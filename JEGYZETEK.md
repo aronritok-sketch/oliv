@@ -2056,7 +2056,9 @@
     `oy_pose_file`), alt: „Halpóz (Matszjászana) – Kovács Olívia mutatja be, jógaászana pajzsmirigy-túlműködésre”. A
     médiatárba írt vékonyabb alt („Kovács Olívia - online jóga otthonról”), ha minden szava benne van a leíróban, átadja a
     helyét a leírónak; akinek saját szavai vannak, az marad. A többi .online kép neve és altja már rendben volt. Tesztek:
-    1821/0.
+    1821/0. **3.12.26 / .hu 1.8.6:** ugyanez a szabály az oldalszerkesztőben (Olívia által cserélt kép: `oye_thinner`) – a
+    „Bejelentkezés és árak” fejlécképén még a vékony alt látszott. Élesben ellenőrizve: a két oldalon 727 kép, mind
+    kulcsszavas néven, ≥ 5 szavas alttal; a .hu 163 képe betölt, 0 törött. Tesztek: 1822/0.
   - Indexelés: a Google „Indexelés kérése” gombja API-n nem érhető el (az Indexing API csak álláshirdetésre és élő
     közvetítésre való), ezt csak a Search Console felületén lehet. Amit lehet: sitemapek újraküldve (CRM `pm/gsc-manage`),
     a .hu IndexNow-n beküldte mind a 33 új címet (Bing, Yandex). A hibás `www.oliviajoga.hu/rolam` sitemap-bejegyzést a
