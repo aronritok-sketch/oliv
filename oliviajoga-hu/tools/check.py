@@ -184,6 +184,7 @@ def nl_checks(files, ok):
             ok('name="action" value="oys_nl_subscribe"' in inner and 'name="consent" value="1" required' in inner and 'name="email" required' in inner
                and 'name="website" tabindex="-1"' in inner and build.ONLINE + '/adatvedelem/' in inner, f'/{path} #{fid}: the signup form is incomplete')
         ok(len(ids) == len(set(ids)), f'/{path}: two forms with the same id')
+        ok(all('élő online' not in f[2] for f in forms), f'/{path}: the signup mentions the live online classes (Áron: „szedjük ki”)')
     priv = files.get(build.PRIVACY_PATH, '')
     if priv:
         ok('<strong>Hírlevél:</strong>' in priv and 'oliviajoga.online oldalra kerül' in priv, f'/{build.PRIVACY_PATH}: the newsletter is missing from the privacy notice')

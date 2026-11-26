@@ -9414,3 +9414,12 @@ msgstr[1] "%d hiba"
 
 msgid "Open link"
 msgstr "Megnyitás"
+
+msgid "From now on I'll let you know about new events and workshops. Every email has a link to unsubscribe."
+msgstr "Mostantól szólok az új eseményekről és workshopokról. Minden levél alján ott a leiratkozás linkje."
+
+msgid "I'd like the newsletter (events, workshops). I can unsubscribe any time; <a href=\"%s\" target=\"_blank\" rel=\"noopener\">privacy notice</a>."
+msgstr "Kérem a hírlevelet (események, workshopok). Bármikor leiratkozhatok; <a href=\"%s\" target=\"_blank\" rel=\"noopener\">adatkezelési tájékoztató</a>."
+
+msgid "Thank you for signing up for my newsletter! Tap the button to confirm it, and I'll let you know about new events and workshops."
+msgstr "Köszönöm, hogy feliratkoztál a hírlevelemre! Koppints a gombra a megerősítéshez, és szólok az új eseményekről és workshopokról."

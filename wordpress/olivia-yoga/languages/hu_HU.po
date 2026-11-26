@@ -2011,3 +2011,6 @@ msgstr "Hírlevél"
 
 msgid "Be the first to hear about events, workshops and live online classes."
 msgstr "Elsőként szólok az új eseményekről, workshopokról és élő online órákról."
+
+msgid "Be the first to hear about new events and workshops."
+msgstr "Elsőként szólok az új eseményekről és workshopokról."

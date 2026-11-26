@@ -2180,6 +2180,14 @@
   - a lejáró bérlet emlékeztető kikapcsolva;
   - az Élő óra teszt.
 
+- **2026-11-26 – A hírlevél szövegeiből kikerültek az élő online órák (oliviajoga.hu 1.8.9, oliviajoga.online 3.12.32,
+  olivia-studio 1.30.2).** Áron (képernyőkép a .hu űrlapjáról): „itt az élő online órákat szedjük ki”. Ahol a hírlevél
+  tartalmát leírjuk, mindenhol csak „események, workshopok” maradt:
+  - a .hu űrlapjai (bevezető, hozzájárulás, lábléc);
+  - a .online lábléce és űrlapja;
+  - a megerősítő e-mail és a köszönőoldal.
+  check.py és run.php figyeli. Tesztek: 4390/0, 1385/0, 1928/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -42,7 +42,7 @@ ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.8.8'
+VERSION = '1.8.9'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -283,7 +283,7 @@ def book_url():
 # értesüljön az aktuális eseményekről … a .online-ról mehessenek ki a levelek … És a footerbe is rakd be a feliratkozást” –
 # the form posts to the online site (olivia-studio, OYS_Newsletter: action oys_nl_subscribe), which sends the confirmation
 # email and the newsletters and sends the visitor back here with ?hirlevel=ok|mar|hiba#<the form> (oliviajoga.js says so).
-NL_TEXT = 'Iratkozz fel a hírlevelemre, és elsőként szólok az új eseményekről, workshopokról és élő online órákról.'
+NL_TEXT = 'Iratkozz fel a hírlevelemre, és elsőként szólok az új eseményekről és workshopokról.'  # Áron, 26 Nov: „az élő online órákat szedjük ki”
 
 
 def newsletter_form(source, fid, title='Hírlevél', text=NL_TEXT, cls=''):
@@ -296,7 +296,7 @@ def newsletter_form(source, fid, title='Hírlevél', text=NL_TEXT, cls=''):
             '<p class="oj-nl__hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></p>'
             '<div class="oj-nl__row"><label class="oj-nl__field"><span>Keresztneved (nem kötelező)</span><input type="text" name="name" autocomplete="given-name" maxlength="120"></label>'
             '<label class="oj-nl__field"><span>E-mail-címed</span><input type="email" name="email" required autocomplete="email" maxlength="190"></label></div>'
-            '<label class="oj-nl__consent"><input type="checkbox" name="consent" value="1" required> <span>Kérem a hírlevelet (események, workshopok, élő online órák). '
+            '<label class="oj-nl__consent"><input type="checkbox" name="consent" value="1" required> <span>Kérem a hírlevelet (események, workshopok). '
             f'Bármikor leiratkozhatok; <a href="{esc(privacy)}" target="_blank" rel="noopener">adatkezelési tájékoztató</a>.</span></label>'
             '<p class="oj-nl__go"><button type="submit" class="btn btn--orchid">Feliratkozom</button></p></form>')
 
@@ -915,7 +915,7 @@ def footer():
 				<ul class="footer__contact"><li>{icon("mail")}<a href="mailto:{EMAIL}">{EMAIL}</a></li><li>{icon("ig")}<a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a></li><li>{icon("fb")}<a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a></li></ul>
 			</div>
 		</div>
-		<div class="footer__nl">{newsletter_form("hu-lablec", "hirlevel-lablec", "Hírlevél", "Új események, workshopok és élő online órák: iratkozz fel, és elsőként szólok.", "oj-nl--dark")}</div>
+		<div class="footer__nl">{newsletter_form("hu-lablec", "hirlevel-lablec", "Hírlevél", "Új események és workshopok: iratkozz fel, és elsőként szólok.", "oj-nl--dark")}</div>
 		<div class="footer__bottom"><p>&copy; 2026 Kovács Olívia{legal} · <span class="footer__credit">Készítette: <a href="https://helloprovision.com/" target="_blank" rel="noopener">HelloProVision</a></span></p></div>
 	</div>
 </footer>

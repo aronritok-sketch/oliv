@@ -274,7 +274,7 @@ class OYS_Newsletter {
 			$home = '<p><a href="' . esc_url( home_url( '/' ) ) . '">' . esc_html( OYS_Settings::get( 'email_from_name' ) ?: get_bloginfo( 'name' ) ) . '</a></p>';
 			if ( 'c' === $kind ) {
 				$ok = self::confirm( (int) $id );
-				wp_die( $ok ? '<h1>' . esc_html__( 'Thank you, you\'re subscribed!', 'olivia-studio' ) . '</h1><p>' . esc_html__( 'From now on I\'ll let you know about new events, workshops and live online classes. Every email has a link to unsubscribe.', 'olivia-studio' ) . '</p>' . $home
+				wp_die( $ok ? '<h1>' . esc_html__( 'Thank you, you\'re subscribed!', 'olivia-studio' ) . '</h1><p>' . esc_html__( 'From now on I\'ll let you know about new events and workshops. Every email has a link to unsubscribe.', 'olivia-studio' ) . '</p>' . $home
 					: '<h1>' . esc_html__( 'This signup is no longer active', 'olivia-studio' ) . '</h1><p>' . esc_html__( 'Sign up again on the website if you would like the newsletter.', 'olivia-studio' ) . '</p>' . $home, esc_html__( 'Newsletter', 'olivia-studio' ), array( 'response' => 200 ) ); // phpcs:ignore
 			}
 			self::list_unsubscribe( (int) $id );
@@ -306,7 +306,7 @@ class OYS_Newsletter {
 			. '<p class="oys-nl__hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></p>'
 			. '<p class="oys-nl__row"><label class="oys-nl__field"><span>' . esc_html__( 'Your name (optional)', 'olivia-studio' ) . '</span><input type="text" name="name" autocomplete="given-name" maxlength="120"></label>'
 			. '<label class="oys-nl__field"><span>' . esc_html__( 'Email', 'olivia-studio' ) . '</span><input type="email" name="email" required autocomplete="email" maxlength="190"></label></p>'
-			. '<label class="oys-nl__consent" for="' . esc_attr( $id ) . '"><input type="checkbox" name="consent" value="1" required id="' . esc_attr( $id ) . '"> <span>' . wp_kses( sprintf( __( 'I\'d like the newsletter (events, workshops, live online classes). I can unsubscribe any time; <a href="%s" target="_blank" rel="noopener">privacy notice</a>.', 'olivia-studio' ), esc_url( $privacy ) ), array( 'a' => array( 'href' => true, 'target' => true, 'rel' => true ) ) ) . '</span></label>'
+			. '<label class="oys-nl__consent" for="' . esc_attr( $id ) . '"><input type="checkbox" name="consent" value="1" required id="' . esc_attr( $id ) . '"> <span>' . wp_kses( sprintf( __( 'I\'d like the newsletter (events, workshops). I can unsubscribe any time; <a href="%s" target="_blank" rel="noopener">privacy notice</a>.', 'olivia-studio' ), esc_url( $privacy ) ), array( 'a' => array( 'href' => true, 'target' => true, 'rel' => true ) ) ) . '</span></label>'
 			. '<p class="oys-nl__go"><button type="submit" class="btn btn--orchid">' . esc_html__( 'Subscribe', 'olivia-studio' ) . '</button></p></form>';
 	}
 

@@ -5813,6 +5813,7 @@ test( 'Áron 26 Nov: the signup form posted from oliviajoga.hu – back to the f
 	remove_filter( 'oys_newsletter_back_hosts', $hosts );
 	$f = OYS_Newsletter::form_html( array( 'source' => 'online-lablec', 'title' => 'Hírlevél', 'back' => 'https://oliviajoga.online/' ) );
 	ok( str_contains( $f, 'name="action" value="oys_nl_subscribe"' ) && str_contains( $f, 'name="consent" value="1" required' ) && str_contains( $f, 'name="website" tabindex="-1"' ) && str_contains( $f, 'value="online-lablec"' ), 'the form: consent required, the robot trap, where it was filled in' );
+	ok( ! str_contains( $f, 'live online' ) && ! str_contains( OYS_Email_Templates::get( 'newsletter_confirm' )['message'], 'live online' ) && ! str_contains( (string) file_get_contents( get_template_directory() . '/footer.php' ), 'live online classes' ), 'the newsletter texts: events and workshops, no live online classes (Áron: „az élő online órákat szedjük ki”)' );
 	ok( str_contains( (string) file_get_contents( get_template_directory() . '/footer.php' ), "OYS_Newsletter::form_html( array( 'source' => 'online-lablec'" ), 'the online site\'s footer has the signup („a footerbe is rakd be”)' );
 } );
 
