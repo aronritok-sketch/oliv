@@ -298,6 +298,7 @@ class OYS_Install {
 			button_label varchar(100) NOT NULL DEFAULT '',
 			button_url varchar(500) NOT NULL DEFAULT '',
 			status varchar(20) NOT NULL DEFAULT 'draft',
+			audience varchar(20) NOT NULL DEFAULT 'subscribers',
 			total int(10) unsigned NOT NULL DEFAULT 0,
 			sent int(10) unsigned NOT NULL DEFAULT 0,
 			created_by bigint(20) unsigned NOT NULL DEFAULT 0,
@@ -314,6 +315,34 @@ class OYS_Install {
 			sent_at datetime NULL,
 			PRIMARY KEY  (id),
 			UNIQUE KEY newsletter_user (newsletter_id,user_id),
+			KEY status (status)
+		) $c;" );
+
+		// Newsletter subscribers by email (Áron, 26 November: a signup on oliviajoga.hu and in the footers, the letters from
+		// here): double opt-in – pending until the link in the confirmation email is clicked – and their own sending queue.
+		dbDelta( 'CREATE TABLE ' . self::table( 'subscribers' ) . " (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			email varchar(190) NOT NULL,
+			name varchar(120) NOT NULL DEFAULT '',
+			source varchar(40) NOT NULL DEFAULT '',
+			page varchar(255) NOT NULL DEFAULT '',
+			status varchar(20) NOT NULL DEFAULT 'pending',
+			created_at datetime NOT NULL,
+			mailed_at datetime NULL,
+			confirmed_at datetime NULL,
+			unsub_at datetime NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY email (email),
+			KEY status (status)
+		) $c;" );
+		dbDelta( 'CREATE TABLE ' . self::table( 'newsletter_list_queue' ) . " (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			newsletter_id bigint(20) unsigned NOT NULL,
+			subscriber_id bigint(20) unsigned NOT NULL,
+			status varchar(20) NOT NULL DEFAULT 'queued',
+			sent_at datetime NULL,
+			PRIMARY KEY  (id),
+			UNIQUE KEY newsletter_subscriber (newsletter_id,subscriber_id),
 			KEY status (status)
 		) $c;" );
 

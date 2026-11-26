@@ -514,6 +514,8 @@ add_action( 'init', function () {
 	// Olívia, 19 November (portal chat): „itt 14:00-tól lehessen kiválasztani 22:00-ig” – Áron, 26 November: „Olívia kérése
 	// legyen” – the one-to-one times in the calendar from 14:00 to 22:00
 	add_filter( 'oys_calendar_ask_hours', fn( $h ) => oy_online_only() ? array( 14, 22 ) : $h );
+	// Áron, 26 November: the newsletter signup forms on oliviajoga.hu post here and come back there
+	add_filter( 'oys_newsletter_back_hosts', fn( $h ) => oy_online_only() ? array_merge( (array) $h, array( 'oliviajoga.hu', 'www.oliviajoga.hu', 'dev.helloprovision.com' ) ) : $h );
 	add_filter( 'oys_birthday_note', fn( $t ) => oy_online_only() ? __( 'Optional, but worth filling in: on your birthday I will treat you to a little gift.', 'olivia-yoga' ) : $t );
 	add_shortcode( 'oy_schedule', fn() => '<div class="block-wide">' . $studio( 'oys_schedule', '<p>' . esc_html__( 'The timetable is coming soon.', 'olivia-yoga' ) . '</p>' )
 		// Olívia, 19 November: the calendar here opens like on the booking page (it stayed open once opened); the cancellation

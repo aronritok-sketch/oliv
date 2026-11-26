@@ -172,6 +172,7 @@ class OYS_Held {
 			$id = (int) $wpdb->insert_id;
 		}
 		$all[ $key ]['status']  = 'online';
+		$all[ $key ]['until']   = $day;
 		$all[ $key ]['note']    = trim( $all[ $key ]['note'] . "\n" . sprintf( __( 'Online until %s', 'olivia-studio' ), $day ) );
 		$all[ $key ]['updated'] = current_time( 'mysql', true );
 		self::save( $all );
@@ -240,19 +241,55 @@ class OYS_Held {
 
 	/* ---------- the admin: a box on Customers, a line on the customer's page ---------- */
 
-	private static function form( $key, $do, $inner, $button, $class = 'button' ) {
+	private static function form( $key, $do, $inner, $button, $class = 'button', $after = '' ) {
 		return '<form method="post" action="' . esc_url( admin_url( 'admin-post.php' ) ) . '" class="oys-inline"><input type="hidden" name="action" value="oys_held">'
 			. wp_nonce_field( 'oys_held', '_wpnonce', true, false ) . '<input type="hidden" name="key" value="' . esc_attr( $key ) . '"><input type="hidden" name="do" value="' . esc_attr( $do ) . '">'
-			. $inner . ' <button class="' . esc_attr( $class ) . '">' . esc_html( $button ) . '</button></form>';
+			. $inner . ' <button class="' . esc_attr( $class ) . '">' . esc_html( $button ) . '</button>' . $after . '</form>';
 	}
 
 	public static function handle() {
 		if ( ! current_user_can( 'oys_manage' ) || ! check_admin_referer( 'oys_held' ) ) {
 			wp_die( esc_html__( 'Not allowed.', 'olivia-studio' ), '', array( 'response' => 403 ) );
 		}
-		$res  = self::act( sanitize_text_field( wp_unslash( $_POST['key'] ?? '' ) ), sanitize_key( $_POST['do'] ?? '' ), sanitize_textarea_field( wp_unslash( $_POST['note'] ?? '' ) ), sanitize_text_field( wp_unslash( $_POST['until'] ?? '' ) ) );
-		$back = wp_get_referer() ?: admin_url( 'admin.php?page=oys-customers' );
+		$key   = sanitize_text_field( wp_unslash( $_POST['key'] ?? '' ) );
+		$until = sanitize_text_field( wp_unslash( $_POST['until'] ?? '' ) );
+		$back  = wp_get_referer() ?: admin_url( 'admin.php?page=oys-customers' );
+		$say   = function ( $msg, $err = false ) use ( $back ) {
+			oys_redirect( add_query_arg( array( 'oys_msg' => rawurlencode( $msg ) ) + ( $err ? array( 'oys_err' => 1 ) : array() ), remove_query_arg( array( 'oys_msg', 'oys_err' ), $back ) ) . '#held' );
+		};
+		// Áron, 26 November: „legyen egy ilyen tesztküldési funkció, ami önmagunknak küld egy levelet” – the guest's email to me first
+		if ( ! empty( $_POST['test'] ) ) {
+			$me = wp_get_current_user()->user_email;
+			$ok = self::get( $key ) && OYS_Emails::held_online( $key, $me, $until );
+			$say( $ok ? sprintf( __( 'Test sent to %s: this is what the guest gets.', 'olivia-studio' ), $me ) : __( 'The test could not be sent.', 'olivia-studio' ), ! $ok );
+			return;
+		}
+		if ( 'notify' === sanitize_key( $_POST['do'] ?? '' ) ) {
+			$ok = self::notify( $key );
+			$say( $ok ? __( 'Email sent to the guest.', 'olivia-studio' ) : __( 'The email could not be sent (is the email „Sessions from Motibro bookable online” switched on?).', 'olivia-studio' ), ! $ok );
+			return;
+		}
+		$res = self::act( $key, sanitize_key( $_POST['do'] ?? '' ), sanitize_textarea_field( wp_unslash( $_POST['note'] ?? '' ) ), $until );
+		if ( ! is_wp_error( $res ) && 'online' === sanitize_key( $_POST['do'] ?? '' ) && ! empty( $_POST['notify'] ) ) {
+			$ok = self::notify( $key );
+			$say( $ok ? __( 'Bookable online, and the guest got the email.', 'olivia-studio' ) : __( 'Bookable online, but the email could not be sent.', 'olivia-studio' ), ! $ok );
+			return;
+		}
 		oys_redirect( add_query_arg( array( 'oys_msg' => rawurlencode( is_wp_error( $res ) ? $res->get_error_message() : __( 'Saved.', 'olivia-studio' ) ) ) + ( is_wp_error( $res ) ? array( 'oys_err' => 1 ) : array() ), remove_query_arg( array( 'oys_msg', 'oys_err' ), $back ) ) . '#held' );
+	}
+
+	/** The email to the guest about their sessions now online (once more is fine: it says the same); noted on the entry. */
+	public static function notify( $key ) {
+		$e = self::get( $key );
+		if ( ! $e || 'online' !== $e['status'] || ! OYS_Emails::held_online( $key ) ) {
+			return false;
+		}
+		$all                    = self::all();
+		$all[ $key ]['note']    = trim( $all[ $key ]['note'] . "\n" . sprintf( __( 'Email sent to the guest: %s', 'olivia-studio' ), wp_date( 'Y-m-d' ) ) );
+		$all[ $key ]['mailed']  = wp_date( 'Y-m-d' );
+		$all[ $key ]['updated'] = current_time( 'mysql', true );
+		self::save( $all );
+		return true;
 	}
 
 	private static function row( array $e, $with_name = true ) {
@@ -266,10 +303,14 @@ class OYS_Held {
 		)[ $e['status'] ] ?? $e['status'];
 		$flags = ( $e['missing'] ? ' · <span class="oys-status oys-status--offered">' . esc_html__( 'not in the newer export – check in Motibro', 'olivia-studio' ) . '</span>' : '' )
 			. ( $e['expires'] && $e['expires'] < wp_date( 'Y-m-d' ) ? ' · ' . esc_html__( 'expired there', 'olivia-studio' ) : '' );
+		$test  = ' <button class="button-link" name="test" value="1" title="' . esc_attr( sprintf( __( 'The email the guest would get, to %s', 'olivia-studio' ), wp_get_current_user()->user_email ) ) . '">' . esc_html__( 'Test email to me', 'olivia-studio' ) . '</button>';
 		$do    = 'held' === $e['status']
 			? self::form( $e['key'], 'redeem', '<input name="note" placeholder="' . esc_attr__( 'What for, e.g. a private session on 3 Dec', 'olivia-studio' ) . '">', __( 'Redeemed', 'olivia-studio' ) )
-				. ' ' . self::form( $e['key'], 'online', '<input type="date" name="until" value="2027-01-27">', __( 'Make bookable online', 'olivia-studio' ) )
-			: self::form( $e['key'], 'hold', '', __( 'Back to the list', 'olivia-studio' ), 'button-link' );
+				. ' ' . self::form( $e['key'], 'online', '<input type="date" name="until" value="2027-01-27"> <label class="oys-held__mail"><input type="checkbox" name="notify" value="1"> ' . esc_html__( 'email the guest', 'olivia-studio' ) . '</label>', __( 'Make bookable online', 'olivia-studio' ), 'button', $test )
+			: ( 'online' === $e['status']
+				? self::form( $e['key'], 'notify', '<input type="hidden" name="until" value="' . esc_attr( $e['until'] ?? '' ) . '">', empty( $e['mailed'] ) ? __( 'Email the guest', 'olivia-studio' ) : __( 'Email the guest again', 'olivia-studio' ), 'button button-small', $test ) . ' '
+				: '' )
+				. self::form( $e['key'], 'hold', '', __( 'Back to the list', 'olivia-studio' ), 'button-link' );
 		return '<tr><td>' . $who . esc_html( $e['name'] ) . '<br><small>' . esc_html( sprintf( __( 'as of %1$s: used %2$d, locked there %3$d · valid there until %4$s', 'olivia-studio' ), $e['snapshot'], (int) $e['used'], (int) $e['locked'], $e['expires'] ?: '—' ) ) . $flags . '</small></td>'
 			. '<td><b>' . (int) $e['left'] . '</b></td><td>' . esc_html( oys_money( self::value_cents( $e ) ) ) . '<br><small>' . esc_html( sprintf( __( '%s / session', 'olivia-studio' ), oys_money( (int) $e['per_cents'] ) ) ) . '</small></td>'
 			. '<td>' . esc_html( $state ) . ( '' !== trim( $e['note'] ) ? '<br><small>' . nl2br( esc_html( trim( $e['note'] ) ) ) . '</small>' : '' ) . '</td><td>' . $do . '</td></tr>'; // phpcs:ignore
@@ -290,6 +331,7 @@ class OYS_Held {
 		[ $n, $sessions, $value ] = self::totals();
 		return '<details class="oys-box" id="held"' . ( $n ? ' open' : '' ) . '><summary><b>' . esc_html__( 'Passes from Motibro: sessions left to redeem', 'olivia-studio' ) . '</b> – ' . esc_html( sprintf( __( '%1$d passes, %2$d sessions, %3$s', 'olivia-studio' ), $n, $sessions, oys_money( $value ) ) ) . '</summary>'
 			. '<p class="description">' . esc_html__( 'These sessions are not bookable online. If the customer writes, redeem them by their value (for example for a private session) and mark them redeemed, or make them bookable online until a day.', 'olivia-studio' ) . '</p>'
+			. '<p class="description">' . esc_html__( '„Make bookable online”: what is left becomes an online pass in the guest\'s account, valid until the day you give; from then on they book the live classes with it. No email goes out unless you tick „email the guest” (or send it later with „Email the guest”). „Test email to me” sends you exactly that email first.', 'olivia-studio' ) . '</p>'
 			. self::table( array_values( $all ) ) . '</details>';
 	}
 

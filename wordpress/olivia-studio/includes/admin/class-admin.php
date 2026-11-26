@@ -24,7 +24,7 @@ class OYS_Admin {
 			}
 		} );
 		$actions = array( 'save_session', 'cancel_session', 'roster', 'save_template', 'delete_template', 'generate', 'private_offer', 'private_decline',
-			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'live_test', 'live_test_open', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'smtp_test', 'hpv_register', 'message', 'pay_later_reset', 'customer_extend', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_delete', 'save_ai', 'import_customers' );
+			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'live_test', 'live_test_open', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'smtp_test', 'hpv_register', 'message', 'pay_later_reset', 'customer_extend', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_delete', 'save_ai', 'import_customers', 'subscriber_add', 'subscriber_remove', 'subscribers_export' );
 		foreach ( $actions as $a ) {
 			add_action( 'admin_post_oys_admin_' . $a, array( __CLASS__, 'guard' ) );
 		}
@@ -1292,8 +1292,9 @@ class OYS_Admin {
 			return;
 		}
 		$subs = count( OYS_Newsletter::subscribers() );
+		$list = count( OYS_Newsletter::list_recipients() );
 		self::header( __( 'Newsletter', 'olivia-studio' ), ' <a class="page-title-action" href="' . esc_url( admin_url( 'admin.php?page=oys-newsletter&edit=0' ) ) . '">' . esc_html__( 'Write a newsletter', 'olivia-studio' ) . '</a>' );
-		echo '<p>' . sprintf( esc_html( _n( '%d subscriber (customers who ticked the newsletter box).', '%d subscribers (customers who ticked the newsletter box).', $subs, 'olivia-studio' ) ), (int) $subs ) . ' ' . esc_html__( 'Emails go out in small batches every few minutes. Every email has an unsubscribe link.', 'olivia-studio' ) . '</p>';
+		echo '<p>' . sprintf( esc_html( _n( 'A newsletter goes to %d person:', 'A newsletter goes to %d people:', $subs + $list, 'olivia-studio' ) ), (int) ( $subs + $list ) ) . ' ' . sprintf( esc_html__( '%1$d customers who ticked the newsletter box and %2$d addresses from the signup forms.', 'olivia-studio' ), (int) $subs, (int) $list ) . ' ' . esc_html__( 'Emails go out in small batches every few minutes. Every email has an unsubscribe link.', 'olivia-studio' ) . ' <a href="#feliratkozok">' . esc_html__( 'Subscribers', 'olivia-studio' ) . '</a></p>';
 		$rows = OYS_Newsletter::query();
 		echo '<table class="widefat striped oys-table"><thead><tr><th>' . esc_html__( 'Subject', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Status', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Sent', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Date', 'olivia-studio' ) . '</th><th></th></tr></thead><tbody>';
 		$st = array( 'draft' => __( 'Draft', 'olivia-studio' ), 'sending' => __( 'Sending…', 'olivia-studio' ), 'sent' => __( 'Sent', 'olivia-studio' ) );
@@ -1305,6 +1306,7 @@ class OYS_Admin {
 			echo '<tr><td colspan="5">' . esc_html__( 'No newsletters yet.', 'olivia-studio' ) . '</td></tr>';
 		}
 		echo '</tbody></table>';
+		self::newsletter_subscribers();
 		// AI settings.
 		$s = OYS_Settings::all();
 		echo '<h2 id="ai">' . esc_html__( 'AI settings', 'olivia-studio' ) . '</h2><p class="description" style="max-width:760px">' . esc_html__( 'The "Write it with AI" button uses Claude from Anthropic. Create an API key at console.anthropic.com (Settings → API keys) and paste it here. A newsletter draft costs a few cents.', 'olivia-studio' ) . '</p>'
@@ -1317,7 +1319,7 @@ class OYS_Admin {
 
 	private static function page_newsletter_edit( $id ) {
 		$n    = $id ? OYS_Newsletter::get( $id ) : null;
-		$v    = $n ?: (object) array( 'id' => 0, 'subject' => '', 'preheader' => '', 'body' => "Hi {first_name},\n\n", 'button_label' => __( 'Book a class', 'olivia-studio' ), 'button_url' => oys_page_url( 'book' ), 'status' => 'draft', 'sent' => 0, 'total' => 0 );
+		$v    = $n ?: (object) array( 'id' => 0, 'subject' => '', 'preheader' => '', 'body' => __( 'Hi {first_name},', 'olivia-studio' ) . "\n\n", 'button_label' => __( 'Book a class', 'olivia-studio' ), 'button_url' => oys_page_url( 'book' ), 'status' => 'draft', 'sent' => 0, 'total' => 0 );
 		$edit = 'draft' === $v->status;
 		self::header( $n ? ( $edit ? __( 'Edit newsletter', 'olivia-studio' ) : __( 'Newsletter', 'olivia-studio' ) ) : __( 'Write a newsletter', 'olivia-studio' ), ' <a class="page-title-action" href="' . esc_url( admin_url( 'admin.php?page=oys-newsletter' ) ) . '">' . esc_html__( 'All newsletters', 'olivia-studio' ) . '</a>' );
 		echo '<div class="oys-nl">';
@@ -1338,23 +1340,91 @@ class OYS_Admin {
 				. '<p><label><b>' . esc_html__( 'Message', 'olivia-studio' ) . '</b><br><textarea name="body" rows="16" class="large-text code">' . esc_textarea( $v->body ) . '</textarea></label></p>'
 				. '<p class="description">' . esc_html__( 'Blank line = new paragraph · "## " heading · "- " list · **bold** · [link text](https://…) · {first_name} = each reader\'s name.', 'olivia-studio' ) . '</p>'
 				. '<p><label>' . esc_html__( 'Button', 'olivia-studio' ) . ' <input name="button_label" value="' . esc_attr( $v->button_label ) . '" placeholder="' . esc_attr__( 'Book a class', 'olivia-studio' ) . '"></label> <label>' . esc_html__( 'links to', 'olivia-studio' ) . ' <input type="url" name="button_url" class="regular-text" value="' . esc_attr( $v->button_url ) . '"></label></p>'
-				. '<p><button class="button button-primary">' . esc_html__( 'Save draft', 'olivia-studio' ) . '</button></p></form>';
+				. '<p><button class="button button-primary">' . esc_html__( 'Save draft', 'olivia-studio' ) . '</button> <button class="button" name="and_test" value="1">' . esc_html( sprintf( __( 'Save and send a test to %s', 'olivia-studio' ), wp_get_current_user()->user_email ) ) . '</button></p></form>';
 		}
 		if ( $n ) {
 			[ $subject, $html ] = OYS_Newsletter::email_for( $n, get_current_user_id() );
 			echo '<h2>' . esc_html__( 'Preview', 'olivia-studio' ) . '</h2><p><b>' . esc_html( $subject ) . '</b>' . ( $n->preheader ? ' — <span class="description">' . esc_html( $n->preheader ) . '</span>' : '' ) . '</p>'
 				. '<iframe class="oys-preview" title="' . esc_attr__( 'Email preview', 'olivia-studio' ) . '" srcdoc="' . esc_attr( $html ) . '" style="width:100%;max-width:640px;height:640px;border:1px solid #dcdcde;background:#fff"></iframe>';
 			if ( $edit ) {
-				$subs = count( OYS_Newsletter::subscribers() );
-				$me   = wp_get_current_user()->user_email;
-				echo '<p>' . self::form( 'newsletter_test', 'class="oys-inline"' ) . '<input type="hidden" name="id" value="' . (int) $n->id . '"><input type="email" name="to" value="' . esc_attr( $me ) . '"> <button class="button">' . esc_html__( 'Send a test', 'olivia-studio' ) . '</button></form></p>' // phpcs:ignore
-					. '<p>' . self::form( 'newsletter_send', 'class="oys-inline" onsubmit="return confirm(\'' . esc_js( sprintf( _n( 'Send this newsletter to %d subscriber?', 'Send this newsletter to %d subscribers?', $subs, 'olivia-studio' ), $subs ) ) . '\')"' ) . '<input type="hidden" name="id" value="' . (int) $n->id . '"><button class="button button-primary button-hero">' . sprintf( esc_html( _n( 'Send to %d subscriber', 'Send to %d subscribers', $subs, 'olivia-studio' ) ), (int) $subs ) . '</button></form> ' // phpcs:ignore
-					. self::form( 'newsletter_delete', 'class="oys-inline" onsubmit="return confirm(\'' . esc_js( __( 'Delete this draft?', 'olivia-studio' ) ) . '\')"' ) . '<input type="hidden" name="id" value="' . (int) $n->id . '"><button class="button button-link-delete">' . esc_html__( 'Delete draft', 'olivia-studio' ) . '</button></form></p>'; // phpcs:ignore
+				$me = wp_get_current_user()->user_email;
+				echo '<p>' . self::form( 'newsletter_test', 'class="oys-inline"' ) . '<input type="hidden" name="id" value="' . (int) $n->id . '"><input type="email" name="to" value="' . esc_attr( $me ) . '"> <button class="button">' . esc_html__( 'Send a test', 'olivia-studio' ) . '</button></form></p>'; // phpcs:ignore
+				self::newsletter_pick( $n );
+				echo '<p>' . self::form( 'newsletter_delete', 'class="oys-inline" onsubmit="return confirm(\'' . esc_js( __( 'Delete this draft?', 'olivia-studio' ) ) . '\')"' ) . '<input type="hidden" name="id" value="' . (int) $n->id . '"><button class="button button-link-delete">' . esc_html__( 'Delete draft', 'olivia-studio' ) . '</button></form></p>'; // phpcs:ignore
 			} else {
 				echo '<p>' . sprintf( esc_html__( 'Sent to %1$d of %2$d subscribers.', 'olivia-studio' ), (int) $n->sent, (int) $n->total ) . '</p>';
 			}
 		}
 		echo '</div></div>';
+	}
+
+	/**
+	 * Who gets it (Áron, 26 November: „ki tudja választani az e-mail megfogalmazását követően, hogy kiknek küldi ki magát a
+	 * levelet, és lássuk mellette, hogy hány alkalma is van”): every guest and signup address with a tick – those who asked
+	 * for the newsletter ticked at first – the sessions they have left next to them, a search and quick choices.
+	 */
+	private static function newsletter_pick( $n ) {
+		$people = OYS_Newsletter::pick_list();
+		$day    = fn( $ymd ) => $ymd ? wp_date( get_option( 'date_format' ), strtotime( $ymd . ' 12:00:00 UTC' ) ) : '';
+		$rows   = '';
+		$on     = 0;
+		foreach ( $people as $p ) {
+			$total = (int) $p['online'] + (int) $p['held'];
+			$parts = array();
+			if ( $p['online'] ) {
+				$parts[] = $p['until'] ? sprintf( __( 'online %1$d, until %2$s', 'olivia-studio' ), (int) $p['online'], $day( $p['until'] ) ) : sprintf( __( 'online %d', 'olivia-studio' ), (int) $p['online'] );
+			}
+			if ( $p['held'] ) {
+				$parts[] = sprintf( __( 'from Motibro %d, to redeem', 'olivia-studio' ), (int) $p['held'] );
+			}
+			$on   += $p['subscribed'] ? 1 : 0;
+			$rows .= '<label class="oys-pick__row" data-sub="' . ( $p['subscribed'] ? 1 : 0 ) . '" data-sessions="' . $total . '" data-q="' . esc_attr( mb_strtolower( remove_accents( $p['name'] . ' ' . $p['email'] ) ) ) . '">'
+				. '<input type="checkbox" name="' . ( 'user' === $p['type'] ? 'pick_users[]' : 'pick_subs[]' ) . '" value="' . (int) $p['id'] . '"' . checked( $p['subscribed'], true, false ) . '>'
+				. '<span class="oys-pick__who"><b>' . esc_html( $p['name'] ?: $p['email'] ) . '</b><small>' . esc_html( $p['email'] ) . '</small></span>'
+				. '<span class="oys-pick__nl' . ( $p['subscribed'] ? ' is-on' : '' ) . '">' . esc_html( $p['subscribed'] ? ( 'sub' === $p['type'] ? __( 'newsletter (signup form)', 'olivia-studio' ) : __( 'newsletter', 'olivia-studio' ) ) : __( 'no newsletter', 'olivia-studio' ) ) . '</span>'
+				. '<span class="oys-pick__n"><b>' . esc_html( $total ? sprintf( _n( '%d session', '%d sessions', $total, 'olivia-studio' ), $total ) : '—' ) . '</b>' . ( $parts ? '<small>' . esc_html( implode( ' · ', $parts ) ) . '</small>' : '' ) . '</span></label>';
+		}
+		echo '<h2 id="kinek">' . esc_html__( 'Who gets it?', 'olivia-studio' ) . '</h2>'
+			. '<p class="description" style="max-width:760px">' . esc_html__( 'Tick the people this letter goes to. Ticked at first: everyone who asked for the newsletter. Next to each name: the sessions they have left (on online passes, and from Motibro still to redeem).', 'olivia-studio' ) . ' '
+			. esc_html__( 'Someone without the newsletter tick did not ask for offers: send them only what concerns their pass or their bookings.', 'olivia-studio' ) . '</p>';
+		if ( ! $people ) {
+			echo '<p>' . esc_html__( 'No guests or subscribers yet.', 'olivia-studio' ) . '</p>';
+			return;
+		}
+		echo self::form( 'newsletter_send', 'class="oys-pick" data-oys-pick data-ask="' . esc_attr( __( 'Send this letter to %d people now?', 'olivia-studio' ) ) . '"' ) // phpcs:ignore
+			. '<input type="hidden" name="id" value="' . (int) $n->id . '"><input type="hidden" name="picked" value="1">'
+			. '<div class="oys-pick__tools"><input type="search" data-oys-pick-q placeholder="' . esc_attr__( 'Search by name or email', 'olivia-studio' ) . '"> '
+			. '<span class="oys-pick__quick">' . esc_html__( 'Tick:', 'olivia-studio' ) . ' <button type="button" class="button button-small" data-oys-pick-set="sub">' . esc_html__( 'who asked for the newsletter', 'olivia-studio' ) . '</button> <button type="button" class="button button-small" data-oys-pick-set="sessions">' . esc_html__( 'who has sessions left', 'olivia-studio' ) . '</button> <button type="button" class="button button-small" data-oys-pick-set="all">' . esc_html__( 'everyone', 'olivia-studio' ) . '</button> <button type="button" class="button button-small" data-oys-pick-set="none">' . esc_html__( 'nobody', 'olivia-studio' ) . '</button></span></div>'
+			. '<div class="oys-pick__list">' . $rows . '</div>' // phpcs:ignore
+			. '<p class="oys-pick__go"><button class="button button-primary button-hero">' . esc_html__( 'Send to the people ticked', 'olivia-studio' ) . ' (<span data-oys-pick-n>' . (int) $on . '</span>)</button></p></form>';
+		?>
+		<script>
+		( function () {
+			var f = document.querySelector( '[data-oys-pick]' );
+			if ( ! f ) { return; }
+			var rows = [].slice.call( f.querySelectorAll( '.oys-pick__row' ) ), n = f.querySelector( '[data-oys-pick-n]' );
+			var count = function () { n.textContent = f.querySelectorAll( '.oys-pick__row input:checked' ).length; };
+			f.addEventListener( 'change', count );
+			f.querySelector( '[data-oys-pick-q]' ).addEventListener( 'input', function () {
+				var q = this.value.toLowerCase().normalize( 'NFD' ).replace( /[̀-ͯ]/g, '' ).trim();
+				rows.forEach( function ( r ) { r.hidden = q && r.dataset.q.indexOf( q ) < 0; } );
+			} );
+			[].forEach.call( f.querySelectorAll( '[data-oys-pick-set]' ), function ( b ) {
+				b.addEventListener( 'click', function () {
+					var w = b.dataset.oysPickSet;
+					rows.forEach( function ( r ) {
+						r.querySelector( 'input' ).checked = 'all' === w || ( 'sub' === w && '1' === r.dataset.sub ) || ( 'sessions' === w && +r.dataset.sessions > 0 );
+					} );
+					count();
+				} );
+			} );
+			f.addEventListener( 'submit', function ( e ) {
+				var k = f.querySelectorAll( '.oys-pick__row input:checked' ).length;
+				if ( ! k || ! window.confirm( f.dataset.ask.replace( '%d', k ) ) ) { e.preventDefault(); }
+			} );
+		} )();
+		</script>
+		<?php
 	}
 
 	private static function newsletter_fields() {
@@ -1369,6 +1439,11 @@ class OYS_Admin {
 
 	private static function do_newsletter_save() {
 		$id = OYS_Newsletter::save( self::newsletter_fields(), (int) $_POST['id'] );
+		if ( ! empty( $_POST['and_test'] ) ) { // phpcs:ignore
+			$me = wp_get_current_user()->user_email;
+			$ok = OYS_Newsletter::send_test( $id, $me );
+			self::back( 'oys-newsletter', array( 'edit' => $id ), $ok ? sprintf( __( 'Draft saved, and a test went to %s.', 'olivia-studio' ), $me ) : __( 'Draft saved, but the test could not be sent.', 'olivia-studio' ), $ok ? 'success' : 'error' );
+		}
 		self::back( 'oys-newsletter', array( 'edit' => $id ), __( 'Draft saved.', 'olivia-studio' ) );
 	}
 
@@ -1398,14 +1473,69 @@ class OYS_Admin {
 	}
 
 	private static function do_newsletter_send() {
-		$id  = (int) $_POST['id'];
-		$res = OYS_Newsletter::send( $id );
+		$id   = (int) $_POST['id'];
+		$pick = empty( $_POST['picked'] ) ? null : array( // phpcs:ignore
+			'users' => array_map( 'intval', (array) wp_unslash( $_POST['pick_users'] ?? array() ) ), // phpcs:ignore
+			'subs'  => array_map( 'intval', (array) wp_unslash( $_POST['pick_subs'] ?? array() ) ), // phpcs:ignore
+		);
+		$res  = OYS_Newsletter::send( $id, $pick );
 		self::back( 'oys-newsletter', array( 'edit' => $id ), is_wp_error( $res ) ? $res->get_error_message() : sprintf( _n( 'Sending to %d subscriber: it goes out over the next few minutes.', 'Sending to %d subscribers: it goes out over the next few minutes.', $res, 'olivia-studio' ), $res ) );
 	}
 
 	private static function do_newsletter_delete() {
 		OYS_Newsletter::delete( (int) $_POST['id'] );
 		self::back( 'oys-newsletter', array(), __( 'Draft deleted.', 'olivia-studio' ) );
+	}
+
+	/**
+	 * The addresses from the signup forms (Áron, 26 November: the forms on oliviajoga.hu and in the footers): who, from
+	 * where, confirmed or waiting; add one by hand, remove one, the list as CSV.
+	 */
+	private static function newsletter_subscribers() {
+		$rows    = OYS_Newsletter::list_query( '', 1000 );
+		$sources = array( 'hu-esemenyek' => 'oliviajoga.hu – ' . __( 'Events', 'olivia-studio' ), 'hu-fooldal' => 'oliviajoga.hu – ' . __( 'Home page', 'olivia-studio' ), 'hu-lablec' => 'oliviajoga.hu – ' . __( 'Footer', 'olivia-studio' ), 'online-lablec' => 'oliviajoga.online – ' . __( 'Footer', 'olivia-studio' ), 'admin' => __( 'Added by hand', 'olivia-studio' ) );
+		$states  = array( 'pending' => __( 'Waiting for confirmation', 'olivia-studio' ), 'confirmed' => __( 'Subscribed', 'olivia-studio' ), 'unsubscribed' => __( 'Unsubscribed', 'olivia-studio' ) );
+		$count   = array_count_values( array_map( fn( $r ) => $r->status, $rows ) );
+		echo '<h2 id="feliratkozok">' . esc_html__( 'Subscribers from the signup forms', 'olivia-studio' ) . '</h2><p class="description" style="max-width:760px">'
+			. esc_html( sprintf( __( '%1$d subscribed, %2$d waiting for confirmation, %3$d unsubscribed. Someone who signs up gets an email with a link; they only get the newsletter after clicking it. Customers who ticked the box in their account are counted above and are not listed here.', 'olivia-studio' ), (int) ( $count['confirmed'] ?? 0 ), (int) ( $count['pending'] ?? 0 ), (int) ( $count['unsubscribed'] ?? 0 ) ) )
+			. '</p>';
+		echo self::form( 'subscriber_add', 'style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:0 0 12px"' ) // phpcs:ignore
+			. '<input type="email" name="email" required placeholder="' . esc_attr__( 'Email', 'olivia-studio' ) . '"> <input type="text" name="name" placeholder="' . esc_attr__( 'Name (optional)', 'olivia-studio' ) . '"> '
+			. '<button class="button">' . esc_html__( 'Add a subscriber', 'olivia-studio' ) . '</button> <span class="description">' . esc_html__( 'Only someone who asked for the newsletter.', 'olivia-studio' ) . '</span></form>';
+		echo self::form( 'subscribers_export', 'style="margin:0 0 12px"' ) . '<button class="button">' . esc_html__( 'Download the list (CSV)', 'olivia-studio' ) . '</button></form>'; // phpcs:ignore
+		echo '<table class="widefat striped oys-table"><thead><tr><th>' . esc_html__( 'Email', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Name', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Signed up on', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Status', 'olivia-studio' ) . '</th><th>' . esc_html__( 'Date', 'olivia-studio' ) . '</th><th></th></tr></thead><tbody>';
+		foreach ( $rows as $r ) {
+			echo '<tr><td>' . esc_html( $r->email ) . '</td><td>' . esc_html( $r->name ?: '—' ) . '</td><td>' . esc_html( $sources[ $r->source ] ?? ( $r->source ?: '—' ) ) . '</td><td>' . esc_html( $states[ $r->status ] ?? $r->status ) . '</td><td>' . esc_html( oys_date( $r->confirmed_at ?: $r->created_at, 'M j, Y' ) ) . '</td><td>'
+				. self::form( 'subscriber_remove', 'onsubmit="return confirm(\'' . esc_js( __( 'Remove this address from the list?', 'olivia-studio' ) ) . '\')"' ) . '<input type="hidden" name="id" value="' . (int) $r->id . '"><button class="button button-small">' . esc_html__( 'Remove', 'olivia-studio' ) . '</button></form></td></tr>'; // phpcs:ignore
+		}
+		if ( ! $rows ) {
+			echo '<tr><td colspan="6">' . esc_html__( 'Nobody has signed up with the form yet.', 'olivia-studio' ) . '</td></tr>';
+		}
+		echo '</tbody></table>';
+	}
+
+	private static function do_subscriber_add() {
+		$res = OYS_Newsletter::list_add( wp_unslash( $_POST['email'] ?? '' ), wp_unslash( $_POST['name'] ?? '' ) ); // phpcs:ignore
+		self::back( 'oys-newsletter', array(), is_wp_error( $res ) ? $res->get_error_message() : __( 'Subscriber added.', 'olivia-studio' ), is_wp_error( $res ) ? 'error' : 'success' );
+	}
+
+	private static function do_subscriber_remove() {
+		OYS_Newsletter::list_delete( (int) ( $_POST['id'] ?? 0 ) ); // phpcs:ignore
+		self::back( 'oys-newsletter', array(), __( 'Removed from the list.', 'olivia-studio' ) );
+	}
+
+	private static function do_subscribers_export() {
+		nocache_headers();
+		header( 'Content-Type: text/csv; charset=utf-8' );
+		header( 'Content-Disposition: attachment; filename="hirlevel-feliratkozok-' . gmdate( 'Y-m-d' ) . '.csv"' );
+		$out = fopen( 'php://output', 'w' );
+		fwrite( $out, "\xEF\xBB\xBF" ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		fputcsv( $out, array( 'email', 'name', 'source', 'status', 'signed_up', 'confirmed', 'unsubscribed' ), ',', '"', '\\' );
+		foreach ( OYS_Newsletter::list_query( '', 100000 ) as $r ) {
+			fputcsv( $out, array( $r->email, $r->name, $r->source, $r->status, $r->created_at, (string) $r->confirmed_at, (string) $r->unsub_at ), ',', '"', '\\' );
+		}
+		fclose( $out ); // phpcs:ignore WordPress.WP.AlternativeFunctions
+		exit;
 	}
 
 	private static function do_save_ai() {

@@ -112,3 +112,27 @@ body[class*="_page_oys"] .update-nag, body.toplevel_page_oys .update-nag { displ
 	html.oys-app #wpadminbar { display: none !important; }
 	html.oys-app #wpbody { padding-top: env(safe-area-inset-top, 0px); }
 }
+
+/* The newsletter: who gets it, one by one (Áron, 26 November) */
+.oys-pick { max-width: 860px; }
+.oys-pick__tools { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; margin: 0 0 10px; }
+.oys-pick__tools input[type="search"] { min-width: 240px; }
+.oys-pick__quick { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.oys-pick__list { max-height: 520px; overflow: auto; border: 1px solid #dcdcde; border-radius: 10px; background: #fff; }
+.oys-pick__row { display: grid; grid-template-columns: 22px minmax(0, 1.6fr) minmax(0, .9fr) minmax(0, 1.3fr); gap: 4px 12px; align-items: center; padding: 9px 12px; border-top: 1px solid #f0f0f1; cursor: pointer; }
+.oys-pick__row:first-child { border-top: 0; }
+.oys-pick__row:hover { background: #f6f7f7; }
+.oys-pick__row[hidden] { display: none; }
+.oys-pick__row input { margin: 0; }
+.oys-pick__who, .oys-pick__n { display: grid; min-width: 0; }
+.oys-pick__who small, .oys-pick__n small { color: #646970; overflow-wrap: anywhere; }
+.oys-pick__nl { font-size: 12px; color: #646970; }
+.oys-pick__nl.is-on { color: #00602b; font-weight: 600; }
+.oys-pick__go { margin-top: 14px; }
+.oys-held__mail { white-space: nowrap; }
+@media (max-width: 782px) {
+	.oys-pick__row { grid-template-columns: 26px minmax(0, 1fr); }
+	.oys-pick__nl, .oys-pick__n { grid-column: 2; }
+	.oys-pick__tools input[type="search"] { min-width: 0; width: 100%; }
+	.oys-pick__list { max-height: none; }
+}

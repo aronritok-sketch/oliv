@@ -2089,6 +2089,46 @@
   - Előtte próbafuttatás, utána újraellenőrzés: a második futás nem változtatna semmit. A fájlokat a CRM-ből töltöttem le,
     a plugin saját olvasójával dolgoztam fel, a művelet után a helyi másolatokat töröltem; vendégadat a repóba nem került.
 
+- **2026-11-26 – Közös hírlevél: feliratkozás a .hu-n és a .online láblécében, küldés a .online-ról (olivia-studio 1.29.0,
+  oliviajoga.online 3.12.28, oliviajoga.hu 1.8.8).** Áron: „Szeretnék egy hírlevél feliratkozást a .hu események aloldalára
+  és a főoldalra az eseményekhez … Építs egy közös hírlevélküldő szoftvert a .online-nal és a .online-ról mehessenek ki a
+  levelek. Legyen egy menüpont az adminban. Használd a meglévő toolokat. … És a footerbe is rakd be a feliratkozást.”
+  - A meglévő Stúdió → Hírlevél bővült: új `subscribers` tábla (e-mail, név, honnan, állapot), dupla megerősítés
+    (`newsletter_confirm` e-mail, aláírt link), saját leiratkozó link minden levélben, a küldési sor a vendégekével együtt
+    megy (5 percenként, adagokban). Egy címre egy levél: ha a cím egy pipás vendégé, ő a vendégként kapja. Aki a fiókjában
+    kiveszi a pipát, a listáról is lekerül. A meg nem erősített és a leiratkozott cím 30 nap után törlődik (óránkénti
+    takarítás). Az adminban: feliratkozók listája (honnan, állapot), kézi hozzáadás, törlés, CSV.
+  - Űrlapok: .hu események oldal teteje (`hu-esemenyek`), főoldal a „Közelgő események” alatt (`hu-fooldal`), minden oldal
+    lábléce (`hu-lablec`); .online lábléc (`online-lablec`). A .hu űrlap a .online `admin-post.php`-jára küld, onnan vissza
+    ugyanahhoz az űrlaphoz `?hirlevel=ok|mar|hiba`-val (csak a két Olívia-domainre enged vissza). Rejtett robotcsapda,
+    kötelező hozzájárulás, óránként legfeljebb 6 feliratkozás egy kapcsolatról.
+  - Adatkezelés: a .online tájékoztató „Hírlevél” pontja és a megőrzés kibővült (egyszeri frissítés az élő oldalon, csak a
+    téma saját mondatai), a .hu tájékoztatóba új „Hírlevél” pont került (az adat a .online-ra kerül, ott a részletek).
+
+- **2026-11-26 – Hírlevél egyesével kijelölt címzetteknek, magyar MI-szöveg, tesztküldések (olivia-studio 1.29.0).** Áron:
+  „Motibróból áthoztuk a usereket, és szeretnénk egyesével kijelölni … ki tudja választani az e-mail megfogalmazását
+  követően, hogy kiknek küldi ki … és lássuk mellette, hogy hány alkalma is van … angolul írja meg a szöveget … magyarul kell
+  lennie … mindegyiknél legyen egy ilyen tesztküldési funkció, ami önmagunknak küld egy levelet, illetve lehessen kiküldeni
+  hírleveleknél tesztet is.”
+  - A hírlevél szerkesztőjében „Kinek megy?”: minden vendég (a Motibróból hozottak is) és minden megerősített feliratkozó
+    pipával; elsőre azok vannak bepipálva, akik kérték a hírlevelet. Mellettük: hány alkalmuk van (online bérleten, lejárattal;
+    Motibróból beváltásra váró). Keresés, gyors kijelölés (aki kérte / akinek van alkalma / mindenki / senki), küldés a
+    kijelölteknek megerősítéssel. A kijelölt (pipa nélküli) vendég is megkapja; figyelmeztetés: nekik csak a bérletükről,
+    foglalásukról írjanak, ajánlatot ne.
+  - „Mentés és teszt magamnak” gomb a szerkesztőben; a teszt tárgya „[Teszt]”.
+  - Az MI-vázlat magyar oldalon magyarul, Olívia hangján, tegezve, „Szia {first_name}!” kezdéssel, magyar dátumokkal készül.
+  - Vendégek → Motibro-bérletek: az „Online foglalhatóvá” gomb mit csinál (kiírva a dobozban is): a megmaradt alkalmak online
+    bérletként a vendég fiókjába kerülnek a megadott napig, e-mail magától nem megy ki. Új: „e-mail a vendégnek” pipa,
+    „Teszt magamnak” (ugyanaz a levél az admin címére), utólag „E-mail a vendégnek” gomb; új levélsablon „Motibro-alkalmak
+    online foglalhatók” (az E-mailek között szerkeszthető). Az elküldést a sor megjegyzése rögzíti.
+
+- **2026-11-26 – Nincs emlékeztető a lejáró bérletről (oliviajoga.online 3.12.28).** Áron: „heti 1 óra van … 5 alkalmas
+  bérlet … ha marad 3 alkalma … és már csak 2 hétig érvényes … Ezt az egészet szedjük most ki, mert nagyon kevés óra van.”
+  Az élő oldalon a „Lejáró bérlet” emlékeztető 0 nap = kikapcsolva (egyszeri frissítés, `oy_migrate_1126`), az új online
+  oldal is így indul, és az E-mailek oldal nem listázza, amíg ki van kapcsolva. Visszakapcsolni: Beállítások →
+  Emlékeztetők → „Lejáró bérlet” napok.
+  Tesztek: 1880/0; .hu check.py 4358/0, `--after` 1353/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

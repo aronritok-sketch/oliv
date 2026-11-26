@@ -2003,3 +2003,11 @@ msgstr "később is kapcsolódhatunk a közös chatben"
 
 msgid "Optional, but worth filling in: on your birthday I will treat you to a little gift."
 msgstr "Nem kötelező, de érdemes kitölteni, mert születésnapodkor egy kis ajándékkal fogok kedveskedni."
+
+# Áron, 26 November: the newsletter signup in the footer
+
+msgid "Newsletter"
+msgstr "Hírlevél"
+
+msgid "Be the first to hear about events, workshops and live online classes."
+msgstr "Elsőként szólok az új eseményekről, workshopokról és élő online órákról."

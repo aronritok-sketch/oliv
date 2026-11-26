@@ -47,6 +47,8 @@ class OYS_Emails {
 				return (int) $a;
 			case 'pass_expiring':
 				return $uid( OYS_Passes::get( $a ) );
+			case 'held_online':
+				return (int) ( OYS_Held::get( (string) $a )['user'] ?? 0 );
 			case 'pass_purchased':
 				return $uid( OYS_Orders::get( $a ) );
 			case 'gift_card':
@@ -456,6 +458,33 @@ class OYS_Emails {
 		self::compose( 'pass_purchased', self::user_email( $o->user_id ), array_merge( OYS_Email_Templates::vars_for( $o->user_id ), array( 'pass' => oys_t( $p->name ) ) ), $blocks, array(), home_url( '/schedule-pricing/' ) );
 	}
 
+	/**
+	 * The guest's sessions from Motibro, bookable online (OYS_Held): to the guest, or with $test to the studio's own
+	 * address – the same email with the guest's details, „[Test]” in the subject. $until: the last day (default: the one saved).
+	 */
+	protected static function held_online( $key, $test_to = '', $until = '' ) {
+		$e = OYS_Held::get( (string) $key );
+		$t = OYS_Email_Templates::get( 'held_online' );
+		if ( ! $e || ! $t ) {
+			return false;
+		}
+		$to = $test_to ?: self::user_email( (int) $e['user'] );
+		if ( ! $to || ( ! $test_to && ! $t['enabled'] ) ) {
+			return false;
+		}
+		$day  = preg_match( '/^\d{4}-\d{2}-\d{2}$/', (string) $until ) ? $until : (string) ( $e['until'] ?? '' );
+		$day  = max( $day, (string) $e['expires'] );
+		$vars = array_merge( OYS_Email_Templates::vars_for( (int) $e['user'] ), array(
+			'pass'     => (string) $e['name'],
+			'sessions' => sprintf( _n( '%d session', '%d sessions', (int) $e['left'], 'olivia-studio' ), (int) $e['left'] ),
+			'until'    => $day ? wp_date( get_option( 'date_format' ), strtotime( $day . ' 12:00:00 UTC' ) ) : '—',
+		) );
+		$body    = OYS_Email_Templates::paragraphs( $t['message'], $vars ) . OYS_Email_Templates::paragraphs( $t['closing'], $vars );
+		$cta     = $t['button'] ? array( OYS_Email_Templates::fill( $t['button'], $vars ), oys_account_url() ) : null;
+		$subject = ( $test_to ? __( '[Test]', 'olivia-studio' ) . ' ' : '' ) . OYS_Email_Templates::fill( $t['subject'], $vars );
+		return self::send( $to, $subject, OYS_Email_Templates::fill( $t['heading'], $vars ), $body, array(), $cta );
+	}
+
 	/** Came regularly, not lately, nothing booked (OYS_Hub_Auto, Motibro's „emlékeztető lemorzsolódó vendégeknek”). */
 	protected static function we_miss_you( $user_id ) {
 		return self::compose( 'we_miss_you', self::user_email( $user_id ), OYS_Email_Templates::vars_for( $user_id ), self::upcoming_html(), array(), home_url( '/' ) );
@@ -710,6 +739,7 @@ class OYS_Emails {
 			'expires' => wp_date( get_option( 'date_format' ), time() + 7 * DAY_IN_SECONDS ), 'recipient' => 'Sofia', 'from' => 'Emma', 'gift' => $pass,
 			'recipient_email' => 'sofia@example.com', 'ends' => wp_date( get_option( 'date_format' ), time() + 20 * DAY_IN_SECONDS ),
 			'missing' => sprintf( _n( '%d more person', '%d more people', 2, 'olivia-studio' ), 2 ), 'deadline' => oys_date( gmdate( 'Y-m-d 17:00:00', time() + DAY_IN_SECONDS ), 'l, g:i a' ),
+			'sessions' => sprintf( _n( '%d session', '%d sessions', 3, 'olivia-studio' ), 3 ), 'until' => wp_date( get_option( 'date_format' ), time() + 60 * DAY_IN_SECONDS ),
 			'percent' => '15%', 'prize' => __( 'a free class', 'olivia-studio' ), 'period' => wp_date( 'F' ), 'tickets' => 8, 'entrants' => 24, 'next_draw' => wp_date( get_option( 'date_format' ), time() + 30 * DAY_IN_SECONDS ),
 		);
 	}
@@ -738,8 +768,9 @@ class OYS_Emails {
 	public static function send_test( $key, $to ) {
 		[ $subject, $html ] = self::preview( $key );
 		$headers = array_merge( array( 'Content-Type: text/html; charset=UTF-8' ), OYS_Mailer::headers() );
-		$sent    = wp_mail( $to, '[Test] ' . $subject, $html, $headers );
-		do_action( 'oys_email_sent', $to, '[Test] ' . $subject, $html );
+		$subject = __( '[Test]', 'olivia-studio' ) . ' ' . $subject;
+		$sent    = wp_mail( $to, $subject, $html, $headers );
+		do_action( 'oys_email_sent', $to, $subject, $html );
 		return $sent;
 	}
 }

@@ -667,3 +667,19 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 .oys-avatar-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; clip: rect(0 0 0 0); }
 .oys-avatar-pick:focus-within { outline: 2px solid var(--oys-orchid); outline-offset: 2px; }
 .oys-notice--todo { border-left: 4px solid var(--oys-orchid); }
+
+/* The newsletter signup (Áron, 26 November): name, email, consent, one button; the robots' field hidden */
+.oys-nl { display: grid; gap: .6rem; max-width: 560px; }
+.oys-nl__title { margin: 0; font-weight: 700; font-size: 1.15rem; }
+.oys-nl__text { margin: 0; }
+.oys-nl__hp { position: absolute !important; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.oys-nl__row { display: grid; grid-template-columns: 1fr 1.4fr; gap: .6rem; margin: 0; }
+.oys-nl__field { display: grid; gap: .2rem; font-size: .88rem; font-weight: 600; }
+.oys-nl__field input { width: 100%; min-height: 44px; padding: .55rem .8rem; border: 1.5px solid currentColor; border-radius: 12px; background: #fff; color: #072624; font: inherit; font-weight: 500; }
+.oys-nl__consent { display: flex; gap: .55rem; align-items: flex-start; font-size: .86rem; line-height: 1.45; }
+.oys-nl__consent input { flex: none; width: 20px; height: 20px; margin-top: .1rem; }
+.oys-nl__consent a { color: inherit; text-decoration: underline; }
+.oys-nl__go { margin: 0; }
+.oys-nl__msg { margin: 0; padding: .6rem .8rem; border-radius: 12px; font-weight: 600; background: #FFF4C2; color: #072624; }
+.oys-nl__msg--hiba { background: #FFE2CC; }
+@media (max-width: 560px) { .oys-nl__row { grid-template-columns: 1fr; } }

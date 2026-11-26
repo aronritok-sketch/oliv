@@ -1804,3 +1804,9 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 	.aside-card--class > .btn { display: none; }
 	.aside-card--class > .oj-policy--aside:first-of-type, .aside-card--class > .oj-replay--aside { margin-top: .9rem; }
 }
+
+/* The newsletter signup in the footer (Áron, 26 November) */
+.footer__nl { margin: 2.4rem 0 0; padding: 1.6rem 0 0; border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent); }
+.footer__nl .oys-nl { max-width: 720px; }
+.footer__nl .oys-nl__title { font-family: var(--f-display); text-transform: uppercase; font-size: clamp(1.3rem, 1.1rem + .6vw, 1.7rem); color: var(--paper, #fff); }
+.footer__nl .oys-nl__field input { border-color: transparent; }

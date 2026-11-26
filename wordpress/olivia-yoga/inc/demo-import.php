@@ -863,11 +863,35 @@ function oy_privacy_1119_pairs() {
 		array( 'a weboldal üzemeltetője és tárhelye (HelloProVision), a Stripe', 'a weboldal üzemeltetője (HelloProVision), a tárhely (GoDaddy virtuális szerver), a Stripe' ),
 		// b – Áron: „lehessen profilképet feltölteni, az adatok kitöltése kötelező legyen” (the town and the photo)
 		array( '<li><strong>Fiók és foglalás:</strong> neved, e-mail-címed, telefonszámod, a foglalásaid, a bérleteid és a fizetéseid. Ezek kellenek', '<li><strong>Fiók és foglalás:</strong> neved, e-mail-címed, telefonszámod, a településed, a foglalásaid, a bérleteid és a fizetéseid, és ha feltöltesz, a profilképed (ezt csak a fiókodban és a stúdió kezelőfelületén látjuk, és bármikor törölheted). Ezek kellenek' ),
+		// c – Áron, 26 November: the newsletter signup on oliviajoga.hu and in the footers, the letters from here
+		array( '<li><strong>Hírlevél:</strong> csak ha feliratkozol. Minden levél alján le tudsz iratkozni.</li>', OY_PRIVACY_NEWSLETTER ),
+		array( '<p>A fiókod adatait addig, amíg a fiókod megvan, vagy amíg nem kéred a törlésüket.', '<p>A fiókod adatait addig, amíg a fiókod megvan, vagy amíg nem kéred a törlésüket. A hírlevél-feliratkozásod adatait addig, amíg le nem iratkozol; a meg nem erősített feliratkozást és a leiratkozott címet 30 nap után töröljük.' ),
 	);
 }
 
+/** The privacy notice's newsletter line (Áron, 26 November): the same on oliviajoga.hu (oliviajoga-hu/build.py). */
+const OY_PRIVACY_NEWSLETTER = '<li><strong>Hírlevél:</strong> csak ha feliratkozol (a fiókodban, vagy az oliviajoga.online és az oliviajoga.hu feliratkozó űrlapján): az e-mail-címed, ha megadod, a neved, és hogy mikor, melyik oldalon iratkoztál fel, és mikor erősítetted meg. Hozzájárulásod alapján kezeljük; az űrlapról érkező feliratkozás csak az e-mailben kapott link megerősítése után él. A hírlevelet az oliviajoga.online küldi; minden levél alján egy kattintással leiratkozhatsz.</li>';
+
+/**
+ * Áron, 26 November: „mivel heti 1 óra van … és 5 alkalmas bérlet van a vendégeknek … ha marad 3 alkalma … és már csak 2
+ * hétig érvényes … ne menjen ki e-mail értesítő a lejáró bérletről … Ezt az egészet szedjük most ki, mert nagyon kevés óra
+ * van” – no reminder about a pass about to expire on the online site (0 days = off; the Emails page no longer lists it).
+ */
+function oy_migrate_1126() {
+	$rev = '2026-11-26';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1126_rev' ) === $rev || ! class_exists( 'OYS_Settings' ) ) {
+		return array();
+	}
+	update_option( 'oy_1126_rev', $rev );
+	if ( (int) OYS_Settings::get( 'pass_expiry_days' ) < 1 ) {
+		return array();
+	}
+	OYS_Settings::update( array( 'pass_expiry_days' => 0 ) );
+	return array( 'no reminder about passes about to expire' );
+}
+
 function oy_migrate_privacy_1119() {
-	$rev = '2026-11-19b';
+	$rev = '2026-11-26c';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_privacy_1119_rev' ) === $rev ) {
 		return array();
 	}
@@ -890,7 +914,7 @@ function oy_migrate_privacy_1119() {
 	kses_remove_filters();
 	wp_update_post( wp_slash( array( 'ID' => $page->ID, 'post_content' => $html ) ) );
 	kses_init_filters();
-	return array( sprintf( 'privacy: the GoDaddy server, the pair\'s partner, the profile photo (%d parts)', $n ) );
+	return array( sprintf( 'privacy: the GoDaddy server, the pair\'s partner, the profile photo, the newsletter (%d parts)', $n ) );
 }
 
 function oy_migrate_1113() {

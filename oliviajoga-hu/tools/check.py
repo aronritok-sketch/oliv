@@ -162,10 +162,31 @@ def main():
                f'/{path}: no „Gyakorolj velem online” note with links to the online classes')
     ok(len(set(crumbs.values())) == len(crumbs) and not any('kerület' in v for v in crumbs.values() if v not in ('Kapcsolat',)),
        'breadcrumb names: each page its own (not the shared „Jóga 18. és 21. kerület” title start)')
+    nl_checks(files, ok)
     for f in fails[:40]:
         print('FAIL', f)
     print(f'{checks - len(fails)} checks passed, {len(fails)} failed')
     sys.exit(1 if fails else 0)
+
+
+def nl_checks(files, ok):
+    """The newsletter signup (Áron, 26 November): the events page, the home page's events and every footer, posting to the
+    online site (which sends the letters), consent required, a link to the online site's privacy notice."""
+    want = {'': ('hirlevel', 'hu-fooldal'), 'események': ('hirlevel-esemenyek', 'hu-esemenyek')}
+    for path, doc in files.items():
+        forms = re.findall(r'<form class="oj-nl[^"]*" id="([a-z-]+)" method="post" action="([^"]+)" data-oj-nl>(.*?)</form>', doc, re.S)
+        ids = [f[0] for f in forms]
+        ok('hirlevel-lablec' in ids, f'/{path}: no newsletter signup in the footer')
+        if path in want:
+            ok(want[path][0] in ids and f'name="source" value="{want[path][1]}"' in doc, f'/{path}: newsletter signup missing')
+        for fid, action, inner in forms:
+            ok(action == build.ONLINE + '/wp-admin/admin-post.php', f'/{path} #{fid}: the signup does not post to the online site')
+            ok('name="action" value="oys_nl_subscribe"' in inner and 'name="consent" value="1" required' in inner and 'name="email" required' in inner
+               and 'name="website" tabindex="-1"' in inner and build.ONLINE + '/adatvedelem/' in inner, f'/{path} #{fid}: the signup form is incomplete')
+        ok(len(ids) == len(set(ids)), f'/{path}: two forms with the same id')
+    priv = files.get(build.PRIVACY_PATH, '')
+    if priv:
+        ok('<strong>Hírlevél:</strong>' in priv and 'oliviajoga.online oldalra kerül' in priv, f'/{build.PRIVACY_PATH}: the newsletter is missing from the privacy notice')
 
 
 def after_checks(data, out, base):
@@ -213,6 +234,7 @@ def after_checks(data, out, base):
         for w in ('szerda', '18:30', '20:00', 'Online kismamatorna'):
             ok(w in text, f'/{path}: „{w}” missing')
     ok('tartottam' in visible(files.get('', '<body>')), '/: „tartottam” missing')
+    nl_checks(files, ok)
     for path, doc in files.items():
         for href in re.findall(r'href="([^"#?]+)', doc):
             h = html.unescape(href)

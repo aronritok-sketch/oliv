@@ -69,6 +69,13 @@ class OYS_Email_Templates {
 				'You won: {prize}!', 'You won!', "Congratulations, {first_name}! You came to {tickets} classes in {period}, and your ticket was drawn: {prize} is now in your account. Thank you for practicing with me so faithfully!", '', 'See my passes', array( 'prize', 'tickets', 'period' ) ),
 			'raffle_announcement' => array( __( 'Loyalty draw: newsletter to everyone', 'olivia-studio' ), 'account', 'customer', __( 'Sent to the newsletter subscribers after the draw (no names); the heading is the preview line', 'olivia-studio' ),
 				'The {period} draw: {prize} has a new home', 'Every class is a ticket', "Hi {first_name},\n\nthe {period} draw is done: {prize} went to one of our most dedicated students ({tickets} tickets from {entrants} of you were in the hat).\n\nA new round has started: every class you come to until {next_draw} is one more ticket.", 'See you on the mat!', 'Book a class', array( 'period', 'prize', 'tickets', 'entrants', 'next_draw' ) ),
+			// Áron, 26 November: the signup forms on the studio's sites – the double opt-in email
+			'newsletter_confirm' => array( __( 'Newsletter signup confirmation', 'olivia-studio' ), 'account', 'customer', __( 'When someone signs up for the newsletter with their email address (on any of the studio\'s sites); the button confirms it', 'olivia-studio' ),
+				'Confirm your newsletter signup', 'One more click', "Thank you for signing up for my newsletter! Tap the button to confirm it, and I'll let you know about new events, workshops and live online classes.", "If it wasn't you, you don't need to do anything: you won't get any emails from me.", 'Confirm my signup' ),
+			// Áron, 26 November: „mi történik, ha a vendégeknél az online foglalhatóvá tétel gombra kattintunk … legyen egy ilyen
+			// tesztküldési funkció” – the guest's sessions from Motibro, now bookable online (sent only when the studio asks)
+			'held_online'       => array( __( 'Sessions from Motibro bookable online', 'olivia-studio' ), 'account', 'customer', __( 'When you make a guest\'s sessions from Motibro bookable online and tick „email the guest” (or send it later from the same row); „Test to me” sends it to you first', 'olivia-studio' ),
+				'Your {sessions} can now be booked online', 'Your sessions are waiting', 'Hi {first_name}, the {sessions} left on your {pass} can now be used for the live online classes, until {until}.', 'Log in with this email address and book from the timetable. First time on the new site? Click „Forgot your password?” on the login page and set one in a minute.', 'Log in and book', array( 'pass', 'sessions', 'until' ) ),
 			// Private sessions
 			'private_request_received' => array( __( 'Private request received', 'olivia-studio' ), 'private', 'customer', __( 'When someone sends a private session request', 'olivia-studio' ),
 				'Your private session request', 'Request received', "Thank you for your request. I'll reply within one working day with a suggested time and price. You can pay and confirm from the email or your account.", '', 'View my requests' ),
@@ -168,6 +175,13 @@ class OYS_Email_Templates {
 			'raffle_winner' => 'raffle', 'raffle_announcement' => 'raffle',
 			'waitlist_promoted' => 'waitlist',
 		);
+		// Áron, 26 November: one class a week and 5-class passes – the expiry reminder is off (0 days) and not listed
+		if ( 'pass_expiring' === $key && (int) OYS_Settings::get( 'pass_expiry_days' ) < 1 ) {
+			return false;
+		}
+		if ( 'held_online' === $key ) {
+			return class_exists( 'OYS_Held' ) && (bool) OYS_Held::all();
+		}
 		return ! isset( $needs[ $key ] ) || ! empty( $f[ $needs[ $key ] ] );
 	}
 

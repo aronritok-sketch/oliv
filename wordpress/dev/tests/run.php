@@ -1552,7 +1552,7 @@ test( 'Áron 19 Nov: a profile photo, the required details (name, phone number, 
 	require_once get_template_directory() . '/inc/demo-import.php';
 	$data = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content-hu-online.json' ), true );
 	ok( str_contains( $data['privacy']['content'], 'telefonszámod, a településed,' ) && str_contains( $data['privacy']['content'], 'ha feltöltesz, a profilképed' ), 'privacy notice: the town and the profile photo among the account data' );
-	ok( 4 === count( oy_privacy_1119_pairs() ) && str_contains( oy_privacy_1119_pairs()[3][1], 'a profilképed' ), '… on the live page too (once)' );
+	ok( 6 === count( oy_privacy_1119_pairs() ) && str_contains( oy_privacy_1119_pairs()[3][1], 'a profilképed' ) && str_contains( oy_privacy_1119_pairs()[4][1], 'feliratkozó űrlapján' ), '… on the live page too (once), and the newsletter signup' );
 } );
 
 test( 'Áron 19 Nov (evening): the chosen times survive signing up and logging in; several times in one go; a taken time can\'t be chosen', function () {
@@ -5714,6 +5714,180 @@ test( 'Olívia and Áron, 17 November: stretching and relaxation explain how it 
 	ok( str_contains( $js, "closest('details > summary')" ) && str_contains( $js, 'pinned.el.getBoundingClientRect().top - pinned.top' ), 'a tapped folding title stays where it was when the open one above closes' );
 	$css = (string) file_get_contents( get_template_directory() . '/assets/site.css' );
 	ok( str_contains( $css, '@media (pointer: coarse), (max-width: 759px) { .btn, .btn--sm { min-height: 44px; } .oys-waiver > summary { display: flex; align-items: center; min-height: 44px; } }' ), 'buttons and the agreement\'s title at least 44 px high on a touch screen (tablets too)' );
+} );
+
+
+test( 'Áron 26 Nov: newsletter signup on the studio\'s sites – double opt-in, sent from here, one letter per address, unsubscribe, 30 days', function () {
+	global $wpdb;
+	$r1  = null;
+	$log = sent_mails( function () use ( &$r1 ) { $r1 = OYS_Newsletter::subscribe( 'Anna.Teszt@Example.test', 'Anna', 'hu-esemenyek', 'https://oliviajoga.hu/esemenyek' ); } );
+	eq( 'sent', $r1, 'a new address: the confirmation goes out' );
+	$row = OYS_Newsletter::list_by_email( 'anna.teszt@example.test' );
+	ok( $row && 'pending' === $row->status && 'hu-esemenyek' === $row->source, 'waits for the click, with where it came from' );
+	ok( 1 === count( $log ) && str_contains( $log[0]['html'], 'oys_nl_confirm=' . $row->id . '.' ), 'the email has the confirmation link' );
+	eq( 'wait', OYS_Newsletter::subscribe( 'anna.teszt@example.test' ), 'signing up again within 10 minutes: no second email' );
+	ok( ! in_array( (int) $row->id, array_map( fn( $r ) => (int) $r->id, OYS_Newsletter::list_recipients() ), true ), 'not confirmed: no newsletter' );
+	preg_match( '/oys_nl_confirm=([0-9]+\.[a-f0-9]+)/', $log[0]['html'], $m );
+	add_filter( 'wp_die_handler', fn() => function ( $msg, $t, $args ) { throw new RuntimeException( 'die:' . ( $args['response'] ?? 0 ) ); } );
+	$_GET['oys_nl_confirm'] = $row->id . '.bad';
+	try { OYS_Newsletter::maybe_list_link(); } catch ( RuntimeException $e ) { eq( 'die:400', $e->getMessage(), 'a forged link is refused' ); }
+	$_GET['oys_nl_confirm'] = $m[1];
+	try { OYS_Newsletter::maybe_list_link(); } catch ( RuntimeException $e ) { eq( 'die:200', $e->getMessage(), 'the thank-you page' ); }
+	unset( $_GET['oys_nl_confirm'] );
+	eq( 'confirmed', OYS_Newsletter::list_get( $row->id )->status, 'confirmed' );
+	eq( 'already', OYS_Newsletter::subscribe( 'anna.teszt@example.test' ), 'already subscribed' );
+	// a customer with the tick whose address is on the list too: one letter
+	$c   = make_user( 'Cili' );
+	update_user_meta( $c, 'oys_marketing', '1' );
+	$cid = OYS_Newsletter::list_add( get_userdata( $c )->user_email );
+	$id  = OYS_Newsletter::save( array( 'subject' => 'Hírek', 'body' => "Szia {first_name}!\n\nÚj esemény." ) );
+	$n   = OYS_Newsletter::send( $id );
+	$log = sent_mails( fn() => OYS_Newsletter::process_queue( 1000 ) );
+	$to  = array_column( $log, 'to' );
+	ok( in_array( 'anna.teszt@example.test', $to, true ), 'the confirmed address gets the newsletter' );
+	eq( 1, count( array_keys( $to, get_userdata( $c )->user_email, true ) ), 'a customer on the list too: one letter' );
+	eq( $n, count( $log ), 'as many went out as were counted' );
+	$mine = array_values( array_filter( $log, fn( $x ) => 'anna.teszt@example.test' === $x['to'] ) )[0];
+	ok( str_contains( $mine['html'], 'Szia Anna!' ) && str_contains( $mine['html'], 'oys_nl_unsub=' . $row->id . '.' ), 'her name, her own unsubscribe link' );
+	preg_match( '/oys_nl_unsub=([0-9]+\.[a-f0-9]+)/', $mine['html'], $m );
+	$_GET['oys_nl_unsub'] = $m[1];
+	try { OYS_Newsletter::maybe_list_link(); } catch ( RuntimeException $e ) { eq( 'die:200', $e->getMessage(), 'unsubscribed with one click' ); }
+	unset( $_GET['oys_nl_unsub'] );
+	remove_all_filters( 'wp_die_handler' );
+	eq( 'unsubscribed', OYS_Newsletter::list_get( $row->id )->status, 'off the list' );
+	update_user_meta( $c, 'oys_marketing', '' );
+	eq( 'unsubscribed', OYS_Newsletter::list_get( $cid )->status, 'a customer who unticks in the account is off the list too' );
+	// 30 days (the privacy notice): unconfirmed and unsubscribed addresses go
+	$wpdb->update( OYS_Install::table( 'subscribers' ), array( 'unsub_at' => gmdate( 'Y-m-d H:i:s', time() - 31 * DAY_IN_SECONDS ) ), array( 'id' => $row->id ) );
+	OYS_Newsletter::subscribe( 'bea@example.test' );
+	OYS_Newsletter::subscribe( 'cecil@example.test' );
+	$bea = OYS_Newsletter::list_by_email( 'bea@example.test' );
+	$cec = OYS_Newsletter::list_by_email( 'cecil@example.test' );
+	$wpdb->update( OYS_Install::table( 'subscribers' ), array( 'mailed_at' => gmdate( 'Y-m-d H:i:s', time() - 40 * DAY_IN_SECONDS ) ), array( 'id' => $cec->id ) );
+	OYS_Newsletter::list_cleanup();
+	ok( ! OYS_Newsletter::list_get( $row->id ) && ! OYS_Newsletter::list_get( $cec->id ) && OYS_Newsletter::list_get( $bea->id ), 'unsubscribed or unconfirmed for 30 days: deleted; a fresh signup stays' );
+} );
+
+test( 'Áron 26 Nov: the signup form posted from oliviajoga.hu – back to the form, consent, robots, a foreign address, at most 6 an hour', function () {
+	add_filter( 'oys_newsletter_back_hosts', $hosts = fn( $h ) => array_merge( (array) $h, array( 'oliviajoga.hu' ) ) );
+	$_SERVER['REMOTE_ADDR'] = '203.0.113.' . wp_rand( 10, 250 );
+	$go = function ( array $post ) {
+		$_POST = $post;
+		$to    = '';
+		$f     = function ( $loc ) use ( &$to ) { $to = $loc; throw new RuntimeException( 'redirect' ); };
+		add_filter( 'wp_redirect', $f, 1 );
+		try { OYS_Newsletter::handle_subscribe(); } catch ( RuntimeException $e ) { unset( $e ); }
+		remove_filter( 'wp_redirect', $f, 1 );
+		$_POST = array();
+		return $to;
+	};
+	$back = 'https://oliviajoga.hu/esemenyek#hirlevel-esemenyek';
+	eq( 'https://oliviajoga.hu/esemenyek?hirlevel=ok#hirlevel-esemenyek', $go( array( 'email' => 'dia@example.test', 'consent' => '1', 'source' => 'hu-esemenyek', 'back' => $back ) ), 'back to the same form on oliviajoga.hu, „ok”' );
+	ok( OYS_Newsletter::list_by_email( 'dia@example.test' ), 'the signup is saved here' );
+	eq( 'https://oliviajoga.hu/esemenyek?hirlevel=hiba#hirlevel-esemenyek', $go( array( 'email' => 'eva@example.test', 'source' => 'hu-esemenyek', 'back' => $back ) ), 'no consent: not saved' );
+	ok( ! OYS_Newsletter::list_by_email( 'eva@example.test' ), '… and nothing saved' );
+	$go( array( 'email' => 'robot@example.test', 'consent' => '1', 'website' => 'spam', 'back' => $back ) );
+	ok( ! OYS_Newsletter::list_by_email( 'robot@example.test' ), 'a robot filling the hidden field: nothing saved' );
+	$evil = $go( array( 'email' => 'fia@example.test', 'consent' => '1', 'back' => 'https://evil.example/x' ) );
+	eq( wp_parse_url( home_url(), PHP_URL_HOST ), wp_parse_url( $evil, PHP_URL_HOST ), 'a foreign address to come back to: back to this site instead' );
+	$last = '';
+	for ( $i = 0; $i < 6; $i++ ) {
+		$last = $go( array( 'email' => 'many' . $i . '@example.test', 'consent' => '1', 'back' => $back ) );
+	}
+	ok( str_contains( $last, 'hirlevel=hiba' ) && ! OYS_Newsletter::list_by_email( 'many5@example.test' ), 'at most 6 signups an hour from one connection' );
+	remove_filter( 'oys_newsletter_back_hosts', $hosts );
+	$f = OYS_Newsletter::form_html( array( 'source' => 'online-lablec', 'title' => 'Hírlevél', 'back' => 'https://oliviajoga.online/' ) );
+	ok( str_contains( $f, 'name="action" value="oys_nl_subscribe"' ) && str_contains( $f, 'name="consent" value="1" required' ) && str_contains( $f, 'name="website" tabindex="-1"' ) && str_contains( $f, 'value="online-lablec"' ), 'the form: consent required, the robot trap, where it was filled in' );
+	ok( str_contains( (string) file_get_contents( get_template_directory() . '/footer.php' ), "OYS_Newsletter::form_html( array( 'source' => 'online-lablec'" ), 'the online site\'s footer has the signup („a footerbe is rakd be”)' );
+} );
+
+test( 'Áron 26 Nov: the newsletter to people chosen one by one, their sessions left next to them; Hungarian AI drafts; save and test', function () {
+	$a = make_user( 'Aliz' );   // no tick, 3 sessions online
+	$b = make_user( 'Bori' );   // the newsletter tick
+	$c = make_user( 'Csilla' ); // no tick, sessions from Motibro
+	update_user_meta( $b, 'oys_marketing', '1' );
+	OYS_Passes::grant( $a, array( 'credits' => 3 ) );
+	OYS_Held::put( 'motibro-test-nl', $c, array( 'name' => '5 alkalmas bérlet', 'used' => 3, 'locked' => 0, 'left' => 2, 'expires' => '2026-12-31' ) );
+	$list = array_column( OYS_Newsletter::pick_list(), null, 'email' );
+	$pa   = $list[ strtolower( get_userdata( $a )->user_email ) ] ?? array();
+	ok( 'user' === ( $pa['type'] ?? '' ) && empty( $pa['subscribed'] ) && 3 === ( $pa['online'] ?? 0 ), 'a guest without the tick is on the list, with 3 sessions online' );
+	ok( ! empty( $list[ strtolower( get_userdata( $b )->user_email ) ]['subscribed'] ), 'the subscriber is marked' );
+	eq( 2, $list[ strtolower( get_userdata( $c )->user_email ) ]['held'] ?? 0, 'the sessions from Motibro still to redeem' );
+	$id = OYS_Newsletter::save( array( 'subject' => 'A bérletedről', 'body' => "Szia {first_name}!\n\nInfó." ) );
+	ob_start();
+	( new ReflectionMethod( 'OYS_Admin', 'newsletter_pick' ) )->invoke( null, OYS_Newsletter::get( $id ) );
+	$html = ob_get_clean();
+	ok( preg_match( '/name="pick_users\[\]" value="' . $b . '" checked/', $html ) && preg_match( '/name="pick_users\[\]" value="' . $a . '">/', $html ), 'who asked for the newsletter is ticked at first, the others can be ticked' );
+	ok( str_contains( $html, '3 sessions' ) && str_contains( $html, 'from Motibro 2, to redeem' ) && str_contains( $html, 'data-oys-pick-set="sessions"' ) && str_contains( $html, 'data-oys-pick-q' ), 'the sessions next to the names, a search, quick choices' );
+	ok( is_wp_error( OYS_Newsletter::send( $id, array( 'users' => array(), 'subs' => array() ) ) ) && 'draft' === OYS_Newsletter::get( $id )->status, 'nobody chosen: not sent, still a draft' );
+	eq( 2, OYS_Newsletter::send( $id, array( 'users' => array( $a, $c, $c ), 'subs' => array() ) ), 'two people chosen (once each)' );
+	$to = array_column( sent_mails( fn() => OYS_Newsletter::process_queue( 1000 ) ), 'to' );
+	ok( in_array( get_userdata( $a )->user_email, $to, true ) && in_array( get_userdata( $c )->user_email, $to, true ) && ! in_array( get_userdata( $b )->user_email, $to, true ), 'exactly the people chosen (without the tick too), not the subscriber who was not chosen' );
+	eq( 'picked', OYS_Newsletter::get( $id )->audience, 'remembered as chosen one by one' );
+	// the AI writes Hungarian on a Hungarian site („angolul írja meg a szöveget … magyarul kell lennie”)
+	OYS_Settings::update( array( 'ai_api_key' => 'sk-ant-test', 'default_lang' => 'hu' ) );
+	$sent = null;
+	$fake = function ( $pre, $args, $url ) use ( &$sent ) {
+		if ( ! str_starts_with( $url, OYS_AI::api_url() ) ) {
+			return $pre;
+		}
+		$sent = json_decode( $args['body'], true );
+		return array( 'headers' => array(), 'body' => wp_json_encode( array( 'stop_reason' => 'end_turn', 'content' => array( array( 'type' => 'text', 'text' => wp_json_encode( array( 'subject' => 'Decemberi workshop', 'preheader' => 'Gyere el', 'body' => "Szia {first_name}!\n\nÖlelés, Olívia", 'button_label' => 'Foglalok' ) ) ) ) ) ), 'response' => array( 'code' => 200, 'message' => 'OK' ), 'cookies' => array(), 'filename' => null );
+	};
+	add_filter( 'pre_http_request', $fake, 5, 3 );
+	$d = OYS_AI::draft_newsletter( 'decemberi workshop' );
+	remove_filter( 'pre_http_request', $fake, 5 );
+	OYS_Settings::update( array( 'ai_api_key' => '', 'default_lang' => 'en' ) );
+	ok( str_contains( $sent['system'] ?? '', 'MAGYARUL' ) && str_contains( $sent['system'], 'tegezve' ) && str_contains( $sent['system'], 'Szia {first_name}!' ) && ! str_contains( $sent['system'], 'English' ), 'the prompt asks for Hungarian, informal „te”, „Szia {first_name}!”' );
+	ok( str_contains( $sent['messages'][0]['content'] ?? '', 'Órarend a következő három hétre' ), 'the timetable in Hungarian as context' );
+	eq( 'Decemberi workshop', $d['subject'] ?? '', 'the draft' );
+	// save and send a test to me, in one click („lehessen kiküldeni hírleveleknél tesztet is”)
+	$admin = file_get_contents( WP_PLUGIN_DIR . '/olivia-studio/includes/admin/class-admin.php' );
+	ok( str_contains( $admin, "name=\"and_test\" value=\"1\"" ) && str_contains( $admin, 'OYS_Newsletter::send_test( $id, $me )' ), 'the editor: „Save and send a test to me”' );
+	$log = sent_mails( fn() => OYS_Newsletter::send_test( $id, 'olivia@example.test' ) );
+	ok( 1 === count( $log ) && str_starts_with( $log[0]['subject'], '[Test] ' ), 'the test, marked as a test' );
+} );
+
+test( 'Áron 26 Nov: „Online foglalhatóvá” – what it does, the email to the guest only when asked, a test to me first', function () {
+	$c = make_user( 'Dora' );
+	OYS_Held::put( 'motibro-test-on', $c, array( 'name' => '5 alkalmas bérlet', 'used' => 2, 'locked' => 0, 'left' => 3, 'expires' => '2026-12-20' ) );
+	$log = sent_mails( fn() => OYS_Emails::held_online( 'motibro-test-on', 'olivia@example.test', '2027-01-27' ) );
+	ok( 1 === count( $log ) && 'olivia@example.test' === $log[0]['to'] && str_starts_with( $log[0]['subject'], '[Test] ' ), 'the test goes to me, marked as a test' );
+	ok( str_contains( $log[0]['html'], 'Dora' ) && str_contains( $log[0]['html'], '3 sessions' ) && str_contains( $log[0]['html'], '5 alkalmas bérlet' ), '… with the guest\'s own name, sessions and pass' );
+	$log = sent_mails( fn() => OYS_Held::act( 'motibro-test-on', 'online', '', '2027-01-27' ) );
+	eq( 0, count( $log ), 'making them bookable online sends nothing by itself' );
+	$p = OYS_Passes::for_user( $c, true );
+	ok( 1 === count( $p ) && 3 === (int) $p[0]->credits_left && str_starts_with( (string) $p[0]->expires_at, '2027-01-2' ), 'the 3 sessions are an online pass in her account, until 27 January' );
+	eq( '2027-01-27', OYS_Held::get( 'motibro-test-on' )['until'] ?? '', 'the day is kept for the email' );
+	$log = sent_mails( fn() => OYS_Held::notify( 'motibro-test-on' ) );
+	ok( 1 === count( $log ) && get_userdata( $c )->user_email === $log[0]['to'] && ! str_starts_with( $log[0]['subject'], '[Test]' ), 'then the email to the guest' );
+	ok( str_contains( OYS_Held::get( 'motibro-test-on' )['note'], 'Email sent to the guest' ), 'noted on the row' );
+	ok( OYS_Email_Templates::in_use( 'held_online' ), 'listed on the Emails page while there are Motibro passes' );
+	$box = OYS_Held::admin_box();
+	ok( str_contains( $box, 'name="test" value="1"' ) && str_contains( $box, 'Email the guest' ) && str_contains( $box, 'No email goes out unless you tick' ), 'each row: a test to me, the email to the guest, and what the button does' );
+	$po = (string) file_get_contents( WP_PLUGIN_DIR . '/olivia-studio/languages/olivia-studio-hu_HU.po' );
+	ok( str_contains( $po, 'msgstr "Teszt magamnak"' ) && str_contains( $po, 'Érvényes eddig: {until}.' ), 'in Hungarian: „Teszt magamnak”, the guest\'s email' );
+} );
+
+test( 'Áron 26 Nov: one class a week, 5-class passes – no reminder about a pass about to expire, and the Emails page does not list it', function () {
+	global $wpdb;
+	$u  = make_user( 'Emese' );
+	$p  = OYS_Passes::grant( $u, array( 'credits' => 3, 'validity_days' => 5, 'name' => '5-class pass' ) );
+	$wpdb->update( OYS_Install::table( 'passes' ), array( 'created_at' => oys_utc_plus( -60 * DAY_IN_SECONDS ) ), array( 'id' => $p ) );
+	OYS_Settings::update( array( 'pass_expiry_days' => 0 ) );
+	eq( 0, count( sent_mails( fn() => OYS_Cron::send_pass_expiry() ) ), '0 days: no reminder' );
+	ok( ! OYS_Email_Templates::in_use( 'pass_expiring' ), 'not listed among the emails' );
+	OYS_Settings::update( array( 'pass_expiry_days' => 7 ) );
+	require_once get_template_directory() . '/inc/demo-import.php';
+	update_option( 'oy_edition', 'hu-online' );
+	delete_option( 'oy_1126_rev' );
+	$log = oy_migrate_1126();
+	eq( 0, (int) OYS_Settings::get( 'pass_expiry_days' ), 'the online site: switched off once on the update' );
+	ok( $log && ! oy_migrate_1126(), '… once' );
+	update_option( 'oy_edition', 'fort-myers' );
+	$data = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content-hu-online.json' ), true );
+	eq( 0, $data['setup']['studio']['pass_expiry_days'] ?? null, 'a new online site starts without it' );
+	ok( str_contains( $data['privacy']['content'], 'az oliviajoga.online és az oliviajoga.hu feliratkozó űrlapján' ) && str_contains( $data['privacy']['content'], 'a leiratkozott címet 30 nap után töröljük' ), 'the privacy notice: the signup forms, sent from oliviajoga.online, 30 days' );
 } );
 
 $t = $GLOBALS['oys_t'];

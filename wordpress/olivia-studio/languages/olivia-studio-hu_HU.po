@@ -8522,3 +8522,256 @@ msgstr "Kiválasztva:"
 
 msgid "Ask for these times (%d)"
 msgstr "Időpontokat kérek (%d)"
+
+# Áron, 26 November: the shared newsletter, choosing who gets it, the Motibro sessions online, test emails
+
+msgid "Please give a valid email address."
+msgstr "Adj meg egy érvényes e-mail-címet."
+
+msgid "Something went wrong, please try again."
+msgstr "Valami nem sikerült, kérlek, próbáld újra."
+
+msgid "Confirm my signup"
+msgstr "Megerősítem a feliratkozást"
+
+msgid "Thank you, you're subscribed!"
+msgstr "Köszönöm, feliratkoztál!"
+
+msgid "From now on I'll let you know about new events, workshops and live online classes. Every email has a link to unsubscribe."
+msgstr "Mostantól szólok az új eseményekről, workshopokról és élő online órákról. Minden levél alján ott a leiratkozás linkje."
+
+msgid "This signup is no longer active"
+msgstr "Ez a feliratkozás már nem érvényes"
+
+msgid "Sign up again on the website if you would like the newsletter."
+msgstr "Ha kéred a hírlevelet, iratkozz fel újra a weboldalon."
+
+msgid "You won't get the newsletter any more. You can sign up again any time on the website."
+msgstr "Többé nem kapod a hírlevelet. Bármikor újra feliratkozhatsz a weboldalon."
+
+msgid "Almost there: I've sent you an email, click the link in it to confirm your signup."
+msgstr "Már csak egy lépés: küldtem egy e-mailt, a benne lévő gombbal erősítsd meg a feliratkozást."
+
+msgid "You're already subscribed. Thank you!"
+msgstr "Már feliratkoztál, köszönöm!"
+
+msgid "That didn't work: check the email address and tick the box, then try again."
+msgstr "Ez most nem sikerült: nézd meg az e-mail-címet, pipáld be a négyzetet, és próbáld újra."
+
+msgid "Your name (optional)"
+msgstr "Keresztneved (nem kötelező)"
+
+msgid "I'd like the newsletter (events, workshops, live online classes). I can unsubscribe any time; <a href=\"%s\" target=\"_blank\" rel=\"noopener\">privacy notice</a>."
+msgstr "Kérem a hírlevelet (események, workshopok, élő online órák). Bármikor leiratkozhatok; <a href=\"%s\" target=\"_blank\" rel=\"noopener\">adatkezelési tájékoztató</a>."
+
+msgid "Subscribe"
+msgstr "Feliratkozom"
+
+msgid "Choose at least one person to send it to."
+msgstr "Jelölj ki legalább egy címzettet."
+
+msgid "[Test]"
+msgstr "[Teszt]"
+
+msgid "Test sent to %s: this is what the guest gets."
+msgstr "Teszt elküldve ide: %s. Ezt kapja a vendég."
+
+msgid "Email sent to the guest."
+msgstr "Az e-mail elment a vendégnek."
+
+msgid "The email could not be sent (is the email „Sessions from Motibro bookable online” switched on?)."
+msgstr "Az e-mailt nem sikerült elküldeni (be van kapcsolva az E-mailek között a „Motibro-alkalmak online foglalhatók” levél?)."
+
+msgid "Bookable online, and the guest got the email."
+msgstr "Online foglalható, és a vendég megkapta az e-mailt."
+
+msgid "Bookable online, but the email could not be sent."
+msgstr "Online foglalható, de az e-mailt nem sikerült elküldeni."
+
+msgid "Email sent to the guest: %s"
+msgstr "E-mail a vendégnek: %s"
+
+msgid "The email the guest would get, to %s"
+msgstr "A levél, amit a vendég kapna, ide: %s"
+
+msgid "Test email to me"
+msgstr "Teszt magamnak"
+
+msgid "email the guest"
+msgstr "e-mail a vendégnek"
+
+msgid "Email the guest"
+msgstr "E-mail a vendégnek"
+
+msgid "Email the guest again"
+msgstr "E-mail újra a vendégnek"
+
+msgid "„Make bookable online”: what is left becomes an online pass in the guest's account, valid until the day you give; from then on they book the live classes with it. No email goes out unless you tick „email the guest” (or send it later with „Email the guest”). „Test email to me” sends you exactly that email first."
+msgstr "„Online foglalhatóvá”: a megmaradt alkalmak online bérletként a vendég fiókjába kerülnek, a megadott napig érvényesen, és ezzel foglalhatja az élő órákat. E-mail csak akkor megy ki, ha bepipálod az „e-mail a vendégnek” négyzetet (vagy később az „E-mail a vendégnek” gombbal küldöd). A „Teszt magamnak” előbb neked küldi el pontosan ugyanezt a levelet."
+
+msgid "Newsletter signup confirmation"
+msgstr "Hírlevél-feliratkozás megerősítése"
+
+msgid "When someone signs up for the newsletter with their email address (on any of the studio's sites); the button confirms it"
+msgstr "Amikor valaki az e-mail-címével feliratkozik a hírlevélre (a stúdió bármelyik oldalán); a gombbal erősíti meg"
+
+msgid "Sessions from Motibro bookable online"
+msgstr "Motibro-alkalmak online foglalhatók"
+
+msgid "When you make a guest's sessions from Motibro bookable online and tick „email the guest” (or send it later from the same row); „Test to me” sends it to you first"
+msgstr "Amikor egy vendég Motibróból hozott alkalmait online foglalhatóvá teszed, és bepipálod az „e-mail a vendégnek” négyzetet (vagy később ugyanabból a sorból küldöd); a „Teszt magamnak” előbb neked küldi el"
+
+msgid "Confirm your newsletter signup"
+msgstr "Erősítsd meg a feliratkozásodat"
+
+msgid "One more click"
+msgstr "Még egy kattintás"
+
+msgid "Thank you for signing up for my newsletter! Tap the button to confirm it, and I'll let you know about new events, workshops and live online classes."
+msgstr "Köszönöm, hogy feliratkoztál a hírlevelemre! Koppints a gombra a megerősítéshez, és szólok az új eseményekről, workshopokról és élő online órákról."
+
+msgid "If it wasn't you, you don't need to do anything: you won't get any emails from me."
+msgstr "Ha nem te iratkoztál fel, nincs teendőd: nem kapsz tőlem levelet."
+
+msgid "Your {sessions} can now be booked online"
+msgstr "Online is felhasználhatod a megmaradt alkalmaidat ({sessions})"
+
+msgid "Your sessions are waiting"
+msgstr "Várnak az alkalmaid"
+
+msgid "Hi {first_name}, the {sessions} left on your {pass} can now be used for the live online classes, until {until}."
+msgstr "Szia {first_name}! A Motibróban vett bérleteden ({pass}) maradt {sessions} mostantól az élő online órákon is felhasználható. Érvényes eddig: {until}."
+
+msgid "Log in with this email address and book from the timetable. First time on the new site? Click „Forgot your password?” on the login page and set one in a minute."
+msgstr "Lépj be ezzel az e-mail-címmel, és foglalj az órarendből. Először jársz az új oldalon? A belépésnél kattints az „Elfelejtetted a jelszavad?” linkre, és egy perc alatt beállíthatod a jelszavad."
+
+msgid "Log in and book"
+msgstr "Belépés és foglalás"
+
+msgid "%1$d customers who ticked the newsletter box and %2$d addresses from the signup forms."
+msgstr "%1$d vendég, aki a fiókjában bepipálta a hírlevelet, és %2$d cím a feliratkozó űrlapokról."
+
+msgid "Subscribers"
+msgstr "Feliratkozók"
+
+msgid "Hi {first_name},"
+msgstr "Szia {first_name}!"
+
+msgid "Save and send a test to %s"
+msgstr "Mentés és teszt ide: %s"
+
+msgid "online %1$d, until %2$s"
+msgstr "online %1$d, eddig: %2$s"
+
+msgid "online %d"
+msgstr "online %d"
+
+msgid "from Motibro %d, to redeem"
+msgstr "Motibróból %d, beváltásra vár"
+
+msgid "newsletter (signup form)"
+msgstr "hírlevél (űrlapról)"
+
+msgid "newsletter"
+msgstr "hírlevél"
+
+msgid "no newsletter"
+msgstr "nem kért hírlevelet"
+
+msgid "Who gets it?"
+msgstr "Kinek megy?"
+
+msgid "Tick the people this letter goes to. Ticked at first: everyone who asked for the newsletter. Next to each name: the sessions they have left (on online passes, and from Motibro still to redeem)."
+msgstr "Pipáld be, kiknek menjen ez a levél. Először azok vannak bepipálva, akik kérték a hírlevelet. A nevek mellett: hány alkalmuk van még (online bérleten, illetve Motibróból beváltásra várva)."
+
+msgid "Someone without the newsletter tick did not ask for offers: send them only what concerns their pass or their bookings."
+msgstr "Aki nem kért hírlevelet, az ajánlatot sem kért: neki csak a bérletével vagy a foglalásaival kapcsolatos levelet küldj."
+
+msgid "No guests or subscribers yet."
+msgstr "Még nincs vendég és feliratkozó."
+
+msgid "Send this letter to %d people now?"
+msgstr "Most elküldöd ezt a levelet %d embernek?"
+
+msgid "Search by name or email"
+msgstr "Keresés név vagy e-mail szerint"
+
+msgid "Tick:"
+msgstr "Kijelölés:"
+
+msgid "who asked for the newsletter"
+msgstr "aki kérte a hírlevelet"
+
+msgid "who has sessions left"
+msgstr "akinek van még alkalma"
+
+msgid "everyone"
+msgstr "mindenki"
+
+msgid "nobody"
+msgstr "senki"
+
+msgid "Send to the people ticked"
+msgstr "Küldés a kijelölteknek"
+
+msgid "Draft saved, and a test went to %s."
+msgstr "A piszkozat elmentve, a teszt elment ide: %s."
+
+msgid "Draft saved, but the test could not be sent."
+msgstr "A piszkozat elmentve, de a tesztet nem sikerült elküldeni."
+
+msgid "Events"
+msgstr "Események"
+
+msgid "Home page"
+msgstr "Főoldal"
+
+msgid "Footer"
+msgstr "Lábléc"
+
+msgid "Added by hand"
+msgstr "Kézzel hozzáadva"
+
+msgid "Waiting for confirmation"
+msgstr "Megerősítésre vár"
+
+msgid "Subscribed"
+msgstr "Feliratkozott"
+
+msgid "Subscribers from the signup forms"
+msgstr "Feliratkozók az űrlapokról"
+
+msgid "%1$d subscribed, %2$d waiting for confirmation, %3$d unsubscribed. Someone who signs up gets an email with a link; they only get the newsletter after clicking it. Customers who ticked the box in their account are counted above and are not listed here."
+msgstr "%1$d feliratkozott, %2$d megerősítésre vár, %3$d leiratkozott. Aki feliratkozik, kap egy e-mailt egy linkkel; a hírlevelet csak azután kapja, hogy rákattintott. A fiókjukban bepipáló vendégek a fenti számban vannak, itt nem szerepelnek."
+
+msgid "Name (optional)"
+msgstr "Név (nem kötelező)"
+
+msgid "Add a subscriber"
+msgstr "Feliratkozó hozzáadása"
+
+msgid "Only someone who asked for the newsletter."
+msgstr "Csak olyat, aki kérte a hírlevelet."
+
+msgid "Download the list (CSV)"
+msgstr "A lista letöltése (CSV)"
+
+msgid "Signed up on"
+msgstr "Hol iratkozott fel"
+
+msgid "Remove this address from the list?"
+msgstr "Törlöd ezt a címet a listáról?"
+
+msgid "Nobody has signed up with the form yet."
+msgstr "Az űrlapon még senki nem iratkozott fel."
+
+msgid "Subscriber added."
+msgstr "Feliratkozó hozzáadva."
+
+msgid "Removed from the list."
+msgstr "Törölve a listáról."
+
+msgid "A newsletter goes to %d person:"
+msgid_plural "A newsletter goes to %d people:"
+msgstr[0] "A hírlevél %d emberhez megy:"
+msgstr[1] "A hírlevél %d emberhez megy:"

@@ -61,3 +61,40 @@
 		}, { threshold: 0.12 }).observe(box);
 	});
 }());
+
+/*
+ * The newsletter signup (Áron, 2026-11-26): the forms post to oliviajoga.online, which sends the confirmation email and
+ * the visitor back here with ?hirlevel=ok|mar|hiba#<the form>. Here: the page to come back to, and the answer in the form.
+ */
+(function () {
+	'use strict';
+	var forms = document.querySelectorAll('[data-oj-nl]');
+	if (!forms.length) { return; }
+	var words = {
+		ok: 'Már csak egy lépés: küldtem egy e-mailt, a benne lévő gombbal erősítsd meg a feliratkozást. (Ha nem látod, nézd meg a Promóciók vagy a Spam mappát is.)',
+		mar: 'Már feliratkoztál, köszönöm!',
+		hiba: 'Ez most nem sikerült: nézd meg az e-mail-címet, pipáld be a négyzetet, és próbáld újra.'
+	};
+	var m = /[?&]hirlevel=(ok|mar|hiba)\b/.exec(window.location.search);
+	forms.forEach(function (f) {
+		f.addEventListener('submit', function () {
+			var back = f.querySelector('[data-oj-nl-back]');
+			if (back) { back.value = window.location.href.split('#')[0].replace(/([?&])hirlevel=[a-z]+&?/, '$1').replace(/[?&]$/, '') + '#' + f.id; }
+			var b = f.querySelector('button[type="submit"]');
+			if (b) { b.disabled = true; }
+		});
+	});
+	if (!m) { return; }
+	var target = document.getElementById(window.location.hash.slice(1));
+	if (!target || !target.hasAttribute('data-oj-nl')) { target = forms[0]; }
+	var msg = target.querySelector('[data-oj-nl-msg]');
+	if (msg) {
+		msg.textContent = words[m[1]];
+		msg.className = 'oj-nl__msg oj-nl__msg--' + m[1];
+		msg.hidden = false;
+		target.scrollIntoView({ block: 'center' });
+	}
+	if (window.history && window.history.replaceState) {
+		window.history.replaceState(null, '', window.location.pathname + window.location.search.replace(/([?&])hirlevel=[a-z]+&?/, '$1').replace(/[?&]$/, '') + window.location.hash);
+	}
+})();

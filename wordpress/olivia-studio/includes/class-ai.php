@@ -31,9 +31,14 @@ class OYS_AI {
 	}
 
 	/** Upcoming classes and events for the prompt (studio time, prices, places). */
-	public static function schedule_context( $days = 21 ) {
+	public static function schedule_context( $days = 21, $hu = false ) {
 		$lines = array();
 		foreach ( OYS_Schedule::upcoming_public( $days ) as $s ) {
+			if ( $hu ) {
+				$where   = oys_is_online( $s ) ? 'élő online' : ( $s->location ?: 'stúdió' ) . ( oys_is_hybrid( $s ) ? ' + élő online' : '' );
+				$lines[] = sprintf( '- %s: %s, %s, %s', 'event' === $s->kind ? 'Esemény' : 'Óra', oys_session_title( $s ), oys_date( $s->starts_at, 'F j., l H:i' ), $where . ', ' . oys_price_label( $s ) );
+				continue;
+			}
 			$where   = oys_is_online( $s ) ? 'live online' : ( $s->location ?: 'studio' ) . ( oys_is_hybrid( $s ) ? ' + live online' : '' );
 			$lines[] = sprintf( '- %s: %s, %s, %s', 'event' === $s->kind ? 'Event' : 'Class', oys_session_title( $s ), oys_date( $s->starts_at, 'D M j, g:i a' ), $where . ', ' . oys_price_label( $s ) );
 		}
@@ -53,6 +58,11 @@ class OYS_AI {
 			return new WP_Error( 'oys_ai', __( 'Write a few words about what the newsletter should say.', 'olivia-studio' ) );
 		}
 		$studio = OYS_Settings::get( 'email_from_name' );
+		// Áron, 26 November: „angolul írja meg a szöveget, és ez nekünk nem jó, magyarul kell lennie” – a Hungarian site
+		// gets its newsletter in Hungarian
+		if ( self::hungarian() ) {
+			return self::draft_newsletter_hu( $studio, $brief, $draft );
+		}
 		$system = "You write the email newsletter for {$studio}, a small yoga studio run by Olivia (Fort Myers, Florida): group classes, private sessions, events and live online classes. "
 			. "Write as Olivia, in warm, simple, natural English, first person, short paragraphs. Friendly and calm, never salesy, no hype or exclamation-mark overload, at most one or two emoji. "
 			. "Only mention dates, times, places and prices that are in the schedule below or in Olivia's brief; never invent them. "
@@ -66,7 +76,35 @@ class OYS_AI {
 			? "Improve this newsletter draft following Olivia's note. Keep what she wrote unless the note says otherwise.\n\nOlivia's note: " . ( $brief ?: 'Polish it.' ) . "\n\nCurrent draft:\n" . $draft
 			: "Olivia's brief for this newsletter:\n" . $brief;
 
-		$out = self::json( $system, $context . "\n\n" . $ask, array(
+		return self::draft_answer( $system, $context . "\n\n" . $ask );
+	}
+
+	/** Is the site Hungarian (its main language, or the admin's)? */
+	public static function hungarian() {
+		return ( function_exists( 'oys_default_lang' ) && 'hu' === oys_default_lang() ) || str_starts_with( (string) get_locale(), 'hu' );
+	}
+
+	/** The newsletter draft in Hungarian: Olívia's voice, informal „te”, Hungarian dates. */
+	private static function draft_newsletter_hu( $studio, $brief, $draft ) {
+		$system = "Te írod a(z) {$studio} hírlevelét. Ez Olívia (Kovács Olívia jógaoktató) online jógastúdiója: élő online csoportos órák, egyéni (privát) online órák, workshopok és események. "
+			. 'A levelet MAGYARUL írd, Olívia nevében, egyes szám első személyben, az olvasót tegezve (te, soha nem ön). Meleg, egyszerű, természetes hang, rövid bekezdések. Barátságos és nyugodt, soha nem nyomulós, nincs túlzás, kevés felkiáltójel, legfeljebb egy-két emoji. Helyes magyar helyesírással és magyar dátumformával (pl. december 3., szerda 18:30). '
+			. 'Csak olyan dátumot, időpontot, helyet és árat írj, ami az alábbi órarendben vagy Olívia kérésében szerepel; soha ne találj ki ilyet. '
+			. "A szöveget csak ezzel a kis jelöléssel formázd: üres sor a bekezdések között, '## ' egy sor elején rövid alcímhez, '- ' felsoroláshoz, **félkövér**, és [link szövege](https://cím) linkhez. "
+			. "A levél törzsét a 'Szia {first_name}!' sorral kezdd, külön sorban ({first_name} helyére minden olvasónál a keresztneve kerül; ezt a jelölést hagyd így). Legfeljebb 250 szó. Egy rövid, Olívia-féle elköszönéssel zárd (például: Ölelés, Olívia). "
+			. 'Tárgy (subject): 60 karakter alatt, konkrét, nem kattintásvadász. Előnézeti sor (preheader): egy mondat 90 karakter alatt, ami kiegészíti a tárgyat. A gomb felirata (button_label) is magyar legyen, rövid (pl. „Foglalok”), vagy üres, ha nem kell gomb. '
+			. 'Ha Olívia kérése vagy a vázlat más nyelvű, akkor is magyarul írd meg.';
+		$context = 'A stúdió weboldala: ' . home_url( '/' ) . "\nFoglalási oldal: " . oys_page_url( 'book' )
+			. ( oys_fb_group_url() ? "\nFacebook-csoport: " . oys_fb_group_url() : '' )
+			. "\n\nÓrarend a következő három hétre:\n" . ( implode( "\n", self::schedule_context( 21, true ) ) ?: '(még nincs kiírt óra)' );
+		$ask = $draft
+			? "Javítsd ezt a hírlevél-vázlatot Olívia megjegyzése szerint. Amit ő írt, maradjon meg, hacsak a megjegyzés mást nem kér.\n\nOlívia megjegyzése: " . ( $brief ?: 'Csiszold át.' ) . "\n\nA mostani vázlat:\n" . $draft
+			: "Olívia kérése ehhez a hírlevélhez:\n" . $brief;
+		return self::draft_answer( $system, $context . "\n\n" . $ask );
+	}
+
+	/** The request and the answer's checks, for both languages. */
+	private static function draft_answer( $system, $content ) {
+		$out = self::json( $system, $content, array(
 			'type'                 => 'object',
 			'properties'           => array(
 				'subject'      => array( 'type' => 'string' ),

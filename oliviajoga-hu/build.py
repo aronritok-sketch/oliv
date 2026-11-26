@@ -36,12 +36,13 @@ ONLINE = 'https://oliviajoga.online'  # Olivia: the final domain, without www
 ONLINE_PATHS = {'home': '/', 'yoga': '/online-orak/hatha-flow-joga-online/', 'prenatal': '/online-orak/online-kismamatorna/',
                 'account': '/fiokom/', 'gift': '/ajandekutalvany/', 'classes': '/online-orak/', 'request': '/fiokom/?tab=private',
                 'private': '/online-orak/egyeni-online-joga/', 'stretching': '/online-orak/stretching-mobility/',
-                'relax': '/online-orak/relaxacio-es-legzes/', 'prices': '/bejelentkezes-es-arak/', 'contact': '/kapcsolat/'}
+                'relax': '/online-orak/relaxacio-es-legzes/', 'prices': '/bejelentkezes-es-arak/', 'contact': '/kapcsolat/',
+                'privacy': '/adatvedelem/', 'signup': '/wp-admin/admin-post.php'}
 ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.8.7'
+VERSION = '1.8.8'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -276,6 +277,28 @@ def online(key='home'):
 def book_url():
     """Where „Bejelentkezés” goes: Motibro until 25 November, the online site after (Olivia)."""
     return online('home') if AFTER else MOTIBRO
+
+
+# Áron, 26 November: „Szeretnék egy hírlevél feliratkozást a .hu események aloldalára és a főoldalra az eseményekhez, hogy
+# értesüljön az aktuális eseményekről … a .online-ról mehessenek ki a levelek … És a footerbe is rakd be a feliratkozást” –
+# the form posts to the online site (olivia-studio, OYS_Newsletter: action oys_nl_subscribe), which sends the confirmation
+# email and the newsletters and sends the visitor back here with ?hirlevel=ok|mar|hiba#<the form> (oliviajoga.js says so).
+NL_TEXT = 'Iratkozz fel a hírlevelemre, és elsőként szólok az új eseményekről, workshopokról és élő online órákról.'
+
+
+def newsletter_form(source, fid, title='Hírlevél', text=NL_TEXT, cls=''):
+    privacy = online('privacy')
+    return (f'<form class="oj-nl{(" " + cls) if cls else ""}" id="{fid}" method="post" action="{esc(online("signup"))}" data-oj-nl>'
+            f'<p class="oj-nl__title">{esc(title)}</p><p class="oj-nl__text">{esc(text)}</p>'
+            '<p class="oj-nl__msg" role="status" hidden data-oj-nl-msg></p>'
+            f'<input type="hidden" name="action" value="oys_nl_subscribe"><input type="hidden" name="source" value="{source}">'
+            f'<input type="hidden" name="back" value="{esc(ORIGIN + "/")}" data-oj-nl-back>'
+            '<p class="oj-nl__hp" aria-hidden="true"><label>Website <input type="text" name="website" tabindex="-1" autocomplete="off"></label></p>'
+            '<div class="oj-nl__row"><label class="oj-nl__field"><span>Keresztneved (nem kötelező)</span><input type="text" name="name" autocomplete="given-name" maxlength="120"></label>'
+            '<label class="oj-nl__field"><span>E-mail-címed</span><input type="email" name="email" required autocomplete="email" maxlength="190"></label></div>'
+            '<label class="oj-nl__consent"><input type="checkbox" name="consent" value="1" required> <span>Kérem a hírlevelet (események, workshopok, élő online órák). '
+            f'Bármikor leiratkozhatok; <a href="{esc(privacy)}" target="_blank" rel="noopener">adatkezelési tájékoztató</a>.</span></label>'
+            '<p class="oj-nl__go"><button type="submit" class="btn btn--orchid">Feliratkozom</button></p></form>')
 
 
 def online_note():
@@ -892,6 +915,7 @@ def footer():
 				<ul class="footer__contact"><li>{icon("mail")}<a href="mailto:{EMAIL}">{EMAIL}</a></li><li>{icon("ig")}<a href="{INSTAGRAM}" target="_blank" rel="noopener">Instagram</a></li><li>{icon("fb")}<a href="{FACEBOOK}" target="_blank" rel="noopener">Facebook</a></li></ul>
 			</div>
 		</div>
+		<div class="footer__nl">{newsletter_form("hu-lablec", "hirlevel-lablec", "Hírlevél", "Új események, workshopok és élő online órák: iratkozz fel, és elsőként szólok.", "oj-nl--dark")}</div>
 		<div class="footer__bottom"><p>&copy; 2026 Kovács Olívia{legal} · <span class="footer__credit">Készítette: <a href="https://helloprovision.com/" target="_blank" rel="noopener">HelloProVision</a></span></p></div>
 	</div>
 </footer>
@@ -1329,7 +1353,8 @@ def home(p):
         lnk = [only_link(b) for b in tiles_blocks([t for c in up[1]['columns'] for t in c])]
         lnk = next((x for x in lnk if x), None)
         out.append(wrap(f'<div class="oj-upcoming" data-reveal><div><p class="kicker">{esc(section_text(sU))}</p>{blocks_html(txt)}</div>'
-                        f'{button(lnk[0], lnk[1], "ghost") if lnk else ""}</div>', 'section section--tight oj-upcoming-wrap'))
+                        f'{button(lnk[0], lnk[1], "ghost") if lnk else ""}</div>'
+                        f'<div class="oj-nl-box" data-reveal>{newsletter_form("hu-fooldal", "hirlevel", "Értesülj az eseményekről")}</div>', 'section section--tight oj-upcoming-wrap'))
     # Miért jóga?
     iW, sW = by_heading(p, 'Miért jóga?')
     take(iW)
@@ -1787,7 +1812,8 @@ def events_page(p):
         i += 1
     if open_ul:
         out.append('</div>')
-    return head + f'<div class="container oj-flow"><div class="oj-events-all">{"".join(out)}</div></div>'
+    signup = f'<div class="oj-nl-box oj-nl-box--events" data-reveal>{newsletter_form("hu-esemenyek", "hirlevel-esemenyek", "Értesülj az új eseményekről")}</div>'
+    return head + f'<div class="container oj-flow">{signup}<div class="oj-events-all">{"".join(out)}</div></div>'
 
 
 # Áron, 26 November: „A .hu-n a pajzsmirigy harmonizálás aloldal legyen ugyanolyan mint az oliviajoga.online-on” – the
@@ -1887,13 +1913,14 @@ PRIVACY_EMAIL = 'info@oliviajoga.online'
 
 def privacy_page():
     m = f'<a href="mailto:{PRIVACY_EMAIL}">{PRIVACY_EMAIL}</a>'
-    body = f"""<p>Ez a tájékoztató arról szól, milyen adataidat kezeljük, amikor az oliviajoga.hu oldalt nézed, vagy írsz nekünk.</p>
+    body = f"""<p>Ez a tájékoztató arról szól, milyen adataidat kezeljük, amikor az oliviajoga.hu oldalt nézed, írsz nekünk, vagy feliratkozol a hírlevélre.</p>
 <h2>Ki kezeli az adataidat?</h2>
 <p>Az adatkezelő az Arovia Group LLC (HelloProVision), 9813 Quinta Artesa Way, Unit 105, Fort Myers, FL 33908, USA: az oldal üzemeltetője. Az órákat Kovács Olívia tartja. Kérdésed vagy kérésed van az adataiddal kapcsolatban? Írj a {m} címre.</p>
 <h2>Milyen adatokat kezelünk, és miért?</h2>
 <ul>
 <li><strong>Ha írsz nekünk</strong> (e-mailben, Instagramon vagy Facebookon): a neved, az elérhetőséged és az üzeneted, csak hogy válaszolni tudjunk.</li>
 <li><strong>Foglalás:</strong> ezen az oldalon nem nyitsz fiókot és nem fizetsz. A „Bejelentkezés” 2026. november 25-ig a Motibro foglalórendszerébe visz (oliviajoga.motibro.com), ott a Motibro tájékoztatója érvényes; november 26-tól az oliviajoga.online oldalra, ahol az <a href="https://oliviajoga.online/adatvedelem/">ottani adatvédelmi tájékoztató</a> érvényes.</li>
+<li><strong>Hírlevél:</strong> ha az oldalon feliratkozol, az e-mail-címed és (ha megadod) a keresztneved az oliviajoga.online oldalra kerül, és azt is feljegyezzük, mikor és melyik oldalon iratkoztál fel. A feliratkozást ott tároljuk, a megerősítő e-mailt és a hírleveleket onnan küldjük; a feliratkozás csak az e-mailben kapott link megerősítése után él. Hozzájárulásod alapján kezeljük, addig, amíg le nem iratkozol (a meg nem erősített feliratkozást és a leiratkozott címet 30 nap után töröljük). Minden levél alján egy kattintással leiratkozhatsz. Bővebben az <a href="https://oliviajoga.online/adatvedelem/">oliviajoga.online adatvédelmi tájékoztatójában</a>.</li>
 </ul>
 <h2>Sütik</h2>
 <p>A működéshez szükséges sütik (például hogy megjegyezzük, mit döntöttél a sütikről) mindig működnek, ezekhez nem kell hozzájárulás.</p>

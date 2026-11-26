@@ -28,6 +28,9 @@ $gift = function_exists( 'oys_page_url' ) ? oys_page_url( 'gifts' ) : oy_contact
 				<?php echo oy_lang_switcher( 'langs langs--footer' ); // phpcs:ignore ?>
 			</div>
 		</div>
+		<?php if ( oy_online_only() && class_exists( 'OYS_Newsletter' ) ) : // Áron, 26 November: the newsletter signup in the footer too ?>
+		<div class="footer__nl"><?php echo OYS_Newsletter::form_html( array( 'source' => 'online-lablec', 'title' => __( 'Newsletter', 'olivia-yoga' ), 'text' => __( 'Be the first to hear about events, workshops and live online classes.', 'olivia-yoga' ), 'back' => home_url( add_query_arg( array() ) ) ) ); // phpcs:ignore ?></div>
+		<?php endif; ?>
 		<?php if ( ! oy_online_only() ) : // Olívia, 14 November: the big name in the footer „szedjük ki mindenhonnan” ?>
 		<p class="footer__word" aria-hidden="true"><?php echo preg_replace( '/ (.+)$/', ' <span>$1</span>', esc_html( oy_teacher_name() ) ); // phpcs:ignore ?></p>
 		<?php endif; ?>
