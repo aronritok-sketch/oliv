@@ -2192,6 +2192,16 @@
   betűk között itt, mert nehezen olvasható”. A cím nagybetűs display betűjét az űrlap alapstílusa álkövérre (700)
   vastagította, ettől összefolytak a betűk. Most normál vastagság (400), 0,08em betűköz, kicsit nagyobb méret.
 
+- **2026-11-26 – Az előnézet leiratkozó linkje már semmit nem csinál; a stúdió visszakapcsolhatja egy vendég hírlevelét
+  (olivia-studio 1.30.3, oliviajoga.online 3.12.34).** Olívia a saját hírlevele előnézetében a „leiratkozás” linkre
+  kattintott, és leiratkozott; Áron: tegyük vissza, hogy mindent megkapjon.
+  - Az admin előnézetében és a tesztlevélben a leiratkozó link csak egy „Ez csak egy előnézet” oldalt mutat. A valódi
+    hírlevélben a link változatlanul működik.
+  - Új: a Vendégek oldalon, a vendég adatlapján „Bekapcsolás (kérte)” / „Kikapcsolás” gomb a hírlevélhez, és ugyanez REST-en
+    is (`/oys/v1/customers/<id>/newsletter`, csak a stúdiónak).
+  - Olívia hírlevelét ezen keresztül kapcsoltam vissza az élő oldalon. A többi értesítőjét a kattintás nem érintette.
+  - Tesztek: 1939/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

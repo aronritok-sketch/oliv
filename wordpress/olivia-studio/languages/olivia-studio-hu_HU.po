@@ -9423,3 +9423,21 @@ msgstr "Kérem a hírlevelet (események, workshopok). Bármikor leiratkozhatok;
 
 msgid "Thank you for signing up for my newsletter! Tap the button to confirm it, and I'll let you know about new events and workshops."
 msgstr "Köszönöm, hogy feliratkoztál a hírlevelemre! Koppints a gombra a megerősítéshez, és szólok az új eseményekről és workshopokról."
+
+msgid "This is only a preview"
+msgstr "Ez csak egy előnézet"
+
+msgid "In the real newsletter this link unsubscribes the reader. In a preview or a test email it does nothing: you are still subscribed."
+msgstr "Az igazi hírlevélben ezzel a linkkel iratkozik le az olvasó. Az előnézetben és a tesztlevélben nem csinál semmit: továbbra is fel vagy iratkozva."
+
+msgid "Switch it off"
+msgstr "Kikapcsolás"
+
+msgid "Switch it on (they asked for it)"
+msgstr "Bekapcsolás (kérte)"
+
+msgid "The newsletter is off for them."
+msgstr "Kikapcsoltad neki a hírlevelet."
+
+msgid "They get the newsletter again."
+msgstr "Újra megkapja a hírlevelet."

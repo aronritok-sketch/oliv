@@ -6114,6 +6114,41 @@ test( 'Áron 26 Nov: the lab page – the check, the rooms with their moments an
 	live_off();
 } );
 
+
+test( 'Olívia 26 Nov: the unsubscribe link of the preview and the test email does nothing; the studio can switch a customer\'s newsletter back on', function () {
+	$o = make_user( 'Olivia' );
+	update_user_meta( $o, 'oys_marketing', '1' );
+	$id = OYS_Newsletter::save( array( 'subject' => 'Hírek', 'body' => "Szia {first_name}!\n\nÚj workshop." ) );
+	$n  = OYS_Newsletter::get( $id );
+	[ , $html ] = OYS_Newsletter::email_for( $n, $o, true );
+	ok( str_contains( $html, 'oys_unsub=preview' ) && ! str_contains( $html, 'oys_unsub=' . $o . '.' ), 'the preview: a harmless unsubscribe link' );
+	$log = sent_mails( fn() => OYS_Newsletter::send_test( $id, get_userdata( $o )->user_email ) );
+	ok( 1 === count( $log ) && str_contains( $log[0]['html'], 'oys_unsub=preview' ), 'the test email too' );
+	$admin = (string) file_get_contents( WP_PLUGIN_DIR . '/olivia-studio/includes/admin/class-admin.php' );
+	ok( str_contains( $admin, 'OYS_Newsletter::email_for( $n, get_current_user_id(), true )' ), 'the admin preview uses it' );
+	add_filter( 'wp_die_handler', fn() => function ( $msg, $t, $args ) { throw new RuntimeException( 'die:' . ( $args['response'] ?? 0 ) ); } );
+	$_GET['oys_unsub'] = 'preview';
+	try { OYS_Newsletter::maybe_unsubscribe(); } catch ( RuntimeException $e ) { eq( 'die:200', $e->getMessage(), '„This is only a preview”' ); }
+	unset( $_GET['oys_unsub'] );
+	remove_all_filters( 'wp_die_handler' );
+	eq( '1', get_user_meta( $o, 'oys_marketing', true ), '… and she is still subscribed' );
+	[ , $real ] = OYS_Newsletter::email_for( $n, $o );
+	ok( str_contains( $real, 'oys_unsub=' . $o . '.' ), 'the real newsletter keeps the real link' );
+	// switched back on by the studio (her own click from before)
+	update_user_meta( $o, 'oys_marketing', '' );
+	list( $code, $data ) = live_owner_req( 'GET', '/customers/' . $o . '/newsletter' );
+	ok( 200 === $code && false === $data['newsletter'] && 'Olivia' === get_userdata( $o )->first_name, 'the studio sees it is off' );
+	$req = new WP_REST_Request( 'POST', '/oys/v1/customers/' . $o . '/newsletter' );
+	$req->set_param( 'on', 1 );
+	wp_set_current_user( get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0] );
+	$res = rest_do_request( $req );
+	wp_set_current_user( 0 );
+	ok( 200 === $res->get_status() && true === $res->get_data()['newsletter'] && '1' === get_user_meta( $o, 'oys_marketing', true ), 'switched on again' );
+	list( $code ) = api( 'GET', '/customers/' . $o . '/newsletter' );
+	ok( in_array( $code, array( 401, 403 ), true ), 'only the studio' );
+	ok( str_contains( $admin, "self::form( 'customer_newsletter'" ), 'and on the customer\'s page: „Switch it on (they asked for it)”' );
+} );
+
 $t = $GLOBALS['oys_t'];
 echo "\n{$t['pass']} assertions passed, {$t['fail']} failed\n";
 exit( $t['fail'] ? 1 : 0 );

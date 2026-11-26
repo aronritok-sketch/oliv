@@ -24,7 +24,7 @@ class OYS_Admin {
 			}
 		} );
 		$actions = array( 'save_session', 'cancel_session', 'roster', 'save_template', 'delete_template', 'generate', 'private_offer', 'private_decline',
-			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'live_test', 'live_test_open', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'smtp_test', 'hpv_register', 'message', 'pay_later_reset', 'customer_extend', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_delete', 'save_ai', 'import_customers', 'subscriber_add', 'subscriber_remove', 'subscribers_export' );
+			'grant_pass', 'adjust_pass', 'refund', 'save_product', 'delete_product', 'save_settings', 'cancel_booking', 'membership', 'zoom_test', 'live_test', 'live_test_open', 'zoom_start', 'zoom_create', 'save_emails', 'save_email_template', 'reset_email_template', 'test_email', 'smtp_test', 'hpv_register', 'message', 'pay_later_reset', 'customer_extend', 'customer_newsletter', 'save_locations', 'coupon_create', 'coupon_delete', 'save_rewards', 'raffle_draw', 'newsletter_save', 'newsletter_ai', 'newsletter_test', 'newsletter_send', 'newsletter_delete', 'save_ai', 'import_customers', 'subscriber_add', 'subscriber_remove', 'subscribers_export' );
 		foreach ( $actions as $a ) {
 			add_action( 'admin_post_oys_admin_' . $a, array( __CLASS__, 'guard' ) );
 		}
@@ -439,6 +439,12 @@ class OYS_Admin {
 		self::back( 'oys-customers', array( 'user' => $user_id ), __( 'Saved.', 'olivia-studio' ) );
 	}
 
+	private static function do_customer_newsletter() {
+		$user_id = (int) $_POST['user'];
+		OYS_Newsletter::set_customer( $user_id, ! empty( $_POST['on'] ) );
+		self::back( 'oys-customers', array( 'user' => $user_id ), empty( $_POST['on'] ) ? __( 'The newsletter is off for them.', 'olivia-studio' ) : __( 'They get the newsletter again.', 'olivia-studio' ) );
+	}
+
 	private static function do_pay_later_reset() {
 		$user_id = (int) $_POST['user'];
 		update_user_meta( $user_id, 'oys_pay_later_reset', oys_now() );
@@ -665,7 +671,8 @@ class OYS_Admin {
 			. '<p><b>' . esc_html__( 'Emergency', 'olivia-studio' ) . ':</b> ' . $m( 'oys_emergency_name' ) . ' ' . $m( 'oys_emergency_phone' ) . '</p>' // phpcs:ignore
 			. '<p><b>' . esc_html__( 'Health notes', 'olivia-studio' ) . ':</b><br>' . nl2br( $m( 'oys_health_notes' ) ) . '</p>' // phpcs:ignore
 			. '<p><b>' . esc_html__( 'Agreement', 'olivia-studio' ) . ':</b> ' . ( OYS_Customers::has_waiver( $user_id ) ? esc_html( sprintf( __( 'accepted %s', 'olivia-studio' ), oys_date( get_user_meta( $user_id, 'oys_waiver_at', true ) ) ) ) : esc_html__( 'not accepted (current version)', 'olivia-studio' ) ) . '</p>'
-			. '<p><b>' . esc_html__( 'Newsletter', 'olivia-studio' ) . ':</b> ' . ( get_user_meta( $user_id, 'oys_marketing', true ) ? esc_html__( 'yes', 'olivia-studio' ) : esc_html__( 'no', 'olivia-studio' ) ) . '</p>'
+			. '<p><b>' . esc_html__( 'Newsletter', 'olivia-studio' ) . ':</b> ' . ( get_user_meta( $user_id, 'oys_marketing', true ) ? esc_html__( 'yes', 'olivia-studio' ) : esc_html__( 'no', 'olivia-studio' ) ) . ' '
+			. self::form( 'customer_newsletter', 'class="oys-inline"' ) . '<input type="hidden" name="user" value="' . (int) $user_id . '"><input type="hidden" name="on" value="' . ( get_user_meta( $user_id, 'oys_marketing', true ) ? '0' : '1' ) . '"><button class="button button-small">' . esc_html( get_user_meta( $user_id, 'oys_marketing', true ) ? __( 'Switch it off', 'olivia-studio' ) : __( 'Switch it on (they asked for it)', 'olivia-studio' ) ) . '</button></form></p>'
 			. self::pay_later_status( $user_id ) . '</div>';
 		$imported = array_filter( array_map( fn( $k ) => (string) get_user_meta( $user_id, 'oys_' . $k, true ), array_combine( OYS_Import::FIELDS, OYS_Import::FIELDS ) ), 'strlen' );
 		if ( $imported ) {
@@ -1344,7 +1351,7 @@ class OYS_Admin {
 				. '<p><button class="button button-primary">' . esc_html__( 'Save draft', 'olivia-studio' ) . '</button> <button class="button" name="and_test" value="1">' . esc_html( sprintf( __( 'Save and send a test to %s', 'olivia-studio' ), wp_get_current_user()->user_email ) ) . '</button></p></form>';
 		}
 		if ( $n ) {
-			[ $subject, $html ] = OYS_Newsletter::email_for( $n, get_current_user_id() );
+			[ $subject, $html ] = OYS_Newsletter::email_for( $n, get_current_user_id(), true ); // the unsubscribe link of the preview does nothing
 			echo '<h2>' . esc_html__( 'Preview', 'olivia-studio' ) . '</h2><p><b>' . esc_html( $subject ) . '</b>' . ( $n->preheader ? ' — <span class="description">' . esc_html( $n->preheader ) . '</span>' : '' ) . '</p>'
 				. '<iframe class="oys-preview" title="' . esc_attr__( 'Email preview', 'olivia-studio' ) . '" srcdoc="' . esc_attr( $html ) . '" style="width:100%;max-width:640px;height:640px;border:1px solid #dcdcde;background:#fff"></iframe>';
 			if ( $edit ) {

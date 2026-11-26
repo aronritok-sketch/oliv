@@ -29,8 +29,41 @@ class OYS_Newsletter {
 		add_action( 'admin_post_oys_nl_subscribe', array( __CLASS__, 'handle_subscribe' ) );
 		add_shortcode( 'oys_newsletter', fn( $a ) => self::form_html( shortcode_atts( array( 'source' => 'online', 'title' => '', 'text' => '', 'id' => 'hirlevel' ), (array) $a ) ) );
 		add_action( 'oys_hourly', array( __CLASS__, 'list_cleanup' ) );
+		add_action( 'rest_api_init', array( __CLASS__, 'routes' ) );
 		add_action( 'added_user_meta', array( __CLASS__, 'sync_customer_tick' ), 10, 4 );
 		add_action( 'updated_user_meta', array( __CLASS__, 'sync_customer_tick' ), 10, 4 );
+	}
+
+	/**
+	 * The studio switches a customer's newsletter on or off (someone asked by phone, or clicked the link in a preview):
+	 * GET /oys/v1/customers/<id>/newsletter, POST with on=1|0.
+	 */
+	public static function routes() {
+		register_rest_route( 'oys/v1', '/customers/(?P<id>\d+)/newsletter', array(
+			'methods'             => array( 'GET', 'POST' ),
+			'permission_callback' => fn() => current_user_can( 'oys_manage' ),
+			'callback'            => function ( WP_REST_Request $r ) {
+				$u = get_userdata( (int) $r['id'] );
+				if ( ! $u ) {
+					return new WP_Error( 'oys_nl', 'Not found.', array( 'status' => 404 ) );
+				}
+				if ( 'POST' === $r->get_method() ) {
+					self::set_customer( $u->ID, (bool) $r->get_param( 'on' ) );
+				}
+				return rest_ensure_response( array( 'id' => (int) $u->ID, 'name' => $u->display_name, 'newsletter' => '1' === (string) get_user_meta( $u->ID, 'oys_marketing', true ) ) );
+			},
+		) );
+	}
+
+	/** A customer's newsletter on or off (their signup-form address follows). */
+	public static function set_customer( $user_id, $on ) {
+		update_user_meta( (int) $user_id, 'oys_marketing', $on ? '1' : '' );
+		$u = get_userdata( (int) $user_id );
+		$r = $u ? self::list_by_email( $u->user_email ) : null;
+		if ( $on && $r && 'confirmed' !== $r->status ) {
+			global $wpdb;
+			$wpdb->update( self::list_table(), array( 'status' => 'confirmed', 'confirmed_at' => oys_now(), 'unsub_at' => null ), array( 'id' => (int) $r->id ) );
+		}
 	}
 
 	/** A customer who unticks the newsletter in their account is off the signup list too (one choice for one address). */
@@ -330,6 +363,9 @@ class OYS_Newsletter {
 		if ( empty( $_GET['oys_unsub'] ) ) {
 			return;
 		}
+		if ( 'preview' === $_GET['oys_unsub'] ) { // phpcs:ignore
+			wp_die( '<h1>' . esc_html__( 'This is only a preview', 'olivia-studio' ) . '</h1><p>' . esc_html__( 'In the real newsletter this link unsubscribes the reader. In a preview or a test email it does nothing: you are still subscribed.', 'olivia-studio' ) . '</p>', esc_html__( 'Newsletter', 'olivia-studio' ), array( 'response' => 200 ) ); // phpcs:ignore
+		}
 		[ $uid, $sig ] = array_pad( explode( '.', sanitize_text_field( wp_unslash( $_GET['oys_unsub'] ) ), 2 ), 2, '' );
 		if ( ! (int) $uid || ! hash_equals( self::sig( (int) $uid ), $sig ) ) {
 			wp_die( esc_html__( 'This unsubscribe link is not valid.', 'olivia-studio' ), '', array( 'response' => 400 ) );
@@ -409,13 +445,13 @@ class OYS_Newsletter {
 		return preg_replace_callback( '/(?<!["=>])\bhttps?:\/\/[^\s<]+/', fn( $m ) => '<a href="' . esc_url( html_entity_decode( $m[0] ) ) . '" style="color:#2B5036">' . $m[0] . '</a>', $s );
 	}
 
-	/** The email as a subscriber sees it. @return array [ subject, html ] */
-	public static function email_for( $n, $user_id = 0 ) {
+	/** The email as a subscriber sees it ($preview: the admin's preview or a test – the unsubscribe link does nothing). @return array [ subject, html ] */
+	public static function email_for( $n, $user_id = 0, $preview = false ) {
 		$u    = $user_id ? get_userdata( $user_id ) : null;
 		$vars = array( 'first_name' => $u ? ( $u->first_name ?: $u->display_name ) : __( 'there', 'olivia-studio' ), 'studio' => OYS_Settings::get( 'email_from_name' ) );
 		$body = self::render( OYS_Email_Templates::fill( $n->body, $vars ) );
 		$cta  = $n->button_label && $n->button_url ? array( $n->button_label, $n->button_url ) : null;
-		$foot = $user_id ? self::unsubscribe_url( $user_id ) : '#';
+		$foot = $preview ? add_query_arg( 'oys_unsub', 'preview', home_url( '/' ) ) : ( $user_id ? self::unsubscribe_url( $user_id ) : '#' );
 		return array( OYS_Email_Templates::fill( $n->subject, $vars ), OYS_Emails::newsletter_html( $n->subject, $n->preheader, $body, $cta, $foot ) );
 	}
 
@@ -595,7 +631,7 @@ class OYS_Newsletter {
 			return false;
 		}
 		$u = get_user_by( 'email', $to );
-		[ $subject, $html ] = self::email_for( $n, $u ? $u->ID : 0 );
+		[ $subject, $html ] = self::email_for( $n, $u ? $u->ID : 0, true );
 		return OYS_Emails::send_raw( $to, __( '[Test]', 'olivia-studio' ) . ' ' . $subject, $html );
 	}
 
