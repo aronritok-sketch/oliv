@@ -2188,6 +2188,10 @@
   - a megerősítő e-mail és a köszönőoldal.
   check.py és run.php figyeli. Tesztek: 4390/0, 1385/0, 1928/0.
 
+- **2026-11-26 – A .online láblécében a „Hírlevél” cím olvashatóbb (3.12.33).** Áron: „legyen egy picit nagyobb táv a
+  betűk között itt, mert nehezen olvasható”. A cím nagybetűs display betűjét az űrlap alapstílusa álkövérre (700)
+  vastagította, ettől összefolytak a betűk. Most normál vastagság (400), 0,08em betűköz, kicsit nagyobb méret.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

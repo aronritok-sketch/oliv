@@ -1808,5 +1808,6 @@ a.oj-voucher:hover, a.oj-voucher:focus-visible { transform: translateY(-2px); bo
 /* The newsletter signup in the footer (Áron, 26 November) */
 .footer__nl { margin: 2.4rem 0 0; padding: 1.6rem 0 0; border-top: 1px solid color-mix(in srgb, currentColor 22%, transparent); }
 .footer__nl .oys-nl { max-width: 720px; }
-.footer__nl .oys-nl__title { font-family: var(--f-display); text-transform: uppercase; font-size: clamp(1.3rem, 1.1rem + .6vw, 1.7rem); color: var(--paper, #fff); }
+/* Áron, 26 November: „legyen egy picit nagyobb táv a betűk között, mert nehezen olvasható” – no faux bold, more air */
+.footer__nl .oys-nl__title { font-family: var(--f-display); font-weight: 400; text-transform: uppercase; letter-spacing: .08em; line-height: 1.1; font-size: clamp(1.35rem, 1.15rem + .6vw, 1.75rem); color: var(--paper, #fff); }
 .footer__nl .oys-nl__field input { border-color: transparent; }
