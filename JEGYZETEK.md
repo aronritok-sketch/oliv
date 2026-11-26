@@ -2407,6 +2407,22 @@
   - 180 napig marad meg. Csak a stúdió (oys_manage) látja.
   - A szöveg mindig a stúdió nyelvén (magyarul) készül, akkor is, ha webhook vagy cron írja.
   - Teszt: 2073 sikeres, 0 hibás. Helyi gépen képernyőképpel ellenőrizve (390 px és 1366 px).
+- **2026-11-26 – A Hub az iPhone-appban végig görgethető (olivia-studio 1.34.1, oliviajoga.online 3.12.49).**
+  Áron (videó az iPhone-ra mentett appról): „Nem lehet görgetni benne … optimalizáld 100%-ra telefonra a hubot”.
+  - A hiba: telefonon a tartalom doboza (`.hub-main`) `top: 0` + `height: 100%` volt, így az alsó távolsága nem
+    érvényesült. Minden nézet utolsó 70–100 pixele az alsó sáv alá került, oda nem lehetett görgetni
+    (a „Legutóbbi befizetések” levágva, a lista visszaugrott).
+  - Javítások:
+    - a panel az alsó sáv fölött végződik;
+    - nincs rugózó oldal az app mögött (`overscroll-behavior`);
+    - mezőre koppintva nincs nagyítás (16 px-es betű);
+    - az óra/állapotsor és az alsó csík saját helyet kap (`viewport-fit=cover`, `safe-area`);
+    - a billentyűzet nem takarja el az üzenetmezőt (visualViewport);
+    - lent 5 fül (Ma, Üzenetek, Értesítések, Naptár, Több), a Beállításaim a Több első csempéje;
+    - a Több nézetet egy régi stílusütközés 10 px-szel lejjebb tolta, ez is javítva.
+  - Ellenőrzés: iPhone 14 Pro emuláció, WebKit (Safari-motor). Minden nézet (Ma, Értesítések, Naptár, Több,
+    Beállításaim, Kimutatások, Üzenetek, beszélgetés) legörgetve az alsó sáv fölött ér véget. Tesztek: 2080 sikeres,
+    0 hibás.
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).

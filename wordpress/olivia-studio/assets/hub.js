@@ -957,6 +957,7 @@
 	/* ---------- More ---------- */
 	function renderMore() {
 		$( '[data-panel="more"]' ).innerHTML = '<h1 class="hub-title">' + esc( T.more ) + '</h1><div class="hub-tiles">' +
+			'<button type="button" class="hub-tile hub-tile--phone" data-goview="settings">' + icon( 'gear' ) + '<b>' + esc( T.settings ) + '</b></button>' +
 			( B.manage ? '<button type="button" class="hub-tile" data-goview="reports">' + icon( 'chart' ) + '<b>' + esc( T.reports ) + '</b><small>' + esc( T.reportsSub ) + '</small></button>' : '' ) +
 			B.links.map( ( l ) => '<a class="hub-tile" href="' + esc( l[ 2 ] ) + '"' + ( 'globe' === l[ 0 ] ? ' target="_blank" rel="noopener"' : '' ) + '>' + icon( l[ 0 ] ) + '<b>' + esc( l[ 1 ] ) + '</b>' + ( l[ 3 ] ? '<small>' + esc( l[ 3 ] ) + '</small>' : '' ) + '</a>' ).join( '' ) +
 			'<a class="hub-tile hub-tile--quiet" href="' + esc( B.logout ) + '">' + icon( 'logout' ) + '<b>' + esc( T.logout ) + '</b></a></div>';
@@ -1207,6 +1208,24 @@
 	}
 	function refreshCountsSoon() {
 		setTimeout( poll, 600 );
+	}
+
+	/* ---------- iPhone: the Hub stays inside what is visible (the keyboard, the browser's bars) ---------- */
+	const vv = window.visualViewport;
+	if ( vv ) {
+		const fit = () => {
+			if ( ! isPhone() ) {
+				root.style.removeProperty( '--hub-vv-h' );
+				root.style.removeProperty( '--hub-vv-top' );
+				return;
+			}
+			root.style.setProperty( '--hub-vv-h', Math.round( vv.height ) + 'px' );
+			root.style.setProperty( '--hub-vv-top', Math.max( 0, Math.round( vv.offsetTop ) ) + 'px' );
+		};
+		vv.addEventListener( 'resize', fit );
+		vv.addEventListener( 'scroll', fit );
+		window.addEventListener( 'orientationchange', () => setTimeout( fit, 300 ) );
+		fit();
 	}
 
 	/* ---------- start ---------- */

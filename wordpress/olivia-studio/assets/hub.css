@@ -316,8 +316,8 @@ body.oys-hub-screen .screen-reader-text:not(:focus) { position: absolute; width:
 .hub-tile small { color: var(--hub-muted); font-size: 12.5px; }
 .hub-tile--quiet .hub-i { color: var(--hub-muted); }
 .hub-form input[type=text], .hub-form textarea { width: 100%; padding: 10px 14px; border: 1.5px solid var(--hub-line); border-radius: 12px; font: inherit; font-size: 16px; }
-.hub-switch { display: flex; align-items: center; gap: 12px; margin: 10px 0; cursor: pointer; }
-.hub-switch input { position: absolute; opacity: 0; }
+.hub-switch { position: relative; display: flex; align-items: center; gap: 12px; margin: 10px 0; cursor: pointer; }
+.hub-switch input { position: absolute; top: 0; left: 0; width: 46px; height: 28px; margin: 0; opacity: 0; }
 .hub-switch span { position: relative; flex: none; width: 46px; height: 28px; border-radius: 99px; background: #cfd8d3; transition: background .15s; }
 .hub-switch span::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); transition: transform .15s; }
 .hub-switch input:checked + span { background: var(--hub-forest); }
@@ -460,8 +460,8 @@ body.oys-hub-screen .screen-reader-text:not(:focus) { position: absolute; width:
 .hub-sum--hot .hub-sum__val { font-size: 30px; }
 @media (min-width: 700px) { .hub-sum--hot { grid-column: span 2; } }
 .hub-sum--warn { background: var(--hub-sun-soft); }
-.hub-more { margin: 10px 2px 0; }
-.hub-more a { font-weight: 700; color: var(--hub-forest); text-decoration: none; }
+p.hub-more { margin: 10px 2px 0; }
+p.hub-more a { font-weight: 700; color: var(--hub-forest); text-decoration: none; }
 /* the five tabs on a narrow phone: „Beállításaim” is not cut off */
 @media (max-width: 899px) {
 	.hub-nav__tab { min-width: 0; }
@@ -614,4 +614,35 @@ html.oys-app body.oys-hub-screen #wpcontent { margin-left: 0 !important; }
 	.hub-alerts { padding: 18px 14px 96px; }
 	.hub-act-item > button, .hub-act-item > div { grid-template-columns: 34px 1fr auto; gap: 10px; padding: 12px; }
 	.hub-act-ic { width: 34px; height: 34px; border-radius: 10px; }
+}
+
+/* ==========================================================================
+   Áron, 26 November (a video from the iPhone app): „Nem lehet görgetni benne … optimalizáld 100%-ra telefonra a hubot”.
+   - The panel ran under the bottom bar: .hub-main had top + height: 100%, so its bottom inset was ignored and the last
+     ~70–100 px of every view could never be scrolled into sight („Latest payments” cut off, the list jumping back).
+   - iPhone: no rubber-banding page behind the app, no zoom on tapping a field (16 px), the status bar and the home bar
+     get their own space (viewport-fit=cover), the keyboard does not cover the message box (visualViewport, hub.js).
+   - Five tabs at the bottom; My settings is the first tile under More.
+   ========================================================================== */
+.hub-tile--phone { display: none; }
+@media (max-width: 899px) {
+	html:has(body.oys-hub-screen), body.oys-hub-screen { height: 100%; overflow: hidden; overscroll-behavior: none; }
+	body.oys-hub-screen { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+	body.oys-hub-screen .hub {
+		top: var(--hub-vv-top, 0px);
+		bottom: auto;
+		height: var(--hub-vv-h, 100%);
+		padding-top: 0;
+		touch-action: manipulation;
+		-webkit-tap-highlight-color: transparent;
+	}
+	body.oys-hub-screen .hub::before { content: ""; position: absolute; top: 0; left: 0; right: 0; z-index: 9; height: env(safe-area-inset-top, 0px); background: var(--hub-cream); pointer-events: none; }
+	.hub-main { top: env(safe-area-inset-top, 0px); bottom: calc(68px + env(safe-area-inset-bottom, 0px)); height: auto; }
+	.hub.is-conv .hub-main { bottom: 0; }
+	.hub-view, .hub-items, .hub-msgs, .hub-ctx { overscroll-behavior-y: contain; -webkit-overflow-scrolling: touch; }
+	.hub input, .hub textarea, .hub select { font-size: 16px !important; }
+	.hub-nav__tab--settings { display: none; }
+	.hub-tile--phone { display: grid; }
+	.hub-alerts { padding-bottom: 30px; }
+	.hub-today, .hub-more, .hub-settings, .hub-week, .hub-reports, .hub-alerts { padding-bottom: 40px; }
 }

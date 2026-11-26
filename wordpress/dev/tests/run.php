@@ -6715,6 +6715,21 @@ test( 'Áron 26 Nov: Notifications – „értesítések fület az adminba is, m
 	wp_set_current_user( 0 );
 } );
 
+test( 'Áron 26 Nov (video from the iPhone app): „Nem lehet görgetni benne … optimalizáld 100%-ra telefonra a hubot”', function () {
+	$css = (string) file_get_contents( OYS_DIR . 'assets/hub.css' );
+	$js  = (string) file_get_contents( OYS_DIR . 'assets/hub.js' );
+	ok( str_contains( $css, '.hub-main { top: env(safe-area-inset-top, 0px); bottom: calc(68px + env(safe-area-inset-bottom, 0px)); height: auto; }' ), 'the panel ends above the bottom bar (height: 100% no longer overrides the bottom inset)' );
+	ok( str_contains( $css, 'overscroll-behavior: none' ) && str_contains( $css, 'overscroll-behavior-y: contain' ), 'no rubber-banding page behind the app' );
+	ok( str_contains( $css, '.hub input, .hub textarea, .hub select { font-size: 16px !important; }' ), 'no zoom on tapping a field (16 px)' );
+	ok( str_contains( $js, "root.style.setProperty( '--hub-vv-h'" ) && str_contains( $css, 'height: var(--hub-vv-h, 100%)' ), 'the keyboard does not cover the message box (visualViewport)' );
+	ok( str_contains( $css, '.hub-nav__tab--settings { display: none; }' ) && str_contains( $js, 'hub-tile hub-tile--phone" data-goview="settings"' ), 'five tabs on a phone; My settings is the first tile under More' );
+	ok( str_contains( $css, 'p.hub-more { margin: 10px 2px 0; }' ), 'the More view is no longer pushed down by the „more” link style' );
+	if ( ! class_exists( 'OYS_Hub_Admin' ) ) {
+		require_once OYS_DIR . 'includes/admin/class-hub-admin.php';
+	}
+	ok( str_contains( (string) file_get_contents( OYS_DIR . 'includes/admin/class-hub-admin.php' ), "admin_viewport_meta', fn( \$m ) => self::is_hub_screen() ? \$m . ',viewport-fit=cover'" ), 'the Hub uses the whole iPhone screen and keeps the status bar and the home bar free itself' );
+} );
+
 $t = $GLOBALS['oys_t'];
 echo "\n{$t['pass']} assertions passed, {$t['fail']} failed\n";
 exit( $t['fail'] ? 1 : 0 );

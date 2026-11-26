@@ -18,6 +18,9 @@ class OYS_Hub_Admin {
 		add_filter( 'admin_body_class', function ( $c ) {
 			return self::is_hub_screen() ? $c . ' oys-hub-screen folded' : $c;
 		} );
+		// iPhone (the app on the home screen): the page may use the whole screen, the Hub keeps the status bar and the
+		// home bar free itself (env(safe-area-inset-*)); without this the bars cover the top and the bottom of the Hub
+		add_filter( 'admin_viewport_meta', fn( $m ) => self::is_hub_screen() ? $m . ',viewport-fit=cover' : $m );
 	}
 
 	public static function is_hub_screen() {
