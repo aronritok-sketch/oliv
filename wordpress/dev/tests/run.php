@@ -4796,6 +4796,12 @@ test( 'going live: the manager can check the site from outside (X-OYS-Auth, /sta
 	$json = wp_json_encode( $st );
 	OYS_Settings::update( array( 'stripe_secret_key' => '' ) );
 	ok( isset( $st['mail']['smtp'], $st['payments']['provider'], $st['site']['search_engines'], $st['schedule']['upcoming_60_days'], $st['people']['customers'] ) && ! str_contains( (string) $json, 'sk_test_hidden_123' ) && 'set' === $st['settings']['stripe_secret_key'], 'the status: mail, payments, search engines, schedule, customers – keys only as set or missing' );
+	$hpv0 = get_option( OYS_HPV_Pay::OPTION );
+	update_option( OYS_HPV_Pay::OPTION, array( 'secret' => 'hpvsecret_hidden_456', 'site' => 's1', 'mode' => 'live', 'registered' => time(), 'error' => '' ), false );
+	$st   = OYS_Ops::status();
+	$json = wp_json_encode( $st );
+	false === $hpv0 ? delete_option( OYS_HPV_Pay::OPTION ) : update_option( OYS_HPV_Pay::OPTION, $hpv0, false );
+	ok( 'live' === $st['payments']['crm']['mode'] && '' !== $st['payments']['crm']['registered'] && is_array( $st['payments']['orders_30d'] ) && array_key_exists( 'last_paid', $st['payments']['orders_30d'] ) && ! str_contains( (string) $json, 'hpvsecret_hidden_456' ), 'the status shows the CRM payment mode and the orders by status, never the CRM secret' );
 } );
 
 test( 'reviews (Olívia, 11.17): only attended students write, name/first name/anonymous, nothing shows before approval, one request each', function () {

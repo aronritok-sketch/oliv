@@ -101,6 +101,28 @@ class OYS_Ops {
 	}
 
 	/** What a manager needs to know before going live. Secrets only as set / missing. */
+	/** The CRM payment connection without its secret: live or test payments, since when, the last error. */
+	private static function crm_pay() {
+		$o = OYS_HPV_Pay::state();
+		return array(
+			'mode'       => (string) $o['mode'],
+			'registered' => $o['registered'] ? wp_date( 'Y-m-d H:i', (int) $o['registered'] ) : '',
+			'error'      => (string) $o['error'],
+		);
+	}
+
+	/** Orders of the last 30 days by status, and when the last one was paid: shows a checkout that gets stuck. */
+	private static function order_counts() {
+		global $wpdb;
+		$t   = OYS_Install::table( 'orders' );
+		$out = array();
+		foreach ( (array) $wpdb->get_results( $wpdb->prepare( "SELECT status, COUNT(*) AS n FROM $t WHERE created_at >= %s GROUP BY status", oys_utc_plus( -30 * DAY_IN_SECONDS ) ) ) as $row ) {
+			$out[ (string) $row->status ] = (int) $row->n;
+		}
+		$out['last_paid'] = (string) $wpdb->get_var( "SELECT MAX(paid_at) FROM $t WHERE status IN ('paid','partially_refunded','refunded')" );
+		return $out;
+	}
+
 	public static function status() {
 		global $wp_version;
 		$secret = fn( $k ) => (bool) preg_match( '/(secret|pass|key|token|signing|webhook)/i', $k );
@@ -150,6 +172,8 @@ class OYS_Ops {
 				'ready'        => OYS_Settings::payments_ready(),
 				'hpv_pay'      => get_option( OYS_HPV_Pay::OPTION ) ? 'registered' : 'not registered',
 				'currency'     => OYS_Settings::get( 'currency' ),
+				'crm'          => self::crm_pay(),
+				'orders_30d'   => self::order_counts(),
 			),
 			'pages'    => $pages,
 			'schedule' => array(

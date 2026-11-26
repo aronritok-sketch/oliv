@@ -2376,6 +2376,14 @@
     Addig a tesztlabor „Ellenőrzés indítása” nem sürgős.
   - Élő ellenőrzés: a főoldal, a Fiókom (regisztráció + nyilatkozat, Van fiókom), a Foglalás, az „Egyéni online jóga”
     oldal és az elfelejtett jelszó oldal mind 200, PHP-hiba nélkül.
+- **2026-11-26 – Fizetés: az állapotjelentésben is látszik, hogy működik (olivia-studio 1.33.5, oliviajoga.online 3.12.47).**
+  Áron: „De a fizetésnek is működnie kell, meg mindennek.”
+  - Az `/oys/v1/status` „payments” része két új mezőt kapott, mindkettő csak olvasható:
+    - `crm`: a CRM-fizetés módja (live/test), mióta él, és az utolsó hiba. A titok nem látszik.
+    - `orders_30d`: az utolsó 30 nap rendelései állapot szerint, plusz az utolsó fizetés ideje. Ebből látszik, ha egy
+      fizetés elakad (sok „pending” vagy „failed”).
+  - Élesben már volt valódi fizetés: 3 kifizetett rendelés van, az utolsó tegnapi (csoportos óra, 3 000 Ft).
+  - Teszt: a jelentés mutatja a módot és a rendeléseket, a CRM titkát soha.
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
