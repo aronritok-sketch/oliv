@@ -1955,6 +1955,7 @@ test( 'minimum: bring-a-friend email before the decision, once', function () {
 	eq( 'scheduled', OYS_Schedule::get( $s->id )->status, 'not decided yet' );
 	eq( 0, count( array_filter( sent_mails( fn() => OYS_Locations::run() ), fn( $m ) => get_userdata( $u )->user_email === $m['to'] ) ), 'sent once' );
 	ok( str_contains( OYS_Locations::notice( OYS_Schedule::get( $s->id ) ), 'goes ahead with 3 or more people' ), 'booking page explains the minimum' );
+	ok( preg_match( '/cancelled \d+ hours? before it starts/', OYS_Locations::notice( OYS_Schedule::get( $s->id ) ) ), 'how many hours before the class, not a day and an hour (Áron: „ne szer 15-ig, hanem előtte 3 órával”)' );
 	OYS_Settings::update( array( 'min_people_default' => 2, 'min_nudge_hours' => 12 ) );
 } );
 

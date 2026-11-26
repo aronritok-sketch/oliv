@@ -248,7 +248,7 @@ class OYS_Locations {
 
 	/** Public line for the booking page: "Goes ahead with 3 or more people…" or ''. */
 	public static function notice( $s ) {
-		[ $min ] = self::rule( $s );
+		[ $min, $hours ] = self::rule( $s );
 		$at      = self::decide_at( $s );
 		if ( ! $min || $min < 2 || 'scheduled' !== $s->status ) {
 			return '';
@@ -259,6 +259,8 @@ class OYS_Locations {
 		if ( time() >= $at ) {
 			return ''; // Being decided right now.
 		}
-		return sprintf( __( 'This class goes ahead with %1$d or more people. If fewer sign up, it\'s cancelled by %2$s and we let you know; your class comes back to you.', 'olivia-studio' ), $min, wp_date( oys_date_format( 'D g:i a' ), $at ) );
+		// Áron, 26 November: „ne így legyen, hogy szer 15-ig, hanem előtte 3 órával” – how long before, not a day and an hour
+		/* translators: 1: minimum number of people, 2: hours before the class */
+		return sprintf( _n( 'This class goes ahead with %1$d or more people. If fewer sign up, it\'s cancelled %2$d hour before it starts and we let you know; your class comes back to you.', 'This class goes ahead with %1$d or more people. If fewer sign up, it\'s cancelled %2$d hours before it starts and we let you know; your class comes back to you.', $hours, 'olivia-studio' ), $min, $hours );
 	}
 }

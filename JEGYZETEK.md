@@ -2202,6 +2202,13 @@
   - Olívia hírlevelét ezen keresztül kapcsoltam vissza az élő oldalon. A többi értesítőjét a kattintás nem érintette.
   - Tesztek: 1939/0.
 
+- **2026-11-26 – A minimum létszám szövege: „3 órával előtte” (olivia-studio 1.30.4, oliviajoga.online 3.12.35).** Áron
+  (képernyőkép a foglalási oldalról): „szer 15-ig. Na, ez ne így legyen … hanem előtte 3 órával … ha máskor lesz az óra,
+  akkor ez így nem lesz hiteles”. A foglalási oldalon és az appban mostantól: „Ez az óra legalább 3 fővel indul. Ha
+  kevesebben jelentkeznek, 3 órával előtte lemondjuk és szólunk; az alkalmad visszajár.” Az óraszám a helyszín / az óra
+  saját beállítása (`decide_hours`). A már foglalóknak szóló „Hozz egy barátot” e-mailben marad a pontos időpont, mert az
+  egy konkrét óráról szól. Teszt: 1940/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -9441,3 +9441,9 @@ msgstr "Kikapcsoltad neki a hírlevelet."
 
 msgid "They get the newsletter again."
 msgstr "Újra megkapja a hírlevelet."
+
+# Áron, 26 November: the minimum – how many hours before, not a day and an hour
+msgid "This class goes ahead with %1$d or more people. If fewer sign up, it's cancelled %2$d hour before it starts and we let you know; your class comes back to you."
+msgid_plural "This class goes ahead with %1$d or more people. If fewer sign up, it's cancelled %2$d hours before it starts and we let you know; your class comes back to you."
+msgstr[0] "Ez az óra legalább %1$d fővel indul. Ha kevesebben jelentkeznek, %2$d órával előtte lemondjuk és szólunk; az alkalmad visszajár."
+msgstr[1] "Ez az óra legalább %1$d fővel indul. Ha kevesebben jelentkeznek, %2$d órával előtte lemondjuk és szólunk; az alkalmad visszajár."
