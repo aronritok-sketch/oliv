@@ -382,6 +382,7 @@ function oy_handle_callback() {
 		$to = class_exists( 'OYS_Settings' ) ? OYS_Settings::get( 'notify_email' ) : get_option( 'admin_email' );
 		/* translators: %s: phone number */
 		wp_mail( $to, sprintf( __( 'Call-back request: %s', 'olivia-yoga' ), $phone ), sprintf( __( "Someone asked for a call back on the website.\n\nPhone number: %s", 'olivia-yoga' ), $phone ) );
+		do_action( 'oys_callback_request', $phone ); // the studio's Notifications (olivia-studio)
 	}
 	$done( true );
 	exit;

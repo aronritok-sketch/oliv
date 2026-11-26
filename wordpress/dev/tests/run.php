@@ -6570,6 +6570,151 @@ test( 'Áron 26 Nov: a guest from Motibro completing the account – the partici
 	ok( OYS_Customers::marketing_answered( $u ) && ! isset( OYS_Customers::missing( $u )['oys_marketing'] ), 'someone who signed up on the site already answered (the box on the form)' );
 } );
 
+test( 'Áron 26 Nov: Notifications – „értesítések fület az adminba is, meg a mobilapra is … Minden ilyen tevékenységről”', function () {
+	global $wpdb;
+	$wpdb->query( 'DELETE FROM ' . OYS_Activity::table() );
+	$staff = wp_insert_user( array( 'user_login' => 'act.staff.' . wp_rand(), 'user_email' => 'act.staff.' . wp_rand() . '@example.test', 'user_pass' => wp_generate_password(), 'role' => 'administrator', 'display_name' => 'Olívia' ) );
+	wp_set_current_user( 0 );
+	$last = fn() => OYS_Activity::feed( '', 0, 1 )['items'][0] ?? array();
+	$count = fn() => (int) $wpdb->get_var( 'SELECT COUNT(*) FROM ' . OYS_Activity::table() );
+
+	// a website message: in the Hub as a conversation, here with who and what, and it opens the conversation
+	do_action( 'oys_contact_message', array( 'name' => 'Kiss Anna', 'email' => 'anna.act@example.test', 'phone' => '', 'topic' => 'Egyéni óra', 'message' => 'Szeretnék egy egyéni órát kérni péntekre.' ) );
+	$it = $last();
+	ok( 'contact' === ( $it['type'] ?? '' ) && str_contains( $it['title'], 'Kiss Anna' ) && str_contains( $it['detail'], 'péntekre' ) && preg_match( '/^t\d+$/', $it['open'] ), 'a website message: who, what, and it opens the conversation' );
+	do_action( 'oys_callback_request', '+36 30 123 4567' );
+	ok( 'callback' === $last()['type'] && str_contains( $last()['title'], '+36 30 123 4567' ), 'a call-back request with the phone number (it was only an email before)' );
+
+	// accounts: a new account, once; logins on the website's form; a password asked for and set; the profile done
+	$u = make_user( 'Aktiv' );
+	OYS_Activity::on_signup( $u );
+	$n = $count();
+	OYS_Activity::on_signup( $u );
+	ok( 'signup' === $last()['type'] && $n === $count(), 'a new account is listed once' );
+	do_action( 'wp_login', 'x', get_userdata( $u ) );
+	ok( 'login' === $last()['type'] && str_contains( $last()['title'], 'Aktiv' ), 'a login on the website' );
+	$n = $count();
+	do_action( 'wp_login_failed', get_userdata( $u )->user_email );
+	eq( $n, $count(), 'a failed login elsewhere (wp-login.php, robots) is not news' );
+	$_POST['action'] = 'oys_login';
+	do_action( 'wp_login_failed', get_userdata( $u )->user_email );
+	do_action( 'wp_login_failed', 'nobody.here@example.test' );
+	unset( $_POST['action'] );
+	$f = OYS_Activity::feed( '', 0, 2 )['items'];
+	ok( 'login_failed' === $f[0]['type'] && str_contains( $f[0]['title'], 'nobody.here@example.test' ) && 'login_failed' === $f[1]['type'] && str_contains( $f[1]['title'], 'Aktiv' ), '… a failed one on the website\'s form: with the name, or the address typed' );
+	do_action( 'retrieve_password', get_userdata( $u )->user_login );
+	ok( 'reset_request' === $last()['type'], 'asked for a new password' );
+	do_action( 'after_password_reset', get_userdata( $u ), 'x' );
+	ok( 'password_set' === $last()['type'], '… and set it' );
+	OYS_Activity::on_profile( $u, true );
+	ok( 'completed' === $last()['type'] && 'accounts' === $last()['cat'], 'the profile complete: can book now' );
+
+	// bookings, payments
+	$s = make_session();
+	OYS_Passes::grant( $u, array( 'credits' => 2 ) );
+	$bid = OYS_Bookings::book_party( $u, $s, array( 'method' => 'credit', 'notify' => false ) );
+	ok( 'booked' === $last()['type'] && 's' . $s->id === $last()['open'] && str_contains( $last()['title'], 'Aktiv' ), 'a booking, which opens the class' );
+	OYS_Bookings::cancel( $bid, array( 'notify' => false ) );
+	ok( 'cancelled' === $last()['type'], 'a cancellation' );
+	$oid = OYS_Orders::create( array( 'user_id' => $u, 'description' => 'Csoportos flow jóga', 'amount_cents' => 300000, 'currency' => 'huf' ) );
+	ok( 'checkout' === $last()['type'] && str_contains( $last()['detail'], 'Csoportos flow jóga' ), 'a checkout started, with what and how much' );
+	OYS_Orders::mark_unpaid( $oid, 'failed' );
+	ok( 'failed' === $last()['type'] && 'payments' === $last()['cat'], 'a failed payment' );
+	$o2 = OYS_Orders::create( array( 'user_id' => $u, 'description' => 'Bérlet', 'amount_cents' => 2000000, 'currency' => 'huf' ) );
+	OYS_Orders::mark_unpaid( $o2, 'expired' );
+	ok( 'abandoned' === $last()['type'], 'a checkout left without paying' );
+
+	// the newsletter: signup from oliviajoga.hu, confirmed
+	$where = OYS_Activity::nl_where( 'footer', 'https://oliviajoga.hu/esemenyek/' );
+	ok( str_contains( $where, 'oliviajoga.hu/esemenyek/' ) && str_contains( $where, 'footer' ), 'where a newsletter signup came from: the site, the page, the form' );
+	OYS_Newsletter::subscribe( 'act.nl@example.test', 'Nóra', 'footer', 'https://oliviajoga.hu/' );
+	$row = OYS_Newsletter::list_by_email( 'act.nl@example.test' );
+	OYS_Newsletter::confirm( $row->id );
+	ok( 'nl_confirmed' === $last()['type'] && str_contains( $last()['title'], 'act.nl@example.test' ), 'a newsletter signup confirmed' );
+	OYS_Newsletter::list_unsubscribe( $row->id );
+	ok( 'nl_unsub' === $last()['type'], '… and an unsubscribe' );
+
+	// what the studio does itself is not news to it
+	wp_set_current_user( $staff );
+	$n = $count();
+	OYS_Activity::on_signup( make_user( 'ByStudio' ) );
+	do_action( 'wp_login', 'x', get_userdata( $staff ) );
+	eq( $n, $count(), 'the studio\'s own doings are not listed' );
+	wp_set_current_user( 0 );
+
+	// the push: the important ones, to whoever wants them
+	$keep = get_option( OYS_Studio_App::SUBS );
+	delete_option( OYS_Studio_App::SUBS );
+	$ep = 'https://push.example.test/send/activity';
+	OYS_Studio_App::subscribe( $staff, $ep, 'iPhone' );
+	OYS_Activity::on_signup( make_user( 'Pushy' ) );
+	$got = OYS_Studio_App::pull( $ep );
+	ok( 1 === count( $got ) && str_contains( $got[0]['title'], 'Pushy' ) && str_contains( $got[0]['url'], 'open=alerts' ), 'a new account arrives on the phone and opens Notifications' );
+	OYS_Activity::on_booked( OYS_Bookings::book_party( $u, $s, array( 'method' => 'credit', 'notify' => false ) ) );
+	$pushes = array_filter( OYS_Studio_App::pull( $ep ), fn( $p ) => str_starts_with( (string) $p['tag'], 'act-' ) );
+	eq( array(), array_values( $pushes ), 'a booking: listed, but no second push (the booking push already comes)' );
+	OYS_Hub::save_prefs( $staff, array( 'push_activity' => 0 ) );
+	OYS_Activity::on_signup( make_user( 'Quiet' ) );
+	eq( array(), OYS_Studio_App::pull( $ep ), 'switched off in My settings: listed, no push' );
+	ok( 0 === OYS_Hub::prefs( $staff )['push_activity'] && 1 === OYS_Hub::prefs( $u )['push_activity'], 'the switch is per person, on by default' );
+	OYS_Hub::save_prefs( $staff, array( 'push_activity' => 1 ) );
+	false === $keep ? delete_option( OYS_Studio_App::SUBS ) : update_option( OYS_Studio_App::SUBS, $keep, false );
+
+	// reading: unread, seen, by category, REST for the studio only
+	wp_set_current_user( $staff );
+	$unread = OYS_Activity::unread();
+	ok( $unread >= 15, 'unread for the studio: everything above (' . $unread . ')' );
+	$pay = OYS_Activity::feed( 'payments' );
+	ok( $pay['items'] && ! array_filter( $pay['items'], fn( $i ) => 'payments' !== $i['cat'] ) && $pay['cats']['payments'] >= 3, 'a category on its own, with its count' );
+	$res = rest_do_request( new WP_REST_Request( 'GET', '/oys/v1/hub/activity' ) );
+	ok( 200 === $res->get_status() && $res->get_data()['items'][0]['new'] && '' !== $res->get_data()['items'][0]['time'] && '' !== $res->get_data()['items'][0]['dayLabel'], 'the list over REST: new ones marked, with the day and the time' );
+	$req = new WP_REST_Request( 'POST', '/oys/v1/hub/activity/seen' );
+	$req->set_param( 'upto', $res->get_data()['items'][0]['id'] );
+	eq( 0, rest_do_request( $req )->get_data()['unread'], 'opened: nothing new' );
+	$poll = rest_do_request( new WP_REST_Request( 'GET', '/oys/v1/hub/poll' ) )->get_data();
+	ok( array_key_exists( 'activity', $poll ) && 0 === $poll['activity'], 'the Hub\'s poll brings the number for the tab' );
+	wp_set_current_user( $u );
+	eq( 403, rest_do_request( new WP_REST_Request( 'GET', '/oys/v1/hub/activity' ) )->get_status(), 'a customer cannot read it' );
+	wp_set_current_user( $staff );
+
+	// everywhere: the Hub tab, Studio → Notifications, the bell
+	$js = (string) file_get_contents( OYS_DIR . 'assets/hub.js' );
+	ok( str_contains( $js, "[ 'alerts', 'bell', T.alerts ]" ) && str_contains( $js, 'data-panel="alerts"' ) && str_contains( $js, "api( 'activity?cat='" ), 'the Hub (admin and phone app) has a Notifications tab' );
+	ok( str_contains( OYS_Studio_App::hub_target( 'alerts', $staff ), '#alerts' ), 'the app opens on it from a push' );
+	if ( ! class_exists( 'OYS_Hub_Admin' ) ) {
+		require_once OYS_DIR . 'includes/admin/class-hub-admin.php';
+	}
+	$_GET['page'] = 'oys-activity';
+	ok( str_contains( (string) file_get_contents( OYS_DIR . 'includes/admin/class-hub-admin.php' ), "array( 'oys', 'oys-hub', 'oys-activity' )" ) && 'alerts' === ( new ReflectionMethod( 'OYS_Hub_Admin', 'boot_data' ) )->invoke( null )['start'], 'Studio → Notifications opens the Hub on the tab' );
+	unset( $_GET['page'] );
+	wp_set_current_user( 0 );
+	OYS_Activity::log( 'signup', array( 'title' => 'Új fiók: Teszt', 'user' => make_user( 'Bell' ) ) );
+	wp_set_current_user( $staff );
+	require_once ABSPATH . WPINC . '/class-wp-admin-bar.php';
+	$bar = new WP_Admin_Bar();
+	OYS_Activity::admin_bar( $bar );
+	$node = $bar->get_node( 'oys-activity' );
+	ok( $node && str_contains( $node->href, 'page=oys-activity' ) && str_contains( $node->title, '>1<' ), 'the bell in the admin bar, with the number' );
+
+	// the last 30 days filled in once, in time order, nothing „new”; Motibro's guests are not new accounts
+	$old = make_user( 'Imported' );
+	update_user_meta( $old, 'oys_imported_at', current_time( 'mysql', true ) );
+	$wpdb->query( 'DELETE FROM ' . OYS_Activity::table() );
+	$n = OYS_Activity::backfill();
+	$all = OYS_Activity::feed( '', 0, 200 )['items'];
+	$ids = array_column( $all, 'id' );
+	ok( $n > 5 && $all && array_filter( $all, fn( $i ) => 'signup' === $i['type'] && str_contains( $i['title'], 'Aktiv' ) ) && ! array_filter( $all, fn( $i ) => 'signup' === $i['type'] && str_contains( $i['title'], 'Imported' ) ), 'the history: accounts made here, not the ones brought over from Motibro' );
+	ok( array_filter( $all, fn( $i ) => 'contact' === $i['type'] ) && array_filter( $all, fn( $i ) => 'checkout' === $i['type'] ) && array_filter( $all, fn( $i ) => 'nl_confirmed' === $i['type'] ), '… messages, payments, the newsletter too' );
+	eq( 0, OYS_Activity::unread( $staff ), '… nothing of it counts as new' );
+	$desc = $ids;
+	rsort( $desc );
+	ok( $ids === $desc, 'newest first' );
+	$wpdb->insert( OYS_Activity::table(), array( 'created_at' => oys_utc_plus( -200 * DAY_IN_SECONDS ), 'type' => 'login', 'cat' => 'accounts', 'title' => 'Régi', 'ref' => 'old-one' ) );
+	OYS_Activity::prune();
+	eq( '0', (string) $wpdb->get_var( "SELECT COUNT(*) FROM " . OYS_Activity::table() . " WHERE ref = 'old-one'" ), 'kept for 180 days' );
+	wp_set_current_user( 0 );
+} );
+
 $t = $GLOBALS['oys_t'];
 echo "\n{$t['pass']} assertions passed, {$t['fail']} failed\n";
 exit( $t['fail'] ? 1 : 0 );

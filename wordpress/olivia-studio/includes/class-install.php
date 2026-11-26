@@ -456,6 +456,26 @@ class OYS_Install {
 			KEY last_at (last_at)
 		) $c;" );
 
+		// Notifications: what happened on the website (OYS_Activity), kept 180 days.
+		dbDelta( 'CREATE TABLE ' . self::table( 'activity' ) . " (
+			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			created_at datetime NOT NULL,
+			type varchar(20) NOT NULL DEFAULT '',
+			cat varchar(12) NOT NULL DEFAULT '',
+			title varchar(255) NOT NULL DEFAULT '',
+			detail varchar(500) NOT NULL DEFAULT '',
+			user_id bigint(20) unsigned NOT NULL DEFAULT 0,
+			email varchar(190) NOT NULL DEFAULT '',
+			url varchar(255) NOT NULL DEFAULT '',
+			open varchar(20) NOT NULL DEFAULT '',
+			ref varchar(40) NOT NULL DEFAULT '',
+			test tinyint(1) unsigned NOT NULL DEFAULT 0,
+			PRIMARY KEY  (id),
+			KEY cat (cat,id),
+			KEY created_at (created_at),
+			KEY ref (ref)
+		) $c;" );
+
 		dbDelta( 'CREATE TABLE ' . self::table( 'thread_msgs' ) . " (
 			id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
 			thread_id bigint(20) unsigned NOT NULL DEFAULT 0,

@@ -291,6 +291,7 @@ class OYS_Customers {
 		update_user_meta( $user_id, 'oys_area', $area );
 		self::set_marketing( $user_id, ! empty( $_POST['marketing'] ) );
 		self::record_waiver( $user_id );
+		OYS_Activity::on_signup( $user_id );
 		wp_set_current_user( $user_id );
 		wp_set_auth_cookie( $user_id, true, is_ssl() );
 		OYS_Emails::welcome( $user_id );
@@ -321,6 +322,7 @@ class OYS_Customers {
 		}
 		$before  = self::missing( $user_id );
 		$missing = self::save_profile( $user_id, wp_unslash( $_POST ), $_FILES ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		OYS_Activity::on_profile( $user_id, $before && ! $missing );
 		if ( $before && ! $missing ) {
 			// Áron, 26 November („hülyebiztosra”): the account is complete – straight on to booking, with one message
 			oys_render_flash();
@@ -390,6 +392,7 @@ class OYS_Customers {
 		check_admin_referer( 'oys_waiver' );
 		if ( is_user_logged_in() && ! empty( $_POST['waiver'] ) ) {
 			self::record_waiver( get_current_user_id() );
+			OYS_Activity::log( 'waiver', array( 'title' => sprintf( __( 'Participation agreement accepted: %s', 'olivia-studio' ), OYS_Activity::name( get_current_user_id() ) ), 'user' => get_current_user_id(), 'email' => wp_get_current_user()->user_email, 'url' => admin_url( 'admin.php?page=oys-customers&user=' . get_current_user_id() ) ) );
 		}
 		oys_redirect( self::back() );
 	}

@@ -22,7 +22,7 @@ class OYS_Hub_Admin {
 
 	public static function is_hub_screen() {
 		$page = sanitize_key( $_GET['page'] ?? '' ); // phpcs:ignore WordPress.Security.NonceVerification
-		return is_admin() && in_array( $page, array( 'oys', 'oys-hub' ), true );
+		return is_admin() && in_array( $page, array( 'oys', 'oys-hub', 'oys-activity' ), true );
 	}
 
 	/** A teacher who isn't the studio gets the Hub first under Teaching. */
@@ -54,6 +54,7 @@ class OYS_Hub_Admin {
 		$items  = array(
 			array( $hub . '#today', __( 'Today', 'olivia-studio' ), '<path d="M4 11 12 4l8 7v8.5a1 1 0 0 1-1 1h-4.5V15h-5v5.5H5a1 1 0 0 1-1-1z"/>', false ),
 			array( $hub . '#inbox', __( 'Messages', 'olivia-studio' ), '<path d="M4.5 6.5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H11l-4.5 3.5V16.5a2 2 0 0 1-2-2z"/>', false, $n ),
+			$manage ? array( admin_url( 'admin.php?page=oys-activity' ), __( 'Notifications', 'olivia-studio' ), '<path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 2h-15z"/><path d="M10 20.5a2 2 0 0 0 4 0"/>', false, OYS_Activity::unread() ) : null,
 			$manage ? array( admin_url( 'admin.php?page=oys-calendar' ), __( 'Calendar', 'olivia-studio' ), '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/>', 'oys-calendar' === $page ) : array( admin_url( 'admin.php?page=oys-teach' ), __( 'My classes', 'olivia-studio' ), '<rect x="3.5" y="5" width="17" height="15.5" rx="2"/><path d="M3.5 9.5h17M8 3v4M16 3v4"/>', 'oys-teach' === $page ),
 			$manage ? array( admin_url( 'admin.php?page=oys-schedule' ), __( 'Rosters', 'olivia-studio' ), '<path d="M9 6.5h11M9 12h11M9 17.5h11M4.5 6.5h.01M4.5 12h.01M4.5 17.5h.01"/>', 'oys-schedule' === $page ) : null,
 			array( $hub . '#more', __( 'More', 'olivia-studio' ), '<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>', ! in_array( $page, array( 'oys-calendar', 'oys-schedule', 'oys-teach' ), true ) ),
@@ -129,6 +130,9 @@ class OYS_Hub_Admin {
 			'emails'  => $manage ? $a( 'oys-emails' ) : '',
 			'customers' => $manage ? $a( 'oys-customers' ) : '',
 			'notes'   => $manage ? $a( 'oys-notes' ) : '',
+			'start'   => 'oys-activity' === sanitize_key( $_GET['page'] ?? '' ) ? 'alerts' : '', // phpcs:ignore WordPress.Security.NonceVerification
+			'activity' => $manage ? OYS_Activity::unread() : 0,
+			'actCats' => $manage ? OYS_Activity::categories() : array(),
 			'privUrl' => $a( 'oys-private', '&request=' ),
 			'boot'    => array( 'today' => OYS_Hub::today(), 'me' => OYS_Hub::prefs() + array( 'name' => OYS_Hub::chat_name( $u->ID ) ) ),
 			'app'     => array(
@@ -310,6 +314,14 @@ class OYS_Hub_Admin {
 			'pushBookings'  => __( 'New bookings, cancellations, waitlist', 'olivia-studio' ),
 			'pushSheet'     => __( 'After class: „who came?” (the attendance sheet)', 'olivia-studio' ),
 			'pushDaily'     => __( 'Every morning: the day ahead (around 7:30)', 'olivia-studio' ),
+			'pushActivity'  => __( 'Everything else on the website: new accounts, payments, newsletter signups, call-back requests, activated accounts', 'olivia-studio' ),
+			'alerts'        => __( 'Notifications', 'olivia-studio' ),
+			'alertsHelp'    => __( 'Everything that happens on the website: every form sent, accounts, logins, bookings, payments, the newsletter. Who, what and from where.', 'olivia-studio' ),
+			'alertsNone'    => __( 'Nothing yet. When someone sends a form on the website, it shows up here.', 'olivia-studio' ),
+			'alertsMore'    => __( 'Earlier', 'olivia-studio' ),
+			'alertsNew'     => __( 'New', 'olivia-studio' ),
+			'alertsTest'    => __( 'Test', 'olivia-studio' ),
+			'alertsOpen'    => __( 'Open it', 'olivia-studio' ),
 			'pushNote'      => __( 'Messages and class chats always come. Switch the notifications on for this phone above.', 'olivia-studio' ),
 			'emailMessages' => __( 'when someone writes to me', 'olivia-studio' ),
 			'emailChat'     => __( 'when someone writes in a class chat (not during the class)', 'olivia-studio' ),

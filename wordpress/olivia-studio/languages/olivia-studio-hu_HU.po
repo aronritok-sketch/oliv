@@ -9713,3 +9713,187 @@ msgstr "privát órára váltva"
 
 msgid "pass taken back – no email was sent"
 msgstr "bérlet visszavonva – nem ment neki e-mail"
+
+msgid "Messages & requests"
+msgstr "Üzenetek, kérések"
+
+msgid "Accounts"
+msgstr "Fiókok"
+
+msgid "Website message: %s"
+msgstr "Üzenet a weboldalról: %s"
+
+msgid "Call-back request: %s"
+msgstr "Visszahívást kértek: %s"
+
+msgid "Someone asked for a call back on the contact page. Only the phone number was given."
+msgstr "Valaki visszahívást kért a kapcsolat oldalon. Csak a telefonszámát adta meg."
+
+msgid "+%d guest"
+msgid_plural "+%d guests"
+msgstr[0] "+%d vendég"
+msgstr[1] "+%d vendég"
+
+msgid "with a pass"
+msgstr "bérlettel"
+
+msgid "with a membership"
+msgstr "tagsággal"
+
+msgid "paid online"
+msgstr "online fizetve"
+
+msgid "free"
+msgstr "ingyenes"
+
+msgid "pays at the studio"
+msgstr "a helyszínen fizet"
+
+msgid "late: the session is used up"
+msgstr "későn: az alkalom elhasználódott"
+
+msgid "Checkout started: %s"
+msgstr "Fizetést kezdett: %s"
+
+msgid "on the payment page now"
+msgstr "most a fizetési oldalon van"
+
+msgid "Payment failed: %s"
+msgstr "Sikertelen fizetés: %s"
+
+msgid "Payment abandoned: %s"
+msgstr "Félbehagyott fizetés: %s"
+
+msgid "the bank did not accept the payment"
+msgstr "a bank nem fogadta el a fizetést"
+
+msgid "left the payment page without paying"
+msgstr "fizetés nélkül hagyta el a fizetési oldalt"
+
+msgid "Refunded: %s"
+msgstr "Visszatérítve: %s"
+
+msgid "refunded: %s"
+msgstr "visszatérítve: %s"
+
+msgid "Gift card redeemed: %s"
+msgstr "Beváltott ajándékutalvány: %s"
+
+msgid "New membership: %s"
+msgstr "Új tagság: %s"
+
+msgid "Membership ended: %s"
+msgstr "Lejárt tagság: %s"
+
+msgid "New review: %s"
+msgstr "Új vélemény: %s"
+
+msgid "Logged in: %s"
+msgstr "Bejelentkezett: %s"
+
+msgid "Login failed: %s"
+msgstr "Sikertelen belépés: %s"
+
+msgid "Wrong password. If it happens again, the password link helps (Fiókom → Elfelejtett jelszó)."
+msgstr "Rossz jelszó. Ha újra megtörténik, az új jelszó link segít (Fiókom → Elfelejtett jelszó)."
+
+msgid "No account with this email address."
+msgstr "Ezzel az e-mail-címmel nincs fiók."
+
+msgid "Asked for a new password: %s"
+msgstr "Új jelszót kért: %s"
+
+msgid "The link to set a password went out by email."
+msgstr "A jelszóbeállító link e-mailben elment."
+
+msgid "Set a password: %s"
+msgstr "Jelszót állított be: %s"
+
+msgid "A guest from Motibro: the account is active now."
+msgstr "Motibrós vendég: a fiókja most már aktív."
+
+msgid "Can log in with the new password."
+msgstr "Az új jelszóval be tud lépni."
+
+msgid "New account: %s"
+msgstr "Új fiók: %s"
+
+msgid "asked for the newsletter"
+msgstr "kérte a hírlevelet"
+
+msgid "Account complete: %s"
+msgstr "Kész az adatlapja: %s"
+
+msgid "Profile saved: %s"
+msgstr "Adatlapot mentett: %s"
+
+msgid "Accepted the participation agreement and answered the newsletter question: can book now."
+msgstr "Elfogadta a részvételi nyilatkozatot és válaszolt a hírlevél-kérdésre: már foglalhat."
+
+msgid "Yesterday"
+msgstr "Tegnap"
+
+msgid "l, F j"
+msgstr "F j., l"
+
+msgid "on a phone"
+msgstr "telefonról"
+
+msgid "on a tablet"
+msgstr "tabletről"
+
+msgid "on a computer"
+msgstr "számítógépről"
+
+msgid "Notifications"
+msgstr "Értesítések"
+
+msgid "%d new notification"
+msgid_plural "%d new notifications"
+msgstr[0] "%d új értesítés"
+msgstr[1] "%d új értesítés"
+
+msgid "Newsletter signup: %s"
+msgstr "Hírlevél-feliratkozás: %s"
+
+msgid "Newsletter confirmed: %s"
+msgstr "Megerősítette a hírlevelet: %s"
+
+msgid "Unsubscribed from the newsletter: %s"
+msgstr "Leiratkozott a hírlevélről: %s"
+
+msgid "from %s"
+msgstr "innen: %s"
+
+msgid "Clicked the link in the email: gets the newsletter from now on."
+msgstr "Rákattintott a levélben a linkre: mostantól megkapja a hírlevelet."
+
+msgid "the confirmation email went out: it counts once they click it"
+msgstr "elment a megerősítő levél: akkor számít, ha rákattint"
+
+msgid "was already on the list, nothing changed"
+msgstr "már a listán volt, nem változott semmi"
+
+msgid "With the link at the bottom of a newsletter."
+msgstr "Egy hírlevél alján lévő linkkel."
+
+msgid "Participation agreement accepted: %s"
+msgstr "Elfogadta a részvételi nyilatkozatot: %s"
+
+msgid "Everything else on the website: new accounts, payments, newsletter signups, call-back requests, activated accounts"
+msgstr "Minden más a weboldalon: új fiókok, fizetések, hírlevél-feliratkozások, visszahívás-kérések, aktivált fiókok"
+
+msgid "Everything that happens on the website: every form sent, accounts, logins, bookings, payments, the newsletter. Who, what and from where."
+msgstr "Minden, ami a weboldalon történik: minden elküldött űrlap, fiókok, belépések, foglalások, fizetések, hírlevél. Ki, mit és honnan."
+
+msgid "Nothing yet. When someone sends a form on the website, it shows up here."
+msgstr "Még nincs semmi. Ha valaki elküld egy űrlapot a weboldalon, itt jelenik meg."
+
+msgid "Earlier"
+msgstr "Korábbiak"
+
+msgid "Test"
+msgstr "Teszt"
+
+msgid "Open it"
+msgstr "Megnyitás"

@@ -29,7 +29,11 @@ class OYS_Orders {
 		$row['meta']       = wp_json_encode( $row['meta'] );
 		$row['created_at'] = oys_now();
 		$wpdb->insert( OYS_Install::table( 'orders' ), $row );
-		return (int) $wpdb->insert_id;
+		$id = (int) $wpdb->insert_id;
+		if ( $id ) {
+			do_action( 'oys_order_created', $id );
+		}
+		return $id;
 	}
 
 	public static function get( $id ) {
@@ -141,6 +145,7 @@ class OYS_Orders {
 		$ok = $wpdb->query( $wpdb->prepare( "UPDATE $t SET status = %s WHERE id = %d AND status = 'pending'", $status, $order_id ) );
 		if ( 1 === (int) $ok ) {
 			OYS_Bookings::release_order( $order_id );
+			do_action( 'oys_order_unpaid', (int) $order_id, (string) $status );
 		}
 	}
 
@@ -158,6 +163,7 @@ class OYS_Orders {
 		$meta = $order->meta;
 		$meta['refunded_cents'] = (int) $amount_refunded_cents;
 		self::update( $order_id, array( 'status' => $full ? 'refunded' : 'partially_refunded', 'meta' => $meta ) );
+		do_action( 'oys_order_refunded', (int) $order_id, (int) $amount_refunded_cents );
 		if ( ! $full ) {
 			return;
 		}

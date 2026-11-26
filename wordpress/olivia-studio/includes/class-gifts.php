@@ -129,7 +129,9 @@ class OYS_Gifts {
 		if ( 1 !== (int) $ok ) {
 			return new WP_Error( 'oys_gift', __( 'This code has already been used.', 'olivia-studio' ) );
 		}
-		return OYS_Passes::grant_product( $user_id, $product, $gift->order_id, 'gift' );
+		$pass = OYS_Passes::grant_product( $user_id, $product, $gift->order_id, 'gift' );
+		do_action( 'oys_gift_redeemed', $gift, (int) $user_id );
+		return $pass;
 	}
 
 	public static function handle_redeem() {

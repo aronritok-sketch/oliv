@@ -282,6 +282,7 @@ class OYS_Reviews {
 		foreach ( get_users( array( 'capability' => 'oys_manage', 'fields' => 'ID' ) ) as $teacher ) {
 			OYS_Studio_App::notify( (int) $teacher, __( 'New review', 'olivia-studio' ), wp_trim_words( $text, 18, '…' ), admin_url( 'edit.php?post_type=' . self::CPT . '&post_status=pending' ), 'review' );
 		}
+		do_action( 'oys_review_submitted', (int) $id, (int) $uid );
 		return (int) $id;
 	}
 

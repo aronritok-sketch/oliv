@@ -103,6 +103,7 @@
 		info: false,
 		note: false,
 		image: null,
+		act: { cat: '', items: [], more: false, cats: {}, unread: B.activity || 0 },
 	};
 	const isPhone = () => window.matchMedia( '(max-width: 899px)' ).matches;
 
@@ -111,13 +112,14 @@
 		const tabs = [
 			[ 'today', 'home', T.today ],
 			[ 'inbox', 'chat', T.inbox ],
+		].concat( B.manage ? [ [ 'alerts', 'bell', T.alerts ] ] : [] ).concat( [
 			[ 'calendar', 'calendar', T.calendar ],
 			[ 'more', 'grid', T.more ],
-		];
+		] );
 		root.innerHTML =
 			'<nav class="hub-nav" aria-label="Hub">' +
 			'<div class="hub-nav__brand"><span class="hub-nav__logo">' + icon( 'heart' ) + '</span><b>' + esc( T.hub ) + '</b></div>' +
-			tabs.map( ( t ) => '<button type="button" class="hub-nav__tab" data-view="' + t[ 0 ] + '">' + icon( t[ 1 ] ) + '<span>' + esc( t[ 2 ] ) + '</span>' + ( 'inbox' === t[ 0 ] ? '<i class="hub-badge" data-badge hidden></i>' : '' ) + '</button>' ).join( '' ) +
+			tabs.map( ( t ) => '<button type="button" class="hub-nav__tab" data-view="' + t[ 0 ] + '">' + icon( t[ 1 ] ) + '<span>' + esc( t[ 2 ] ) + '</span>' + ( 'inbox' === t[ 0 ] ? '<i class="hub-badge" data-badge hidden></i>' : '' ) + ( 'alerts' === t[ 0 ] ? '<i class="hub-badge" data-badge-act hidden></i>' : '' ) + '</button>' ).join( '' ) +
 			'<button type="button" class="hub-nav__tab hub-nav__tab--settings" data-view="settings">' + icon( 'gear' ) + '<span>' + esc( T.settings ) + '</span></button>' +
 			'</nav>' +
 			'<main class="hub-main">' +
@@ -130,6 +132,7 @@
 			'<div class="hub-conv" data-conv><div class="hub-conv__empty">' + icon( 'chat' ) + '<p>' + esc( T.pick ) + '</p></div></div>' +
 			'<aside class="hub-ctx" data-ctx></aside>' +
 			'</section>' +
+			'<section class="hub-view hub-alerts" data-panel="alerts"></section>' +
 			'<section class="hub-view hub-week" data-panel="calendar"></section>' +
 			'<section class="hub-view hub-reports" data-panel="reports"></section>' +
 			'<section class="hub-view hub-more" data-panel="more"></section>' +
@@ -161,6 +164,8 @@
 			refreshToday();
 		} else if ( 'inbox' === view ) {
 			loadInbox();
+		} else if ( 'alerts' === view ) {
+			loadAlerts( false );
 		} else if ( 'calendar' === view ) {
 			loadWeek( S.week || '' );
 		} else if ( 'reports' === view ) {
@@ -192,6 +197,91 @@
 			el.setAttribute( 'aria-selected', el.dataset.filter === S.filter ? 'true' : 'false' );
 		} );
 		document.title = ( n ? '(' + n + ') ' : '' ) + document.title.replace( /^\(\d+\+?\)\s*/, '' );
+	}
+
+	/* ---------- Notifications: everything on the website (OYS_Activity) ---------- */
+	function setActBadge( n ) {
+		S.act.unread = n || 0;
+		const b = $( '[data-badge-act]' );
+		if ( b ) {
+			b.hidden = ! S.act.unread;
+			b.textContent = S.act.unread > 99 ? '99+' : S.act.unread;
+		}
+	}
+	async function loadAlerts( more ) {
+		const p = $( '[data-panel="alerts"]' );
+		if ( ! p ) {
+			return;
+		}
+		if ( ! more && ! S.act.items.length ) {
+			p.innerHTML = '<h1 class="hub-title">' + esc( T.alerts ) + '</h1><p class="hub-muted">' + esc( T.loading ) + '</p>';
+		}
+		const list = S.act.items;
+		const before = more && list.length ? list[ list.length - 1 ].id : 0;
+		try {
+			const d = await api( 'activity?cat=' + encodeURIComponent( S.act.cat ) + ( before ? '&before=' + before : '' ) );
+			S.act.items = more ? list.concat( d.items ) : d.items;
+			S.act.more = d.more;
+			S.act.cats = d.cats || {};
+			setActBadge( d.unread );
+			renderAlerts();
+			const top = S.act.items.length ? S.act.items[ 0 ].id : 0;
+			// seen once the whole list was on the screen (a filtered list leaves the rest new)
+			if ( ! more && ! S.act.cat && d.unread && top && 'alerts' === S.view ) {
+				const r = await api( 'activity/seen', { method: 'POST', json: { upto: top } } );
+				setActBadge( r.unread );
+			}
+		} catch ( e ) {
+			toast( e.message, true );
+		}
+	}
+	function renderAlerts() {
+		const p = $( '[data-panel="alerts"]' );
+		const cats = B.actCats || {};
+		let h = '<h1 class="hub-title">' + esc( T.alerts ) + '</h1><p class="hub-muted hub-act-help">' + esc( T.alertsHelp ) + '</p>' +
+			'<div class="hub-chips" role="tablist">' + [ [ '', T.all ] ].concat( Object.keys( cats ).map( ( k ) => [ k, cats[ k ] ] ) ).map( ( c ) => '<button type="button" role="tab" class="hub-chip' + ( S.act.cat === c[ 0 ] ? ' is-on' : '' ) + '" aria-selected="' + ( S.act.cat === c[ 0 ] ? 'true' : 'false' ) + '" data-actcat="' + c[ 0 ] + '">' + esc( c[ 1 ] ) + '<i>' + ( c[ 0 ] && S.act.cats[ c[ 0 ] ] ? S.act.cats[ c[ 0 ] ] : '' ) + '</i></button>' ).join( '' ) + '</div>';
+		if ( ! S.act.items.length ) {
+			h += '<div class="hub-card hub-act-empty">' + icon( 'bell' ) + '<p>' + esc( T.alertsNone ) + '</p></div>';
+		} else {
+			let day = '';
+			S.act.items.forEach( ( it, i ) => {
+				if ( it.day !== day ) {
+					h += ( day ? '</ul>' : '' ) + '<h2 class="hub-act-day">' + esc( it.dayLabel ) + '</h2><ul class="hub-act-list">';
+					day = it.day;
+				}
+				const go = it.open || it.url;
+				const inner = '<span class="hub-act-ic">' + icon( it.icon ) + '</span>' +
+					'<span class="hub-act-txt"><b>' + esc( it.title ) + '</b>' + ( it.detail ? '<small>' + esc( it.detail ) + '</small>' : '' ) + '</span>' +
+					'<span class="hub-act-meta"><time>' + esc( it.time ) + '</time>' + ( it.new ? '<em>' + esc( T.alertsNew ) + '</em>' : '' ) + ( it.test ? '<em class="is-test">' + esc( T.alertsTest ) + '</em>' : '' ) + '</span>';
+				h += '<li class="hub-act-item hub-act--' + esc( it.cat ) + ( it.new ? ' is-new' : '' ) + '">' + ( go ? '<button type="button" data-act="' + i + '" title="' + esc( T.alertsOpen ) + '">' + inner + '</button>' : '<div>' + inner + '</div>' ) + '</li>';
+			} );
+			h += '</ul>' + ( S.act.more ? '<p class="hub-more"><button type="button" class="hub-btn" data-actmore>' + esc( T.alertsMore ) + '</button></p>' : '' );
+		}
+		p.innerHTML = h;
+		$$( '[data-actcat]', p ).forEach( ( b ) => b.addEventListener( 'click', () => {
+			S.act.cat = b.dataset.actcat;
+			S.act.items = [];
+			loadAlerts( false );
+		} ) );
+		$$( '[data-act]', p ).forEach( ( b ) => b.addEventListener( 'click', () => {
+			const it = S.act.items[ parseInt( b.dataset.act, 10 ) ];
+			if ( ! it ) {
+				return;
+			}
+			if ( /^[tc]\d+$/.test( it.open ) ) {
+				go( 'inbox' );
+				openItem( it.open );
+			} else if ( /^s\d+$/.test( it.open ) ) {
+				go( 'calendar' );
+				openSheet( parseInt( it.open.slice( 1 ), 10 ) );
+			} else if ( it.url ) {
+				window.location.href = it.url;
+			}
+		} ) );
+		const m = $( '[data-actmore]', p );
+		if ( m ) {
+			m.addEventListener( 'click', () => loadAlerts( true ) );
+		}
 	}
 
 	/* ---------- Today ---------- */
@@ -884,7 +974,7 @@
 			'<label class="hub-switch"><input type="checkbox" name="email_chat"' + ( m.email_chat ? ' checked' : '' ) + '><span></span>' + esc( T.emailChat ) + '</label>' +
 			'<p class="hub-muted">' + esc( T.emailNote ) + ( B.manage && B.emails ? ' <a href="' + esc( B.emails ) + '">' + esc( T.studioEmails ) + '</a>' : '' ) + '</p></section>' +
 			'<section class="hub-card"><h2 class="hub-h">' + icon( 'bell' ) + esc( T.pushMe ) + '</h2>' +
-			[ [ 'push_bookings', T.pushBookings ], [ 'push_sheet', T.pushSheet ], [ 'push_daily', T.pushDaily ] ].map( ( k ) => '<label class="hub-switch"><input type="checkbox" name="' + k[ 0 ] + '"' + ( m[ k[ 0 ] ] ? ' checked' : '' ) + '><span></span>' + esc( k[ 1 ] ) + '</label>' ).join( '' ) +
+			[ [ 'push_bookings', T.pushBookings ], [ 'push_sheet', T.pushSheet ], [ 'push_daily', T.pushDaily ] ].concat( B.manage ? [ [ 'push_activity', T.pushActivity ] ] : [] ).map( ( k ) => '<label class="hub-switch"><input type="checkbox" name="' + k[ 0 ] + '"' + ( m[ k[ 0 ] ] ? ' checked' : '' ) + '><span></span>' + esc( k[ 1 ] ) + '</label>' ).join( '' ) +
 			'<p class="hub-muted">' + esc( T.pushNote ) + '</p></section>' +
 			'<section class="hub-card"><h2 class="hub-h">' + icon( 'user' ) + esc( T.chatName ) + '</h2><input type="text" name="chat_name" value="' + esc( m.chat_name || '' ) + '" placeholder="' + esc( m.name || B.name ) + '"></section>' +
 			'<section class="hub-card"><h2 class="hub-h">' + icon( 'bolt' ) + esc( T.replies ) + '</h2><p class="hub-muted">' + esc( T.repliesHelp ) + '</p><textarea name="replies" rows="6">' + esc( ( m.replies || [] ).join( '\n' ) ) + '</textarea></section>' +
@@ -894,7 +984,7 @@
 			e.preventDefault();
 			const f = new FormData( form );
 			try {
-				S.me = Object.assign( S.me || {}, await api( 'me', { method: 'POST', json: {
+				S.me = Object.assign( S.me || {}, await api( 'me', { method: 'POST', json: Object.assign( B.manage ? { push_activity: f.get( 'push_activity' ) ? 1 : 0 } : {}, {
 					email_messages: f.get( 'email_messages' ) ? 1 : 0,
 					email_chat: f.get( 'email_chat' ) ? 1 : 0,
 					push_bookings: f.get( 'push_bookings' ) ? 1 : 0,
@@ -902,7 +992,7 @@
 					push_daily: f.get( 'push_daily' ) ? 1 : 0,
 					chat_name: f.get( 'chat_name' ),
 					replies: String( f.get( 'replies' ) || '' ).split( '\n' ).map( ( s ) => s.trim() ).filter( Boolean ),
-				} } ) );
+				} ) } ) );
 				toast( T.saved );
 			} catch ( err ) {
 				toast( err.message, true );
@@ -1097,6 +1187,13 @@
 			}
 			lastKeys = new Set( ( d.latest || [] ).map( ( i ) => i.key + ':' + i.ts ) );
 			lastTotal = d.counts.total;
+			if ( undefined !== d.activity ) {
+				const more = ( d.activity || 0 ) > S.act.unread;
+				setActBadge( d.activity );
+				if ( more && 'alerts' === S.view && ! document.hidden ) {
+					loadAlerts( false );
+				}
+			}
 			const changed = JSON.stringify( d.counts ) !== JSON.stringify( S.counts );
 			setBadges( d.counts );
 			if ( changed && 'inbox' === S.view ) {
@@ -1115,6 +1212,7 @@
 	/* ---------- start ---------- */
 	shell();
 	setBadges( S.counts );
+	setActBadge( S.act.unread );
 	const hash = window.location.hash.replace( '#', '' );
 	if ( /^[tc]\d+$/.test( hash ) ) {
 		go( 'inbox', false );
@@ -1122,6 +1220,8 @@
 	} else if ( /^s\d+$/.test( hash ) ) {
 		go( 'calendar', false );
 		openSheet( parseInt( hash.slice( 1 ), 10 ) );
+	} else if ( 'alerts' === hash || ( ! hash && 'alerts' === B.start ) ) {
+		go( B.manage ? 'alerts' : 'today', false );
 	} else if ( [ 'today', 'inbox', 'calendar', 'reports', 'more', 'settings' ].includes( hash ) ) {
 		go( hash, false );
 	} else {

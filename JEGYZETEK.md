@@ -2384,6 +2384,29 @@
       fizetés elakad (sok „pending” vagy „failed”).
   - Élesben már volt valódi fizetés: 3 kifizetett rendelés van, az utolsó tegnapi (csoportos óra, 3 000 Ft).
   - Teszt: a jelentés mutatja a módot és a rendeléseket, a CRM titkát soha.
+- **2026-11-26 – Értesítések: minden, ami a weboldalon történik (olivia-studio 1.34.0, oliviajoga.online 3.12.48).**
+  Áron: „Szeretnék egy értesítések fület az adminba is, meg a mobilapra is … Analytics-ben 5 perce egy form submitted volt,
+  de én arról nem látok semmit … Minden ilyen tevékenységről.”
+  - Hol látszik:
+    - a Hubban új fül (admin és telefonos app): „Értesítések”, számlálóval;
+    - Stúdió → Értesítések (ugyanez a fül);
+    - csengő a felső admin sávban, az olvasatlanok számával;
+    - a telefonos alsó sávban is.
+  - Mi kerül bele (ki, mit, honnan; a stúdió saját lépései nem):
+    - üzenet a weboldalról, visszahívás-kérés (eddig csak e-mail volt), egyéni kérés, válasz a Hubban, vélemény;
+    - új fiók, belépés (telefonról/gépről), sikertelen belépés a weboldal űrlapján, új jelszó kérése és beállítása
+      (Motibrós vendég aktiválása), kész adatlap, adatlap mentése, részvételi nyilatkozat;
+    - foglalás, lemondás, várólista;
+    - fizetés indítása, fizetve, sikertelen, félbehagyott, visszatérítve, ajándékutalvány beváltása, tagság;
+    - hírlevél: feliratkozás (melyik oldalról: .hu vagy .online, melyik űrlap), megerősítés, leiratkozás.
+  - Push a telefonra (Hub → Beállításaim → „Minden más a weboldalon”, alapból be):
+    - új fiók, fizetés, sikertelen fizetés, hírlevél-feliratkozás, visszahívás-kérés, aktivált fiók, kész adatlap.
+    - Az üzenetek, kérések és foglalások eddig is jöttek, ezekből nincs dupla push.
+  - Az első betöltéskor az elmúlt 30 nap visszatöltődik abból, amit az oldal már tudott: fiókok, belépések,
+    jelszókérések, fizetések, foglalások, hírlevél, üzenetek. Ezek nem számítanak „új”-nak.
+  - 180 napig marad meg. Csak a stúdió (oys_manage) látja.
+  - A szöveg mindig a stúdió nyelvén (magyarul) készül, akkor is, ha webhook vagy cron írja.
+  - Teszt: 2073 sikeres, 0 hibás. Helyi gépen képernyőképpel ellenőrizve (390 px és 1366 px).
 
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).

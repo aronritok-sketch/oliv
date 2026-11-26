@@ -260,6 +260,8 @@ class OYS_Hub {
 			'push_bookings'  => isset( $p['push_bookings'] ) ? (int) $p['push_bookings'] : 1,
 			'push_sheet'     => isset( $p['push_sheet'] ) ? (int) $p['push_sheet'] : 1,
 			'push_daily'     => isset( $p['push_daily'] ) ? (int) $p['push_daily'] : 1,
+			// everything else on the website (OYS_Activity): new accounts, payments, newsletter signups, call-back requests…
+			'push_activity'  => isset( $p['push_activity'] ) ? (int) $p['push_activity'] : 1,
 		);
 	}
 
@@ -284,6 +286,7 @@ class OYS_Hub {
 			'push_bookings'  => $keep( 'push_bookings' ),
 			'push_sheet'     => $keep( 'push_sheet' ),
 			'push_daily'     => $keep( 'push_daily' ),
+			'push_activity'  => $keep( 'push_activity' ),
 		) );
 		return self::prefs( $user_id );
 	}
@@ -901,7 +904,7 @@ class OYS_Hub {
 	public static function rest_poll() {
 		self::mark_active();
 		$items = self::inbox( 'unread' );
-		return rest_ensure_response( array( 'v' => OYS_VERSION, 'counts' => self::counts(), 'latest' => array_slice( array_map( fn( $i ) => array( 'key' => $i['key'], 'title' => $i['title'], 'sub' => $i['sub'], 'ts' => $i['ts'] ), $items ), 0, 5 ) ) );
+		return rest_ensure_response( array( 'v' => OYS_VERSION, 'counts' => self::counts(), 'activity' => self::can_manage() ? OYS_Activity::unread() : 0, 'latest' => array_slice( array_map( fn( $i ) => array( 'key' => $i['key'], 'title' => $i['title'], 'sub' => $i['sub'], 'ts' => $i['ts'] ), $items ), 0, 5 ) ) );
 	}
 
 	private static function thread_req( WP_REST_Request $req ) {

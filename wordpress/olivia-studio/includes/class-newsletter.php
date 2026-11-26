@@ -247,6 +247,7 @@ class OYS_Newsletter {
 		}
 		if ( 'confirmed' !== $r->status ) {
 			$wpdb->update( self::list_table(), array( 'status' => 'confirmed', 'confirmed_at' => oys_now(), 'unsub_at' => null ), array( 'id' => (int) $id ) );
+			OYS_Activity::log( 'nl_confirmed', array( 'title' => sprintf( __( 'Newsletter confirmed: %s', 'olivia-studio' ), $r->name ? $r->name . ' (' . $r->email . ')' : $r->email ), 'detail' => __( 'Clicked the link in the email: gets the newsletter from now on.', 'olivia-studio' ), 'email' => $r->email, 'url' => admin_url( 'admin.php?page=oys-newsletter' ), 'ref' => 'nc' . (int) $id ) );
 		}
 		$u = get_user_by( 'email', $r->email );
 		if ( $u ) {
@@ -263,6 +264,9 @@ class OYS_Newsletter {
 			return false;
 		}
 		$wpdb->update( self::list_table(), array( 'status' => 'unsubscribed', 'unsub_at' => oys_now() ), array( 'id' => (int) $id ) );
+		if ( 'unsubscribed' !== $r->status ) {
+			OYS_Activity::log( 'nl_unsub', array( 'title' => sprintf( __( 'Unsubscribed from the newsletter: %s', 'olivia-studio' ), $r->name ? $r->name . ' (' . $r->email . ')' : $r->email ), 'email' => $r->email, 'url' => admin_url( 'admin.php?page=oys-newsletter' ) ) );
+		}
 		$u = get_user_by( 'email', $r->email );
 		if ( $u ) {
 			update_user_meta( $u->ID, 'oys_marketing', '' );
@@ -331,6 +335,19 @@ class OYS_Newsletter {
 			$go( 'hiba' );
 		}
 		$res = self::subscribe( wp_unslash( $_POST['email'] ?? '' ), wp_unslash( $_POST['name'] ?? '' ), wp_unslash( $_POST['source'] ?? '' ), $back ); // phpcs:ignore
+		if ( in_array( $res, array( 'sent', 'already' ), true ) ) {
+			// Áron, 26 November: every form on the website in Notifications – who, and from which page
+			$email = strtolower( trim( sanitize_email( wp_unslash( $_POST['email'] ?? '' ) ) ) ); // phpcs:ignore
+			$name  = sanitize_text_field( wp_unslash( $_POST['name'] ?? '' ) ); // phpcs:ignore
+			$where = OYS_Activity::nl_where( sanitize_key( wp_unslash( $_POST['source'] ?? '' ) ), $back ); // phpcs:ignore
+			OYS_Activity::log( 'nl_signup', array(
+				'title'  => sprintf( __( 'Newsletter signup: %s', 'olivia-studio' ), $name ? $name . ' (' . $email . ')' : $email ),
+				'detail' => 'sent' === $res ? trim( $where . ' · ' . __( 'the confirmation email went out: it counts once they click it', 'olivia-studio' ), ' ·' ) : trim( $where . ' · ' . __( 'was already on the list, nothing changed', 'olivia-studio' ), ' ·' ),
+				'email'  => $email,
+				'url'    => admin_url( 'admin.php?page=oys-newsletter' ),
+				'push'   => 'sent' === $res,
+			) );
+		}
 		$go( is_wp_error( $res ) ? 'hiba' : ( 'already' === $res ? 'mar' : 'ok' ) );
 	}
 
@@ -410,8 +427,12 @@ class OYS_Newsletter {
 		if ( ! (int) $uid || ! hash_equals( self::sig( (int) $uid ), $sig ) ) {
 			wp_die( esc_html__( 'This unsubscribe link is not valid.', 'olivia-studio' ), '', array( 'response' => 400 ) );
 		}
+		$was = '1' === (string) get_user_meta( (int) $uid, 'oys_marketing', true );
 		OYS_Customers::set_marketing( (int) $uid, false );
 		$u = get_userdata( (int) $uid );
+		if ( $u && $was ) {
+			OYS_Activity::log( 'nl_unsub', array( 'title' => sprintf( __( 'Unsubscribed from the newsletter: %s', 'olivia-studio' ), OYS_Activity::name( $u->ID ) ), 'detail' => __( 'With the link at the bottom of a newsletter.', 'olivia-studio' ), 'user' => $u->ID, 'email' => $u->user_email, 'url' => admin_url( 'admin.php?page=oys-customers&user=' . (int) $u->ID ) ) );
+		}
 		$r = $u ? self::list_by_email( $u->user_email ) : null;
 		if ( $r && 'unsubscribed' !== $r->status ) {
 			global $wpdb;
