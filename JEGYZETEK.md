@@ -2026,6 +2026,13 @@
   `ONLINE_SERVICES`, `private_prices()`); gomb: az .online privát jóga oldala. 390 és 1280 px-en nincs túlcsordulás.
   check.py: 3469/0, `--after` 1219/0.
 
+- **2026-11-26 – oliviajoga.hu 1.8.3: a főoldali meghívó az online csoportos órára.** Áron (képernyőkép: „…várlak
+  szeretettel a 11. kerületi, 18. kerületi és 21. kerületi csoportos jóga órákon!”): „ide pedig ne a kerületeket írjuk,
+  hanem hogy online, csoportos jóga órákon és a .online csoportos jóga aloldalára vigyen a szöveg” → „…várlak szeretettel
+  az online, csoportos jóga órákon!”, a link az .online csoportos flow jóga oldalára, új lapon (`OLD_INVITE`,
+  `fix_links`). A két új fotó (miért jóga, gyakoroljunk) altjából is kikerült a 11. kerület / Újbuda / Móricz; check.py
+  most minden kép altját nézi. check.py: 3735/0, `--after` 1217/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

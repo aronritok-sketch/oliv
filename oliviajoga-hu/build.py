@@ -41,7 +41,7 @@ ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.8.2'
+VERSION = '1.8.3'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -93,7 +93,8 @@ ONLINE_SERVICES = [
 SERVICES_LINE = ('Élő online, a saját otthonodból: csoportos hatha flow jóga szerdánként 18:30-tól 20:00-ig, és egyéni '
                  'időpontban egyéni online jóga, online kismamatorna, stretching és mobilizáció, relaxáció és légzés.')
 REPLACED_TEXT = {'csoportos hatha flow jóga órák Budapest 18. kerület Budapest 21. kerület', '1 órás vagy 5 alkalmas jóga ajándékutalvány', 'Ezekre az információkra lesz szükségem az ajándékutalvány kiállításához:'}
-REPLACED_TEXT_START = ('Vásárlás után kérlek, vedd fel velem a kapcsolatot', 'Ahhoz, hogy az ajándékozott tudjon online foglalni')  # Kapcsolat: the message form
+REPLACED_TEXT_START = ('Vásárlás után kérlek, vedd fel velem a kapcsolatot', 'Ahhoz, hogy az ajándékozott tudjon online foglalni',
+                       'Ha szeretnéd megtapasztalni azt, hogy milyen az elfogadás')  # the last: fix_links, OLD_INVITE (Áron, 26 Nov)  # Kapcsolat: the message form
 DROPPED_LENGTHS = {'90 perc'}  # Árak: there are no 90-minute classes any more
 # Photos from the theme (Olivia's own, round 8) for the page heads; Hungarian alt text.
 THEME_PHOTOS = {
@@ -292,8 +293,17 @@ def asset(rel):
     return f'{BASE}assets/{rel}'
 
 
+# Áron, 26 November (a screenshot of the home page's line): „ide pedig ne a kerületeket írjuk, hanem hogy online, csoportos
+# jóga órákon és a .online csoportos jóga aloldalára vigyen a szöveg”
+OLD_INVITE = 'szeretettel a 11. kerületi, 18. kerületi és 21. kerületi <a href="page:kapcsolat">csoportos jóga órákon!</a>'
+
+
 def fix_links(h):
     """page:<path> links from the old site → new addresses; outside links open in a new tab."""
+    if OLD_INVITE in h:
+        u = online('yoga')  # a new tab, as every link to the online site (rep below adds it to the http ones)
+        h = h.replace(OLD_INVITE, f'szeretettel az <a href="{esc(u)}"{ext_attr(u) if u.startswith("%%") else ""}>online, csoportos jóga órákon!</a>')
+
     def rep(m):
         href = html.unescape(m.group(1))
         if href.startswith('page:'):
@@ -412,7 +422,7 @@ def new_pic(key, sizes='(min-width: 960px) 36vw, 90vw', eager=False, cls='photo'
     small, big = asset(f'img/new/{key}-800.jpg'), asset(f'img/new/{key}-1600.jpg')
     srcset = f' srcset="{small} 800w, {big} {m["w"]}w" sizes="{sizes}"' if m['w'] > 800 else ''
     load = ' fetchpriority="high"' if eager else ' loading="lazy"'
-    return (f'<img class="{cls}" src="{big if m["w"] > 800 else small}"{srcset} alt="{esc(NEW_PHOTOS[key])}" width="{m["w"]}" '
+    return (f'<img class="{cls}" src="{big if m["w"] > 800 else small}"{srcset} alt="{esc(drop_xi(NEW_PHOTOS[key]))}" width="{m["w"]}" '
             f'height="{m["h"]}" style="object-position:{pos}"{load} decoding="async">')
 
 

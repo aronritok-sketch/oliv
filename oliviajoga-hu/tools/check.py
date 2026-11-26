@@ -104,6 +104,13 @@ def main():
                     elif t['type'] == 'embed' and not any(r in t['src'] for r in build.REMOVED_EMBEDS):
                         ok(html.escape(t['src'], quote=True) in doc, f'/{p["path"]}: embed missing: {t["src"][:60]}')
         ok('href="page:' not in doc, f'/{p["path"]}: unresolved old link')
+    # Áron, 25–26 November: no 11th-district words in any picture's alt; the home page invites to the online group class
+    for path, doc in files.items():
+        for alt in re.findall(r'<img[^>]*\balt="([^"]*)"', doc):
+            ok(not any(re.search(w, html.unescape(alt), re.I) for w in build.XI_WORDS), f'/{path}: an 11th-district word in an alt: {alt[:80]}')
+    home = files.get('', '')
+    ok('11. kerületi' not in home and re.search(r'szeretettel az <a href="[^"]*/online-orak/hatha-flow-joga-online/"[^>]*>online, csoportos jóga órákon!</a>', home),
+       '/: „várlak szeretettel az online, csoportos jóga órákon” → the online group class page (Áron, 26 Nov)')
     # internal links
     for path, doc in files.items():
         for href in re.findall(r'href="([^"#?]+)', doc):
@@ -181,7 +188,8 @@ def after_checks(data, out, base):
             for c in s['columns']:
                 for t in c:
                     for b in t.get('blocks', []) if t['type'] == 'text' else []:
-                        if b['t'] in ('h1', 'h2', 'h3') and norm(b['html']) and not re.match(r'\d+ perc$', norm(b['html'])):
+                        if b['t'] in ('h1', 'h2', 'h3') and norm(b['html']) and not re.match(r'\d+ perc$', norm(b['html'])) \
+                                and not norm(b['html']).startswith(build.REPLACED_TEXT_START):
                             ok(norm(b['html']) in text, f'/{p["path"]}: heading missing: {norm(b["html"])[:80]}')
     old_text = {p['path']: norm(json.dumps(p['sections'], ensure_ascii=False)) for p in data['pages']}
     for path in ('', 'kapcsolat'):
