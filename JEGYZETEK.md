@@ -2289,6 +2289,15 @@
   - Teszt a 292-es teszt-vendégfiókra (Olívia `+test` címe): ment, saját működő linkkel.
   - A valódi kiküldés Olívia tesztje után jöhet. A címzettválasztóban a „Motibróból, alkalom nélkül” gomb jelöli ki őket.
 
+- **2026-11-26 – Az admin e-mail-szerkesztője angolul nyílt; most az oldal nyelvén nyílik (olivia-studio 1.32.1,
+  oliviajoga.online 3.12.40).** Áron: „rendszerüzenetek az összes angol nyelvű … most valamiért az adminba angol”.
+  - Az ok: `?lang` nélkül a szerkesztő alapból az angol változatot nyitotta meg. Angol volt a szöveg, az előnézet és a
+    „Teszt”, és egy mentés is az angol példányba ment, amit a magyar vendégek sosem kapnak meg.
+  - Most az oldal saját nyelve (`default_lang`, itt magyar) az alap. A mentés, a teszt és a „vissza az eredetire” is
+    ezt követi, a fül „Magyar” feliratú.
+  - Az admin űrlapok többi angol alapértelmezése (az órák `lang` mezője) is az oldal nyelvére állt.
+  - Élesben nem volt angolul elmentett egyedi szöveg, így semmit nem kellett áthozni. Teszt: 1986/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

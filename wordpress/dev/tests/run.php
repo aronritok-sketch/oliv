@@ -5899,6 +5899,19 @@ test( 'Áron 26 Nov: „Online foglalhatóvá” – what it does, the email to 
 	ok( str_contains( $po, 'msgstr "Teszt magamnak"' ) && str_contains( $po, 'Érvényes eddig: {until}.' ), 'in Hungarian: „Teszt magamnak”, the guest\'s email' );
 } );
 
+test( 'Áron 26 Nov: „rendszerüzenetek az összes angol … az adminba angol” – the email editor opens in the site\'s language (a Hungarian site: Hungarian), the test and the save go there too', function () {
+	require_once OYS_DIR . 'includes/admin/class-admin.php';
+	$was = OYS_Settings::get( 'default_lang' );
+	$wl  = OYS_Settings::get( 'languages' );
+	OYS_Settings::update( array( 'languages' => 'hu', 'default_lang' => 'hu' ) );
+	$m = new ReflectionMethod( 'OYS_Admin', 'email_lang' );
+	unset( $_GET['lang'] );
+	eq( array( 'hu', 'hu', 'hu' ), array( $m->invoke( null ), $m->invoke( null, '' ), $m->invoke( null, 'en' ) ), 'no ?lang (and a language the site does not offer): Hungarian, not English' );
+	$src = (string) file_get_contents( WP_PLUGIN_DIR . '/olivia-studio/includes/admin/class-admin.php' );
+	ok( ! str_contains( $src, "email_lang( wp_unslash( \$_POST['lang'] ?? 'en' ) )" ) && ! str_contains( $src, "email_lang( \$in['lang'] ?? 'en' )" ) && str_contains( $src, "esc_html( \$l['native'] )" ), 'saving, the test and „back to the original” follow it; the tabs say „Magyar”' );
+	OYS_Settings::update( array( 'languages' => $wl, 'default_lang' => $was ) );
+} );
+
 test( 'Áron 26 Nov: the newsletter to the Motibro guests – {password_button}: each guest\'s own one-tap link, a preview in the studio\'s test, the real link in a test to a guest test account', function () {
 	$mail = 'nl.motibro.' . wp_rand() . '@example.test';
 	$g    = wp_insert_user( array( 'user_login' => $mail, 'user_email' => $mail, 'user_pass' => wp_generate_password(), 'first_name' => 'Kata', 'role' => 'oys_customer' ) );

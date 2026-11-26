@@ -272,7 +272,7 @@ class OYS_Calendar {
 			'due'             => OYS_Bookings::due_at_studio( $s->id ),
 			'teacher_id'      => (int) $s->teacher_id,
 			'teacher'         => OYS_Teachers::name_for( $s ),
-			'lang'            => $s->lang ?: 'en',
+			'lang'            => $s->lang ?: OYS_I18n::default_lang(),
 			'note'            => $s->note,
 			'status'          => $s->status,
 			'past'            => oys_ts( $s->ends_at ) < time(),
@@ -337,7 +337,7 @@ class OYS_Calendar {
 			'min_people'      => array_key_exists( 'min_people', $p ) ? OYS_Schedule::nullable_int( $p['min_people'] ) : ( $current->min_people ?? null ),
 			'decide_hours'    => array_key_exists( 'decide_hours', $p ) ? OYS_Schedule::nullable_int( $p['decide_hours'], 1 ) : ( $current->decide_hours ?? null ),
 			'teacher_id'      => array_key_exists( 'teacher_id', $p ) ? OYS_Teachers::valid_id( $p['teacher_id'] ) : (int) ( $current->teacher_id ?? 0 ),
-			'lang'            => array_key_exists( 'lang', $p ) ? oys_valid_lang( $p['lang'] ) : ( $current->lang ?? 'en' ),
+			'lang'            => array_key_exists( 'lang', $p ) ? oys_valid_lang( $p['lang'] ) : ( $current->lang ?? OYS_I18n::default_lang() ),
 			'note'            => sanitize_text_field( $p['note'] ?? '' ),
 			// Helpers for the caller, not columns.
 			'_date'           => $date,

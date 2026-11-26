@@ -267,7 +267,7 @@ class OYS_Admin {
 			echo '</select></td></tr>';
 		}
 		echo '<tr><th>' . esc_html__( 'Short note', 'olivia-studio' ) . '</th><td><input class="regular-text" name="note" value="' . esc_attr( $v->note ) . '" placeholder="Sunrise on the sand, weather permitting"></td></tr>';
-		echo '<tr><th>' . esc_html__( 'Taught in', 'olivia-studio' ) . '</th><td>' . self::lang_select( $v->lang ?? 'en' ) . '</td></tr>'; // phpcs:ignore
+		echo '<tr><th>' . esc_html__( 'Taught in', 'olivia-studio' ) . '</th><td>' . self::lang_select( $v->lang ?? OYS_I18n::default_lang() ) . '</td></tr>'; // phpcs:ignore
 		echo '</table>';
 		submit_button( $s ? __( 'Save session', 'olivia-studio' ) : __( 'Create session', 'olivia-studio' ) );
 		echo '</form>';
@@ -303,7 +303,7 @@ class OYS_Admin {
 			'pay_later'       => empty( $_POST['pay_later'] ) ? 0 : 1,
 			'note'            => sanitize_text_field( wp_unslash( $_POST['note'] ) ),
 			'teacher_id'      => OYS_Teachers::valid_id( $_POST['teacher_id'] ?? 0 ),
-			'lang'            => oys_valid_lang( $_POST['lang'] ?? 'en' ),
+			'lang'            => oys_valid_lang( $_POST['lang'] ?? OYS_I18n::default_lang() ),
 		);
 		$clash = OYS_Schedule::overlap( $data['starts_at'], $data['ends_at'], $data['teacher_id'], $id );
 		if ( $clash ) {
@@ -526,7 +526,7 @@ class OYS_Admin {
 				echo '<option value="' . esc_attr( $k ) . '"' . selected( $t->class_slug, $k, false ) . '>' . esc_html( $l ) . '</option>';
 			}
 			echo '</select></td><td><input form="' . $fid . '" type="number" name="capacity" class="small-text" value="' . (int) $t->capacity . '"></td><td><input form="' . $fid . '" name="price" class="small-text" value="' . esc_attr( $t->price_cents / 100 ) . '"></td>'
-				. '<td><input form="' . $fid . '" name="location" value="' . esc_attr( $t->location ) . '" placeholder="' . esc_attr__( 'Location', 'olivia-studio' ) . '"><br><input form="' . $fid . '" type="url" name="online_url" value="' . esc_attr( $t->online_url ) . '" placeholder="https://zoom.us/…"><br><input form="' . $fid . '" name="note" value="' . esc_attr( $t->note ) . '" placeholder="' . esc_attr__( 'Note', 'olivia-studio' ) . '"><br>' . self::lang_select( $t->lang ?? 'en', 'form="' . $fid . '"' ) . '</td>'
+				. '<td><input form="' . $fid . '" name="location" value="' . esc_attr( $t->location ) . '" placeholder="' . esc_attr__( 'Location', 'olivia-studio' ) . '"><br><input form="' . $fid . '" type="url" name="online_url" value="' . esc_attr( $t->online_url ) . '" placeholder="https://zoom.us/…"><br><input form="' . $fid . '" name="note" value="' . esc_attr( $t->note ) . '" placeholder="' . esc_attr__( 'Note', 'olivia-studio' ) . '"><br>' . self::lang_select( $t->lang ?? OYS_I18n::default_lang(), 'form="' . $fid . '"' ) . '</td>'
 				. '<td><input form="' . $fid . '" type="checkbox" name="active" value="1"' . checked( 1, (int) $t->active, false ) . '></td><td>';
 			echo self::form( 'save_template', 'id="' . $fid . '"' ) . '<input type="hidden" name="id" value="' . (int) $t->id . '"><button class="button button-primary button-small">' . ( $t->id ? esc_html__( 'Save', 'olivia-studio' ) : esc_html__( 'Add', 'olivia-studio' ) ) . '</button></form>'; // phpcs:ignore
 			if ( $t->id ) {
@@ -550,7 +550,7 @@ class OYS_Admin {
 			'online_url'   => wp_unslash( $_POST['online_url'] ?? '' ),
 			'price_cents'  => oys_cents_from_input( wp_unslash( $_POST['price'] ?? '0' ) ),
 			'note'         => wp_unslash( $_POST['note'] ?? '' ),
-			'lang'         => $_POST['lang'] ?? 'en',
+			'lang'         => $_POST['lang'] ?? OYS_I18n::default_lang(),
 			'active'       => $_POST['active'] ?? 0,
 		);
 		$tid   = (int) $_POST['id'];
@@ -1632,10 +1632,14 @@ class OYS_Admin {
 			. '<p><button type="submit" form="oys-smtp-test" class="button">' . esc_html( sprintf( __( 'Send a test email to %s', 'olivia-studio' ), wp_get_current_user()->user_email ) ) . '</button></p><p class="description">' . esc_html__( 'Save first, then test.', 'olivia-studio' ) . '</p></td></tr></table>';
 	}
 
-	/** The email language being edited (?lang=hu); English by default. */
+	/**
+	 * The email language being edited (?lang=hu): the site's own language by default (Áron, 26 November: „rendszerüzenetek
+	 * az összes angol nyelvű … az adminba angol” – it opened in English, so the text, the preview, the test and a save all
+	 * went to the English copy, which the Hungarian guests never get).
+	 */
 	private static function email_lang( $from = null ) {
-		$lang = sanitize_key( $from ?? ( $_GET['lang'] ?? 'en' ) ); // phpcs:ignore WordPress.Security.NonceVerification
-		return isset( OYS_I18n::languages()[ $lang ] ) ? $lang : 'en';
+		$lang = sanitize_key( (string) ( $from ?? ( $_GET['lang'] ?? '' ) ) ); // phpcs:ignore WordPress.Security.NonceVerification
+		return isset( OYS_I18n::languages()[ $lang ] ) ? $lang : OYS_I18n::default_lang();
 	}
 
 	private static function page_email_edit( $key ) {
@@ -1645,7 +1649,7 @@ class OYS_Admin {
 		[ , $html ] = OYS_I18n::with( $lang, fn() => OYS_Emails::preview( $key ) );
 		$tabs = '';
 		foreach ( OYS_I18n::languages() as $code => $l ) {
-			$tabs .= '<a class="nav-tab' . ( $code === $lang ? ' nav-tab-active' : '' ) . '" href="' . esc_url( admin_url( 'admin.php?page=oys-emails&edit=' . $key . '&lang=' . $code ) ) . '">' . esc_html( $l['name'] ) . ( OYS_Email_Templates::get( $key, $code )['customized'] ? ' •' : '' ) . '</a>';
+			$tabs .= '<a class="nav-tab' . ( $code === $lang ? ' nav-tab-active' : '' ) . '" href="' . esc_url( admin_url( 'admin.php?page=oys-emails&edit=' . $key . '&lang=' . $code ) ) . '">' . esc_html( $l['native'] ) . ( OYS_Email_Templates::get( $key, $code )['customized'] ? ' •' : '' ) . '</a>';
 		}
 		echo '<p>' . esc_html( $t['when'] ) . '.</p><nav class="nav-tab-wrapper">' . $tabs . '</nav><p class="description">' . esc_html__( 'Customers get this email in the language they use on the site. Each language has its own text; the original texts are already translated.', 'olivia-studio' ) . '</p><div class="oys-email-edit"><div>'; // phpcs:ignore
 		$lang_field = '<input type="hidden" name="lang" value="' . esc_attr( $lang ) . '">';
@@ -1706,7 +1710,7 @@ class OYS_Admin {
 			self::back( 'oys-emails' );
 		}
 		$in   = wp_unslash( $_POST );
-		$lang = self::email_lang( $in['lang'] ?? 'en' );
+		$lang = self::email_lang( $in['lang'] ?? '' );
 		OYS_Email_Templates::save( $key, array(
 			'enabled' => empty( $in['enabled'] ) ? 0 : 1,
 			'subject' => sanitize_text_field( $in['subject'] ?? '' ),
@@ -1720,7 +1724,7 @@ class OYS_Admin {
 
 	private static function do_reset_email_template() {
 		$key  = sanitize_key( $_POST['key'] ?? '' );
-		$lang = self::email_lang( wp_unslash( $_POST['lang'] ?? 'en' ) );
+		$lang = self::email_lang( wp_unslash( $_POST['lang'] ?? '' ) );
 		OYS_Email_Templates::reset( $key, $lang );
 		self::back( 'oys-emails', array( 'edit' => $key, 'lang' => $lang ), __( 'Back to the original text.', 'olivia-studio' ) );
 	}
@@ -1728,7 +1732,7 @@ class OYS_Admin {
 	private static function do_test_email() {
 		$key = sanitize_key( $_POST['key'] ?? '' );
 		$to   = wp_get_current_user()->user_email;
-		$lang = self::email_lang( wp_unslash( $_POST['lang'] ?? 'en' ) );
+		$lang = self::email_lang( wp_unslash( $_POST['lang'] ?? '' ) );
 		$ok   = OYS_Email_Templates::get( $key ) && OYS_I18n::with( $lang, fn() => OYS_Emails::send_test( $key, $to ) );
 		self::back( 'oys-emails', array( 'edit' => $key, 'lang' => $lang ), $ok ? sprintf( __( 'Test sent to %s.', 'olivia-studio' ), $to ) : __( 'The test could not be sent. Check the sending server (SMTP) on the Emails page.', 'olivia-studio' ) );
 	}
