@@ -2078,6 +2078,17 @@
   (`oys_calendar_ask_hours` szűrő a témában; a bővítmény alapértéke 14–21 maradt a többi oldalnak). Tesztek: 1824/0.
   Előtte Olíviának üzenet ment (9149107) a két oldal változásairól.
 
+- **2026-11-26 – A végleges Motibro-exportok importja (élő oliviajoga.online).** Olívia (portál-chat 9149110–12): „küldöm a
+  friss, végleges motibro exportokat” (Érvényes bérletek 2026-11-26, Vendéglista). A 11.16-i kérése szerint („ha abban az
+  exportban még marad alkalmuk, hosszabbítsd meg a bérletüket január 27-ig és a maradék alkalmukat tudják felhasználni
+  online addig”):
+  - Vendéglista (288 sor): 2 új, 18 frissült, 266 változatlan, 2 kihagyva (nincs azonosító adat).
+  - Érvényes bérletek (7 sor): 7 bérlet, 18 hátralévő alkalommal, online foglalható 2027-01-27-ig
+    (`customers/import`, `online_until`); zárolt alkalom 0. A 11.16-i listából 10 bejegyzés már nincs a végleges
+    exportban: ezeket a lista „nézd meg a Motibróban” jelöléssel mutatja (valószínűleg elfogytak az utolsó órákon).
+  - Előtte próbafuttatás, utána újraellenőrzés: a második futás nem változtatna semmit. A fájlokat a CRM-ből töltöttem le,
+    a plugin saját olvasójával dolgoztam fel, a művelet után a helyi másolatokat töröltem; vendégadat a repóba nem került.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
