@@ -131,6 +131,34 @@ class OYS_Held {
 		return array( 'id' => (int) $p->id, 'expires' => $wpdb->get_var( $wpdb->prepare( "SELECT expires_at FROM $t WHERE id = %d", (int) $p->id ) ) );
 	}
 
+	/**
+	 * Take back a pass moved online (Áron, 26 November: „Amire Olivia nem kattintott, hogy menjen e-mail neki, ő ne kapja
+	 * meg a bérletet”): the online pass is deleted and the row closed – unless a booking already used it (then nothing
+	 * changes and the answer says so).
+	 */
+	public static function revoke( $key, $note = '' ) {
+		global $wpdb;
+		$e = self::get( $key );
+		if ( ! $e || 'online' !== $e['status'] ) {
+			return new WP_Error( 'oys_held', 'Only a row moved online.', array( 'status' => 400 ) );
+		}
+		$t = OYS_Install::table( 'passes' );
+		$p = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $t WHERE user_id = %d AND product_id = %s ORDER BY id DESC LIMIT 1", (int) $e['user'], (string) $key ) );
+		if ( $p ) {
+			$used = (int) $wpdb->get_var( $wpdb->prepare( 'SELECT COUNT(*) FROM ' . OYS_Install::table( 'bookings' ) . ' WHERE pass_id = %d', (int) $p->id ) );
+			if ( $used ) {
+				return new WP_Error( 'oys_held', sprintf( 'The pass was already used for %d booking(s): nothing changed.', $used ), array( 'status' => 409 ) );
+			}
+			$wpdb->delete( $t, array( 'id' => (int) $p->id ) );
+		}
+		$all                    = self::all();
+		$all[ $key ]['status']  = 'closed';
+		$all[ $key ]['note']    = trim( $all[ $key ]['note'] . "\n" . wp_date( 'Y-m-d' ) . ': ' . ( '' !== $note ? $note : __( 'pass taken back – no email was sent', 'olivia-studio' ) ) );
+		$all[ $key ]['updated'] = current_time( 'mysql', true );
+		self::save( $all );
+		return true;
+	}
+
 	/** Everything not moved online is closed (Áron, 26 November: „akit nem hozott át most Olivia online-ra, azok kuka”). */
 	public static function close_rest() {
 		$closed = array();
@@ -314,6 +342,10 @@ class OYS_Held {
 
 	/** held → redeemed (with what for), → online (until a day), or back to held. */
 	public static function act( $key, $do, $note = '', $until = '' ) {
+		if ( 'revoke' === $do ) {
+			$res = self::revoke( $key, $note );
+			return is_wp_error( $res ) ? $res : self::get( $key );
+		}
 		if ( 'private' === $do ) {
 			$credits = func_num_args() > 4 ? (int) func_get_arg( 4 ) : 1;
 			$res     = self::to_private( $key, $credits ?: 1 );

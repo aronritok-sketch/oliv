@@ -9710,3 +9710,6 @@ msgstr "%1$d alkalom → %2$s"
 
 msgid "swapped for a private class"
 msgstr "privát órára váltva"
+
+msgid "pass taken back – no email was sent"
+msgstr "bérlet visszavonva – nem ment neki e-mail"

@@ -5956,6 +5956,19 @@ test( 'Áron 26 Nov: the Motibro past closed – „akit nem hozott át most Oli
 	$priv = make_session( array( 'kind' => 'private', 'format' => 'online', 'capacity' => 1 ) );
 	eq( 1, OYS_Passes::available_for( $a, $priv, 'online' ), '… which pays for a private class' );
 	ok( is_wp_error( OYS_Held::act( 'motibro-t-off', 'private', '', '', 1 ) ), 'only a row already moved online' );
+	// „Amire Olivia nem kattintott, hogy menjen e-mail neki, ő ne kapja meg a bérletet”
+	$d = make_user( 'Nomail' );
+	OYS_Held::put( 'motibro-t-nomail', $d, array( 'name' => '5 alkalmas', 'used' => 1, 'locked' => 0, 'left' => 4, 'expires' => '2027-06-30' ) );
+	OYS_Held::to_online( 'motibro-t-nomail', '2027-06-30' );
+	$r = OYS_Held::act( 'motibro-t-nomail', 'revoke' );
+	ok( ! is_wp_error( $r ) && 'closed' === $r['status'] && ! OYS_Passes::for_user( $d ) && str_contains( $r['note'], 'no email' ), 'taken back: the online pass is gone, the row closed and noted' );
+	$f = make_user( 'Booked' );
+	OYS_Held::put( 'motibro-t-booked', $f, array( 'name' => '5 alkalmas', 'used' => 1, 'locked' => 0, 'left' => 4, 'expires' => '2027-06-30' ) );
+	OYS_Held::to_online( 'motibro-t-booked', '2027-06-30' );
+	$pf = OYS_Passes::for_user( $f )[0];
+	global $wpdb;
+	$wpdb->insert( OYS_Install::table( 'bookings' ), array( 'session_id' => make_session( array( 'format' => 'online' ) )->id, 'user_id' => $f, 'pass_id' => $pf->id, 'status' => 'confirmed', 'created_at' => oys_now() ) );
+	ok( is_wp_error( OYS_Held::act( 'motibro-t-booked', 'revoke' ) ) && 1 === count( OYS_Passes::for_user( $f ) ), 'already used for a booking: nothing changes, and it says so' );
 	// „azokat javítsd ki, hogy nem 2075-ig jók”: Motibro's „never” does not win over the day the studio gives
 	$c = make_user( 'Farfuture' );
 	OYS_Held::put( 'motibro-t-far', $c, array( 'name' => '5 alkalmas', 'used' => 3, 'locked' => 0, 'left' => 2, 'expires' => '2075-05-17' ) );

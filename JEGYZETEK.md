@@ -2360,6 +2360,13 @@
     többi áthozott bérletnél adott. Utána: 0 túl messzi bérlet.
   - Teszt: 2033/0.
 
+- **2026-11-26 – Akinek Olívia nem küldött e-mailt, attól a bérlet visszavonva (olivia-studio 1.33.4, oliviajoga.online
+  3.12.46).** Áron: „Amire Olivia nem kattintott, hogy menjen e-mail neki, ő ne kapja meg a bérletet, szóval azt a
+  másikat töröld ki.”
+  - Új művelet: `POST /oys/v1/customers/held/<key>` `do=revoke`. Törli az online bérletet és lezárja a sort („bérlet
+    visszavonva – nem ment neki e-mail”). Ha már foglaltak vele, nem változtat semmit, és ezt jelzi.
+  - Vivien sora marad (ő privát órát kapott, Áron kérésére). Teszt: 2035/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
