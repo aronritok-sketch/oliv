@@ -1702,6 +1702,15 @@ test( 'Áron 25 Nov: „mindenhol legyen favicon a találatokban” – the onli
 	ok( "\0\0\1\0" === substr( (string) file_get_contents( $dir . 'favicon-online.ico' ), 0, 4 ) && str_contains( (string) file_get_contents( get_template_directory() . '/inc/seo.php' ), "header( 'Content-Type: image/x-icon' )" ), '/favicon.ico is a real .ico (16, 32, 48 px), sent with 200' );
 } );
 
+test( 'Olívia 19 Nov / Áron 26 Nov: the one-to-one times in the calendar from 14:00 to 22:00 on the online site („Olívia kérése legyen”)', function () {
+	update_option( 'oy_edition', 'hu-online' );
+	$times = OYS_Privates::ask_times();
+	$any   = OYS_I18n::with( 'hu', fn() => OYS_Privates::slot_label( array( 'day' => wp_date( 'Y-m-d', time() + 3 * DAY_IN_SECONDS ), 'time' => '' ) ) );
+	update_option( 'oy_edition', 'fort-myers' );
+	ok( '14:00' === $times[0] && '22:00' === end( $times ) && 17 === count( $times ), 'half hours from 14:00 to 22:00: ' . $times[0] . ' … ' . end( $times ) );
+	ok( str_ends_with( $any, 'bármikor 14:00 és 22:00 között' ), '„any time” says 14:00–22:00: ' . $any );
+} );
+
 test( 'Áron 25 Nov: „footerben viszont maradjon szövegként” – the online footer has the line again, as plain text', function () {
 	update_option( 'oy_edition', 'hu-online' );
 	$foot = oy_specialities_text();

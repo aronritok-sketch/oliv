@@ -2072,6 +2072,12 @@
   ahogy az .online-on is (`REMOVED_FILES`, `REPLACED_TEXT_START`). Helyben 390 és 1280 px: 14 kártya, 0 törött kép, nincs
   túlcsordulás. check.py: 4222/0, `--after` 1217/0.
 
+- **2026-11-26 – Privát időpont a naptárban 14:00–22:00 (oliviajoga.online 3.12.27).** Olívia (portál-chat, 11.19.,
+  9148987): „itt 14:00-tól lehessen kiválasztani 22:00-ig”; Áron korábban 14–21-et kért, a kérdésre: „Olívia kérése
+  legyen”. Az online kiadásban félóránként 14:00-tól 22:00-ig (17 gomb), „Bármikor jó 14 és 22 óra között”
+  (`oys_calendar_ask_hours` szűrő a témában; a bővítmény alapértéke 14–21 maradt a többi oldalnak). Tesztek: 1824/0.
+  Előtte Olíviának üzenet ment (9149107) a két oldal változásairól.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

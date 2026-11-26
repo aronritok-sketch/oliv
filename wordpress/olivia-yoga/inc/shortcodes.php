@@ -511,6 +511,9 @@ add_action( 'init', function () {
 	) : $m );
 	// „Choose more in the calendar” on the request form: the calendar on the prices page
 	add_filter( 'oys_calendar_url', fn( $u ) => oy_online_only() ? oy_page_link( 'schedule-pricing', 'naptar' ) : $u );
+	// Olívia, 19 November (portal chat): „itt 14:00-tól lehessen kiválasztani 22:00-ig” – Áron, 26 November: „Olívia kérése
+	// legyen” – the one-to-one times in the calendar from 14:00 to 22:00
+	add_filter( 'oys_calendar_ask_hours', fn( $h ) => oy_online_only() ? array( 14, 22 ) : $h );
 	add_filter( 'oys_birthday_note', fn( $t ) => oy_online_only() ? __( 'Optional, but worth filling in: on your birthday I will treat you to a little gift.', 'olivia-yoga' ) : $t );
 	add_shortcode( 'oy_schedule', fn() => '<div class="block-wide">' . $studio( 'oys_schedule', '<p>' . esc_html__( 'The timetable is coming soon.', 'olivia-yoga' ) . '</p>' )
 		// Olívia, 19 November: the calendar here opens like on the booking page (it stayed open once opened); the cancellation
