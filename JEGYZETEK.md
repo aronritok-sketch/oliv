@@ -2129,6 +2129,11 @@
   Emlékeztetők → „Lejáró bérlet” napok.
   Tesztek: 1880/0; .hu check.py 4358/0, `--after` 1353/0.
 
+- **2026-11-26 – Adatvédelmi oldal: háromszor szerepelt a „Hol vannak az adataid?” (oliviajoga.online 3.12.29).** Az élő
+  ellenőrzésnél derült ki: a 11.19-i frissítés új szövege tartalmazta a régit, ezért minden újabb revíziónál újra beszúrta
+  a szerver-szakaszt. Javítva: egy csere csak akkor fut, ha az új szöveg még nincs az oldalon, és a frissítés az ismétlődő
+  szakaszokból egyet hagy meg (a többi mondat és Olívia saját szövege marad). Teszt: 1881/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -891,7 +891,7 @@ function oy_migrate_1126() {
 }
 
 function oy_migrate_privacy_1119() {
-	$rev = '2026-11-26c';
+	$rev = '2026-11-26d';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_privacy_1119_rev' ) === $rev ) {
 		return array();
 	}
@@ -903,11 +903,23 @@ function oy_migrate_privacy_1119() {
 	$html = (string) $page->post_content;
 	$n    = 0;
 	foreach ( oy_privacy_1119_pairs() as $pair ) {
-		if ( str_contains( $html, $pair[0] ) ) {
+		// a new text that holds the old one (the server section, the retention) is done once: a later revision must not
+		// add it again
+		if ( str_contains( $html, $pair[0] ) && ! str_contains( $html, $pair[1] ) ) {
 			$html = str_replace( $pair[0], $pair[1], $html );
 			++$n;
 		}
 	}
+	// … and where earlier revisions did add it again („Hol vannak az adataid?” three times on 26 November), it stays once
+	$html = preg_replace_callback(
+		'~(<h2>Hol vannak az adataid\?</h2>\s*<p>Az oldal és az adatbázisa a GoDaddy[^<]*</p>\s*){2,}~u',
+		function ( $m ) use ( &$n ) {
+			++$n;
+			preg_match( '~<h2>Hol vannak az adataid\?</h2>\s*<p>Az oldal és az adatbázisa a GoDaddy[^<]*</p>\s*~u', $m[0], $one );
+			return $one[0];
+		},
+		$html
+	);
 	if ( ! $n ) {
 		return array();
 	}

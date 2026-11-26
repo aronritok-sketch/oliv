@@ -1553,6 +1553,21 @@ test( 'Áron 19 Nov: a profile photo, the required details (name, phone number, 
 	$data = json_decode( (string) file_get_contents( get_template_directory() . '/demo/content-hu-online.json' ), true );
 	ok( str_contains( $data['privacy']['content'], 'telefonszámod, a településed,' ) && str_contains( $data['privacy']['content'], 'ha feltöltesz, a profilképed' ), 'privacy notice: the town and the profile photo among the account data' );
 	ok( 6 === count( oy_privacy_1119_pairs() ) && str_contains( oy_privacy_1119_pairs()[3][1], 'a profilképed' ) && str_contains( oy_privacy_1119_pairs()[4][1], 'feliratkozó űrlapján' ), '… on the live page too (once), and the newsletter signup' );
+	// a later revision does not add a section again, and the copies an earlier one added go (live, 26 November: three times)
+	update_option( 'oy_edition', 'hu-online' );
+	$pp0  = get_option( 'wp_page_for_privacy_policy' );
+	$srv  = '<h2>Hol vannak az adataid?</h2>' . "\n" . '<p>Az oldal és az adatbázisa a GoDaddy virtuális szerverén (VPS) fut, európai uniós adatközpontban; a szervert a HelloProVision üzemelteti.</p>' . "\n";
+	$keep = '<p>A fiókod adatait addig, amíg a fiókod megvan, vagy amíg nem kéred a törlésüket. A hírlevél-feliratkozásod adatait addig, amíg le nem iratkozol; a meg nem erősített feliratkozást és a leiratkozott címet 30 nap után töröljük. A fizetések…</p>';
+	$pid  = wp_insert_post( array( 'post_type' => 'page', 'post_status' => 'publish', 'post_title' => 'Adatvédelem (teszt 2)', 'post_content' => '<p>Eleje.</p>' . "\n" . $srv . $srv . $srv . '<h2>Adataid az Egyesült Államokban</h2>' . "\n" . '<p>Az Arovia Group LLC amerikai cég, …</p>' . "\n" . $keep ) );
+	update_post_meta( $pid, 'oy_privacy', 1 );
+	update_option( 'wp_page_for_privacy_policy', $pid );
+	delete_option( 'oy_privacy_1119_rev' );
+	oy_migrate_privacy_1119();
+	$new = get_post_field( 'post_content', $pid );
+	wp_delete_post( $pid, true );
+	update_option( 'wp_page_for_privacy_policy', $pp0 );
+	update_option( 'oy_edition', 'fort-myers' );
+	ok( 1 === substr_count( $new, 'Hol vannak az adataid?' ) && 1 === substr_count( $new, 'Hírlevél-feliratkozásod' ) + substr_count( $new, 'hírlevél-feliratkozásod' ) && str_contains( $new, '<p>Eleje.</p>' ), 'the server section once again, the retention sentence not added twice' );
 } );
 
 test( 'Áron 19 Nov (evening): the chosen times survive signing up and logging in; several times in one go; a taken time can\'t be chosen', function () {
