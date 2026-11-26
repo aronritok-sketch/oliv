@@ -5949,6 +5949,13 @@ test( 'Áron 26 Nov: the Motibro past closed – „akit nem hozott át most Oli
 	$log = sent_mails( fn() => OYS_Held::email_customer( $a, 'Privát óra', 'Privát óra a bérletedből', "Szia {first_name}!\n\n{password_button}\n\nÖlelés", 'motibro-t-on' ) );
 	ok( 1 === count( $log ) && get_userdata( $a )->user_email === $log[0]['to'] && str_contains( $log[0]['html'], 'Szia Holdon!' ) && str_contains( html_entity_decode( $log[0]['html'] ), 'oys_welcome=' . $a . '.' ) && str_contains( OYS_Held::get( 'motibro-t-on' )['note'], '„Privát óra”' ), 'to the guest: her name, her own one-tap link, noted on the row' );
 	ok( isset( rest_get_server()->get_routes()['/oys/v1/customers/(?P<id>\d+)/email'], rest_get_server()->get_routes()['/oys/v1/customers/held/close-rest'] ), 'both over REST, for the studio' );
+	// „a Viviennek 1 órára lehessen privát órára a 3 bérletét”
+	$res = OYS_Held::act( 'motibro-t-on', 'private', '', '', 1 );
+	$w   = OYS_Held::with_passes()['motibro-t-on']['pass'];
+	ok( ! is_wp_error( $res ) && 'private' === $res['status'] && 'private' === $w['kind'] && 1 === $w['left'] && 1 === $w['total'] && str_starts_with( (string) $w['expires'], '2027-02-0' ), 'her 3 online sessions: one 60-minute private class, same last day' );
+	$priv = make_session( array( 'kind' => 'private', 'format' => 'online', 'capacity' => 1 ) );
+	eq( 1, OYS_Passes::available_for( $a, $priv, 'online' ), '… which pays for a private class' );
+	ok( is_wp_error( OYS_Held::act( 'motibro-t-off', 'private', '', '', 1 ) ), 'only a row already moved online' );
 	update_option( OYS_Held::OPTION, $keep, false );
 } );
 

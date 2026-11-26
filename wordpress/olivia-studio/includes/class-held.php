@@ -56,11 +56,37 @@ class OYS_Held {
 				'methods'             => 'POST',
 				'permission_callback' => $can,
 				'callback'            => function ( WP_REST_Request $r ) {
-					$res = self::act( (string) $r['key'], sanitize_key( (string) $r->get_param( 'do' ) ), sanitize_textarea_field( (string) $r->get_param( 'note' ) ), sanitize_text_field( (string) $r->get_param( 'until' ) ) );
+					$res = self::act( (string) $r['key'], sanitize_key( (string) $r->get_param( 'do' ) ), sanitize_textarea_field( (string) $r->get_param( 'note' ) ), sanitize_text_field( (string) $r->get_param( 'until' ) ), (int) $r->get_param( 'credits' ) );
 					return is_wp_error( $res ) ? $res : rest_ensure_response( $res );
 				},
 			) );
 		} );
+	}
+
+	/**
+	 * The sessions moved online, swapped for private class credits (Áron, 26 November: „a Viviennek 1 órára lehessen
+	 * privát órára a 3 bérletét”): the online pass becomes a private pass of $credits 60-minute sessions, same last day.
+	 */
+	public static function to_private( $key, $credits = 1 ) {
+		global $wpdb;
+		$e = self::get( $key );
+		if ( ! $e || 'online' !== $e['status'] ) {
+			return new WP_Error( 'oys_held', 'Only a row already moved online.', array( 'status' => 400 ) );
+		}
+		$t = OYS_Install::table( 'passes' );
+		$p = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $t WHERE user_id = %d AND product_id = %s ORDER BY id DESC LIMIT 1", (int) $e['user'], (string) $key ) );
+		if ( ! $p ) {
+			return new WP_Error( 'oys_held', 'The online pass is not there.', array( 'status' => 404 ) );
+		}
+		$credits = max( 1, (int) $credits );
+		$name    = sprintf( _n( '%d private class (60 min), from your Motibro pass', '%d private classes (60 min), from your Motibro pass', $credits, 'olivia-studio' ), $credits );
+		$wpdb->update( $t, array( 'kind' => 'private', 'credits_total' => $credits, 'credits_left' => $credits, 'name' => $name ), array( 'id' => (int) $p->id ) );
+		$all                     = self::all();
+		$all[ $key ]['status']   = 'private';
+		$all[ $key ]['note']     = trim( $all[ $key ]['note'] . "\n" . wp_date( 'Y-m-d' ) . ': ' . sprintf( __( '%1$d sessions → %2$s', 'olivia-studio' ), (int) $p->credits_left, $name ) );
+		$all[ $key ]['updated']  = current_time( 'mysql', true );
+		self::save( $all );
+		return true;
 	}
 
 	/** Everything not moved online is closed (Áron, 26 November: „akit nem hozott át most Olivia online-ra, azok kuka”). */
@@ -80,7 +106,7 @@ class OYS_Held {
 		global $wpdb;
 		$out = array();
 		foreach ( self::all() as $k => $e ) {
-			$p = 'online' === $e['status'] ? $wpdb->get_row( $wpdb->prepare( 'SELECT id, kind, credits_left, credits_total, expires_at FROM ' . OYS_Install::table( 'passes' ) . ' WHERE user_id = %d AND product_id = %s ORDER BY id DESC LIMIT 1', (int) $e['user'], (string) $k ) ) : null;
+			$p = in_array( $e['status'], array( 'online', 'private' ), true ) ? $wpdb->get_row( $wpdb->prepare( 'SELECT id, kind, credits_left, credits_total, expires_at FROM ' . OYS_Install::table( 'passes' ) . ' WHERE user_id = %d AND product_id = %s ORDER BY id DESC LIMIT 1', (int) $e['user'], (string) $k ) ) : null;
 			$u = get_userdata( (int) $e['user'] );
 			$out[ $k ] = $e + array( 'pass' => $p ? array( 'id' => (int) $p->id, 'kind' => $p->kind, 'left' => (int) $p->credits_left, 'total' => (int) $p->credits_total, 'expires' => $p->expires_at ) : null, 'guest' => $u ? $u->display_name : '' );
 		}
@@ -243,6 +269,11 @@ class OYS_Held {
 
 	/** held → redeemed (with what for), → online (until a day), or back to held. */
 	public static function act( $key, $do, $note = '', $until = '' ) {
+		if ( 'private' === $do ) {
+			$credits = func_num_args() > 4 ? (int) func_get_arg( 4 ) : 1;
+			$res     = self::to_private( $key, $credits ?: 1 );
+			return is_wp_error( $res ) ? $res : self::get( $key );
+		}
 		$all = self::all();
 		if ( ! isset( $all[ $key ] ) ) {
 			return new WP_Error( 'oys_held', __( 'Not found.', 'olivia-studio' ), array( 'status' => 404 ) );
@@ -368,6 +399,7 @@ class OYS_Held {
 			'online'   => __( 'moved online', 'olivia-studio' ),
 			'redeemed' => __( 'redeemed', 'olivia-studio' ),
 			'closed'   => __( 'closed', 'olivia-studio' ),
+			'private'  => __( 'swapped for a private class', 'olivia-studio' ),
 		)[ $e['status'] ] ?? $e['status'];
 		$flags = ( $e['missing'] ? ' · <span class="oys-status oys-status--offered">' . esc_html__( 'not in the newer export – check in Motibro', 'olivia-studio' ) . '</span>' : '' )
 			. ( $e['expires'] && $e['expires'] < wp_date( 'Y-m-d' ) ? ' · ' . esc_html__( 'expired there', 'olivia-studio' ) : '' );

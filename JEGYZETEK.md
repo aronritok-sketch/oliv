@@ -2334,6 +2334,10 @@
     megmarad nyomnak, de eltűnik a vendég fiókjából, a számlálókból és a Vendégek listájáról.
     `POST /oys/v1/customers/held/close-rest` lezár minden nem áthozottat. A `GET /customers/held` mostantól az online
     tételek mögötti bérletet is mutatja (ellenőrzéshez).
+  - **Motibrós bérlet → privát óra** (1.33.2, Áron: „a Viviennek 1 órára lehessen privát órára a 3 bérletét”):
+    `POST /oys/v1/customers/held/<key>` `do=private&credits=1`. Az online bérletből `private` típusú, 1 alkalmas bérlet
+    lesz („1 privát óra (60 perc) – a Motibrós bérletedből”), ugyanazzal a lejárattal. Ebből fizethető egy 60 perces
+    privát óra. A tétel állapota „privát órára váltva”.
   - **Egyedi levél egy vendégnek:** `POST /oys/v1/customers/<id>/email` (`subject`, `heading`, `body` hírlevél-formátumban,
     `{password_button}`, `test_to`, `note_key`).
   - Teszt: 2027/0.

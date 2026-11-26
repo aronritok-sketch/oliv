@@ -9699,3 +9699,14 @@ msgstr "lezárva – nem lett online"
 
 msgid "closed"
 msgstr "lezárva"
+
+msgid "%d private class (60 min), from your Motibro pass"
+msgid_plural "%d private classes (60 min), from your Motibro pass"
+msgstr[0] "%d privát óra (60 perc) – a Motibrós bérletedből"
+msgstr[1] "%d privát óra (60 perc) – a Motibrós bérletedből"
+
+msgid "%1$d sessions → %2$s"
+msgstr "%1$d alkalom → %2$s"
+
+msgid "swapped for a private class"
+msgstr "privát órára váltva"
