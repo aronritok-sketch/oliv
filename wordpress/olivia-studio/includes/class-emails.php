@@ -494,9 +494,10 @@ class OYS_Emails {
 			'email'    => self::user_email( (int) $e['user'] ),
 			'account'  => oys_account_url(),
 		) );
-		// Áron, 26 November: „közvetlen legyen az a gomb, hogy elfelejtett jelszó” – the button opens the lost password page
-		// (the guest types the address, the „New password” email comes), right under the first paragraph; the steps follow
-		$button  = $t['button'] ? self::button_html( array( OYS_Email_Templates::fill( $t['button'], $vars ), wp_lostpassword_url() ), '20px 0 24px' ) : '';
+		// Áron, 26 November: „közvetlen legyen az a gomb, hogy elfelejtett jelszó … Hülye biztosat csináld meg” – the button
+		// is the guest's own link: they choose a password and are logged in (OYS_Welcome); right under the first paragraph,
+		// the steps follow. The studio's test copy gets a link that only says it is a preview.
+		$button  = $t['button'] ? self::button_html( array( OYS_Email_Templates::fill( $t['button'], $vars ), OYS_Welcome::link( (int) $e['user'], '' !== $test_to ) ), '20px 0 24px' ) : '';
 		$body    = OYS_Email_Templates::paragraphs( $t['message'], $vars ) . $button . OYS_Email_Templates::paragraphs( $t['closing'], $vars );
 		$cta     = null;
 		$subject = ( $test_to ? __( '[Test]', 'olivia-studio' ) . ' ' : '' ) . OYS_Email_Templates::fill( $t['subject'], $vars );

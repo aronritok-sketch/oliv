@@ -8648,8 +8648,8 @@ msgstr "Lépj be ezzel az e-mail-címmel, és foglalj az órarendből. Először
 msgid "Log in and book"
 msgstr "Belépés és foglalás"
 
-msgid "How to log in the first time on the new site:\n\n1. Tap „Set my password” above. It opens the „Lost password” page: type this email address ({email}) and tap „Get new password”.\n\n2. In a few minutes you get an email with the subject „New password” (look in your spam folder too). Tap the button in it, choose your password and save it.\n\n3. Then tap „Back to log in” (or open {account}), choose the „I have an account” tab and log in with your email address and your new password.\n\n4. Accept the participation agreement, answer yes or no to the newsletter, and you can book from the timetable.\n\nAlready set your password? Skip all this and log in here: {account}"
-msgstr "Így lépsz be először az új oldalon:\n\n1. Kattints a fenti „Jelszót állítok be” gombra. Az „Elfelejtett jelszó” oldalra visz: írd be ezt az e-mail-címet ({email}), és kattints az „Új jelszót kérek” gombra.\n\n2. Pár perc múlva kapsz egy levelet „Új jelszó” tárggyal (ha nem látod, nézd meg a spam mappát is). Kattints benne az „Új jelszót adok meg” gombra, add meg a jelszavad, és kattints az „Elmentem” gombra.\n\n3. Utána kattints a „Vissza a belépéshez” linkre (vagy nyisd meg ezt: {account}), válaszd a „Van fiókom” fület, és lépj be az e-mail-címeddel és az új jelszavaddal.\n\n4. Fogadd el a részvételi nyilatkozatot, válaszolj a hírlevél kérdésére, és már foglalhatsz is az órarendből.\n\nMár beállítottad a jelszavad? Akkor ezt mind kihagyhatod, és itt lépj be: {account}"
+msgid "How it goes (2 minutes):\n\n1. Tap „Set my password” above and choose a password. You're logged in straight away, nothing else to type.\n\n2. Accept the participation agreement, answer yes or no to the newsletter, and tap „Save”.\n\n3. Pick a class from the timetable and book.\n\nNext time you log in at {account}: the „I have an account” tab, your email address ({email}) and your password.\n\nThe button works for 30 days. If it has run out, tap it anyway: you can ask for a new one with one tap."
+msgstr "Így megy (2 perc az egész):\n\n1. Kattints a fenti „Jelszót állítok be” gombra, és adj meg egy jelszót. Utána rögtön be is lépsz, mást nem kell beírnod.\n\n2. Fogadd el a részvételi nyilatkozatot, válaszolj a hírlevél kérdésére, és kattints a „Mentés” gombra.\n\n3. Válassz órát az órarendből, és foglalj.\n\nKésőbb így lépsz be: {account} – „Van fiókom” fül, az e-mail-címed ({email}) és a jelszavad.\n\nA gomb 30 napig működik. Ha lejárt, akkor is kattints rá: egy gombnyomással kérhetsz újat."
 
 msgid "Set my password"
 msgstr "Jelszót állítok be"
@@ -9465,3 +9465,72 @@ msgstr "Igen, kérem a hírlevelet"
 
 msgid "No, thank you"
 msgstr "Nem, köszönöm"
+
+msgid "This is only a preview. In the guest's email this button opens the page where they choose a password and are logged in at once."
+msgstr "Ez csak egy előnézet. A vendég levelében ez a gomb arra az oldalra visz, ahol megadja a jelszavát, és rögtön be is lép."
+
+msgid "You are logged in with another account. Log out, then tap the button in the email again."
+msgstr "Most egy másik fiókkal vagy belépve. Jelentkezz ki, aztán kattints újra a levélben lévő gombra."
+
+msgid "This link doesn't work. Log in below, or tap „Forgot your password?” and we'll send you a new one."
+msgstr "Ez a link nem működik. Lépj be lent, vagy kattints az „Elfelejtetted a jelszavad?” linkre, és küldünk egy újat."
+
+msgid "Log in with your password instead"
+msgstr "Inkább belépek a jelszavammal"
+
+msgid "Choose your password"
+msgstr "Add meg a jelszavad"
+
+msgid "Hi %s! Choose a password and you're in. Nothing else to do here."
+msgstr "Szia %s! Adj meg egy jelszót, és már bent is vagy. Itt mást nem kell tenned."
+
+msgid "Your email address – you log in with this"
+msgstr "Az e-mail-címed – ezzel lépsz be"
+
+msgid "Your new password (at least 8 characters)"
+msgstr "Az új jelszavad (legalább 8 karakter)"
+
+msgid "Show the password while I type"
+msgstr "Mutasd a jelszót, amíg gépelem"
+
+msgid "Save and log in"
+msgstr "Elmentem és belépek"
+
+msgid "You have already set your password with this link. Log in with your email address and that password:"
+msgstr "Ezzel a linkkel már beállítottad a jelszavad. Lépj be az e-mail-címeddel és azzal a jelszóval:"
+
+msgid "This link has run out (it works for 30 days). Tap the button and we'll send a new one to your email address at once:"
+msgstr "Ez a link már lejárt (30 napig működik). Kattints a gombra, és azonnal küldünk egy újat az e-mail-címedre:"
+
+msgid "Send me a new link"
+msgstr "Kérek egy új linket"
+
+msgid "I don't remember it – send me a new link"
+msgstr "Nem emlékszem rá – kérek egy új linket"
+
+msgid "This link has run out"
+msgstr "Ez a link már lejárt"
+
+msgid "This link doesn't work any more. Log in below, or tap „Forgot your password?” and we'll send you a new one."
+msgstr "Ez a link már nem működik. Lépj be lent, vagy kattints az „Elfelejtetted a jelszavad?” linkre, és küldünk egy újat."
+
+msgid "Your password needs at least 8 characters."
+msgstr "A jelszavad legyen legalább 8 karakter."
+
+msgid "Done, you're logged in! One last step: fill in what's missing below and tap „Save”. Then you can book."
+msgstr "Kész, be is léptél! Már csak egy lépés: töltsd ki lent, ami hiányzik, és kattints a „Mentés” gombra. Utána már foglalhatsz."
+
+msgid "Done, you're logged in! Pick a class and book."
+msgstr "Kész, be is léptél! Válassz órát, és foglalj."
+
+msgid "You already have an account with %s."
+msgstr "Ezzel a címmel már van fiókod: %s."
+
+msgid "We've sent a link to %s. Open the email „New password” (look in the spam folder too) and tap its button: you choose a password and you're in."
+msgstr "Küldtünk egy linket ide: %s. Nyisd meg az „Új jelszó” levelet (nézd meg a spam mappát is), és kattints benne a gombra: megadod a jelszavad, és már bent is vagy."
+
+msgid "Two things, then you can book"
+msgstr "Még két dolog, és foglalhatsz"
+
+msgid "Everything is there. Pick a class and book!"
+msgstr "Minden megvan. Válassz órát, és foglalj!"

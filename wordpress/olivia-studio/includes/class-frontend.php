@@ -1405,6 +1405,9 @@ class OYS_Frontend {
 		if ( isset( $_GET['live'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification -- the live page of a class (OYS_Live)
 			return $flash . OYS_Live::page();
 		}
+		if ( ! is_user_logged_in() && 'setpass' === ( $_GET['oys_view'] ?? '' ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			return $flash . OYS_Welcome::page(); // the button in the Motibro email (Áron, 26 November: „hülyebiztosra”)
+		}
 		if ( ! is_user_logged_in() ) {
 			// Áron, 19 November: „ha új fiókot hozok létre … eltűnik a foglalni kívánt időpont”; „ha van fiókja és belép, akkor
 			// is mentse” – after signing up or logging in, back to this very address (the private tab, the chosen times)
@@ -1880,9 +1883,14 @@ class OYS_Frontend {
 	}
 
 	private static function tab_profile( $user_id ) {
-		$u   = get_userdata( $user_id );
-		$m   = fn( $k ) => esc_attr( get_user_meta( $user_id, $k, true ) );
-		$out = self::form_open( 'oys_profile', 'class="oys-form oys-card" enctype="multipart/form-data"' ) . '<h3>' . esc_html__( 'Your details', 'olivia-studio' ) . '</h3>'
+		$u      = get_userdata( $user_id );
+		$m      = fn( $k ) => esc_attr( get_user_meta( $user_id, $k, true ) );
+		$waiver = OYS_Customers::has_waiver( $user_id ) ? '' : '<fieldset class="oys-choice oys-choice--waiver" id="oys-p-waiver"><legend>' . esc_html__( 'Participation agreement', 'olivia-studio' ) . ' <span class="oys-req" aria-hidden="true">*</span></legend>' . self::waiver_field() . '</fieldset>';
+		// Áron, 26 November („hülyebiztosra”): what still stands between the guest and booking – the agreement, yes or no to
+		// the newsletter – comes first, with its own Save button, not at the bottom of a long form
+		$first  = '' !== $waiver || ! OYS_Customers::marketing_answered( $user_id );
+		$todo   = $first ? '<div class="oys-todo" id="oys-p-todo"><h3>' . esc_html__( 'Two things, then you can book', 'olivia-studio' ) . '</h3>' . $waiver . self::newsletter_choice( $user_id ) . '<button class="btn btn--primary" type="submit">' . esc_html__( 'Save', 'olivia-studio' ) . '</button></div>' : '';
+		$out    = self::form_open( 'oys_profile', 'class="oys-form oys-card" enctype="multipart/form-data"' ) . $todo . '<h3>' . esc_html__( 'Your details', 'olivia-studio' ) . '</h3>'
 			// Áron, 19 November: „lehessen profilképet feltölteni”
 			. '<div class="oys-avatar-field" id="oys-avatar"><span class="oys-avatar oys-avatar--lg" data-oys-avatar-preview>' . self::avatar_html( $user_id, 160 ) . '</span><div class="oys-avatar-field__do">'
 			. '<label class="btn btn--ghost oys-avatar-pick"><input type="file" name="oys_avatar" id="oys-p-avatar" accept="image/jpeg,image/png,image/webp" class="oys-avatar-input" data-oys-avatar><span>' . esc_html( OYS_Customers::avatar_id( $user_id ) ? __( 'Change photo', 'olivia-studio' ) : __( 'Upload a profile photo', 'olivia-studio' ) ) . '</span></label>'
@@ -1896,11 +1904,9 @@ class OYS_Frontend {
 			. '<label class="field"><span>' . esc_html__( 'Their phone number', 'olivia-studio' ) . '</span><input type="tel" name="oys_emergency_phone" id="oys-p-ephone" value="' . $m( 'oys_emergency_phone' ) . '"></label></div>'
 			. '<label class="field"><span>' . esc_html__( 'Injuries, pregnancy or health notes (optional, only Olivia sees this)', 'olivia-studio' ) . '</span><textarea name="oys_health_notes" id="oys-p-health" rows="4">' . esc_textarea( get_user_meta( $user_id, 'oys_health_notes', true ) ) . '</textarea></label>'
 			. self::birthday_field( $user_id )
-			. self::newsletter_choice( $user_id )
+			. ( $first ? '' : self::newsletter_choice( $user_id ) )
 			. oys_fb_group_link( __( 'And join our Facebook group', 'olivia-studio' ) )
 			. '<label class="field"><span>' . esc_html__( 'New password (leave empty to keep the current one)', 'olivia-studio' ) . '</span><input type="password" name="new_password" id="oys-p-pass" minlength="8" autocomplete="new-password"></label>'
-			// Áron, 26 November: the participation agreement is part of completing the account (required)
-			. ( OYS_Customers::has_waiver( $user_id ) ? '' : '<fieldset class="oys-choice oys-choice--waiver" id="oys-p-waiver"><legend>' . esc_html__( 'Participation agreement', 'olivia-studio' ) . ' <span class="oys-req" aria-hidden="true">*</span></legend>' . self::waiver_field() . '</fieldset>' )
 			. '<button class="btn btn--primary" type="submit">' . esc_html__( 'Save', 'olivia-studio' ) . '</button></form>';
 		if ( OYS_Customers::has_waiver( $user_id ) ) {
 			$at   = get_user_meta( $user_id, 'oys_waiver_at', true );

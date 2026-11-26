@@ -191,7 +191,7 @@ class OYS_Email_Templates {
 	const FIELDS = array( 'subject', 'heading', 'message', 'closing', 'button' );
 
 	/** How a guest from Motibro logs in the first time (the held_online email, under its button). */
-	const HELD_STEPS = "How to log in the first time on the new site:\n\n1. Tap „Set my password” above. It opens the „Lost password” page: type this email address ({email}) and tap „Get new password”.\n\n2. In a few minutes you get an email with the subject „New password” (look in your spam folder too). Tap the button in it, choose your password and save it.\n\n3. Then tap „Back to log in” (or open {account}), choose the „I have an account” tab and log in with your email address and your new password.\n\n4. Accept the participation agreement, answer yes or no to the newsletter, and you can book from the timetable.\n\nAlready set your password? Skip all this and log in here: {account}";
+	const HELD_STEPS = "How it goes (2 minutes):\n\n1. Tap „Set my password” above and choose a password. You're logged in straight away, nothing else to type.\n\n2. Accept the participation agreement, answer yes or no to the newsletter, and tap „Save”.\n\n3. Pick a class from the timetable and book.\n\nNext time you log in at {account}: the „I have an account” tab, your email address ({email}) and your password.\n\nThe button works for 30 days. If it has run out, tap it anyway: you can ask for a new one with one tap.";
 
 	/**
 	 * The email as it will be sent: saved texts over the defaults, plus `enabled`.

@@ -702,3 +702,10 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 .oys-choice .oys-small { margin: 0 0 .5rem; }
 .oys-choice .oys-check { margin: .3rem 0; }
 .oys-req { color: #b3261e; }
+/* … what is still missing comes first on the profile, where the welcome link lands (Áron, 26 November: „hülyebiztosra”) */
+.oys-todo { margin: 0 0 1.75rem; padding: 1rem 1.1rem 1.25rem; border-radius: 18px; background: var(--sun-soft, #FFF4C2); scroll-margin-top: 96px; }
+.oys-todo h3 { margin-top: 0; }
+.oys-todo fieldset.oys-choice { background: #fff; padding: 1rem 1.1rem; margin: 0 0 .9rem; }
+.oys-todo .oys-choice legend { float: left; width: 100%; padding: 0; margin: 0 0 .5rem; }
+.oys-todo .oys-choice legend + * { clear: both; }
+.oys-setpass { scroll-margin-top: 96px; }

@@ -123,9 +123,11 @@ add_filter( 'retrieve_password_notification_email', function ( $mail, $key, $use
 	// Áron, 26 November: „írjuk le, hogyha módosította a jelszót, mit kell csináljon, hogy be tudjon lépni, tehát hogy
 	// kattintson a van fiókomra” – the way in after the new password, with the account page on that tab
 	$login = add_query_arg( 'oys_view', 'login', function_exists( 'oys_account_url' ) ? oys_account_url() : home_url( '/fiokom/' ) );
+	// a guest's button opens the studio's own page: the password, and they are logged in (OYS_Welcome, „hülyebiztosra”)
+	$guest = $user instanceof WP_User && class_exists( 'OYS_Welcome' ) && OYS_Customers::is_customer_only( $user );
 	$body  = '<p>' . esc_html( $name ? 'Szia ' . $name . '!' : 'Szia!' ) . '</p>'
-		. '<p>Új jelszót kértél az ' . esc_html( oy_site_name() ) . ' fiókodhoz. A lenti „Új jelszót adok meg” gombra kattintva megadhatod. A link egy napig érvényes.</p>'
-		. '<p><b>Ha elmentetted az új jelszavad, így lépsz be:</b> nyisd meg a <a href="' . esc_url( $login ) . '">Fiókom</a> oldalt, kattints a „Van fiókom” fülre, és írd be az e-mail-címed és az új jelszavad. Utána már foglalhatsz is az órarendből.</p>'
+		. '<p>Új jelszót kértél az ' . esc_html( oy_site_name() ) . ' fiókodhoz. Kattints a lenti „Új jelszót adok meg” gombra, és add meg a jelszavad' . ( $guest ? ': utána rögtön be is lépsz, mást nem kell beírnod' : '' ) . '. A link egy napig érvényes.</p>'
+		. '<p><b>Később így lépsz be:</b> a <a href="' . esc_url( $login ) . '">Fiókom</a> oldalon kattints a „Van fiókom” fülre, és írd be az e-mail-címed és a jelszavad.</p>'
 		. '<p>Ha nem te kérted, nem kell tenned semmit: a jelszavad marad a régi.</p>';
 	$mail['subject'] = 'Új jelszó – ' . oy_site_name();
 	$mail['message'] = OYS_Emails::wrap_public( 'Új jelszó', $body, array( 'Új jelszót adok meg', $url ) );

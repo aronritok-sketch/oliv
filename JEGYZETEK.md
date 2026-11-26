@@ -2240,6 +2240,29 @@
     szövege (csak a mezők nevét), és a legutóbbi frissítési naplót.
   - A dátum után nincs dupla pont („2027. január 27.”). Teszt: 1960/0.
 
+- **2026-11-26 – „Hülyebiztos” fiókaktiválás: egy gomb, jelszó, és bent van (olivia-studio 1.31.0, oliviajoga.online
+  3.12.38).** Áron: „Hülye biztosat csináld meg. Hülye biztosra.”
+  - **A levél gombja („Jelszót állítok be”) a vendég saját linkje** (`OYS_Welcome`). Egy koppintás, és megnyílik az „Add
+    meg a jelszavad” oldal: kiírja a vendég e-mail-címét („ezzel lépsz be”), egyetlen jelszómező van (gépelés közben
+    látszik), és az „Elmentem és belépek” gombbal rögtön be is lép. Nem kell e-mail-címet gépelni, második levélre várni
+    vagy külön belépni.
+  - **Belépés után** az Adatlapon a hiányzó két dolog van legfelül, és az oldal oda is ugrik: „Még két dolog, és
+    foglalhatsz” (nyilatkozat, hírlevél igen/nem, saját Mentés gomb). Mentés után egyenesen a foglalási oldalra visz:
+    „Minden megvan. Válassz órát, és foglalj!”
+  - **A link** 30 napig és egyszer működik, e-mail-cím nincs benne. A kulcs rövid életű sütibe kerül, az oldal tiszta
+    címen nyílik (`/fiokom/?oys_view=setpass`), így az Analyticsbe és az előzményekbe semmi nem kerül.
+    - Ha már használták: a belépés jelenik meg, kitöltött e-mail-címmel, és egy „Nem emlékszem rá – kérek egy új linket”
+      gombbal.
+    - Ha lejárt: „Kérek egy új linket” (egy gomb, 10 percenként legfeljebb egyszer).
+  - Olívia „Teszt magamnak” példányában a gomb csak egy „Ez csak egy előnézet” üzenetet mutat, a vendég linkje érvényes
+    marad.
+  - **Az „Elfelejtett jelszó” levél linkje** is erre az oldalra visz a vendégeknek (a stúdió fiókjainak marad a WordPress
+    saját képernyője).
+  - **Ha valaki a meglévő címével újra regisztrálna**, hibaüzenet helyett megkapja a linket („Ezzel a címmel már van
+    fiókod … Küldtünk egy linket”), és nem jön létre második fiók.
+  - Böngészőben (iPhone-méret) a helyi másolaton végigkattintva: link → jelszó → belépve az Adatlapon a két
+    hiányzónál → mentés → /foglalas/. Ugyanaz a link újra: belépés kitöltött címmel. Teszt: 1974/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -249,6 +249,13 @@ class OYS_Customers {
 		$area  = sanitize_text_field( wp_unslash( $_POST['area'] ?? '' ) );
 		$pass  = (string) wp_unslash( $_POST['password'] ?? '' );
 
+		// Áron, 26 November („hülyebiztosra”): someone who already has an account here (a guest from Motibro, or who forgot)
+		// and signs up again gets the link to choose a password, not an error
+		$known = is_email( $email ) && empty( $_POST['website'] ) ? get_user_by( 'email', $email ) : false;
+		if ( $known && self::is_customer_only( $known ) ) {
+			OYS_Welcome::send_new( $known, true );
+			oys_redirect( add_query_arg( 'oys_view', 'login', $back ) );
+		}
 		$errors = self::register_errors( $first, $last, $email, $phone, $area, $pass );
 		if ( empty( $_POST['waiver'] ) ) {
 			$errors[] = __( 'Please read and accept the participation agreement.', 'olivia-studio' );
@@ -312,7 +319,14 @@ class OYS_Customers {
 		if ( ! $user_id ) {
 			oys_redirect( oys_account_url() );
 		}
-		self::save_profile( $user_id, wp_unslash( $_POST ), $_FILES ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		$before  = self::missing( $user_id );
+		$missing = self::save_profile( $user_id, wp_unslash( $_POST ), $_FILES ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput
+		if ( $before && ! $missing ) {
+			// Áron, 26 November („hülyebiztosra”): the account is complete – straight on to booking, with one message
+			oys_render_flash();
+			oys_flash( __( 'Everything is there. Pick a class and book!', 'olivia-studio' ) );
+			oys_redirect( oys_page_url( 'book' ) );
+		}
 		oys_redirect( oys_account_url( 'profile' ) );
 	}
 

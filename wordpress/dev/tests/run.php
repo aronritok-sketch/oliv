@@ -5899,17 +5899,134 @@ test( 'Áron 26 Nov: „Online foglalhatóvá” – what it does, the email to 
 	ok( str_contains( $po, 'msgstr "Teszt magamnak"' ) && str_contains( $po, 'Érvényes eddig: {until}.' ), 'in Hungarian: „Teszt magamnak”, the guest\'s email' );
 } );
 
-test( 'Áron 26 Nov: the Motibro email – the button opens the lost password page, the steps to log in are in the email and in the reset email', function () {
-	$c = make_user( 'Beata' );
+test( 'Áron 26 Nov: „hülyebiztosra” – the Motibro email\'s button is the guest\'s own link: a password, logged in, what is missing, then booking', function () {
+	$go    = function ( callable $fn ) {
+		$to = '';
+		$f  = function ( $loc ) use ( &$to ) { $to = $loc; throw new RuntimeException( 'redirect' ); };
+		add_filter( 'wp_redirect', $f, 1 );
+		try { $fn(); } catch ( RuntimeException $e ) { unset( $e ); }
+		remove_filter( 'wp_redirect', $f, 1 );
+		return $to;
+	};
+	$mails = function ( callable $fn ) {
+		$log = array();
+		$f   = function ( $r, $a ) use ( &$log ) { $log[] = $a; return true; };
+		add_filter( 'pre_wp_mail', $f, 1, 2 );
+		$fn();
+		remove_filter( 'pre_wp_mail', $f, 1 );
+		return $log;
+	};
+	$post  = function ( $action, array $fields = array() ) {
+		$_POST    = array_merge( array( '_wpnonce' => wp_create_nonce( $action ) ), $fields );
+		$_REQUEST = $_POST;
+	};
+	$mail = 'beata.' . wp_rand() . '@example.test';
+	$c    = wp_insert_user( array( 'user_login' => $mail, 'user_email' => $mail, 'user_pass' => wp_generate_password(), 'first_name' => 'Beáta', 'last_name' => 'Nagy', 'role' => 'oys_customer' ) );
+	update_user_meta( $c, 'oys_imported_at', current_time( 'mysql', true ) );
+	update_user_meta( $c, 'oys_phone', '+36 30 123 4567' );
+	update_user_meta( $c, 'oys_area', 'Budapest' );
 	OYS_Held::put( 'motibro-test-pw', $c, array( 'name' => 'Hatha flow jóga bérlet - 5 alkalom (60p)', 'used' => 3, 'locked' => 0, 'left' => 2, 'expires' => '2027-01-27' ) );
 	OYS_Held::to_online( 'motibro-test-pw', '2027-01-27' );
+
+	// the email
 	$log = sent_mails( fn() => OYS_Held::notify( 'motibro-test-pw' ) );
 	$h   = $log[0]['html'] ?? '';
-	ok( 1 === count( $log ) && preg_match( '/<a href="([^"]+)"[^>]*>Set my password<\/a>/', $h, $m ) && str_contains( html_entity_decode( $m[1] ), 'wp-login.php?action=lostpassword' ), 'the button: „Set my password”, straight to the lost password page („közvetlen legyen az a gomb, hogy elfelejtett jelszó”)' );
-	ok( str_contains( $h, esc_html( get_userdata( $c )->user_email ) ) && str_contains( $h, 'I have an account' ) && str_contains( $h, 'New password' ) && str_contains( $h, esc_html( oys_account_url() ) ) && substr_count( $h, '<p>' ) >= 6, '… the steps under it: her own address to type, the „New password” email, then „I have an account” on the account page' );
-	ok( ! str_contains( $h, 'Log in and book' ), 'no more „Log in and book”' );
+	ok( 1 === count( $log ) && preg_match( '/<a href="([^"]+)"[^>]*>Set my password<\/a>/', $h, $m ) && str_contains( html_entity_decode( $m[1] ), '?oys_welcome=' . $c . '.' ), 'the button: „Set my password”, her own link („Hülye biztosat csináld meg”)' );
+	$link = html_entity_decode( $m[1] ?? '' );
+	ok( ! str_contains( $link, '@' ) && ! str_contains( $link, 'wp-login' ), '… no email address in it, no WordPress screen' );
+	ok( strpos( $h, 'Set my password</a>' ) < strpos( $h, 'How it goes' ) && str_contains( $h, 'logged in straight away' ) && str_contains( $h, esc_html( $mail ) ) && str_contains( $h, 'I have an account' ) && ! str_contains( $h, 'Log in and book' ), '… right under the first paragraph; then 3 steps, and how to log in next time' );
+	$log = sent_mails( fn() => OYS_Emails::held_online( 'motibro-test-pw', 'olivia@example.test' ) );
+	ok( str_contains( html_entity_decode( $log[0]['html'] ?? '' ), '?oys_welcome=preview' ), 'the test copy to me: a preview link (her own link stays valid)' );
 	$hu = OYS_Email_Templates::get( 'held_online', 'hu' );
-	ok( 'Jelszót állítok be' === $hu['button'] && str_contains( $hu['closing'], '„Van fiókom” fület' ) && str_contains( $hu['closing'], '„Új jelszót kérek”' ) && str_contains( $hu['closing'], '„Elmentem”' ) && str_contains( $hu['closing'], 'részvételi nyilatkozatot' ), 'in Hungarian: „Jelszót állítok be”, then „Új jelszót kérek”, „Elmentem”, the „Van fiókom” tab, the agreement' );
+	ok( 'Jelszót állítok be' === $hu['button'] && str_contains( $hu['closing'], 'Utána rögtön be is lépsz' ) && str_contains( $hu['closing'], '„Van fiókom” fül' ) && str_contains( $hu['closing'], 'részvételi nyilatkozatot' ) && str_contains( $hu['closing'], 'egy gombnyomással kérhetsz újat' ), 'in Hungarian: „Jelszót állítok be”, „Utána rögtön be is lépsz”, the agreement, a new link with one tap' );
+
+	// arriving: the key into a cookie, the page on a clean address
+	wp_set_current_user( 0 );
+	parse_str( (string) wp_parse_url( $link, PHP_URL_QUERY ), $q );
+	$key                 = (string) ( $q['oys_welcome'] ?? '' );
+	$_GET['oys_welcome'] = $key;
+	$to                  = $go( fn() => OYS_Welcome::arrive() );
+	unset( $_GET['oys_welcome'] );
+	ok( str_contains( $to, 'oys_view=setpass' ) && ! str_contains( $to, 'oys_welcome' ) && ( $_COOKIE['oys_welcome'] ?? '' ) === $key, 'tapped: the key goes into a cookie, the page opens on a clean address' );
+	$_GET['oys_view'] = 'setpass';
+	$page             = OYS_Frontend::sc_account();
+	ok( str_contains( $page, 'Choose your password' ) && str_contains( $page, 'value="' . esc_attr( $mail ) . '" readonly' ) && 1 === substr_count( $page, 'name="password"' ) && str_contains( $page, 'Save and log in' ) && str_contains( $page, 'id="oys-setpass-show" checked' ), 'the page: her address shown (that is how she logs in), one password field shown while typing, „Save and log in”' );
+
+	// saving
+	$post( 'oys_setpass', array( 'password' => 'rovid' ) );
+	$to = $go( fn() => OYS_Welcome::handle() );
+	ok( str_contains( $to, 'oys_view=setpass' ) && ! is_user_logged_in(), 'too short: back to the page, not logged in' );
+	oys_render_flash();
+	$post( 'oys_setpass', array( 'password' => 'jogajoga123' ) );
+	$to = $go( fn() => OYS_Welcome::handle() );
+	ok( get_current_user_id() === $c && wp_check_password( 'jogajoga123', get_userdata( $c )->user_pass, $c ) && str_contains( $to, 'tab=profile' ) && empty( $_COOKIE['oys_welcome'] ), 'saved: logged in at once, on her profile (the agreement and the newsletter are missing)' );
+	ok( str_contains( oys_render_flash(), 'logged in' ), '… „Done, you\'re logged in! One last step …”' );
+	$_GET['tab'] = 'profile';
+	unset( $_GET['oys_view'] );
+	$prof = OYS_Frontend::sc_account();
+	unset( $_GET['tab'] );
+	ok( str_contains( $prof, 'id="oys-p-todo"' ) && strpos( $prof, 'id="oys-p-todo"' ) < strpos( $prof, 'Your details' ) && strpos( $prof, 'id="oys-p-waiver"' ) < strpos( $prof, 'Your details' ) && 2 === substr_count( $prof, 'name="oys_marketing"' ), 'the profile: the two missing things first, with their own Save' );
+	$post( 'oys_profile', array( 'first_name' => 'Beáta', 'last_name' => 'Nagy', 'oys_phone' => '+36 30 123 4567', 'oys_area' => 'Budapest', 'oys_marketing' => '0', 'waiver' => '1' ) );
+	$to = $go( fn() => OYS_Customers::handle_profile() );
+	ok( oys_page_url( 'book' ) === $to && ! OYS_Customers::missing( $c ), 'agreement accepted, newsletter answered: straight on to the timetable' );
+	oys_render_flash();
+
+	// the same link again, a link that ran out, a wrong one
+	wp_set_current_user( 0 );
+	$_COOKIE['oys_welcome'] = $key;
+	$_GET['oys_view']       = 'setpass';
+	$page                   = OYS_Frontend::sc_account();
+	ok( 'used' === OYS_Welcome::check( $key )[0] && str_contains( $page, 'already set your password with this link' ) && str_contains( $page, 'id="oys-login"' ) && str_contains( $page, 'value="' . esc_attr( $mail ) . '"' ) && ! isset( $_GET['oys_email'] ), 'the same link again: once only – the login, her address already filled in' );
+	$old  = OYS_Welcome::issue( $c );
+	$list = get_user_meta( $c, OYS_Welcome::META, true );
+	foreach ( $list as $i => $t ) {
+		$list[ $i ]['until'] = empty( $t['used'] ) ? time() - 60 : $t['until'];
+	}
+	update_user_meta( $c, OYS_Welcome::META, $list );
+	$_COOKIE['oys_welcome'] = $old;
+	$page                   = OYS_Frontend::sc_account();
+	ok( str_contains( $page, 'This link has run out' ) && str_contains( $page, 'Send me a new link' ), 'after 30 days: „Send me a new link”' );
+	delete_transient( 'oys_welcome_sent_' . $c );
+	$post( 'oys_welcome_again' );
+	$sent = $mails( fn() => $go( fn() => OYS_Welcome::handle_again() ) );
+	ok( 1 === count( $sent ) && $mail === $sent[0]['to'], '… one tap: a new link to her address' );
+	$sent = $mails( fn() => $go( fn() => OYS_Welcome::handle_again() ) );
+	eq( 0, count( $sent ), '… at most once in 10 minutes' );
+	oys_render_flash();
+	ok( array( 'bad', null ) === OYS_Welcome::check( $c . '.' . str_repeat( 'a', 32 ) ), 'a wrong key: nothing about whose it would be' );
+	unset( $_GET['oys_view'], $_COOKIE['oys_welcome'] );
+
+	// WordPress's own reset link: a guest comes to the same page, the studio keeps WordPress's screen
+	$_SERVER['REQUEST_METHOD'] = 'GET';
+	$_GET                      = array( 'action' => 'rp', 'key' => get_password_reset_key( get_userdata( $c ) ), 'login' => get_userdata( $c )->user_login );
+	$_REQUEST                  = $_GET;
+	$to                        = $go( fn() => OYS_Welcome::from_reset_link() );
+	ok( str_contains( $to, 'oys_view=setpass' ) && 'ok' === OYS_Welcome::check( $_COOKIE['oys_welcome'] ?? '' )[0], 'a guest\'s „forgotten password” link: the same page (a password, logged in)' );
+	$staff = wp_insert_user( array( 'user_login' => 'staff.' . wp_rand(), 'user_email' => 'staff.' . wp_rand() . '@example.test', 'user_pass' => wp_generate_password(), 'role' => 'administrator' ) );
+	$_GET     = array( 'action' => 'rp', 'key' => get_password_reset_key( get_userdata( $staff ) ), 'login' => get_userdata( $staff )->user_login );
+	$_REQUEST = $_GET;
+	eq( '', $go( fn() => OYS_Welcome::from_reset_link() ), '… the studio\'s own accounts keep WordPress\'s screen' );
+	$_GET = $_REQUEST = $_POST = array();
+	unset( $_COOKIE['oys_welcome'] );
+
+	// signing up again with her address
+	delete_transient( 'oys_welcome_sent_' . $c );
+	$post( 'oys_register', array( 'first_name' => 'Beáta', 'last_name' => 'Nagy', 'email' => $mail, 'phone' => '+36 30 123 4567', 'area' => 'Budapest', 'password' => '12345678', 'waiver' => '1', 'redirect_to' => oys_account_url() ) );
+	$sent = $mails( fn() => $go( fn() => OYS_Customers::handle_register() ) );
+	$fl   = oys_render_flash();
+	ok( 1 === count( $sent ) && $mail === $sent[0]['to'] && str_contains( $fl, 'You already have an account' ) && 1 === count( get_users( array( 'search' => $mail, 'search_columns' => array( 'user_email' ) ) ) ), 'signing up again with her address: the link to her, not an error and not a second account' );
+	$_POST = $_REQUEST = array();
+
+	// the reset email: for a guest, logged in at once; how to log in later
+	update_option( 'oy_edition', 'hu-online' );
+	$u  = get_userdata( $c );
+	$rm = apply_filters( 'retrieve_password_notification_email', array( 'to' => $u->user_email, 'subject' => '', 'message' => '', 'headers' => '' ), 'k3y', $u->user_login, $u );
+	update_option( 'oy_edition', 'fort-myers' );
+	ok( str_contains( $rm['message'], 'utána rögtön be is lépsz' ) && str_contains( $rm['message'], 'Később így lépsz be:' ) && str_contains( $rm['message'], '„Van fiókom” fülre' ) && str_contains( $rm['message'], esc_url( add_query_arg( 'oys_view', 'login', oys_account_url() ) ) ), 'the „Új jelszó” email: logged in straight after, and how to log in later (the account page on „Van fiókom”)' );
+	ok( str_contains( oy_login_text( 'x', 'Your password has been reset.', 'default' ), '„Van fiókom” fülön' ), 'the WordPress screen (the studio\'s accounts) says it too' );
+	$src = (string) file_get_contents( get_template_directory() . '/inc/login.php' );
+	ok( str_contains( $src, "\$account = add_query_arg( 'oys_view', 'login'," ), '„Vissza a belépéshez” opens the account page on the „Van fiókom” tab' );
+
 	// a saved copy of the old texts (the studio saved the email unchanged) goes to the new ones; her own words stay
 	require_once get_template_directory() . '/inc/demo-import.php';
 	$keep = get_option( OYS_Email_Templates::OPTION, array() );
@@ -5920,8 +6037,7 @@ test( 'Áron 26 Nov: the Motibro email – the button opens the lost password pa
 	delete_option( 'oy_1126b_rev' );
 	$mlog = oy_migrate_1126b();
 	$hu   = OYS_Email_Templates::get( 'held_online', 'hu' );
-	ok( 'Saját tárgy' === $hu['subject'] && 'Jelszót állítok be' === $hu['button'] && str_contains( $hu['closing'], 'Van fiókom' ) && 2 === count( $mlog ), 'the update: the old closing and button go to the new ones, her own subject stays' );
-	ok( ! oy_migrate_1126b(), '… once' );
+	ok( 'Saját tárgy' === $hu['subject'] && 'Jelszót állítok be' === $hu['button'] && str_contains( $hu['closing'], 'Van fiókom' ) && 2 === count( $mlog ) && ! oy_migrate_1126b(), 'the update (once): the old closing and button go to the new ones, her own subject stays' );
 	$opt['held_online']['tr']['hu'] = array( 'closing' => 'Olívia saját szövege.', 'button' => 'Gyere!' );
 	update_option( OYS_Email_Templates::OPTION, $opt, false );
 	delete_option( 'oy_1126b_rev' );
@@ -5930,18 +6046,8 @@ test( 'Áron 26 Nov: the Motibro email – the button opens the lost password pa
 	$st = OYS_Ops::status();
 	ok( isset( $st['emails']['held_online']['hu'] ) && in_array( 'button', $st['emails']['held_online']['hu'], true ) && array_key_exists( 'setup', $st ), 'the status says which emails have her own texts (names only)' );
 	update_option( OYS_Email_Templates::OPTION, $keep, false );
-	// the reset email: the steps after the new password, the account page on the „Van fiókom” tab
-	$u    = get_userdata( $c );
-	$mail = apply_filters( 'retrieve_password_notification_email', array( 'to' => $u->user_email, 'subject' => '', 'message' => '', 'headers' => '' ), 'k3y', $u->user_login, $u );
-	ok( str_contains( $mail['message'], 'Ha elmentetted az új jelszavad, így lépsz be:' ) && str_contains( $mail['message'], '„Van fiókom” fülre' ) && str_contains( $mail['message'], esc_url( add_query_arg( 'oys_view', 'login', oys_account_url() ) ) ) && str_contains( $mail['message'], 'action=rp' ), 'the „Új jelszó” email: after saving, „Van fiókom” on the account page (linked, that tab open)' );
-	ok( str_contains( oy_login_text( 'x', 'Your password has been reset.', 'default' ), '„Van fiókom” fülön' ) && str_contains( oy_login_text( 'x', 'Check your email for the confirmation link, then visit the <a href="%s">login page</a>.', 'default' ), '„Van fiókom” fülön' ), 'the screens say it too: „Kész, megvan az új jelszavad. Most lépj be vele … a „Van fiókom” fülön”' );
 	update_option( 'oy_edition', 'fort-myers' );
-	$src = (string) file_get_contents( get_template_directory() . '/inc/login.php' );
-	ok( str_contains( $src, "\$account = add_query_arg( 'oys_view', 'login'," ), '„Vissza a belépéshez” opens the account page on the „Van fiókom” tab' );
-	$_GET['oys_view'] = 'login';
-	$forms            = OYS_Frontend::auth_forms( oys_account_url() );
-	unset( $_GET['oys_view'] );
-	ok( preg_match( '/data-panel="oys-login">/', $forms ) && preg_match( '/data-panel="oys-register" hidden/', $forms ), '… where „Van fiókom” is the open tab' );
+	wp_set_current_user( 0 );
 } );
 
 test( 'Áron 26 Nov: one class a week, 5-class passes – no reminder about a pass about to expire, and the Emails page does not list it', function () {
