@@ -2369,6 +2369,14 @@
   - Élesben: a `…ffa8a1` sor bérlete (4 online alkalom) nem volt foglalásra használva, így törölve, a sor lezárva.
     Utána: 7 online (mind kapott e-mailt), 1 privát (Vivien), 9 lezárva.
 
+- **2026-11-26 – Állapot és döntés (Áron).**
+  - Az oldal él. December 16-ig a vendégek regisztrálnak és egyéni órát kérnek, csoportos óra addig nem lesz.
+  - Az első online óra: december 16., szerda 18:30.
+  - A LiveKit-élőzés még nem kell, hogy 100%-ban menjen. Áron jövő hét végéig nem akar vele tesztelni, utána ő teszteli.
+    Addig a tesztlabor „Ellenőrzés indítása” nem sürgős.
+  - Élő ellenőrzés: a főoldal, a Fiókom (regisztráció + nyilatkozat, Van fiókom), a Foglalás, az „Egyéni online jóga”
+    oldal és az elfelejtett jelszó oldal mind 200, PHP-hiba nélkül.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
