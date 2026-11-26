@@ -2171,6 +2171,15 @@
   Motibro-lejáratot írta volna 2027. január 27. helyett. Mostantól a levél a valódi online bérletből veszi a napot és a még
   meglévő alkalmakat. Teszt: 1927/0.
 
+- **2026-11-26 – Üzenet Olíviának (portál-chat 9149128, Áron nevében).** Áron: „Írd meg mindent Oliviának.” Az üzenet
+  pontjai:
+  - hírlevél-feliratkozás a két oldalon;
+  - címzettek kiválasztása egyesével, magyar MI-vázlat, „Mentés és teszt”;
+  - mit csinál az „Online foglalhatóvá”, a „Teszt magamnak” és az „E-mail a vendégnek”;
+  - a 7 bérletes vendégnek még nem ment levél: gombbal kiküldheti, vagy szóljon, és mi küldjük;
+  - a lejáró bérlet emlékeztető kikapcsolva;
+  - az Élő óra teszt.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
