@@ -42,6 +42,20 @@ class OYS_Held {
 					return is_wp_error( $res ) ? $res : rest_ensure_response( array( 'sent' => $res ) );
 				},
 			) );
+			// passes valid absurdly far ahead (Motibro's „never”), and setting a pass's last day
+			register_rest_route( 'oys/v1', '/customers/passes/far', array(
+				'methods'             => 'GET',
+				'permission_callback' => $can,
+				'callback'            => fn( WP_REST_Request $r ) => rest_ensure_response( self::far_passes( sanitize_text_field( (string) ( $r->get_param( 'after' ) ?: wp_date( 'Y-m-d', strtotime( '+3 years' ) ) ) ) ) ),
+			) );
+			register_rest_route( 'oys/v1', '/customers/passes/(?P<id>\d+)/expiry', array(
+				'methods'             => 'POST',
+				'permission_callback' => $can,
+				'callback'            => function ( WP_REST_Request $r ) {
+					$res = self::set_pass_expiry( (int) $r['id'], sanitize_text_field( (string) $r->get_param( 'until' ) ) );
+					return is_wp_error( $res ) ? $res : rest_ensure_response( $res );
+				},
+			) );
 			register_rest_route( 'oys/v1', '/customers/held/close-rest', array(
 				'methods'             => 'POST',
 				'permission_callback' => $can,
@@ -87,6 +101,34 @@ class OYS_Held {
 		$all[ $key ]['updated']  = current_time( 'mysql', true );
 		self::save( $all );
 		return true;
+	}
+
+	/** Passes still valid after $after (Y-m-d): who, what, how many left, until when. */
+	public static function far_passes( $after ) {
+		global $wpdb;
+		$rows = $wpdb->get_results( $wpdb->prepare( 'SELECT id, user_id, product_id, name, kind, credits_left, credits_total, expires_at FROM ' . OYS_Install::table( 'passes' ) . ' WHERE expires_at > %s ORDER BY expires_at DESC', oys_local_to_utc( $after . ' 23:59:59' ) ) );
+		return array_map( fn( $p ) => array( 'id' => (int) $p->id, 'user' => (int) $p->user_id, 'product' => $p->product_id, 'name' => $p->name, 'kind' => $p->kind, 'left' => (int) $p->credits_left, 'total' => (int) $p->credits_total, 'expires' => $p->expires_at ), $rows );
+	}
+
+	/** A pass valid until the end of $until (site time); its Motibro row (if any) notes the new day. */
+	public static function set_pass_expiry( $pass_id, $until ) {
+		global $wpdb;
+		if ( ! preg_match( '/^\d{4}-\d{2}-\d{2}$/', (string) $until ) ) {
+			return new WP_Error( 'oys_held', 'until: Y-m-d', array( 'status' => 400 ) );
+		}
+		$t = OYS_Install::table( 'passes' );
+		$p = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $t WHERE id = %d", (int) $pass_id ) );
+		if ( ! $p ) {
+			return new WP_Error( 'oys_held', 'Not found.', array( 'status' => 404 ) );
+		}
+		$wpdb->update( $t, array( 'expires_at' => oys_local_to_utc( $until . ' 23:59:59' ) ), array( 'id' => (int) $p->id ) );
+		$all = self::all();
+		if ( isset( $all[ $p->product_id ] ) && (int) $all[ $p->product_id ]['user'] === (int) $p->user_id ) {
+			$all[ $p->product_id ]['until'] = $until;
+			$all[ $p->product_id ]['note']  = trim( $all[ $p->product_id ]['note'] . "\n" . sprintf( __( 'Online until %s', 'olivia-studio' ), $until ) . ' (' . wp_date( 'Y-m-d' ) . ')' );
+			self::save( $all );
+		}
+		return array( 'id' => (int) $p->id, 'expires' => $wpdb->get_var( $wpdb->prepare( "SELECT expires_at FROM $t WHERE id = %d", (int) $p->id ) ) );
 	}
 
 	/** Everything not moved online is closed (Áron, 26 November: „akit nem hozott át most Olivia online-ra, azok kuka”). */
@@ -236,7 +278,10 @@ class OYS_Held {
 			return new WP_Error( 'oys_held', __( 'Not found.', 'olivia-studio' ), array( 'status' => 404 ) );
 		}
 		$t       = OYS_Install::table( 'passes' );
-		$day     = max( (string) $until, (string) $e['expires'] );
+		// Motibro's „never expires” is a day decades away (2075): then the day the studio gives (Áron, 26 November: „azokat
+		// javítsd ki, hogy nem 2075-ig jók”)
+		$far     = (string) $e['expires'] > wp_date( 'Y-m-d', strtotime( '+3 years' ) );
+		$day     = $far ? (string) $until : max( (string) $until, (string) $e['expires'] );
 		$expires = preg_match( '/^\d{4}-\d{2}-\d{2}$/', $day ) ? oys_local_to_utc( $day . ' 23:59:59' ) : null;
 		$total   = max( 1, (int) $e['used'] + (int) $e['locked'] + (int) $e['left'] );
 		$have    = $wpdb->get_row( $wpdb->prepare( "SELECT * FROM $t WHERE user_id = %d AND product_id = %s LIMIT 1", (int) $e['user'], $key ) );

@@ -2349,6 +2349,15 @@
     `{password_button}`, `test_to`, `note_key`).
   - Teszt: 2027/0.
 
+- **2026-11-26 – Nincs több 2075-ig érvényes bérlet (olivia-studio 1.33.3, oliviajoga.online 3.12.45).** Áron: „azokat
+  javítsd ki, hogy nem 2075-ig jók”.
+  - Az ok: áthozáskor a nap a Motibro-lejárat és az Olívia által megadott nap közül a későbbi volt, a Motibro „soha nem
+    jár le” jelölése pedig 2075. Mostantól a 3 évnél messzebbi Motibro-dátumot figyelmen kívül hagyja, és az Olívia által
+    megadott nap érvényes.
+  - REST (csak a stúdiónak): `GET /oys/v1/customers/passes/far?after=Y-m-d` (a túl messzi lejáratú bérletek) és
+    `POST /oys/v1/customers/passes/<id>/expiry` (`until`). A Motibrós sor is megkapja az új napot.
+  - Teszt: 2033/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

@@ -5956,6 +5956,18 @@ test( 'Áron 26 Nov: the Motibro past closed – „akit nem hozott át most Oli
 	$priv = make_session( array( 'kind' => 'private', 'format' => 'online', 'capacity' => 1 ) );
 	eq( 1, OYS_Passes::available_for( $a, $priv, 'online' ), '… which pays for a private class' );
 	ok( is_wp_error( OYS_Held::act( 'motibro-t-off', 'private', '', '', 1 ) ), 'only a row already moved online' );
+	// „azokat javítsd ki, hogy nem 2075-ig jók”: Motibro's „never” does not win over the day the studio gives
+	$c = make_user( 'Farfuture' );
+	OYS_Held::put( 'motibro-t-far', $c, array( 'name' => '5 alkalmas', 'used' => 3, 'locked' => 0, 'left' => 2, 'expires' => '2075-05-17' ) );
+	OYS_Held::to_online( 'motibro-t-far', '2027-01-27' );
+	$fp = OYS_Held::with_passes()['motibro-t-far']['pass'];
+	ok( str_starts_with( (string) $fp['expires'], '2027-01-2' ), 'moved online with a 2075 day there: valid until the day given (2027-01-27), not 2075' );
+	global $wpdb;
+	$wpdb->update( OYS_Install::table( 'passes' ), array( 'expires_at' => '2075-05-17 21:59:59' ), array( 'id' => $fp['id'] ) );
+	$far = OYS_Held::far_passes( '2030-01-01' );
+	ok( in_array( $fp['id'], array_column( $far, 'id' ), true ), 'the passes valid absurdly far ahead are listed' );
+	$res = OYS_Held::set_pass_expiry( $fp['id'], '2027-01-27' );
+	ok( str_starts_with( (string) $res['expires'], '2027-01-2' ) && ! in_array( $fp['id'], array_column( OYS_Held::far_passes( '2030-01-01' ), 'id' ), true ) && '2027-01-27' === OYS_Held::get( 'motibro-t-far' )['until'], '… and set to a real last day, noted on the row' );
 	update_option( OYS_Held::OPTION, $keep, false );
 } );
 
