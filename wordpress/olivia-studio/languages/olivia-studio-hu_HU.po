@@ -9534,3 +9534,12 @@ msgstr "Még két dolog, és foglalhatsz"
 
 msgid "Everything is there. Pick a class and book!"
 msgstr "Minden megvan. Válassz órát, és foglalj!"
+
+msgid "Create my account"
+msgstr "Létrehozom a fiókom"
+
+msgid "{password_button} on a line of its own = the „Set my password” button: each guest gets their own link – one tap, a password, and they are logged in (for guests from Motibro who have not logged in yet). In a test to your own address the button only says it is a preview; send the test to a guest test account to try the whole way in."
+msgstr "{password_button} (vagy {jelszo_gomb}) külön sorban = a „Jelszót állítok be” gomb: minden vendég a saját linkjét kapja – egy koppintás, egy jelszó, és már be is lépett (a Motibróból áthozott, még be nem lépett vendégeknek). A saját címedre küldött tesztben a gomb csak előnézet; az egész utat egy teszt-vendégfiókra küldött teszttel próbálhatod ki."
+
+msgid "from Motibro, no sessions left"
+msgstr "Motibróból, alkalom nélkül"

@@ -1347,6 +1347,7 @@ class OYS_Admin {
 				. '<p><label>' . esc_html__( 'Preview line (shown next to the subject in the inbox)', 'olivia-studio' ) . '<br><input name="preheader" class="large-text" value="' . esc_attr( $v->preheader ) . '"></label></p>'
 				. '<p><label><b>' . esc_html__( 'Message', 'olivia-studio' ) . '</b><br><textarea name="body" rows="16" class="large-text code">' . esc_textarea( $v->body ) . '</textarea></label></p>'
 				. '<p class="description">' . esc_html__( 'Blank line = new paragraph · "## " heading · "- " list · **bold** · [link text](https://…) · {first_name} = each reader\'s name.', 'olivia-studio' ) . '</p>'
+				. '<p class="description">' . esc_html__( '{password_button} on a line of its own = the „Set my password” button: each guest gets their own link – one tap, a password, and they are logged in (for guests from Motibro who have not logged in yet). In a test to your own address the button only says it is a preview; send the test to a guest test account to try the whole way in.', 'olivia-studio' ) . '</p>'
 				. '<p><label>' . esc_html__( 'Button', 'olivia-studio' ) . ' <input name="button_label" value="' . esc_attr( $v->button_label ) . '" placeholder="' . esc_attr__( 'Book a class', 'olivia-studio' ) . '"></label> <label>' . esc_html__( 'links to', 'olivia-studio' ) . ' <input type="url" name="button_url" class="regular-text" value="' . esc_attr( $v->button_url ) . '"></label></p>'
 				. '<p><button class="button button-primary">' . esc_html__( 'Save draft', 'olivia-studio' ) . '</button> <button class="button" name="and_test" value="1">' . esc_html( sprintf( __( 'Save and send a test to %s', 'olivia-studio' ), wp_get_current_user()->user_email ) ) . '</button></p></form>';
 		}
@@ -1386,7 +1387,7 @@ class OYS_Admin {
 				$parts[] = sprintf( __( 'from Motibro %d, to redeem', 'olivia-studio' ), (int) $p['held'] );
 			}
 			$on   += $p['subscribed'] ? 1 : 0;
-			$rows .= '<label class="oys-pick__row" data-sub="' . ( $p['subscribed'] ? 1 : 0 ) . '" data-sessions="' . $total . '" data-q="' . esc_attr( mb_strtolower( remove_accents( $p['name'] . ' ' . $p['email'] ) ) ) . '">'
+			$rows .= '<label class="oys-pick__row" data-sub="' . ( $p['subscribed'] ? 1 : 0 ) . '" data-sessions="' . $total . '" data-motibro="' . ( empty( $p['motibro'] ) ? 0 : 1 ) . '" data-q="' . esc_attr( mb_strtolower( remove_accents( $p['name'] . ' ' . $p['email'] ) ) ) . '">'
 				. '<input type="checkbox" name="' . ( 'user' === $p['type'] ? 'pick_users[]' : 'pick_subs[]' ) . '" value="' . (int) $p['id'] . '"' . checked( $p['subscribed'], true, false ) . '>'
 				. '<span class="oys-pick__who"><b>' . esc_html( $p['name'] ?: $p['email'] ) . '</b><small>' . esc_html( $p['email'] ) . '</small></span>'
 				. '<span class="oys-pick__nl' . ( $p['subscribed'] ? ' is-on' : '' ) . '">' . esc_html( $p['subscribed'] ? ( 'sub' === $p['type'] ? __( 'newsletter (signup form)', 'olivia-studio' ) : __( 'newsletter', 'olivia-studio' ) ) : __( 'no newsletter', 'olivia-studio' ) ) . '</span>'
@@ -1402,7 +1403,7 @@ class OYS_Admin {
 		echo self::form( 'newsletter_send', 'class="oys-pick" data-oys-pick data-ask="' . esc_attr( __( 'Send this letter to %d people now?', 'olivia-studio' ) ) . '"' ) // phpcs:ignore
 			. '<input type="hidden" name="id" value="' . (int) $n->id . '"><input type="hidden" name="picked" value="1">'
 			. '<div class="oys-pick__tools"><input type="search" data-oys-pick-q placeholder="' . esc_attr__( 'Search by name or email', 'olivia-studio' ) . '"> '
-			. '<span class="oys-pick__quick">' . esc_html__( 'Tick:', 'olivia-studio' ) . ' <button type="button" class="button button-small" data-oys-pick-set="sub">' . esc_html__( 'who asked for the newsletter', 'olivia-studio' ) . '</button> <button type="button" class="button button-small" data-oys-pick-set="sessions">' . esc_html__( 'who has sessions left', 'olivia-studio' ) . '</button> <button type="button" class="button button-small" data-oys-pick-set="all">' . esc_html__( 'everyone', 'olivia-studio' ) . '</button> <button type="button" class="button button-small" data-oys-pick-set="none">' . esc_html__( 'nobody', 'olivia-studio' ) . '</button></span></div>'
+			. '<span class="oys-pick__quick">' . esc_html__( 'Tick:', 'olivia-studio' ) . ' <button type="button" class="button button-small" data-oys-pick-set="sub">' . esc_html__( 'who asked for the newsletter', 'olivia-studio' ) . '</button> <button type="button" class="button button-small" data-oys-pick-set="sessions">' . esc_html__( 'who has sessions left', 'olivia-studio' ) . '</button> <button type="button" class="button button-small" data-oys-pick-set="motibro-none">' . esc_html__( 'from Motibro, no sessions left', 'olivia-studio' ) . '</button> <button type="button" class="button button-small" data-oys-pick-set="all">' . esc_html__( 'everyone', 'olivia-studio' ) . '</button> <button type="button" class="button button-small" data-oys-pick-set="none">' . esc_html__( 'nobody', 'olivia-studio' ) . '</button></span></div>'
 			. '<div class="oys-pick__list">' . $rows . '</div>' // phpcs:ignore
 			. '<p class="oys-pick__go"><button class="button button-primary button-hero">' . esc_html__( 'Send to the people ticked', 'olivia-studio' ) . ' (<span data-oys-pick-n>' . (int) $on . '</span>)</button></p></form>';
 		?>
@@ -1421,7 +1422,7 @@ class OYS_Admin {
 				b.addEventListener( 'click', function () {
 					var w = b.dataset.oysPickSet;
 					rows.forEach( function ( r ) {
-						r.querySelector( 'input' ).checked = 'all' === w || ( 'sub' === w && '1' === r.dataset.sub ) || ( 'sessions' === w && +r.dataset.sessions > 0 );
+						r.querySelector( 'input' ).checked = 'all' === w || ( 'sub' === w && '1' === r.dataset.sub ) || ( 'sessions' === w && +r.dataset.sessions > 0 ) || ( 'motibro-none' === w && '1' === r.dataset.motibro && 0 === +r.dataset.sessions );
 					} );
 					count();
 				} );

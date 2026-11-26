@@ -5899,6 +5899,45 @@ test( 'Áron 26 Nov: „Online foglalhatóvá” – what it does, the email to 
 	ok( str_contains( $po, 'msgstr "Teszt magamnak"' ) && str_contains( $po, 'Érvényes eddig: {until}.' ), 'in Hungarian: „Teszt magamnak”, the guest\'s email' );
 } );
 
+test( 'Áron 26 Nov: the newsletter to the Motibro guests – {password_button}: each guest\'s own one-tap link, a preview in the studio\'s test, the real link in a test to a guest test account', function () {
+	$mail = 'nl.motibro.' . wp_rand() . '@example.test';
+	$g    = wp_insert_user( array( 'user_login' => $mail, 'user_email' => $mail, 'user_pass' => wp_generate_password(), 'first_name' => 'Kata', 'role' => 'oys_customer' ) );
+	update_user_meta( $g, 'oys_imported_at', current_time( 'mysql', true ) );
+	$staff = wp_insert_user( array( 'user_login' => 'nl.staff.' . wp_rand(), 'user_email' => 'nl.staff.' . wp_rand() . '@example.test', 'user_pass' => wp_generate_password(), 'role' => 'administrator' ) );
+	$id = OYS_Newsletter::save( array( 'subject' => 'Gyere vissza', 'body' => "Szia {first_name}!\n\nRégen láttalak.\n\n{password_button}\n\nKöszi!", 'button_label' => 'Foglalok', 'button_url' => home_url( '/foglalas/' ) ) );
+	$n  = OYS_Newsletter::get( $id );
+	[ , $h ] = OYS_Newsletter::email_for( $n, $g );
+	ok( preg_match( '/<a href="([^"]+)"[^>]*>Set my password<\/a>/', $h, $m ) && str_contains( html_entity_decode( $m[1] ), '?oys_welcome=' . $g . '.' ) && 'ok' === OYS_Welcome::check( explode( 'oys_welcome=', html_entity_decode( $m[1] ) )[1] )[0], 'sent to a guest: „Set my password” with their own working link' );
+	ok( strpos( $h, 'Régen láttalak' ) < strpos( $h, 'Set my password</a>' ) && strpos( $h, 'Set my password</a>' ) < strpos( $h, 'Köszi!' ) && ! str_contains( $h, '{password_button}' ), '… where the placeholder stood, the rest of the text as it was' );
+	$before = count( (array) get_user_meta( $staff, OYS_Welcome::META, true ) );
+	[ , $p ] = OYS_Newsletter::email_for( $n, $staff, true );
+	ok( str_contains( html_entity_decode( $p ), '?oys_welcome=preview' ), 'the admin\'s preview: a link that only says it is a preview' );
+	$log = array();
+	$f   = function ( $r, $a ) use ( &$log ) { $log[] = $a; return true; };
+	add_filter( 'pre_wp_mail', $f, 1, 2 );
+	OYS_Newsletter::send_test( $id, get_userdata( $staff )->user_email );
+	OYS_Newsletter::send_test( $id, $mail );
+	remove_filter( 'pre_wp_mail', $f, 1 );
+	ok( 2 === count( $log ) && str_contains( html_entity_decode( $log[0]['message'] ), '?oys_welcome=preview' ) && str_contains( html_entity_decode( $log[1]['message'] ), '?oys_welcome=' . $g . '.' ) && str_contains( html_entity_decode( $log[1]['message'] ), 'oys_unsub=preview' ), 'a test to the studio: preview; a test to a guest test account: the real link (the unsubscribe link still harmless)' );
+	$jel = OYS_Newsletter::save( array( 'subject' => 'x', 'body' => "Szia!\n\n{jelszo_gomb}" ) );
+	[ , $h2 ] = OYS_Newsletter::email_for( OYS_Newsletter::get( $jel ), $g );
+	ok( str_contains( $h2, 'Set my password</a>' ), '{jelszo_gomb} works too' );
+	$sub = OYS_Newsletter::list_get( OYS_Newsletter::list_add( 'nl.list.' . wp_rand() . '@example.test', 'Lili' ) );
+	[ , $h3 ] = OYS_Newsletter::email_for_list( $n, $sub );
+	ok( str_contains( $h3, 'Create my account</a>' ) && ! str_contains( $h3, 'oys_welcome' ), 'a signup-form address (no account): „Create my account”' );
+	$row = current( array_filter( OYS_Newsletter::pick_list(), fn( $r ) => 'user' === $r['type'] && $g === $r['id'] ) );
+	ok( ! empty( $row['motibro'] ) && 0 === (int) $row['online'] + (int) $row['held'], 'the picker knows who came from Motibro with no sessions left' );
+	$admin = file_get_contents( WP_PLUGIN_DIR . '/olivia-studio/includes/admin/class-admin.php' );
+	ok( str_contains( $admin, 'data-oys-pick-set="motibro-none"' ) && str_contains( $admin, "'motibro-none' === w && '1' === r.dataset.motibro && 0 === +r.dataset.sessions" ), '… with a quick tick: „Motibróból, alkalom nélkül”' );
+	$routes = rest_get_server()->get_routes();
+	ok( isset( $routes['/oys/v1/newsletters'], $routes['/oys/v1/newsletters/(?P<id>\d+)'], $routes['/oys/v1/newsletters/(?P<id>\d+)/test'] ), 'the drafts over REST for the studio (read, change a draft, one test – no send to the list)' );
+	wp_set_current_user( 0 );
+	$res = rest_do_request( new WP_REST_Request( 'GET', '/oys/v1/newsletters/' . $id ) );
+	ok( in_array( $res->get_status(), array( 401, 403 ), true ), '… not for anyone else' );
+	OYS_Newsletter::delete( $id );
+	OYS_Newsletter::delete( $jel );
+} );
+
 test( 'Áron 26 Nov: „hülyebiztosra” – the Motibro email\'s button is the guest\'s own link: a password, logged in, what is missing, then booking', function () {
 	$go    = function ( callable $fn ) {
 		$to = '';

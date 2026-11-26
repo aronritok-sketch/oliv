@@ -39,6 +39,46 @@ class OYS_Newsletter {
 	 * GET /oys/v1/customers/<id>/newsletter, POST with on=1|0.
 	 */
 	public static function routes() {
+		// the drafts, for the studio's tools (Áron, 26 November: „olvasd el, hogy mi van a hírlevélszövegben … küldj ki egy
+		// e-mailt a tesztfiókjára”): read, change a draft, send one test – never a send to the list
+		$manage = fn() => current_user_can( 'oys_manage' ) || current_user_can( 'manage_options' );
+		register_rest_route( 'oys/v1', '/newsletters', array(
+			'methods'             => 'GET',
+			'permission_callback' => $manage,
+			'callback'            => fn() => rest_ensure_response( array_map( fn( $n ) => array( 'id' => (int) $n->id, 'subject' => $n->subject, 'status' => $n->status, 'audience' => $n->audience ?? '', 'created_at' => $n->created_at, 'sent' => (int) $n->sent, 'total' => (int) $n->total ), self::query( 50 ) ) ),
+		) );
+		register_rest_route( 'oys/v1', '/newsletters/(?P<id>\d+)', array(
+			array(
+				'methods'             => 'GET',
+				'permission_callback' => $manage,
+				'callback'            => function ( WP_REST_Request $r ) {
+					$n = self::get( (int) $r['id'] );
+					return $n ? rest_ensure_response( array( 'id' => (int) $n->id, 'subject' => $n->subject, 'preheader' => $n->preheader, 'body' => $n->body, 'button_label' => $n->button_label, 'button_url' => $n->button_url, 'status' => $n->status ) ) : new WP_Error( 'oys_not_found', 'Not found', array( 'status' => 404 ) );
+				},
+			),
+			array(
+				'methods'             => 'POST',
+				'permission_callback' => $manage,
+				'callback'            => function ( WP_REST_Request $r ) {
+					$n = self::get( (int) $r['id'] );
+					if ( ! $n || 'draft' !== $n->status ) {
+						return new WP_Error( 'oys_newsletter', 'Only a draft can be changed.', array( 'status' => 409 ) );
+					}
+					$p = (array) ( $r->get_json_params() ?: $r->get_params() );
+					self::save( array_merge( array( 'subject' => $n->subject, 'preheader' => $n->preheader, 'body' => $n->body, 'button_label' => $n->button_label, 'button_url' => $n->button_url ), array_intersect_key( $p, array_flip( array( 'subject', 'preheader', 'body', 'button_label', 'button_url' ) ) ) ), $n->id );
+					return rest_ensure_response( array( 'saved' => true, 'id' => (int) $n->id ) );
+				},
+			),
+		) );
+		register_rest_route( 'oys/v1', '/newsletters/(?P<id>\d+)/test', array(
+			'methods'             => 'POST',
+			'permission_callback' => $manage,
+			'callback'            => function ( WP_REST_Request $r ) {
+				$u  = (int) $r->get_param( 'user' ) ? get_userdata( (int) $r->get_param( 'user' ) ) : null;
+				$to = $u ? $u->user_email : sanitize_email( (string) $r->get_param( 'to' ) );
+				return rest_ensure_response( array( 'sent' => (bool) self::send_test( (int) $r['id'], $to ), 'own_link' => $u && OYS_Customers::is_customer_only( $u ) ) );
+			},
+		) );
 		register_rest_route( 'oys/v1', '/customers/(?P<id>\d+)/newsletter', array(
 			'methods'             => array( 'GET', 'POST' ),
 			'permission_callback' => fn() => current_user_can( 'oys_manage' ),
@@ -445,11 +485,40 @@ class OYS_Newsletter {
 		return preg_replace_callback( '/(?<!["=>])\bhttps?:\/\/[^\s<]+/', fn( $m ) => '<a href="' . esc_url( html_entity_decode( $m[0] ) ) . '" style="color:#2B5036">' . $m[0] . '</a>', $s );
 	}
 
-	/** The email as a subscriber sees it ($preview: the admin's preview or a test – the unsubscribe link does nothing). @return array [ subject, html ] */
-	public static function email_for( $n, $user_id = 0, $preview = false ) {
+	/** The placeholders of the one-tap password button (on a line of its own in the message). */
+	const PASSWORD_BUTTON = array( '{password_button}', '{jelszo_gomb}' );
+
+	/** The message with {first_name} filled in and the password button where the placeholder stands. */
+	private static function body_html( $n, array $vars, callable $button ) {
+		$mark = 'OYSPASSWORDBUTTON';
+		$text = str_replace( self::PASSWORD_BUTTON, "\n\n" . $mark . "\n\n", OYS_Email_Templates::fill( $n->body, $vars ) );
+		$html = self::render( $text );
+		return str_contains( $html, '<p>' . $mark . '</p>' ) ? str_replace( '<p>' . $mark . '</p>', $button(), $html ) : $html;
+	}
+
+	/**
+	 * „Jelszót állítok be” (Áron, 26 November: „ez az egy kattintásos, jelszógenerálós gomb ez legyen benne”): a guest's
+	 * own link – one tap, a password, logged in (OYS_Welcome). $real false: a link that only says it is a preview (the
+	 * admin's preview, a test to the studio). A signup-form address has no account yet: the button opens the account page.
+	 */
+	public static function password_button( $user_id, $real ) {
+		$u = $user_id ? get_userdata( (int) $user_id ) : null;
+		if ( ! $u && $real ) {
+			return OYS_Emails::button_html( array( __( 'Create my account', 'olivia-studio' ), oys_account_url() ), '8px 0 24px' );
+		}
+		$own = $real && $u && OYS_Customers::is_customer_only( $u );
+		return OYS_Emails::button_html( array( __( 'Set my password', 'olivia-studio' ), $own ? OYS_Welcome::link( $u->ID ) : OYS_Welcome::link( 0, true ) ), '8px 0 24px' );
+	}
+
+	/**
+	 * The email as a subscriber sees it ($preview: the admin's preview or a test – the unsubscribe link does nothing).
+	 * $real_link: the password button carries the reader's own link (default: not in a preview; a test to a guest's own
+	 * account does, so the studio can try the whole way in). @return array [ subject, html ]
+	 */
+	public static function email_for( $n, $user_id = 0, $preview = false, $real_link = null ) {
 		$u    = $user_id ? get_userdata( $user_id ) : null;
 		$vars = array( 'first_name' => $u ? ( $u->first_name ?: $u->display_name ) : __( 'there', 'olivia-studio' ), 'studio' => OYS_Settings::get( 'email_from_name' ) );
-		$body = self::render( OYS_Email_Templates::fill( $n->body, $vars ) );
+		$body = self::body_html( $n, $vars, fn() => self::password_button( $u ? $u->ID : 0, null === $real_link ? ! $preview : (bool) $real_link ) );
 		$cta  = $n->button_label && $n->button_url ? array( $n->button_label, $n->button_url ) : null;
 		$foot = $preview ? add_query_arg( 'oys_unsub', 'preview', home_url( '/' ) ) : ( $user_id ? self::unsubscribe_url( $user_id ) : '#' );
 		return array( OYS_Email_Templates::fill( $n->subject, $vars ), OYS_Emails::newsletter_html( $n->subject, $n->preheader, $body, $cta, $foot ) );
@@ -494,12 +563,13 @@ class OYS_Newsletter {
 				'online'     => $left[ (int) $u->ID ][0] ?? 0,
 				'until'      => $left[ (int) $u->ID ][1] ?? '',
 				'held'       => $held[ (int) $u->ID ] ?? 0,
+				'motibro'    => '' !== (string) get_user_meta( $u->ID, 'oys_imported_at', true ),
 			);
 			$seen[ $email ] = true;
 		}
 		foreach ( self::list_query( 'confirmed', 100000 ) as $r ) {
 			if ( ! isset( $seen[ strtolower( $r->email ) ] ) ) {
-				$out[] = array( 'type' => 'sub', 'id' => (int) $r->id, 'name' => (string) $r->name, 'email' => strtolower( $r->email ), 'subscribed' => true, 'online' => 0, 'until' => '', 'held' => 0 );
+				$out[] = array( 'type' => 'sub', 'id' => (int) $r->id, 'name' => (string) $r->name, 'email' => strtolower( $r->email ), 'subscribed' => true, 'online' => 0, 'until' => '', 'held' => 0, 'motibro' => false );
 			}
 		}
 		usort( $out, fn( $a, $b ) => array( ! $a['subscribed'], remove_accents( mb_strtolower( $a['name'] ?: $a['email'] ) ) ) <=> array( ! $b['subscribed'], remove_accents( mb_strtolower( $b['name'] ?: $b['email'] ) ) ) );
@@ -619,19 +689,22 @@ class OYS_Newsletter {
 	/** The email to a signup-form address: their name if they gave one, their own unsubscribe link. */
 	public static function email_for_list( $n, $sub ) {
 		$vars = array( 'first_name' => '' !== (string) $sub->name ? $sub->name : __( 'there', 'olivia-studio' ), 'studio' => OYS_Settings::get( 'email_from_name' ) );
-		$body = self::render( OYS_Email_Templates::fill( $n->body, $vars ) );
+		$body = self::body_html( $n, $vars, fn() => self::password_button( 0, true ) );
 		$cta  = $n->button_label && $n->button_url ? array( $n->button_label, $n->button_url ) : null;
 		return array( OYS_Email_Templates::fill( $n->subject, $vars ), OYS_Emails::newsletter_html( $n->subject, $n->preheader, $body, $cta, self::list_unsubscribe_url( $sub->id ) ) );
 	}
 
-	/** One test email to the studio (or any address). */
+	/**
+	 * One test email to the studio (or any address). To a guest's own account (e.g. Olívia's test guest) the password
+	 * button is that account's real link, so the whole way in can be tried; to anyone else it only says it is a preview.
+	 */
 	public static function send_test( $id, $to ) {
 		$n = self::get( $id );
 		if ( ! $n || ! is_email( $to ) ) {
 			return false;
 		}
 		$u = get_user_by( 'email', $to );
-		[ $subject, $html ] = self::email_for( $n, $u ? $u->ID : 0, true );
+		[ $subject, $html ] = self::email_for( $n, $u ? $u->ID : 0, true, $u && OYS_Customers::is_customer_only( $u ) );
 		return OYS_Emails::send_raw( $to, __( '[Test]', 'olivia-studio' ) . ' ' . $subject, $html );
 	}
 

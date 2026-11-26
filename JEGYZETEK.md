@@ -2263,6 +2263,18 @@
   - Böngészőben (iPhone-méret) a helyi másolaton végigkattintva: link → jelszó → belépve az Adatlapon a két
     hiányzónál → mentés → /foglalas/. Ugyanaz a link újra: belépés kitöltött címmel. Teszt: 1974/0.
 
+- **2026-11-26 – Hírlevél: egy kattintásos „Jelszót állítok be” gomb (olivia-studio 1.32.0, oliviajoga.online 3.12.39).**
+  Áron: a Motibrós, alkalom nélküli vendégeknek szóló piszkozatba „ez az egy kattintásos, jelszógenerálós gomb ez legyen
+  benne”, és Olívia is tesztelje a tesztfiókján.
+  - A hírlevél szövegében egy külön sorba írt `{password_button}` (vagy `{jelszo_gomb}`) a „Jelszót állítok be” gomb.
+    Minden vendég a saját linkjét kapja (`OYS_Welcome`). A feliratkozó űrlapról jött címeknek, akiknek nincs fiókjuk,
+    „Létrehozom a fiókom” gomb jelenik meg.
+  - Az admin előnézetében és a saját címre küldött tesztben a gomb csak előnézet. Egy teszt-vendégfiókra küldött
+    tesztben a valódi link van benne, így az egész út kipróbálható; a leiratkozó link ott is ártalmatlan.
+  - Címzettválasztó: új gyorsválasztó, „Motibróból, alkalom nélkül”.
+  - REST (csak a stúdiónak): `GET /oys/v1/newsletters`, `GET|POST /newsletters/<id>` (csak piszkozat),
+    `POST /newsletters/<id>/test` (`user` vagy `to`). Listára küldeni ezen nem lehet. Teszt: 1984/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
