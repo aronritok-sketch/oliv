@@ -2014,6 +2014,11 @@
     (az új cím 404, a sütisáv a régi címre linkelt). Most egy nem közzétett oldal félreáll (`…-wp-vazlat`), az adatvédelmi
     oldal csak közzétett lehet, a sütisáv tartalék címe ékezet nélküli. Helyben az élő helyzettel kipróbálva.
 
+- **2026-11-26 – Online lábléc: a címsor ki (oliviajoga.online 3.12.24).** Áron: „.online oldalon most jó a footer csak
+  ezt szedd ki” (képernyőkép: „Jógaoktató | Pre- és postnatális tréner | Mozgás- és wellness coach”). Az online lábléc
+  logó, mottó, „Jóga • Kismamatorna • Mobilizáció • Relaxáció és légzés”, gomb; a többi oldal láblécében marad a címsor.
+  Tesztek: 1819/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

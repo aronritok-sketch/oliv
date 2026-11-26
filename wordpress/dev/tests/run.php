@@ -1710,6 +1710,7 @@ test( 'Áron 25 Nov: „footerben viszont maradjon szövegként” – the onlin
 	$tpl = file_get_contents( get_template_directory() . '/footer.php' );
 	ok( str_starts_with( $foot, '<p class="footer__spec">' ) && 3 === substr_count( $foot, ' • ' ) && ! str_contains( $foot, '<i' ), 'online footer: one plain line, four items with • between them (no markup) – ' . wp_strip_all_tags( $foot ) );
 	ok( str_contains( $tpl, 'oy_online_only() ? oy_specialities_text() : oy_specialities_line(' ), 'the footer template prints it on the online site, the other sites keep their own line' );
+	ok( str_contains( $tpl, "<?php if ( ! oy_online_only() ) : // Áron, 26 November" ) && preg_match( '#if \( ! oy_online_only\(\) \) : [^\n]*<p><\?php echo esc_html\( oy_title_line\(\) \); \?></p><\?php endif; \?>#', $tpl ), 'Áron 26 Nov: „csak ezt szedd ki” – the online footer without the title line (Jógaoktató | Pre- és postnatális tréner | …), other sites keep it' );
 	ok( ! str_contains( $card, 'namecard__spec' ), 'not back anywhere else on the online site: the name card has none' );
 } );
 
