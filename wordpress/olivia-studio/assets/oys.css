@@ -683,3 +683,15 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 .oys-nl__msg { margin: 0; padding: .6rem .8rem; border-radius: 12px; font-weight: 600; background: #FFF4C2; color: #072624; }
 .oys-nl__msg--hiba { background: #FFE2CC; }
 @media (max-width: 560px) { .oys-nl__row { grid-template-columns: 1fr; } }
+
+/* The live class test lab: „Check this device” under a test room (Áron, 26 November) */
+.oys-diag { margin: 1.2rem 0 0; padding: 1rem 1.2rem; border: 1.5px dashed currentColor; border-radius: 16px; }
+.oys-diag__h { margin: 0 0 .3rem; font-size: 1.05rem; }
+.oys-diag__lead { margin: 0 0 .6rem; font-size: .9rem; }
+.oys-diag__sum { margin: .4rem 0 0; font-weight: 600; }
+.oys-diag__list { margin: .4rem 0 0; padding-left: 1.2rem; font-size: .9rem; }
+.oys-diag__list li { margin: .2rem 0; overflow-wrap: anywhere; }
+.oys-diag__list .is-ok { color: #1d6b3a; }
+.oys-diag__list .is-bad { color: #b3261e; font-weight: 600; }
+.oys-diag__list .is-skip, .oys-diag__list .is-run { opacity: .75; }
+.oys-live.is-live .oys-diag { display: none; }

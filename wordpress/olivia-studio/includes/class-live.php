@@ -71,7 +71,7 @@ class OYS_Live {
 	/** Is the teacher recorded in this class? Group classes and events by default, private sessions only with "all". */
 	public static function records( $session ) {
 		$mode = (string) OYS_Settings::get( 'live_record' );
-		return 'all' === $mode || ( 'group' === $mode && 'private' !== $session->kind );
+		return 'all' === $mode || ( 'group' === $mode && 'private' !== $session->kind && 'private' !== self::test_profile( $session ) );
 	}
 
 	/**
@@ -98,13 +98,17 @@ class OYS_Live {
 
 	/** The opening words are summarised in group classes and events (never in private sessions). */
 	public static function summarises( $session ) {
-		return 'off' !== (string) OYS_Settings::get( 'live_summary' ) && 'private' !== $session->kind && (int) OYS_Settings::get( 'live_intro_minutes' ) > 0;
+		return 'off' !== (string) OYS_Settings::get( 'live_summary' ) && 'private' !== $session->kind && 'private' !== self::test_profile( $session ) && (int) OYS_Settings::get( 'live_intro_minutes' ) > 0;
 	}
 
 	/** Students may send video and sound: private sessions, and group classes up to `live_grid_max` online seats. */
 	public static function two_way( $session ) {
-		if ( 'private' === $session->kind ) {
+		$profile = self::test_profile( $session );
+		if ( 'private' === $session->kind || 'private' === $profile || 'small' === $profile ) {
 			return true;
+		}
+		if ( 'big' === $profile ) {
+			return false;
 		}
 		$seats = oys_is_online( $session ) ? (int) $session->capacity : (int) $session->online_capacity;
 		return $seats > 0 && $seats <= (int) OYS_Settings::get( 'live_grid_max' );
@@ -120,7 +124,22 @@ class OYS_Live {
 
 	const TEST_OPTION = 'oys_live_test_session';
 	const TEST_BASE   = 4000000000; // the test participants' links: booking ids nobody has (TEST_BASE + 1 …)
-	const TEST_PEOPLE = 3;
+	const TEST_PEOPLE = 6; // the test lab shows four, room for more devices
+
+	/**
+	 * How a test room behaves (OYS_Live_Lab, Áron, 26 November: „minden funkció, ami bent van”): small (everyone may send
+	 * picture and sound, recorded), big (only the teacher is on screen, recorded), private (two-way, not recorded, no
+	 * summary); '' for the plain test class and every real class.
+	 */
+	public static function test_profile( $session ) {
+		return self::is_test( $session ) && class_exists( 'OYS_Live_Lab' ) ? OYS_Live_Lab::profile_of( (int) $session->id ) : '';
+	}
+
+	/** The API key, shortened for the screen (never the secret). */
+	public static function key_hint() {
+		$k = self::conf( 'api_key' );
+		return '' === $k ? '' : mb_substr( $k, 0, 4 ) . '…' . mb_substr( $k, -3 );
+	}
 
 	public static function is_test( $session ) {
 		return $session && 'test' === $session->kind;
@@ -155,19 +174,42 @@ class OYS_Live {
 		$s   = self::test_session();
 		$now = time();
 		OYS_Schedule::save( array( 'starts_at' => gmdate( 'Y-m-d H:i:s', $now ), 'ends_at' => gmdate( 'Y-m-d H:i:s', $now + 2 * HOUR_IN_SECONDS ), 'status' => 'scheduled' ), $s->id );
+		self::wipe( $s->id );
+		return OYS_Schedule::get( $s->id );
+	}
+
+	/** A test room starts afresh: its recordings (files too), chat, opening words, summary and raised hands go. */
+	public static function wipe( $session_id ) {
 		global $wpdb;
-		$row = self::row( $s->id );
+		$row = self::row( $session_id );
 		if ( $row ) {
 			foreach ( self::recordings( $row ) as $r ) {
 				if ( ! empty( $r['file'] ) && is_file( self::rec_dir() . '/' . $r['file'] ) ) {
 					wp_delete_file( self::rec_dir() . '/' . $r['file'] );
 				}
 			}
-			$wpdb->delete( self::table(), array( 'session_id' => (int) $s->id ) );
+			$wpdb->delete( self::table(), array( 'session_id' => (int) $session_id ) );
 		}
-		$wpdb->delete( self::table( 'live_chat' ), array( 'session_id' => (int) $s->id ) );
-		delete_transient( self::hands_key( $s->id ) );
-		return OYS_Schedule::get( $s->id );
+		$wpdb->delete( self::table( 'live_chat' ), array( 'session_id' => (int) $session_id ) );
+		delete_transient( self::hands_key( $session_id ) );
+	}
+
+	/** One recording off the list and off the disk (the lab's own check recording). */
+	public static function drop_recording( $session_id, $rec_id ) {
+		$row  = self::row( $session_id );
+		$keep = array();
+		foreach ( self::recordings( $row ) as $r ) {
+			if ( $r['id'] === $rec_id ) {
+				if ( ! empty( $r['file'] ) && is_file( self::rec_dir() . '/' . $r['file'] ) ) {
+					wp_delete_file( self::rec_dir() . '/' . $r['file'] );
+				}
+				continue;
+			}
+			$keep[] = $r;
+		}
+		if ( $row ) {
+			self::save_recordings( $session_id, $keep );
+		}
 	}
 
 	/** The links of the test class: the teacher's and one for each test participant (no login needed). */
@@ -379,16 +421,8 @@ class OYS_Live {
 		$row = self::ensure_row( $session );
 		list( , $closes ) = self::window( $session );
 		$two      = self::two_way( $session );
-		$identity = $who['owner'] ? 'teacher-' . (int) $who['user_id'] : 'b' . (int) $who['booking']->id;
-		$grant    = array( 'room' => $row->room_name, 'roomJoin' => true, 'canSubscribe' => true, 'canPublishData' => true );
-		if ( $who['owner'] ) {
-			$grant['canPublish'] = true;
-		} else {
-			$grant['canPublish'] = $two;
-			if ( $two ) {
-				$grant['canPublishSources'] = array( 'camera', 'microphone' );
-			}
-		}
+		$identity = self::identity( $who );
+		$grant    = self::grant( $session, $who, $row->room_name );
 		$lang = self::lang( $session );
 		do_action( 'oys_live_joined', $session, $who ); // the attendance sheet: who came into the room (OYS_Hub_Classes)
 		return array(
@@ -405,6 +439,26 @@ class OYS_Live {
 			) : null,
 			'start'  => oys_ts( $session->starts_at ) * 1000,
 		);
+	}
+
+	/** A person's identity in the room: teacher-<user> or b<booking>. */
+	public static function identity( array $who ) {
+		return $who['owner'] ? 'teacher-' . (int) $who['user_id'] : 'b' . (int) $who['booking']->id;
+	}
+
+	/** What a person may do in the room (the token's video grant): the teacher everything, a participant per the class. */
+	public static function grant( $session, array $who, $room ) {
+		$grant = array( 'room' => (string) $room, 'roomJoin' => true, 'canSubscribe' => true, 'canPublishData' => true );
+		if ( $who['owner'] ) {
+			$grant['canPublish'] = true;
+		} else {
+			$two                 = self::two_way( $session );
+			$grant['canPublish'] = $two;
+			if ( $two ) {
+				$grant['canPublishSources'] = array( 'camera', 'microphone' );
+			}
+		}
+		return $grant;
 	}
 
 	/** The teacher mutes everyone's microphone. @return int|WP_Error how many were muted */
@@ -1052,8 +1106,11 @@ class OYS_Live {
 				. '</ul></div>'
 				. ( $who['owner'] ? '<div class="oys-live__owner" data-live-owner hidden><span data-live-rec-state></span> <button type="button" class="btn btn--ghost btn--sm" data-live-rec hidden></button> <span class="oys-small" data-live-intro></span></div>' : '' );
 		}
-		$out .= '</section>' . self::chat_html( $session, $who ) . '</div></div>';
-		return $out;
+		$out .= '</section>' . self::chat_html( $session, $who ) . '</div>';
+		if ( self::is_test( $session ) && class_exists( 'OYS_Live_Lab' ) && 'over' !== $phase ) {
+			$out .= OYS_Live_Lab::diag_html( $session, $who, $b, $k ); // the test lab: check this device (Áron, 26 November)
+		}
+		return $out . '</div>';
 	}
 
 	private static function chat_html( $session, array $who ) {

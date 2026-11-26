@@ -5905,6 +5905,201 @@ test( 'Áron 26 Nov: one class a week, 5-class passes – no reminder about a pa
 	ok( str_contains( $data['privacy']['content'], 'az oliviajoga.online és az oliviajoga.hu feliratkozó űrlapján' ) && str_contains( $data['privacy']['content'], 'a leiratkozott címet 30 nap után töröljük' ), 'the privacy notice: the signup forms, sent from oliviajoga.online, 30 days' );
 } );
 
+
+/* ---------- The live class test lab (Áron, 26 November: „teljes környezet, tesztkörnyezet … éles kulcsokkal … minden funkció”) ---------- */
+
+/** LiveKit's answers for the lab: the rooms it made, one person, the token check, the live page's headers. */
+function lab_mock( $fail = false ) {
+	$GLOBALS['lab_made']  = array();
+	$GLOBALS['lab_valid'] = 0;
+	$f = function ( $pre, $args, $url ) use ( $fail ) {
+		if ( str_contains( $url, '/rtc/validate?access_token=' ) ) {
+			++$GLOBALS['lab_valid'];
+			parse_str( (string) wp_parse_url( $url, PHP_URL_QUERY ), $q );
+			$ok = null !== lk_claims( $q['access_token'] ?? '' );
+			return array( 'headers' => array(), 'body' => $ok ? 'success' : 'invalid token', 'response' => array( 'code' => $ok ? 200 : 401, 'message' => '' ), 'cookies' => array(), 'filename' => null );
+		}
+		if ( 'HEAD' === ( $args['method'] ?? '' ) && str_contains( $url, 'live=' ) ) {
+			return array( 'headers' => array( 'permissions-policy' => 'camera=(self), microphone=(self)' ), 'body' => '', 'response' => array( 'code' => 200, 'message' => 'OK' ), 'cookies' => array(), 'filename' => null );
+		}
+		if ( ! str_contains( $url, '/twirp/livekit.RoomService/' ) ) {
+			return $pre;
+		}
+		if ( $fail ) {
+			return array( 'headers' => array(), 'body' => '{"code":"unauthenticated","msg":"invalid API key"}', 'response' => array( 'code' => 401, 'message' => '' ), 'cookies' => array(), 'filename' => null );
+		}
+		$method = substr( $url, strrpos( $url, '/' ) + 1 );
+		$body   = json_decode( $args['body'] ?? '{}', true ) ?: array();
+		$GLOBALS['lk_calls'][] = array( $method, $body, '' );
+		$json = array();
+		if ( 'CreateRoom' === $method ) {
+			$GLOBALS['lab_made'][ $body['name'] ] = true;
+			$json = array( 'name' => $body['name'] );
+		} elseif ( 'DeleteRoom' === $method ) {
+			unset( $GLOBALS['lab_made'][ $body['room'] ] );
+		} elseif ( 'ListRooms' === $method ) {
+			$json = array( 'rooms' => array_map( fn( $n ) => array( 'name' => $n, 'num_participants' => 0 ), array_keys( $GLOBALS['lab_made'] ) ) );
+		} elseif ( 'ListParticipants' === $method ) {
+			$json = array( 'participants' => $GLOBALS['lk_participants'] ?? array() );
+		} elseif ( 'GetParticipant' === $method ) {
+			$json = array_values( array_filter( $GLOBALS['lk_participants'] ?? array(), fn( $p ) => $p['identity'] === $body['identity'] ) )[0] ?? array();
+		}
+		return array( 'headers' => array(), 'body' => wp_json_encode( (object) $json ), 'response' => array( 'code' => 200, 'message' => 'OK' ), 'cookies' => array(), 'filename' => null );
+	};
+	add_filter( 'pre_http_request', $f, 5, 3 );
+	return $f;
+}
+
+test( 'Áron 26 Nov: the live class test lab – three rooms that behave like the real classes, every moment of a class, the links', function () {
+	live_on();
+	$small = OYS_Live_Lab::ensure_room( 'small' );
+	$big   = OYS_Live_Lab::ensure_room( 'big' );
+	$priv  = OYS_Live_Lab::ensure_room( 'private' );
+	ok( OYS_Live::is_test( $small ) && OYS_Live::is_test( $big ) && OYS_Live::is_test( $priv ) && 3 === count( array_unique( array( $small->id, $big->id, $priv->id ) ) ), 'three hidden test rooms (kind „test”)' );
+	eq( $small->id, OYS_Live_Lab::ensure_room( 'small' )->id, 'made once' );
+	ok( OYS_Live::two_way( $small ) && ! OYS_Live::two_way( $big ) && OYS_Live::two_way( $priv ), 'small and one-to-one: two-way; big: only the teacher' );
+	ok( OYS_Live::records( $small ) && OYS_Live::records( $big ) && ! OYS_Live::records( $priv ), 'recorded like a group class; the one-to-one not' );
+	ok( OYS_Live::summarises( $small ) && ! OYS_Live::summarises( $priv ), 'summary in groups, not one-to-one' );
+	ok( ! in_array( (int) $small->id, array_map( fn( $x ) => (int) $x->id, OYS_Schedule::query( array( 'kind' => array( 'group', 'event' ), 'from' => oys_utc_plus( -DAY_IN_SECONDS ), 'limit' => 500 ) ) ), true ), 'not on the timetable' );
+	// the links
+	$l = OYS_Live_Lab::links( $small );
+	ok( 4 === count( $l['people'] ) && str_contains( $l['teacher'], 'live=' . $small->id ), 'the teacher link and four participant links' );
+	parse_str( (string) wp_parse_url( $l['people'][2], PHP_URL_QUERY ), $q );
+	$who = OYS_Live::who( $small, (int) $q['b'], $q['k'] );
+	ok( $who && ! empty( $who['test'] ) && ! $who['owner'], 'a participant link works without login (a test participant, no booking)' );
+	ok( ! OYS_Live::who( $small, (int) $q['b'], $q['k'] . 'x' ), 'a changed link does not get in' );
+	ok( OYS_Live::who( $small, OYS_Live::TEST_BASE + 6, OYS_Live::sign( $small->id, OYS_Live::TEST_BASE + 6 ) ) && ! OYS_Live::who( $small, OYS_Live::TEST_BASE + 7, OYS_Live::sign( $small->id, OYS_Live::TEST_BASE + 7 ) ), 'room for six test devices, no more' );
+	// the moments of a class
+	OYS_Live_Lab::set_phase( 'small', 'wait' );
+	$s = OYS_Schedule::get( $small->id );
+	ok( 'waiting' === OYS_Live_Lab::moment( $s ) && 'before' === OYS_Live::phase( $s ) && 'open' === OYS_Live::phase( $s, true ), 'waiting room: participants wait, the teacher can go in' );
+	OYS_Live_Lab::set_phase( 'small', 'soon' );
+	$s = OYS_Schedule::get( $small->id );
+	ok( 'open' === OYS_Live_Lab::moment( $s ) && oys_ts( $s->starts_at ) > time(), 'starts in 3 minutes: the room is open, the class not started' );
+	OYS_Live_Lab::set_phase( 'small', 'open' );
+	$s = OYS_Schedule::get( $small->id );
+	eq( 'live', OYS_Live_Lab::moment( $s ), 'start now: the class is on' );
+	$j = OYS_Live::join( $s, $who );
+	$c = lk_claims( $j['token'] );
+	ok( $c && true === $c['video']['canPublish'] && $c['video']['room'] === OYS_Live::room_name( $s->id ), 'small group: the participant may send picture and sound, in this room only' );
+	OYS_Live_Lab::set_phase( 'big', 'open' );
+	$b  = OYS_Schedule::get( $big->id );
+	$cb = lk_claims( OYS_Live::join( $b, OYS_Live::who( $b, OYS_Live::TEST_BASE + 1, OYS_Live::sign( $b->id, OYS_Live::TEST_BASE + 1 ) ) )['token'] );
+	ok( $cb && false === $cb['video']['canPublish'], 'big group: the participant only watches' );
+	// over: everyone out, the recording closed, the summary written now
+	$rec = OYS_Live::rec_start( $s, 'video/webm' );
+	OYS_Live::rec_chunk( $s, $rec['id'], 0, 'abc' );
+	$GLOBALS['lk_calls'] = array();
+	OYS_Live_Lab::set_phase( 'small', 'over' );
+	$s = OYS_Schedule::get( $small->id );
+	ok( 'over' === OYS_Live_Lab::moment( $s ) && 1 === count( lk_calls( 'DeleteRoom' ) ), 'over: the video room closes' );
+	eq( 'finished', OYS_Live::recordings( OYS_Live::row( $s->id ) )[0]['status'] ?? '', '… and the recording is closed at once, watchable' );
+	// afresh
+	OYS_Live_Lab::set_phase( 'small', 'fresh' );
+	ok( ! OYS_Live::row( $small->id ) && 'live' === OYS_Live_Lab::moment( OYS_Schedule::get( $small->id ) ), 'afresh: recordings and chat gone, open again' );
+	// the device check on a test room's page
+	$_GET = array( 'live' => $small->id, 'b' => $q['b'], 'k' => $q['k'] );
+	$html = OYS_Live::page();
+	$_GET = array();
+	preg_match( '/data-oys-diag="([^"]+)"/', $html, $m );
+	$cfg = $m ? json_decode( html_entity_decode( $m[1] ), true ) : array();
+	$dc  = lk_claims( $cfg['token'] ?? '' );
+	ok( $dc && str_starts_with( $dc['video']['room'], 'oys-lab-net-' . $small->id . '-' ) && true === $dc['video']['canPublish'], 'the test room page: „Check this device”, in a room of its own (the class is not disturbed)' );
+	live_off();
+} );
+
+test( 'Áron 26 Nov: the lab\'s automatic check on the LiveKit project – the server, a room, the entry tokens, chat, hand, recording, the page header', function () {
+	live_on();
+	wp_set_current_user( get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0] );
+	$f     = lab_mock();
+	$steps = OYS_Live_Lab::auto_check();
+	remove_filter( 'pre_http_request', $f, 5 );
+	$bad = array_filter( $steps, fn( $x ) => 'bad' === $x[0] );
+	ok( ! $bad, 'every step passes against LiveKit (' . implode( '; ', array_map( fn( $x ) => $x[1] . ': ' . $x[2], $bad ) ) . ')' );
+	$titles = implode( ' | ', array_column( $steps, 1 ) );
+	ok( str_contains( $titles, 'The LiveKit server answers' ) && str_contains( $titles, 'A room made, changed and deleted' ) && str_contains( $titles, 'Class chat' ) && str_contains( $titles, 'Raised hand' ) && str_contains( $titles, 'Recording: a piece' ) && str_contains( $titles, 'Camera and microphone allowed' ), 'the steps: server, room, chat, hand, recording, page header' );
+	ok( 1 === count( lk_calls( 'CreateRoom' ) ) && 1 === count( lk_calls( 'DeleteRoom' ) ) && ! $GLOBALS['lab_made'], 'its own room is deleted again' );
+	eq( 6, $GLOBALS['lab_valid'], 'LiveKit checked the teacher\'s and a participant\'s entry token of all three rooms' );
+	$small = OYS_Live_Lab::room( 'small' );
+	ok( ! OYS_Live::messages( $small->id ) && ! OYS_Live::hands( $small->id ) && ! OYS_Live::recordings( OYS_Live::row( $small->id ) ), 'it leaves nothing behind: no message, no hand, no recording' );
+	ok( ! empty( OYS_Live_Lab::state()['run']['steps'] ), 'the result is kept for the page' );
+	ok( ! str_contains( wp_json_encode( $steps, JSON_UNESCAPED_UNICODE ), 'secret-for-tests' ) && str_contains( wp_json_encode( $steps, JSON_UNESCAPED_UNICODE ), 'APIt…est' ), 'the key is shown shortened, the secret never' );
+	// LiveKit refuses the key
+	$f     = lab_mock( true );
+	$steps = OYS_Live_Lab::auto_check();
+	remove_filter( 'pre_http_request', $f, 5 );
+	ok( 'bad' === ( array_values( array_filter( $steps, fn( $x ) => str_contains( $x[1], 'does not answer' ) ) )[0][0] ?? '' ), 'a wrong key: „The LiveKit server does not answer”, with LiveKit\'s reason' );
+	wp_set_current_user( 0 );
+	live_off();
+} );
+
+test( 'Áron 26 Nov: the lab shows who is in each room (from LiveKit), mutes and takes people out; devices report their check', function () {
+	live_on();
+	wp_set_current_user( get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0] );
+	OYS_Live_Lab::set_phase( 'small', 'open' );
+	$small = OYS_Live_Lab::room( 'small' );
+	OYS_Live::ensure_row( $small );
+	$GLOBALS['lk_participants'] = array(
+		array( 'identity' => 'teacher-1', 'name' => 'Olívia', 'state' => 'ACTIVE', 'joined_at' => (string) time(), 'tracks' => array( array( 'sid' => 'TR_v', 'type' => 'VIDEO', 'source' => 'CAMERA', 'width' => 1280, 'height' => 720 ), array( 'sid' => 'TR_a', 'type' => 'AUDIO', 'source' => 'MICROPHONE' ) ) ),
+		array( 'identity' => 'b4000000001', 'name' => 'Test participant 1', 'state' => 'ACTIVE', 'joined_at' => (string) time(), 'tracks' => array( array( 'sid' => 'TR_b', 'type' => 'AUDIO', 'source' => 'MICROPHONE', 'muted' => false ) ) ),
+	);
+	$f = lab_mock();
+	list( $code, $data ) = live_owner_req( 'GET', '/live-lab' );
+	ok( 200 === $code && 2 === count( $data['rooms']['small']['people'] ?? array() ), 'the monitor: two people in the small room' );
+	$t = $data['rooms']['small']['people'][0];
+	ok( $t['teacher'] && 'Olívia' === $t['name'] && '1280×720' === $t['tracks'][0]['size'] && 'audio' === $t['tracks'][1]['kind'], '… the teacher with her camera (1280×720) and microphone' );
+	$GLOBALS['lk_calls'] = array();
+	wp_set_current_user( get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0] );
+	OYS_Live_Lab::act( 'small', 'mute', 'b4000000001' );
+	OYS_Live_Lab::act( 'small', 'remove', 'b4000000001' );
+	ok( 'TR_b' === ( lk_calls( 'MutePublishedTrack' )[0][1]['track_sid'] ?? '' ) && 'b4000000001' === ( lk_calls( 'RemoveParticipant' )[0][1]['identity'] ?? '' ), 'muting a participant\'s microphone, taking them out' );
+	wp_set_current_user( 0 );
+	list( $code ) = api( 'GET', '/live-lab' );
+	ok( in_array( $code, array( 401, 403 ), true ), 'the monitor is only for the studio' );
+	remove_filter( 'pre_http_request', $f, 5 );
+	// a device's check, from its own test link
+	$b      = OYS_Live::TEST_BASE + 2;
+	$report = array( 'device' => 'iPhone · Safari 18', 'caps' => array( 'secure' => true, 'webrtc' => true, 'media' => true, 'recorder' => 'video/mp4', 'speech' => false, 'fullscreen' => true ), 'checks' => array( array( 'name' => 'Connecting to signal connection via WebSocket', 'status' => 'success', 'note' => '' ), array( 'name' => 'Can connect via TURN', 'status' => 'failed', 'note' => '<b>timeout</b>' ), array( 'name' => 'x', 'status' => 'hacked' ) ) );
+	list( $code ) = api( 'POST', '/live/' . $small->id . '/diag?b=' . $b . '&k=' . OYS_Live::sign( $small->id, $b ), $report );
+	$d = OYS_Live_Lab::state()['devices'][0] ?? array();
+	ok( 200 === $code && 'iPhone · Safari 18' === $d['device'] && false === $d['ok'] && 'timeout' === $d['checks'][1]['note'] && 'idle' === $d['checks'][2]['status'] && 'Test participant 2' === $d['who'], 'the report is kept (cleaned): one failed line, so not ok' );
+	list( $code ) = api( 'POST', '/live/' . $small->id . '/diag?b=' . $b . '&k=wrong', $report );
+	eq( 403, $code, 'a forged link can\'t report' );
+	$real = make_session( array( 'format' => 'online' ) );
+	list( $code ) = api( 'POST', '/live/' . $real->id . '/diag?b=' . $b . '&k=' . OYS_Live::sign( $real->id, $b ), $report );
+	eq( 403, $code, 'only the test rooms take reports' );
+	unset( $GLOBALS['lk_participants'] );
+	live_off();
+} );
+
+test( 'Áron 26 Nov: the lab page – the check, the rooms with their moments and links (QR), the devices, the checklist, in Hungarian', function () {
+	live_on();
+	wp_set_current_user( get_users( array( 'role' => 'administrator', 'number' => 1, 'fields' => 'ID' ) )[0] );
+	OYS_Live_Lab::set_phase( 'small', 'open' );
+	OYS_Live_Lab::set_phase( 'private', 'wait' );
+	OYS_Live_Lab::save_checks( array( 's' => array( 'teacher_join' => 'ok', 'hand' => 'bad', 'zzz' => 'ok' ), 'n' => array( 'hand' => 'iPhone: the hand did not show' ) ) );
+	list( $ok, $bad, $total ) = OYS_Live_Lab::tally();
+	ok( 1 === $ok && 1 === $bad && $total >= 30, 'the checklist: one works, one problem, ' . $total . ' points' );
+	eq( 'iPhone: the hand did not show', OYS_Live_Lab::state()['checks']['hand']['n'], 'the note is kept' );
+	ob_start();
+	OYS_Live_Lab::page();
+	$html = ob_get_clean();
+	ok( str_contains( $html, 'id="check"' ) && str_contains( $html, 'id="rooms"' ) && str_contains( $html, 'id="devices"' ) && str_contains( $html, 'id="list"' ), 'four parts: check, rooms, devices, checklist' );
+	ok( 3 === substr_count( $html, 'data-lab-room=' ) && 15 === substr_count( $html, 'name="phase"' ), 'three rooms, five moments each' );
+	ok( substr_count( $html, 'data-lab-qr=' ) >= 8 && str_contains( $html, 'is-waiting' ) && str_contains( $html, 'is-live' ), 'QR codes for the links; the moment of each room' );
+	ok( str_contains( $html, 'data-oys-diag=' ) && str_contains( $html, 'value="bad" checked' ) && str_contains( $html, 'iPhone: the hand did not show' ), 'the device check here, the ticks and notes' );
+	ok( ! str_contains( $html, 'secret-for-tests' ), 'the secret is never on the page' );
+	OYS_Live_Lab::new_round();
+	ok( ! OYS_Live_Lab::state()['checks'] && 1 === count( OYS_Live_Lab::state()['rounds'] ), 'a new round: empty ticks, the old numbers kept' );
+	$po = (string) file_get_contents( WP_PLUGIN_DIR . '/olivia-studio/languages/olivia-studio-hu_HU.po' );
+	ok( str_contains( $po, 'msgstr "Élő óra teszt"' ) && str_contains( $po, 'msgstr "Eszköz ellenőrzése"' ) && str_contains( $po, 'msgstr "3 perc múlva kezdődik"' ) && str_contains( $po, '„Élő adás indítása” gombra' ), 'in Hungarian, with the real button names' );
+	$hub = (string) file_get_contents( WP_PLUGIN_DIR . '/olivia-studio/includes/admin/class-hub-admin.php' );
+	ok( str_contains( $hub, "\$a( 'oys-live-lab' )" ), 'in the Studio app\'s menu too' );
+	ok( is_file( WP_PLUGIN_DIR . '/olivia-studio/assets/vendor/qrcode-generator.js' ) && is_file( WP_PLUGIN_DIR . '/olivia-studio/assets/live-diag.js' ) && is_file( WP_PLUGIN_DIR . '/olivia-studio/assets/live-lab.js' ), 'its scripts are there' );
+	wp_set_current_user( 0 );
+	live_off();
+} );
+
 $t = $GLOBALS['oys_t'];
 echo "\n{$t['pass']} assertions passed, {$t['fail']} failed\n";
 exit( $t['fail'] ? 1 : 0 );

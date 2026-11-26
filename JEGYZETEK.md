@@ -2134,6 +2134,38 @@
   a szerver-szakaszt. Javítva: egy csere csak akkor fut, ha az új szöveg még nincs az oldalon, és a frissítés az ismétlődő
   szakaszokból egyet hagy meg (a többi mondat és Olívia saját szövege marad). Teszt: 1881/0.
 
+- **2026-11-26 – Élő óra tesztlabor a valódi LiveKit-kulcsokkal (olivia-studio 1.30.0, oliviajoga.online 3.12.30).** Áron:
+  „A LiveKit-re szeretnék egy teljes környezetet, tesztkörnyezetet, hogy tudjunk mindent tesztelni, éles kulcsokkal,
+  mindennel együtt. Minden funkció, ami bent van, szeretnék tesztelni. A LiveKit-re kifejezetten.”
+  Stúdió → **Élő óra teszt** (a Stúdió appban is), `includes/class-live-lab.php`, `assets/live-lab.js`, `assets/live-diag.js`:
+  - **Automatikus ellenőrzés** az oldal saját LiveKit-projektjén:
+    - kulcsok (a kulcs rövidítve, a titok soha);
+    - a szerver válaszideje;
+    - saját szoba létrehozása, módosítása, lekérdezése, törlése;
+    - a három szoba oktatói és résztvevői belépőkulcsát a LiveKit maga ellenőrzi (`/rtc/validate`);
+    - chat: írás, olvasás, törlés; kézfeltartás: fel és le;
+    - egy felvételdarab mentése, visszaolvasása, törlése; szabad hely; PHP-korlátok;
+    - az élő oldal Permissions-Policy fejléce; háttérfeladatok; MI-kulcs (kérésre próba-összefoglalóval).
+    Nem hagy nyomot.
+  - **Három tesztszoba** (kind „test”: nem foglalható, nincs az órarendben, nincs e-mail):
+    - kis csoport: mindenki kamerázhat, van felvétel és összefoglaló;
+    - nagy csoport: csak az oktató látszik, van felvétel;
+    - egyéni óra: kétirányú, nincs felvétel, nincs összefoglaló.
+    Gombokkal az óra bármelyik pillanatába tehetők: indítás most / 3 perc múlva kezdődik (a felvétel magától indul) /
+    váró / véget ért (mindenki kilép, a felvétel lezárul, az összefoglaló azonnal elkészül) / tiszta lappal. Oktatói link és
+    4 résztvevői link (bejelentkezés nélkül, QR-kóddal; 6 eszközig), „Küldd el nekem az összes linket”.
+  - **Ki van a szobában** 4 másodpercenként, egyenesen a LiveKitből: név, kamera és mikrofon (felbontással), mióta bent
+    van; némítás, kiléptetés, mindenki némítása; a projekt összes nyitott szobája.
+  - **Eszköz ellenőrzése** minden tesztlink oldalán és a laborban: a LiveKit saját kapcsolattesztje (WebSocket, WebRTC,
+    TURN, visszacsatlakozás, hang- és képküldés, UDP/TCP, régió), plusz a böngésző képességei (felvétel,
+    beszédfelismerés, teljes képernyő). Az eredmény eszközönként a laborba érkezik.
+  - **Ellenőrzőlista**: 36 pont, 6 csoportban (belépés, kép és hang, chat és kéz, felvétel és összefoglaló, kapcsolat,
+    eszközök). Működik/hiba/még nem, megjegyzés, ki és mikor; „Új tesztkör”, a korábbi körök számai megmaradnak.
+  - Helyben ellenőrizve: hamis LiveKit-címmel a labor oldala 1280 és 390 px-en, a QR-kód, és az eszköz-ellenőrzés
+    bejelentkezés nélküli résztvevőként. A valódi LiveKittel a labor gombjaival kell végigmenni.
+  - Egy helyi LiveKit-szervert lefordítottam a végponttól végpontig tartó próbához, de az indítását a biztonsági
+    ellenőrzés nem engedte. A teszteket ezért a LiveKit válaszainak utánzásával futtattam (1926/0).
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

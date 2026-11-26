@@ -347,6 +347,7 @@ class OYS_Testbench {
 		self::step( ! is_wp_error( $ok ) && false !== $ok, is_wp_error( $ok ) ? $ok->get_error_message() : __( 'LiveKit answers: the room can start.', 'olivia-studio' ) );
 		self::step( true, __( 'Your link (teacher):', 'olivia-studio' ) . ' ' . OYS_Live::url( $s->id ) );
 		self::step( true, __( 'The test guest\'s link:', 'olivia-studio' ) . ' ' . OYS_Live::url( $s->id, $b->id ) );
+		self::step( true, __( 'Every live class feature, step by step:', 'olivia-studio' ) . ' ' . admin_url( 'admin.php?page=oys-live-lab' ) );
 	}
 
 	public static function run_waitlist() {

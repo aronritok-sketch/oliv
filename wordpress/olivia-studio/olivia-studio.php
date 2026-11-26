@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Olivia Studio — Booking & Payments
  * Description:       Class schedule, online booking, class passes, memberships, private sessions, gift cards, waitlist, customer accounts and Stripe payments for Olivia Kovacs Yoga.
- * Version:           1.29.0
+ * Version:           1.30.0
  * Requires at least: 6.4
  * Requires PHP:      8.1
  * Author:            Olivia Kovacs Yoga
@@ -12,7 +12,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'OYS_VERSION', '1.29.0' );
+define( 'OYS_VERSION', '1.30.0' );
 define( 'OYS_DB_VERSION', '17' );
 define( 'OYS_FILE', __FILE__ );
 define( 'OYS_DIR', plugin_dir_path( __FILE__ ) );
@@ -50,6 +50,7 @@ require_once OYS_DIR . 'includes/class-gifts.php';
 require_once OYS_DIR . 'includes/class-memberships.php';
 require_once OYS_DIR . 'includes/class-zoom.php';
 require_once OYS_DIR . 'includes/class-live.php';
+require_once OYS_DIR . 'includes/class-live-lab.php';
 require_once OYS_DIR . 'includes/class-hub.php';
 require_once OYS_DIR . 'includes/class-studio-app.php';
 require_once OYS_DIR . 'includes/class-hub-classes.php';

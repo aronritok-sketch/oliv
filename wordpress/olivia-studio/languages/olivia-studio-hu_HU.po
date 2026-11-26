@@ -8775,3 +8775,642 @@ msgid "A newsletter goes to %d person:"
 msgid_plural "A newsletter goes to %d people:"
 msgstr[0] "A hírlevél %d emberhez megy:"
 msgstr[1] "A hírlevél %d emberhez megy:"
+
+# Áron, 26 November: the live class test lab
+
+msgid "Small group"
+msgstr "Kis csoport"
+
+msgid "Like a group class of at most %d online places: the participants may turn their camera and microphone on and everyone sees everyone. Recorded (only the teacher), with the summary of the opening words."
+msgstr "Mint egy legfeljebb %d online helyes csoportos óra: a résztvevők is bekapcsolhatják a kamerájukat és a mikrofonjukat, mindenki látja egymást. Felvétel készül (csak az oktatóról), és összefoglaló a bevezető szavakról."
+
+msgid "Big group"
+msgstr "Nagy csoport"
+
+msgid "Like a group class of more than %d online places: the participants see and hear only the teacher, their camera and microphone stay off; questions go in the chat or with a raised hand. Recorded."
+msgstr "Mint egy %d online helynél nagyobb csoportos óra: a résztvevők csak az oktatót látják és hallják, a kamerájuk és a mikrofonjuk kikapcsolva marad; kérdezni a chatben vagy kézfeltartással lehet. Felvétel készül."
+
+msgid "Like a one-to-one session: both see and hear each other. No recording and no summary."
+msgstr "Mint egy egyéni óra: mindketten látjátok és halljátok egymást. Nincs felvétel és nincs összefoglaló."
+
+msgid "Test – %s"
+msgstr "Teszt – %s"
+
+msgid "LiveKit did not say (%d)."
+msgstr "A LiveKit nem adott választ (%d)."
+
+msgid "No LiveKit project is connected"
+msgstr "Nincs LiveKit-projekt csatlakoztatva"
+
+msgid "Settings → Live online: the address, the API key and the secret."
+msgstr "Beállítások → Élő online: a cím, az API-kulcs és a titkos kulcs."
+
+msgid "LiveKit project"
+msgstr "LiveKit-projekt"
+
+msgid "API key %s"
+msgstr "API-kulcs: %s"
+
+msgid "Live classes switched on"
+msgstr "Élő órák bekapcsolva"
+
+msgid "The online classes run in the site's own live room."
+msgstr "Az online órák az oldal saját élő termében futnak."
+
+msgid "Off: the real classes do not use it (the test rooms work)."
+msgstr "Kikapcsolva: a valódi órák nem ezt használják (a tesztszobák működnek)."
+
+msgid "The LiveKit server does not answer"
+msgstr "A LiveKit-szerver nem válaszol"
+
+msgid "The LiveKit server answers"
+msgstr "A LiveKit-szerver válaszol"
+
+msgid "%1$d ms · rooms open now: %2$d"
+msgstr "%1$d ms · most nyitott szobák: %2$d"
+
+msgid "A room could not be made"
+msgstr "Nem sikerült szobát létrehozni"
+
+msgid "A room made, changed and deleted"
+msgstr "Szoba létrehozva, módosítva és törölve"
+
+msgid "participants: camera and microphone"
+msgstr "résztvevők: kamera és mikrofon"
+
+msgid "participants: watch and listen only"
+msgstr "résztvevők: csak néznek és hallgatnak"
+
+msgid "recorded"
+msgstr "felvétel készül"
+
+msgid "not recorded"
+msgstr "nincs felvétel"
+
+msgid "summary"
+msgstr "összefoglaló"
+
+msgid "no summary"
+msgstr "nincs összefoglaló"
+
+msgid "%s: entry for the teacher and the participants"
+msgstr "%s: belépés az oktatónak és a résztvevőknek"
+
+msgid "[Check] test message"
+msgstr "[Ellenőrzés] próbaüzenet"
+
+msgid "Class chat: written, read, removed"
+msgstr "Órai chat: megírva, elolvasva, törölve"
+
+msgid "The small group room is over: open it and check again."
+msgstr "A kis csoport szobája lezárult: nyisd meg, és futtasd újra az ellenőrzést."
+
+msgid "Raised hand: up, seen, lowered by the teacher"
+msgstr "Kézfeltartás: feltéve, látszik, az oktató leengedte"
+
+msgid "Recording is switched off (Settings → Live online)."
+msgstr "A felvétel ki van kapcsolva (Beállítások → Élő online)."
+
+msgid "Recording: a piece saved on the server, read back, deleted"
+msgstr "Felvétel: egy darab elmentve a szerveren, visszaolvasva, törölve"
+
+msgid "free space: %s"
+msgstr "szabad hely: %s"
+
+msgid "Little free space for recordings"
+msgstr "Kevés a szabad hely a felvételeknek"
+
+msgid "An hour of class is about 0.5–1 GB."
+msgstr "Egy óra felvétele kb. 0,5–1 GB."
+
+msgid "Size of the recording pieces the server takes"
+msgstr "A felvétel darabjainak mérete, amit a szerver fogad"
+
+msgid "Camera and microphone allowed on the live page"
+msgstr "Kamera és mikrofon engedélyezve az élő óra oldalán"
+
+msgid "The site could not be asked from itself:"
+msgstr "Az oldal nem tudta lekérdezni önmagát:"
+
+msgid "no Permissions-Policy header"
+msgstr "nincs Permissions-Policy fejléc"
+
+msgid "Background jobs"
+msgstr "Háttérfeladatok"
+
+msgid "next run: %s"
+msgstr "következő futás: %s"
+
+msgid "not scheduled"
+msgstr "nincs ütemezve"
+
+msgid "AI summary"
+msgstr "MI-összefoglaló"
+
+msgid "No Anthropic API key (Newsletter → AI settings): no summary after class."
+msgstr "Nincs Anthropic API-kulcs (Hírlevél → MI-beállítások): óra után nem készül összefoglaló."
+
+msgid "Good evening everyone, welcome. Today we work on the hips and the lower back, slowly. If your knee hurts, put a blanket under it. Breathe out long in every forward bend, and we finish with a long relaxation."
+msgstr "Szép estét mindenkinek, jó, hogy itt vagytok. Ma a csípővel és a derékkal foglalkozunk, lassan. Ha fáj a térded, tegyél alá egy takarót. Minden előrehajlásnál fújd ki hosszan a levegőt, és egy hosszú relaxációval zárunk."
+
+msgid "AI summary of sample opening words"
+msgstr "MI-összefoglaló minta-bevezetőről"
+
+msgid "The key is set (tick „with the AI summary” to try it)."
+msgstr "A kulcs be van állítva (a kipróbáláshoz pipáld be: „MI-összefoglalóval”)."
+
+msgid "Nobody is in this room."
+msgstr "Ebben a szobában nincs senki."
+
+msgid "Check this device"
+msgstr "Eszköz ellenőrzése"
+
+msgid "The test of the live video service itself: does this phone or computer reach it, can it send sound and picture, and does it get back in after an interruption. Allow the camera and the microphone when asked. It takes about half a minute; the result goes to the test page."
+msgstr "Az élő videószolgáltatás saját tesztje: eléri-e ez a telefon vagy számítógép, tud-e hangot és képet küldeni, és visszajut-e egy megszakadás után. Ha a böngésző kéri, engedélyezd a kamerát és a mikrofont. Kb. fél perc; az eredmény a tesztoldalra kerül."
+
+msgid "Checking… (allow the camera and the microphone)"
+msgstr "Ellenőrzés… (engedélyezd a kamerát és a mikrofont)"
+
+msgid "Everything works on this device."
+msgstr "Ezen az eszközön minden működik."
+
+msgid "Something does not work on this device: see the red lines."
+msgstr "Ezen az eszközön valami nem működik: nézd a piros sorokat."
+
+msgid "The result is on the test page."
+msgstr "Az eredmény a tesztoldalon van."
+
+msgid "The check could not start. Try again in a moment."
+msgstr "Az ellenőrzés nem indult el. Próbáld újra egy perc múlva."
+
+msgid "Check again"
+msgstr "Újra ellenőrzöm"
+
+msgid "Secure connection (https)"
+msgstr "Biztonságos kapcsolat (https)"
+
+msgid "Live video in this browser (WebRTC)"
+msgstr "Élő videó ebben a böngészőben (WebRTC)"
+
+msgid "Camera and microphone access"
+msgstr "Hozzáférés a kamerához és a mikrofonhoz"
+
+msgid "Recording in this browser (teacher)"
+msgstr "Felvétel ebben a böngészőben (oktató)"
+
+msgid "Speech recognition for the opening words (teacher)"
+msgstr "Beszédfelismerés a bevezető szavakhoz (oktató)"
+
+msgid "Reaching the live video server (WebSocket)"
+msgstr "Az élő videószerver elérése (WebSocket)"
+
+msgid "Video connection (WebRTC)"
+msgstr "Videókapcsolat (WebRTC)"
+
+msgid "Connection through a firewall (TURN)"
+msgstr "Kapcsolat tűzfalon át (TURN)"
+
+msgid "Getting back in after an interruption"
+msgstr "Visszacsatlakozás megszakadás után"
+
+msgid "Sending sound (microphone)"
+msgstr "Hang küldése (mikrofon)"
+
+msgid "Sending picture (camera)"
+msgstr "Kép küldése (kamera)"
+
+msgid "Type of connection (UDP or TCP)"
+msgstr "A kapcsolat típusa (UDP vagy TCP)"
+
+msgid "The nearest LiveKit data centre"
+msgstr "A legközelebbi LiveKit-adatközpont"
+
+msgid "Only for the test rooms."
+msgstr "Csak a tesztszobákhoz."
+
+msgid "Too many checks: try again later."
+msgstr "Túl sok ellenőrzés: próbáld újra később."
+
+msgid "Getting in"
+msgstr "Belépés"
+
+msgid "The teacher goes live"
+msgstr "Az oktató élőben indít"
+
+msgid "Open the teacher link (logged in) on a computer, tap „Go live”, allow the camera and the microphone."
+msgstr "Nyisd meg az oktatói linket (bejelentkezve) számítógépen, koppints az „Élő adás indítása” gombra, engedélyezd a kamerát és a mikrofont."
+
+msgid "A participant joins without logging in"
+msgstr "Résztvevő belép bejelentkezés nélkül"
+
+msgid "Open a participant link on a phone (or in another browser) and tap „Join the class”."
+msgstr "Nyiss meg egy résztvevői linket telefonon (vagy másik böngészőben), és koppints a „Belépek az órára” gombra."
+
+msgid "Waiting room and countdown"
+msgstr "Váró és visszaszámlálás"
+
+msgid "Set a room to „Waiting room”: the participant link counts down and can't join yet; the teacher can already go in."
+msgstr "Állíts egy szobát „Váró”-ra: a résztvevői link visszaszámol, és még nem lehet belépni; az oktató már be tud lépni."
+
+msgid "After the class"
+msgstr "Az óra után"
+
+msgid "Set the room to „Over”: everyone leaves the video; the chat and the recording stay on the page."
+msgstr "Állítsd a szobát „Véget ért”-re: mindenki kilép a videóból; a chat és a felvétel az oldalon marad."
+
+msgid "A wrong link does not get in"
+msgstr "Hibás linkkel nem lehet belépni"
+
+msgid "Change the last letter of a participant link: the page must not let you in."
+msgstr "Írd át egy résztvevői link utolsó betűjét: az oldal nem engedhet be."
+
+msgid "The same link on two devices"
+msgstr "Ugyanaz a link két eszközön"
+
+msgid "Open the same participant link on two devices and join on both: the newer one stays in the room, the older one leaves."
+msgstr "Nyisd meg ugyanazt a résztvevői linket két eszközön, és lépj be mindkettőn: az újabb bent marad, a régebbi kilép."
+
+msgid "Picture and sound"
+msgstr "Kép és hang"
+
+msgid "Small group: everyone sees everyone"
+msgstr "Kis csoport: mindenki látja egymást"
+
+msgid "In the small group room a participant turns the camera on: the teacher and the other participants see them."
+msgstr "A kis csoport szobájában egy résztvevő bekapcsolja a kameráját: az oktató és a többi résztvevő is látja."
+
+msgid "Big group: only the teacher is on screen"
+msgstr "Nagy csoport: csak az oktató látszik"
+
+msgid "In the big group room the participants see and hear only the teacher and have no camera or microphone button."
+msgstr "A nagy csoport szobájában a résztvevők csak az oktatót látják és hallják, és nincs kamera- vagy mikrofongombjuk."
+
+msgid "One-to-one: two-way picture and sound"
+msgstr "Egyéni óra: kétirányú kép és hang"
+
+msgid "In the one-to-one room both see and hear each other."
+msgstr "Az egyéni óra szobájában mindketten látjátok és halljátok egymást."
+
+msgid "Own microphone and camera off and on"
+msgstr "Saját mikrofon és kamera ki-be"
+
+msgid "The teacher and a participant switch their own microphone and camera off and on again."
+msgstr "Az oktató és egy résztvevő kikapcsolja, majd visszakapcsolja a saját mikrofonját és kameráját."
+
+msgid "With participants talking, the teacher taps „Mute everyone”: every participant's microphone goes off."
+msgstr "Amíg a résztvevők beszélnek, az oktató a „Mindenki némítása” gombra koppint: minden résztvevő mikrofonja kikapcsol."
+
+msgid "Sound on phones"
+msgstr "Hang telefonon"
+
+msgid "On an iPhone (silent switch on and off) and on an Android phone the teacher can be heard."
+msgstr "iPhone-on (néma kapcsolóval és anélkül) és Android telefonon is hallatszik az oktató."
+
+msgid "„Full screen” on a phone and on a computer, and back."
+msgstr "„Teljes képernyő” telefonon és számítógépen, majd vissza."
+
+msgid "Picture quality"
+msgstr "Képminőség"
+
+msgid "The teacher's picture is sharp on a computer; on a weak connection it gets blurrier but keeps going."
+msgstr "Számítógépen éles az oktató képe; gyenge netnél elmosódottabb lesz, de nem áll le."
+
+msgid "Chat and raised hands"
+msgstr "Chat és kézfeltartás"
+
+msgid "Chat messages"
+msgstr "Chatüzenetek"
+
+msgid "A participant and the teacher write: the messages appear for everyone within a few seconds."
+msgstr "Egy résztvevő és az oktató ír: az üzenetek pár másodpercen belül mindenkinél megjelennek."
+
+msgid "A photo in the chat"
+msgstr "Fotó a chatben"
+
+msgid "A participant sends a photo from the phone; it appears in the chat."
+msgstr "Egy résztvevő fotót küld a telefonjáról, és megjelenik a chatben."
+
+msgid "Removing a message"
+msgstr "Üzenet törlése"
+
+msgid "The teacher removes a message: it disappears for everyone."
+msgstr "Az oktató töröl egy üzenetet: mindenkinél eltűnik."
+
+msgid "Raising a hand"
+msgstr "Kézfeltartás"
+
+msgid "A participant raises a hand: the teacher sees it at once and can lower it; the participant can lower it too."
+msgstr "Egy résztvevő feltartja a kezét: az oktató azonnal látja és le tudja engedni; a résztvevő is le tudja engedni."
+
+msgid "Who is in the room"
+msgstr "Ki van a szobában"
+
+msgid "On this page, under the room, the people in it appear within a few seconds, with their camera and microphone."
+msgstr "Ezen az oldalon, a szoba alatt pár másodpercen belül megjelennek a bent lévők, a kamerájukkal és a mikrofonjukkal."
+
+msgid "Recording and summary"
+msgstr "Felvétel és összefoglaló"
+
+msgid "The recording starts with the class"
+msgstr "A felvétel az órával együtt indul"
+
+msgid "Set a room to „Starts in 3 minutes” and go live as the teacher: the recording starts by itself at the start."
+msgstr "Állíts egy szobát „3 perc múlva kezdődik”-re, és indíts élőben oktatóként: a felvétel a kezdéskor magától elindul."
+
+msgid "Stopping and restarting the recording"
+msgstr "A felvétel leállítása és újraindítása"
+
+msgid "The teacher stops the recording and starts it again: both parts are saved."
+msgstr "Az oktató leállítja, majd újraindítja a felvételt: mindkét rész megmarad."
+
+msgid "Only the teacher is on the recording"
+msgstr "A felvételen csak az oktató van"
+
+msgid "Watch the recording: only the teacher's picture and sound are on it."
+msgstr "Nézd meg a felvételt: csak az oktató képe és hangja van rajta."
+
+msgid "Watching it again"
+msgstr "Visszanézés"
+
+msgid "After „Over” the participant link shows the recording and it plays, on a phone and on a computer."
+msgstr "A „Véget ért” után a résztvevői linken ott a felvétel, és lejátszható telefonon és számítógépen is."
+
+msgid "Downloading the recording"
+msgstr "A felvétel letöltése"
+
+msgid "The teacher can download the recording from the live page."
+msgstr "Az oktató le tudja tölteni a felvételt az élő óra oldaláról."
+
+msgid "The teacher talks for a minute at the start (in Chrome). After „Over” the short summary is on the page."
+msgstr "Az oktató az elején egy percig beszél (Chrome-ban). A „Véget ért” után ott a rövid összefoglaló az oldalon."
+
+msgid "No recording in a one-to-one session"
+msgstr "Egyéni órán nincs felvétel"
+
+msgid "In the one-to-one room there is no recording and no summary."
+msgstr "Az egyéni óra szobájában nincs felvétel és nincs összefoglaló."
+
+msgid "Connection"
+msgstr "Kapcsolat"
+
+msgid "Device check on every device"
+msgstr "Eszköz-ellenőrzés minden eszközön"
+
+msgid "Run „Check this device” on every phone and computer you test with: every line green."
+msgstr "Futtasd az „Eszköz ellenőrzése” gombot minden telefonon és számítógépen, amivel tesztelsz: minden sor zöld."
+
+msgid "Getting back in"
+msgstr "Visszacsatlakozás"
+
+msgid "Reload the page, or switch from Wi-Fi to mobile data: you get back into the room."
+msgstr "Töltsd újra az oldalt, vagy válts wifiről mobilnetre: visszakerülsz a szobába."
+
+msgid "Leaving and coming back"
+msgstr "Kilépés és visszatérés"
+
+msgid "„Leave”, then join again with the same link."
+msgstr "„Kilépés”, aztán belépés újra ugyanazzal a linkkel."
+
+msgid "Devices"
+msgstr "Eszközök"
+
+msgid "As a participant, and as the teacher too if Olívia ever teaches from a phone."
+msgstr "Résztvevőként, és oktatóként is, ha Olívia valaha telefonról tartana órát."
+
+msgid "As a participant."
+msgstr "Résztvevőként."
+
+msgid "As the teacher and as a participant."
+msgstr "Oktatóként és résztvevőként."
+
+msgid "As the teacher (recording, opening words) and as a participant."
+msgstr "Oktatóként (felvétel, bevezető szavak) és résztvevőként."
+
+msgid "Live class test"
+msgstr "Élő óra teszt"
+
+msgid "Done: the links below work accordingly."
+msgstr "Kész: a lenti linkek ennek megfelelően működnek."
+
+msgid "The check is done: everything the server can check works."
+msgstr "Az ellenőrzés kész: minden működik, amit a szerver ellenőrizni tud."
+
+msgid "A new round started: the ticks and the device results are empty."
+msgstr "Új tesztkör indult: a pipák és az eszközök eredményei üresek."
+
+msgid "The links are in your mailbox (%s)."
+msgstr "A linkek a postafiókodban vannak (%s)."
+
+msgid "The email could not be sent."
+msgstr "Az e-mailt nem sikerült elküldeni."
+
+msgid "Teacher (log in first):"
+msgstr "Oktató (előbb jelentkezz be):"
+
+msgid "The links of the live class test rooms. Open a participant link on each phone or computer you test with; the teacher link only works logged in."
+msgstr "Az élő óra tesztszobáinak linkjei. Minden telefonon vagy számítógépen, amivel tesztelsz, nyiss meg egy résztvevői linket; az oktatói link csak bejelentkezve működik."
+
+msgid "Live class test: the links"
+msgstr "Élő óra teszt: a linkek"
+
+msgid "Every part of the live classes, for real: on the site's own LiveKit project with its real keys, in three test rooms nobody can book or see on the timetable. Nothing is booked, paid or emailed to guests."
+msgstr "Az élő órák minden része, élesben: az oldal saját LiveKit-projektjén, a valódi kulcsokkal, három tesztszobában, amit senki nem foglalhat le, és az órarendben sem látszik. Semmi nem kerül foglalásra vagy fizetésre, és a vendégek nem kapnak e-mailt."
+
+msgid "No LiveKit project is connected yet: Settings → Live online (the address, the API key and the secret)."
+msgstr "Még nincs LiveKit-projekt csatlakoztatva: Beállítások → Élő online (a cím, az API-kulcs és a titkos kulcs)."
+
+msgid "Automatic check"
+msgstr "Automatikus ellenőrzés"
+
+msgid "Test rooms"
+msgstr "Tesztszobák"
+
+msgid "Checklist (%1$d/%2$d)"
+msgstr "Ellenőrzőlista (%1$d/%2$d)"
+
+msgid "What the server can try by itself, on the real LiveKit project: the keys, a room made and deleted, the entry tokens of the three rooms, the chat, a raised hand, a piece of recording, the camera permission of the live page, the background jobs, the AI."
+msgstr "Amit a szerver magától ki tud próbálni, a valódi LiveKit-projekten: a kulcsok, egy létrehozott és törölt szoba, a három szoba belépőkulcsai, a chat, a kézfeltartás, egy darab felvétel, az élő oldal kameraengedélye, a háttérfeladatok, az MI."
+
+msgid "with the AI summary (a few forints)"
+msgstr "MI-összefoglalóval (pár forint)"
+
+msgid "Run the check"
+msgstr "Ellenőrzés indítása"
+
+msgid "Last run: %1$s (%2$s)"
+msgstr "Legutóbb: %1$s (%2$s)"
+
+msgid "Settings now: the room opens %1$d minutes before · grid up to %2$d places · recording: %3$s · watchable for %4$d days, deleted after %5$d · opening words: %6$d minutes, summary: %7$s."
+msgstr "Jelenlegi beállítások: a szoba %1$d perccel előtte nyílik · rácsnézet legfeljebb %2$d helyig · felvétel: %3$s · %4$d napig visszanézhető, %5$d nap után törlődik · bevezető szavak: %6$d perc, összefoglaló: %7$s."
+
+msgid "Change"
+msgstr "Módosítás"
+
+msgid "Put a room into any moment of a class with the buttons, then open the teacher link here (you are logged in) and the participant links on phones or in other browsers (no login: scan the QR code). Who is in the room shows below it within seconds, straight from LiveKit."
+msgstr "A gombokkal tedd a szobát az óra bármelyik pillanatába, aztán nyisd meg itt az oktatói linket (be vagy jelentkezve), a résztvevői linkeket pedig telefonon vagy másik böngészőben (bejelentkezés nélkül: olvasd be a QR-kódot). Hogy ki van a szobában, pár másodpercen belül megjelenik alatta, egyenesen a LiveKitből."
+
+msgid "Email me every link"
+msgstr "Küldd el nekem az összes linket"
+
+msgid "Open, the class starts soon"
+msgstr "Nyitva, hamarosan kezdődik"
+
+msgid "The class is on"
+msgstr "Az óra folyik"
+
+msgid "Over"
+msgstr "Véget ért"
+
+msgid "Start now"
+msgstr "Indítás most"
+
+msgid "Starts in 3 minutes"
+msgstr "3 perc múlva kezdődik"
+
+msgid "Start afresh"
+msgstr "Tiszta lappal"
+
+msgid "The chat, the recordings and the summary of this room are deleted. Go on?"
+msgstr "A szoba chatje, felvételei és összefoglalója törlődik. Folytatod?"
+
+msgid "Open as the teacher"
+msgstr "Megnyitás oktatóként"
+
+msgid "Who is in the room: loading…"
+msgstr "Ki van a szobában: betöltés…"
+
+msgid "Start the room to get its links."
+msgstr "Indítsd el a szobát, hogy megkapd a linkjeit."
+
+msgid "„Check this device” is on every test link's page (under the class), and here for this computer. The results of every device arrive here."
+msgstr "Az „Eszköz ellenőrzése” minden tesztlink oldalán ott van (az óra alatt), itt pedig ehhez a számítógéphez. Minden eszköz eredménye ide érkezik."
+
+msgid "Device"
+msgstr "Eszköz"
+
+msgid "Result"
+msgstr "Eredmény"
+
+msgid "works"
+msgstr "működik"
+
+msgid "No device has been checked yet."
+msgstr "Még egy eszközt sem ellenőriztél."
+
+msgid "Checklist"
+msgstr "Ellenőrzőlista"
+
+msgid "%1$d of %2$d works, %3$d needs fixing. Tick what you tried; write what you saw if something is wrong."
+msgstr "%2$d pontból %1$d működik, %3$d javításra vár. Pipáld be, amit kipróbáltál; ha valami nem jó, írd le, mit láttál."
+
+msgid "%1$s, %2$s"
+msgstr "%1$s, %2$s"
+
+msgid "problem"
+msgstr "hiba"
+
+msgid "not yet"
+msgstr "még nem"
+
+msgid "Note (what happened, on which device)"
+msgstr "Megjegyzés (mi történt, melyik eszközön)"
+
+msgid "Save the checklist"
+msgstr "Ellenőrzőlista mentése"
+
+msgid "Start a new round"
+msgstr "Új tesztkör"
+
+msgid "The ticks, the notes and the device results start empty (the numbers of this round are kept). Go on?"
+msgstr "A pipák, a megjegyzések és az eszközök eredményei kiürülnek (ennek a körnek a számai megmaradnak). Folytatod?"
+
+msgid "Earlier rounds:"
+msgstr "Korábbi körök:"
+
+msgid "%1$s: %2$d/%3$d works, %4$d problems"
+msgstr "%1$s: %2$d/%3$d működik, %4$d hiba"
+
+msgid "Nobody is in the room."
+msgstr "Senki nincs a szobában."
+
+msgid "In the room now: %d"
+msgstr "Most a szobában: %d"
+
+msgid "since %s"
+msgstr "%s óta"
+
+msgid "camera"
+msgstr "kamera"
+
+msgid "microphone"
+msgstr "mikrofon"
+
+msgid "off"
+msgstr "ki"
+
+msgid "no camera, no microphone"
+msgstr "nincs kamera, nincs mikrofon"
+
+msgid "Take out"
+msgstr "Kiléptetés"
+
+msgid "Raised hands: %s"
+msgstr "Feltartott kéz: %s"
+
+msgid "Chat messages: %d"
+msgstr "Chatüzenetek: %d"
+
+msgid "Recordings: %s"
+msgstr "Felvételek: %s"
+
+msgid "Opening words written down: %d characters"
+msgstr "Leírt bevezető szavak: %d karakter"
+
+msgid "Summary: %s"
+msgstr "Összefoglaló: %s"
+
+msgid "Rooms open in the LiveKit project now:"
+msgstr "Most nyitott szobák a LiveKit-projektben:"
+
+msgid "%d people"
+msgstr "%d fő"
+
+msgid "Copied"
+msgstr "Kimásolva"
+
+msgid "LiveKit did not answer: %s"
+msgstr "A LiveKit nem válaszolt: %s"
+
+msgid "updated %s"
+msgstr "frissítve: %s"
+
+msgid "recording"
+msgstr "felvétel folyik"
+
+msgid "saved"
+msgstr "elmentve"
+
+msgid "empty"
+msgstr "üres"
+
+msgid "Every live class feature, on the real LiveKit"
+msgstr "Az élő órák minden funkciója, a valódi LiveKiten"
+
+msgid "Live class test: every feature, step by step"
+msgstr "Élő óra teszt: minden funkció, lépésről lépésre"
+
+msgid "Every live class feature, step by step:"
+msgstr "Az élő órák minden funkciója, lépésről lépésre:"
+
+msgid "The check found %d problem: see below."
+msgid_plural "The check found %d problems: see below."
+msgstr[0] "Az ellenőrzés %d hibát talált: lásd lent."
+msgstr[1] "Az ellenőrzés %d hibát talált: lásd lent."
+
+msgid "%d problem"
+msgid_plural "%d problems"
+msgstr[0] "%d hiba"
+msgstr[1] "%d hiba"
+
+msgid "Open link"
+msgstr "Megnyitás"

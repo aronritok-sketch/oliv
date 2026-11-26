@@ -1091,6 +1091,7 @@ class OYS_Admin {
 				echo '</ol>';
 			}
 			echo '<p class="description">' . esc_html__( 'A class that is not on the timetable and can\'t be booked: go live, let the test participants in, try the camera, the chat, raising a hand, muting everyone and the recording. Opening it again starts afresh (the earlier test\'s chat and recording are deleted).', 'olivia-studio' ) . '</p>';
+			echo '<p><a class="button" href="' . esc_url( admin_url( 'admin.php?page=oys-live-lab' ) ) . '">' . esc_html__( 'Live class test: every feature, step by step', 'olivia-studio' ) . '</a></p>';
 		} else {
 			echo '<p class="description">' . esc_html__( 'Connect the LiveKit project above first.', 'olivia-studio' ) . '</p>';
 		}
