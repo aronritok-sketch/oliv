@@ -2019,6 +2019,13 @@
   logó, mottó, „Jóga • Kismamatorna • Mobilizáció • Relaxáció és légzés”, gomb; a többi oldal láblécében marad a címsor.
   Tesztek: 1819/0.
 
+- **2026-11-26 – oliviajoga.hu 1.8.2: a főoldalon a kismamatorna-doboz helyén a privát jóga árai.** Áron (képernyőkép a
+  „Kismamatorna online, egyénileg” dobozról): „a .hu-n ennek a helyére a főoldalon inkább a privát jóga árait tegyük be”.
+  „Privát online jóga” / „Privát jóga online, egyénileg”, egyéni időpontban, 60 vagy 90 perc; 1 alkalom és 5 alkalmas bérlet
+  egyedül és párban (8 000 / 35 000, 10 000 / 43 000, 12 000 / 52 000, 15 000 / 65 000 Ft – az .online árai,
+  `ONLINE_SERVICES`, `private_prices()`); gomb: az .online privát jóga oldala. 390 és 1280 px-en nincs túlcsordulás.
+  check.py: 3469/0, `--after` 1219/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

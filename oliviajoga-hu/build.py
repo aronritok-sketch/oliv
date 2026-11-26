@@ -41,7 +41,7 @@ ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.8.1'
+VERSION = '1.8.2'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -1141,17 +1141,28 @@ def online_boxes():
     """From 26 November (Olivia): instead of the places and their timetables, the online yoga and the online prenatal
     class, with time, prices and a button."""
     yoga_prices = ''.join(f'<li><b>{a}</b><span>{esc(c)}{" · " + esc(u.split(" · ")[1]) if " · " in u else ""}</span></li>' for c, a, u, _ in YOGA_PRICES)
-    pre_prices = ''.join(f'<li><b>{a}</b><span>{esc(c)} · {esc(u)}</span></li>' for c, a, u in PRENATAL_PRICES)
     return (f'<article class="oj-loc oj-loc--pink oj-loc--online" data-reveal><p class="oj-loc__name">Élő online jóga</p>'
             f'<p class="oj-loc__seo">Hatha flow jóga online</p>'
             f'<ul class="oj-slots"><li class="oj-slot"><span>szerda</span><span>18:30 – 20:00</span><span>90 perc</span></li></ul>'
             f'<ul class="oj-loc__prices">{yoga_prices}</ul>'
             f'<p class="btn-row">{button(online("yoga"), "Online jóga bejelentkezés", "dark")}</p></article>'
-            f'<article class="oj-loc oj-loc--lilac oj-loc--online" data-reveal><p class="oj-loc__name">Online kismamatorna</p>'
-            f'<p class="oj-loc__seo">Kismamatorna online, egyénileg</p>'
-            f'<ul class="oj-slots"><li class="oj-slot"><span>egyéni időpontban</span><span>60 perc</span></li></ul>'
-            f'<ul class="oj-loc__prices">{pre_prices}</ul>'
-            f'<p class="btn-row">{button(online("prenatal"), "Online kismamatorna", "dark")}</p></article>')
+            # Áron, 26 November (the prenatal box on the home page): „a .hu-n ennek a helyére a főoldalon inkább a privát jóga
+            # árait tegyük be” – the online site's one-to-one yoga prices (ONLINE_SERVICES), alone and in pairs, 60 and 90 min
+            f'<article class="oj-loc oj-loc--lilac oj-loc--online" data-reveal><p class="oj-loc__name">Privát online jóga</p>'
+            f'<p class="oj-loc__seo">Privát jóga online, egyénileg</p>'
+            f'<ul class="oj-slots"><li class="oj-slot"><span>egyéni időpontban</span><span>60 vagy 90 perc</span></li></ul>'
+            f'<ul class="oj-loc__prices">{private_prices()}</ul>'
+            f'<p class="btn-row">{button(online("private"), "Privát online jóga", "dark")}</p></article>')
+
+
+def private_prices():
+    """The one-to-one online yoga's prices, from ONLINE_SERVICES: one session and the 5-session pass, alone and in pairs."""
+    rows = []
+    for who, length, one, five in next(x for x in ONLINE_SERVICES if x[1] == 'private')[3]:
+        pair = who == 'Párban'
+        rows.append(('1 alkalom' + (' párban' if pair else ''), one, length))
+        rows.append(('5 alkalom párban' if pair else '5 alkalmas bérlet', five, length))
+    return ''.join(f'<li><b>{a.replace(" ", NB)}</b><span>{esc(c)} · {esc(u.replace(" ", NB))}</span></li>' for c, a, u in rows)
 
 
 def was_strip(heads_html):
