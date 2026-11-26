@@ -57,7 +57,7 @@ class OYS_Newsletter {
 
 	/** A customer's newsletter on or off (their signup-form address follows). */
 	public static function set_customer( $user_id, $on ) {
-		update_user_meta( (int) $user_id, 'oys_marketing', $on ? '1' : '' );
+		OYS_Customers::set_marketing( (int) $user_id, $on );
 		$u = get_userdata( (int) $user_id );
 		$r = $u ? self::list_by_email( $u->user_email ) : null;
 		if ( $on && $r && 'confirmed' !== $r->status ) {
@@ -210,7 +210,7 @@ class OYS_Newsletter {
 		}
 		$u = get_user_by( 'email', $r->email );
 		if ( $u ) {
-			update_user_meta( $u->ID, 'oys_marketing', '1' );
+			OYS_Customers::set_marketing( $u->ID, true );
 		}
 		return true;
 	}
@@ -370,7 +370,7 @@ class OYS_Newsletter {
 		if ( ! (int) $uid || ! hash_equals( self::sig( (int) $uid ), $sig ) ) {
 			wp_die( esc_html__( 'This unsubscribe link is not valid.', 'olivia-studio' ), '', array( 'response' => 400 ) );
 		}
-		update_user_meta( (int) $uid, 'oys_marketing', '' );
+		OYS_Customers::set_marketing( (int) $uid, false );
 		$u = get_userdata( (int) $uid );
 		$r = $u ? self::list_by_email( $u->user_email ) : null;
 		if ( $r && 'unsubscribed' !== $r->status ) {

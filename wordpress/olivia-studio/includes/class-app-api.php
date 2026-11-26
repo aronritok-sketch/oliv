@@ -505,7 +505,7 @@ class OYS_App_API {
 	/** Newsletter on/off from the app: { subscribe: bool }. */
 	public static function newsletter( WP_REST_Request $req ) {
 		$p = $req->get_json_params() ?: $req->get_params();
-		update_user_meta( get_current_user_id(), 'oys_marketing', empty( $p['subscribe'] ) ? '' : '1' );
+		OYS_Customers::set_marketing( get_current_user_id(), ! empty( $p['subscribe'] ) );
 		return rest_ensure_response( self::me_data( get_current_user_id() ) );
 	}
 

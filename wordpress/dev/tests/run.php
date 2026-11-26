@@ -6150,6 +6150,32 @@ test( 'Olívia 26 Nov: the unsubscribe link of the preview and the test email do
 	ok( str_contains( $admin, "self::form( 'customer_newsletter'" ), 'and on the customer\'s page: „Switch it on (they asked for it)”' );
 } );
 
+
+test( 'Áron 26 Nov: a guest from Motibro completing the account – the participation agreement and a yes or no on the newsletter are required', function () {
+	$id = wp_insert_user( array( 'user_login' => 'motibro.guest.' . wp_rand(), 'user_email' => 'motibro.guest.' . wp_rand() . '@example.test', 'user_pass' => wp_generate_password(), 'first_name' => 'Zsófi', 'last_name' => 'Kiss', 'role' => 'oys_customer' ) );
+	update_user_meta( $id, 'oys_imported_at', current_time( 'mysql', true ) );
+	update_user_meta( $id, 'oys_phone', '+36 30 111 2222' );
+	update_user_meta( $id, 'oys_area', 'Budapest' );
+	$m = OYS_Customers::missing( $id );
+	ok( isset( $m['waiver'], $m['oys_marketing'] ) && 2 === count( $m ), 'an imported guest: the agreement and the newsletter question are missing' );
+	wp_set_current_user( $id );
+	$html = ( new ReflectionMethod( 'OYS_Frontend', 'tab_profile' ) )->invoke( null, $id );
+	ok( preg_match( '/name="oys_marketing" value="1" required>/', $html ) && preg_match( '/name="oys_marketing" value="0" required>/', $html ), 'the profile: yes or no, required, nothing chosen in advance' );
+	ok( str_contains( $html, 'name="waiver" value="1" required' ) && str_contains( $html, 'id="oys-p-waiver"' ), '… and the agreement inside the same form, required' );
+	// saved without them: still missing
+	OYS_Customers::save_profile( $id, array( 'first_name' => 'Zsófi', 'last_name' => 'Kiss', 'oys_phone' => '+36 30 111 2222', 'oys_area' => 'Budapest' ) );
+	ok( 2 === count( OYS_Customers::missing( $id ) ), 'saved without them: still asked' );
+	OYS_Customers::save_profile( $id, array( 'first_name' => 'Zsófi', 'last_name' => 'Kiss', 'oys_phone' => '+36 30 111 2222', 'oys_area' => 'Budapest', 'waiver' => '1', 'oys_marketing' => '0' ) );
+	ok( ! OYS_Customers::missing( $id ) && OYS_Customers::has_waiver( $id ) && '' === get_user_meta( $id, 'oys_marketing', true ) && OYS_Customers::marketing_answered( $id ), '„no, thank you” is an answer: complete, not subscribed' );
+	OYS_Customers::save_profile( $id, array( 'oys_marketing' => '1' ) );
+	eq( '1', get_user_meta( $id, 'oys_marketing', true ), 'changing it to yes later' );
+	$html = ( new ReflectionMethod( 'OYS_Frontend', 'tab_profile' ) )->invoke( null, $id );
+	ok( preg_match( '/name="oys_marketing" value="1" required checked/', $html ) && ! str_contains( $html, 'id="oys-p-waiver"' ) && str_contains( $html, 'Read it again' ), 'answered: the choice is shown; the agreement as accepted' );
+	wp_set_current_user( 0 );
+	$u = make_user( 'Signed' );
+	ok( OYS_Customers::marketing_answered( $u ) && ! isset( OYS_Customers::missing( $u )['oys_marketing'] ), 'someone who signed up on the site already answered (the box on the form)' );
+} );
+
 $t = $GLOBALS['oys_t'];
 echo "\n{$t['pass']} assertions passed, {$t['fail']} failed\n";
 exit( $t['fail'] ? 1 : 0 );

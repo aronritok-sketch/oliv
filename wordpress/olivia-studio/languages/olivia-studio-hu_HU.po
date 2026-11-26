@@ -9447,3 +9447,15 @@ msgid "This class goes ahead with %1$d or more people. If fewer sign up, it's ca
 msgid_plural "This class goes ahead with %1$d or more people. If fewer sign up, it's cancelled %2$d hours before it starts and we let you know; your class comes back to you."
 msgstr[0] "Ez az óra legalább %1$d fővel indul. Ha kevesebben jelentkeznek, %2$d órával előtte lemondjuk és szólunk; az alkalmad visszajár."
 msgstr[1] "Ez az óra legalább %1$d fővel indul. Ha kevesebben jelentkeznek, %2$d órával előtte lemondjuk és szólunk; az alkalmad visszajár."
+
+msgid "Newsletter (yes or no)"
+msgstr "Hírlevél (igen vagy nem)"
+
+msgid "Would you like my newsletter about new events and workshops? You can change it any time. Booking emails and reminders come either way."
+msgstr "Kéred a hírlevelemet az új eseményekről és workshopokról? Bármikor módosíthatod. A foglalásokról szóló e-maileket és az emlékeztetőket mindenképp megkapod."
+
+msgid "Yes, email me the newsletter"
+msgstr "Igen, kérem a hírlevelet"
+
+msgid "No, thank you"
+msgstr "Nem, köszönöm"

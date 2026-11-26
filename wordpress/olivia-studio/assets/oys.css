@@ -695,3 +695,10 @@ html.oys-live-open, html.oys-live-open body { overflow: hidden; }
 .oys-diag__list .is-bad { color: #b3261e; font-weight: 600; }
 .oys-diag__list .is-skip, .oys-diag__list .is-run { opacity: .75; }
 .oys-live.is-live .oys-diag { display: none; }
+
+/* Completing the account: yes or no to the newsletter, the participation agreement (Áron, 26 November) */
+.oys-choice { margin: 1rem 0; padding: .9rem 1rem; border: 1.5px solid currentColor; border-radius: 14px; }
+.oys-choice legend { padding: 0 .35rem; font-weight: 700; }
+.oys-choice .oys-small { margin: 0 0 .5rem; }
+.oys-choice .oys-check { margin: .3rem 0; }
+.oys-req { color: #b3261e; }

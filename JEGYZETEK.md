@@ -2209,6 +2209,20 @@
   saját beállítása (`decide_hours`). A már foglalóknak szóló „Hozz egy barátot” e-mailben marad a pontos időpont, mert az
   egy konkrét óráról szól. Teszt: 1940/0.
 
+- **2026-11-26 – Fiókaktiválásnál kötelező a részvételi nyilatkozat és a hírlevél-válasz (olivia-studio 1.30.5,
+  oliviajoga.online 3.12.36).** Áron: a Motibróból áthozott vendégek most aktiválják a fiókjukat; „a részvételi
+  nyilatkozatot legyen kötelező elfogadni, és a hírlevélre feliratkozást is legyen kötelező … az adatlapnál, amikor
+  elkészül a fiókja.”
+  - Adatlap: ha a nyilatkozat még nincs elfogadva, az adatlap űrlapján belül jelenik meg (kötelező pipa). Elfogadás után
+    a régi kártya marad („Elfogadva: …”, „Elolvasom újra”).
+  - Hírlevél: kötelező igen/nem kérdés, előre semmi nincs kijelölve („Igen, kérem a hírlevelet” / „Nem, köszönöm”).
+    Kényszerített „igen” nem lehet: a GDPR szerint a hozzájárulás csak önkéntes lehet, nem lehet feltétele a fióknak, és
+    az előre bepipált mező érvénytelen. A foglalási e-maileket és az emlékeztetőket mindenki megkapja.
+  - Amíg a kettő hiányzik, minden fiókfülön ott a „Kérlek, töltsd ki az adataidat: Részvételi nyilatkozat, Hírlevél (igen
+    vagy nem)” sor. A válasz idejét (`oys_marketing_at`) minden helyen elmentjük (adatlap, app, admin kapcsoló,
+    megerősítés, leiratkozás). Az oldalon regisztrálók már válaszoltak (a regisztrációs űrlapon), őket ez nem érinti.
+  - Teszt: 1948/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

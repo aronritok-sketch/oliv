@@ -1849,6 +1849,19 @@ class OYS_Frontend {
 		return '<span class="oys-avatar__initial" aria-hidden="true">' . esc_html( mb_strtoupper( mb_substr( (string) $name, 0, 1 ) ) ?: '·' ) . '</span>';
 	}
 
+	/**
+	 * Yes or no to the newsletter, required (Áron, 26 November): nothing is chosen until the customer chooses – a consent
+	 * has to be their own (GDPR), so „no” is an answer too; the booking emails and reminders come either way.
+	 */
+	private static function newsletter_choice( $user_id ) {
+		$answered = OYS_Customers::marketing_answered( $user_id );
+		$on       = '1' === (string) get_user_meta( $user_id, 'oys_marketing', true );
+		return '<fieldset class="oys-choice" id="oys-p-newsletter"><legend>' . esc_html__( 'Newsletter', 'olivia-studio' ) . ' <span class="oys-req" aria-hidden="true">*</span></legend>'
+			. '<p class="oys-small">' . esc_html__( 'Would you like my newsletter about new events and workshops? You can change it any time. Booking emails and reminders come either way.', 'olivia-studio' ) . '</p>'
+			. '<label class="oys-check"><input type="radio" name="oys_marketing" value="1" required' . checked( $answered && $on, true, false ) . '> <span>' . esc_html__( 'Yes, email me the newsletter', 'olivia-studio' ) . '</span></label>'
+			. '<label class="oys-check"><input type="radio" name="oys_marketing" value="0" required' . checked( $answered && ! $on, true, false ) . '> <span>' . esc_html__( 'No, thank you', 'olivia-studio' ) . '</span></label></fieldset>';
+	}
+
 	/** Optional birthday (month and day), for the birthday gift. */
 	private static function birthday_field( $user_id ) {
 		[ $m, $d ] = array_map( 'intval', array_pad( explode( '-', OYS_Rewards::birthday( $user_id ) ), 2, 0 ) );
@@ -1883,18 +1896,17 @@ class OYS_Frontend {
 			. '<label class="field"><span>' . esc_html__( 'Their phone number', 'olivia-studio' ) . '</span><input type="tel" name="oys_emergency_phone" id="oys-p-ephone" value="' . $m( 'oys_emergency_phone' ) . '"></label></div>'
 			. '<label class="field"><span>' . esc_html__( 'Injuries, pregnancy or health notes (optional, only Olivia sees this)', 'olivia-studio' ) . '</span><textarea name="oys_health_notes" id="oys-p-health" rows="4">' . esc_textarea( get_user_meta( $user_id, 'oys_health_notes', true ) ) . '</textarea></label>'
 			. self::birthday_field( $user_id )
-			. '<label class="oys-check"><input type="checkbox" name="oys_marketing" value="1"' . checked( '1', get_user_meta( $user_id, 'oys_marketing', true ), false ) . '> <span>' . esc_html__( 'Email me the newsletter: new classes and events', 'olivia-studio' ) . '</span></label>'
+			. self::newsletter_choice( $user_id )
 			. oys_fb_group_link( __( 'And join our Facebook group', 'olivia-studio' ) )
 			. '<label class="field"><span>' . esc_html__( 'New password (leave empty to keep the current one)', 'olivia-studio' ) . '</span><input type="password" name="new_password" id="oys-p-pass" minlength="8" autocomplete="new-password"></label>'
+			// Áron, 26 November: the participation agreement is part of completing the account (required)
+			. ( OYS_Customers::has_waiver( $user_id ) ? '' : '<fieldset class="oys-choice oys-choice--waiver" id="oys-p-waiver"><legend>' . esc_html__( 'Participation agreement', 'olivia-studio' ) . ' <span class="oys-req" aria-hidden="true">*</span></legend>' . self::waiver_field() . '</fieldset>' )
 			. '<button class="btn btn--primary" type="submit">' . esc_html__( 'Save', 'olivia-studio' ) . '</button></form>';
-		$at   = get_user_meta( $user_id, 'oys_waiver_at', true );
-		$out .= '<div class="oys-card"><h3>' . esc_html__( 'Participation agreement', 'olivia-studio' ) . '</h3>';
 		if ( OYS_Customers::has_waiver( $user_id ) ) {
-			$out .= '<p>' . sprintf( esc_html__( 'Accepted on %s.', 'olivia-studio' ), esc_html( oys_date( $at, get_option( 'date_format' ) ) ) ) . '</p><details class="oys-waiver"><summary>' . esc_html__( 'Read it again', 'olivia-studio' ) . '</summary><p>' . esc_html( OYS_Settings::get( 'waiver_text' ) ) . '</p></details>';
-		} else {
-			$out .= self::form_open( 'oys_waiver' ) . '<input type="hidden" name="redirect_to" value="' . esc_attr( oys_account_url( 'profile' ) ) . '">' . self::waiver_field() . '<button class="btn btn--primary" type="submit">' . esc_html__( 'Accept', 'olivia-studio' ) . '</button></form>';
+			$at   = get_user_meta( $user_id, 'oys_waiver_at', true );
+			$out .= '<div class="oys-card"><h3>' . esc_html__( 'Participation agreement', 'olivia-studio' ) . '</h3><p>' . sprintf( esc_html__( 'Accepted on %s.', 'olivia-studio' ), esc_html( oys_date( $at, get_option( 'date_format' ) ) ) ) . '</p><details class="oys-waiver"><summary>' . esc_html__( 'Read it again', 'olivia-studio' ) . '</summary><p>' . esc_html( OYS_Settings::get( 'waiver_text' ) ) . '</p></details></div>';
 		}
-		return $out . '</div>';
+		return $out;
 	}
 
 	/* ======================================================================

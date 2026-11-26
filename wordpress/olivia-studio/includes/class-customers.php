@@ -41,10 +41,35 @@ class OYS_Customers {
 				$out[ $k ] = $labels[ $k ];
 			}
 		}
+		// Áron, 26 November (the guests from Motibro activating their accounts): „a részvételi nyilatkozatot legyen kötelező
+		// elfogadni, és a hírlevélre feliratkozást is … amikor elkészül a fiókja” – the agreement, and a yes or no on the
+		// newsletter (a consent can't be forced, but the question must be answered)
+		if ( ! self::has_waiver( $u->ID ) ) {
+			$out['waiver'] = __( 'Participation agreement', 'olivia-studio' );
+		}
+		if ( ! self::marketing_answered( $u->ID ) ) {
+			$out['oys_marketing'] = __( 'Newsletter (yes or no)', 'olivia-studio' );
+		}
 		if ( ! oys_is_hu() && isset( $out['last_name'], $out['first_name'] ) ) {
 			$out = array( 'first_name' => $out['first_name'], 'last_name' => $out['last_name'] ) + $out;
 		}
 		return $out;
+	}
+
+	/**
+	 * Has the customer said yes or no to the newsletter? Those who signed up on the site did (the box on the form); a guest
+	 * brought over from Motibro answers when they complete their account.
+	 */
+	public static function marketing_answered( $user_id ) {
+		return '1' === (string) get_user_meta( (int) $user_id, 'oys_marketing', true )
+			|| '' !== (string) get_user_meta( (int) $user_id, 'oys_marketing_at', true )
+			|| '' === (string) get_user_meta( (int) $user_id, 'oys_imported_at', true );
+	}
+
+	/** The customer's own yes or no to the newsletter (kept with when it was said). */
+	public static function set_marketing( $user_id, $on ) {
+		update_user_meta( (int) $user_id, 'oys_marketing', $on ? '1' : '' );
+		update_user_meta( (int) $user_id, 'oys_marketing_at', oys_now() );
 	}
 
 	/** The name as it is said: „Kovács Olívia” in Hungarian, „Olivia Kovacs” otherwise. */
@@ -257,7 +282,7 @@ class OYS_Customers {
 		OYS_Security::record_signup();
 		update_user_meta( $user_id, 'oys_phone', $phone );
 		update_user_meta( $user_id, 'oys_area', $area );
-		update_user_meta( $user_id, 'oys_marketing', empty( $_POST['marketing'] ) ? '' : '1' );
+		self::set_marketing( $user_id, ! empty( $_POST['marketing'] ) );
 		self::record_waiver( $user_id );
 		wp_set_current_user( $user_id );
 		wp_set_auth_cookie( $user_id, true, is_ssl() );
@@ -310,12 +335,21 @@ class OYS_Customers {
 			}
 		}
 		foreach ( self::PROFILE_FIELDS as $key ) {
+			if ( 'oys_marketing' === $key ) {
+				continue; // a yes or a no, below
+			}
 			$raw = (string) ( $post[ $key ] ?? '' );
 			$val = 'oys_health_notes' === $key ? sanitize_textarea_field( $raw ) : sanitize_text_field( $raw );
 			if ( '' === $val && in_array( $key, array( 'oys_phone', 'oys_area' ), true ) && '' !== (string) get_user_meta( $user_id, $key, true ) ) {
 				continue; // required: an empty field does not wipe it
 			}
 			update_user_meta( $user_id, $key, $val );
+		}
+		if ( isset( $post['oys_marketing'] ) && in_array( (string) $post['oys_marketing'], array( '0', '1' ), true ) ) {
+			self::set_marketing( $user_id, '1' === (string) $post['oys_marketing'] );
+		}
+		if ( ! empty( $post['waiver'] ) && ! self::has_waiver( $user_id ) ) {
+			self::record_waiver( $user_id );
 		}
 		if ( isset( $post['bday_month'] ) ) {
 			OYS_Rewards::set_birthday( $user_id, $post['bday_month'], $post['bday_day'] ?? 0 );
