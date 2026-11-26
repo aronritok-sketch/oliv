@@ -8648,6 +8648,12 @@ msgstr "Lépj be ezzel az e-mail-címmel, és foglalj az órarendből. Először
 msgid "Log in and book"
 msgstr "Belépés és foglalás"
 
+msgid "How to log in the first time on the new site:\n\n1. Tap „Set my password” above. It opens the „Lost password” page: type this email address ({email}) and tap „Get new password”.\n\n2. In a few minutes you get an email with the subject „New password” (look in your spam folder too). Tap the button in it, choose your password and save it.\n\n3. Then tap „Back to log in” (or open {account}), choose the „I have an account” tab and log in with your email address and your new password.\n\n4. Accept the participation agreement, answer yes or no to the newsletter, and you can book from the timetable.\n\nAlready set your password? Skip all this and log in here: {account}"
+msgstr "Így lépsz be először az új oldalon:\n\n1. Kattints a fenti „Jelszót állítok be” gombra. Az „Elfelejtett jelszó” oldalra visz: írd be ezt az e-mail-címet ({email}), és kattints az „Új jelszót kérek” gombra.\n\n2. Pár perc múlva kapsz egy levelet „Új jelszó” tárggyal (ha nem látod, nézd meg a spam mappát is). Kattints benne az „Új jelszót adok meg” gombra, add meg a jelszavad, és kattints az „Elmentem” gombra.\n\n3. Utána kattints a „Vissza a belépéshez” linkre (vagy nyisd meg ezt: {account}), válaszd a „Van fiókom” fület, és lépj be az e-mail-címeddel és az új jelszavaddal.\n\n4. Fogadd el a részvételi nyilatkozatot, válaszolj a hírlevél kérdésére, és már foglalhatsz is az órarendből.\n\nMár beállítottad a jelszavad? Akkor ezt mind kihagyhatod, és itt lépj be: {account}"
+
+msgid "Set my password"
+msgstr "Jelszót állítok be"
+
 msgid "%1$d customers who ticked the newsletter box and %2$d addresses from the signup forms."
 msgstr "%1$d vendég, aki a fiókjában bepipálta a hírlevelet, és %2$d cím a feliratkozó űrlapokról."
 

@@ -2223,6 +2223,23 @@
     megerősítés, leiratkozás). Az oldalon regisztrálók már válaszoltak (a regisztrációs űrlapon), őket ez nem érinti.
   - Teszt: 1948/0.
 
+- **2026-11-26 – A Motibrós levél gombja egyenesen az „Elfelejtett jelszó” oldalra visz, a belépés lépései a levélben
+  (olivia-studio 1.30.6, oliviajoga.online 3.12.37).** Áron (képernyőkép a „Várnak az alkalmaid” levélről): „ez nem jó,
+  közvetlen legyen az a gomb, hogy elfelejtett jelszó … és utána még az e-mailbe írjuk le, hogyha módosította a jelszót,
+  mit kell csináljon, hogy be tudjon lépni, tehát hogy kattintson a van fiókomra”.
+  - „Várnak az alkalmaid” levél: a „Belépés és foglalás” gomb helyett „Jelszót állítok be”, közvetlenül az első bekezdés
+    alatt, és az „Elfelejtett jelszó” oldalra visz. Alatta 4 lépés: e-mail-cím beírása (a levél kiírja a vendég saját
+    címét) → „Új jelszó” levél, „Új jelszót adok meg”, „Elmentem” → „Vissza a belépéshez” / Fiókom, „Van fiókom” fül →
+    nyilatkozat, hírlevél-válasz, foglalás. Plusz: „Már beállítottad a jelszavad? … itt lépj be”.
+  - Az „Új jelszó” levélben is benne van: „Ha elmentetted az új jelszavad, így lépsz be: nyisd meg a Fiókom oldalt,
+    kattints a „Van fiókom” fülre…” (a link a Fiókom oldalt már a „Van fiókom” fülön nyitja).
+  - A jelszóképernyők: „Kész, megvan az új jelszavad. Most lépj be vele…”, és a „Vissza a belépéshez” link a „Van
+    fiókom” fülre visz (eddig az „Új vagyok itt” fül nyílt meg).
+  - Ha a levél régi szövege el volt mentve az adminban változtatás nélkül, a frissítés az újra cseréli. Olívia saját
+    szövegét meghagyja, és ezt a frissítési napló jelzi. A státusz-végpont mostantól mutatja, melyik levélnek van saját
+    szövege (csak a mezők nevét), és a legutóbbi frissítési naplót.
+  - A dátum után nincs dupla pont („2027. január 27.”). Teszt: 1960/0.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

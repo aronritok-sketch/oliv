@@ -113,11 +113,13 @@ class OYS_Emails {
 		return self::recolor( self::frame( $heading, $body, $cta, $footer_extra, $preheader ) );
 	}
 
+	/** The emails' button ([ label, url ]), at the end of the email or inside the text. */
+	public static function button_html( array $cta, $margin = '28px 0 8px' ) {
+		return '<p style="margin:' . esc_attr( $margin ) . '"><a href="' . esc_url( $cta[1] ) . '" style="display:inline-block;background:#2B5036;color:#F3F2EC;text-decoration:none;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:13px;padding:14px 22px;border-radius:999px">' . esc_html( $cta[0] ) . '</a></p>';
+	}
+
 	private static function frame( $heading, $body, $cta, $footer_extra = '', $preheader = '' ) {
-		$button = '';
-		if ( $cta ) {
-			$button = '<p style="margin:28px 0 8px"><a href="' . esc_url( $cta[1] ) . '" style="display:inline-block;background:#2B5036;color:#F3F2EC;text-decoration:none;font-weight:700;letter-spacing:.06em;text-transform:uppercase;font-size:13px;padding:14px 22px;border-radius:999px">' . esc_html( $cta[0] ) . '</a></p>';
-		}
+		$button = $cta ? self::button_html( $cta ) : '';
 		return '<!doctype html><html><body style="margin:0;background:#F3F2EC;font-family:Arial,Helvetica,sans-serif;color:#26352B">' . $preheader
 			. '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#F3F2EC;padding:24px 12px"><tr><td align="center">'
 			. '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FBFBF8;border:2px solid #12231A">'
@@ -487,10 +489,16 @@ class OYS_Emails {
 		$vars = array_merge( OYS_Email_Templates::vars_for( (int) $e['user'] ), array(
 			'pass'     => (string) $e['name'],
 			'sessions' => sprintf( _n( '%d session', '%d sessions', $left, 'olivia-studio' ), $left ),
-			'until'    => $day ? wp_date( get_option( 'date_format' ), strtotime( $day . ' 12:00:00 UTC' ) ) : '—',
+			// „2027. január 27.” – the sentence's own full stop follows, so not two
+			'until'    => $day ? rtrim( wp_date( get_option( 'date_format' ), strtotime( $day . ' 12:00:00 UTC' ) ), '.' ) : '—',
+			'email'    => self::user_email( (int) $e['user'] ),
+			'account'  => oys_account_url(),
 		) );
-		$body    = OYS_Email_Templates::paragraphs( $t['message'], $vars ) . OYS_Email_Templates::paragraphs( $t['closing'], $vars );
-		$cta     = $t['button'] ? array( OYS_Email_Templates::fill( $t['button'], $vars ), oys_account_url() ) : null;
+		// Áron, 26 November: „közvetlen legyen az a gomb, hogy elfelejtett jelszó” – the button opens the lost password page
+		// (the guest types the address, the „New password” email comes), right under the first paragraph; the steps follow
+		$button  = $t['button'] ? self::button_html( array( OYS_Email_Templates::fill( $t['button'], $vars ), wp_lostpassword_url() ), '20px 0 24px' ) : '';
+		$body    = OYS_Email_Templates::paragraphs( $t['message'], $vars ) . $button . OYS_Email_Templates::paragraphs( $t['closing'], $vars );
+		$cta     = null;
 		$subject = ( $test_to ? __( '[Test]', 'olivia-studio' ) . ' ' : '' ) . OYS_Email_Templates::fill( $t['subject'], $vars );
 		return self::send( $to, $subject, OYS_Email_Templates::fill( $t['heading'], $vars ), $body, array(), $cta );
 	}

@@ -68,7 +68,9 @@ add_action( 'login_init', function () {
 	if ( ! oy_login_guest_screen() ) {
 		return;
 	}
-	$account = function_exists( 'oys_account_url' ) ? oys_account_url() : home_url( '/fiokom/' );
+	// „Back to log in” opens the account page on its „I have an account” tab (Áron, 26 November: after the new password
+	// the guest logs in there)
+	$account = add_query_arg( 'oys_view', 'login', function_exists( 'oys_account_url' ) ? oys_account_url() : home_url( '/fiokom/' ) );
 	add_filter( 'login_url', fn() => $account, 99 );
 	// the request ends on „check your email”, not silently on the account page the link came from
 	add_filter( 'lostpassword_redirect', '__return_empty_string', 99 );
@@ -90,13 +92,13 @@ function oy_login_text( $translation, $text, $domain ) {
 		'Log in'                                          => 'Vissza a belépéshez',
 		'Lost Password'                                   => 'Elfelejtett jelszó',
 		'Check your email'                                => 'Nézd meg a postafiókod',
-		'Check your email for the confirmation link, then visit the <a href="%s">login page</a>.' => 'Elküldtem a levelet. Nézd meg a postafiókod (ha nem látod, a spam mappát is), és kattints a levélben a linkre: ott megadhatod az új jelszavad. Utána itt tudsz <a href="%s">belépni</a>.',
+		'Check your email for the confirmation link, then visit the <a href="%s">login page</a>.' => 'Elküldtem a levelet „Új jelszó” tárggyal. Nézd meg a postafiókod (ha nem látod, a spam mappát is), és kattints a levélben az „Új jelszót adok meg” gombra: ott megadhatod az új jelszavad. Utána a „Van fiókom” fülön tudsz <a href="%s">belépni</a> az e-mail-címeddel és az új jelszavaddal.',
 		'Enter your new password below or generate one.'  => 'Add meg az új jelszavad, vagy kérj egy erőset a gombbal.',
 		'New password'                                    => 'Új jelszó',
 		'Save Password'                                   => 'Elmentem',
 		'Generate Password'                               => 'Kérek egy erős jelszót',
 		'Reset Password'                                  => 'Új jelszó',
-		'Your password has been reset.'                   => 'Kész, megvan az új jelszavad.',
+		'Your password has been reset.'                   => 'Kész, megvan az új jelszavad. Most lépj be vele: a lenti linkre kattintva a „Van fiókom” fülön írd be az e-mail-címed és az új jelszavad.',
 		'<strong>Error:</strong> Please enter a username or email address.' => '<strong>Hoppá:</strong> írd be az e-mail címed.',
 		'<strong>Error:</strong> There is no account with that username or email address.' => '<strong>Hoppá:</strong> ezzel az e-mail címmel nincs fiók. Nézd meg, jól írtad-e, vagy regisztrálj a Fiókom oldalon.',
 		'<strong>Error:</strong> Your password reset link appears to be invalid. Please request a new link below.' => '<strong>Hoppá:</strong> ez a link már nem érvényes. Kérj lent egy újat.',
@@ -118,8 +120,12 @@ add_filter( 'retrieve_password_notification_email', function ( $mail, $key, $use
 	}
 	$url  = network_site_url( 'wp-login.php?action=rp&key=' . $key . '&login=' . rawurlencode( $user_login ), 'login' );
 	$name = $user instanceof WP_User && $user->first_name ? $user->first_name : '';
-	$body = '<p>' . esc_html( $name ? 'Szia ' . $name . '!' : 'Szia!' ) . '</p>'
-		. '<p>Új jelszót kértél az ' . esc_html( oy_site_name() ) . ' fiókodhoz. A gombra kattintva megadhatod. A link egy napig érvényes.</p>'
+	// Áron, 26 November: „írjuk le, hogyha módosította a jelszót, mit kell csináljon, hogy be tudjon lépni, tehát hogy
+	// kattintson a van fiókomra” – the way in after the new password, with the account page on that tab
+	$login = add_query_arg( 'oys_view', 'login', function_exists( 'oys_account_url' ) ? oys_account_url() : home_url( '/fiokom/' ) );
+	$body  = '<p>' . esc_html( $name ? 'Szia ' . $name . '!' : 'Szia!' ) . '</p>'
+		. '<p>Új jelszót kértél az ' . esc_html( oy_site_name() ) . ' fiókodhoz. A lenti „Új jelszót adok meg” gombra kattintva megadhatod. A link egy napig érvényes.</p>'
+		. '<p><b>Ha elmentetted az új jelszavad, így lépsz be:</b> nyisd meg a <a href="' . esc_url( $login ) . '">Fiókom</a> oldalt, kattints a „Van fiókom” fülre, és írd be az e-mail-címed és az új jelszavad. Utána már foglalhatsz is az órarendből.</p>'
 		. '<p>Ha nem te kérted, nem kell tenned semmit: a jelszavad marad a régi.</p>';
 	$mail['subject'] = 'Új jelszó – ' . oy_site_name();
 	$mail['message'] = OYS_Emails::wrap_public( 'Új jelszó', $body, array( 'Új jelszót adok meg', $url ) );

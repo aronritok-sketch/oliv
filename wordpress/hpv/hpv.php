@@ -66,6 +66,7 @@ add_action( 'hpv_child_setup', function ( $from, $to, $slug ) {
 	$log = array_merge( $log, oy_migrate_classes_1119c() ); // her renamed class types: the copies the update put in go, her classes keep their names inside, the addresses she gave them are public (once; before the import below)
 	$log = array_merge( $log, oy_migrate_privacy_1119() ); // the privacy notice: the GoDaddy server (EU), the pair's partner (once; only the theme's sentences)
 	$log = array_merge( $log, oy_migrate_1126() ); // no reminder about passes about to expire on the online site (once)
+	$log = array_merge( $log, oy_migrate_1126b() ); // the Motibro email: a saved copy of its old closing and button goes to the new steps and the lost password button (once)
 	kses_remove_filters();
 	$log = array_merge( $log, oy_import_all( false ) );
 	kses_init_filters();

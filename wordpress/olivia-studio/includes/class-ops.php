@@ -170,7 +170,33 @@ class OYS_Ops {
 			'plugins'  => array_values( (array) get_option( 'active_plugins' ) ),
 			'storage'  => self::storage(),
 			'settings' => $settings,
+			// which emails have the studio's own texts (and in which language), and what the last theme update did
+			'emails'   => self::email_texts(),
+			'setup'    => get_option( 'oy_hpv_setup_log' ) ?: '',
 		);
+	}
+
+	/** Email key => the languages whose texts the studio changed (fields only, never the texts themselves). */
+	private static function email_texts() {
+		$out = array();
+		foreach ( (array) get_option( OYS_Email_Templates::OPTION, array() ) as $key => $row ) {
+			if ( ! is_array( $row ) ) {
+				continue;
+			}
+			$fields = array_flip( OYS_Email_Templates::FIELDS );
+			if ( array_intersect_key( $row, $fields ) ) {
+				$out[ $key ]['en'] = array_keys( array_intersect_key( $row, $fields ) );
+			}
+			foreach ( (array) ( $row['tr'] ?? array() ) as $lang => $texts ) {
+				if ( array_intersect_key( (array) $texts, $fields ) ) {
+					$out[ $key ][ $lang ] = array_keys( array_intersect_key( (array) $texts, $fields ) );
+				}
+			}
+			if ( isset( $row['enabled'] ) && ! (int) $row['enabled'] ) {
+				$out[ $key ]['off'] = true;
+			}
+		}
+		return $out;
 	}
 
 	/**

@@ -75,7 +75,10 @@ class OYS_Email_Templates {
 			// Áron, 26 November: „mi történik, ha a vendégeknél az online foglalhatóvá tétel gombra kattintunk … legyen egy ilyen
 			// tesztküldési funkció” – the guest's sessions from Motibro, now bookable online (sent only when the studio asks)
 			'held_online'       => array( __( 'Sessions from Motibro bookable online', 'olivia-studio' ), 'account', 'customer', __( 'When you make a guest\'s sessions from Motibro bookable online and tick „email the guest” (or send it later from the same row); „Test to me” sends it to you first', 'olivia-studio' ),
-				'Your {sessions} can now be booked online', 'Your sessions are waiting', 'Hi {first_name}, the {sessions} left on your {pass} can now be used for the live online classes, until {until}.', 'Log in with this email address and book from the timetable. First time on the new site? Click „Forgot your password?” on the login page and set one in a minute.', 'Log in and book', array( 'pass', 'sessions', 'until' ) ),
+				// Áron, 26 November (the email in his inbox): „közvetlen legyen az a gomb, hogy elfelejtett jelszó … és utána még az
+				// e-mailbe írjuk le, hogyha módosította a jelszót, mit kell csináljon, hogy be tudjon lépni” – the button opens the
+				// lost password page, the steps after it are in the email
+				'Your {sessions} can now be booked online', 'Your sessions are waiting', 'Hi {first_name}, the {sessions} left on your {pass} can now be used for the live online classes, until {until}.', self::HELD_STEPS, 'Set my password', array( 'pass', 'sessions', 'until', 'email', 'account' ) ),
 			// Private sessions
 			'private_request_received' => array( __( 'Private request received', 'olivia-studio' ), 'private', 'customer', __( 'When someone sends a private session request', 'olivia-studio' ),
 				'Your private session request', 'Request received', "Thank you for your request. I'll reply within one working day with a suggested time and price. You can pay and confirm from the email or your account.", '', 'View my requests' ),
@@ -186,6 +189,9 @@ class OYS_Email_Templates {
 	}
 
 	const FIELDS = array( 'subject', 'heading', 'message', 'closing', 'button' );
+
+	/** How a guest from Motibro logs in the first time (the held_online email, under its button). */
+	const HELD_STEPS = "How to log in the first time on the new site:\n\n1. Tap „Set my password” above. It opens the „Lost password” page: type this email address ({email}) and tap „Get new password”.\n\n2. In a few minutes you get an email with the subject „New password” (look in your spam folder too). Tap the button in it, choose your password and save it.\n\n3. Then tap „Back to log in” (or open {account}), choose the „I have an account” tab and log in with your email address and your new password.\n\n4. Accept the participation agreement, answer yes or no to the newsletter, and you can book from the timetable.\n\nAlready set your password? Skip all this and log in here: {account}";
 
 	/**
 	 * The email as it will be sent: saved texts over the defaults, plus `enabled`.

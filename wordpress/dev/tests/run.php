@@ -5899,6 +5899,51 @@ test( 'Áron 26 Nov: „Online foglalhatóvá” – what it does, the email to 
 	ok( str_contains( $po, 'msgstr "Teszt magamnak"' ) && str_contains( $po, 'Érvényes eddig: {until}.' ), 'in Hungarian: „Teszt magamnak”, the guest\'s email' );
 } );
 
+test( 'Áron 26 Nov: the Motibro email – the button opens the lost password page, the steps to log in are in the email and in the reset email', function () {
+	$c = make_user( 'Beata' );
+	OYS_Held::put( 'motibro-test-pw', $c, array( 'name' => 'Hatha flow jóga bérlet - 5 alkalom (60p)', 'used' => 3, 'locked' => 0, 'left' => 2, 'expires' => '2027-01-27' ) );
+	OYS_Held::to_online( 'motibro-test-pw', '2027-01-27' );
+	$log = sent_mails( fn() => OYS_Held::notify( 'motibro-test-pw' ) );
+	$h   = $log[0]['html'] ?? '';
+	ok( 1 === count( $log ) && preg_match( '/<a href="([^"]+)"[^>]*>Set my password<\/a>/', $h, $m ) && str_contains( html_entity_decode( $m[1] ), 'wp-login.php?action=lostpassword' ), 'the button: „Set my password”, straight to the lost password page („közvetlen legyen az a gomb, hogy elfelejtett jelszó”)' );
+	ok( str_contains( $h, esc_html( get_userdata( $c )->user_email ) ) && str_contains( $h, 'I have an account' ) && str_contains( $h, 'New password' ) && str_contains( $h, esc_html( oys_account_url() ) ) && substr_count( $h, '<p>' ) >= 6, '… the steps under it: her own address to type, the „New password” email, then „I have an account” on the account page' );
+	ok( ! str_contains( $h, 'Log in and book' ), 'no more „Log in and book”' );
+	$hu = OYS_Email_Templates::get( 'held_online', 'hu' );
+	ok( 'Jelszót állítok be' === $hu['button'] && str_contains( $hu['closing'], '„Van fiókom” fület' ) && str_contains( $hu['closing'], '„Új jelszót kérek”' ) && str_contains( $hu['closing'], '„Elmentem”' ) && str_contains( $hu['closing'], 'részvételi nyilatkozatot' ), 'in Hungarian: „Jelszót állítok be”, then „Új jelszót kérek”, „Elmentem”, the „Van fiókom” tab, the agreement' );
+	// a saved copy of the old texts (the studio saved the email unchanged) goes to the new ones; her own words stay
+	require_once get_template_directory() . '/inc/demo-import.php';
+	$keep = get_option( OYS_Email_Templates::OPTION, array() );
+	$opt  = $keep;
+	$opt['held_online'] = array( 'tr' => array( 'hu' => array( 'subject' => 'Saját tárgy', 'closing' => 'Lépj be ezzel az e-mail-címmel, és foglalj az órarendből. Először jársz az új oldalon? A belépésnél kattints az „Elfelejtetted a jelszavad?” linkre, és egy perc alatt beállíthatod a jelszavad.', 'button' => 'Belépés és foglalás' ) ) );
+	update_option( OYS_Email_Templates::OPTION, $opt, false );
+	update_option( 'oy_edition', 'hu-online' );
+	delete_option( 'oy_1126b_rev' );
+	$mlog = oy_migrate_1126b();
+	$hu   = OYS_Email_Templates::get( 'held_online', 'hu' );
+	ok( 'Saját tárgy' === $hu['subject'] && 'Jelszót állítok be' === $hu['button'] && str_contains( $hu['closing'], 'Van fiókom' ) && 2 === count( $mlog ), 'the update: the old closing and button go to the new ones, her own subject stays' );
+	ok( ! oy_migrate_1126b(), '… once' );
+	$opt['held_online']['tr']['hu'] = array( 'closing' => 'Olívia saját szövege.', 'button' => 'Gyere!' );
+	update_option( OYS_Email_Templates::OPTION, $opt, false );
+	delete_option( 'oy_1126b_rev' );
+	$mlog = oy_migrate_1126b();
+	ok( 'Gyere!' === OYS_Email_Templates::get( 'held_online', 'hu' )['button'] && str_contains( implode( ' ', $mlog ), 'own text kept' ), 'texts she wrote herself are kept (and the log says so)' );
+	$st = OYS_Ops::status();
+	ok( isset( $st['emails']['held_online']['hu'] ) && in_array( 'button', $st['emails']['held_online']['hu'], true ) && array_key_exists( 'setup', $st ), 'the status says which emails have her own texts (names only)' );
+	update_option( OYS_Email_Templates::OPTION, $keep, false );
+	// the reset email: the steps after the new password, the account page on the „Van fiókom” tab
+	$u    = get_userdata( $c );
+	$mail = apply_filters( 'retrieve_password_notification_email', array( 'to' => $u->user_email, 'subject' => '', 'message' => '', 'headers' => '' ), 'k3y', $u->user_login, $u );
+	ok( str_contains( $mail['message'], 'Ha elmentetted az új jelszavad, így lépsz be:' ) && str_contains( $mail['message'], '„Van fiókom” fülre' ) && str_contains( $mail['message'], esc_url( add_query_arg( 'oys_view', 'login', oys_account_url() ) ) ) && str_contains( $mail['message'], 'action=rp' ), 'the „Új jelszó” email: after saving, „Van fiókom” on the account page (linked, that tab open)' );
+	ok( str_contains( oy_login_text( 'x', 'Your password has been reset.', 'default' ), '„Van fiókom” fülön' ) && str_contains( oy_login_text( 'x', 'Check your email for the confirmation link, then visit the <a href="%s">login page</a>.', 'default' ), '„Van fiókom” fülön' ), 'the screens say it too: „Kész, megvan az új jelszavad. Most lépj be vele … a „Van fiókom” fülön”' );
+	update_option( 'oy_edition', 'fort-myers' );
+	$src = (string) file_get_contents( get_template_directory() . '/inc/login.php' );
+	ok( str_contains( $src, "\$account = add_query_arg( 'oys_view', 'login'," ), '„Vissza a belépéshez” opens the account page on the „Van fiókom” tab' );
+	$_GET['oys_view'] = 'login';
+	$forms            = OYS_Frontend::auth_forms( oys_account_url() );
+	unset( $_GET['oys_view'] );
+	ok( preg_match( '/data-panel="oys-login">/', $forms ) && preg_match( '/data-panel="oys-register" hidden/', $forms ), '… where „Van fiókom” is the open tab' );
+} );
+
 test( 'Áron 26 Nov: one class a week, 5-class passes – no reminder about a pass about to expire, and the Emails page does not list it', function () {
 	global $wpdb;
 	$u  = make_user( 'Emese' );

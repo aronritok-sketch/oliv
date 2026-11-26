@@ -890,6 +890,51 @@ function oy_migrate_1126() {
 	return array( 'no reminder about passes about to expire' );
 }
 
+/**
+ * Áron, 26 November (the Motibro email in his inbox): „közvetlen legyen az a gomb, hogy elfelejtett jelszó” – a saved copy
+ * of the held_online email's old closing and button (as they were, the studio saving the email unchanged) goes back to
+ * the new default (the steps, „Jelszót állítok be”). Texts the studio wrote itself stay, and the log says so.
+ */
+function oy_migrate_1126b() {
+	$rev = '2026-11-26b';
+	if ( 'hu-online' !== oy_edition() || get_option( 'oy_1126b_rev' ) === $rev || ! class_exists( 'OYS_Email_Templates' ) ) {
+		return array();
+	}
+	update_option( 'oy_1126b_rev', $rev );
+	$saved = get_option( OYS_Email_Templates::OPTION, array() );
+	if ( ! is_array( $saved ) || empty( $saved['held_online'] ) || ! is_array( $saved['held_online'] ) ) {
+		return array();
+	}
+	// the texts as they were before (here, not in the plugin: the update runs with the old plugin still loaded)
+	$was  = array(
+		'closing' => array( 'Log in with this email address and book from the timetable. First time on the new site? Click „Forgot your password?” on the login page and set one in a minute.', 'Lépj be ezzel az e-mail-címmel, és foglalj az órarendből. Először jársz az új oldalon? A belépésnél kattints az „Elfelejtetted a jelszavad?” linkre, és egy perc alatt beállíthatod a jelszavad.' ),
+		'button'  => array( 'Log in and book', 'Belépés és foglalás' ),
+	);
+	$row  = $saved['held_online'];
+	$log  = array();
+	$drop = function ( array $texts, $where ) use ( &$log, $was ) {
+		foreach ( $was as $f => $old ) {
+			if ( ! isset( $texts[ $f ] ) ) {
+				continue;
+			}
+			if ( in_array( trim( (string) $texts[ $f ] ), $old, true ) ) {
+				unset( $texts[ $f ] );
+				$log[] = 'held_online ' . $f . ' (' . $where . '): the new default';
+			} else {
+				$log[] = 'held_online ' . $f . ' (' . $where . '): the studio\'s own text kept';
+			}
+		}
+		return $texts;
+	};
+	$row = $drop( $row, 'en' );
+	foreach ( (array) ( $row['tr'] ?? array() ) as $lang => $texts ) {
+		$row['tr'][ $lang ] = $drop( (array) $texts, $lang );
+	}
+	$saved['held_online'] = $row;
+	update_option( OYS_Email_Templates::OPTION, $saved, false );
+	return $log;
+}
+
 function oy_migrate_privacy_1119() {
 	$rev = '2026-11-26d';
 	if ( 'hu-online' !== oy_edition() || get_option( 'oy_privacy_1119_rev' ) === $rev ) {
