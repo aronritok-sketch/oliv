@@ -2275,6 +2275,20 @@
   - REST (csak a stúdiónak): `GET /oys/v1/newsletters`, `GET|POST /newsletters/<id>` (csak piszkozat),
     `POST /newsletters/<id>/test` (`user` vagy `to`). Listára küldeni ezen nem lehet. Teszt: 1984/0.
 
+- **2026-11-26 – Az „Első online flow óránk: december 16., szerda” piszkozat (1-es) a Motibrós, alkalom nélküli
+  vendégeknek: az egy kattintásos gomb benne van, és ment egy teszt Olívia tesztfiókjára.** Áron: „A hírlevélszövegén ne
+  változtass, viszont ezt az egy kattintásos, jelszógenerálós gomb ez legyen benne, és írd bele a folyamatot … szedd ki
+  azt a részt az új fiók létrehozásából, ami nem fontos, vagy ami már nem így van”.
+  - Csak a „Belépés” rész változott:
+    - Kikerült: „Kattints itt az "Aktiválom a fiókom" gombra, írd be az e-mail címed, és e-mailben kapsz egy linket…”.
+    - Bekerült: „Kattints a lenti „Jelszót állítok be” gombra, adj meg egy jelszót, és már bent is vagy.” Utána a
+      `{password_button}`, majd az „Így működik” lista és a „Később így lépsz be” sor; a gomb 30 napig működik.
+    - Olívia két mondata szó szerint maradt („Utána bármelyik órára…”, „Ha valahol elakadsz…”).
+    - A régi alsó „Aktiválom a fiókom” gomb (az elfelejtett jelszó oldalra vitt) kikerült.
+  - A szöveg minden más része betűre ugyanaz (ellenőrizve).
+  - Teszt a 292-es teszt-vendégfiókra (Olívia `+test` címe): ment, saját működő linkkel.
+  - A valódi kiküldés Olívia tesztje után jöhet. A címzettválasztóban a „Motibróból, alkalom nélkül” gomb jelöli ki őket.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.
