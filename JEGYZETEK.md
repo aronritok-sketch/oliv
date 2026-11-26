@@ -2039,6 +2039,29 @@
   „Online jóga bejelentkezés”), jobb: „Privát online jóga” (egyéni időpontban, 60 vagy 90 perc, gomb az .online privát
   jóga oldalára). check.py: 3735/0, `--after` 1217/0.
 
+- **2026-11-26 – Képek: kulcsszavas fájlnevek és leíró, kulcsszavas altok mindkét oldalon (oliviajoga.hu 1.8.5,
+  oliviajoga.online 3.12.25).** Áron: „A kép alt textek is legyenek rendben mindkét oldalon (kép fájlnevek tartalmazzák a
+  szükséges kulcsszavakat ékezet nélkül, kötőjellel, az alt textek pedig szintén tartalmazzanak kulcsszavakat ékezetesen,
+  spaceszel, a képet is leírva!” – és: „Csináld meg te az indexeléseket és a sitemapet.”
+  - .hu: 86 kép új néven (160 fájl, `git mv`): az alt szövegéből ASCII, kötőjeles név (`tools/image_names.py`,
+    `content/image-names.json`; pl. old/18bbeec02e8a → old/alkalmas-joga-ajandekutalvany-nyomtatott-kartyan-csepel-18-kerulet,
+    new/korszak-01 → new/csoportos-jogaora-18-kerulet-pestszentlorincen-prana-jogakozpontban). A build belül a régi
+    kulcsokkal dolgozik, a kiírt cím az új (`img_rel` → `asset`). Az élő szerveren a régi nevű fotók megvannak: a setup
+    helyben átmásolja őket az új nevekre (nem tölt le, nincs törött kép), és az adminban beállított képhelyek
+    (`oj_img_pos`) is átkerülnek az új kulcsokra (`img_renamed`). Altok: ahol csak leírás vagy csak kulcsszó volt
+    (korszak-*, díszítő fotók, hero, miért jóga, gyakoroljunk, privát jóga, cikk-munka, téma-fotók), most mindkettő
+    („mit mutat – kulcsszavak”). check.py: minden kép neve kulcsszavas, ékezet nélküli, minden alt ≥ 5 szó és van benne
+    kulcsszó; 4215/0, `--after` 1217/0; helyben 161 kép tölt be, 0 törött.
+  - .online: a pajzsmirigy-cikk 14 pózfotója új néven (`halpoz-matszjaszana-joga-pajzsmirigy-kovacs-olivia-600.jpg`,
+    `oy_pose_file`), alt: „Halpóz (Matszjászana) – Kovács Olívia mutatja be, jógaászana pajzsmirigy-túlműködésre”. A
+    médiatárba írt vékonyabb alt („Kovács Olívia - online jóga otthonról”), ha minden szava benne van a leíróban, átadja a
+    helyét a leírónak; akinek saját szavai vannak, az marad. A többi .online kép neve és altja már rendben volt. Tesztek:
+    1821/0.
+  - Indexelés: a Google „Indexelés kérése” gombja API-n nem érhető el (az Indexing API csak álláshirdetésre és élő
+    közvetítésre való), ezt csak a Search Console felületén lehet. Amit lehet: sitemapek újraküldve (CRM `pm/gsc-manage`),
+    a .hu IndexNow-n beküldte mind a 33 új címet (Bing, Yandex). A hibás `www.oliviajoga.hu/rolam` sitemap-bejegyzést a
+    CRM nem tudja törölni (ehhez a hub-bővítmény kiadása kellene) – az indexelést nem zavarja.
+
 ## Következő kör – nyitott pontok / ötletek
 - Admin felület magyarul (fordítási fájl), ha Olivia így kényelmesebb (a látogatói felület már 3 nyelvű).
 - Tagság: csomagváltás (upgrade/downgrade), szüneteltetés, próbaidőszak – ha kell.

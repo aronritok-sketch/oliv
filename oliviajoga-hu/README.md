@@ -11,6 +11,11 @@ legyen, csak egy új UX-et kapjon”.
 > **2026-11-25 (1.8.0), Áron:** „minden aloldal url slug legyen ékezet nélkül, kötőjellel” – a címek azóta ékezet nélküliek
 > (`/rolam`, `/arak`, `/jogarol` …, `build.ascii_slug`); a régi ékezetes címek 301-gyel az újakra (a WordPress-témában
 > `oj_moved_target`, a statikus változatban `.htaccess`). Az alább „ugyanazon az útvonalon” leírt állapot ez előtt volt így.
+>
+> **2026-11-26 (1.8.5): a képek fájlnevei kulcsszavasak** (Áron): `tools/image_names.py dist <after-build> [--apply]` az
+> alt szövegből ad ASCII, kötőjeles nevet (`content/image-names.json`), és átnevezi a fájlokat. Új képnél: build, aztán ez
+> a parancs `--apply`-jal (a meglévő nevek nem változnak). A build belül a régi kulcsokkal dolgozik (`old/<hash>`,
+> `new/korszak-01`), a kiírt cím az új.
 
 - **Címek:** mind a 33 oldal ugyanazon az útvonalon: `/rólam`, `/árak`, `/események`, `/jógáról`, `/jógaóra-cégeknek`,
   `/bejelentkezés-jóga-bérlet`, `/kapcsolat`, `/főoldal` és a 24 írás (`/a-nyújtás-hatása`, `/binge` …). Perjel nélkül, ahogy

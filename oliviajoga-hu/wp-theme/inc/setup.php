@@ -107,6 +107,19 @@ function oj_setup() {
 	}
 	update_option( 'oj_setup_md5', $md5, false );
 	kses_init_filters();
+	// the image positions chosen in the admin (Megjelenés → Képek helye) move with the pictures' new file names
+	$pos   = (array) get_option( 'oj_img_pos', array() );
+	$moved = 0;
+	foreach ( (array) ( $data['img_renamed'] ?? array() ) as $from => $to ) {
+		if ( isset( $pos[ $from ] ) && ! isset( $pos[ $to ] ) ) {
+			$pos[ $to ] = $pos[ $from ];
+			$moved++;
+		}
+	}
+	if ( $moved ) {
+		update_option( 'oj_img_pos', $pos );
+		$log[] = sprintf( 'image positions: %d moved to the new file names', $moved );
+	}
 	$log[] = sprintf( '%d new pages, %d updated, %d renamed (no accents)', $made, $updated, $renamed );
 
 	$home = get_page_by_path( 'fooldal' );
@@ -151,9 +164,18 @@ function oj_sync_media() {
 	$got  = 0;
 	$left = 0;
 	$t0   = microtime( true );
+	// a picture renamed to its keyword name (Áron, 26 November) is already here under its old name: copied, not fetched
+	$old_of = array_flip( (array) ( oj_data()['img_renamed'] ?? array() ) );
 	foreach ( $need as $rel ) {
 		if ( str_contains( $rel, '..' ) || is_file( $dir . '/' . $rel ) ) {
 			continue;
+		}
+		if ( preg_match( '#^(.+?)((?:-(?:600|800|1200|1600))?\.\w+)$#', $rel, $mm ) && isset( $old_of[ $mm[1] ] ) && is_file( $dir . '/' . $old_of[ $mm[1] ] . $mm[2] ) ) {
+			wp_mkdir_p( dirname( $dir . '/' . $rel ) );
+			if ( copy( $dir . '/' . $old_of[ $mm[1] ] . $mm[2], $dir . '/' . $rel ) ) {
+				$got++;
+				continue;
+			}
 		}
 		if ( microtime( true ) - $t0 > 40 ) {
 			$left++;

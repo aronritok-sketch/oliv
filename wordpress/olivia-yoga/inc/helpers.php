@@ -154,8 +154,14 @@ function oy_photo( $src, $sizes = '100vw', $eager = false, $alt = null ) {
 			$key  = (string) get_post_meta( (int) $src, 'oy_key', true );
 			$imgs = $key ? oy_images() : array();
 			$own  = (string) get_post_meta( (int) $src, '_wp_attachment_image_alt', true );
-			if ( isset( $imgs[ $key ] ) && ( '' === $own || $own === (string) $imgs[ $key ]['alt'] ) ) {
-				$attrs['alt'] = oy_image_alt( $key );
+			// … or a thinner one whose every word is in ours (Áron, 26 November: the alt describes the photo and has the keywords;
+			// „Kovács Olívia - online jóga otthonról” → „Kovács Olívia táncos pózban otthon, a nappaliban – online jóga otthonról”).
+			// A text with words of its own is someone's description: it stays.
+			$theirs = isset( $imgs[ $key ] ) ? oy_image_alt( $key ) : '';
+			$words  = fn( $t ) => array_filter( preg_split( '/[^\p{L}\p{N}]+/u', mb_strtolower( (string) $t ) ), fn( $w ) => mb_strlen( $w ) > 2 );
+			$subset = '' !== $own && ! array_diff( $words( $own ), $words( $theirs ) ) && mb_strlen( $own ) < mb_strlen( $theirs );
+			if ( '' !== $theirs && ( '' === $own || $own === (string) $imgs[ $key ]['alt'] || $subset ) ) {
+				$attrs['alt'] = $theirs;
 			}
 		}
 		$pos = get_post_meta( (int) $src, 'oy_pos', true );

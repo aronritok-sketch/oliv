@@ -3345,6 +3345,9 @@ test( 'photos on the online edition: Hungarian names and texts with the keywords
 		ok( str_contains( oy_photo( $att ), 'alt="' . esc_attr( $imgs['journal-19']['hu']['alt'] ) . '"' ), 'a journal photo with no text of its own: the Hungarian one' );
 		update_post_meta( $att, '_wp_attachment_image_alt', 'Olívia saját leírása' );
 		ok( str_contains( oy_photo( $att ), 'alt="Olívia saját leírása"' ), 'a text someone wrote stays' );
+		update_post_meta( $att, '_wp_attachment_image_alt', 'Kovács Olívia - jóga' );
+		ok( str_contains( oy_photo( $att ), 'alt="' . esc_attr( $imgs['journal-19']['hu']['alt'] ) . '"' ) || ! preg_match( '/kovács|olívia/iu', $imgs['journal-19']['hu']['alt'] ), 'Áron 26 Nov: a thinner text whose words are all in ours („Kovács Olívia - online jóga otthonról”) gives way to the one that describes the photo' );
+		update_post_meta( $att, '_wp_attachment_image_alt', 'Olívia saját leírása' );
 	} finally {
 		update_option( 'oy_edition', 'fort-myers' );
 	}
@@ -4180,8 +4183,15 @@ test( 'Olívia\'s doc of 14 November, past midnight: the price cards look the sa
 	$ij = json_decode( (string) file_get_contents( get_template_directory() . '/assets/img/images.json' ), true );
 	ok( 7 === count( array_filter( array( 'journal-04', 'journal-10', 'journal-16', 'journal-19', 'journal-20', 'journal-22', 'journal-24' ), fn( $k ) => '50% 22%' === ( $ij[ $k ]['pos_prev'] ?? '' ) && (int) explode( ' ', $ij[ $k ]['pos'] )[1] > 22 ) ), 'Jógáról: seven photos show more of their lower part, where she is („ezeket a képeket is csúsztassuk feljebb”), only where the focus is still the old one' );
 	$po = oy_poses( 'tul' ) . oy_poses( 'alul' );
-	ok( 14 === substr_count( $po, '<li class="oj-pose">' ) && str_contains( $po, 'Ha túlműködik a pajzsmirigy' ) && str_contains( $po, 'Ha alulműködik a pajzsmirigy' ) && str_contains( $po, '/assets/img/poses/fejenallas-900.jpg 900w' ) && '' === oy_poses( 'x' ), 'thyroid article: the poses for an over- and an underactive thyroid, as cards with her photos („hiányzik a lényeg, a kép”)' );
+	ok( 14 === substr_count( $po, '<li class="oj-pose">' ) && str_contains( $po, 'Ha túlműködik a pajzsmirigy' ) && str_contains( $po, 'Ha alulműködik a pajzsmirigy' ) && str_contains( $po, '/assets/img/poses/fejenallas-sirsaszana-joga-pajzsmirigy-kovacs-olivia-900.jpg 900w' ) && '' === oy_poses( 'x' ), 'thyroid article: the poses for an over- and an underactive thyroid, as cards with her photos („hiányzik a lényeg, a kép”)' );
 	ok( 28 === count( glob( get_template_directory() . '/assets/img/poses/*.jpg' ) ), '… the photos ship with the theme, two sizes each' );
+	preg_match_all( '#<img src="[^"]*/poses/([^"]+)-600\.jpg"[^>]*alt="([^"]*)"#', $po, $pm, PREG_SET_ORDER );
+	$files_ok = 14 === count( $pm );
+	foreach ( $pm as $one ) {
+		$files_ok = $files_ok && preg_match( '/^[a-z0-9]+(-[a-z0-9]+)+-joga-pajzsmirigy-kovacs-olivia$/', $one[1] ) && is_file( get_template_directory() . '/assets/img/poses/' . $one[1] . '-900.jpg' )
+			&& str_contains( $one[2], 'Kovács Olívia mutatja be, jógaászana pajzsmirigy-' ) && preg_match( '/\(\S+\)/u', $one[2] );
+	}
+	ok( $files_ok, 'Áron 26 Nov: every pose photo has its keywords in the file name (ascii, hyphens) and an alt that describes it with the keywords (halpóz (Matszjászana) – Kovács Olívia mutatja be, jógaászana pajzsmirigy-túlműködésre)' );
 	$tp2 = wp_insert_post( array( 'post_type' => 'post', 'post_status' => 'publish', 'post_title' => 'Pajzsmirigy', 'post_name' => 'pajzsmirigy-harmonizalas-jogaval', 'post_content' => "<p>A jóga erre kiváló eszköz.</p>\n<p>Ezek az ászanák akkor is nagyon jó hatással vannak.</p>" ) );
 	update_option( 'oy_edition', 'hu-online' );
 	delete_option( 'oy_1114d_rev' );

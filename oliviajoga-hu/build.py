@@ -41,7 +41,7 @@ ONLINE_TIME = 'szerdánként 18:30-tól 20:00-ig'
 # The second half of her document („NOVEMBER 26-ÁN”): --after builds it; the WordPress theme switches on AFTER_FROM.
 AFTER = False
 AFTER_FROM = '2026-11-26'
-VERSION = '1.8.4'
+VERSION = '1.8.5'
 # "Jógaóra cégeknek" left the menu and the home page (Olivia, 2026-11-05); the page stays at its address.
 NAV = [
     ('', 'Főoldal'), ('rólam', 'Rólam'), ('események', 'Események'), ('árak', 'Árak'), ('jógáról', 'Jógáról'),
@@ -49,18 +49,22 @@ NAV = [
 ]
 # Olivia's own photos from her Drive (tools/images.py import): key → Hungarian alt text.
 NEW_PHOTOS = {
-    'hero': 'Hatha flow jóga óra egy tóparti teraszon, lefelé néző kutya pózban',
-    'diszito': 'Csoportos jóga egy fesztivál pavilonjában, felnyújtott karokkal',
-    'diszito2': 'Gyermekpóz egy szabadtéri csoportos jógaórán',
-    'diszito3': 'Kovács Olívia felnyújtott karokkal vezeti a szabadtéri csoportos jógaórát',
-    'diszito4': 'Kovács Olívia harcos pózban egy réten, naplementekor',
-    'diszito5': 'Szabadtéri csoportos jógaóra kitörésben',
-    'diszito6': 'Jógázó hátulról, fordított namaszte kéztartással, mögötte csoportos óra',
-    'olivia3': 'Kovács Olívia guggoló pózban, összetett kézzel egy fesztivál teraszán',
-    'private-yoga': 'Fa póz egy világos jógateremben',
-    # 2026-11-06 (Olivia, CRM chat): instead of the old round cut-outs; they keep the old pictures' alt text
-    'miert-joga': 'jóga 21. kerület jóga 18. kerület jóga 11. kerület jóga csepel flow kovács olívia jógaoktató',
-    'gyakoroljunk': 'jóga 11. kerület újbuda mórcz xxi. kerület jóga 18. kerület jóga csepel jóga 21. kerület kovács olívia jógaoktató',
+    # Áron, 26 November: „az alt textek … tartalmazzanak kulcsszavakat ékezetesen, spaceszel, a képet is leírva” – what the
+    # picture shows, then the searched words
+    'hero': 'Hatha flow jógaóra egy tóparti teraszon, lefelé néző kutya pózban – csoportos hatha flow jóga Kovács Olíviával',
+    'diszito': 'Csoportos jógaóra egy fesztivál pavilonjában, felnyújtott karokkal – hatha flow jóga, Kovács Olívia jógaoktató',
+    'diszito2': 'Gyermekpóz egy szabadtéri csoportos jógaórán – relaxáció a hatha flow jógaóra végén',
+    'diszito3': 'Kovács Olívia felnyújtott karokkal vezeti a szabadtéri csoportos jógaórát – szabadtéri hatha flow jóga',
+    'diszito4': 'Kovács Olívia harcos pózban egy réten, naplementekor – hatha jóga, Kovács Olívia jógaoktató',
+    'diszito5': 'Szabadtéri csoportos jógaóra kitörésben – hatha flow jóga a szabadban, Kovács Olívia jógaoktató',
+    'diszito6': 'Jógázó hátulról, fordított namaszte kéztartással, mögötte csoportos óra – nyújtás a hatha flow jógaórán',
+    'olivia3': 'Kovács Olívia guggoló pózban, összetett kézzel egy fesztivál teraszán – Kovács Olívia jógaoktató',
+    'private-yoga': 'Egyéni jógaóra Kovács Olíviával: fa póz (vrikshászana) egy világos jógateremben – privát jóga, egyéni online jóga',
+    # 2026-11-06 (Olivia, CRM chat): instead of the old round cut-outs; the old pictures' keywords stay after the description
+    'miert-joga': ('Csoportos hatha flow jógaóra egy tóparti fateraszon, a résztvevők felnyújtott karokkal ülnek – jóga 21. kerület, '
+                   'jóga 18. kerület, jóga 11. kerület, jóga Csepel, flow jóga, Kovács Olívia jógaoktató'),
+    'gyakoroljunk': ('Jógaóra egy hangtálakkal díszített jógateremben, a résztvevők a matracokon ülnek – jóga 11. kerület, Újbuda, '
+                     'Móricz, jóga XXI. kerület, jóga 18. kerület, jóga Csepel, jóga 21. kerület, Kovács Olívia jógaoktató'),
 }
 # Olivia (2026-11-06): „töröljük teljesen a jógaóra cégeknek mindenhonnan” – no page, the old address goes home (301)
 DELETED_PAGES = {'jógaóra-cégeknek'}
@@ -98,12 +102,12 @@ REPLACED_TEXT_START = ('Vásárlás után kérlek, vedd fel velem a kapcsolatot'
 DROPPED_LENGTHS = {'90 perc'}  # Árak: there are no 90-minute classes any more
 # Photos from the theme (Olivia's own, round 8) for the page heads; Hungarian alt text.
 THEME_PHOTOS = {
-    'olivia-golden-hour-arms': 'Kovács Olívia felnyújtott karokkal a meleg esti fényben',
-    'olivia-sunset-smile': 'Kovács Olívia jógaoktató mosolyog naplementekor',
+    'olivia-golden-hour-arms': 'Kovács Olívia felnyújtott karokkal a meleg esti fényben – élő online jóga, Kovács Olívia jógaoktató',
+    'olivia-sunset-smile': 'Kovács Olívia jógaoktató mosolyog naplementekor – hatha flow jóga és online jóga',
     'olivia-mandala-lunge': 'Kovács Olívia magas kitörésben egy mandala előtt',
     'olivia-terrace-profile': 'Kovács Olívia egy teraszon naplementekor, a távolba néz',
     'team-tree-pose-gym': 'Csapat fa pózban egy sportcsarnokban',
-    'studio-plants-class': 'Csoportos óra egy világos, növényekkel teli teremben',
+    'studio-plants-class': 'Csoportos jógaóra egy világos, növényekkel teli teremben – hatha flow jóga, Kovács Olívia jógaoktató',
     'white-studio-class': 'Ülő csoportos óra egy fehér teremben',
 }
 PAGE_PHOTO = {
@@ -283,7 +287,19 @@ def online_note():
             f'Időpontok, bérletek és foglalás: {a("home", "oliviajoga.online")}.</p></aside>')
 
 
+# The pictures' keyword file names (Áron, 26 November; tools/image_names.py): old key → new key, e.g. old/18bbeec02e8a →
+# old/alkalmas-joga-ajandekutalvany-nyomtatott-kartyan-csepel-18-kerulet. The keys inside the build stay the old ones.
+IMG_NAMES = {k: v for k, v in json.load(open(os.path.join(HERE, 'content', 'image-names.json'), encoding='utf-8')).items() if not k.startswith('_')}
+
+
+def img_rel(rel):
+    """img/old/18bbeec02e8a-800.jpg → img/old/<keyword name>-800.jpg (any size, any type)."""
+    m = re.fullmatch(r'img/((?:old|new|theme)/[^/]+?)((?:-(?:600|800|1200|1600))?\.\w+)', rel)
+    return 'img/' + IMG_NAMES[m.group(1)] + m.group(2) if m and m.group(1) in IMG_NAMES else rel
+
+
 def asset(rel):
+    rel = img_rel(rel)
     if WP:  # the photos come from the media folder (VPS: media_dir from this repo), the rest from the theme
         if rel.startswith('img/theme/'):
             return '%%THEME%%/assets/' + rel
@@ -373,6 +389,9 @@ def drop_xi(alt):
     for w in XI_WORDS:
         s = re.sub(w, ' ', s, flags=re.I)
     s = re.sub(r'\bjóga(\s+jóga\b)+', 'jóga', ' '.join(s.split()), flags=re.I)  # „jóga 11. kerület jóga csepel” → „jóga csepel”
+    s = re.sub(r'(\s*,)+(\s*(jóga)?\s*,)+', ',', s, flags=re.I)  # „jóga , , , jóga XXI.” → „jóga, jóga XXI.”
+    s = re.sub(r'(–|,)\s*(jóga\s*)?,', r'\1', s, flags=re.I)
+    s = re.sub(r'\s+,', ',', s)
     return re.sub(r'\s*\bjóga\s*$', '', s).strip(' ,') if s.strip().lower() != 'jóga' else ''
 
 
@@ -1868,6 +1887,7 @@ def wp_theme(pages, versions):
         '404': page_head({'t': 'h1', 'html': 'Az oldal nem található'}, '404', [('', 'Főoldal')], '', '', 'lilac')
                + f'<div class="container oj-flow"><p class="btn-row"><a class="btn btn--orchid" href="{esc(link(""))}">Főoldal</a></p></div>',
         '404_title': nf['title'], 'pages': pages, 'llms': versions.get('llms', ''), 'moved': versions.get('moved', {}),
+        'img_renamed': IMG_NAMES,  # the image positions chosen in the admin move with the new file names (setup)
     }
     os.makedirs(os.path.join(OUT, 'data'), exist_ok=True)
     json.dump(chrome, open(os.path.join(OUT, 'data', 'site.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=0)
@@ -1885,7 +1905,7 @@ def wp_theme(pages, versions):
     shutil.copy(os.path.join(THEME, 'assets', 'edit.css'), os.path.join(OUT, 'assets', 'edit.css'))
     for key in used:
         for w in (600, 1200):
-            shutil.copy(os.path.join(THEME, 'assets', 'img', f'{key}-{w}.jpg'), os.path.join(OUT, 'assets', 'img', 'theme', f'{key}-{w}.jpg'))
+            shutil.copy(os.path.join(THEME, 'assets', 'img', f'{key}-{w}.jpg'), os.path.join(OUT, 'assets', img_rel(f'img/theme/{key}-{w}.jpg')))
     print(f'{len(pages)} pages → WordPress theme {OUT} ({VERSION})')
 
 
@@ -2018,7 +2038,7 @@ def main():
     shutil.copy(os.path.join(HERE, 'assets', 'oliviajoga.js'), os.path.join(OUT, 'assets', 'oliviajoga.js'))
     for key in used:
         for w in (600, 1200):
-            shutil.copy(os.path.join(THEME, 'assets', 'img', f'{key}-{w}.jpg'), os.path.join(OUT, 'assets', 'img', 'theme', f'{key}-{w}.jpg'))
+            shutil.copy(os.path.join(THEME, 'assets', 'img', f'{key}-{w}.jpg'), os.path.join(OUT, 'assets', img_rel(f'img/theme/{key}-{w}.jpg')))
     shutil.copytree(os.path.join(HERE, 'assets', 'img', 'old'), os.path.join(OUT, 'assets', 'img', 'old'))
     shutil.copytree(os.path.join(HERE, 'assets', 'img', 'new'), os.path.join(OUT, 'assets', 'img', 'new'))
     shutil.copy(os.path.join(HERE, 'assets', 'img', 'barion-fizetes.svg'), os.path.join(OUT, 'assets', 'img', 'barion-fizetes.svg'))

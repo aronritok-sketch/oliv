@@ -90,10 +90,13 @@ def main():
                             src = build.card_key(t['href'][5:])
                         # the alt: the picture described, then every keyword of the old alt (build.better_alt, 2026-11-12)
                         alt = html.escape(build.better_alt(src, old_alt), quote=True)
-                        found = re.search(r'<img[^>]*' + re.escape(src) + r'-[^>]*alt="' + re.escape(alt) + '"', doc)
+                        # the file under its keyword name (Áron, 26 November: build.IMG_NAMES)
+                        named = lambda key: build.img_rel('img/' + key + '.jpg')[4:-4]  # noqa: E731 (old/<hash> → old/<keyword name>)
+                        fname = named(src if '/' in src else 'new/' + src)
+                        found = re.search(r'<img[^>]*' + re.escape(fname) + r'-[^>]*alt="' + re.escape(alt) + '"', doc)
                         if not found and build.card_key(p['path']) in NEW_PHOTOS:  # a post's head: her raw photo (11.12)
                             ck = build.card_key(p['path'])
-                            found = re.search(r'<img[^>]*' + re.escape(ck) + r'-[^>]*alt="' + re.escape(html.escape(build.better_alt(ck, old_alt), quote=True)) + '"', doc)
+                            found = re.search(r'<img[^>]*' + re.escape(named('new/' + ck)) + r'-[^>]*alt="' + re.escape(html.escape(build.better_alt(ck, old_alt), quote=True)) + '"', doc)
                         bare = lambda x: unicodedata.normalize('NFKD', x.lower()).encode('ascii', 'ignore').decode()  # noqa: E731 (kovacs = Kovács)
                         # every old keyword stays – except the 11th district's (Áron, 25 November: build.drop_xi)
                         words = [w for w in re.findall(r'\w+', bare(build.drop_xi(old_alt))) if len(w) > 2]
@@ -104,6 +107,16 @@ def main():
                     elif t['type'] == 'embed' and not any(r in t['src'] for r in build.REMOVED_EMBEDS):
                         ok(html.escape(t['src'], quote=True) in doc, f'/{p["path"]}: embed missing: {t["src"][:60]}')
         ok('href="page:' not in doc, f'/{p["path"]}: unresolved old link')
+    # Áron, 26 November: „kép fájlnevek tartalmazzák a szükséges kulcsszavakat ékezet nélkül, kötőjellel, az alt textek pedig
+    # szintén tartalmazzanak kulcsszavakat ékezetesen, spaceszel, a képet is leírva”
+    for path, doc in files.items():
+        for src, alt in re.findall(r'<img[^>]*\bsrc="[^"]*/assets/img/(?:old|new|theme)/([^"/]+)"[^>]*\balt="([^"]*)"', doc):
+            name = re.sub(r'(-(?:600|800|1200|1600))?\.\w+$', '', src)
+            ok(re.fullmatch(r'[a-z0-9]+(-[a-z0-9]+){3,}', name) is not None and not re.fullmatch(r'[0-9a-f]{12}', name),
+               f'/{path}: a picture without a keyword file name: {src}')
+            a = html.unescape(alt)
+            ok(len(a.split()) >= 5 and re.search(r'jóga|Kovács Olívia|kismama|hangfürdő|relaxáció|Fitmummy|Motibro', a, re.I) is not None,
+               f'/{path}: an alt without a description or keyword: {a[:70]}')
     # Áron, 25–26 November: no 11th-district words in any picture's alt; the home page invites to the online group class
     for path, doc in files.items():
         for alt in re.findall(r'<img[^>]*\balt="([^"]*)"', doc):

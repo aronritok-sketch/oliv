@@ -576,6 +576,11 @@ function oy_pose_sets() {
 	);
 }
 
+/** A pose photo's file name: the pose, its Sanskrit name, „joga-pajzsmirigy-kovacs-olivia” (halpoz-matszjaszana-…). */
+function oy_pose_file( $p ) {
+	return $p[0] . '-' . sanitize_title( remove_accents( $p[2] ) ) . '-joga-pajzsmirigy-kovacs-olivia';
+}
+
 function oy_poses( $set ) {
 	$sets = oy_pose_sets();
 	if ( ! isset( $sets[ $set ] ) ) {
@@ -585,8 +590,10 @@ function oy_poses( $set ) {
 	$base = get_template_directory_uri() . '/assets/img/poses/';
 	$out  = '<section class="oj-poses oj-poses--' . esc_attr( $s['tone'] ) . '"><h2 class="oj-poses__title">' . esc_html( $s['title'] ) . '</h2><p class="oj-poses__lead">' . esc_html( $s['lead'] ) . '</p><ul class="oj-poses__list">';
 	foreach ( $s['poses'] as $p ) {
-		$alt  = sprintf( 'Kovács Olívia: %1$s (%2$s)', mb_strtolower( $p[1] ), $p[2] );
-		$out .= '<li class="oj-pose"><img src="' . esc_url( $base . $p[0] . '-600.jpg' ) . '" srcset="' . esc_url( $base . $p[0] . '-600.jpg' ) . ' 600w, ' . esc_url( $base . $p[0] . '-900.jpg' ) . ' 900w" sizes="(min-width: 960px) 260px, (min-width: 600px) 45vw, 92vw" width="900" height="598" alt="' . esc_attr( $alt ) . '" loading="lazy" decoding="async">'
+		// Áron, 26 November: the file name with the keywords without accents, the alt with them and what the photo shows
+		$alt  = sprintf( '%1$s (%2$s) – Kovács Olívia mutatja be, jógaászana %3$s', $p[1], $p[2], 'tul' === $set ? 'pajzsmirigy-túlműködésre' : 'pajzsmirigy-alulműködésre' );
+		$file = oy_pose_file( $p );
+		$out .= '<li class="oj-pose"><img src="' . esc_url( $base . $file . '-600.jpg' ) . '" srcset="' . esc_url( $base . $file . '-600.jpg' ) . ' 600w, ' . esc_url( $base . $file . '-900.jpg' ) . ' 900w" sizes="(min-width: 960px) 260px, (min-width: 600px) 45vw, 92vw" width="900" height="598" alt="' . esc_attr( $alt ) . '" loading="lazy" decoding="async">'
 			. '<span class="oj-pose__name">' . esc_html( $p[1] ) . '</span><span class="oj-pose__sanskrit">' . esc_html( $p[2] ) . '</span></li>';
 	}
 	return $out . '</ul></section>';
