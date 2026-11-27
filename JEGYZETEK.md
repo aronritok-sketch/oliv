@@ -2423,6 +2423,20 @@
   - Ellenőrzés: iPhone 14 Pro emuláció, WebKit (Safari-motor). Minden nézet (Ma, Értesítések, Naptár, Több,
     Beállításaim, Kimutatások, Üzenetek, beszélgetés) legörgetve az alsó sáv fölött ér véget. Tesztek: 2080 sikeres,
     0 hibás.
+- **2026-11-27 – Olívia kész a Search Console-lal; /kapcsolat átirányítási hiba javítva (oliviajoga.hu 1.8.10).**
+  - **Olívia, 11.27:** „kész van minden”. Ellenőrizve:
+    - a régi Google Site él: „Weboldalam megújult. Látogass ide: oliviajoga.hu” és egy „Tovább” gomb az
+      `https://oliviajoga.hu?uj` címre; a régi aloldalak törölve;
+    - a .hu-n már csak a helyes oldaltérkép van (32 cím, 0 hiba);
+    - a /rolam és az /arak ma bekerült a Google-be;
+    - az indexelési keretet elérte, a cikkeket is kérné egyenként.
+  - **Hiba:** a /kapcsolat „Redirect error” volt. A .hu 302-vel (ideiglenesen) küldte a .online/kapcsolat/-ra, és közben
+    benne volt a .hu oldaltérképében. Ugyanez a /bejelentkezes-joga-berlet.
+  - **Javítás:**
+    - a két továbbküldő oldal 301-gyel (véglegesen) visz a .online-ra (Olívia nov. 16-i döntése szerint végleges);
+    - kikerülnek a .hu oldaltérképéből (`wp_sitemaps_posts_query_args`).
+  - check.py: 4390/0, `--after` 1385/0.
+
 - **2026-11-27 – A régi Google Site újra kell (az én hibás feladatom javítása).**
   - **A hiba:** nov. 26-án a Search Console-feladat (portál 186228637) 3. lépésében azt írtam Olíviának, hogy vonja vissza
     a régi Google Site közzétételét. Ő megcsinálta.

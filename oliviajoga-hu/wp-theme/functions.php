@@ -295,17 +295,36 @@ function oj_main() {
 	return oj_fill( do_shortcode( $html ) );
 }
 
-// From 26 November „Bejelentkezés & jóga bérlet” is her account on the online site (Olivia): straight there.
+// From 26 November „Bejelentkezés & jóga bérlet” is her account on the online site (Olivia): straight there. Permanent
+// (301): Search Console reported the temporary one as a „Redirect error” for /kapcsolat (27 November).
 add_action( 'template_redirect', function () {
 	if ( ! oj_after() || is_404() ) {
 		return;
 	}
 	$to = oj_data()['after']['redirect'][ oj_path() ] ?? '';
 	if ( '' !== $to ) {
-		wp_redirect( oj_fill( $to ), 302 ); // phpcs:ignore WordPress.Security.SafeRedirect -- her own online site
+		wp_redirect( oj_fill( $to ), 301 ); // phpcs:ignore WordPress.Security.SafeRedirect -- her own online site
 		exit;
 	}
 } );
+
+// A page that only forwards to the online site is not in this site's sitemap: Google indexes it there.
+add_filter( 'wp_sitemaps_posts_query_args', function ( $args, $post_type ) {
+	if ( 'page' !== $post_type || ! oj_after() ) {
+		return $args;
+	}
+	$ids = array();
+	foreach ( array_keys( (array) ( oj_data()['after']['redirect'] ?? array() ) ) as $path ) {
+		$page = get_page_by_path( (string) $path );
+		if ( $page ) {
+			$ids[] = (int) $page->ID;
+		}
+	}
+	if ( $ids ) {
+		$args['post__not_in'] = array_merge( (array) ( $args['post__not_in'] ?? array() ), $ids );
+	}
+	return $args;
+}, 10, 2 );
 
 /**
  * The old accented addresses (Áron, 25 November: „minden aloldal url slug legyen ékezet nélkül, kötőjellel”): /rólam,
