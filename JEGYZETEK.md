@@ -2423,6 +2423,25 @@
   - Ellenőrzés: iPhone 14 Pro emuláció, WebKit (Safari-motor). Minden nézet (Ma, Értesítések, Naptár, Több,
     Beállításaim, Kimutatások, Üzenetek, beszélgetés) legörgetve az alsó sáv fölött ér véget. Tesztek: 2080 sikeres,
     0 hibás.
+- **2026-11-27 – A régi Google Site újra kell (az én hibás feladatom javítása).**
+  - **A hiba:** nov. 26-án a Search Console-feladat (portál 186228637) 3. lépésében azt írtam Olíviának, hogy vonja vissza
+    a régi Google Site közzétételét. Ő megcsinálta.
+    - Ez ellentmondott a nov. 18-i döntésnek (lásd fent: a Google Site-nak élnie kell, egy gombbal).
+    - Következmény: akinek a böngészője megjegyezte a régi ELIN-es 301-et, az az oliviajoga.hu beírására Google 404-et
+      kapott. Áron iPhone-ján is ez történt.
+  - **Ellenőrzés:**
+    - az ELIN névszerverein az `@` és a `www` A-rekordja 37.148.205.64; nincs AAAA vagy CNAME;
+    - a szerver mindkét címre az új oldalt adja;
+    - a két `google-site-verification` TXT csak hitelesítés. A gyökéren lévő a Search Console domain-tulajdonhoz kell,
+      nem törölhető.
+  - **Javítva (Áron nevében):**
+    - a feladat 3. lépése: újraközzététel egyetlen lappal és egy gombbal az `https://oliviajoga.hu/?uj` címre, a
+      többi lap törlése, legalább egy évig így;
+    - a 4. pipa szövege;
+    - chatüzenet Olíviának (9149154), bocsánatkéréssel.
+  - **Ellenőrizni,** ha Olívia szól: a `sites.google.com/view/oliviajoga` 200-zal, a gombbal (most 302 a Google-belépésre).
+  - **Tanulság a közös szabályok közé:** DONTESEK 2026-11-27.
+
 - **2026-11-26 – Hub telefonon: maga az oldal görög; helyszíni fizetés és Motibro-mezők ki (olivia-studio 1.34.2, oliviajoga.online 3.12.50).**
   Áron: „amikor átkattintunk egy új fülre, akkor nem lehet görgetni … visszatérő probléma, szóval mindenhol javítsd” és
   „Nincs helyszíni fizetés … online fizetés van csak. Meg a motibrós azonosítókat … szedjük ki”.
